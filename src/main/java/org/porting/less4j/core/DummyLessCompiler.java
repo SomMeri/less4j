@@ -1,4 +1,4 @@
-package org.porting.less4j.core.parser;
+package org.porting.less4j.core;
 
 import org.porting.less4j.ILessCompiler;
 

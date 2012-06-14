@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.porting.less4j.core.parser.DummyLessCompiler;
+import org.porting.less4j.core.DummyLessCompiler;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
