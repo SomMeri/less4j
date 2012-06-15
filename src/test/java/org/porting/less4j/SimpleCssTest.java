@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -17,12 +16,12 @@ import org.porting.less4j.core.DummyLessCompiler;
  * 
  */
 @RunWith(Parameterized.class)
-public class LessJsTest extends AbstractFileBasedTest {
+public class SimpleCssTest extends AbstractFileBasedTest {
 
-  private static final String inputLessDir = "src\\test\\resources\\less.js\\less\\";
-  private static final String expectedCssDir = "src\\test\\resources\\less.js\\css\\";
+  private static final String inputLess = "src\\test\\resources\\less.js\\less\\css.less";
+  private static final String outputCss = "src\\test\\resources\\less.js\\css\\css.css";
 
-  public LessJsTest(File inputFile, File cssFile, String testName) {
+  public SimpleCssTest(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);
   }
 
@@ -31,27 +30,13 @@ public class LessJsTest extends AbstractFileBasedTest {
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    Collection<File> allFiles = FileUtils.listFiles(new File(inputLessDir), null, false);
     Collection<Object[]> result = new ArrayList<Object[]>();
-    for (File file : allFiles) {
-      result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
-    }
+    result.add(new Object[] { new File(inputLess), new File(outputCss), inputLess });
     return result;
   }
 
   protected ILessCompiler getCompiler() {
     return new DummyLessCompiler();
-  }
-
-  protected static File findCorrespondingCss(File lessFile) {
-    String lessFileName = lessFile.getName();
-    String cssFileName = convertToOutputFilename(lessFileName);
-    File cssFile = new File(expectedCssDir + cssFileName);
-    return cssFile;
-  }
-
-  private static String convertToOutputFilename(String name) {
-    return name.substring(0, name.length() - 5) + ".css";
   }
 
 }

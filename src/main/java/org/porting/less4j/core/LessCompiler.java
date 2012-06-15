@@ -1,5 +1,7 @@
 package org.porting.less4j.core;
 
+import java.util.List;
+
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -14,12 +16,16 @@ public class LessCompiler {
     try {
       // lexer splits input into tokens
       ANTLRStringStream input = new ANTLRStringStream(expression);
-      TokenStream tokens = new CommonTokenStream(new LessLexer(input));
+      LessLexer lexer = new LessLexer(input);
+      TokenStream tokens = new CommonTokenStream(lexer);
 
       // parser generates abstract syntax tree
       LessParser parser = new LessParser(tokens);
       LessParser.styleSheet_return ret = parser.styleSheet();
 
+      List<RecognitionException> allLexerErrors = lexer.getAllErrors();
+      List<RecognitionException> allParserErrors = parser.getAllErrors();
+      
       // acquire parse result
       CommonTree ast = (CommonTree) ret.getTree();
       printTree(ast);
