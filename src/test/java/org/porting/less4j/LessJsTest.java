@@ -1,17 +1,18 @@
 package org.porting.less4j;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.porting.less4j.core.DummyLessCompiler;
 
 /**
@@ -20,45 +21,35 @@ import org.porting.less4j.core.DummyLessCompiler;
  * from the master branch.
  * 
  */
+@RunWith(Parameterized.class)
 public class LessJsTest {
 
-  private static final String inputLessDir = "src\\test\\resources\\less\\";
-  private static final String expectedCssDir = "src\\test\\resources\\css\\";
+  private static final String inputLessDir = "src\\test\\resources\\less.js\\less\\";
+  private static final String expectedCssDir = "src\\test\\resources\\less.js\\css\\";
+  private final File inputFile;
 
-  //FIXME: each one of these should be a separate test, however this is manageable ugliness for the first prototype 
-  @Test
-  public void runAllTestsCount() throws Exception {
-    int count = 0;
-    Set<AssertionError> errors = new HashSet<AssertionError>();
+  public LessJsTest(File inputFile, String testName) {
+    this.inputFile = inputFile;
+  }
 
-    Iterator<File> it = FileUtils.iterateFiles(new File(inputLessDir), null, false);
-    while (it.hasNext()) {
-      count++;
-      File lessFile = it.next();
-      File cssFile = findCorrespondingCss(lessFile);
-      try {
-        testCompiler(lessFile, cssFile);
-      } catch (AssertionError ex) {
-        errors.add(ex);
-      }
+  //TODO: the alternative annotation is going to be usefull right after jUnit 11 comes out. It will contain
+  //nicer test name.
+  //@Parameters(name="Compile Less: {0}, {2}")
+  @Parameters()
+  public static Collection<Object[]> allTestsParameters() {
+    Collection<File> allFiles = FileUtils.listFiles(new File(inputLessDir), null, false);
+    Collection<Object[]> result = new ArrayList<Object[]>();
+    for (File file : allFiles) {
+      result.add(new Object[] { file, file.getName() });
     }
-
-    if (!errors.isEmpty()) {
-      String message = "Failed " + errors.size() + " out of " + count + " test cases. ";
-      fail(message);
-    }
+    return result;
   }
 
   @Test
   public void runAllTests() throws Exception {
-    Iterator<File> it = FileUtils.iterateFiles(new File(inputLessDir), null, false);
-    while (it.hasNext()) {
-      File lessFile = it.next();
-      File cssFile = findCorrespondingCss(lessFile);
-      // TODO it would be cool if each one of these would be a separate test
-      // in gui and report
-      testCompiler(lessFile, cssFile);
-    }
+    File lessFile = inputFile;
+    File cssFile = findCorrespondingCss(lessFile);
+    testCompiler(lessFile, cssFile);
   }
 
   protected void testCompiler(File lessFile, File cssFile) throws Exception {

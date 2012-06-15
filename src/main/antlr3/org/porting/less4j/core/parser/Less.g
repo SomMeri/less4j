@@ -67,7 +67,7 @@ imports
 media
     : MEDIA_SYM medium (COMMA medium)*
         LBRACE
-            ruleSet
+            declaration SEMI (declaration SEMI)*
         RBRACE
     ;
 
@@ -87,8 +87,16 @@ bodyset
     : ruleSet
     | media
     | page
+    | fontface
     ;   
     
+fontface
+    : FONT_FACE_SYM 
+        LBRACE
+            declaration SEMI (declaration SEMI)*
+        RBRACE
+    ;
+
 page
     : PAGE_SYM pseudoPage?
         LBRACE
@@ -100,9 +108,11 @@ pseudoPage
     : COLON IDENT
     ;
     
+//FIXME: opeq here is just a workaround
 operator
     : SOLIDUS
     | COMMA
+    | OPEQ
     |
     ;
     
@@ -188,8 +198,9 @@ pseudo
                 )?
     ;
 
+//malformed css may miss expression grrrr
 declaration
-    : property COLON expr prio?
+    : property COLON expr? prio?
     ;
     
 prio
@@ -303,9 +314,8 @@ fragment    NMCHAR      : '_'
 fragment    NAME        : NMCHAR+   ;
 
 fragment    URL         : ( 
-                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'-'|'~'
-                            | NONASCII
-                            | ESCAPE
+                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'-'|'~'|'/'|'.'
+                            | NMCHAR
                           )*
                         ;
 
@@ -568,10 +578,12 @@ STRING          : '\'' ( ~('\n'|'\r'|'\f'|'\'') )*
                           '"'
                         | { $type = INVALID; }
                     )
+                | NMCHAR
                 ;
 
 // -------------
 // Identifier.  Identifier tokens pick up properties names and values
+//
 //
 IDENT           : '-'? NMSTART NMCHAR*  ;
 
@@ -583,6 +595,7 @@ HASH            : '#' NAME              ;
 IMPORT_SYM      : '@' I M P O R T       ;
 PAGE_SYM        : '@' P A G E           ;
 MEDIA_SYM       : '@' M E D I A         ;
+FONT_FACE_SYM   : '@' F O N T MINUS F A C E ;
 CHARSET_SYM     : '@charset '           ;
 
 IMPORTANT_SYM   : '!' (WS|COMMENT)* I M P O R T A N T   ;
