@@ -32,7 +32,7 @@ public class LessJsTest {
     this.inputFile = inputFile;
   }
 
-  //TODO: the alternative annotation is going to be usefull right after jUnit 11 comes out. It will contain
+  //TODO: the alternative annotation is going to be useful right after jUnit 11 comes out. It will contain
   //nicer test name.
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
