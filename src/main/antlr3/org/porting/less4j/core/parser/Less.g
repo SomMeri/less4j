@@ -246,8 +246,11 @@ pseudo
     ;
 
 //malformed css may miss expression grrrr
+//declaration can refer also to a mixin
+//TODO declaration can contain nested ruleSet - not done yet
 declaration
     : property COLON expr? prio?
+    | IDENT
     ;
     
 prio

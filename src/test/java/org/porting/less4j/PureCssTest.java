@@ -2,6 +2,7 @@ package org.porting.less4j;
 
 import java.io.FileReader;
 
+import static org.junit.Assert.*;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.porting.less4j.core.LessCompiler;
@@ -13,19 +14,24 @@ public class PureCssTest {
   private static final String mini2 = "src\\test\\resources\\minitests\\css\\alphaOpacity.css";
   private static final String mini3 = "src\\test\\resources\\minitests\\css\\inputtype.css";
   
+  private static final String mixinLess = "src\\test\\resources\\minitests\\less\\mixins.less";
+  private static final String mixinCss = "src\\test\\resources\\minitests\\css\\mixins.css";
+
+  
   //FIXME: missing semicolons are not accepted
   //FIXME: operator = is only hack, 
   @Test
   public void test() throws Throwable {
     LessCompiler compiler = new LessCompiler();
-    compiler.compile(IOUtils.toString(new FileReader(mini3)));
+    compiler.compile(IOUtils.toString(new FileReader(mixinLess)));
+    assertTrue(compiler.getAllErrors().isEmpty());
 
-    compiler.compile(IOUtils.toString(new FileReader(mini1)));
-    compiler.compile(IOUtils.toString(new FileReader(mini2)));
-    compiler.compile(IOUtils.toString(new FileReader(mini3)));
-    compiler.compile(IOUtils.toString(new FileReader(inputLess)));
-    compiler.compile(IOUtils.toString(new FileReader(expectedCss)));
-    compiler.compileExpression("url(images/image.jpg)");
+//    compiler.compile(IOUtils.toString(new FileReader(mini1)));
+//    compiler.compile(IOUtils.toString(new FileReader(mini2)));
+//    compiler.compile(IOUtils.toString(new FileReader(mini3)));
+//    compiler.compile(IOUtils.toString(new FileReader(inputLess)));
+//    compiler.compile(IOUtils.toString(new FileReader(expectedCss)));
+//    compiler.compileExpression("url(images/image.jpg)");
   }
 
 }

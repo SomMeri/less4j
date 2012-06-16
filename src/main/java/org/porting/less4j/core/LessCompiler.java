@@ -1,5 +1,6 @@
 package org.porting.less4j.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.ANTLRStringStream;
@@ -12,8 +13,11 @@ import org.porting.less4j.core.parser.LessParser;
 
 public class LessCompiler {
 
+  private List<RecognitionException> errors = new ArrayList<RecognitionException>();
+
   public CommonTree compile(String expression) {
     try {
+      errors = new ArrayList<RecognitionException>();
       // lexer splits input into tokens
       ANTLRStringStream input = new ANTLRStringStream(expression);
       LessLexer lexer = new LessLexer(input);
@@ -23,8 +27,8 @@ public class LessCompiler {
       LessParser parser = new LessParser(tokens);
       LessParser.styleSheet_return ret = parser.styleSheet();
 
-      List<RecognitionException> allLexerErrors = lexer.getAllErrors();
-      List<RecognitionException> allParserErrors = parser.getAllErrors();
+      errors.addAll(lexer.getAllErrors());
+      errors.addAll(parser.getAllErrors());
       
       // acquire parse result
       CommonTree ast = (CommonTree) ret.getTree();
@@ -73,4 +77,8 @@ public class LessCompiler {
       }
   }
 
+  //add new method
+  public List<RecognitionException> getAllErrors() {
+    return new ArrayList<RecognitionException>(errors);
+  }
 }
