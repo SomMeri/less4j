@@ -135,8 +135,13 @@ bodyset
     | media
     | page
     | fontface
+    | variabledeclaration
     ;   
     
+variabledeclaration
+    : VARIABLE COLON expr SEMI
+    ;
+
 fontface
     : FONT_FACE_SYM 
         LBRACE
@@ -159,6 +164,9 @@ pseudoPage
 operator
     : SOLIDUS
     | COMMA
+    | STAR
+    | PLUS
+    | MINUS
     | OPEQ
     |
     ;
@@ -178,10 +186,11 @@ property
     : IDENT
     ;
     
+// ruleSet can contain other rulesets.  
 ruleSet
     : selector (COMMA selector)*
         LBRACE
-            declaration SEMI (declaration SEMI)*
+            ((declaration SEMI) | variabledeclaration | ruleSet | (combinator ruleSet) | ('&' COLON ruleSet))*
         RBRACE
     ;
     
@@ -272,6 +281,7 @@ term
             | ANGLE
             | TIME
             | FREQ
+            | VARIABLE
         )
     | STRING
     | IDENT (   // Function
@@ -648,6 +658,8 @@ MEDIA_SYM       : '@' M E D I A         ;
 FONT_FACE_SYM   : '@' F O N T MINUS F A C E ;
 CHARSET_SYM     : '@charset '           ;
 
+VARIABLE        : '@'+ NAME              ;
+
 IMPORTANT_SYM   : '!' (WS|COMMENT)* I M P O R T A N T   ;
 
 // ---------
@@ -724,7 +736,7 @@ NUMBER
 //
 URI :   U R L
         '('
-            ((WS)=>WS)? (URL|STRING) WS?
+            ((WS)=>WS)? (URL|STRING|VARIABLE) WS?
         ')'
     ;
 

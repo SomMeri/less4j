@@ -32,6 +32,7 @@ public class LessCompiler {
       
       // acquire parse result
       CommonTree ast = (CommonTree) ret.getTree();
+      
       printTree(ast);
       return ast;
     } catch (RecognitionException e) {

@@ -1,0 +1,7 @@
+.empty {
+}
+.empty:hover {
+}
+.empty > hello {
+}
+/* An empty rule should be compiled without errors.*/
