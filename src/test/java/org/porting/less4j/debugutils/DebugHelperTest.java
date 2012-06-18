@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.antlr.runtime.tree.CommonTree;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -57,7 +58,8 @@ public class DebugHelperTest {
   public void shouldParseWithoutErrors() throws Throwable {
     ASTParser compiler = new ASTParser();
     try {
-      compiler.compile(IOUtils.toString(new FileReader(file)));
+      CommonTree tree = compiler.compile(IOUtils.toString(new FileReader(file)));
+      DebugPrint.print(tree);
     } catch (Throwable th) {
       th.printStackTrace();
       fail(name + " " + th.toString());
@@ -76,7 +78,7 @@ public class DebugHelperTest {
 
   public static Collection<Object[]> singleTestsParameters() {
     Collection<Object[]> result = new ArrayList<Object[]>();
-    addFiles(result, new File(inputNot));
+    addFiles(result, new File(expectedCss));
     return result;
   }
 

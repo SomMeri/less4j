@@ -83,7 +83,6 @@ public class ASTParser {
   private CommonTree finalize(ParserRuleReturnScope ret) {
     collectErrors(lexer, parser);
     CommonTree ast = (CommonTree) ret.getTree();
-    printTree(ast);
     return ast;
   }
 
@@ -95,25 +94,6 @@ public class ASTParser {
   //add new method
   public List<RecognitionException> getAllErrors() {
     return new ArrayList<RecognitionException>(errors);
-  }
-
-  private void printTree(CommonTree ast) {
-    print(ast, 0);
-  }
-
-  private void print(CommonTree tree, int level) {
-    // indent level
-    for (int i = 0; i < level; i++)
-      System.out.print("--");
-
-    // print node description: type code followed by token text
-    System.out.println(" " + tree.getType() + " " + tree.getText());
-
-    // print all children
-    if (tree.getChildren() != null)
-      for (Object ie : tree.getChildren()) {
-        print((CommonTree) ie, level + 1);
-      }
   }
 
 }
