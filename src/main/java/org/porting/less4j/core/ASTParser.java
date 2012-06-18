@@ -7,7 +7,6 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.parser.LessLexer;
@@ -67,15 +66,6 @@ public class ASTParser {
     errors = new ArrayList<RecognitionException>();
     lexer = createLexer(expression);
     parser = createParser(lexer);
-    
-    LessLexer createLexer = createLexer(expression);
-    for (int i = 0; i < 20; i++) {
-      System.out.println(toString(createLexer.nextToken()));
-    }
-  }
-
-  private String toString(Token token) {
-    return " " + token.getType() + " " + token.getText();
   }
 
   private LessParser createParser(LessLexer lexer) {

@@ -10,6 +10,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
 import org.porting.less4j.core.ASTParser;
 import org.porting.less4j.core.parser.LessLexer;
+import org.porting.less4j.debugutils.DebugPrint;
 
 /**
  * Testing selectors parser.
@@ -65,6 +66,68 @@ public class SelectorsGrammarTest {
   public void notAttribute() {
     ASTParser compiler = new ASTParser();
     CommonTree tree = compiler.compileSelector("p:not([class*=\"lead\"]) {");
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  @Test
+  public void formulaAnb() {
+    ASTParser compiler = new ASTParser();
+    CommonTree tree = compiler.compileSelector("li:nth-child(4n+1) {");
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  @Test
+  public void formulaAnMinusb() {
+    DebugPrint.printTokenStream("li:nth-child(4n-1) {");
+    ASTParser compiler = new ASTParser();
+    CommonTree tree = compiler.compileSelector("li:nth-child(4n-1) {");
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  @Test
+  public void formulaAn() {
+    ASTParser compiler = new ASTParser();
+    CommonTree tree = compiler.compileSelector("li:nth-child(4n) {");
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  @Test
+  public void formulaMinusAn() {
+    ASTParser compiler = new ASTParser();
+    CommonTree tree = compiler.compileSelector("li:nth-child(-4n) {");
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  @Test
+  public void formulaMinusN() {
+    ASTParser compiler = new ASTParser();
+    CommonTree tree = compiler.compileSelector("li:nth-child(-n) {");
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  @Test
+  public void formulaEven() {
+    ASTParser compiler = new ASTParser();
+    //TODO ako je to s case sensitivity?
+    CommonTree tree = compiler.compileSelector("li:nth-child(even) {");
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  //FIXME: what happens when somebody names a class ODD or EVEN? it is quite likely,
+  //especially in CSS2
+  //TODO what does less.js do in this situation: nth-child(@variable+4) ???
+  @Test
+  public void formulaOdd() {
+    ASTParser compiler = new ASTParser();
+    //TODO ako je to s case sensitivity?
+    CommonTree tree = compiler.compileSelector("li:nth-child(odd) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }

@@ -200,7 +200,9 @@ property
     : IDENT
     ;
     
-// ruleSet can contain other rulesets.  
+// ruleSet can contain other rulesets.
+//TODO: this rule generates warning: Decision can match input such as "IDENT" using multiple alternatives: 1, 2
+//
 ruleSet
     : a+=selector (COMMA a+=selector)*
         LBRACE
@@ -267,8 +269,16 @@ pseudo
             IDENT
                 ( // Function
                 
-                    (LPAREN ( | simpleSelector| NUMBER) RPAREN) 
+                    (LPAREN ( | simpleSelector| NUMBER | nth) RPAREN) 
                 )?
+    ;
+
+//see http://www.w3.org/TR/selectors/#nth-child-pseudo
+nth
+    : (PLUS | MINUS)? (REPEATER | N) ((PLUS | MINUS) NUMBER)?
+    | (PLUS | MINUS) NUMBER
+    | ODD
+    | EVEN
     ;
 
 //malformed css may miss expression grrrr
@@ -699,7 +709,7 @@ fragment    LENGTH      :;  // 'px'. 'cm', 'mm', 'in'. 'pt', 'pc'
 fragment    ANGLE       :;  // 'deg', 'rad', 'grad'
 fragment    TIME        :;  // 'ms', 's'
 fragment    FREQ        :;  // 'khz', 'hz'
-fragment    REPEATER    :;   // n found in n-th child formulas
+fragment    REPEATER    :;   // n found in n-th child formulas if I would not do that, the dimension would eat it. TODO: maybe multiple small grammars for different css aspects would be nicer. 
 fragment    DIMENSION   :;  // nnn'Somethingnotyetinvented'
 fragment    PERCENTAGE  :;  // '%'
 
@@ -765,6 +775,10 @@ URI :   U R L
             ((WS)=>WS)? (URL|STRING) WS?
         ')'
     ;
+
+// odd and even for nth-child FIXME: this will each a class name ODD too!!!
+ODD: O D D;
+EVEN: E V E N;
 
 // -------------
 // Whitespace.  Though the W3 standard shows a Yacc/Lex style parser and lexer
