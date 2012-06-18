@@ -10,25 +10,22 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.core.parser.LessParser;
+import org.porting.less4j.core.parser.LessParser.declaration_return;
+import org.porting.less4j.core.parser.LessParser.expr_return;
 
-public class LessCompiler {
+public class ASTParser {
 
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
 
   public CommonTree compile(String expression) {
     try {
-      errors = new ArrayList<RecognitionException>();
-      // lexer splits input into tokens
-      ANTLRStringStream input = new ANTLRStringStream(expression);
-      LessLexer lexer = new LessLexer(input);
-      TokenStream tokens = new CommonTokenStream(lexer);
+      cleanErrors();
 
-      // parser generates abstract syntax tree
-      LessParser parser = new LessParser(tokens);
+      LessLexer lexer = createLexer(expression);
+      LessParser parser = createParser(lexer);
       LessParser.styleSheet_return ret = parser.styleSheet();
 
-      errors.addAll(lexer.getAllErrors());
-      errors.addAll(parser.getAllErrors());
+      collectErrors(lexer, parser);
       
       // acquire parse result
       CommonTree ast = (CommonTree) ret.getTree();
@@ -40,15 +37,35 @@ public class LessCompiler {
     }
   }
 
-  public CommonTree compileExpression(String expression) {
-    try {
-      // lexer splits input into tokens
-      ANTLRStringStream input = new ANTLRStringStream(expression);
-      TokenStream tokens = new CommonTokenStream(new LessLexer(input));
+  private void collectErrors(LessLexer lexer, LessParser parser) {
+    errors.addAll(lexer.getAllErrors());
+    errors.addAll(parser.getAllErrors());
+  }
 
-      // parser generates abstract syntax tree
-      LessParser parser = new LessParser(tokens);
-      LessParser.expr_return ret = parser.expr();
+  private void cleanErrors() {
+    errors = new ArrayList<RecognitionException>();
+  }
+
+  private LessParser createParser(LessLexer lexer) {
+    TokenStream tokens = new CommonTokenStream(lexer);
+    LessParser parser = new LessParser(tokens);
+    return parser;
+  }
+
+  private LessLexer createLexer(String expression) {
+    ANTLRStringStream input = new ANTLRStringStream(expression);
+    LessLexer lexer = new LessLexer(input);
+    return lexer;
+  }
+
+  public CommonTree compileDeclaration(String expression) {
+    try {
+      cleanErrors();
+      LessLexer lexer = createLexer(expression);
+      LessParser parser = createParser(lexer);
+      declaration_return ret = parser.declaration();
+
+      collectErrors(lexer, parser);
 
       // acquire parse result
       CommonTree ast = (CommonTree) ret.getTree();
@@ -81,5 +98,23 @@ public class LessCompiler {
   //add new method
   public List<RecognitionException> getAllErrors() {
     return new ArrayList<RecognitionException>(errors);
+  }
+
+  public CommonTree compileExpression(String expression) {
+    try {
+      cleanErrors();
+      LessLexer lexer = createLexer(expression);
+      LessParser parser = createParser(lexer);
+      expr_return ret = parser.expr();
+
+      collectErrors(lexer, parser);
+
+      // acquire parse result
+      CommonTree ast = (CommonTree) ret.getTree();
+      printTree(ast);
+      return ast;
+    } catch (RecognitionException e) {
+      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
+    }
   }
 }

@@ -24,6 +24,16 @@ options {
     output = AST;
 }
 
+tokens {  
+//  VARIABLE_DECLARATION;
+  EXPRESSION;
+//  VARIABLE_REFERENCE;
+  RULESET;
+  SELECTOR;
+  EXPRESSION;
+  EMPTY_SEPARATOR;
+}  
+
 @lexer::header {
   package org.porting.less4j.core.parser;
 }
@@ -135,12 +145,16 @@ bodyset
     | media
     | page
     | fontface
-    | variabledeclaration
+//    | variabledeclaration
     ;   
     
-variabledeclaration
-    : VARIABLE COLON expr SEMI
-    ;
+//variabledeclaration
+//    : VARIABLE COLON expr SEMI -> ^(VARIABLE_DECLARATION VARIABLE expr)
+//    ;
+//
+//variablereference
+//    : '@' VARIABLE -> ^(VARIABLE_REFERENCE VARIABLE)
+//    ;
 
 fontface
     : FONT_FACE_SYM 
@@ -168,7 +182,7 @@ operator
     | PLUS
     | MINUS
     | OPEQ
-    |
+    | (-> EMPTY_SEPARATOR) 
     ;
     
 combinator
@@ -188,14 +202,16 @@ property
     
 // ruleSet can contain other rulesets.  
 ruleSet
-    : selector (COMMA selector)*
+    : a+=selector (COMMA a+=selector)*
         LBRACE
-            ((declaration SEMI) | variabledeclaration | ruleSet | (combinator ruleSet) | ('&' COLON ruleSet))*
+            ((b+=declaration SEMI) /*| b+=variabledeclaration*/ | (b+=combinator b+=ruleSet) | ('&' COLON b+=ruleSet))*
         RBRACE
+     -> ^(RULESET $a* $b*)
     ;
     
 selector
-    : simpleSelector (combinator simpleSelector)*
+    : a=simpleSelector (b+=combinator c+=simpleSelector)*
+    -> ^(SELECTOR $a ^($b $c)*)
     ;
 
 simpleSelector
@@ -256,7 +272,6 @@ pseudo
 
 //malformed css may miss expression grrrr
 //declaration can refer also to a mixin
-//TODO declaration can contain nested ruleSet - not done yet
 declaration
     : property COLON expr? prio?
     | IDENT
@@ -267,7 +282,7 @@ prio
     ;
     
 expr
-    : term (operator term)*
+    : a=term (b+=operator c+=term)* -> ^(EXPRESSION $a ($b $c)*)
     ;
     
 term
@@ -281,14 +296,15 @@ term
             | ANGLE
             | TIME
             | FREQ
-            | VARIABLE
+//            | VARIABLE
         )
     | STRING
     | IDENT (   // Function
                 LPAREN expr RPAREN
             )?
     | URI
-    | hexColor
+//    | variablereference
+    | hexColor  
     ;
     
 hexColor
@@ -372,15 +388,17 @@ fragment    NMCHAR      : '_'
                         ;
                         
 fragment    NAME        : NMCHAR+   ;
+fragment    UNKNOWN_DIMENSION        : NMSTART NMCHAR*   ;
 
+// The original URL did not allowed characters and . 
 fragment    URL         : ( 
-                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'-'|'~'|'/'|'.'
+                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'
                             | NMCHAR
                           )*
                         ;
 
                         
-// Basic Alpha characters in upper, lower and escaped form. Note that
+// Basic Alpha characters in upper, lower and escaped form. Note that   
 // whitespace and newlines are unimportant even within keywords. We do not
 // however call a further fragment rule to consume these characters for
 // reasons of performance - the rules are still eminently readable.
@@ -625,7 +643,9 @@ DOT             : '.'       ;
 
 // -----------------
 // Literal strings. Delimited by either ' or "
-//
+// original grammar considered a single isolated letter to be a string too. 
+// therefore  h1, h2 > a > p, h3 would be tokenized as IDENT COLON IDENT GREATER STRING GREATER STRING ...
+// removed that option
 fragment    INVALID :;
 STRING          : '\'' ( ~('\n'|'\r'|'\f'|'\'') )* 
                     (
@@ -638,7 +658,6 @@ STRING          : '\'' ( ~('\n'|'\r'|'\f'|'\'') )*
                           '"'
                         | { $type = INVALID; }
                     )
-                | NMCHAR
                 ;
 
 // -------------
@@ -658,7 +677,7 @@ MEDIA_SYM       : '@' M E D I A         ;
 FONT_FACE_SYM   : '@' F O N T MINUS F A C E ;
 CHARSET_SYM     : '@charset '           ;
 
-VARIABLE        : '@'+ NAME              ;
+//VARIABLE        : '@' NAME              ;
 
 IMPORTANT_SYM   : '!' (WS|COMMENT)* I M P O R T A N T   ;
 
@@ -681,9 +700,10 @@ fragment    FREQ        :;  // 'khz', 'hz'
 fragment    DIMENSION   :;  // nnn'Somethingnotyetinvented'
 fragment    PERCENTAGE  :;  // '%'
 
+// there is no reason to require a dot inside a number
 NUMBER
     :   (
-              '0'..'9' ('.' '0'..'9'+)?
+              '0'..'9' ('.'? '0'..'9'+)?
             | '.' '0'..'9'+
         )
         (
@@ -723,7 +743,7 @@ NUMBER
             | (K? H Z)=>
                 K? H    Z   { $type = FREQ;         }
             
-            | IDENT         { $type = DIMENSION;    }
+            | UNKNOWN_DIMENSION         { $type = DIMENSION;    }
             
             | '%'           { $type = PERCENTAGE;   }
             
@@ -733,10 +753,10 @@ NUMBER
 
 // ------------
 // url and uri.
-//
+//TODO this gives warning, but we have to handle it differently thanks to variables
 URI :   U R L
         '('
-            ((WS)=>WS)? (URL|STRING|VARIABLE) WS?
+            ((WS)=>WS)? (URL|STRING) WS?
         ')'
     ;
 
