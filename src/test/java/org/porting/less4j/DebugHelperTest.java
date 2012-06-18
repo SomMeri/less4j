@@ -11,23 +11,24 @@ import java.util.Collection;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.porting.less4j.core.ASTParser;
 
 @RunWith(Parameterized.class)
-public class ParserTest {
+public class DebugHelperTest {
 
   private static final String inputDir = "src\\test\\resources\\minitests\\css\\";
+  @SuppressWarnings("unused")
   private static final String rulesets = "src\\test\\resources\\minitests\\css\\rulesets.less";
   private static final String empty = "src\\test\\resources\\minitests\\css\\emptyRule.css";
   private static final String variable = "src\\test\\resources\\minitests\\css\\variablesNoCommentsNoMixins.less";
-  //private static final String variable = "src\\test\\resources\\minitests\\css\\variablesMini.less";
-  
+  private static final String variableMini = "src\\test\\resources\\minitests\\css\\variablesMini.less";
+
   private static final String inputCss21 = "src\\test\\resources\\minitests\\less\\css.less";
-  private static final String inputCss3 = "src\\test\\resources\\minitests\\less\\css-3.less";
+  private static final String inputCss3 = "src\\test\\resources\\minitests\\css\\css-3.less";
+  private static final String inputNot = "src\\test\\resources\\minitests\\css\\cssNot.less";
   private static final String expectedCss = "src\\test\\resources\\less.js\\css\\css.css";
   private static final String urlCss = "src\\test\\resources\\minitests\\css\\url.css";
   private static final String urlVariable = "src\\test\\resources\\minitests\\css\\urlWithVariable.css";
@@ -42,7 +43,7 @@ public class ParserTest {
 
   private String name;
 
-  public ParserTest(File file, String name) {
+  public DebugHelperTest(File file, String name) {
     this.file = file;
     this.name = name;
   }
@@ -50,15 +51,16 @@ public class ParserTest {
   // FIXME: missing semicolons are not accepted
   // FIXME: operator = is only hack,
   // FIXME: @@name is OK, is @@@name also OK?
-  // FIXME: special URLs url(data:something) are not accepted 
+  // FIXME: special URLs url(data:something) are not accepted
+  // It also accepts the ‘even’ and ‘odd’ values as arguments.(for n-th argument)
   @Test
   public void shouldParseWithoutErrors() throws Throwable {
     ASTParser compiler = new ASTParser();
-    try{
-    compiler.compile(IOUtils.toString(new FileReader(file)));
+    try {
+      compiler.compile(IOUtils.toString(new FileReader(file)));
     } catch (Throwable th) {
       th.printStackTrace();
-      fail(name + " " +  th.toString());
+      fail(name + " " + th.toString());
     }
     assertTrue(name, compiler.getAllErrors().isEmpty());
   }
@@ -74,7 +76,7 @@ public class ParserTest {
 
   public static Collection<Object[]> singleTestsParameters() {
     Collection<Object[]> result = new ArrayList<Object[]>();
-    addFiles(result, new File(inputCss21));
+    addFiles(result, new File(inputNot));
     return result;
   }
 

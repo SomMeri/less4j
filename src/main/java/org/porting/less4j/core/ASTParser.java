@@ -5,45 +5,77 @@ import java.util.List;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.core.parser.LessParser;
-import org.porting.less4j.core.parser.LessParser.declaration_return;
-import org.porting.less4j.core.parser.LessParser.expr_return;
 
+/**
+ * This class is NOT thread safe. 
+ *
+ */
 public class ASTParser {
 
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
+  private LessLexer lexer;
+  private LessParser parser;
 
   public CommonTree compile(String expression) {
     try {
-      cleanErrors();
-
-      LessLexer lexer = createLexer(expression);
-      LessParser parser = createParser(lexer);
-      LessParser.styleSheet_return ret = parser.styleSheet();
-
-      collectErrors(lexer, parser);
-      
-      // acquire parse result
-      CommonTree ast = (CommonTree) ret.getTree();
-      
-      printTree(ast);
-      return ast;
+      initialize(expression);
+      ParserRuleReturnScope ret = parser.styleSheet();
+      return finalize(ret);
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");
     }
   }
 
-  private void collectErrors(LessLexer lexer, LessParser parser) {
-    errors.addAll(lexer.getAllErrors());
-    errors.addAll(parser.getAllErrors());
+  public CommonTree compileDeclaration(String expression) {
+    try {
+      initialize(expression);
+      ParserRuleReturnScope ret = parser.declaration();
+      return finalize(ret);
+    } catch (RecognitionException e) {
+      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
+    }
+  }
+  
+  public CommonTree compileExpression(String expression) {
+    try {
+      initialize(expression);
+      ParserRuleReturnScope ret = parser.expr();
+      return finalize(ret);
+    } catch (RecognitionException e) {
+      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
+    }
   }
 
-  private void cleanErrors() {
+  public CommonTree compileSelector(String selector) {
+    try {
+      initialize(selector);
+      ParserRuleReturnScope ret = parser.selector();
+      return finalize(ret);
+    } catch (RecognitionException e) {
+      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
+    }
+  }
+
+  private void initialize(String expression) {
     errors = new ArrayList<RecognitionException>();
+    lexer = createLexer(expression);
+    parser = createParser(lexer);
+    
+    LessLexer createLexer = createLexer(expression);
+    for (int i = 0; i < 20; i++) {
+      System.out.println(toString(createLexer.nextToken()));
+    }
+  }
+
+  private String toString(Token token) {
+    return " " + token.getType() + " " + token.getText();
   }
 
   private LessParser createParser(LessLexer lexer) {
@@ -58,24 +90,23 @@ public class ASTParser {
     return lexer;
   }
 
-  public CommonTree compileDeclaration(String expression) {
-    try {
-      cleanErrors();
-      LessLexer lexer = createLexer(expression);
-      LessParser parser = createParser(lexer);
-      declaration_return ret = parser.declaration();
-
-      collectErrors(lexer, parser);
-
-      // acquire parse result
-      CommonTree ast = (CommonTree) ret.getTree();
-      printTree(ast);
-      return ast;
-    } catch (RecognitionException e) {
-      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
-    }
+  private CommonTree finalize(ParserRuleReturnScope ret) {
+    collectErrors(lexer, parser);
+    CommonTree ast = (CommonTree) ret.getTree();
+    printTree(ast);
+    return ast;
   }
-  
+
+  private void collectErrors(LessLexer lexer, LessParser parser) {
+    errors.addAll(lexer.getAllErrors());
+    errors.addAll(parser.getAllErrors());
+  }
+
+  //add new method
+  public List<RecognitionException> getAllErrors() {
+    return new ArrayList<RecognitionException>(errors);
+  }
+
   private void printTree(CommonTree ast) {
     print(ast, 0);
   }
@@ -95,26 +126,4 @@ public class ASTParser {
       }
   }
 
-  //add new method
-  public List<RecognitionException> getAllErrors() {
-    return new ArrayList<RecognitionException>(errors);
-  }
-
-  public CommonTree compileExpression(String expression) {
-    try {
-      cleanErrors();
-      LessLexer lexer = createLexer(expression);
-      LessParser parser = createParser(lexer);
-      expr_return ret = parser.expr();
-
-      collectErrors(lexer, parser);
-
-      // acquire parse result
-      CommonTree ast = (CommonTree) ret.getTree();
-      printTree(ast);
-      return ast;
-    } catch (RecognitionException e) {
-      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
-    }
-  }
 }

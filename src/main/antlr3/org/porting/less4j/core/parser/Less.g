@@ -179,10 +179,10 @@ operator
     : SOLIDUS
     | COMMA
     | STAR
-    | PLUS
-    | MINUS
+    | (PLUS)=>PLUS //TODO:why do I have to do this with plus and minus?
+    | (MINUS)=>MINUS
     | OPEQ
-    | (-> EMPTY_SEPARATOR) 
+    | ( -> EMPTY_SEPARATOR) 
     ;
     
 combinator
@@ -231,7 +231,7 @@ elementSubsequent
     | attrib
     | pseudo
     ;
-    
+
 cssClass
     : DOT IDENT
     ;
@@ -240,11 +240,11 @@ elementName
     : IDENT
     | STAR
     ;
-    
+
 attrib
     : LBRACKET
     
-        IDENT
+        IDENT STAR?
         
             (
                 (
@@ -255,6 +255,7 @@ attrib
                 (
                       IDENT
                     | STRING
+                    | NUMBER
                 )       
             )?
     
@@ -262,11 +263,11 @@ attrib
 ;
 
 pseudo
-    : COLON 
+    : COLON COLON? 
             IDENT
                 ( // Function
                 
-                    LPAREN IDENT? RPAREN
+                    (LPAREN ( | simpleSelector| NUMBER) RPAREN) 
                 )?
     ;
 
@@ -390,9 +391,10 @@ fragment    NMCHAR      : '_'
 fragment    NAME        : NMCHAR+   ;
 fragment    UNKNOWN_DIMENSION        : NMSTART NMCHAR*   ;
 
-// The original URL did not allowed characters and . 
+// The original URL did not allowed characters, '.', '=', ':', ';', ','  and so on
+// TODO: For now, I added only those characters that appear in less.js css test case.
 fragment    URL         : ( 
-                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'
+                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'|'='|':'|';'|','|'\r'|'\n'|'\t'|' '|'+'
                             | NMCHAR
                           )*
                         ;
@@ -697,6 +699,7 @@ fragment    LENGTH      :;  // 'px'. 'cm', 'mm', 'in'. 'pt', 'pc'
 fragment    ANGLE       :;  // 'deg', 'rad', 'grad'
 fragment    TIME        :;  // 'ms', 's'
 fragment    FREQ        :;  // 'khz', 'hz'
+fragment    REPEATER    :;   // n found in n-th child formulas
 fragment    DIMENSION   :;  // nnn'Somethingnotyetinvented'
 fragment    PERCENTAGE  :;  // '%'
 
@@ -742,6 +745,9 @@ NUMBER
                 
             | (K? H Z)=>
                 K? H    Z   { $type = FREQ;         }
+
+            | (N)=>
+                N           { $type = REPEATER;         }
             
             | UNKNOWN_DIMENSION         { $type = DIMENSION;    }
             

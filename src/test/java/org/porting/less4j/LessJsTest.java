@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -16,6 +17,7 @@ import org.porting.less4j.core.DummyLessCompiler;
  * from the master branch.
  * 
  */
+@Ignore
 @RunWith(Parameterized.class)
 public class LessJsTest extends AbstractFileBasedTest {
 
