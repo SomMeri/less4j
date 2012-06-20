@@ -1,10 +1,8 @@
 package org.porting.less4j.grammar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Iterator;
+import static org.porting.less4j.grammar.GrammarAsserts.assertChilds;
+import static org.porting.less4j.grammar.GrammarAsserts.assertValid;
+import static org.porting.less4j.grammar.GrammarAsserts.assertValidSelector;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
@@ -26,6 +24,7 @@ import org.porting.less4j.debugutils.DebugPrint;
  * * http://www.w3.org/TR/selectors/
  * 
  * TODO: those :nth-of-type() type selectors are not covered by the grammar
+ * TODO add tests for what is in this document: http://www.w3.org/TR/selectors/#nth-child-pseudo
  * 
  */
 public class SelectorsGrammarTest {
@@ -69,6 +68,19 @@ public class SelectorsGrammarTest {
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
+  
+  @Test
+  public void stylesheetWithMultipleFormulas() {
+    String combined_stylesheet = "li:nth-child(4n+1),\n" +
+        "li:nth-child(-5n),\n" +
+        "li:nth-child(-n+2) {\n" +
+        "  color: white;\n" +
+        "}";
+    
+    ASTParser compiler = new ASTParser();
+    compiler.compile(combined_stylesheet);
+    assertValid(compiler);
+  }
 
   @Test
   public void formulaAnb() {
@@ -80,7 +92,6 @@ public class SelectorsGrammarTest {
 
   @Test
   public void formulaAnMinusb() {
-    DebugPrint.printTokenStream("li:nth-child(4n-1) {");
     ASTParser compiler = new ASTParser();
     CommonTree tree = compiler.compileSelector("li:nth-child(4n-1) {");
     assertValidSelector(compiler, tree);
@@ -112,6 +123,16 @@ public class SelectorsGrammarTest {
   }
 
   @Test
+  public void formulaMinusNMinus() {
+    ASTParser compiler = new ASTParser();
+    String selector = "li:nth-child(-n+2) {";
+    DebugPrint.printTokenStream(selector);
+    CommonTree tree = compiler.compileSelector(selector);
+    assertValidSelector(compiler, tree);
+    //TODO test also structure (once we decide what is it going to be)
+  }
+
+  @Test
   public void formulaEven() {
     ASTParser compiler = new ASTParser();
     //TODO ako je to s case sensitivity?
@@ -130,24 +151,6 @@ public class SelectorsGrammarTest {
     CommonTree tree = compiler.compileSelector("li:nth-child(odd) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
-  }
-
-  private void assertValidSelector(ASTParser compiler, CommonTree tree) {
-    assertTrue(compiler.getAllErrors().isEmpty());
-    assertEquals(LessLexer.SELECTOR, tree.getType());
-  }
-
-  @SuppressWarnings("rawtypes")
-  private void assertChilds(CommonTree tree, int... childType) {
-    Iterator kids = tree.getChildren().iterator();
-    for (int type : childType) {
-      if (!kids.hasNext())
-        fail("Some children are missing.");
-
-      CommonTree kid = (CommonTree) kids.next();
-      assertEquals(type, kid.getType());
-    }
-
   }
 
 }

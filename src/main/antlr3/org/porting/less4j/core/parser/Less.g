@@ -31,7 +31,10 @@ tokens {
   RULESET;
   SELECTOR;
   EXPRESSION;
-  EMPTY_SEPARATOR;
+  //ANTLR seems to generate null pointers exceptions on malformed css if 
+  //rules match nothig and generate an empty token 
+  EMPTY_SEPARATOR; 
+  EMPTY_COMBINATOR;
 }  
 
 @lexer::header {
@@ -96,7 +99,7 @@ tokens {
 // of imports, and then the main body of style rules.
 //
 styleSheet  
-    :   charSet
+    :   charSet?
         imports*
         bodylist
      EOF
@@ -104,10 +107,9 @@ styleSheet
     
 // -----------------
 // Character set.   Picks up the user specified character set, should it be present.
-//
+// Removed an empty option from this rule, ANTLR seems to have problems with this.
 charSet
     :   CHARSET_SYM STRING SEMI
-    |
     ;
 
 // ---------
@@ -188,7 +190,7 @@ operator
 combinator
     : PLUS
     | GREATER
-    |
+    | ( -> EMPTY_COMBINATOR)
     ;
     
 unaryOperator
@@ -276,7 +278,7 @@ pseudo
 //see http://www.w3.org/TR/selectors/#nth-child-pseudo
 nth
     : (PLUS | MINUS)? (REPEATER | N) ((PLUS | MINUS) NUMBER)?
-    | (PLUS | MINUS) NUMBER
+    | (PLUS | MINUS)? NUMBER
     | ODD
     | EVEN
     ;

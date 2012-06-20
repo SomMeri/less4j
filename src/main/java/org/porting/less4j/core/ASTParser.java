@@ -7,7 +7,6 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.core.parser.LessParser;
@@ -69,8 +68,11 @@ public class ASTParser {
   }
 
   private LessParser createParser(LessLexer lexer) {
-    TokenStream tokens = new CommonTokenStream(lexer);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
     LessParser parser = new LessParser(tokens);
+    //TODO: attach comments and whitespaces to tokens 
+    //how to do it: get token position and attach all previous whitespaces, comments and whatever
+    //parser.setTreeAdaptor(new HiddenAwareTreeAdaptor());
     return parser;
   }
 
@@ -97,3 +99,33 @@ public class ASTParser {
   }
 
 }
+
+//class HiddenAwareTreeAdaptor extends CommonTreeAdaptor implements TreeAdaptor {
+//
+//  @Override
+//  public Object dupNode(Object t) {
+//    // TODO Auto-generated method stub
+//    return super.dupNode(t);
+//  }
+//
+//  @Override
+//  public Object create(Token payload) {
+//    int tokenIndex = payload.getTokenIndex();
+//    // TODO Auto-generated method stub
+//    return super.create(payload);
+//  }
+//
+//  @Override
+//  public Token createToken(int tokenType, String text) {
+//    // TODO Auto-generated method stub
+//    return super.createToken(tokenType, text);
+//  }
+//
+//  @Override
+//  public Token createToken(Token fromToken) {
+//    // TODO Auto-generated method stub
+//    return super.createToken(fromToken);
+//  }
+//  
+//}
+//

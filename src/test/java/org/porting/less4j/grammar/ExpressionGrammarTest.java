@@ -1,10 +1,8 @@
 package org.porting.less4j.grammar;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Iterator;
+import static org.porting.less4j.grammar.GrammarAsserts.assertChilds;
+import static org.porting.less4j.grammar.GrammarAsserts.assertValidExpression;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
@@ -89,24 +87,6 @@ public class ExpressionGrammarTest {
     assertValidExpression(compiler, tree);
     assertEquals(1, tree.getChildren().size());
     assertEquals(LessLexer.NUMBER, tree.getChild(0).getType());
-  }
-
-  private void assertValidExpression(ASTParser compiler, CommonTree tree) {
-    assertTrue(compiler.getAllErrors().isEmpty());
-    assertEquals(LessLexer.EXPRESSION, tree.getType());
-  }
-
-  @SuppressWarnings("rawtypes")
-  private void assertChilds(CommonTree tree, int... childType) {
-    Iterator kids = tree.getChildren().iterator();
-    for (int type : childType) {
-      if (!kids.hasNext())
-        fail("Some children are missing.");
-
-      CommonTree kid = (CommonTree) kids.next();
-      assertEquals(type, kid.getType());
-    }
-
   }
 
 }

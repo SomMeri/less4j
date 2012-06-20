@@ -30,7 +30,7 @@ public class DebugPrint {
     print(ast, 0);
   }
 
-  public static void print(CommonTree tree, int level) {
+  private static void print(CommonTree tree, int level) {
     // indent level
     for (int i = 0; i < level; i++)
       System.out.print("--");

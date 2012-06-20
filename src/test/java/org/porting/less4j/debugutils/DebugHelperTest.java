@@ -78,7 +78,7 @@ public class DebugHelperTest {
 
   public static Collection<Object[]> singleTestsParameters() {
     Collection<Object[]> result = new ArrayList<Object[]>();
-    addFiles(result, new File(expectedCss));
+    addFiles(result, new File(inputCss3));
     return result;
   }
 
