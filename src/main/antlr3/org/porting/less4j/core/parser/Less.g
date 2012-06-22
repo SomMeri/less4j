@@ -44,6 +44,7 @@ tokens {
   CSS_CLASS;
   SIMPLE_SELECTOR;
   PSEUDO;
+  ATTRIBUTE;
 }  
 
 @lexer::header {
@@ -256,24 +257,27 @@ elementName
     ;
 
 attrib
-    : LBRACKET
+    : (LBRACKET
     
-        IDENT STAR?
-        
+        a+=IDENT        
             (
                 (
-                      OPEQ
-                    | INCLUDES
-                    | DASHMATCH
+                      a+=OPEQ
+                    | a+=INCLUDES
+                    | a+=DASHMATCH
+                    | a+=PREFIXMATCH
+                    | a+=SUFFIXMATCH
+                    | a+=SUBSTRINGMATCH
                 )
                 (
-                      IDENT
-                    | STRING
-                    | NUMBER
+                      a+=IDENT
+                    | a+=STRING
+                    | a+=NUMBER
                 )       
             )?
     
-      RBRACKET
+      RBRACKET)
+      -> ^(ATTRIBUTE $a* )
 ;
 
 pseudo
@@ -657,6 +661,10 @@ CDC             : '-->'
                 
 INCLUDES        : '~='      ;
 DASHMATCH       : '|='      ;
+PREFIXMATCH       : '^='      ;
+SUFFIXMATCH       : '$='      ;
+SUBSTRINGMATCH       : '*='      ;
+
 
 GREATER         : '>'       ;
 LBRACE          : '{'       ;

@@ -1,0 +1,33 @@
+input[type="submit"] {
+  width: auto;
+  clear: both;
+}
+input[type*="submit"] {
+  width: auto;
+  clear: both;
+}
+input[type] {
+  width: auto;
+  clear: both;
+}
+input[type~="submit"] {
+  width: auto;
+  clear: both;
+}
+input[type|="submit"] {
+  width: auto;
+  clear: both;
+}
+input[type^=""] {
+  width: auto;
+  clear: both;
+}
+input[type$="submit"] {
+  width: auto;
+  clear: both;
+}
+something,
+input[type*="submit"] {
+  width: auto;
+  clear: both;
+}

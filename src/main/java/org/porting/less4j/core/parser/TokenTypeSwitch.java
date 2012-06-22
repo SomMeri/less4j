@@ -37,7 +37,15 @@ public abstract class TokenTypeSwitch<T> {
       return safe(handleStyleSheet(token));
     }
 
+    if (type==LessLexer.ATTRIBUTE) {
+      return safe(handleSelectorAttribute(token));
+    }
+    
     throw new IllegalStateException("Unexpected token type: " + type);
+  }
+
+  public T handleSelectorAttribute(CommonTree token) {
+    return null;
   }
 
   public T handlePseudo(CommonTree token) {

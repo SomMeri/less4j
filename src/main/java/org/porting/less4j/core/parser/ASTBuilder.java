@@ -10,6 +10,8 @@ import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
+import org.porting.less4j.core.ast.SelectorAttribute;
+import org.porting.less4j.core.ast.SelectorAttribute.Operator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
 
@@ -107,6 +109,47 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<CommonTree> children = getChildren(token);
     CssClass result = new CssClass(token, children.get(0).getText());
     return result;
+  }
+
+  public SelectorAttribute handleSelectorAttribute(CommonTree token) {
+    List<CommonTree> children = getChildren(token);
+    if (children.size()==0)
+      throw new IncorrectTreeException();
+      
+    if (children.size()==1)
+      return new SelectorAttribute(token, children.get(0).getText());
+
+    if (children.size()<3)
+      throw new IncorrectTreeException();
+
+    return new SelectorAttribute(token, children.get(0).getText(), toSelectorOperator(children.get(1)), children.get(2).getText());
+  }
+  
+  private Operator toSelectorOperator(CommonTree token) {
+    switch (token.getType()) {
+    case LessLexer.OPEQ:
+      return Operator.EQUALS;
+
+    case LessLexer.INCLUDES:
+      return Operator.INCLUDES;
+
+    case LessLexer.DASHMATCH:
+      return Operator.SPECIAL_PREFIX;
+
+    case LessLexer.PREFIXMATCH:
+      return Operator.PREFIXMATCH;
+
+    case LessLexer.SUFFIXMATCH:
+      return Operator.SUFFIXMATCH;
+
+    case LessLexer.SUBSTRINGMATCH:
+      return Operator.SUBSTRINGMATCH;
+
+    default:
+      break;
+    }
+ 
+    throw new IncorrectTreeException();
   }
 
   public Pseudo handlePseudo(CommonTree token) {

@@ -6,7 +6,6 @@ import java.util.List;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.ILessCompiler;
 import org.porting.less4j.core.ast.ASTCssNode;
-import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.Combinator;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
@@ -14,6 +13,8 @@ import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
+import org.porting.less4j.core.ast.SelectorAttribute;
+import org.porting.less4j.core.ast.SelectorAttribute.Operator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
@@ -61,11 +62,56 @@ class Builder {
     case PSEUDO:
       appendPseudo((Pseudo)node);
       break;
-      
+
+    case SELECTOR_ATTRIBUTE:
+      appendSelectorAttribute((SelectorAttribute)node);
+      break;
+
     default:
       throw new IllegalStateException("Unknown");
     }
     
+  }
+
+  public void appendSelectorAttribute(SelectorAttribute node) {
+    builder.append("[");
+    builder.append(node.getName());
+    appendSelectorOperator(node.getOperator());
+    builder.appendIgnoreNull(node.getValue());
+    builder.append("]");
+  }
+
+  public void appendSelectorOperator(Operator operator) {
+    switch (operator) {
+    case NONE:
+      break;
+
+    case EQUALS:
+      builder.append("=");
+      break;
+
+    case INCLUDES:
+      builder.append("~=");
+      break;
+
+    case SPECIAL_PREFIX:
+      builder.append("|=");
+      break;
+
+    case PREFIXMATCH:
+      builder.append("^=");
+      break;
+
+    case SUFFIXMATCH:
+      builder.append("$=");
+      break;
+
+    case SUBSTRINGMATCH:
+      builder.append("*=");
+      break;
+    default:
+      break;
+    }
   }
 
   public void appendPseudo(Pseudo node) {
