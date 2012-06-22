@@ -30,13 +30,14 @@ public abstract class AbstractFileBasedTest {
   @Test
   public final void compileAndCompare() throws Exception {
     String less = IOUtils.toString(new FileReader(lessFile));
-    String css = IOUtils.toString(new FileReader(cssFile));
+    String expected = IOUtils.toString(new FileReader(cssFile));
 
     ILessCompiler compiler = getCompiler();
-    assertEquals(lessFile.toString(), canonize(css), canonize(compiler.compile(less)));
+    String actual = compiler.compile(less);
+    assertEquals(lessFile.toString(), canonize(expected), canonize(actual));
   }
 
-  private String canonize(String text) {
+  protected String canonize(String text) {
     return text.replaceAll("\\s", "");
   }
 

@@ -1,4 +1,4 @@
-package org.porting.less4j.core;
+package org.porting.less4j.core.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +15,13 @@ import org.porting.less4j.core.parser.LessParser;
  * This class is NOT thread safe. 
  *
  */
-public class ASTParser {
+public class ANTLRParser {
 
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
   private LessLexer lexer;
   private LessParser parser;
 
-  public CommonTree compile(String expression) {
+  public CommonTree parse(String expression) {
     try {
       initialize(expression);
       ParserRuleReturnScope ret = parser.styleSheet();
@@ -31,7 +31,7 @@ public class ASTParser {
     }
   }
 
-  public CommonTree compileDeclaration(String expression) {
+  public CommonTree parseDeclaration(String expression) {
     try {
       initialize(expression);
       ParserRuleReturnScope ret = parser.declaration();
@@ -41,7 +41,7 @@ public class ASTParser {
     }
   }
   
-  public CommonTree compileExpression(String expression) {
+  public CommonTree parseExpression(String expression) {
     try {
       initialize(expression);
       ParserRuleReturnScope ret = parser.expr();
@@ -51,7 +51,7 @@ public class ASTParser {
     }
   }
 
-  public CommonTree compileSelector(String selector) {
+  public CommonTree parseSelector(String selector) {
     try {
       initialize(selector);
       ParserRuleReturnScope ret = parser.selector();

@@ -6,7 +6,7 @@ import static org.porting.less4j.grammar.GrammarAsserts.assertValidExpression;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
-import org.porting.less4j.core.ASTParser;
+import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.LessLexer;
 
 /**
@@ -23,56 +23,56 @@ public class ExpressionGrammarTest {
 
   @Test
   public void sequenceNumbersLong() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("12-34 56+7 8*90 ");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("12-34 56+7 8*90 ");
     assertValidExpression(compiler, tree);
     assertChilds(tree, LessLexer.NUMBER, LessLexer.MINUS, LessLexer.NUMBER, LessLexer.EMPTY_SEPARATOR, LessLexer.NUMBER, LessLexer.PLUS, LessLexer.NUMBER, LessLexer.EMPTY_SEPARATOR, LessLexer.NUMBER, LessLexer.STAR, LessLexer.NUMBER);
   }
 
   @Test
   public void sequenceNumbersLongSpaces() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("12 - 34 56 + 7 8 * 90 ");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("12 - 34 56 + 7 8 * 90 ");
     assertValidExpression(compiler, tree);
     assertChilds(tree, LessLexer.NUMBER, LessLexer.MINUS, LessLexer.NUMBER, LessLexer.EMPTY_SEPARATOR, LessLexer.NUMBER, LessLexer.PLUS, LessLexer.NUMBER, LessLexer.EMPTY_SEPARATOR, LessLexer.NUMBER, LessLexer.STAR, LessLexer.NUMBER);
   }
 
   @Test
   public void sequencePixels() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("12px 13px");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("12px 13px");
     assertValidExpression(compiler, tree);
     assertChilds(tree, LessLexer.LENGTH, LessLexer.EMPTY_SEPARATOR, LessLexer.LENGTH);
   }
 
   @Test
   public void plusPixels() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("12px + 13px");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("12px + 13px");
     assertValidExpression(compiler, tree);
     assertChilds(tree, LessLexer.LENGTH, LessLexer.PLUS, LessLexer.LENGTH);
   }
 
   @Test
   public void plusPixelsShort() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("12px+13px");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("12px+13px");
     assertValidExpression(compiler, tree);
     assertChilds(tree, LessLexer.LENGTH, LessLexer.PLUS, LessLexer.LENGTH);
   }
 
   @Test
   public void sequenceNumbers() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("1.2 13 ");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("1.2 13 ");
     assertValidExpression(compiler, tree);
     assertChilds(tree, LessLexer.NUMBER, LessLexer.EMPTY_SEPARATOR, LessLexer.NUMBER);
   }
 
   @Test
   public void floating() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("1.2 ");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("1.2 ");
 
     assertValidExpression(compiler, tree);
     assertEquals(1, tree.getChildren().size());
@@ -81,8 +81,8 @@ public class ExpressionGrammarTest {
 
   @Test
   public void integer() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileExpression("12 ");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseExpression("12 ");
 
     assertValidExpression(compiler, tree);
     assertEquals(1, tree.getChildren().size());

@@ -1,0 +1,38 @@
+a {
+  padding: 10px;
+}
+* {
+  padding: 10px;
+}
+.simpleClass {
+  padding: 10px;
+}
+a.simpleClass {
+  padding: 10px;
+}
+*.simpleClass {
+  padding: 10px;
+}
+*.simpleClass.otherclass.whoooooos {
+  padding: 10px;
+}
+.simple {
+  padding: 10px;
+}
+.simple,
+another {
+  padding: 10px;
+}
+.simple:hover {
+  padding-top: 25px;
+  padding-bottom: 25px;
+  padding-right: 50px;
+  padding-left: 50px;
+}
+.simple > hello {
+  padding-top: 25px;
+}
+.simple > hello,
+.complicated > goodbye {
+  padding-top: 25px;
+}

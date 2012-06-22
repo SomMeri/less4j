@@ -11,14 +11,16 @@ import java.util.Collection;
 import org.antlr.runtime.tree.CommonTree;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.porting.less4j.core.ASTParser;
+import org.porting.less4j.core.parser.ANTLRParser;
 
 @RunWith(Parameterized.class)
 @SuppressWarnings("unused")
+@Ignore
 public class DebugHelperTest {
 
   private static final String inputDir = "src\\test\\resources\\minitests\\css\\";
@@ -56,9 +58,9 @@ public class DebugHelperTest {
   // It also accepts the ‘even’ and ‘odd’ values as arguments.(for n-th argument)
   @Test
   public void shouldParseWithoutErrors() throws Throwable {
-    ASTParser compiler = new ASTParser();
+    ANTLRParser compiler = new ANTLRParser();
     try {
-      CommonTree tree = compiler.compile(IOUtils.toString(new FileReader(file)));
+      CommonTree tree = compiler.parse(IOUtils.toString(new FileReader(file)));
       DebugPrint.print(tree);
     } catch (Throwable th) {
       th.printStackTrace();

@@ -1,10 +1,8 @@
 package org.porting.less4j.grammar;
 
-import static org.junit.Assert.fail;
-
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
-import org.porting.less4j.core.ASTParser;
+import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.debugutils.DebugPrint;
 
 /**
@@ -14,10 +12,10 @@ public class CommentsGrammarTest {
 
   @Test
   public void experiment() {
-    ASTParser compiler = new ASTParser();
+    ANTLRParser compiler = new ANTLRParser();
     String css = "/* comment*/ li:after {}";
     DebugPrint.printTokenStream(css);
-    CommonTree tree = compiler.compile(css);
+    CommonTree tree = compiler.parse(css);
     DebugPrint.print(tree);
   }
 

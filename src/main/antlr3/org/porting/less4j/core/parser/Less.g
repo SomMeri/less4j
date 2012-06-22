@@ -24,17 +24,26 @@ options {
     output = AST;
 }
 
+//this is not official way how to do things, but debugging 
+//stuff when parsing functionality is not all written in
+//parser rules is much easier. 
 tokens {  
 //  VARIABLE_DECLARATION;
   EXPRESSION;
+  DECLARATION;
 //  VARIABLE_REFERENCE;
   RULESET;
   SELECTOR;
   EXPRESSION;
+  STYLE_SHEET;
   //ANTLR seems to generate null pointers exceptions on malformed css if 
   //rules match nothig and generate an empty token 
   EMPTY_SEPARATOR; 
   EMPTY_COMBINATOR;
+  ELEMENT_NAME;
+  CSS_CLASS;
+  SIMPLE_SELECTOR;
+  PSEUDO;
 }  
 
 @lexer::header {
@@ -99,10 +108,10 @@ tokens {
 // of imports, and then the main body of style rules.
 //
 styleSheet  
-    :   charSet?
-        imports*
-        bodylist
-     EOF
+    :  ( a+=charSet?
+        a+=imports*
+        a+=bodylist
+        EOF ) -> ^(STYLE_SHEET ($a)*)
     ;
     
 // -----------------
@@ -214,15 +223,16 @@ ruleSet
     ;
     
 selector
-    : a=simpleSelector (b+=combinator c+=simpleSelector)*
-    -> ^(SELECTOR $a ^($b $c)*)
+    : a+=simpleSelector (a+=combinator a+=simpleSelector)*
+    -> ^(SELECTOR ($a)* )
     ;
 
 simpleSelector
-    : elementName 
-        ((esPred)=>elementSubsequent)*
+    : (a+=elementName 
+        ((esPred)=>a+=elementSubsequent)*
         
-    | ((esPred)=>elementSubsequent)+
+    | ((esPred)=>a+=elementSubsequent)+
+    ) -> ^(SIMPLE_SELECTOR ($a)* )
     ;
     
 esPred
@@ -237,12 +247,12 @@ elementSubsequent
     ;
 
 cssClass
-    : DOT IDENT
+    : DOT IDENT -> ^(CSS_CLASS IDENT)
     ;
     
 elementName
-    : IDENT
-    | STAR
+    : (IDENT -> ^(ELEMENT_NAME IDENT)) 
+    | (STAR -> ^(ELEMENT_NAME STAR))
     ;
 
 attrib
@@ -267,27 +277,37 @@ attrib
 ;
 
 pseudo
-    : COLON COLON? 
-            IDENT
+    : (COLON COLON? 
+            a=IDENT
                 ( // Function
                 
-                    (LPAREN ( | simpleSelector| NUMBER | nth) RPAREN) 
+                    (LPAREN ( b=pseudoparameters ) RPAREN) 
                 )?
+      ) -> ^(PSEUDO $a $b*)
     ;
+    
+ pseudoparameters:
+      (IDENT) => IDENT
+    | (NUMBER) => NUMBER
+    | simpleSelector 
+ ;
 
+//| simpleSelector| NUMBER
 //see http://www.w3.org/TR/selectors/#nth-child-pseudo
-nth
-    : (PLUS | MINUS)? (REPEATER | N) ((PLUS | MINUS) NUMBER)?
-    | (PLUS | MINUS)? NUMBER
-    | ODD
-    | EVEN
-    ;
+//nth and other special pseudos are going to be lexer tokens. Their parameters 
+//work differently than anything else and correspondig lexer rules and parser 
+//would have to be too complicated otherwise.
+//nth
+//    : (PLUS | MINUS)? (REPEATER | N) ((PLUS | MINUS) NUMBER)?
+//    | (PLUS | MINUS)? NUMBER
+//    | ODD
+//    | EVEN
+//    ;
 
 //malformed css may miss expression grrrr
-//declaration can refer also to a mixin
+//declaration can refer also to a mixin - removed for now, I will handle mixins later 
 declaration
-    : property COLON expr? prio?
-    | IDENT
+    : property COLON expr? prio? -> ^(DECLARATION property expr? prio?)
     ;
     
 prio

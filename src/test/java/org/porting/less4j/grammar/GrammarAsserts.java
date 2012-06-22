@@ -18,7 +18,7 @@ import org.antlr.runtime.tree.CommonErrorNode;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
-import org.porting.less4j.core.ASTParser;
+import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.LessLexer;
 
 public class GrammarAsserts {
@@ -26,17 +26,17 @@ public class GrammarAsserts {
   //TODO move to some helper
   public static final Set<Integer> DUMMY_TOKENS = new HashSet<Integer>(Arrays.asList(LessLexer.SELECTOR, LessLexer.RULESET,LessLexer.EMPTY_COMBINATOR,LessLexer.EMPTY_SEPARATOR, LessLexer.EXPRESSION ));
 
-  public static void assertValidSelector(ASTParser compiler, CommonTree tree) {
+  public static void assertValidSelector(ANTLRParser compiler, CommonTree tree) {
     assertValid(compiler);
     assertEquals(LessLexer.SELECTOR, tree.getType());
   }
 
-  public static void assertValidExpression(ASTParser compiler, CommonTree tree) {
+  public static void assertValidExpression(ANTLRParser compiler, CommonTree tree) {
     assertValid(compiler);
     assertEquals(LessLexer.EXPRESSION, tree.getType());
   }
 
-  public static void assertValid(ASTParser compiler) {
+  public static void assertValid(ANTLRParser compiler) {
     assertTrue(compiler.getAllErrors().isEmpty());
   }
 
@@ -78,8 +78,6 @@ public class GrammarAsserts {
     LessLexer lexer = new LessLexer(input);
     return new CommonTokenStream(lexer);
   }
-
-
 
 }
 
@@ -129,7 +127,7 @@ class CountNodesAction implements TreeVisitorAction {
 
   //TODO move to some helper
   private boolean isDummy(Token token) {
-    return GrammarAsserts.DUMMY_TOKENS.contains(token.getType());
+    return token.getType()<LessLexer.CHARSET_SYM;
   }
 
   private boolean isOnChannel(CommonToken token) {

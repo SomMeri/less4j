@@ -6,7 +6,7 @@ import static org.porting.less4j.grammar.GrammarAsserts.assertValidSelector;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
-import org.porting.less4j.core.ASTParser;
+import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.debugutils.DebugPrint;
 
@@ -31,40 +31,45 @@ public class SelectorsGrammarTest {
 
   @Test
   public void afterCSS2() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li:after {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("li:after {");
     assertValidSelector(compiler, tree);
-    assertChilds(tree, LessLexer.IDENT, LessLexer.COLON, LessLexer.IDENT);
+    assertChilds(tree, LessLexer.SIMPLE_SELECTOR);
+    assertChilds((CommonTree)tree.getChild(0), LessLexer.ELEMENT_NAME, LessLexer.PSEUDO);
   }
 
   @Test
   public void afterCSS3() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li::after {");
+    ANTLRParser compiler = new ANTLRParser();
+    String selector = "li::after {";
+    CommonTree tree = compiler.parseSelector(selector);
     assertValidSelector(compiler, tree);
-    assertChilds(tree, LessLexer.IDENT, LessLexer.COLON, LessLexer.COLON, LessLexer.IDENT);
+    DebugPrint.print(tree);
+    assertChilds(tree, LessLexer.SIMPLE_SELECTOR);
+    assertChilds((CommonTree)tree.getChild(0), LessLexer.ELEMENT_NAME, LessLexer.PSEUDO);
   }
 
   @Test
   public void notPseudo() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li:not(:only-child) { ");
+    ANTLRParser compiler = new ANTLRParser();
+    String selector = "li:not(:only-child) { ";
+    CommonTree tree = compiler.parseSelector(selector);
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
     }
 
   @Test
   public void notNumber() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("class#id[attr=32]:not(1) {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("class#id[attr=32]:not(1) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
   public void notAttribute() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("p:not([class*=\"lead\"]) {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("p:not([class*=\"lead\"]) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
@@ -77,66 +82,66 @@ public class SelectorsGrammarTest {
         "  color: white;\n" +
         "}";
     
-    ASTParser compiler = new ASTParser();
-    compiler.compile(combined_stylesheet);
+    ANTLRParser compiler = new ANTLRParser();
+    compiler.parse(combined_stylesheet);
     assertValid(compiler);
   }
 
   @Test
   public void formulaAnb() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li:nth-child(4n+1) {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("li:nth-child(4n+1) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
   public void formulaAnMinusb() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li:nth-child(4n-1) {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("li:nth-child(4n-1) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
   public void formulaAn() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li:nth-child(4n) {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("li:nth-child(4n) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
   public void formulaMinusAn() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li:nth-child(-4n) {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("li:nth-child(-4n) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
   public void formulaMinusN() {
-    ASTParser compiler = new ASTParser();
-    CommonTree tree = compiler.compileSelector("li:nth-child(-n) {");
+    ANTLRParser compiler = new ANTLRParser();
+    CommonTree tree = compiler.parseSelector("li:nth-child(-n) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
   public void formulaMinusNMinus() {
-    ASTParser compiler = new ASTParser();
+    ANTLRParser compiler = new ANTLRParser();
     String selector = "li:nth-child(-n+2) {";
     DebugPrint.printTokenStream(selector);
-    CommonTree tree = compiler.compileSelector(selector);
+    CommonTree tree = compiler.parseSelector(selector);
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
   public void formulaEven() {
-    ASTParser compiler = new ASTParser();
+    ANTLRParser compiler = new ANTLRParser();
     //TODO ako je to s case sensitivity?
-    CommonTree tree = compiler.compileSelector("li:nth-child(even) {");
+    CommonTree tree = compiler.parseSelector("li:nth-child(even) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
@@ -146,9 +151,9 @@ public class SelectorsGrammarTest {
   //TODO what does less.js do in this situation: nth-child(@variable+4) ???
   @Test
   public void formulaOdd() {
-    ASTParser compiler = new ASTParser();
+    ANTLRParser compiler = new ANTLRParser();
     //TODO ako je to s case sensitivity?
-    CommonTree tree = compiler.compileSelector("li:nth-child(odd) {");
+    CommonTree tree = compiler.parseSelector("li:nth-child(odd) {");
     assertValidSelector(compiler, tree);
     //TODO test also structure (once we decide what is it going to be)
   }
