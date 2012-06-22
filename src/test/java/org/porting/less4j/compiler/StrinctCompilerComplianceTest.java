@@ -29,10 +29,10 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
   public static Collection<Object[]> allTestsParameters() {
     Collection<File> allFiles = FileUtils.listFiles(new File(inputDir), new String[] {"css","less"}, false);
     Collection<Object[]> result = new ArrayList<Object[]>();
-//    for (File file : allFiles) {
-//      addFiles(result, file);
-//    }
-    addFiles(result, new File(inputDir + "selectors-elementname-inputtype.less"));
+    for (File file : allFiles) {
+      addFiles(result, file);
+    }
+//    addFiles(result, new File(inputDir + "selectors-elementname-inputtype.less"));
 
     return result;
   }
