@@ -7,6 +7,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.Combinator;
 import org.porting.less4j.core.ast.CssClass;
+import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
@@ -166,6 +167,19 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     //FIXME: handle this case the same way as less.js
     throw new IncorrectTreeException();
   }
+  
+  public IdSelector handleIdSelector(CommonTree token) {
+    List<CommonTree> children = getChildren(token);
+    if (children.size()!=1)
+      throw new IncorrectTreeException();
+    
+    String text = children.get(0).getText();
+    if (text==null || text.length()<1)
+      throw new IncorrectTreeException();
+    
+    return new IdSelector(token, text.substring(1));
+  }
+
 }
 
 //FIXME: do something meaningful instead of this exception

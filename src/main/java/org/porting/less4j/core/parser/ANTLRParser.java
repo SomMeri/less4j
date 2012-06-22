@@ -10,6 +10,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.core.parser.LessParser;
+import org.porting.less4j.debugutils.DebugPrint;
 
 /**
  * This class is NOT thread safe. 
@@ -24,6 +25,7 @@ public class ANTLRParser {
   public CommonTree parse(String expression) {
     try {
       initialize(expression);
+      DebugPrint.printTokenStream(expression);
       ParserRuleReturnScope ret = parser.styleSheet();
       return finalize(ret);
     } catch (RecognitionException e) {
@@ -85,6 +87,7 @@ public class ANTLRParser {
   private CommonTree finalize(ParserRuleReturnScope ret) {
     collectErrors(lexer, parser);
     CommonTree ast = (CommonTree) ret.getTree();
+    DebugPrint.print(ast);
     return ast;
   }
 

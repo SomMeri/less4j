@@ -2,11 +2,11 @@ package org.porting.less4j.core.ast;
 
 import org.antlr.runtime.tree.CommonTree;
 
-public class CssClass extends ASTCssNode {
+public class IdSelector extends ASTCssNode {
 
   private String name;
 
-  public CssClass(CommonTree token, String name) {
+  public IdSelector(CommonTree token, String name) {
     super(token);
     this.name = name;
   }
@@ -21,7 +21,7 @@ public class CssClass extends ASTCssNode {
 
   @Override
   public ASTCssNodeType getType() {
-    return ASTCssNodeType.CSS_CLASS;
+    return ASTCssNodeType.ID_SELECTOR;
   }
 
 }

@@ -45,6 +45,7 @@ tokens {
   SIMPLE_SELECTOR;
   PSEUDO;
   ATTRIBUTE;
+  ID_SELECTOR;
 }  
 
 @lexer::header {
@@ -57,6 +58,18 @@ tokens {
 
 //override some methods and add new members to generated lexer
 @lexer::members {
+  List tokens = new ArrayList();
+  public void emit(Token token) {
+        state.token = token;
+        tokens.add(token);
+  }
+  public Token nextToken() {
+        super.nextToken();
+        if ( tokens.size()==0 ) {
+            return Token.EOF_TOKEN;
+        }
+        return (Token)tokens.remove(0);
+  }
   //add new field
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
   
@@ -200,6 +213,7 @@ operator
 combinator
     : PLUS
     | GREATER
+    | EMPTY_COMBINATOR
     | ( -> EMPTY_COMBINATOR)
     ;
     
@@ -222,9 +236,10 @@ ruleSet
         RBRACE
      -> ^(RULESET $a* $b*)
     ;
-    
+
+//That empty combinator in the beginning is a result of HASH_COMBINATOR hack. 
 selector
-    : a+=simpleSelector (a+=combinator a+=simpleSelector)*
+    : EMPTY_COMBINATOR? a+=simpleSelector (a+=combinator a+=simpleSelector)*
     -> ^(SELECTOR ($a)* )
     ;
 
@@ -241,7 +256,7 @@ esPred
     ;
     
 elementSubsequent
-    : HASH
+    : HASH -> ^(ID_SELECTOR HASH)
     | cssClass
     | attrib
     | pseudo
@@ -710,8 +725,16 @@ IDENT           : '-'? NMSTART NMCHAR*  ;
 
 // -------------
 // Reference.   Reference to an element in the body we are styling, such as <XXXX id="reference">
-//
-HASH            : '#' NAME              ;
+// 
+fragment HASH_FRAGMENT : '#' NAME             ; 
+HASH            : HASH_FRAGMENT             ; 
+//Hopefully, I will not destroy document references too much
+HASH_COMBINATOR : a=WS b=HASH_FRAGMENT {
+                     $a.setType(EMPTY_COMBINATOR);
+                     emit($a);
+                     $b.setType(HASH);
+                     emit($b);
+                   }; 
 
 IMPORT_SYM      : '@' I M P O R T       ;
 PAGE_SYM        : '@' P A G E           ;

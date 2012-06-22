@@ -40,8 +40,16 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.ATTRIBUTE) {
       return safe(handleSelectorAttribute(token));
     }
-    
+
+    if (type==LessLexer.ID_SELECTOR) {
+      return safe(handleIdSelector(token));
+    }
+
     throw new IllegalStateException("Unexpected token type: " + type);
+  }
+
+  public T handleIdSelector(CommonTree token) {
+    return null;
   }
 
   public T handleSelectorAttribute(CommonTree token) {

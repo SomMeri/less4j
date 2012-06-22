@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -21,20 +22,31 @@ public abstract class AbstractFileBasedTest {
 
   private final File lessFile;
   private final File cssFile;
+  private final String testName;
 
   public AbstractFileBasedTest(File lessFile, File cssFile, String testName) {
     this.lessFile = lessFile;
     this.cssFile = cssFile;
+    this.testName = testName;
   }
 
   @Test
-  public final void compileAndCompare() throws Exception {
-    String less = IOUtils.toString(new FileReader(lessFile));
-    String expected = IOUtils.toString(new FileReader(cssFile));
+  public final void compileAndCompare() throws Throwable {
+    try {
+      String less = IOUtils.toString(new FileReader(lessFile));
+      String expected = IOUtils.toString(new FileReader(cssFile));
 
-    ILessCompiler compiler = getCompiler();
-    String actual = compiler.compile(less);
-    assertEquals(lessFile.toString(), canonize(expected), canonize(actual));
+      ILessCompiler compiler = getCompiler();
+      String actual = compiler.compile(less);
+      assertEquals(lessFile.toString(), canonize(expected), canonize(actual));
+
+    } catch (Throwable ex) {
+      if (ex instanceof ComparisonFailure) {
+        ComparisonFailure fail = (ComparisonFailure)ex;
+        throw new ComparisonFailure (testName + " " + fail.getMessage(), fail.getExpected(), fail.getActual());
+      }
+      throw new RuntimeException(testName, ex);
+    }
   }
 
   protected String canonize(String text) {

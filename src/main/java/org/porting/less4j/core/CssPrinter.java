@@ -10,6 +10,7 @@ import org.porting.less4j.core.ast.Combinator;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
 import org.porting.less4j.core.ast.Expression;
+import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
@@ -67,10 +68,19 @@ class Builder {
       appendSelectorAttribute((SelectorAttribute)node);
       break;
 
+    case ID_SELECTOR:
+      appendIdSelector((IdSelector)node);
+      break;
+
     default:
       throw new IllegalStateException("Unknown");
     }
     
+  }
+
+  public void appendIdSelector(IdSelector node) {
+    builder.append("#");
+    builder.append(node.getName());
   }
 
   public void appendSelectorAttribute(SelectorAttribute node) {
@@ -230,7 +240,7 @@ class Builder {
       break;
 
     case EMPTY:
-      builder.append(" > ");
+      builder.append(" ");
       break;
 
     }
