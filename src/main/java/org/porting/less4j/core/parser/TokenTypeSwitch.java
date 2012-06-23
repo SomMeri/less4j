@@ -43,7 +43,15 @@ public abstract class TokenTypeSwitch<T> {
       return safe(handleIdSelector(token));
     }
 
+    if (type==LessLexer.CHARSET_DECLARATION) {
+      return safe(handleCharsetDeclaration(token));
+    }
+
     throw new IllegalStateException("Unexpected token type: " + type);
+  }
+
+  public T handleCharsetDeclaration(CommonTree token) {
+    return null;
   }
 
   public T handleIdSelector(CommonTree token) {

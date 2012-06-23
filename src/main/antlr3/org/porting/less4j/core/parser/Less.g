@@ -46,6 +46,7 @@ tokens {
   PSEUDO;
   ATTRIBUTE;
   ID_SELECTOR;
+  CHARSET_DECLARATION;
 }  
 
 @lexer::header {
@@ -122,7 +123,7 @@ tokens {
 // of imports, and then the main body of style rules.
 //
 styleSheet  
-    :  ( a+=charSet?
+    :  ( a+=charSet* //the original ? was replaced by *, because it is possible (even if it makes no sense) and less.js is able to handle such situation
         a+=imports*
         a+=bodylist
         EOF ) -> ^(STYLE_SHEET ($a)*)
@@ -131,8 +132,9 @@ styleSheet
 // -----------------
 // Character set.   Picks up the user specified character set, should it be present.
 // Removed an empty option from this rule, ANTLR seems to have problems with this.
+// https://developer.mozilla.org/en/CSS/@charset
 charSet
-    :   CHARSET_SYM STRING SEMI
+    :   CHARSET_SYM STRING SEMI -> ^(CHARSET_DECLARATION STRING)
     ;
 
 // ---------
@@ -199,7 +201,7 @@ pseudoPage
     : COLON IDENT
     ;
     
-//FIXME: opeq here is just a workaround
+//NOTE: opeq here is just a workaround, but it seems to be sufficient for a less -> css compiler 
 operator
     : SOLIDUS
     | COMMA
@@ -213,7 +215,7 @@ operator
 combinator
     : PLUS
     | GREATER
-    | EMPTY_COMBINATOR
+    | (EMPTY_COMBINATOR) => EMPTY_COMBINATOR //suppressing warning
     | ( -> EMPTY_COMBINATOR)
     ;
     
@@ -351,9 +353,7 @@ term
 //            | VARIABLE
         )
     | STRING
-    | IDENT (   // Function
-                LPAREN expr RPAREN
-            )?
+    | function
     | URI
 //    | variablereference
     | hexColor  
@@ -361,6 +361,12 @@ term
     
 hexColor
     : EMPTY_COMBINATOR? HASH -> HASH
+    ;
+
+function
+    : IDENT (   // Function
+                LPAREN expr RPAREN
+            )?
     ;
     
 // ==============================================================

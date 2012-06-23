@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.ast.ASTCssNode;
+import org.porting.less4j.core.ast.CharsetDeclaration;
 import org.porting.less4j.core.ast.Combinator;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.IdSelector;
@@ -40,6 +41,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   @SuppressWarnings("unchecked")
   private List<CommonTree> getChildren(CommonTree token) {
     return (List<CommonTree>) token.getChildren();
+  }
+
+  public CharsetDeclaration handleCharsetDeclaration(CommonTree token) {
+    //FIXME: just an idea, what does less.js do if charset is followed by a lot of declarations?
+    List<CommonTree> children = getChildren(token);
+    if (children.isEmpty())
+      throw new IncorrectTreeException();
+    
+    return new CharsetDeclaration(token, children.get(0).getText());
   }
 
   public RuleSet handleRuleSet(CommonTree token) {

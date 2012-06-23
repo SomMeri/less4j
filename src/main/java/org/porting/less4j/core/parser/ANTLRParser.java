@@ -23,7 +23,7 @@ public class ANTLRParser {
   public CommonTree parse(String expression) {
     try {
       initialize(expression);
-      //DebugPrint.printTokenStream(expression);
+      DebugPrint.printTokenStream(expression);
       ParserRuleReturnScope ret = parser.styleSheet();
       return finalize(ret);
     } catch (RecognitionException e) {
@@ -85,7 +85,7 @@ public class ANTLRParser {
   private CommonTree finalize(ParserRuleReturnScope ret) {
     collectErrors(lexer, parser);
     CommonTree ast = (CommonTree) ret.getTree();
-    //DebugPrint.print(ast);
+    DebugPrint.print(ast);
     return ast;
   }
 

@@ -12,6 +12,9 @@ import org.porting.less4j.AbstractFileBasedTest;
 import org.porting.less4j.ILessCompiler;
 import org.porting.less4j.core.CssPrinter;
 
+//FIXME: what does less.js do when the charset declaration goes AFTER ruleset? It is incorrect css anyway.
+//if there is a difference I should at least document it
+//TODO: document charset handling, it is easy enough to document
 @RunWith(Parameterized.class)
 public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
 
@@ -32,7 +35,11 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "declaration-color.less"));
+//    addFiles(result, new File(inputDir + "charset-1.less"));
+//    addFiles(result, new File(inputDir + "charset-2.less"));
+//    addFiles(result, new File(inputDir + "charset-3.less"));
+//    addFiles(result, new File(inputDir + "charset-4.less"));
+//    addFiles(result, new File(inputDir + "charset-5.less"));
 
     return result;
   }

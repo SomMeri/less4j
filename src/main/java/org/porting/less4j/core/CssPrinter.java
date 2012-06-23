@@ -6,6 +6,7 @@ import java.util.List;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.ILessCompiler;
 import org.porting.less4j.core.ast.ASTCssNode;
+import org.porting.less4j.core.ast.CharsetDeclaration;
 import org.porting.less4j.core.ast.Combinator;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
@@ -71,10 +72,22 @@ class Builder {
       appendIdSelector((IdSelector)node);
       break;
 
+    case CHARSET_DECLARATION:
+      appendCharsetDeclaration((CharsetDeclaration)node);
+      break;
+
     default:
       throw new IllegalStateException("Unknown");
     }
     
+  }
+
+  //FIXME: does less.js keeps original cases in charsets and elsewhere or not? I'm converting it all to 
+  //lowercases
+  public void appendCharsetDeclaration(CharsetDeclaration node) {
+    builder.append("@charset ");
+    builder.append(node.getCharset());
+    builder.append(";\n");
   }
 
   public void appendIdSelector(IdSelector node) {
