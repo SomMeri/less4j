@@ -1,8 +1,6 @@
 package org.porting.less4j.core.parser;
 
 import org.antlr.runtime.tree.CommonTree;
-import org.porting.less4j.core.ast.SimpleSelector;
-import org.porting.less4j.core.parser.LessLexer;
 
 public abstract class TokenTypeSwitch<T> {
   

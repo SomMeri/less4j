@@ -204,9 +204,9 @@ operator
     : SOLIDUS
     | COMMA
     | STAR
-    | (PLUS)=>PLUS //TODO:why do I have to do this with plus and minus?
-    | (MINUS)=>MINUS
-    | OPEQ
+//    | (PLUS)=>PLUS //TODO:why do I have to do this with plus and minus?
+//    | (MINUS)=>MINUS
+//    | OPEQ
     | ( -> EMPTY_SEPARATOR) 
     ;
     
@@ -360,7 +360,7 @@ term
     ;
     
 hexColor
-    : HASH
+    : EMPTY_COMBINATOR? HASH -> HASH
     ;
     
 // ==============================================================

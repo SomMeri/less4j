@@ -39,7 +39,7 @@ public abstract class AbstractFileBasedTest {
       ILessCompiler compiler = getCompiler();
       String actual = compiler.compile(less);
       assertEquals(lessFile.toString(), canonize(expected), canonize(actual));
-
+      
     } catch (Throwable ex) {
       if (ex instanceof ComparisonFailure) {
         ComparisonFailure fail = (ComparisonFailure)ex;

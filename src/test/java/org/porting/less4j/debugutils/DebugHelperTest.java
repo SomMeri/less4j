@@ -20,7 +20,6 @@ import org.porting.less4j.core.parser.ANTLRParser;
 
 @RunWith(Parameterized.class)
 @SuppressWarnings("unused")
-@Ignore
 public class DebugHelperTest {
 
   private static final String inputDir = "src\\test\\resources\\minitests\\css\\";
@@ -29,7 +28,7 @@ public class DebugHelperTest {
   private static final String variable = "src\\test\\resources\\minitests\\css\\variablesNoCommentsNoMixins.less";
   private static final String variableMini = "src\\test\\resources\\minitests\\css\\variablesMini.less";
 
-  private static final String inputCss21 = "src\\test\\resources\\minitests\\less\\css.less";
+  private static final String inputCss21 = "src\\test\\resources\\minitests\\css\\css.less";
   private static final String inputCss3 = "src\\test\\resources\\minitests\\css\\css-3.less";
   private static final String inputNot = "src\\test\\resources\\minitests\\css\\cssNot.less";
   private static final String expectedCss = "src\\test\\resources\\less.js\\css\\css.css";
@@ -80,7 +79,7 @@ public class DebugHelperTest {
 
   public static Collection<Object[]> singleTestsParameters() {
     Collection<Object[]> result = new ArrayList<Object[]>();
-    addFiles(result, new File(inputCss3));
+    addFiles(result, new File(inputCss21));
     return result;
   }
 

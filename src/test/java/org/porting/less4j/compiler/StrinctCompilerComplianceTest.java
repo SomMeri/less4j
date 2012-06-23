@@ -32,7 +32,7 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "selectors-idselector-bug.less"));
+//    addFiles(result, new File(inputDir + "declaration-color.less"));
 
     return result;
   }

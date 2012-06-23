@@ -33,7 +33,6 @@ public class CssPrinter implements ILessCompiler {
 
     CommonTree ast = parser.parse(content);
     StyleSheet styleSheet = astBuilder.parse(ast);
-    DebugPrint.print(ast);
     Builder builder = new Builder(stringBuilder);
     builder.appendStyleSheet(styleSheet);
     return stringBuilder.toString();
