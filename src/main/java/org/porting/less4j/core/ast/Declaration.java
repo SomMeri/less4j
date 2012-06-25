@@ -1,44 +1,26 @@
 package org.porting.less4j.core.ast;
 
-import java.util.List;
-
 import org.antlr.runtime.tree.CommonTree;
-import org.porting.less4j.core.parser.LessLexer;
 
 public class Declaration extends ASTCssNode {
 
   private String name;
   private Expression expression;
-  private boolean priority;
+  private boolean important;
 
-  public Declaration(CommonTree token) {
+  public Declaration(CommonTree token, String name) {
+    this(token, name, null, false);
+  }
+
+  public Declaration(CommonTree token, String name, Expression expression) {
+    this(token, name, expression, false);
+  }
+
+  public Declaration(CommonTree token, String name, Expression expression, boolean important) {
     super(token);
-    // TODO:add assert
-    List<CommonTree> members = extractUnderlyingMembers();
-    name = extractName(members);
-    expression = extractExpression(members);
-    priority = extractPriority(members);
-  }
-
-  private Expression extractExpression(List<CommonTree> members) {
-    if (members!=null && members.size()>1)
-      return new Expression(members.get(1));
-    
-    return null;
-  }
-
-  private String extractName(List<CommonTree> members) {
-    if (members!=null && members.size()>0)
-      return members.get(0).getText();
-    
-    return null;
-  }
-
-  private boolean extractPriority(List<CommonTree> members) {
-    if (members!=null && members.size()>2)
-      return members.get(2).getType()==LessLexer.IMPORTANT_SYM;
-    
-    return false;
+    this.name = name;
+    this.expression = expression;
+    this.important = important;
   }
 
   public String getName() {
@@ -49,8 +31,8 @@ public class Declaration extends ASTCssNode {
     return expression;
   }
 
-  public boolean hasPriority() {
-    return priority;
+  public boolean isImportant() {
+    return important;
   }
   
   @Override

@@ -4,6 +4,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 //FIXME: this does not handle parametrized classes yet
 //FIXME: this does not handle :: correctly
+//FIXME: not done yet
 public class Pseudo extends ASTCssNode {
 
   private String name;
@@ -14,7 +15,6 @@ public class Pseudo extends ASTCssNode {
   }
   
   public Pseudo(CommonTree token, String name, String parameter) {
-    //TODO asserts
     super(token);
     this.name = name;
     this.parameter = parameter;

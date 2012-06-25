@@ -19,18 +19,9 @@ public abstract class ASTCssNode {
     return children;
   }
   
-  //FIXME: this will probably disappear, but I need it to test unfinished structures
+  @Deprecated
   public String getUnderlyingText(){
     return underlyingStructure.getText();
-  }
-
-  @SuppressWarnings("unchecked")
-  protected List<CommonTree> extractUnderlyingMembers() {
-    List<CommonTree> result = (List<CommonTree>) underlyingStructure.getChildren();
-    if (result==null)
-      result = new ArrayList<CommonTree>();
-    
-    return result;
   }
 
   public void addChild(ASTCssNode kid) {

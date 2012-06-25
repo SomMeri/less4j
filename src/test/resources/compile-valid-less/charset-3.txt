@@ -1,0 +1,1 @@
+/* another incorrect file, charset should be alone in the line */

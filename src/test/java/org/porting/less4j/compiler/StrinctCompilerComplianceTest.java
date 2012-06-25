@@ -18,8 +18,8 @@ import org.porting.less4j.core.CssPrinter;
 @RunWith(Parameterized.class)
 public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
 
-  private static final String inputDir = "src\\test\\resources\\compile-valid-less\\input\\";
-  private static final String outputDir = "src\\test\\resources\\compile-valid-less\\output\\";
+  private static final String inputDir = "src\\test\\resources\\compile-valid-less\\";
+  private static final String outputDir = inputDir;
 
   public StrinctCompilerComplianceTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
@@ -30,16 +30,12 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    Collection<File> allFiles = FileUtils.listFiles(new File(inputDir), new String[] {"css","less"}, false);
+    Collection<File> allFiles = FileUtils.listFiles(new File(inputDir), new String[] {"less"}, false);
     Collection<Object[]> result = new ArrayList<Object[]>();
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "charset-1.less"));
-//    addFiles(result, new File(inputDir + "charset-2.less"));
-//    addFiles(result, new File(inputDir + "charset-3.less"));
-//    addFiles(result, new File(inputDir + "charset-4.less"));
-//    addFiles(result, new File(inputDir + "charset-5.less"));
+//    addFiles(result, new File(inputDir + "expression-number-simple.less"));
 
     return result;
   }

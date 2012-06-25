@@ -1,0 +1,66 @@
+number {
+  padding: 1;
+  padding: 12;
+  padding: 1123132;
+  padding: -1;
+  padding: -12;
+  padding: -1123132;
+}
+percentage {
+  padding: 1%;
+  padding: 12%;
+  padding: 1123132%;
+  padding: -1%;
+  padding: -12%;
+  padding: -1123132%;
+}
+dimension {
+  padding: 1asd;
+  padding: 12nn;
+  padding: 1123132d;
+}
+frequency {
+  padding: 1khz;
+  padding: 12hz;
+  padding: 1123132khz;
+}
+time {
+  padding: 1ms;
+  padding: 12s;
+  padding: 1123132ms;
+  padding: -1ms;
+  padding: -12s;
+  padding: -1123132ms;
+}
+angle {
+  padding: 1deg;
+  padding: 12rad;
+  padding: 1123132grad;
+  padding: -1grad;
+  padding: -12deg;
+  padding: -1123132rad;
+}
+em {
+  padding: 1em;
+  padding: 12em;
+  padding: 1123132em;
+  padding: -1em;
+  padding: -12em;
+  padding: -1123132em;
+}
+ex {
+  padding: 1ex;
+  padding: 12ex;
+  padding: 1123132ex;
+  padding: -1ex;
+  padding: -12ex;
+  padding: -1123132ex;
+}
+length {
+  padding: 1px;
+  padding: 12cm;
+  padding: 1123132mm;
+  padding: -1pt;
+  padding: -12px;
+  padding: -1123132mm;
+}

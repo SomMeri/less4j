@@ -9,7 +9,7 @@ import org.porting.less4j.core.parser.LessLexer;
 public class RuleSet extends ASTCssNode {
 
   private List<Selector> selectors = new ArrayList<Selector>();
-  private List<Declaration> body;
+  private List<Declaration> body = new ArrayList<Declaration>();
 
   public RuleSet(CommonTree token) {
     super(token);
@@ -22,26 +22,11 @@ public class RuleSet extends ASTCssNode {
   
   //FIXME:this is going to return all types of childs later
   public List<Declaration> getDeclarations() {
-   if (body==null) {
-     body =new ArrayList<Declaration>();
-     List<CommonTree> children = extractUnderlyingMembers();
-     for (CommonTree kid : children) {
-      if (kid.getType()==LessLexer.DECLARATION)
-        body.add(new Declaration(kid));
-    }
-   }
-   
    return body;
   }
   
   public boolean hasEmptyBody() {
-    List<CommonTree> children = extractUnderlyingMembers();
-    for (CommonTree commonTree : children) {
-      if (commonTree.getType()!=LessLexer.SELECTOR)
-        return false;
-    }
-    
-    return true;
+    return body.isEmpty();
   }
 
   public ASTCssNodeType getType() {
@@ -50,5 +35,9 @@ public class RuleSet extends ASTCssNode {
 
   public void addSelectors(List<Selector> selectors) {
     this.selectors.addAll(selectors);
+  }
+
+  public void addDeclarations(List<Declaration> body) {
+    this.body.addAll(body);
   }
 }

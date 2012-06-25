@@ -1,3 +1,5 @@
+//http://stackoverflow.com/questions/7765018/returning-list-in-antlr-for-type-checking-language-java
+//
 // A complete lexer and grammar for CSS 2.1 as defined by the
 // W3 specification.
 //
@@ -47,6 +49,8 @@ tokens {
   ATTRIBUTE;
   ID_SELECTOR;
   CHARSET_DECLARATION;
+  TERM_FUNCTION;
+  TERM;
 }  
 
 @lexer::header {
@@ -184,10 +188,10 @@ bodyset
 //    ;
 
 fontface
-    : FONT_FACE_SYM 
-        LBRACE
-            declaration SEMI (declaration SEMI)*
-        RBRACE
+    : FONT_FACE_SYM^ 
+        LBRACE!
+            declaration SEMI! (declaration SEMI!)*
+        RBRACE!
     ;
 
 page
@@ -340,6 +344,15 @@ expr
     ;
     
 term
+    : (a+=value_term
+    | a+=function_or_identifier
+    | a+=special_function
+//    | variablereference
+    | a+=hexColor)
+    -> ^(TERM $a*)  
+    ;
+    
+value_term
     : unaryOperator?
         (
               NUMBER
@@ -348,25 +361,25 @@ term
             | EMS
             | EXS
             | ANGLE
+            | UNKNOWN_DIMENSION
             | TIME
             | FREQ
 //            | VARIABLE
         )
     | STRING
-    | function
-    | URI
-//    | variablereference
-    | hexColor  
+    | IDENT
     ;
-    
+
+special_function
+    : URI
+    ;
+
 hexColor
     : EMPTY_COMBINATOR? HASH -> HASH
     ;
 
-function
-    : IDENT (   // Function
-                LPAREN expr RPAREN
-            )?
+function_or_identifier
+    : a=IDENT LPAREN b=expr RPAREN -> ^(TERM_FUNCTION $a $b*)
     ;
     
 // ==============================================================
@@ -709,14 +722,15 @@ DOT             : '.'       ;
 // original grammar considered a single isolated letter to be a string too. 
 // therefore  h1, h2 > a > p, h3 would be tokenized as IDENT COLON IDENT GREATER STRING GREATER STRING ...
 // removed that option
+//the original string definition did not supported escaping '\\\\'* 
 fragment    INVALID :;
-STRING          : '\'' ( ~('\n'|'\r'|'\f'|'\'') )* 
+STRING          : '\'' ( ('\\\'') | ~('\n'|'\r'|'\f'|'\'') )* 
                     (
                           '\''
                         | { $type = INVALID; }
                     )
                     
-                | '"' ( ~('\n'|'\r'|'\f'|'"') )*
+                | '"' ( ('\\"') | ~('\n'|'\r'|'\f'|'"') )*
                     (
                           '"'
                         | { $type = INVALID; }
@@ -769,14 +783,15 @@ fragment    ANGLE       :;  // 'deg', 'rad', 'grad'
 fragment    TIME        :;  // 'ms', 's'
 fragment    FREQ        :;  // 'khz', 'hz'
 fragment    REPEATER    :;   // n found in n-th child formulas if I would not do that, the dimension would eat it. TODO: maybe multiple small grammars for different css aspects would be nicer. 
-fragment    DIMENSION   :;  // nnn'Somethingnotyetinvented'
 fragment    PERCENTAGE  :;  // '%'
 
 // there is no reason to require a dot inside a number
+fragment PURE_NUMBER: '0'..'9' ('.'? '0'..'9'+)?
+            | '.' '0'..'9'+;
+            
 NUMBER
-    :   (
-              '0'..'9' ('.'? '0'..'9'+)?
-            | '.' '0'..'9'+
+    :   (PURE_NUMBER
+              
         )
         (
               (E (M|X))=>
@@ -818,13 +833,13 @@ NUMBER
             | (N)=>
                 N           { $type = REPEATER;         }
             
-            | UNKNOWN_DIMENSION         { $type = DIMENSION;    }
-            
             | '%'           { $type = PERCENTAGE;   }
             
             | // Just a number
         )
     ;
+    
+NUMBER_UNKNOWN_DIMENSION: PURE_NUMBER UNKNOWN_DIMENSION  { $type = UNKNOWN_DIMENSION; } ; 
 
 // ------------
 // url and uri.

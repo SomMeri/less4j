@@ -7,11 +7,16 @@ import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.ILessCompiler;
 import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.CharsetDeclaration;
+import org.porting.less4j.core.ast.ColorExpression;
 import org.porting.less4j.core.ast.Combinator;
+import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
+import org.porting.less4j.core.ast.CssString;
 import org.porting.less4j.core.ast.Declaration;
-import org.porting.less4j.core.ast.Expression;
+import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.IdSelector;
+import org.porting.less4j.core.ast.IdentifierExpression;
+import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
@@ -19,9 +24,9 @@ import org.porting.less4j.core.ast.SelectorAttribute;
 import org.porting.less4j.core.ast.SelectorAttribute.Operator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
+import org.porting.less4j.core.ast.UrlFunction;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
-import org.porting.less4j.debugutils.DebugPrint;
 
 public class CssPrinter implements ILessCompiler {
   private ANTLRParser parser = new ANTLRParser();
@@ -76,12 +81,50 @@ class Builder {
       appendCharsetDeclaration((CharsetDeclaration)node);
       break;
 
+    case FONT_FACE:
+      appendFontFace((FontFace)node);
+      break;
+    
+    case COMPOSED_EXPRESSION:
+      appendComposedExpression((ComposedExpression)node);
+      break;
+
+    case STRING_EXPRESSION:
+      appendCssString((CssString)node);
+      break;
+
+    case NUMBER:
+      appendNumberExpression((NumberExpression)node);
+      break;
+
+    case IDENTIFIER_EXPRESSION:
+      appendIdentifierExpression((IdentifierExpression)node);
+      break;
+
+    case COLOR_EXPRESSION:
+      appendColorExpression((ColorExpression)node);
+      break;
+
+    case URL:
+      appendUrlExpression((UrlFunction)node);
+      break;
+
     default:
-      throw new IllegalStateException("Unknown");
+      throw new IllegalStateException("Unknown: " + node.getType());
     }
     
   }
 
+  //FIXME: use correct line separator for platform. I systematically use wrong one
+  //FIXME: does less.js keeps original cases in charsets and elsewhere or not? I'm converting it all to 
+  //lowercases
+  public void appendFontFace(FontFace node) {
+    builder.append("@font-face {\n");
+    appendallChilds(node);
+    builder.append("}\n");
+  }
+
+  //FIXME: use correct line separator for platform. I systematically use wrong one
   //FIXME: does less.js keeps original cases in charsets and elsewhere or not? I'm converting it all to 
   //lowercases
   public void appendCharsetDeclaration(CharsetDeclaration node) {
@@ -145,10 +188,7 @@ class Builder {
   }
 
   public void appendStyleSheet(StyleSheet styleSheet) {
-    List<ASTCssNode> allChilds = styleSheet.getChilds();
-    for (ASTCssNode node : allChilds) {
-      append(node);
-    }
+    appendallChilds(styleSheet);
   }
 
   // TODO test with empty selector e.g.:
@@ -170,25 +210,51 @@ class Builder {
     builder.append("}\n");
   }
 
-  private void appendDeclaration(Declaration declaration) {
+  public void appendDeclaration(Declaration declaration) {
     builder.appendIgnoreNull("  ");
     builder.appendIgnoreNull(declaration.getName());
     builder.appendIgnoreNull(": ");
-    appendExpression(declaration.getExpression());
-    if(declaration.hasPriority())
+    append(declaration.getExpression());
+    if(declaration.isImportant())
       builder.appendIgnoreNull("!");
     builder.appendIgnoreNull(";");
   }
 
-  private void appendExpression(Expression expression) {
-    if (expression==null)
-      return ;
-    
-    //FIXME: only temporary measure
+  public void appendComposedExpression(ComposedExpression expression) {
     List<ASTCssNode> allChilds = expression.getChilds();
     for (ASTCssNode astCssNode : allChilds) {
-      builder.append(astCssNode.getUnderlyingText());
+      append(astCssNode);
     }
+  }
+
+  public void appendCssString(CssString expression) {
+    builder.append(expression.getValue());
+  }
+
+  public void appendIdentifierExpression(IdentifierExpression expression) {
+    builder.append(expression.getName());
+  }
+
+  private void appendColorExpression(ColorExpression expression) {
+    builder.append(expression.getValue());
+  }
+
+  private void appendUrlExpression(UrlFunction node) {
+    builder.append(node.getValue());
+  }
+
+  private void appendNumberExpression(NumberExpression node) {
+    switch (node.getSign()) {
+    case PLUS:
+      builder.append("+");
+      break;
+
+    case MINUS:
+      builder.append("-");
+      break;
+    }
+    
+    builder.append(node.getValueAsString());
   }
 
   public void appendSelectors(List<Selector> selectors) {
@@ -257,6 +323,13 @@ class Builder {
 
     }
 
+ }
+
+  private void appendallChilds(ASTCssNode styleSheet) {
+    List<ASTCssNode> allChilds = styleSheet.getChilds();
+    for (ASTCssNode node : allChilds) {
+      append(node);
+    }
   }
 
 }

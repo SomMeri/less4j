@@ -1,0 +1,12 @@
+    @font-face {  
+      font-family: MyHelvetica;  
+      src: local("Helvetica Neue Bold"),  
+      local("HelveticaNeue-Bold"),  
+      url(MgOpenModernaBold.ttf);  
+      font-weight: bold;  
+    }  
+    
+    
+@font-face { font-family: "Bitstream Vera Serif Bold";
+      src: url("http://developer.mozilla.org/@api/deki/files/2934/=VeraSeBd.ttf");
+}

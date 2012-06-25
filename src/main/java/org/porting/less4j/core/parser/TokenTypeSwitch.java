@@ -7,6 +7,10 @@ public abstract class TokenTypeSwitch<T> {
   public T switchOn(CommonTree token) {
     int type = token.getType();
     
+//    if (type==LessLexer.RULESET) {
+//      return safe(handleRuleSet(token));
+//    }
+
     if (type==LessLexer.RULESET) {
       return safe(handleRuleSet(token));
     }
@@ -47,7 +51,41 @@ public abstract class TokenTypeSwitch<T> {
       return safe(handleCharsetDeclaration(token));
     }
 
-    throw new IllegalStateException("Unexpected token type: " + type);
+    if (type==LessLexer.FONT_FACE_SYM) {
+      return safe(handleFontFace(token));
+    }
+
+    if (type==LessLexer.DECLARATION) {
+      return safe(handleDeclaration(token));
+    }
+
+    if (type==LessLexer.EXPRESSION) {
+      return safe(handleExpression(token));
+    }
+    
+    if (type==LessLexer.TERM)
+      return safe(handleTerm(token));
+
+//    if (type==LessLexer.TERM_FUNCTION)
+//      return safe(handleTermFunction(token));
+
+    throw new IllegalStateException("Unexpected token type: " + type + " for " + token.getText());
+  }
+
+  public T handleTerm(CommonTree token) {
+    return null;
+  }
+
+  public T handleExpression(CommonTree token) {
+    return null;
+  }
+
+  public T handleDeclaration(CommonTree token) {
+    return null;
+  }
+
+  public T handleFontFace(CommonTree token) {
+    return null;
   }
 
   public T handleCharsetDeclaration(CommonTree token) {

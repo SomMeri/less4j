@@ -1,0 +1,1 @@
+/* Selectors construction. It tests only whether they chain correctly. It does not test attributes, pseudoclasses and other cases inside simple selectors. */

@@ -1,0 +1,2 @@
+   @charset "utf-8";
+/* The above line is incorrect, charset must not be preceded by some character. */
