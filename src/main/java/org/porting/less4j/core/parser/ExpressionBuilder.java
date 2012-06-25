@@ -6,19 +6,15 @@ import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.ast.ColorExpression;
 import org.porting.less4j.core.ast.CssString;
 import org.porting.less4j.core.ast.Expression;
+import org.porting.less4j.core.ast.FunctionExpression;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.NumberExpression.Sign;
-import org.porting.less4j.core.ast.SpecialFunctionExpression;
-import org.porting.less4j.core.ast.UrlFunction;
 
 public class ExpressionBuilder {
 
-  private final ASTBuilderSwitch parentSwitch;
-
-  public ExpressionBuilder(ASTBuilderSwitch parentSwitch) {
+  public ExpressionBuilder() {
     super();
-    this.parentSwitch = parentSwitch;
   }
 
   public Expression buildExpression(CommonTree token) {
@@ -52,10 +48,8 @@ public class ExpressionBuilder {
     case LessLexer.URI:
       return buildFromSpecialFunction(token, first);
 
-      //TODO    | a+=function_or_identifier
-    //TODO    | a+=special_function
-
-
+    case LessLexer.TERM_FUNCTION:
+      return buildFromNormalFunction(token, first);
     }
 
     throw new IncorrectTreeException("type number: " + first.getType()+ " for " + first.getText());
@@ -91,8 +85,25 @@ public class ExpressionBuilder {
     return new IdentifierExpression(parent, first.getText());
   }
 
-  private SpecialFunctionExpression buildFromSpecialFunction(CommonTree token, CommonTree first) {
-    return new UrlFunction(token, first.getText());
+  private FunctionExpression buildFromSpecialFunction(CommonTree token, CommonTree first) {
+    return new FunctionExpression(token, "url", extractUrlParameter(token, first.getText()));
+  }
+
+  private Expression extractUrlParameter(CommonTree token, String text) {
+    if (text==null)
+      return null;
+    
+    if (text.length()<5)
+      return new CssString(token, "");
+    
+    return new CssString(token, text.substring(4, text.length()-1));
+  }
+
+  //FIXME: write test for this, there is no such case
+  private FunctionExpression buildFromNormalFunction(CommonTree token, CommonTree first) {
+    String name = first.getText();
+    Expression parameter = buildExpression(getChildren(token).get(1));
+    return new FunctionExpression(token, name, parameter);
   }
 
   @SuppressWarnings("unchecked")

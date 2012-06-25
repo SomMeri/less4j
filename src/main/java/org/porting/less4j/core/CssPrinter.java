@@ -14,6 +14,7 @@ import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.CssString;
 import org.porting.less4j.core.ast.Declaration;
 import org.porting.less4j.core.ast.FontFace;
+import org.porting.less4j.core.ast.FunctionExpression;
 import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.NumberExpression;
@@ -24,7 +25,6 @@ import org.porting.less4j.core.ast.SelectorAttribute;
 import org.porting.less4j.core.ast.SelectorAttribute.Operator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
-import org.porting.less4j.core.ast.UrlFunction;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
 
@@ -105,8 +105,8 @@ class Builder {
       appendColorExpression((ColorExpression)node);
       break;
 
-    case URL:
-      appendUrlExpression((UrlFunction)node);
+    case FUNCTION:
+      appendFunctionExpression((FunctionExpression)node);
       break;
 
     default:
@@ -239,8 +239,11 @@ class Builder {
     builder.append(expression.getValue());
   }
 
-  private void appendUrlExpression(UrlFunction node) {
-    builder.append(node.getValue());
+  private void appendFunctionExpression(FunctionExpression node) {
+    builder.append(node.getName());
+    builder.append("(");
+    append(node.getParameter());
+    builder.append(")");
   }
 
   private void appendNumberExpression(NumberExpression node) {

@@ -22,7 +22,7 @@ import org.porting.less4j.core.ast.StyleSheet;
 
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   
-  private final ExpressionBuilder termBuilder = new ExpressionBuilder(this);
+  private final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
 
   public StyleSheet handleStyleSheet(CommonTree token) {
     StyleSheet result = new StyleSheet(token);
@@ -39,7 +39,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Expression handleTerm(CommonTree token) {
-    return termBuilder.buildExpression(token);
+    return expressionBuilder.buildExpression(token);
   }
   
   public Expression handleExpression(CommonTree token) {

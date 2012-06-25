@@ -7,10 +7,6 @@ public abstract class TokenTypeSwitch<T> {
   public T switchOn(CommonTree token) {
     int type = token.getType();
     
-//    if (type==LessLexer.RULESET) {
-//      return safe(handleRuleSet(token));
-//    }
-
     if (type==LessLexer.RULESET) {
       return safe(handleRuleSet(token));
     }
