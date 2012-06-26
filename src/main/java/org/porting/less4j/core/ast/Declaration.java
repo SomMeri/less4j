@@ -2,6 +2,7 @@ package org.porting.less4j.core.ast;
 
 import org.antlr.runtime.tree.CommonTree;
 
+//FIXME: http://en.wikipedia.org/wiki/CSS_filter#.21important_quirks
 public class Declaration extends ASTCssNode {
 
   private String name;

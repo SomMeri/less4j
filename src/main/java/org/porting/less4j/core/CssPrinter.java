@@ -25,10 +25,11 @@ import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
+import org.porting.less4j.platform.Constants;
 
 public class CssPrinter implements ILessCompiler {
   private ANTLRParser parser = new ANTLRParser();
-  private ASTBuilder astBuilder = new ASTBuilder(); 
+  private ASTBuilder astBuilder = new ASTBuilder();
 
   @Override
   public String compile(String content) {
@@ -56,75 +57,79 @@ class Builder {
   public void append(ASTCssNode node) {
     switch (node.getType()) {
     case RULE_SET:
-      appendRuleset((RuleSet)node);
+      appendRuleset((RuleSet) node);
       break;
 
     case CSS_CLASS:
-      appendCssClass((CssClass)node);
+      appendCssClass((CssClass) node);
       break;
 
     case PSEUDO:
-      appendPseudo((Pseudo)node);
+      appendPseudo((Pseudo) node);
       break;
 
     case SELECTOR_ATTRIBUTE:
-      appendSelectorAttribute((SelectorAttribute)node);
+      appendSelectorAttribute((SelectorAttribute) node);
       break;
 
     case ID_SELECTOR:
-      appendIdSelector((IdSelector)node);
+      appendIdSelector((IdSelector) node);
       break;
 
     case CHARSET_DECLARATION:
-      appendCharsetDeclaration((CharsetDeclaration)node);
+      appendCharsetDeclaration((CharsetDeclaration) node);
       break;
 
     case FONT_FACE:
-      appendFontFace((FontFace)node);
+      appendFontFace((FontFace) node);
       break;
-    
+
     case COMPOSED_EXPRESSION:
-      appendComposedExpression((ComposedExpression)node);
+      appendComposedExpression((ComposedExpression) node);
       break;
 
     case STRING_EXPRESSION:
-      appendCssString((CssString)node);
+      appendCssString((CssString) node);
       break;
 
     case NUMBER:
-      appendNumberExpression((NumberExpression)node);
+      appendNumberExpression((NumberExpression) node);
       break;
 
     case IDENTIFIER_EXPRESSION:
-      appendIdentifierExpression((IdentifierExpression)node);
+      appendIdentifierExpression((IdentifierExpression) node);
       break;
 
     case COLOR_EXPRESSION:
-      appendColorExpression((ColorExpression)node);
+      appendColorExpression((ColorExpression) node);
       break;
 
     case FUNCTION:
-      appendFunctionExpression((FunctionExpression)node);
+      appendFunctionExpression((FunctionExpression) node);
+      break;
+
+    case DECLARATION:
+      appendDeclaration((Declaration) node);
       break;
 
     default:
       throw new IllegalStateException("Unknown: " + node.getType());
     }
-    
+
   }
 
-  //FIXME: use correct line separator for platform. I systematically use wrong one
-  //FIXME: does less.js keeps original cases in charsets and elsewhere or not? I'm converting it all to 
-  //lowercases
+  // FIXME: does less.js keeps original cases in charsets and elsewhere or not?
+  // I'm converting it all to
+  // lowercases
   public void appendFontFace(FontFace node) {
     builder.append("@font-face {").newLine();
-    appendallChilds(node);
+    appendAllChilds(node, Constants.NEW_LINE);
     builder.append("}").newLine();
   }
 
-  //FIXME: use correct line separator for platform. I systematically use wrong one
-  //FIXME: does less.js keeps original cases in charsets and elsewhere or not? I'm converting it all to 
-  //lowercases
+  // FIXME: does less.js keeps original cases in charsets and elsewhere or not?
+  // I'm converting it all to
+  // lowercases
   public void appendCharsetDeclaration(CharsetDeclaration node) {
     builder.append("@charset ");
     builder.append(node.getCharset());
@@ -172,7 +177,7 @@ class Builder {
     case SUBSTRINGMATCH:
       builder.append("*=");
       break;
-      
+
     default:
       throw new IllegalStateException("Unknown: " + operator);
     }
@@ -187,7 +192,7 @@ class Builder {
   }
 
   public void appendStyleSheet(StyleSheet styleSheet) {
-    appendallChilds(styleSheet);
+    appendAllChilds(styleSheet);
   }
 
   // TODO test with empty selector e.g.:
@@ -203,7 +208,7 @@ class Builder {
     Iterator<Declaration> iterator = ruleSet.getDeclarations().iterator();
     while (iterator.hasNext()) {
       Declaration declaration = iterator.next();
-      appendDeclaration(declaration);
+      append(declaration);
       builder.newLine();
     }
     builder.append("}").newLine();
@@ -213,10 +218,11 @@ class Builder {
     builder.appendIgnoreNull("  ");
     builder.appendIgnoreNull(declaration.getName());
     builder.appendIgnoreNull(": ");
-    if (declaration.getExpression()!=null)
+    if (declaration.getExpression() != null)
       append(declaration.getExpression());
-    //FIXME: zdokumentontovat: less.js prints important as it was, e.g. it may not have leading space or it  may be ! important
-    if(declaration.isImportant())
+    // FIXME: zdokumentontovat: less.js prints important as it was, e.g. it may
+    // not have leading space or it may be ! important
+    if (declaration.isImportant())
       builder.appendIgnoreNull(" !important");
     builder.appendIgnoreNull(";");
   }
@@ -279,8 +285,8 @@ class Builder {
       builder.append("-");
       break;
     }
-    
-    //FIXME: why does the number contain also the next space????
+
+    // FIXME: why does the number contain also the next space????
     builder.append(node.getValueAsString().trim());
   }
 
@@ -298,21 +304,21 @@ class Builder {
   public void appendSelector(Selector selector) {
     if (!selector.isCombined()) {
       appendSimpleSelector(selector.getHead());
-      return ;
+      return;
     }
     appendSimpleSelector(selector.getHead());
     appendCombinator(selector.getCombinator());
     appendSelector(selector.getRight());
   }
 
-  //TODO add test to all cases
+  // TODO add test to all cases
   private void appendSimpleSelector(SimpleSelector selector) {
     appendSimpleSelectorHead(selector);
     appendSimpleSelectorTail(selector);
   }
 
   private void appendSimpleSelectorTail(SimpleSelector selector) {
-    //FIXME: here I assume that only CSS classes are possible
+    // FIXME: here I assume that only CSS classes are possible
     List<ASTCssNode> allChilds = selector.getSubsequent();
     for (ASTCssNode astCssNode : allChilds) {
       append(astCssNode);
@@ -320,7 +326,6 @@ class Builder {
   }
 
   private void appendCssClass(CssClass cssClass) {
-    //TODO: things like this could be known by the class itself?
     builder.append(".").append(cssClass.getName());
   }
 
@@ -330,7 +335,7 @@ class Builder {
     } else {
       builder.appendIgnoreNull(selector.getElementName());
     }
-    
+
   }
 
   // TODO add test on plus greated and empty!!!!!!
@@ -350,14 +355,18 @@ class Builder {
 
     }
 
- }
+  }
 
-  private void appendallChilds(ASTCssNode styleSheet) {
-    List<ASTCssNode> allChilds = styleSheet.getChilds();
-    for (ASTCssNode node : allChilds) {
-      append(node);
+  private void appendAllChilds(ASTCssNode node) {
+    appendAllChilds(node, null);
+  }
+
+  private void appendAllChilds(ASTCssNode node, String delimiter) {
+    List<? extends ASTCssNode> allChilds = node.getChilds();
+    for (ASTCssNode kid : allChilds) {
+      append(kid);
+      builder.appendIgnoreNull(delimiter);
     }
   }
 
 }
-

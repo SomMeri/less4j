@@ -9,8 +9,6 @@ public class Selector extends ASTCssNode {
   private final Selector right;
 
   public Selector(CommonTree token, SimpleSelector head, Combinator combinator, Selector right) {
-    //TODO add assert
-    //FIXME: I will have to remove those assertions to be able to handle malformed trees
     super(token);
     this.head = head;
     this.combinator = combinator;

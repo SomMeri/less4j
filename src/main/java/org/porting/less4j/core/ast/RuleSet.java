@@ -20,7 +20,6 @@ public class RuleSet extends ASTCssNode {
    return selectors;
   }
   
-  //FIXME:this is going to return all types of childs later
   public List<Declaration> getDeclarations() {
    return body;
   }

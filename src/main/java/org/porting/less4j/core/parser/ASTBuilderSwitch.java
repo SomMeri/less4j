@@ -108,8 +108,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public FontFace handleFontFace(CommonTree token) {
-    // TODO not implemented yet, found out that I have to do declaration first
-    return null;
+    FontFace result = new FontFace(token);
+
+    List<CommonTree> children = getChildren(token);
+    List<Declaration> declarations = new ArrayList<Declaration>();
+    for (CommonTree kid : children) {
+      if (kid.getType() == LessLexer.DECLARATION)
+        declarations.add(handleDeclaration(kid));
+    }
+
+    result.addDeclarations(declarations);
+    return result; 
   }
 
   public CharsetDeclaration handleCharsetDeclaration(CommonTree token) {
@@ -186,7 +195,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (theSelector.getType() == LessLexer.STAR)
       return new SimpleSelector(token, null, true, new ArrayList<ASTCssNode>());
 
-    // TODO this of course assumes that the tree is OK
     int startIndex = 0;
     String elementName = null;
     if (theSelector.getType() == LessLexer.ELEMENT_NAME) {

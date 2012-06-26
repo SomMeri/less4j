@@ -2,7 +2,6 @@ package org.porting.less4j.core.ast;
 
 import org.antlr.runtime.tree.CommonTree;
 
-//TODO not sure whether this is a good hierarchy, but will do for now
 public class IdentifierExpression extends Expression {
   
   private String name;

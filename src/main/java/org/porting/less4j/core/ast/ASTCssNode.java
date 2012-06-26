@@ -15,7 +15,7 @@ public abstract class ASTCssNode {
   }
   
   // FIXME: turn to abstract
-  public List<ASTCssNode> getChilds() {
+  public List<? extends ASTCssNode> getChilds() {
     return children;
   }
   
