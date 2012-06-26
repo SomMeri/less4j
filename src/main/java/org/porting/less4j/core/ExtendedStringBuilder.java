@@ -1,5 +1,7 @@
 package org.porting.less4j.core;
 
+import org.porting.less4j.platform.Constants;
+
 public class ExtendedStringBuilder {
   private StringBuilder builder = new StringBuilder();
 
@@ -83,5 +85,8 @@ public class ExtendedStringBuilder {
     return builder.toString();
   }
 
+  public void newLine() {
+    builder.append(Constants.NEW_LINE);
+  }
   
 }

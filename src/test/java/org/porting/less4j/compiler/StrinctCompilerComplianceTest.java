@@ -35,7 +35,7 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "expression-number-simple.less"));
+//    addFiles(result, new File(inputDir + "almost-css21.less"));
 
     return result;
   }

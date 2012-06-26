@@ -8,12 +8,14 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
-import org.porting.less4j.debugutils.DebugPrint;
 
 /**
  * This class is NOT thread safe. 
  *
  */
+//FIXME:   add handling of filter: alpha(opacity=100);
+//FIXME:   add handling of media
+//FIXME:   add handling of font face
 public class ANTLRParser {
 
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
@@ -23,7 +25,7 @@ public class ANTLRParser {
   public CommonTree parse(String expression) {
     try {
       initialize(expression);
-      DebugPrint.printTokenStream(expression);
+      //DebugPrint.printTokenStream(expression);
       ParserRuleReturnScope ret = parser.styleSheet();
       return finalize(ret);
     } catch (RecognitionException e) {
@@ -85,7 +87,7 @@ public class ANTLRParser {
   private CommonTree finalize(ParserRuleReturnScope ret) {
     collectErrors(lexer, parser);
     CommonTree ast = (CommonTree) ret.getTree();
-    DebugPrint.print(ast);
+    //DebugPrint.print(ast);
     return ast;
   }
 
@@ -105,26 +107,22 @@ public class ANTLRParser {
 //
 //  @Override
 //  public Object dupNode(Object t) {
-//    // TODO Auto-generated method stub
 //    return super.dupNode(t);
 //  }
 //
 //  @Override
 //  public Object create(Token payload) {
 //    int tokenIndex = payload.getTokenIndex();
-//    // TODO Auto-generated method stub
 //    return super.create(payload);
 //  }
 //
 //  @Override
 //  public Token createToken(int tokenType, String text) {
-//    // TODO Auto-generated method stub
 //    return super.createToken(tokenType, text);
 //  }
 //
 //  @Override
 //  public Token createToken(Token fromToken) {
-//    // TODO Auto-generated method stub
 //    return super.createToken(fromToken);
 //  }
 //  

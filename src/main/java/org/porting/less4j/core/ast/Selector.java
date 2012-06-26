@@ -36,4 +36,9 @@ public class Selector extends ASTCssNode {
   public ASTCssNodeType getType() {
     return ASTCssNodeType.SELECTOR;
   }
+  
+  public enum Combinator {
+    PLUS, GREATER, EMPTY;
+  }
+
 }

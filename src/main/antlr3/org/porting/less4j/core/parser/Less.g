@@ -345,7 +345,7 @@ expr
     
 term
     : (a+=value_term
-    | a+=function_or_identifier
+    | a+=function
     | a+=special_function
 //    | variablereference
     | a+=hexColor)
@@ -378,7 +378,7 @@ hexColor
     : EMPTY_COMBINATOR? HASH -> HASH
     ;
 
-function_or_identifier
+function
     : a=IDENT LPAREN b=expr RPAREN -> ^(TERM_FUNCTION $a $b*)
     ;
     

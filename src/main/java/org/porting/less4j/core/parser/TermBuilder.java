@@ -10,14 +10,17 @@ import org.porting.less4j.core.ast.FunctionExpression;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.NumberExpression.Sign;
+import org.porting.less4j.platform.Constants;
 
-public class ExpressionBuilder {
+public class TermBuilder {
 
-  public ExpressionBuilder() {
-    super();
+  private final ASTBuilderSwitch parentBuilder;
+
+  public TermBuilder(ASTBuilderSwitch astBuilderSwitch) {
+    this.parentBuilder = astBuilderSwitch;
   }
 
-  public Expression buildExpression(CommonTree token) {
+  public Expression buildFromTerm(CommonTree token) {
     List<CommonTree> children = getChildren(token);
     CommonTree first = children.get(0);
     switch (first.getType()) {
@@ -50,6 +53,9 @@ public class ExpressionBuilder {
 
     case LessLexer.TERM_FUNCTION:
       return buildFromNormalFunction(token, first);
+
+    case LessLexer.TERM:
+      return buildFromTerm(first);
     }
 
     throw new IncorrectTreeException("type number: " + first.getType()+ " for " + first.getText());
@@ -86,7 +92,12 @@ public class ExpressionBuilder {
   }
 
   private FunctionExpression buildFromSpecialFunction(CommonTree token, CommonTree first) {
-    return new FunctionExpression(token, "url", extractUrlParameter(token, first.getText()));
+    return new FunctionExpression(token, "url", extractUrlParameter(token, normalizeNewLineSymbols(first.getText())));
+  }
+
+  //some places (e.g. only url) allow new lines in them. Less.js tend to translate them into  
+  private String normalizeNewLineSymbols(String text) {
+    return text.replaceAll("\r?\n", Constants.NEW_LINE);
   }
 
   private Expression extractUrlParameter(CommonTree token, String text) {
@@ -101,8 +112,9 @@ public class ExpressionBuilder {
 
   //FIXME: write test for this, there is no such case
   private FunctionExpression buildFromNormalFunction(CommonTree token, CommonTree first) {
-    String name = first.getText();
-    Expression parameter = buildExpression(getChildren(token).get(1));
+    List<CommonTree> children = getChildren(first);
+    String name = children.get(0).getText();
+    Expression parameter = (Expression) parentBuilder.switchOn(children.get(1));
     return new FunctionExpression(token, name, parameter);
   }
 

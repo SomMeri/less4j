@@ -8,7 +8,6 @@ import org.porting.less4j.ILessCompiler;
 import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.CharsetDeclaration;
 import org.porting.less4j.core.ast.ColorExpression;
-import org.porting.less4j.core.ast.Combinator;
 import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.CssString;
@@ -22,7 +21,6 @@ import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
 import org.porting.less4j.core.ast.SelectorAttribute;
-import org.porting.less4j.core.ast.SelectorAttribute.Operator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
@@ -119,9 +117,9 @@ class Builder {
   //FIXME: does less.js keeps original cases in charsets and elsewhere or not? I'm converting it all to 
   //lowercases
   public void appendFontFace(FontFace node) {
-    builder.append("@font-face {\n");
+    builder.append("@font-face {").newLine();
     appendallChilds(node);
-    builder.append("}\n");
+    builder.append("}").newLine();
   }
 
   //FIXME: use correct line separator for platform. I systematically use wrong one
@@ -130,7 +128,7 @@ class Builder {
   public void appendCharsetDeclaration(CharsetDeclaration node) {
     builder.append("@charset ");
     builder.append(node.getCharset());
-    builder.append(";\n");
+    builder.append(";").newLine();
   }
 
   public void appendIdSelector(IdSelector node) {
@@ -146,7 +144,7 @@ class Builder {
     builder.append("]");
   }
 
-  public void appendSelectorOperator(Operator operator) {
+  public void appendSelectorOperator(SelectorAttribute.Operator operator) {
     switch (operator) {
     case NONE:
       break;
@@ -174,8 +172,9 @@ class Builder {
     case SUBSTRINGMATCH:
       builder.append("*=");
       break;
+      
     default:
-      break;
+      throw new IllegalStateException("Unknown: " + operator);
     }
   }
 
@@ -200,30 +199,54 @@ class Builder {
       return;
 
     appendSelectors(ruleSet.getSelectors());
-    builder.append(" {\n");
+    builder.append(" {").newLine();
     Iterator<Declaration> iterator = ruleSet.getDeclarations().iterator();
     while (iterator.hasNext()) {
       Declaration declaration = iterator.next();
       appendDeclaration(declaration);
-      builder.append("\n");
+      builder.newLine();
     }
-    builder.append("}\n");
+    builder.append("}").newLine();
   }
 
   public void appendDeclaration(Declaration declaration) {
     builder.appendIgnoreNull("  ");
     builder.appendIgnoreNull(declaration.getName());
     builder.appendIgnoreNull(": ");
-    append(declaration.getExpression());
+    if (declaration.getExpression()!=null)
+      append(declaration.getExpression());
+    //FIXME: zdokumentontovat: less.js prints important as it was, e.g. it may not have leading space or it  may be ! important
     if(declaration.isImportant())
-      builder.appendIgnoreNull("!");
+      builder.appendIgnoreNull(" !important");
     builder.appendIgnoreNull(";");
   }
 
   public void appendComposedExpression(ComposedExpression expression) {
-    List<ASTCssNode> allChilds = expression.getChilds();
-    for (ASTCssNode astCssNode : allChilds) {
-      append(astCssNode);
+    append(expression.getLeft());
+    appendExpressionOperator(expression.getOperator());
+    append(expression.getRight());
+  }
+
+  public void appendExpressionOperator(ComposedExpression.Operator operator) {
+    switch (operator) {
+    case COMMA:
+      builder.append(", ");
+      break;
+
+    case SOLIDUS:
+      builder.append("/");
+      break;
+
+    case STAR:
+      builder.append(" * ");
+      break;
+
+    case EMPTY_OPERATOR:
+      builder.append(" ");
+      break;
+
+    default:
+      throw new IllegalStateException("Unknown: " + operator);
     }
   }
 
@@ -257,7 +280,8 @@ class Builder {
       break;
     }
     
-    builder.append(node.getValueAsString());
+    //FIXME: why does the number contain also the next space????
+    builder.append(node.getValueAsString().trim());
   }
 
   public void appendSelectors(List<Selector> selectors) {
@@ -267,7 +291,7 @@ class Builder {
       appendSelector(selector);
 
       if (iterator.hasNext())
-        builder.append(",\n");
+        builder.append(",").newLine();
     }
   }
 
@@ -310,10 +334,10 @@ class Builder {
   }
 
   // TODO add test on plus greated and empty!!!!!!
-  public void appendCombinator(Combinator combinator) {
+  public void appendCombinator(Selector.Combinator combinator) {
     switch (combinator) {
     case PLUS:
-      builder.append("+");
+      builder.append(" + ");
       break;
 
     case GREATER:

@@ -6,7 +6,6 @@ import java.util.List;
 import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.CharsetDeclaration;
-import org.porting.less4j.core.ast.Combinator;
 import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
@@ -22,7 +21,7 @@ import org.porting.less4j.core.ast.StyleSheet;
 
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   
-  private final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+  private final TermBuilder termBuilder = new TermBuilder(this);
 
   public StyleSheet handleStyleSheet(CommonTree token) {
     StyleSheet result = new StyleSheet(token);
@@ -39,7 +38,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Expression handleTerm(CommonTree token) {
-    return expressionBuilder.buildExpression(token);
+    return termBuilder.buildFromTerm(token);
   }
   
   public Expression handleExpression(CommonTree token) {
@@ -157,11 +156,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     // this must represent a simple selector. Otherwise we are doomed anyway.
     SimpleSelector head = handleSimpleSelector(members.get(0));
 
-    Combinator combinator;
+    Selector.Combinator combinator;
     if (members.size() == 1)
       combinator = null;
     else
-      combinator = Combinator.convert(members.get(1));
+      combinator = toSelectorCombinator(members.get(1));
 
     if (members.size() < 2)
       return new Selector(parent, head, combinator, null);
@@ -169,6 +168,18 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new Selector(parent, head, combinator, createSelector(parent, members.subList(2, members.size())));
   }
 
+  public Selector.Combinator toSelectorCombinator(CommonTree token) {
+    switch (token.getType()) {
+    case LessLexer.PLUS:
+      return Selector.Combinator.PLUS;
+    case LessLexer.GREATER:
+      return Selector.Combinator.GREATER;
+    case LessLexer.EMPTY_COMBINATOR:
+      return Selector.Combinator.EMPTY;
+    }
+    
+    throw new IllegalStateException("Unknown: " + token.getType());
+  }
   public SimpleSelector handleSimpleSelector(CommonTree token) {
     List<CommonTree> members = getChildren(token);
     CommonTree theSelector = members.get(0);
