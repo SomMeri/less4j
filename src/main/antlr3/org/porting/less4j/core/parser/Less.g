@@ -51,6 +51,7 @@ tokens {
   CHARSET_DECLARATION;
   TERM_FUNCTION;
   TERM;
+  MEDIUM_DECLARATION;
 }  
 
 @lexer::header {
@@ -151,13 +152,16 @@ imports
 // ---------
 // Media.   Introduce a set of rules that are to be used if the consumer indicates
 //          it belongs to the signified medium.
+// Media can also have a ruleset in them.  
 //
 media
-    : MEDIA_SYM medium (COMMA medium)*
+    : MEDIA_SYM (m+=medium (COMMA m+=medium)*)
         LBRACE
-            declaration SEMI (declaration SEMI)*
+            ((declaration) => b+=declaration SEMI 
+            | b+=ruleSet )*
         RBRACE
-    ;
+    -> ^(MEDIA_SYM ^(MEDIUM_DECLARATION $m*) $b*) 
+    ; 
 
 // ---------    
 // Medium.  The name of a medim that are particulare set of rules applies to.

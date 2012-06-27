@@ -35,7 +35,7 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "font-face.less"));
+//    addFiles(result, new File(inputDir + "media-simple.less"));
 
     return result;
   }

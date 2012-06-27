@@ -1,6 +1,7 @@
 package org.porting.less4j.core.parser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
@@ -12,6 +13,8 @@ import org.porting.less4j.core.ast.Declaration;
 import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.IdSelector;
+import org.porting.less4j.core.ast.Media;
+import org.porting.less4j.core.ast.Medium;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
@@ -286,6 +289,26 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       throw new IncorrectTreeException();
 
     return new IdSelector(token, text.substring(1));
+  }
+
+  public Media handleMedia(CommonTree token) {
+    List<CommonTree> children = getChildren(token);
+    Media result = new Media(token);
+    for (CommonTree kid : children) {
+      result.addChild(switchOn(kid));
+      
+    }
+    return result;
+  }
+
+  public Medium handleMediumDeclaration(CommonTree token) {
+    Medium result = new Medium(token);
+    List<CommonTree> children = getChildren(token);
+    for (CommonTree kid : children) {
+      result.addMedium(kid.getText());
+    }
+    
+    return result;
   }
 
 }

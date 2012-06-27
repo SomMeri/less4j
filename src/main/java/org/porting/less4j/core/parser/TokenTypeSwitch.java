@@ -62,10 +62,21 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.TERM)
       return safe(handleTerm(token));
 
-//    if (type==LessLexer.TERM_FUNCTION)
-//      return safe(handleTermFunction(token));
+    if (type==LessLexer.MEDIA_SYM)
+      return safe(handleMedia(token));
+
+    if (type==LessLexer.MEDIUM_DECLARATION)
+      return safe(handleMediumDeclaration(token));
 
     throw new IllegalStateException("Unexpected token type: " + type + " for " + token.getText());
+  }
+
+  public T handleMediumDeclaration(CommonTree token) {
+    return null;
+  }
+
+  public T handleMedia(CommonTree token) {
+    return null;
   }
 
   public T handleTerm(CommonTree token) {

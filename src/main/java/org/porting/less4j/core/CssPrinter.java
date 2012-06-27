@@ -16,6 +16,8 @@ import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.FunctionExpression;
 import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.IdentifierExpression;
+import org.porting.less4j.core.ast.Media;
+import org.porting.less4j.core.ast.Medium;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
@@ -25,7 +27,6 @@ import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
-import org.porting.less4j.platform.Constants;
 
 public class CssPrinter implements ILessCompiler {
   private ANTLRParser parser = new ANTLRParser();
@@ -54,63 +55,61 @@ class Builder {
     this.builder = builder;
   }
 
-  public void append(ASTCssNode node) {
+  /**
+   * returns whether the output changed as a result of the operation
+   * 
+   * @param node
+   * @return
+   */
+  public boolean append(ASTCssNode node) {
     switch (node.getType()) {
     case RULE_SET:
-      appendRuleset((RuleSet) node);
-      break;
+      return appendRuleset((RuleSet) node);
 
     case CSS_CLASS:
-      appendCssClass((CssClass) node);
-      break;
+      return appendCssClass((CssClass) node);
 
     case PSEUDO:
-      appendPseudo((Pseudo) node);
-      break;
+      return appendPseudo((Pseudo) node);
 
     case SELECTOR_ATTRIBUTE:
-      appendSelectorAttribute((SelectorAttribute) node);
-      break;
+      return appendSelectorAttribute((SelectorAttribute) node);
 
     case ID_SELECTOR:
-      appendIdSelector((IdSelector) node);
-      break;
+      return appendIdSelector((IdSelector) node);
 
     case CHARSET_DECLARATION:
-      appendCharsetDeclaration((CharsetDeclaration) node);
-      break;
+      return appendCharsetDeclaration((CharsetDeclaration) node);
 
     case FONT_FACE:
-      appendFontFace((FontFace) node);
-      break;
+      return appendFontFace((FontFace) node);
 
     case COMPOSED_EXPRESSION:
-      appendComposedExpression((ComposedExpression) node);
-      break;
+      return appendComposedExpression((ComposedExpression) node);
 
     case STRING_EXPRESSION:
-      appendCssString((CssString) node);
-      break;
+      return appendCssString((CssString) node);
 
     case NUMBER:
-      appendNumberExpression((NumberExpression) node);
-      break;
+      return appendNumberExpression((NumberExpression) node);
 
     case IDENTIFIER_EXPRESSION:
-      appendIdentifierExpression((IdentifierExpression) node);
-      break;
+      return appendIdentifierExpression((IdentifierExpression) node);
 
     case COLOR_EXPRESSION:
-      appendColorExpression((ColorExpression) node);
-      break;
+      return appendColorExpression((ColorExpression) node);
 
     case FUNCTION:
-      appendFunctionExpression((FunctionExpression) node);
-      break;
+      return appendFunctionExpression((FunctionExpression) node);
 
     case DECLARATION:
-      appendDeclaration((Declaration) node);
-      break;
+      return appendDeclaration((Declaration) node);
+
+    case MEDIA:
+      return appendMedia((Media) node);
+
+    case MEDIUM:
+      return appendMedium((Medium) node);
 
     default:
       throw new IllegalStateException("Unknown: " + node.getType());
@@ -121,32 +120,42 @@ class Builder {
   // FIXME: does less.js keeps original cases in charsets and elsewhere or not?
   // I'm converting it all to
   // lowercases
-  public void appendFontFace(FontFace node) {
+  public boolean appendFontFace(FontFace node) {
     builder.append("@font-face {").newLine();
-    appendAllChilds(node, Constants.NEW_LINE);
-    builder.append("}").newLine();
+    builder.increaseIndentationLevel();
+    appendAllChilds(node);
+    builder.decreaseIndentationLevel();
+    builder.append("}");
+
+    return true;
   }
 
   // FIXME: does less.js keeps original cases in charsets and elsewhere or not?
   // I'm converting it all to
   // lowercases
-  public void appendCharsetDeclaration(CharsetDeclaration node) {
+  public boolean appendCharsetDeclaration(CharsetDeclaration node) {
     builder.append("@charset ");
     builder.append(node.getCharset());
-    builder.append(";").newLine();
+    builder.append(";");
+
+    return true;
   }
 
-  public void appendIdSelector(IdSelector node) {
+  public boolean appendIdSelector(IdSelector node) {
     builder.append("#");
     builder.append(node.getName());
+
+    return true;
   }
 
-  public void appendSelectorAttribute(SelectorAttribute node) {
+  public boolean appendSelectorAttribute(SelectorAttribute node) {
     builder.append("[");
     builder.append(node.getName());
     appendSelectorOperator(node.getOperator());
     builder.appendIgnoreNull(node.getValue());
     builder.append("]");
+
+    return true;
   }
 
   public void appendSelectorOperator(SelectorAttribute.Operator operator) {
@@ -183,12 +192,14 @@ class Builder {
     }
   }
 
-  public void appendPseudo(Pseudo node) {
+  public boolean appendPseudo(Pseudo node) {
     builder.append(":");
     builder.append(node.getName());
     if (node.hasParameters()) {
       builder.append(node.getParameter());
     }
+
+    return true;
   }
 
   public void appendStyleSheet(StyleSheet styleSheet) {
@@ -199,23 +210,26 @@ class Builder {
   // 1.) "something, , else"
   // 2.) "something, , ,"
   // 3.) "" - what happen is some rule set has no selector?
-  public void appendRuleset(RuleSet ruleSet) {
+  public boolean appendRuleset(RuleSet ruleSet) {
     if (ruleSet.hasEmptyBody())
-      return;
+      return false;
 
     appendSelectors(ruleSet.getSelectors());
     builder.append(" {").newLine();
+    builder.increaseIndentationLevel();
     Iterator<Declaration> iterator = ruleSet.getDeclarations().iterator();
     while (iterator.hasNext()) {
       Declaration declaration = iterator.next();
       append(declaration);
       builder.newLine();
     }
-    builder.append("}").newLine();
+    builder.decreaseIndentationLevel();
+    builder.append("}");
+
+    return true;
   }
 
-  public void appendDeclaration(Declaration declaration) {
-    builder.appendIgnoreNull("  ");
+  public boolean appendDeclaration(Declaration declaration) {
     builder.appendIgnoreNull(declaration.getName());
     builder.appendIgnoreNull(": ");
     if (declaration.getExpression() != null)
@@ -225,12 +239,54 @@ class Builder {
     if (declaration.isImportant())
       builder.appendIgnoreNull(" !important");
     builder.appendIgnoreNull(";");
+
+    return true;
   }
 
-  public void appendComposedExpression(ComposedExpression expression) {
+  public boolean appendMedia(Media node) {
+    builder.append("@media ");
+    appendMedium(node.getMedium());
+    builder.append(" {").newLine();
+    builder.increaseIndentationLevel();
+    //FIXME: DOCUMENTATION less.js reorders statements in @media. It prints declarations first and rulesets second 
+    //FIXME: DOCUMENTATION no new line for the last declaration 
+    //FIXME: DOCUMENTATION media-simple.txt 
+    Iterator<ASTCssNode> declarations = node.getDeclarations().iterator();
+    List<ASTCssNode> ruleSets = node.getRuleSets();
+    while (declarations.hasNext()) {
+      ASTCssNode body = declarations.next();
+      append(body);
+      if (declarations.hasNext() || ruleSets.isEmpty())
+        builder.newLine();
+    }
+    for (ASTCssNode body : ruleSets) {
+      append(body);
+      builder.newLine();
+    }
+    builder.decreaseIndentationLevel();
+    builder.append("}");
+
+    return true;
+  }
+
+  public boolean appendMedium(Medium medium) {
+    Iterator<String> iterator = medium.getMediums().iterator();
+    if (!iterator.hasNext())
+      return false;
+    builder.append(iterator.next());
+    while (iterator.hasNext()) {
+      builder.append(", ").append(iterator.next());
+    }
+
+    return true;
+  }
+
+  public boolean appendComposedExpression(ComposedExpression expression) {
     append(expression.getLeft());
     appendExpressionOperator(expression.getOperator());
     append(expression.getRight());
+
+    return true;
   }
 
   public void appendExpressionOperator(ComposedExpression.Operator operator) {
@@ -256,26 +312,34 @@ class Builder {
     }
   }
 
-  public void appendCssString(CssString expression) {
+  public boolean appendCssString(CssString expression) {
     builder.append(expression.getValue());
+
+    return true;
   }
 
-  public void appendIdentifierExpression(IdentifierExpression expression) {
+  public boolean appendIdentifierExpression(IdentifierExpression expression) {
     builder.append(expression.getName());
+
+    return true;
   }
 
-  private void appendColorExpression(ColorExpression expression) {
+  private boolean appendColorExpression(ColorExpression expression) {
     builder.append(expression.getValue());
+
+    return true;
   }
 
-  private void appendFunctionExpression(FunctionExpression node) {
+  private boolean appendFunctionExpression(FunctionExpression node) {
     builder.append(node.getName());
     builder.append("(");
     append(node.getParameter());
     builder.append(")");
+
+    return true;
   }
 
-  private void appendNumberExpression(NumberExpression node) {
+  private boolean appendNumberExpression(NumberExpression node) {
     switch (node.getSign()) {
     case PLUS:
       builder.append("+");
@@ -288,6 +352,8 @@ class Builder {
 
     // FIXME: why does the number contain also the next space????
     builder.append(node.getValueAsString().trim());
+
+    return true;
   }
 
   public void appendSelectors(List<Selector> selectors) {
@@ -325,8 +391,9 @@ class Builder {
     }
   }
 
-  private void appendCssClass(CssClass cssClass) {
+  private boolean appendCssClass(CssClass cssClass) {
     builder.append(".").append(cssClass.getName());
+    return true;
   }
 
   public void appendSimpleSelectorHead(SimpleSelector selector) {
@@ -358,14 +425,10 @@ class Builder {
   }
 
   private void appendAllChilds(ASTCssNode node) {
-    appendAllChilds(node, null);
-  }
-
-  private void appendAllChilds(ASTCssNode node, String delimiter) {
     List<? extends ASTCssNode> allChilds = node.getChilds();
     for (ASTCssNode kid : allChilds) {
-      append(kid);
-      builder.appendIgnoreNull(delimiter);
+      if (append(kid))
+        builder.newLine();
     }
   }
 

@@ -25,10 +25,16 @@ div#id {
 .one.two.three {
   color: grey;
 }
-@media print {
+  @media print {
   font-size: 3em;
 }
 @media screen {
+  font-size: 10px;
+}
+@media screen,print {
+  font-size: 10px;
+}
+@media screen , screen {
   font-size: 10px;
 }
 @font-face {
