@@ -18,7 +18,7 @@ import org.porting.less4j.core.CssPrinter;
 @RunWith(Parameterized.class)
 public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
 
-  private static final String inputDir = "src\\test\\resources\\compile-valid-less\\";
+  private static final String inputDir = "src\\test\\resources\\compile-valid-css\\";
   private static final String outputDir = inputDir;
 
   public StrinctCompilerComplianceTest(File inputFile, File outputFile, String testName) {
@@ -35,7 +35,7 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "media-simple.less"));
+//    addFiles(result, new File(inputDir + "comments.less"));
 
     return result;
   }

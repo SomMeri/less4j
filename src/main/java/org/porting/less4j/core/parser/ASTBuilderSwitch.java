@@ -1,7 +1,6 @@
 package org.porting.less4j.core.parser;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;

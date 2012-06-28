@@ -14,7 +14,7 @@ import org.porting.less4j.debugutils.DebugPrint;
  * This class is NOT thread safe. 
  *
  */
-//FIXME:   add handling of filter: alpha(opacity=100);
+//FIXME: add handling of filter: alpha(opacity=100);
 public class ANTLRParser {
 
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();

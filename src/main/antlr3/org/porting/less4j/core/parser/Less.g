@@ -238,11 +238,11 @@ property
     
 // ruleSet can contain other rulesets.
 //TODO: this rule generates warning: Decision can match input such as "IDENT" using multiple alternatives: 1, 2
-//
+////the last declaration does not have to have semicolon
 ruleSet
     : a+=selector (COMMA a+=selector)*
         LBRACE
-            ((b+=declaration SEMI) /*| b+=variabledeclaration*/ | (b+=combinator b+=ruleSet) | ('&' COLON b+=ruleSet))*
+            ((b+=declaration SEMI) /*| b+=variabledeclaration*/ | (b+=combinator b+=ruleSet) | ('&' COLON b+=ruleSet))* (b+=declaration)?
         RBRACE
      -> ^(RULESET $a* $b*)
     ;
@@ -671,6 +671,8 @@ COMMENT         : '/*' ( options { greedy=false; } : .*) '*/'
                     }
                 ;
 
+COMMENT_LITTLE : '//' ( options { greedy=false; } : .*) NL { $channel = HIDDEN; };
+
 // ---------------------
 // HTML comment open.   HTML/XML comments may be placed around style sheets so that they
 //                      are hidden from higher scope parsing engines such as HTML parsers.
@@ -864,8 +866,8 @@ EVEN: E V E N;
 //              need to deal with the whitespace directly in the parser.
 //
 WS      : (' '|'\t')+           { $channel = HIDDEN;    }   ;
-NL      : ('\r' '\n'? | '\n')   { $channel = HIDDEN;    }   ;
-
+fragment NL      : ('\r' '\n'? | '\n');
+NEW_LINE: NL   { $channel = HIDDEN;    }   ;
 
 // -------------
 //  Illegal.    Any other character shoudl not be allowed.
