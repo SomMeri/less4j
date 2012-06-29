@@ -1,6 +1,6 @@
 Less4j is a port of [less.js](http://lesscss.org/) into Java. 
 
-Roadmap:
+# Roadmap:
 *  add comments handling into grammar as exists now,
 *  clean up unit tests,
 *  make it compatible with css2.1 and css3,
@@ -8,9 +8,9 @@ Roadmap:
 *  add less.js features and document the grammar while doing it,
 *  finalize API.
 
-Architecture:
-I'm still experimenting with the architecture. TODO
+# Architecture:
+I'm still experimenting with the architecture. 
 
-API:
+# API:
 Not finished yet. 
 
