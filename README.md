@@ -1,4 +1,4 @@
-Less4j is a port of [less.js](http://lesscss.org/) into Java. 
+Less4j is port of [less.js](http://lesscss.org/) into Java. 
 
 ## Roadmap:
 *  add comments handling into grammar as exists now,
