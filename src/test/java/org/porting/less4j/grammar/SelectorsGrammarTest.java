@@ -55,7 +55,6 @@ public class SelectorsGrammarTest {
     String selector = "li:not(:only-child) { ";
     CommonTree tree = compiler.parseSelector(selector);
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
     }
 
   @Test
@@ -63,7 +62,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     CommonTree tree = compiler.parseSelector("class#id[attr=32]:not(1) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
@@ -71,7 +69,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     CommonTree tree = compiler.parseSelector("p:not([class*=\"lead\"]) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
   
   @Test
@@ -92,7 +89,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     CommonTree tree = compiler.parseSelector("li:nth-child(4n+1) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
@@ -100,7 +96,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     CommonTree tree = compiler.parseSelector("li:nth-child(4n-1) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
@@ -108,7 +103,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     CommonTree tree = compiler.parseSelector("li:nth-child(4n) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
@@ -116,7 +110,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     CommonTree tree = compiler.parseSelector("li:nth-child(-4n) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
@@ -124,7 +117,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     CommonTree tree = compiler.parseSelector("li:nth-child(-n) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
@@ -134,7 +126,6 @@ public class SelectorsGrammarTest {
     DebugPrint.printTokenStream(selector);
     CommonTree tree = compiler.parseSelector(selector);
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   @Test
@@ -143,7 +134,6 @@ public class SelectorsGrammarTest {
     //TODO ako je to s case sensitivity?
     CommonTree tree = compiler.parseSelector("li:nth-child(even) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
   //FIXME: what happens when somebody names a class ODD or EVEN? it is quite likely,
@@ -155,7 +145,6 @@ public class SelectorsGrammarTest {
     //TODO ako je to s case sensitivity?
     CommonTree tree = compiler.parseSelector("li:nth-child(odd) {");
     assertValidSelector(compiler, tree);
-    //TODO test also structure (once we decide what is it going to be)
   }
 
 }

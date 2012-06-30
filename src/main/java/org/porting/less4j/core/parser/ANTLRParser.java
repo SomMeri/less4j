@@ -1,20 +1,27 @@
 package org.porting.less4j.core.parser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.porting.less4j.debugutils.DebugPrint;
 
 /**
- * This class is NOT thread safe. 
- *
+ * This class is NOT thread safe.
+ * 
  */
-//FIXME: add handling of filter: alpha(opacity=100);
+// FIXME: try to handle missing semicolon in rulecatch of declaration_complete <- I can not do that because
+// the catch clause does not handle that. 
+// FIXME: add handling of filter: alpha(opacity=100);
 public class ANTLRParser {
 
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
@@ -41,7 +48,7 @@ public class ANTLRParser {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");
     }
   }
-  
+
   public CommonTree parseExpression(String expression) {
     try {
       initialize(expression);
@@ -69,11 +76,14 @@ public class ANTLRParser {
   }
 
   private LessParser createParser(LessLexer lexer) {
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    LessParser parser = new LessParser(tokens);
-    //TODO: attach comments and whitespaces to tokens 
-    //how to do it: get token position and attach all previous whitespaces, comments and whatever
-    //parser.setTreeAdaptor(new HiddenAwareTreeAdaptor());
+    SelectiveGrammarCallback callback = new SelectiveGrammarCallback();
+    CommentsCollectingTokenSource tokenSource = new CommentsCollectingTokenSource(lexer,  callback);
+    CommonTokenStream tokens = new CommonTokenStream(tokenSource);
+    LessParser parser = new LessParser(callback, tokens);
+    // TODO: attach comments and whitespaces to tokens
+    // how to do it: get token position and attach all previous whitespaces,
+    // comments and whatever
+    // parser.setTreeAdaptor(new HiddenAwareTreeAdaptor());
     return parser;
   }
 
@@ -95,35 +105,45 @@ public class ANTLRParser {
     errors.addAll(parser.getAllErrors());
   }
 
-  //add new method
+  // add new method
   public List<RecognitionException> getAllErrors() {
     return new ArrayList<RecognitionException>(errors);
   }
 
 }
 
-//class HiddenAwareTreeAdaptor extends CommonTreeAdaptor implements TreeAdaptor {
-//
-//  @Override
-//  public Object dupNode(Object t) {
-//    return super.dupNode(t);
-//  }
-//
-//  @Override
-//  public Object create(Token payload) {
-//    int tokenIndex = payload.getTokenIndex();
-//    return super.create(payload);
-//  }
-//
-//  @Override
-//  public Token createToken(int tokenType, String text) {
-//    return super.createToken(tokenType, text);
-//  }
-//
-//  @Override
-//  public Token createToken(Token fromToken) {
-//    return super.createToken(fromToken);
-//  }
-//  
-//}
-//
+class CommentsCollectingTokenSource implements TokenSource {
+  
+  private final TokenSource source;
+  //FIXME NOW: move to interface and make nicer
+  private final Set<Integer> channels = new HashSet<Integer>();
+  private final Set<Integer> tokenTypes = new HashSet<Integer>();
+  private final ILessGrammarCallback callback;
+
+  public CommentsCollectingTokenSource(TokenSource source, ILessGrammarCallback callback) {
+    super();
+    this.source = source;
+    this.callback = callback;
+    channels.add(2);
+    tokenTypes.add(LessLexer.COMMENT);
+  }
+
+  public Token nextToken() {
+    Token nextToken = source.nextToken();
+    if (isPassable(nextToken)) {
+      callback.skippingOffChannelToken(nextToken);
+    }
+    
+    return nextToken;
+  }
+
+  public boolean isPassable(Token nextToken) {
+    return channels.contains(nextToken.getChannel()) && tokenTypes.contains(nextToken.getType());
+  }
+
+  public String getSourceName() {
+    return "Comments Collecting " + source.getSourceName();
+  }
+ 
+}
+

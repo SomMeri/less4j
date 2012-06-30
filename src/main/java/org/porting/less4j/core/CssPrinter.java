@@ -235,7 +235,7 @@ class Builder {
     if (declaration.getExpression() != null)
       append(declaration.getExpression());
     // FIXME: zdokumentontovat: less.js prints important as it was, e.g. it may
-    // not have leading space or it may be ! important
+    // not have leading space or it may be ! important <- that is important, because it is one of multiple CSS hacks 
     if (declaration.isImportant())
       builder.appendIgnoreNull(" !important");
     builder.appendIgnoreNull(";");
@@ -384,7 +384,6 @@ class Builder {
   }
 
   private void appendSimpleSelectorTail(SimpleSelector selector) {
-    // FIXME: here I assume that only CSS classes are possible
     List<ASTCssNode> allChilds = selector.getSubsequent();
     for (ASTCssNode astCssNode : allChilds) {
       append(astCssNode);
@@ -406,8 +405,7 @@ class Builder {
   }
 
   // TODO add test on plus greated and empty!!!!!!
-  public void appendCombinator(Selector.Combinator combinator) {
-    switch (combinator) {
+  public void appendCombinator(Selector.Combinator combinator) { switch (combinator) {
     case PLUS:
       builder.append(" + ");
       break;

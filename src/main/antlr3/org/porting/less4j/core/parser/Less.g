@@ -60,6 +60,8 @@ tokens {
  
 @parser::header {
   package org.porting.less4j.core.parser;
+  
+  import org.porting.less4j.core.parser.ILessGrammarCallback;
 }
 
 //override some methods and add new members to generated lexer
@@ -100,9 +102,28 @@ tokens {
 //override some methods and add new members to generated parser
 @parser::members {
   //add new field
+  private ILessGrammarCallback grammarCallback = ILessGrammarCallback.NULL_CALLBACK;
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
   
+  public LessParser(ILessGrammarCallback grammarCallback, TokenStream input) {
+    this(input);
+    this.grammarCallback=grammarCallback;
+  }
+
+  public LessParser(ILessGrammarCallback grammarCallback, TokenStream input, RecognizerSharedState state) {
+    super(input, state);
+    this.grammarCallback=grammarCallback;
+  }
+  
   //add new method
+  public ILessGrammarCallback getGrammarCallback() {
+    return grammarCallback;
+  }
+
+  public void setGrammarCallback(ILessGrammarCallback grammarCallback) {
+    this.grammarCallback = grammarCallback;
+  }
+  
   public List<RecognitionException> getAllErrors() {
     return new ArrayList<RecognitionException>(errors);
   }
@@ -242,7 +263,9 @@ property
 ruleSet
     : a+=selector (COMMA a+=selector)*
         LBRACE
-            ((b+=declaration SEMI) /*| b+=variabledeclaration*/ | (b+=combinator b+=ruleSet) | ('&' COLON b+=ruleSet))* (b+=declaration)?
+            (  (b+=declaration_both_cases ) /*| b+=variabledeclaration*/ 
+               | (b+=combinator b+=ruleSet) 
+               | ('&' COLON b+=ruleSet))* 
         RBRACE
      -> ^(RULESET $a* $b*)
     ;
@@ -333,8 +356,13 @@ pseudo
 //    | EVEN
 //    ;
 
-//malformed css may miss expression grrrr
-//declaration can refer also to a mixin - removed for now, I will handle mixins later 
+//css does not require ; in last declaration
+//declaration can refer also to a mixin - removed for now, I will handle mixins later
+//TODO: what does less.js do if the statement before nested rule miss semicolon?
+declaration_both_cases
+    : declaration ((RBRACE)=>
+    | SEMI!);
+     
 declaration
     : property COLON expr? prio? -> ^(DECLARATION property expr? prio?)
     ;
