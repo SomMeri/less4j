@@ -41,7 +41,6 @@ tokens {
   //ANTLR seems to generate null pointers exceptions on malformed css if 
   //rules match nothig and generate an empty token 
   EMPTY_SEPARATOR; 
-  EMPTY_COMBINATOR;
   ELEMENT_NAME;
   CSS_CLASS;
   SIMPLE_SELECTOR;
@@ -264,8 +263,9 @@ ruleSet
     : a+=selector (COMMA a+=selector)*
         LBRACE
             (  (b+=declaration_both_cases ) /*| b+=variabledeclaration*/ 
-               | (b+=combinator b+=ruleSet) 
-               | ('&' COLON b+=ruleSet))* 
+//               | (b+=combinator b+=ruleSet) 
+//               | ('&' COLON b+=ruleSet)
+             )* 
         RBRACE
      -> ^(RULESET $a* $b*)
     ;
@@ -449,6 +449,7 @@ function
 //      character as a fragment and reuse it in all other rules.
 // ==============================================================
 
+fragment  EMPTY_COMBINATOR: ;
 
 // --------------------------------------------------------------
 // Define all the fragments of the lexer. These rules neither recognize
@@ -758,13 +759,15 @@ DOT             : '.'       ;
 // removed that option
 //the original string definition did not supported escaping '\\\\'* 
 fragment    INVALID :;
-STRING          : '\'' ( ('\\\'') | ~('\n'|'\r'|'\f'|'\'') )* 
+fragment    ESCAPE_SINGLE_QUOTE :  '\\\''; 
+fragment    ESCAPE_DOUBLE_QUOTE :  '\\"'; 
+STRING          : '\'' ( (ESCAPE_SINGLE_QUOTE) | ~('\n'|'\r'|'\f'|'\'') )* 
                     (
                           '\''
                         | { $type = INVALID; }
                     )
                     
-                | '"' ( ('\\"') | ~('\n'|'\r'|'\f'|'"') )*
+                | '"' ( (ESCAPE_DOUBLE_QUOTE) | ~('\n'|'\r'|'\f'|'"') )*
                     (
                           '"'
                         | { $type = INVALID; }
