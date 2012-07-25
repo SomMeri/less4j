@@ -37,7 +37,7 @@ public class CommentTreeCombiner {
   }
 
   public void associateAsChild(HiddenTokenAwareTree ast) {
-    addAllPreceedingTokens(ast);
+    addAllPrecedingTokens(ast);
 
     LinkedList<HiddenTokenAwareTree> children = getChildren(ast);
     HiddenTokenAwareTree previousChild = null;
@@ -60,7 +60,7 @@ public class CommentTreeCombiner {
       if (tail.peekLast().getType() == LessLexer.NEW_LINE)
         firstChild.addFollowing(tail);
       else
-        secondChild.addPreceeding(tail);
+        secondChild.addPreceding(tail);
     }
   }
 
@@ -85,10 +85,10 @@ public class CommentTreeCombiner {
     return copy;
   }
 
-  private void addAllPreceedingTokens(HiddenTokenAwareTree target) {
+  private void addAllPrecedingTokens(HiddenTokenAwareTree target) {
     int start = target.getTokenStartIndex();
     List<Token> tokens = readPrefix(hiddenTokens, start);
-    target.addPreceeding(tokens);
+    target.addPreceding(tokens);
   }
 
   // FIXME: document comments and new lines only condition

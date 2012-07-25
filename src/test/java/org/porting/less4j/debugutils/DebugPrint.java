@@ -57,7 +57,7 @@ public class DebugPrint {
       base = base + optionalsuffix;
     }
     if (printComments) {
-      String optionalsuffix = " " + tree.getPreceeding().size() + " " + tree.getFollowing().size();
+      String optionalsuffix = " " + tree.getPreceding().size() + " " + tree.getFollowing().size();
       base = base + optionalsuffix;
     }
     System.out.println(base);

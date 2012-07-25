@@ -33,8 +33,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   @Override
   public <M extends ASTCssNode> M postprocess(M something) {
     HiddenTokenAwareTree underlyingStructure = something.getUnderlyingStructure();
-    List<Comment> preceeding = convertToComments(underlyingStructure.getPreceeding());
-    something.setOpeningComments(preceeding);
+    List<Comment> preceding = convertToComments(underlyingStructure.getPreceding());
+    something.setOpeningComments(preceding);
 
     List<Comment> following = convertToComments(underlyingStructure.getFollowing());
     something.setTrailingComments(following);
@@ -44,11 +44,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return something;
   }
 
-  private List<Comment> convertToComments(List<Token> preceeding) {
+  private List<Comment> convertToComments(List<Token> preceding) {
     List<Comment> result = new ArrayList<Comment>();
 
     Comment comment = null;
-    for (Token token : preceeding) {
+    for (Token token : preceding) {
       if (token.getType() == LessLexer.COMMENT) {
         comment = new Comment(new HiddenTokenAwareTree(token));
         result.add(comment);
@@ -195,7 +195,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         previousKid = body;
       }
       if (kid.getType() == LessLexer.COMMA) {
-        List<Comment> comments = convertToComments(kid.getPreceeding());
+        List<Comment> comments = convertToComments(kid.getPreceding());
         previousKid.addTrailingComments(comments);
       }
     }
