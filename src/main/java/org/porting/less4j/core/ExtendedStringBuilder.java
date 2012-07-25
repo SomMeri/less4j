@@ -12,7 +12,7 @@ public class ExtendedStringBuilder {
   private StringBuilder builder = new StringBuilder();
   private int indentationLevel;
   private boolean onNewLine = true;
-  
+
   static {
     SEPARATORS.add(' ');
     SEPARATORS.add(';');
@@ -105,7 +105,7 @@ public class ExtendedStringBuilder {
       handleIndentation();
       builder.append(s);
     }
-    
+
     return this;
   }
 
@@ -117,9 +117,10 @@ public class ExtendedStringBuilder {
     if (!onNewLine)
       newLine();
   }
+
   public void newLine() {
     builder.append(Constants.NEW_LINE);
-    onNewLine=true;
+    onNewLine = true;
   }
 
   public void increaseIndentationLevel() {
@@ -128,11 +129,11 @@ public class ExtendedStringBuilder {
 
   public void decreaseIndentationLevel() {
     indentationLevel--;
-    if (indentationLevel<0)
+    if (indentationLevel < 0)
       indentationLevel = 0;
   }
-  
-  private void handleIndentation(){
+
+  private void handleIndentation() {
     if (onNewLine()) {
       onNewLine = false;
       for (int i = 0; i < indentationLevel; i++) {
@@ -146,18 +147,18 @@ public class ExtendedStringBuilder {
   }
 
   public ExtendedStringBuilder ensureSeparator() {
-    if (onNewLine() || endsWithSeparator()) 
+    if (onNewLine() || endsWithSeparator())
       return this;
-    
+
     builder.append(SPACE);
     return this;
   }
 
   public boolean endsWithSeparator() {
-    int length = builder.length()-1;
-    if (length<0)
+    int length = builder.length() - 1;
+    if (length < 0)
       return false;
-    
+
     return SEPARATORS.contains(builder.charAt(length));
   }
 

@@ -42,7 +42,6 @@ public class HiddenTokenAwareTree extends CommonTree {
   }
 
   public void addPreceeding(Token token) {
-    System.out.println("Preceeding: " + token.getText());
     preceeding.add(token);
   }
 
@@ -51,7 +50,6 @@ public class HiddenTokenAwareTree extends CommonTree {
   }
 
   public void addOrphan(Token token) {
-    System.out.println("Orphan: " + token.getText());
     orphans.add(token);
   }
 
@@ -60,7 +58,6 @@ public class HiddenTokenAwareTree extends CommonTree {
   }
 
   public void addFollowing(Token token) {
-    System.out.println("Following: " + token.getText());
     following.add(token);
   }
 
