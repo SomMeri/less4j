@@ -30,7 +30,6 @@
   /**/
   color: red;
   /* A C-style comment */
-
   background-color: orange;
   font-size: 12px;
   /* lost comment */
@@ -50,7 +49,28 @@
   color: #808080, /* blue */ #ffa500;
   -webkit-border-radius: 2px /* webkit only */;
   -moz-border-radius: 8px /* moz only with operation */;
+  -webkit-border-radius: 2px;/* webkit only */
+  -moz-border-radius: 8px;/* moz only with operation */
+}
+.selector /* .with */,
+.lots,
+/* of */ .comments {
+  color: #808080, /* blue */ #ffa500;
+  color: #808080 /* blue */ , #ffa500;
+  -webkit-border-radius: 2px /* webkit only */;
+  -moz-border-radius: 8px /* moz only with operation */;
+  -webkit-border-radius: 2px;/* webkit only */
+  -moz-border-radius: 8px;/* moz only with operation */
+}
+/* before */ .comments /* after */ {
+  color: #808080, /* blue */ #ffa500;
+}
+#lonely {
+  /* lonely comment */
 }
 #last {
   color: #0000ff;
+}
+.selector /* .1 */ > /* .2 */ .lots /* .3 */ + /* .4 */ .comments other /* .5 */ blaaah {
+  -webkit-border-radius: 2px /* webkit only */;
 }

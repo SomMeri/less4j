@@ -1,0 +1,8 @@
+correctEscaping {
+  padding: 'dd\\ddd';
+  padding: 'dd\ddd';
+  padding: 'd"""dd\'d';
+  padding: "d'''dd\"d";
+  padding: "asdfasdf\\";
+  padding: 'ddddd\\';
+}

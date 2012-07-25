@@ -1,7 +1,10 @@
 package org.porting.less4j.core.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -11,27 +14,27 @@ import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
-import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.porting.less4j.debugutils.DebugPrint;
 
 /**
- * This class is NOT thread safe.
+ * This class is NOT thread safe. 
+ * 
+ * This is statefull class.
  * 
  */
-// FIXME: try to handle missing semicolon in rulecatch of declaration_complete <- I can not do that because
-// the catch clause does not handle that. 
 // FIXME: add handling of filter: alpha(opacity=100);
 public class ANTLRParser {
 
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
   private LessLexer lexer;
   private LessParser parser;
+  private HiddenTokensCollectorTokenSource tokenSource;
 
-  public CommonTree parse(String expression) {
+  public HiddenTokenAwareTree parse(String expression) {
     try {
       initialize(expression);
-      DebugPrint.printTokenStream(expression);
+      //DebugPrint.printTokenStream(expression);
       ParserRuleReturnScope ret = parser.styleSheet();
       return finalize(ret);
     } catch (RecognitionException e) {
@@ -39,7 +42,7 @@ public class ANTLRParser {
     }
   }
 
-  public CommonTree parseDeclaration(String expression) {
+  public HiddenTokenAwareTree parseDeclaration(String expression) {
     try {
       initialize(expression);
       ParserRuleReturnScope ret = parser.declaration();
@@ -49,7 +52,7 @@ public class ANTLRParser {
     }
   }
 
-  public CommonTree parseExpression(String expression) {
+  public HiddenTokenAwareTree parseExpression(String expression) {
     try {
       initialize(expression);
       ParserRuleReturnScope ret = parser.expr();
@@ -59,7 +62,17 @@ public class ANTLRParser {
     }
   }
 
-  public CommonTree parseSelector(String selector) {
+  public HiddenTokenAwareTree parseTerm(String expression) {
+    try {
+      initialize(expression);
+      ParserRuleReturnScope ret = parser.term();
+      return finalize(ret);
+    } catch (RecognitionException e) {
+      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
+    }
+  }
+
+  public HiddenTokenAwareTree parseSelector(String selector) {
     try {
       initialize(selector);
       ParserRuleReturnScope ret = parser.selector();
@@ -76,14 +89,12 @@ public class ANTLRParser {
   }
 
   private LessParser createParser(LessLexer lexer) {
-    SelectiveGrammarCallback callback = new SelectiveGrammarCallback();
-    CommentsCollectingTokenSource tokenSource = new CommentsCollectingTokenSource(lexer,  callback);
+    //FIXME: make this consistent 
+    HiddenTokensCollectorTokenSource tokenSource = new HiddenTokensCollectorTokenSource(lexer,  Arrays.asList(LessLexer.COMMENT, LessLexer.NEW_LINE));
+    this.tokenSource = tokenSource;
     CommonTokenStream tokens = new CommonTokenStream(tokenSource);
-    LessParser parser = new LessParser(callback, tokens);
-    // TODO: attach comments and whitespaces to tokens
-    // how to do it: get token position and attach all previous whitespaces,
-    // comments and whatever
-    // parser.setTreeAdaptor(new HiddenAwareTreeAdaptor());
+    LessParser parser = new LessParser(tokens);
+    parser.setTreeAdaptor(new LessTreeAdaptor());
     return parser;
   }
 
@@ -93,9 +104,12 @@ public class ANTLRParser {
     return lexer;
   }
 
-  private CommonTree finalize(ParserRuleReturnScope ret) {
+  private HiddenTokenAwareTree finalize(ParserRuleReturnScope ret) {
     collectErrors(lexer, parser);
-    CommonTree ast = (CommonTree) ret.getTree();
+    HiddenTokenAwareTree ast = (HiddenTokenAwareTree) ret.getTree();
+    LinkedList<Token> hiddenTokens = tokenSource.getCollectedTokens();
+    CommentTreeCombiner combiner = new CommentTreeCombiner();
+    combiner.associate(ast, hiddenTokens);
     DebugPrint.print(ast);
     return ast;
   }
@@ -112,38 +126,50 @@ public class ANTLRParser {
 
 }
 
-class CommentsCollectingTokenSource implements TokenSource {
+class HiddenTokensCollectorTokenSource implements TokenSource {
   
   private final TokenSource source;
-  //FIXME NOW: move to interface and make nicer
-  private final Set<Integer> channels = new HashSet<Integer>();
   private final Set<Integer> tokenTypes = new HashSet<Integer>();
-  private final ILessGrammarCallback callback;
-
-  public CommentsCollectingTokenSource(TokenSource source, ILessGrammarCallback callback) {
+  private final LinkedList<Token> collectedTokens = new LinkedList<Token>();
+  
+  public HiddenTokensCollectorTokenSource(TokenSource source, Collection<Integer> tokenTypes) {
     super();
     this.source = source;
-    this.callback = callback;
-    channels.add(2);
-    tokenTypes.add(LessLexer.COMMENT);
+    this.tokenTypes.addAll(tokenTypes);
+  }
+
+  public LinkedList<Token> getCollectedTokens() {
+    return collectedTokens;
   }
 
   public Token nextToken() {
     Token nextToken = source.nextToken();
     if (isPassable(nextToken)) {
-      callback.skippingOffChannelToken(nextToken);
+      //Each token is read from the token source only once.
+      //This is not documented, but it is not reasonable to build unnecessary
+      //structures. Antlr3 will not have major updates and antl4 will not
+      //be compatible with it.
+      collectedTokens.add(nextToken);
     }
     
     return nextToken;
   }
 
   public boolean isPassable(Token nextToken) {
-    return channels.contains(nextToken.getChannel()) && tokenTypes.contains(nextToken.getType());
+    return tokenTypes.contains(nextToken.getType());
   }
 
   public String getSourceName() {
-    return "Comments Collecting " + source.getSourceName();
+    return "Collect hidden channel " + source.getSourceName();
   }
  
 }
 
+class LessTreeAdaptor extends CommonTreeAdaptor {
+
+  @Override
+  public Object create(Token payload) {
+    return new HiddenTokenAwareTree(payload);
+  }
+
+}

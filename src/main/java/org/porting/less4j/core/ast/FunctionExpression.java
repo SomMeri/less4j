@@ -1,13 +1,13 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class FunctionExpression extends Expression {
 
   private String name;
   private Expression parameter;
 
-  public FunctionExpression(CommonTree token, String name, Expression parameter) {
+  public FunctionExpression(HiddenTokenAwareTree token, String name, Expression parameter) {
     super(token);
     this.name = name;
     this.parameter = parameter;

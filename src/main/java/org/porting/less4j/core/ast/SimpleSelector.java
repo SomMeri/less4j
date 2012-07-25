@@ -2,7 +2,7 @@ package org.porting.less4j.core.ast;
 
 import java.util.List;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.core.parser.LessLexer;
 
 public class SimpleSelector extends ASTCssNode {
@@ -11,7 +11,7 @@ public class SimpleSelector extends ASTCssNode {
   private boolean isStar;
   private List<ASTCssNode> subsequent;
 
-  public SimpleSelector(CommonTree token, String elementName, boolean isStar, List<ASTCssNode> subsequent) {
+  public SimpleSelector(HiddenTokenAwareTree token, String elementName, boolean isStar, List<ASTCssNode> subsequent) {
     super(token);
     assert token!=null && token.getType()==LessLexer.SIMPLE_SELECTOR;
     this.elementName = elementName;

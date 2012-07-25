@@ -1,13 +1,13 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 //FIXME: Named colors work only by accident, they do not even go to this class http://www.w3schools.com/cssref/css_colornames.asp
 public class ColorExpression extends Expression {
 
   private String value;
 
-  public ColorExpression(CommonTree token, String value) {
+  public ColorExpression(HiddenTokenAwareTree token, String value) {
     super(token);
     this.value = value;
   }

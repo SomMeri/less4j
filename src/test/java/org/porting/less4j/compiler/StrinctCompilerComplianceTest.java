@@ -35,7 +35,7 @@ public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "comments.less"));
+    addFiles(result, new File(inputDir + "debug-comments-pure-css-simple.less"));
 
     return result;
   }

@@ -36,6 +36,11 @@ public class GrammarAsserts {
     assertEquals(LessLexer.EXPRESSION, tree.getType());
   }
 
+  public static void assertValidTerm(ANTLRParser compiler, CommonTree tree) {
+    assertValid(compiler);
+    assertEquals(LessLexer.TERM, tree.getType());
+  }
+
   public static void assertValid(ANTLRParser compiler) {
     assertTrue(compiler.getAllErrors().isEmpty());
   }

@@ -1,18 +1,18 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class SelectorAttribute extends ASTCssNode {
 
   private String name;
-  private Operator operator;
+  private SelectorOperator operator;
   private String value;
 
-  public SelectorAttribute(CommonTree token, String name) {
-    this(token, name, Operator.NONE, null);
+  public SelectorAttribute(HiddenTokenAwareTree token, String name) {
+    this(token, name, new SelectorOperator(new HiddenTokenAwareTree(), SelectorOperator.Operator.NONE), null);
   }
   
-  public SelectorAttribute(CommonTree token, String name, Operator operator, String value) {
+  public SelectorAttribute(HiddenTokenAwareTree token, String name, SelectorOperator operator, String value) {
     super(token);
     this.name = name;
     this.operator = operator;
@@ -23,11 +23,11 @@ public class SelectorAttribute extends ASTCssNode {
     return name;
   }
 
-  public Operator getOperator() {
+  public SelectorOperator getOperator() {
     return operator;
   }
 
-  public void setOperator(Operator operator) {
+  public void setOperator(SelectorOperator operator) {
     this.operator = operator;
   }
 
@@ -48,7 +48,4 @@ public class SelectorAttribute extends ASTCssNode {
     return ASTCssNodeType.SELECTOR_ATTRIBUTE;
   }
 
-  public enum Operator {
-    NONE, EQUALS, INCLUDES, SPECIAL_PREFIX, PREFIXMATCH, SUFFIXMATCH, SUBSTRINGMATCH
-  }
 }

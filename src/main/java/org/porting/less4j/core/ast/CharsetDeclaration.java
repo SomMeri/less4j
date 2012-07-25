@@ -1,12 +1,12 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class CharsetDeclaration extends ASTCssNode {
 
   private String charset;
 
-  public CharsetDeclaration(CommonTree token, String charset) {
+  public CharsetDeclaration(HiddenTokenAwareTree token, String charset) {
     super(token);
     this.charset = charset;
   }

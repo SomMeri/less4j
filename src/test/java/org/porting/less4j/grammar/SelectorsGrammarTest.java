@@ -7,6 +7,7 @@ import static org.porting.less4j.grammar.GrammarAsserts.assertValidSelector;
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
 import org.porting.less4j.core.parser.ANTLRParser;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.debugutils.DebugPrint;
 
@@ -42,7 +43,7 @@ public class SelectorsGrammarTest {
   public void afterCSS3() {
     ANTLRParser compiler = new ANTLRParser();
     String selector = "li::after {";
-    CommonTree tree = compiler.parseSelector(selector);
+    HiddenTokenAwareTree tree = compiler.parseSelector(selector);
     assertValidSelector(compiler, tree);
     DebugPrint.print(tree);
     assertChilds(tree, LessLexer.SIMPLE_SELECTOR);

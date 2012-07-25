@@ -3,15 +3,15 @@ package org.porting.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.core.parser.LessLexer;
 
 public class RuleSet extends ASTCssNode {
 
   private List<Selector> selectors = new ArrayList<Selector>();
-  private List<Declaration> body = new ArrayList<Declaration>();
+  private DeclarationsBody body;
 
-  public RuleSet(CommonTree token) {
+  public RuleSet(HiddenTokenAwareTree token) {
     super(token);
     assert token!=null && token.getType()==LessLexer.RULESET;
   }
@@ -20,12 +20,16 @@ public class RuleSet extends ASTCssNode {
    return selectors;
   }
   
-  public List<Declaration> getDeclarations() {
-   return body;
+  public DeclarationsBody getBody() {
+    return body;
   }
-  
+
   public boolean hasEmptyBody() {
-    return body.isEmpty();
+    return body==null? true : body.isEmpty();
+  }
+
+  public void setBody(DeclarationsBody body) {
+    this.body = body;
   }
 
   public ASTCssNodeType getType() {
@@ -36,7 +40,4 @@ public class RuleSet extends ASTCssNode {
     this.selectors.addAll(selectors);
   }
 
-  public void addDeclarations(List<Declaration> body) {
-    this.body.addAll(body);
-  }
 }

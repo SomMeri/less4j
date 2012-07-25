@@ -3,7 +3,7 @@ package org.porting.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class Media extends ASTCssNode {
   // FIXME: grrr http://webdesignerwall.com/tutorials/css3-media-queries
@@ -12,10 +12,11 @@ public class Media extends ASTCssNode {
   // http://webdesignerwall.com/tutorials/css3-media-queries
   // TODO: review for specification:
   // http://www.w3.org/TR/2012/REC-css3-mediaqueries-20120619/
+//FIXME: make media body extend it general class Body
   private List<ASTCssNode> body = new ArrayList<ASTCssNode>();
   private Medium medium;
 
-  public Media(CommonTree token) {
+  public Media(HiddenTokenAwareTree token) {
     super(token);
   }
 

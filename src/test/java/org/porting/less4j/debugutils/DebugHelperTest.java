@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.porting.less4j.core.parser.ANTLRParser;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 @RunWith(Parameterized.class)
 @SuppressWarnings("unused")
@@ -59,7 +60,7 @@ public class DebugHelperTest {
   public void shouldParseWithoutErrors() throws Throwable {
     ANTLRParser compiler = new ANTLRParser();
     try {
-      CommonTree tree = compiler.parse(IOUtils.toString(new FileReader(file)));
+      HiddenTokenAwareTree tree = compiler.parse(IOUtils.toString(new FileReader(file)));
       DebugPrint.print(tree);
     } catch (Throwable th) {
       th.printStackTrace();

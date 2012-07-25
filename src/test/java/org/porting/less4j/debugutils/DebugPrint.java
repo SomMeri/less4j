@@ -2,12 +2,13 @@ package org.porting.less4j.debugutils;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.core.parser.LessLexer;
 
 public class DebugPrint {
 
-  private static boolean full = true;
+  private static boolean printIndexes = false;
+  private static boolean printComments = true;
 
   public static void printTokenStream(String expression) {
     LessLexer createLexer = createLexer(expression);
@@ -29,18 +30,18 @@ public class DebugPrint {
     return "(" + count + ") " + token.getType() + " " + token.getText();
   }
 
-  public static void print(CommonTree ast) {
+  public static void print(HiddenTokenAwareTree ast) {
     print(ast, 0);
   }
 
-  private static void print(CommonTree tree, int level) {
+  private static void print(HiddenTokenAwareTree tree, int level) {
     indent(level);
     printSingleNode(tree);
 
     // print all children
     if (tree.getChildren() != null)
       for (Object ie : tree.getChildren()) {
-        print((CommonTree) ie, level + 1);
+        print((HiddenTokenAwareTree) ie, level + 1);
       }
   }
 
@@ -49,13 +50,17 @@ public class DebugPrint {
       System.out.print("--");
   }
 
-  public static void printSingleNode(CommonTree tree) {
+  public static void printSingleNode(HiddenTokenAwareTree tree) {
     String base = " " + tree.getType() + " " + tree.getText();
-    String optionalsuffix = " " + tree.getTokenStartIndex() + " " + tree.getTokenStopIndex() + " " + (tree.getToken() == null ? "" : tree.getToken().getTokenIndex());
-    if (full)
-      System.out.println(base + optionalsuffix);
-    else
-      System.out.println(base);
+    if (printIndexes) {
+      String optionalsuffix = " " + tree.getTokenStartIndex() + " " + tree.getTokenStopIndex() + " " + (tree.getToken() == null ? "" : tree.getToken().getTokenIndex());
+      base = base + optionalsuffix;
+    }
+    if (printComments) {
+      String optionalsuffix = " " + tree.getPreceeding().size() + " " + tree.getFollowing().size();
+      base = base + optionalsuffix;
+    }
+    System.out.println(base);
   }
 
 }

@@ -1,12 +1,12 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class IdSelector extends ASTCssNode {
 
   private String name;
 
-  public IdSelector(CommonTree token, String name) {
+  public IdSelector(HiddenTokenAwareTree token, String name) {
     super(token);
     this.name = name;
   }

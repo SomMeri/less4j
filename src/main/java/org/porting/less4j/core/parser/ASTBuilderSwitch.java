@@ -3,63 +3,106 @@ package org.porting.less4j.core.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.Token;
 import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.CharsetDeclaration;
+import org.porting.less4j.core.ast.Comment;
 import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
 import org.porting.less4j.core.ast.Expression;
+import org.porting.less4j.core.ast.ExpressionOperator;
 import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.Medium;
 import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.RuleSet;
+import org.porting.less4j.core.ast.DeclarationsBody;
 import org.porting.less4j.core.ast.Selector;
 import org.porting.less4j.core.ast.SelectorAttribute;
+import org.porting.less4j.core.ast.SelectorCombinator;
+import org.porting.less4j.core.ast.SelectorOperator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
 
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
-  
+
   private final TermBuilder termBuilder = new TermBuilder(this);
 
-  public StyleSheet handleStyleSheet(CommonTree token) {
+  @Override
+  public <M extends ASTCssNode> M postprocess(M something) {
+    HiddenTokenAwareTree underlyingStructure = something.getUnderlyingStructure();
+    List<Comment> preceeding = convertToComments(underlyingStructure.getPreceeding());
+    something.setOpeningComments(preceeding);
+
+    List<Comment> following = convertToComments(underlyingStructure.getFollowing());
+    something.setTrailingComments(following);
+
+    List<Comment> orphans = convertToComments(underlyingStructure.getOrphans());
+    something.setOrphanComments(orphans);
+    return something;
+  }
+
+  private List<Comment> convertToComments(List<Token> preceeding) {
+    List<Comment> result = new ArrayList<Comment>();
+
+    Comment comment = null;
+    for (Token token : preceeding) {
+      if (token.getType() == LessLexer.COMMENT) {
+        comment = new Comment(new HiddenTokenAwareTree(token));
+        result.add(comment);
+      }
+      if (token.getType() == LessLexer.NEW_LINE) {
+        if (comment!=null)
+          comment.setHasNewLine(true);
+      }
+    }
+
+    //FIXME DOCUMENT: I do not follow less.js /* A C-style comment */\n\n I will create 1 new line less 2 new lines 
+
+
+    return result;
+  }
+
+  public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {
     StyleSheet result = new StyleSheet(token);
-    for (CommonTree kid : getChildren(token)) {
+    for (HiddenTokenAwareTree kid : token.getChildren()) {
       result.addChild(switchOn(kid));
     }
 
     return result;
   }
 
-  @SuppressWarnings("unchecked")
-  private List<CommonTree> getChildren(CommonTree token) {
-    return (List<CommonTree>) token.getChildren();
-  }
-
-  public Expression handleTerm(CommonTree token) {
+  public Expression handleTerm(HiddenTokenAwareTree token) {
     return termBuilder.buildFromTerm(token);
   }
-  
-  public Expression handleExpression(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
+
+  public Expression handleExpression(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0)
       throw new IncorrectTreeException();
     
+    if (children.size() == 1) {
+      Expression head = (Expression) switchOn(children.get(0));
+      // we have to switch to parent token, because we would loose it otherwise.
+      // for example, comments before simple expressions would not be accessible anymore 
+      head.setUnderlyingStructure(token);
+      return head;
+    }
+
     return createExpression(token, children);
   }
 
-  private Expression createExpression(CommonTree parent, List<CommonTree> members) {
+  private Expression createExpression(HiddenTokenAwareTree parent, List<HiddenTokenAwareTree> members) {
     // this must represent a term. Otherwise we are doomed anyway.
     Expression head = (Expression) switchOn(members.get(0));
-
-    ComposedExpression.Operator operator;
-    if (members.size() == 1)
+    if (members.size() == 1) {
       return head;
-    
-    operator = toExpressionOperator(members.get(1));
+    }
+
+    HiddenTokenAwareTree token = members.get(1);
+    ExpressionOperator operator = postprocess(new ExpressionOperator(token, toExpressionOperator(token)));
 
     if (members.size() < 2)
       return new ComposedExpression(parent, head, operator, null);
@@ -67,19 +110,19 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new ComposedExpression(parent, head, operator, createExpression(parent, members.subList(2, members.size())));
   }
 
-  private ComposedExpression.Operator toExpressionOperator(CommonTree token) {
+  private ExpressionOperator.Operator toExpressionOperator(HiddenTokenAwareTree token) {
     switch (token.getType()) {
     case LessLexer.SOLIDUS:
-      return ComposedExpression.Operator.SOLIDUS;
+      return ExpressionOperator.Operator.SOLIDUS;
 
     case LessLexer.COMMA:
-      return ComposedExpression.Operator.COMMA;
+      return ExpressionOperator.Operator.COMMA;
 
     case LessLexer.STAR:
-      return ComposedExpression.Operator.STAR;
+      return ExpressionOperator.Operator.STAR;
 
     case LessLexer.EMPTY_SEPARATOR:
-      return ComposedExpression.Operator.EMPTY_OPERATOR;
+      return ExpressionOperator.Operator.EMPTY_OPERATOR;
 
     default:
       break;
@@ -88,14 +131,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new IncorrectTreeException();
   }
 
-  public Declaration handleDeclaration(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
+  public Declaration handleDeclaration(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
 
     String name = children.get(0).getText();
     if (children.size() == 1)
       return new Declaration(token, name);
 
-    CommonTree expressionToken = children.get(1);
+    HiddenTokenAwareTree expressionToken = children.get(1);
     if (expressionToken.getType() == LessLexer.IMPORTANT_SYM)
       return new Declaration(token, name, null, true);
 
@@ -109,121 +152,144 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new IncorrectTreeException();
   }
 
-  public FontFace handleFontFace(CommonTree token) {
+  public FontFace handleFontFace(HiddenTokenAwareTree token) {
     FontFace result = new FontFace(token);
 
-    List<CommonTree> children = getChildren(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
     List<Declaration> declarations = new ArrayList<Declaration>();
-    for (CommonTree kid : children) {
+    for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.DECLARATION)
-        declarations.add(handleDeclaration(kid));
+        declarations.add(postprocess(handleDeclaration(kid)));
     }
 
     result.addDeclarations(declarations);
-    return result; 
+    return result;
   }
 
-  public CharsetDeclaration handleCharsetDeclaration(CommonTree token) {
+  public CharsetDeclaration handleCharsetDeclaration(HiddenTokenAwareTree token) {
     // FIXME: just an idea, what does less.js do if charset is followed by a lot
     // of declarations?
-    List<CommonTree> children = getChildren(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.isEmpty())
       throw new IncorrectTreeException();
 
     return new CharsetDeclaration(token, children.get(0).getText());
   }
 
-  public RuleSet handleRuleSet(CommonTree token) {
+  public RuleSet handleRuleSet(HiddenTokenAwareTree token) {
     RuleSet ruleSet = new RuleSet(token);
 
     List<Selector> selectors = new ArrayList<Selector>();
-    List<CommonTree> children = getChildren(token);
-    for (CommonTree kid : children) {
-      if (kid.getType() == LessLexer.SELECTOR)
-        selectors.add(handleSelector(kid));
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    
+    ASTCssNode previousKid = null;
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType() == LessLexer.SELECTOR) {
+        Selector selector = postprocess(handleSelector(kid));
+        selectors.add(selector);
+        previousKid = selector;
+      }
+      if (kid.getType() == LessLexer.BODY_OF_DECLARATIONS) {
+        DeclarationsBody body = postprocess(handleDeclarationsBody(kid));
+        ruleSet.setBody(body);
+        previousKid = body;
+      }
+      if (kid.getType() == LessLexer.COMMA) {
+        List<Comment> comments = convertToComments(kid.getPreceeding());
+        previousKid.addTrailingComments(comments);
+      }
     }
 
     ruleSet.addSelectors(selectors);
-
-    List<Declaration> declarations = new ArrayList<Declaration>();
-    for (CommonTree kid : children) {
-      if (kid.getType() == LessLexer.DECLARATION)
-        declarations.add(handleDeclaration(kid));
-    }
-
-    ruleSet.addDeclarations(declarations);
     return ruleSet;
   }
 
-  public Selector handleSelector(CommonTree token) {
-    List<CommonTree> members = getChildren(token);
-    return createSelector(token, members);
+  public DeclarationsBody handleDeclarationsBody(HiddenTokenAwareTree token) {
+    if (token.getChildren()==null)
+      return new DeclarationsBody(token);
+    
+    List<Declaration> declarations = new ArrayList<Declaration>();
+    for (HiddenTokenAwareTree kid : token.getChildren()) {
+      if (kid.getType() == LessLexer.DECLARATION)
+        declarations.add(postprocess(handleDeclaration(kid)));
+    }
+
+    return new DeclarationsBody(token, declarations);
   }
 
-  public Selector createSelector(CommonTree parent, List<CommonTree> members) {
+  public Selector handleSelector(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> members = token.getChildren();
+    return postprocess(createSelector(token, members));
+  }
+
+  public Selector createSelector(HiddenTokenAwareTree parent, List<HiddenTokenAwareTree> members) {
     if (members.size() == 0)
       throw new IncorrectTreeException();
 
     // this must represent a simple selector. Otherwise we are doomed anyway.
-    SimpleSelector head = handleSimpleSelector(members.get(0));
+    SimpleSelector head = postprocess(handleSimpleSelector(members.get(0)));
 
-    Selector.Combinator combinator;
+    SelectorCombinator combinator;
     if (members.size() == 1)
       combinator = null;
-    else
-      combinator = toSelectorCombinator(members.get(1));
+    else {
+      HiddenTokenAwareTree token = members.get(1);
+      combinator = postprocess(new SelectorCombinator(token, toSelectorCombinator(token)));
+    }
 
     if (members.size() < 2)
-      return new Selector(parent, head, combinator, null);
+      return postprocess(new Selector(parent, head, combinator, null));
 
+    //FIXME: bad design, there should not be a need to add postprocess call everywhere 
     return new Selector(parent, head, combinator, createSelector(parent, members.subList(2, members.size())));
   }
 
-  public Selector.Combinator toSelectorCombinator(CommonTree token) {
+  public SelectorCombinator.Combinator toSelectorCombinator(HiddenTokenAwareTree token) {
     switch (token.getType()) {
     case LessLexer.PLUS:
-      return Selector.Combinator.PLUS;
+      return SelectorCombinator.Combinator.PLUS;
     case LessLexer.GREATER:
-      return Selector.Combinator.GREATER;
+      return SelectorCombinator.Combinator.GREATER;
     case LessLexer.EMPTY_COMBINATOR:
-      return Selector.Combinator.EMPTY;
+      return SelectorCombinator.Combinator.EMPTY;
     }
-    
+
     throw new IllegalStateException("Unknown: " + token.getType());
   }
-  public SimpleSelector handleSimpleSelector(CommonTree token) {
-    List<CommonTree> members = getChildren(token);
-    CommonTree theSelector = members.get(0);
+
+  public SimpleSelector handleSimpleSelector(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> members = token.getChildren();
+    HiddenTokenAwareTree theSelector = members.get(0);
     if (theSelector.getType() == LessLexer.STAR)
       return new SimpleSelector(token, null, true, new ArrayList<ASTCssNode>());
 
     int startIndex = 0;
     String elementName = null;
     if (theSelector.getType() == LessLexer.ELEMENT_NAME) {
-      elementName = getChildren(theSelector).get(0).getText();
+      elementName = theSelector.getChildren().get(0).getText();
       startIndex++;
     }
 
     if (startIndex >= members.size())
       return new SimpleSelector(token, elementName, false, new ArrayList<ASTCssNode>());
 
-    List<CommonTree> subsequentMembers = members.subList(startIndex, members.size());
+    List<HiddenTokenAwareTree> subsequentMembers = members.subList(startIndex, members.size());
     List<ASTCssNode> subsequent = new ArrayList<ASTCssNode>();
-    for (CommonTree commonTree : subsequentMembers) {
-      subsequent.add(switchOn(commonTree));
+    for (HiddenTokenAwareTree HiddenTokenAwareTree : subsequentMembers) {
+      subsequent.add(switchOn(HiddenTokenAwareTree));
     }
 
     return new SimpleSelector(token, elementName, false, subsequent);
   }
 
-  public CssClass handleCssClass(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
+  public CssClass handleCssClass(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
     CssClass result = new CssClass(token, children.get(0).getText());
     return result;
   }
 
-  public SelectorAttribute handleSelectorAttribute(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
+  public SelectorAttribute handleSelectorAttribute(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0)
       throw new IncorrectTreeException();
 
@@ -233,28 +299,32 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.size() < 3)
       throw new IncorrectTreeException();
 
-    return new SelectorAttribute(token, children.get(0).getText(), toSelectorOperator(children.get(1)), children.get(2).getText());
+    return new SelectorAttribute(token, children.get(0).getText(), postprocess(handleSelectorOperator(children.get(1))), children.get(2).getText());
   }
 
-  private SelectorAttribute.Operator toSelectorOperator(CommonTree token) {
+  public SelectorOperator handleSelectorOperator(HiddenTokenAwareTree token) {
+    return new SelectorOperator(token, toSelectorOperator(token));
+  }
+
+  private SelectorOperator.Operator toSelectorOperator(HiddenTokenAwareTree token) {
     switch (token.getType()) {
     case LessLexer.OPEQ:
-      return SelectorAttribute.Operator.EQUALS;
+      return SelectorOperator.Operator.EQUALS;
 
     case LessLexer.INCLUDES:
-      return SelectorAttribute.Operator.INCLUDES;
+      return SelectorOperator.Operator.INCLUDES;
 
     case LessLexer.DASHMATCH:
-      return SelectorAttribute.Operator.SPECIAL_PREFIX;
+      return SelectorOperator.Operator.SPECIAL_PREFIX;
 
     case LessLexer.PREFIXMATCH:
-      return SelectorAttribute.Operator.PREFIXMATCH;
+      return SelectorOperator.Operator.PREFIXMATCH;
 
     case LessLexer.SUFFIXMATCH:
-      return SelectorAttribute.Operator.SUFFIXMATCH;
+      return SelectorOperator.Operator.SUFFIXMATCH;
 
     case LessLexer.SUBSTRINGMATCH:
-      return SelectorAttribute.Operator.SUBSTRINGMATCH;
+      return SelectorOperator.Operator.SUBSTRINGMATCH;
 
     default:
       break;
@@ -263,8 +333,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new IncorrectTreeException();
   }
 
-  public Pseudo handlePseudo(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
+  public Pseudo handlePseudo(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0)
       throw new IncorrectTreeException();
 
@@ -278,8 +348,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new IncorrectTreeException();
   }
 
-  public IdSelector handleIdSelector(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
+  public IdSelector handleIdSelector(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() != 1)
       throw new IncorrectTreeException();
 
@@ -290,23 +360,23 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new IdSelector(token, text.substring(1));
   }
 
-  public Media handleMedia(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
+  public Media handleMedia(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
     Media result = new Media(token);
-    for (CommonTree kid : children) {
+    for (HiddenTokenAwareTree kid : children) {
       result.addChild(switchOn(kid));
-      
+
     }
     return result;
   }
 
-  public Medium handleMediumDeclaration(CommonTree token) {
+  public Medium handleMediumDeclaration(HiddenTokenAwareTree token) {
     Medium result = new Medium(token);
-    List<CommonTree> children = getChildren(token);
-    for (CommonTree kid : children) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
       result.addMedium(kid.getText());
     }
-    
+
     return result;
   }
 

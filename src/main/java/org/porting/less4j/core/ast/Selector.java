@@ -1,14 +1,14 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class Selector extends ASTCssNode {
   
-  private final Combinator combinator;
+  private final SelectorCombinator combinator;
   private final SimpleSelector head;
   private final Selector right;
 
-  public Selector(CommonTree token, SimpleSelector head, Combinator combinator, Selector right) {
+  public Selector(HiddenTokenAwareTree token, SimpleSelector head, SelectorCombinator combinator, Selector right) {
     super(token);
     this.head = head;
     this.combinator = combinator;
@@ -19,7 +19,7 @@ public class Selector extends ASTCssNode {
     return combinator!=null;
   }
   
-  public Combinator getCombinator() {
+  public SelectorCombinator getCombinator() {
     return combinator;
   }
 
@@ -33,10 +33,6 @@ public class Selector extends ASTCssNode {
 
   public ASTCssNodeType getType() {
     return ASTCssNodeType.SELECTOR;
-  }
-  
-  public enum Combinator {
-    PLUS, GREATER, EMPTY;
   }
 
 }

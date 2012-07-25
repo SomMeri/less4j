@@ -51,6 +51,7 @@ tokens {
   TERM_FUNCTION;
   TERM;
   MEDIUM_DECLARATION;
+  BODY_OF_DECLARATIONS;
 }  
 
 @lexer::header {
@@ -59,8 +60,6 @@ tokens {
  
 @parser::header {
   package org.porting.less4j.core.parser;
-  
-  import org.porting.less4j.core.parser.ILessGrammarCallback;
 }
 
 //override some methods and add new members to generated lexer
@@ -101,27 +100,7 @@ tokens {
 //override some methods and add new members to generated parser
 @parser::members {
   //add new field
-  private ILessGrammarCallback grammarCallback = ILessGrammarCallback.NULL_CALLBACK;
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
-  
-  public LessParser(ILessGrammarCallback grammarCallback, TokenStream input) {
-    this(input);
-    this.grammarCallback=grammarCallback;
-  }
-
-  public LessParser(ILessGrammarCallback grammarCallback, TokenStream input, RecognizerSharedState state) {
-    super(input, state);
-    this.grammarCallback=grammarCallback;
-  }
-  
-  //add new method
-  public ILessGrammarCallback getGrammarCallback() {
-    return grammarCallback;
-  }
-
-  public void setGrammarCallback(ILessGrammarCallback grammarCallback) {
-    this.grammarCallback = grammarCallback;
-  }
   
   public List<RecognitionException> getAllErrors() {
     return new ArrayList<RecognitionException>(errors);
@@ -256,19 +235,23 @@ property
     : IDENT
     ;
     
+//we need to put comma into the tree so we can collect comments to it
+ruleSet
+    : c=selector (COMMA a+=selector)* b=ruleset_body
+     -> ^(RULESET $c (COMMA $a)* $b)
+    ;
+    
 // ruleSet can contain other rulesets.
 //TODO: this rule generates warning: Decision can match input such as "IDENT" using multiple alternatives: 1, 2
 ////the last declaration does not have to have semicolon
-ruleSet
-    : a+=selector (COMMA a+=selector)*
-        LBRACE
-            (  (b+=declaration_both_cases ) /*| b+=variabledeclaration*/ 
+ruleset_body 
+    :  LBRACE
+            (  (a+=declaration_both_cases ) /*| b+=variabledeclaration*/ 
 //               | (b+=combinator b+=ruleSet) 
 //               | ('&' COLON b+=ruleSet)
              )* 
         RBRACE
-     -> ^(RULESET $a* $b*)
-    ;
+     -> ^(BODY_OF_DECLARATIONS $a*);
 
 //That empty combinator in the beginning is a result of HASH_COMBINATOR hack. 
 selector
@@ -362,7 +345,9 @@ pseudo
 declaration_both_cases
     : declaration ((RBRACE)=>
     | SEMI!);
-     
+    
+//The expr is optional, because less.js supports this: "margin: ;" I do not know why, but they have it in 
+//their unit tests (so it was intentional)    
 declaration
     : property COLON expr? prio? -> ^(DECLARATION property expr? prio?)
     ;
@@ -696,7 +681,7 @@ fragment    Z   :   ('z'|'Z') ('\r'|'\n'|'\t'|'\f'|' ')*
 COMMENT         : '/*' ( options { greedy=false; } : .*) '*/'
     
                     {
-                        $channel = 2;   // Comments on channel 2 in case we want to find them
+                        $channel = HIDDEN;   // Comments on channel 2 in case we want to find them
                     }
                 ;
 
@@ -759,15 +744,17 @@ DOT             : '.'       ;
 // removed that option
 //the original string definition did not supported escaping '\\\\'* 
 fragment    INVALID :;
-fragment    ESCAPE_SINGLE_QUOTE :  '\\\''; 
-fragment    ESCAPE_DOUBLE_QUOTE :  '\\"'; 
-STRING          : '\'' ( (ESCAPE_SINGLE_QUOTE) | ~('\n'|'\r'|'\f'|'\'') )* 
+//This would normally contains all allowed escape symbols. As we are doing compiler into css, we do not 
+//care about the exact meaning of escaped symbol, nor we do care whether that make sense. 
+//we just want to eat a character that follows escape symbol.   
+fragment    ESCAPED_SIMBOL :  '\\' . ; 
+STRING          : '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )* 
                     (
                           '\''
                         | { $type = INVALID; }
                     )
                     
-                | '"' ( (ESCAPE_DOUBLE_QUOTE) | ~('\n'|'\r'|'\f'|'"') )*
+                | '"' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
                     (
                           '"'
                         | { $type = INVALID; }

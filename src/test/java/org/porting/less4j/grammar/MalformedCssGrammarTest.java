@@ -6,6 +6,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
 import org.porting.less4j.core.parser.ANTLRParser;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.debugutils.DebugPrint;
 
 //TODO: comments
@@ -38,7 +39,7 @@ public class MalformedCssGrammarTest {
   public void stylesheet() throws RecognitionException {
     String crashingSelector =   "p:not([class**=\"lead\"]) {\n  color: black;\n}";
     ANTLRParser compiler = new ANTLRParser();
-    CommonTree tree = compiler.parse(crashingSelector);
+    HiddenTokenAwareTree tree = compiler.parse(crashingSelector);
 
     DebugPrint.printTokenStream(crashingSelector);
     DebugPrint.print(tree);

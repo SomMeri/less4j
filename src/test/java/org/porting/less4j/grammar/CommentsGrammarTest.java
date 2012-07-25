@@ -1,8 +1,8 @@
 package org.porting.less4j.grammar;
 
-import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
 import org.porting.less4j.core.parser.ANTLRParser;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.debugutils.DebugPrint;
 
 /**
@@ -15,7 +15,7 @@ public class CommentsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     String css = "/* comment*/ li:after {}";
     DebugPrint.printTokenStream(css);
-    CommonTree tree = compiler.parse(css);
+    HiddenTokenAwareTree tree = compiler.parse(css);
     DebugPrint.print(tree);
   }
 

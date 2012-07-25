@@ -1,6 +1,6 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 //FIXME: this does not handle parametrized classes yet
 //FIXME: this does not handle :: correctly
@@ -10,11 +10,11 @@ public class Pseudo extends ASTCssNode {
   private String name;
   private String parameter;
 
-  public Pseudo(CommonTree token, String name) {
+  public Pseudo(HiddenTokenAwareTree token, String name) {
     this(token, name, null);
   }
   
-  public Pseudo(CommonTree token, String name, String parameter) {
+  public Pseudo(HiddenTokenAwareTree token, String name, String parameter) {
     super(token);
     this.name = name;
     this.parameter = parameter;

@@ -1,6 +1,6 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class NumberExpression extends Expression {
 
@@ -9,7 +9,7 @@ public class NumberExpression extends Expression {
   @SuppressWarnings("unused")
   private Dimension dimension = Dimension.NUMBER;
 
-  public NumberExpression(CommonTree token) {
+  public NumberExpression(HiddenTokenAwareTree token) {
     super(token);
   }
 

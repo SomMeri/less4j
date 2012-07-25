@@ -2,7 +2,6 @@ package org.porting.less4j.core.parser;
 
 import java.util.List;
 
-import org.antlr.runtime.tree.CommonTree;
 import org.porting.less4j.core.ast.ColorExpression;
 import org.porting.less4j.core.ast.CssString;
 import org.porting.less4j.core.ast.Expression;
@@ -20,9 +19,9 @@ public class TermBuilder {
     this.parentBuilder = astBuilderSwitch;
   }
 
-  public Expression buildFromTerm(CommonTree token) {
-    List<CommonTree> children = getChildren(token);
-    CommonTree first = children.get(0);
+  public Expression buildFromTerm(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    HiddenTokenAwareTree first = children.get(0);
     switch (first.getType()) {
     case LessLexer.IDENT:
       return buildFromIdentifier(token, first);
@@ -61,12 +60,12 @@ public class TermBuilder {
     throw new IncorrectTreeException("type number: " + first.getType()+ " for " + first.getText());
   }
 
-  private Expression buildFromColorHash(CommonTree token, CommonTree first) {
+  private Expression buildFromColorHash(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     return new ColorExpression(token, first.getText());
   }
 
-  private Expression buildFromSignedNumber(CommonTree token, List<CommonTree> children) {
-    CommonTree sign = children.get(0);
+  private Expression buildFromSignedNumber(HiddenTokenAwareTree token, List<HiddenTokenAwareTree> children) {
+    HiddenTokenAwareTree sign = children.get(0);
     NumberExpression number = buildFromNumber(token, children.get(1));
     if (sign.getType()==LessLexer.PLUS)
       number.setSign(Sign.PLUS);
@@ -76,22 +75,22 @@ public class TermBuilder {
     return number;
   }
 
-  private NumberExpression buildFromNumber(CommonTree token, CommonTree actual) {
+  private NumberExpression buildFromNumber(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {
     NumberExpression result = new NumberExpression(token);
     result.setValueAsString(actual.getText());
     return result;
   }
 
   // FIXME: the current grammar does not support escaping
-  private Expression buildFromString(CommonTree token, CommonTree first) {
+  private Expression buildFromString(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     return new CssString(token, first.getText());
   }
 
-  private Expression buildFromIdentifier(CommonTree parent, CommonTree first) {
+  private Expression buildFromIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
     return new IdentifierExpression(parent, first.getText());
   }
 
-  private FunctionExpression buildFromSpecialFunction(CommonTree token, CommonTree first) {
+  private FunctionExpression buildFromSpecialFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     return new FunctionExpression(token, "url", extractUrlParameter(token, normalizeNewLineSymbols(first.getText())));
   }
 
@@ -100,7 +99,7 @@ public class TermBuilder {
     return text.replaceAll("\r?\n", Constants.NEW_LINE);
   }
 
-  private Expression extractUrlParameter(CommonTree token, String text) {
+  private Expression extractUrlParameter(HiddenTokenAwareTree token, String text) {
     if (text==null)
       return null;
     
@@ -111,16 +110,11 @@ public class TermBuilder {
   }
 
   //FIXME: write test for this, there is no such case
-  private FunctionExpression buildFromNormalFunction(CommonTree token, CommonTree first) {
-    List<CommonTree> children = getChildren(first);
+  private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
+    List<HiddenTokenAwareTree> children = first.getChildren();
     String name = children.get(0).getText();
     Expression parameter = (Expression) parentBuilder.switchOn(children.get(1));
     return new FunctionExpression(token, name, parameter);
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<CommonTree> getChildren(CommonTree token) {
-    return (List<CommonTree>) token.getChildren();
   }
 
 }

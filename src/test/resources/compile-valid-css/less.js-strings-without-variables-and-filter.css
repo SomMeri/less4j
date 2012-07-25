@@ -1,0 +1,24 @@
+#strings {
+  background-image: url("http://son-of-a-banana.com");
+  quotes: "~" "~";
+  content: "#*%:&^,)!.(~*})";
+  empty: "";
+  brackets: "{" "}";
+  escapes: "\"hello\" \\world";
+  escapes2: "\"llo";
+}
+#comments {
+  content: "/* hello */ // not-so-secret";
+}
+#single-quote {
+  quotes: "'" "'";
+  content: '""#!&""';
+  empty: '';
+  semi-colon: ';';
+}
+#one-line {
+  image: url(http://tooks.com);
+}
+#crazy {
+  image: url(http://), "}", url("http://}");
+}

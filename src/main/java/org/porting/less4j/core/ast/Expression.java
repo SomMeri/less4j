@@ -1,10 +1,10 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public abstract class Expression extends ASTCssNode {
 
-  public Expression(CommonTree token) {
+  public Expression(HiddenTokenAwareTree token) {
     super(token);
   }
 

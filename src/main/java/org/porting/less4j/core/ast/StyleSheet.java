@@ -1,10 +1,10 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class StyleSheet extends ASTCssNode {
 
-  public StyleSheet(CommonTree underlyingStructure) {
+  public StyleSheet(HiddenTokenAwareTree underlyingStructure) {
     super(underlyingStructure);
   }
 

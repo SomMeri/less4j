@@ -1,12 +1,12 @@
 package org.porting.less4j.core.ast;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class CssString extends Expression {
 
   private String value;
 
-  public CssString(CommonTree token, String value) {
+  public CssString(HiddenTokenAwareTree token, String value) {
     super(token);
     this.value = value;
   }

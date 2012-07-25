@@ -3,13 +3,13 @@ package org.porting.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.runtime.tree.CommonTree;
+import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class FontFace extends ASTCssNode {
-
+  //FIXME: make this extend body!!!
   private List<Declaration> body = new ArrayList<Declaration>();
 
-  public FontFace(CommonTree token) {
+  public FontFace(HiddenTokenAwareTree token) {
     super(token);
   }
 

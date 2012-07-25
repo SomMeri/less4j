@@ -1,12 +1,22 @@
 package org.porting.less4j.core;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.porting.less4j.platform.Constants;
 
 public class ExtendedStringBuilder {
-  private static final Object INDENTATION = "  ";
+  private static final String INDENTATION = "  ";
+  private static final char SPACE = ' ';
+  private static final Set<Character> SEPARATORS = new HashSet<Character>();
   private StringBuilder builder = new StringBuilder();
   private int indentationLevel;
-  private boolean onNewLine;
+  private boolean onNewLine = true;
+  
+  static {
+    SEPARATORS.add(' ');
+    SEPARATORS.add(';');
+  }
 
   public ExtendedStringBuilder(String string) {
     builder = new StringBuilder(string);
@@ -103,6 +113,10 @@ public class ExtendedStringBuilder {
     return builder.toString();
   }
 
+  public void ensureNewLine() {
+    if (!onNewLine)
+      newLine();
+  }
   public void newLine() {
     builder.append(Constants.NEW_LINE);
     onNewLine=true;
@@ -119,12 +133,32 @@ public class ExtendedStringBuilder {
   }
   
   private void handleIndentation(){
-    if (onNewLine) {
+    if (onNewLine()) {
       onNewLine = false;
       for (int i = 0; i < indentationLevel; i++) {
         builder.append(INDENTATION);
       }
     }
+  }
+
+  private boolean onNewLine() {
+    return onNewLine;
+  }
+
+  public ExtendedStringBuilder ensureSeparator() {
+    if (onNewLine() || endsWithSeparator()) 
+      return this;
+    
+    builder.append(SPACE);
+    return this;
+  }
+
+  public boolean endsWithSeparator() {
+    int length = builder.length()-1;
+    if (length<0)
+      return false;
+    
+    return SEPARATORS.contains(builder.charAt(length));
   }
 
 }
