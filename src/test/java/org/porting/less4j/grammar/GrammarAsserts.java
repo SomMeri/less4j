@@ -26,23 +26,23 @@ public class GrammarAsserts {
   //TODO move to some helper
   public static final Set<Integer> DUMMY_TOKENS = new HashSet<Integer>(Arrays.asList(LessLexer.SELECTOR, LessLexer.RULESET,LessLexer.EMPTY_COMBINATOR,LessLexer.EMPTY_SEPARATOR, LessLexer.EXPRESSION ));
 
-  public static void assertValidSelector(ANTLRParser compiler, CommonTree tree) {
-    assertValid(compiler);
-    assertEquals(LessLexer.SELECTOR, tree.getType());
+  public static void assertValidSelector(ANTLRParser.ParseResult result) {
+    assertValid(result);
+    assertEquals(LessLexer.SELECTOR, result.getTree().getType());
   }
 
-  public static void assertValidExpression(ANTLRParser compiler, CommonTree tree) {
-    assertValid(compiler);
-    assertEquals(LessLexer.EXPRESSION, tree.getType());
+  public static void assertValidExpression(ANTLRParser.ParseResult result) {
+    assertValid(result);
+    assertEquals(LessLexer.EXPRESSION, result.getTree().getType());
   }
 
-  public static void assertValidTerm(ANTLRParser compiler, CommonTree tree) {
-    assertValid(compiler);
-    assertEquals(LessLexer.TERM, tree.getType());
+  public static void assertValidTerm(ANTLRParser.ParseResult result) {
+    assertValid(result);
+    assertEquals(LessLexer.TERM, result.getTree().getType());
   }
 
-  public static void assertValid(ANTLRParser compiler) {
-    assertTrue(compiler.getAllErrors().isEmpty());
+  public static void assertValid(ANTLRParser.ParseResult result) {
+    assertTrue(result.getErrors().isEmpty());
   }
 
   @SuppressWarnings("rawtypes")

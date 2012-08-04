@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.porting.less4j.core.parser.ANTLRParser;
+import org.porting.less4j.core.parser.ANTLRParser.ParseResult;
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 @RunWith(Parameterized.class)
@@ -60,13 +61,13 @@ public class DebugHelperTest {
   public void shouldParseWithoutErrors() throws Throwable {
     ANTLRParser compiler = new ANTLRParser();
     try {
-      HiddenTokenAwareTree tree = compiler.parse(IOUtils.toString(new FileReader(file)));
-      DebugPrint.print(tree);
+      ParseResult result = compiler.parseStyleSheet(IOUtils.toString(new FileReader(file)));
+      DebugPrint.print(result.getTree());
+      assertTrue(name, result.getErrors().isEmpty());
     } catch (Throwable th) {
       th.printStackTrace();
       fail(name + " " + th.toString());
     }
-    assertTrue(name, compiler.getAllErrors().isEmpty());
   }
 
   // TODO: add names after jUnit 11 comes out

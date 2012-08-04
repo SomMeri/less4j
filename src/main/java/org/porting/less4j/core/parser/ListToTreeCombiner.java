@@ -7,12 +7,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
 
 /**
- * This class is NOT thread-safe.
+ * This class is NOT thread-safe. 
+ * 
+ * The combined merges a list of tokens with abstract syntax tree. The merging algorithm 
+ * assigns each token to exactly one node in abstract syntax tree.
  * 
  */
-public class CommentTreeCombiner {
+public class ListToTreeCombiner {
 
   private LinkedList<Token> hiddenTokens;
 
@@ -36,10 +40,15 @@ public class CommentTreeCombiner {
     this.hiddenTokens = hiddenTokens;
   }
 
-  public void associateAsChild(HiddenTokenAwareTree ast) {
+  private void associateAsChild(HiddenTokenAwareTree ast) {
     addAllPrecedingTokens(ast);
 
     LinkedList<HiddenTokenAwareTree> children = getChildren(ast);
+    if (children.isEmpty()) {
+      addAllContainedTokens(ast);
+      return;
+    }
+
     HiddenTokenAwareTree previousChild = null;
     for (HiddenTokenAwareTree child : children) {
       assignFirstCommentsSegment(previousChild, child);
@@ -47,14 +56,10 @@ public class CommentTreeCombiner {
       previousChild = child;
     }
 
-    if (children.isEmpty()) {
-      addAllContainedTokens(ast);
-    } else {
-      addFollowingTokens(children.getLast(), ast.getTokenStopIndex());
-    }
+    addFollowingTokens(previousChild, ast.getTokenStopIndex());
   }
 
-  public void assignFirstCommentsSegment(HiddenTokenAwareTree firstChild, HiddenTokenAwareTree secondChild) {
+  private void assignFirstCommentsSegment(HiddenTokenAwareTree firstChild, HiddenTokenAwareTree secondChild) {
     LinkedList<Token> tail = readTillNewLine(hiddenTokens, secondChild.getTokenStartIndex());
     if (!tail.isEmpty() && firstChild != null) {
       if (tail.peekLast().getType() == LessLexer.NEW_LINE)
@@ -79,7 +84,7 @@ public class CommentTreeCombiner {
     List<HiddenTokenAwareTree> children = ast.getChildren();
     if (children == null)
       return new LinkedList<HiddenTokenAwareTree>();
-    // FIXME can not handle error nodes !!!
+
     LinkedList<HiddenTokenAwareTree> copy = new LinkedList<HiddenTokenAwareTree>(children);
     Collections.sort(copy, new PositionComparator());
     return copy;
@@ -91,7 +96,6 @@ public class CommentTreeCombiner {
     target.addPreceding(tokens);
   }
 
-  // FIXME: document comments and new lines only condition
   private LinkedList<Token> readTillNewLine(LinkedList<Token> hiddenTokens, int end) {
     LinkedList<Token> result = new LinkedList<Token>();
     if (hiddenTokens.isEmpty())
@@ -125,11 +129,11 @@ public class CommentTreeCombiner {
     return result;
   }
 
-  class PositionComparator implements Comparator<HiddenTokenAwareTree> {
+  class PositionComparator implements Comparator<CommonTree> {
 
     @Override
-    public int compare(HiddenTokenAwareTree arg0, HiddenTokenAwareTree arg1) {
-      return arg0.getTokenStartIndex() - arg1.getTokenStopIndex();
+    public int compare(CommonTree arg0, CommonTree arg1) {
+      return arg0.getTokenStartIndex() - arg1.getTokenStartIndex();
     }
 
   }

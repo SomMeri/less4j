@@ -7,6 +7,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 
 public class HiddenTokenAwareTree extends CommonTree {
+  
   private List<Token> preceding = new LinkedList<Token>();
   private List<Token> orphans = new LinkedList<Token>();
   private List<Token> following = new LinkedList<Token>();
@@ -23,6 +24,11 @@ public class HiddenTokenAwareTree extends CommonTree {
     super(node);
   }
   
+  @Override
+  public CommonTree getChild(int i) {
+    return (CommonTree) super.getChild(i);
+  }
+
   @SuppressWarnings("unchecked")
   public List<HiddenTokenAwareTree> getChildren() {
     return super.getChildren();

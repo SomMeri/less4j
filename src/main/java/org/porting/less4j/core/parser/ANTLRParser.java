@@ -18,154 +18,180 @@ import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.porting.less4j.debugutils.DebugPrint;
 
 /**
- * This class is NOT thread safe. 
  * 
- * This is statefull class.
  * 
  */
 // FIXME: add handling of filter: alpha(opacity=100);
 public class ANTLRParser {
 
-  private List<RecognitionException> errors = new ArrayList<RecognitionException>();
-  private LessLexer lexer;
-  private LessParser parser;
-  private HiddenTokensCollectorTokenSource tokenSource;
+  private static final List<Integer> KEEP_HIDDEN_TOKENS = Arrays.asList(LessLexer.COMMENT, LessLexer.NEW_LINE);
 
-  public HiddenTokenAwareTree parse(String expression) {
+  public ParseResult parseStyleSheet(String styleSheet) {
+    return parse(styleSheet, InputType.STYLE_SHEET);
+  }
+
+  public ParseResult parseDeclaration(String declaration) {
+    return parse(declaration, InputType.DECLARATION);
+  }
+
+  public ParseResult parseExpression(String expression) {
+    return parse(expression, InputType.EXPRESSION);
+  }
+
+  public ParseResult parseTerm(String term) {
+    return parse(term, InputType.TERM);
+  }
+
+  public ParseResult parseSelector(String selector) {
+    return parse(selector, InputType.SELECTOR);
+  }
+
+  private ParseResult parse(String input, InputType inputType) {
     try {
-      initialize(expression);
-      //DebugPrint.printTokenStream(expression);
-      ParserRuleReturnScope ret = parser.styleSheet();
-      return finalize(ret);
+      List<RecognitionException> errors = new ArrayList<RecognitionException>();
+      LessLexer lexer = createLexer(input, errors);
+
+      CollectorTokenSource tokenSource = new CollectorTokenSource(lexer, KEEP_HIDDEN_TOKENS);
+      LessParser parser = createParser(lexer, tokenSource, errors);
+      ParserRuleReturnScope returnScope = inputType.parseTree(parser);
+      
+      HiddenTokenAwareTree ast = (HiddenTokenAwareTree) returnScope.getTree();
+      merge(ast, tokenSource.getCollectedTokens());
+      DebugPrint.print(ast);
+      return new ParseResultImpl(ast, new ArrayList<RecognitionException>(errors));
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");
     }
   }
 
-  public HiddenTokenAwareTree parseDeclaration(String expression) {
-    try {
-      initialize(expression);
-      ParserRuleReturnScope ret = parser.declaration();
-      return finalize(ret);
-    } catch (RecognitionException e) {
-      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
-    }
-  }
-
-  public HiddenTokenAwareTree parseExpression(String expression) {
-    try {
-      initialize(expression);
-      ParserRuleReturnScope ret = parser.expr();
-      return finalize(ret);
-    } catch (RecognitionException e) {
-      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
-    }
-  }
-
-  public HiddenTokenAwareTree parseTerm(String expression) {
-    try {
-      initialize(expression);
-      ParserRuleReturnScope ret = parser.term();
-      return finalize(ret);
-    } catch (RecognitionException e) {
-      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
-    }
-  }
-
-  public HiddenTokenAwareTree parseSelector(String selector) {
-    try {
-      initialize(selector);
-      ParserRuleReturnScope ret = parser.selector();
-      return finalize(ret);
-    } catch (RecognitionException e) {
-      throw new IllegalStateException("Recognition exception is never thrown, only declared.");
-    }
-  }
-
-  private void initialize(String expression) {
-    errors = new ArrayList<RecognitionException>();
-    lexer = createLexer(expression);
-    parser = createParser(lexer);
-  }
-
-  private LessParser createParser(LessLexer lexer) {
-    //FIXME: make this consistent 
-    HiddenTokensCollectorTokenSource tokenSource = new HiddenTokensCollectorTokenSource(lexer,  Arrays.asList(LessLexer.COMMENT, LessLexer.NEW_LINE));
-    this.tokenSource = tokenSource;
+  private LessParser createParser(LessLexer lexer, TokenSource tokenSource, List<RecognitionException> errors) {
     CommonTokenStream tokens = new CommonTokenStream(tokenSource);
-    LessParser parser = new LessParser(tokens);
-    parser.setTreeAdaptor(new LessTreeAdaptor());
+    LessParser parser = new LessParser(tokens, errors);
+    parser.setTreeAdaptor(new HiddenTokenAwareTreeAdaptor());
     return parser;
   }
 
-  private LessLexer createLexer(String expression) {
+  private LessLexer createLexer(String expression, List<RecognitionException> errors) {
     ANTLRStringStream input = new ANTLRStringStream(expression);
-    LessLexer lexer = new LessLexer(input);
+    LessLexer lexer = new LessLexer(input, errors);
     return lexer;
   }
 
-  private HiddenTokenAwareTree finalize(ParserRuleReturnScope ret) {
-    collectErrors(lexer, parser);
-    HiddenTokenAwareTree ast = (HiddenTokenAwareTree) ret.getTree();
-    LinkedList<Token> hiddenTokens = tokenSource.getCollectedTokens();
-    CommentTreeCombiner combiner = new CommentTreeCombiner();
+  private HiddenTokenAwareTree merge(HiddenTokenAwareTree ast, LinkedList<Token> hiddenTokens) {
+    ListToTreeCombiner combiner = new ListToTreeCombiner();
     combiner.associate(ast, hiddenTokens);
-    DebugPrint.print(ast);
     return ast;
   }
 
-  private void collectErrors(LessLexer lexer, LessParser parser) {
-    errors.addAll(lexer.getAllErrors());
-    errors.addAll(parser.getAllErrors());
+  public interface ParseResult {
+    HiddenTokenAwareTree getTree();
+    List<RecognitionException> getErrors();
   }
 
-  // add new method
-  public List<RecognitionException> getAllErrors() {
-    return new ArrayList<RecognitionException>(errors);
+  private class ParseResultImpl implements ParseResult {
+    private final HiddenTokenAwareTree tree;
+    private final List<RecognitionException> errors;
+
+    public ParseResultImpl(HiddenTokenAwareTree tree, List<RecognitionException> errors) {
+      super();
+      this.tree = tree;
+      this.errors = errors;
+    }
+
+    public HiddenTokenAwareTree getTree() {
+      return tree;
+    }
+
+    public List<RecognitionException> getErrors() {
+      return errors;
+    }
+
   }
 
+  private enum InputType {
+    SELECTOR {
+      @Override
+      public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
+        return parser.selector();
+      }
+    },
+    TERM {
+      @Override
+      public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
+        return parser.term();
+      }
+    },
+    EXPRESSION {
+      @Override
+      public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
+        return parser.expr();
+      }
+    },
+    DECLARATION {
+      @Override
+      public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
+        return parser.declaration();
+      }
+    },
+    STYLE_SHEET {
+      @Override
+      public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
+        return parser.styleSheet();
+      }
+    };
+
+    public abstract ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException;
+
+  }
 }
 
-class HiddenTokensCollectorTokenSource implements TokenSource {
-  
+class CollectorTokenSource implements TokenSource {
+
   private final TokenSource source;
-  private final Set<Integer> tokenTypes = new HashSet<Integer>();
+  private final Set<Integer> collectTokenTypes = new HashSet<Integer>();
   private final LinkedList<Token> collectedTokens = new LinkedList<Token>();
-  
-  public HiddenTokensCollectorTokenSource(TokenSource source, Collection<Integer> tokenTypes) {
+
+  public CollectorTokenSource(TokenSource source, Collection<Integer> collectTokenTypes) {
     super();
     this.source = source;
-    this.tokenTypes.addAll(tokenTypes);
+    this.collectTokenTypes.addAll(collectTokenTypes);
+  }
+
+  /**
+   * Returns next token from the wrapped token source. Stores it in a list if
+   * necessary.
+   * 
+   */
+  @Override
+  public Token nextToken() {
+    Token nextToken = source.nextToken();
+    if (shouldCollect(nextToken)) {
+      collectedTokens.add(nextToken);
+    }
+
+    return nextToken;
+  }
+
+  /**
+   * Decide whether collect the token or not.
+   */
+  protected boolean shouldCollect(Token nextToken) {
+    // filter the token by its type
+    return collectTokenTypes.contains(nextToken.getType());
   }
 
   public LinkedList<Token> getCollectedTokens() {
     return collectedTokens;
   }
 
-  public Token nextToken() {
-    Token nextToken = source.nextToken();
-    if (isPassable(nextToken)) {
-      //Each token is read from the token source only once.
-      //This is not documented, but it is not reasonable to build unnecessary
-      //structures. Antlr3 will not have major updates and antl4 will not
-      //be compatible with it.
-      collectedTokens.add(nextToken);
-    }
-    
-    return nextToken;
-  }
-
-  public boolean isPassable(Token nextToken) {
-    return tokenTypes.contains(nextToken.getType());
-  }
-
+  @Override
   public String getSourceName() {
     return "Collect hidden channel " + source.getSourceName();
   }
- 
+
 }
 
-class LessTreeAdaptor extends CommonTreeAdaptor {
+class HiddenTokenAwareTreeAdaptor extends CommonTreeAdaptor {
 
   @Override
   public Object create(Token payload) {

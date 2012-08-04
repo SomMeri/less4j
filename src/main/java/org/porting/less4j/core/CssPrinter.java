@@ -31,7 +31,6 @@ import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
-import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 //FIXME document: not matching spaces especially around terms expressions and comments
 public class CssPrinter implements ILessCompiler {
@@ -43,8 +42,8 @@ public class CssPrinter implements ILessCompiler {
     // FIXME: ugly, clean hierarchy and dependencies
     ExtendedStringBuilder stringBuilder = new ExtendedStringBuilder("");
 
-    HiddenTokenAwareTree ast = parser.parse(content);
-    StyleSheet styleSheet = astBuilder.parse(ast);
+    ANTLRParser.ParseResult result = parser.parseStyleSheet(content);
+    StyleSheet styleSheet = astBuilder.parse(result.getTree());
     Builder builder = new Builder(stringBuilder);
     builder.append(styleSheet);
     return stringBuilder.toString();

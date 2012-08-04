@@ -64,6 +64,19 @@ tokens {
 
 //override some methods and add new members to generated lexer
 @lexer::members {
+    public LessLexer(List<RecognitionException> errors) {
+      this.errors = errors;
+    } 
+
+    public LessLexer(CharStream input, List<RecognitionException> errors) {
+      this(input, new RecognizerSharedState(), errors);
+    }
+    public LessLexer(CharStream input, RecognizerSharedState state, List<RecognitionException> errors) {
+      super(input,state);
+      this.errors = errors;
+    }
+
+  //FIXME: document - what am I doing this for?
   List tokens = new ArrayList();
   public void emit(Token token) {
         state.token = token;
@@ -99,6 +112,15 @@ tokens {
 
 //override some methods and add new members to generated parser
 @parser::members {
+
+  public LessParser(TokenStream input, List<RecognitionException> errors) {
+    this(input, new RecognizerSharedState(), errors);
+  }
+  public LessParser(TokenStream input, RecognizerSharedState state, List<RecognitionException> errors) {
+    super(input, state);
+    this.errors = errors;
+  }
+
   //add new field
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
   

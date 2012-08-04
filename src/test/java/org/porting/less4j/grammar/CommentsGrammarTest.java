@@ -15,8 +15,8 @@ public class CommentsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     String css = "/* comment*/ li:after {}";
     DebugPrint.printTokenStream(css);
-    HiddenTokenAwareTree tree = compiler.parse(css);
-    DebugPrint.print(tree);
+    ANTLRParser.ParseResult result = compiler.parseStyleSheet(css);
+    DebugPrint.print(result.getTree());
   }
 
 }
