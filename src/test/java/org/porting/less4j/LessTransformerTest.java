@@ -9,6 +9,7 @@ import java.net.URL;
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.porting.less4j.core.CssPrinter;
 
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.Resource;
@@ -23,7 +24,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class LessTransformerTest {
-
+  @Ignore
   @Test
   public void shouldTransformUsingRhinoLessProcessor()
       throws Exception {
@@ -34,7 +35,6 @@ public class LessTransformerTest {
   /**
    * This test will pass when the ANTLR based processor will be implemented.
    */
-  @Ignore
   @Test
   public void shouldTransformUsingAntlrBasedLessProcessor()
       throws Exception {
@@ -42,9 +42,8 @@ public class LessTransformerTest {
       @Override
       public void process(Resource resource, Reader reader, Writer writer)
           throws IOException {
-        // TODO use antlr processor to transform resource read from reader and write the processed result in writer. 
-        //for now the output is the same as input (and the test will fail)
-        IOUtils.copy(reader, writer);
+        final String css = new CssPrinter().compile(IOUtils.toString(reader));
+        IOUtils.write(css, writer);
       }
     };
     genericTransformerTest(processor);
