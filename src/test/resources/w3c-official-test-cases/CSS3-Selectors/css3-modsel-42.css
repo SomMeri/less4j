@@ -1,0 +1,7 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-42.css
+::after pseudo-element
+*/
+p::after {
+  background-color: lime;
+  content: "GENERATED CONTENT ";
+}

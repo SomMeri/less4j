@@ -43,10 +43,11 @@ tokens {
   EMPTY_SEPARATOR; 
   ELEMENT_NAME;
   CSS_CLASS;
-  SIMPLE_SELECTOR;
+  NTH;
   PSEUDO;
   ATTRIBUTE;
   ID_SELECTOR;
+  ELEMENT_SUBSEQUENT;
   CHARSET_DECLARATION;
   TERM_FUNCTION;
   TERM;
@@ -60,6 +61,7 @@ tokens {
  
 @parser::header {
   package org.porting.less4j.core.parser;
+  import org.porting.less4j.core.parser.ParsersSemanticPredicates;
 }
 
 //override some methods and add new members to generated lexer
@@ -123,6 +125,7 @@ tokens {
 
   //add new field
   private List<RecognitionException> errors = new ArrayList<RecognitionException>();
+  private ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
   
   public List<RecognitionException> getAllErrors() {
     return new ArrayList<RecognitionException>(errors);
@@ -244,7 +247,8 @@ operator
 combinator
     : PLUS
     | GREATER
-    | (EMPTY_COMBINATOR) => EMPTY_COMBINATOR //suppressing warning
+    | TILDE
+//    | (EMPTY_COMBINATOR) => EMPTY_COMBINATOR //suppressing warning
     | ( -> EMPTY_COMBINATOR)
     ;
     
@@ -275,33 +279,98 @@ ruleset_body
         RBRACE
      -> ^(BODY_OF_DECLARATIONS $a*);
 
-//That empty combinator in the beginning is a result of HASH_COMBINATOR hack. 
+//selector2
+//    : (EMPTY_COMBINATOR? a+=simpleSelector (a+=combinator a+=simpleSelector)*
+//    -> ^(SELECTOR ($a)* ) )
+//    {
+//       predicates.compensateForWrongSimpleSelectorGrammar($tree);
+//    } 
+//    ;
+
+/*TODO add to documentation
+  This does not create correct structure for selectors, but neither did the 
+  original http://www.antlr.org/grammar/1240941192304/css21.g
+
+  The problem is that whitespaces are hidden and therefore following inputs: 
+  * "div :not(:enabled) :not(:disabled)"  
+  * "div:not(:enabled):not(:disabled)" 
+  
+  turn into exactly the same token stream. Which is unfortunate, because they mean 
+  two different things. The first one is equivalent to "div *:not(:enabled) *:not(:disabled)" 
+  while the second one.
+  
+  We originally wanted to use semantic predicates to guide prediction phase, but we were not 
+  succesfull. No matter what we did, unsatified predicates have been either throwing exceptions 
+  or generated error nodes.
+  
+  Some of them even apparently exposed some obsure ANTLR bugs and caused errors in entirely 
+  different rules.
+  
+  Therefore we decided to just parse the thing into as simple structure as possible and solve 
+  the rest in ASTSwitchBuilder. Again, it would be possible to add an action to the rule to
+  modify the tree in the parser, but it is unnecessary given that we are translating ANTLR
+  tree into another one. 
+*/
 selector
-    : EMPTY_COMBINATOR? a+=simpleSelector (a+=combinator a+=simpleSelector)*
-    -> ^(SELECTOR ($a)* )
+    : ( (a+=elementName | a+=elementSubsequent) (a+=combinator (a+=elementName | a+=elementSubsequent))*
+    -> ^(SELECTOR ($a)* ) )
     ;
 
-simpleSelector
-    : (a+=elementName 
-        ((esPred)=>a+=elementSubsequent)*
-        
-    | ((esPred)=>a+=elementSubsequent)+
-    ) -> ^(SIMPLE_SELECTOR ($a)* )
-    ;
+//simpleSelector
+//    : (a+=elementName 
+//          ((esPred)=>a+=elementSubsequent)*
+//    | ((esPred)=>a+=elementSubsequent)+
+//    ) -> ^(SIMPLE_SELECTOR ($a)* )
+//    ;
+
+//simpleSelector
+//    : (({1==2}?=>((esPred)=>a+=elementSubsequent) 
+//       |a+=elementName
+//       |
+//       ) ({1==2}?=>(esPred)=>a+=elementSubsequent)*
+//     )-> ^(SIMPLE_SELECTOR ($a)* ) 
+//    ;
     
 esPred
-    : HASH | DOT | LBRACKET | COLON
+    : HASH 
+    | DOT 
+    | LBRACKET 
+    | COLON
     ;
     
 elementSubsequent
-    : HASH -> ^(ID_SELECTOR HASH)
-    | cssClass
-    | attrib
-    | pseudo
+    :  HASH -> ^(ELEMENT_SUBSEQUENT ^(ID_SELECTOR HASH))
+      | cssClass -> ^(ELEMENT_SUBSEQUENT cssClass)
+      | attrib -> ^(ELEMENT_SUBSEQUENT attrib)
+      | pseudo -> ^(ELEMENT_SUBSEQUENT pseudo)
     ;
 
+//TODO Document: a class name can be also a number e.g., .56 or .5cm
+//if that is the case, then the lexer spits out some kind of number instead of IDENT
+//this could be solved by a semantic predicate, but if I do this: 
+//cssClass
+//    : {1==2}?=>(a=. -> ^(CSS_CLASS $a))
+//    | ((DOT) => DOT IDENT -> ^(CSS_CLASS IDENT))
+//    ;
+//then predicates.isNthPseudoClass($a) from pseudoclass starts to be copied all over the 
+//place including places where variable a is not accessible. End result: he parser stops 
+//being compilable.  
+
+//A class name can be also a number e.g., .56 or .5cm or anything else that starts with .. 
+//unfortunately, those can be turned into numbers by lexer. This feels like an ugly hack,
+//but I do not know how to solve the problem otherwise.
 cssClass
     : DOT IDENT -> ^(CSS_CLASS IDENT)
+    | NUMBER -> ^(CSS_CLASS NUMBER)
+    | EMS -> ^(CSS_CLASS EMS)
+    | EXS -> ^(CSS_CLASS EXS)
+    | LENGTH -> ^(CSS_CLASS LENGTH)
+    | ANGLE -> ^(CSS_CLASS ANGLE)
+    | TIME -> ^(CSS_CLASS TIME)
+    | FREQ -> ^(CSS_CLASS FREQ)
+    | REPEATER -> ^(CSS_CLASS REPEATER)
+    | PERCENTAGE -> ^(CSS_CLASS PERCENTAGE)
+    | UNKNOWN_DIMENSION -> ^(CSS_CLASS UNKNOWN_DIMENSION)
     ;
     
 elementName
@@ -333,21 +402,35 @@ attrib
       -> ^(ATTRIBUTE $a* )
 ;
 
+//pseudo
+//    : (c+=COLON c+=COLON? a=IDENT
+//            (  { predicates.isNthPseudoClass($a)}?=> ( LPAREN ( b1=nth ) RPAREN) 
+//               | ( 
+//                  (LPAREN ( b2=pseudoparameters ) RPAREN)?
+//                 )
+//            )
+//      ) -> ^(PSEUDO $c+ $a $b1* $b2*)
+//    ;
+
 pseudo
-    : (COLON COLON? 
-            a=IDENT
-                ( // Function
-                
-                    (LPAREN ( b=pseudoparameters ) RPAREN) 
-                )?
-      ) -> ^(PSEUDO $a $b*)
+    : (c+=COLON c+=COLON? a=IDENT
+            ( 
+                (LPAREN ( { predicates.isNthPseudoClass($a)}?=> b1=nth | b2=pseudoparameters ) RPAREN)?
+            )
+      ) -> ^(PSEUDO $c+ $a $b1* $b2*)
     ;
     
+//it can be also that (-)xn+-y thingy    
  pseudoparameters:
       (IDENT) => IDENT
     | (NUMBER) => NUMBER
-    | simpleSelector 
+    | selector 
  ;
+ 
+ nth: ((a+=PLUS | a+=MINUS)? (a+=REPEATER | a+=IDENT) ((b+=PLUS | b+=MINUS) b+=NUMBER)?
+                      | (b+=PLUS | b+=MINUS)? b+=NUMBER)
+      -> ^(NTH ^(TERM $a*) ^(TERM $b*));
+ 
 
 //| simpleSelector| NUMBER
 //see http://www.w3.org/TR/selectors/#nth-child-pseudo
@@ -414,7 +497,7 @@ special_function
     ;
 
 hexColor
-    : EMPTY_COMBINATOR? HASH -> HASH
+    : HASH -> HASH
     ;
 
 function
@@ -742,6 +825,7 @@ SUFFIXMATCH       : '$='      ;
 SUBSTRINGMATCH       : '*='      ;
 
 
+TILDE           : '~'       ;
 GREATER         : '>'       ;
 LBRACE          : '{'       ;
 RBRACE          : '}'       ;
@@ -795,12 +879,12 @@ IDENT           : '-'? NMSTART NMCHAR*  ;
 fragment HASH_FRAGMENT : '#' NAME             ; 
 HASH            : HASH_FRAGMENT             ; 
 //Hopefully, I will not destroy document references too much
-HASH_COMBINATOR : a=WS b=HASH_FRAGMENT {
-                     $a.setType(EMPTY_COMBINATOR);
-                     emit($a);
-                     $b.setType(HASH);
-                     emit($b);
-                   }; 
+//HASH_COMBINATOR : a=WS b=HASH_FRAGMENT {
+//                     $a.setType(EMPTY_COMBINATOR);
+//                     emit($a);
+//                     $b.setType(HASH);
+//                     emit($b);
+//                   }; 
 
 IMPORT_SYM      : '@' I M P O R T       ;
 PAGE_SYM        : '@' P A G E           ;
@@ -876,17 +960,15 @@ NUMBER
             | (K? H Z)=>
                 K? H    Z   { $type = FREQ;         }
 
-            | (N)=>
+            | (N ~('a'..'z'|'A'..'Z')|'0'..'9')=>
                 N           { $type = REPEATER;         }
             
             | '%'           { $type = PERCENTAGE;   }
-            
+            | UNKNOWN_DIMENSION  { $type = UNKNOWN_DIMENSION; }            
             | // Just a number
         )
     ;
     
-NUMBER_UNKNOWN_DIMENSION: PURE_NUMBER UNKNOWN_DIMENSION  { $type = UNKNOWN_DIMENSION; } ; 
-
 // ------------
 // url and uri.
 //TODO this gives warning, but we have to handle it differently thanks to variables
@@ -896,9 +978,19 @@ URI :   U R L
         ')'
     ;
 
-// odd and even for nth-child FIXME: this will each a class name ODD too!!!
-ODD: O D D;
-EVEN: E V E N;
+//TODO escape also '-'
+//TODO document why
+//fragment ODD: O D D;
+//fragment EVEN: E V E N;
+//fragment NTH_IDENT:  COLON (N T H '-' C H I L D |  N T H '-' L A S T '-' C H I L D | N T H '-' O F '-' T Y P E | N T H '-' L A S T '-' O F '-' T Y P E);
+//fragment NTH_ARGUMENT: (PLUS | MINUS)? WS* c=PURE_NUMBER? N WS* ((PLUS | MINUS) WS* PURE_NUMBER)?
+//                       | (PLUS | MINUS)? PURE_NUMBER | ODD | EVEN ;
+//                       
+//NTH_PSEUDO_CLASS: a=NTH_IDENT WS* b=LPAREN WS* c=NTH_ARGUMENT WS* RPAREN {
+//  emit($a);
+//  emit($b);
+//  emit($c);
+//};
 
 // -------------
 // Whitespace.  Though the W3 standard shows a Yacc/Lex style parser and lexer

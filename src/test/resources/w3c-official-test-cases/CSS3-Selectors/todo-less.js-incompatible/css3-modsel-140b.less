@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-140b.css
+NEGATED Attribute dash-separated value selector without declared namespace
+*/
+@namespace a url(http://www.example.org/a);
+@namespace b url(http://www.example.org/b);
+@namespace html url(http://www.w3.org/1999/xhtml);
+*|p, *|address, *|q, *|r { display : block ; margin-bottom : 1em }
+*|address, *|r { background-color : lime ! important }
+div.stub *|*:not([|lang|="foo-bar"]) { background-color : red }

@@ -1,0 +1,12 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-31.css
+:nth-last-of-type() pseudo-class
+*/
+.red {
+  background-color: red;
+}
+p:nth-last-of-type(3) {
+  background-color: lime;
+}
+dl > :nth-last-of-type(3n+1) {
+  background-color: lime;
+}

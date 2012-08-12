@@ -1,0 +1,7 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-174b.css
+NEGATED Attribute selectors with multiple attributes
+*/
+
+ tests, tests * { display: block; color: green }
+ testA:not([*|attribute="pass"]) { color: red; }
+ testB:not([*|attribute="pass"]) { color: red; }

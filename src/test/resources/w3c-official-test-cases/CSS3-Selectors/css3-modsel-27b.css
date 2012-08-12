@@ -1,0 +1,12 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-27b.css
+Impossible rules (* html, * :root)
+*/
+* html {
+  background-color: red;
+}
+* :root {
+  background-color: red;
+}
+p {
+  color: green;
+}

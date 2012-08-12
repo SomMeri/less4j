@@ -6,11 +6,21 @@ public class NumberExpression extends Expression {
 
   private Sign sign = Sign.NONE;
   private String valueAsString;
-  @SuppressWarnings("unused")
   private Dimension dimension = Dimension.NUMBER;
 
   public NumberExpression(HiddenTokenAwareTree token) {
     super(token);
+  }
+
+  public NumberExpression(HiddenTokenAwareTree token, String valueAsString) {
+    super(token);
+    this.valueAsString = valueAsString;
+  }
+
+  public NumberExpression(HiddenTokenAwareTree token, String valueAsString, Sign sign, Dimension dimension) {
+    this(token, valueAsString);
+    this.sign = sign;
+    this.dimension = dimension;
   }
 
   public Sign getSign() {
@@ -30,14 +40,11 @@ public class NumberExpression extends Expression {
   }
 
   public Dimension getDimension() {
-    //TODO: this method will be needed when doing more complicated expressions
-    throw new IllegalStateException("not implemented yet");
-    //return dimension;
+    return dimension;
   }
 
   public void setDimension(Dimension dimension) {
     this.dimension = dimension;
-    throw new IllegalStateException("not implemented yet");
   }
 
   @Override
@@ -50,6 +57,6 @@ public class NumberExpression extends Expression {
   }
 
   public enum Dimension {
-    NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQ
+    NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQ, REPEATER, NONE;
   }
 }

@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-54.css
+NEGATED substring matching attribute selector on beginning
+*/
+div.stub > * {
+  color: red;
+}
+div.stub *:not([title^="si on"]) {
+  color: lime;
+}

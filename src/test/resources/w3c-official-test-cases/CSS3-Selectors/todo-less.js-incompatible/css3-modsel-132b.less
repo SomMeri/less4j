@@ -1,0 +1,10 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-132b.css
+NEGATED Attribute space-separated value selector with universal namespace
+*/
+@namespace a url(http://www.example.org/a);
+@namespace b url(http://www.example.org/b);
+@namespace html url(http://www.w3.org/1999/xhtml);
+*|p, *|q, *|r, *|s { display : block ; margin-bottom : 1em }
+*|p.deu, *|q { background-color : lime ! important }
+div.stub html|*:not([*|class~="deux"]),
+   div.stub *|*:not(html|*):not([*|foo~="deux"]) { background-color : red }

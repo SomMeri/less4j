@@ -1,0 +1,13 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-3.css
+Universal selector
+*/
+* {
+  color: lime;
+}
+ul,
+p {
+  color: red;
+}
+*.t1 {
+  color: lime;
+}

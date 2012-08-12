@@ -1,0 +1,6 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-38.css
+::first-line pseudo-element
+*/
+p:first-line {
+  background-color: lime;
+}

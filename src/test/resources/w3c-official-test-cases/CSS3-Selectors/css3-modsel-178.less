@@ -1,0 +1,7 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-178.css
+Parsing: :not and pseudo-elements
+*/
+
+ div { color: green; }
+ p:not(:first-line) { color: yellow; background: red; }
+ p:not(:after) { color: yellow; background: red; content: ' THIS TEST HAS FAILED! '; }

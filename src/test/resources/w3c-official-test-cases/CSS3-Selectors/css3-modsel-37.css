@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-37.css
+:only-of-type pseudo-class
+*/
+.red {
+  background-color: red;
+}
+.t1 :only-of-type {
+  background-color: lime;
+}

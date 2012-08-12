@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-4.css
+Omitted universal selector
+*/
+#foo {
+  background-color: lime;
+}
+p {
+  background-color: red;
+}

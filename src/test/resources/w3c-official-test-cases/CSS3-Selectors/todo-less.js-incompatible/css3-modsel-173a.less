@@ -1,0 +1,12 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-173a.css
+Namespaced attribute selectors
+*/
+
+ tests, tests * { display: block; color: red; }
+ testA[*|attribute] { color: green; }
+ testB[*|attribute="pass"] { color: green; }
+ testC[*|attribute~="pass"] { color: green; }
+ testD[*|attribute^="pass"] { color: green; }
+ testE[*|attribute*="pass"] { color: green; }
+ testF[*|attribute$="pass"] { color: green; }
+ testG[*|attribute|="pass"] { color: green; }

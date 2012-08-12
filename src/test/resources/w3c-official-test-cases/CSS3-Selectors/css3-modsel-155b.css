@@ -1,0 +1,11 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-155b.css
+Syntax and parsing
+*/
+p {
+  background: lime;
+}
+.two\ words {
+  background: red;
+} /* the "." and "~=" forms match on a space separated list of words.
+  In such a list, a word containing a space can never match, since it
+  would by definition be two words. */

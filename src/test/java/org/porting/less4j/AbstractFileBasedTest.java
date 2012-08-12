@@ -34,10 +34,10 @@ public abstract class AbstractFileBasedTest {
   public final void compileAndCompare() throws Throwable {
     try {
       String less = IOUtils.toString(new FileReader(lessFile));
-      String expected = IOUtils.toString(new FileReader(cssFile));
-
       ILessCompiler compiler = getCompiler();
       String actual = compiler.compile(less);
+      
+      String expected = IOUtils.toString(new FileReader(cssFile));
       assertEquals(lessFile.toString(), canonize(expected), canonize(actual));
       
     } catch (Throwable ex) {

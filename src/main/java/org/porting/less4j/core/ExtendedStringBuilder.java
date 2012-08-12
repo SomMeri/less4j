@@ -16,6 +16,8 @@ public class ExtendedStringBuilder {
   static {
     SEPARATORS.add(' ');
     SEPARATORS.add(';');
+    SEPARATORS.add('(');
+    //SEPARATORS.add(')');
   }
 
   public ExtendedStringBuilder(String string) {

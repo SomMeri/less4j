@@ -1,0 +1,11 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-168.css
+:before with ::before
+*/
+span:before {
+  background-color: red;
+  content: 'FAILED';
+}
+span::before {
+  background-color: lime;
+  content: 'PASSED';
+}

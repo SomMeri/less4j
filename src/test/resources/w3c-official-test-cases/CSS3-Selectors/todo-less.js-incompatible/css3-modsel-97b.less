@@ -1,0 +1,8 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-97b.css
+Attribute existence selector with declared namespace
+*/
+@namespace a url(http://www.example.org/a);
+@namespace b url(http://www.example.org/b);
+*|p, *|q, *|r { display : block ; margin-bottom : 1em }
+*|q { background-color : lime ! important }
+*[a|title] {background-color : red }

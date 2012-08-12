@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-129b.css
+NEGATED Substring matching attribute value selector on middle with declared namespace
+*/
+@namespace a url(http://www.example.org/a);
+@namespace b url(http://www.example.org/b);
+@namespace html url(http://www.w3.org/1999/xhtml);
+*|p, *|q, *|r, *|s { display : block ; margin-bottom : 1em }
+*|q, *|s { background-color : lime ! important }
+div.stub *|*:not([a|title*="hanta"]) { background-color : red }

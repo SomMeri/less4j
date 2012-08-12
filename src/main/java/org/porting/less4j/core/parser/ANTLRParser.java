@@ -48,6 +48,7 @@ public class ANTLRParser {
 
   private ParseResult parse(String input, InputType inputType) {
     try {
+      DebugPrint.printTokenStream(input);
       List<RecognitionException> errors = new ArrayList<RecognitionException>();
       LessLexer lexer = createLexer(input, errors);
 

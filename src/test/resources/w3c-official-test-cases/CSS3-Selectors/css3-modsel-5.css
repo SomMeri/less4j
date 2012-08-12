@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-5.css
+Attribute existence selector
+*/
+p {
+  background-color: red;
+}
+p[title] {
+  background-color: lime;
+}

@@ -4,10 +4,14 @@ import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class Selector extends ASTCssNode {
   
-  private final SelectorCombinator combinator;
-  private final SimpleSelector head;
-  private final Selector right;
+  private SimpleSelector head;
+  private SelectorCombinator combinator;
+  private Selector right;
 
+  public Selector(HiddenTokenAwareTree token) {
+    super(token);
+  }
+  
   public Selector(HiddenTokenAwareTree token, SimpleSelector head, SelectorCombinator combinator, Selector right) {
     super(token);
     this.head = head;
@@ -29,6 +33,18 @@ public class Selector extends ASTCssNode {
 
   public Selector getRight() {
     return right;
+  }
+
+  public void setHead(SimpleSelector head) {
+    this.head = head;
+  }
+
+  public void setCombinator(SelectorCombinator combinator) {
+    this.combinator = combinator;
+  }
+
+  public void setRight(Selector right) {
+    this.right = right;
   }
 
   public ASTCssNodeType getType() {

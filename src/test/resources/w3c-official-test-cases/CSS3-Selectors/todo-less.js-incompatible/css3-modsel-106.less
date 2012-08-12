@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-106.css
+Attribute space-separated value selector with universal namespace
+*/
+@namespace a url(http://www.example.org/a);
+@namespace b url(http://www.example.org/b);
+@namespace html url(http://www.w3.org/1999/xhtml);
+*|p, *|q, *|r, *|s { display : block ; margin-bottom : 1em }
+*|p, *|r, *|s { background-color : red }
+*|*[*|class~="deux"], *|*[*|foo~="deux"] { background-color : lime }

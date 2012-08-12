@@ -1,0 +1,15 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-145a.css
+:nth-of-type() pseudo-class with hidden elements
+*/
+line {
+  display: block;
+}
+[type~=odd] {
+  background: red;
+}
+line:nth-of-type(odd) {
+  background: lime;
+}
+[hidden] {
+  display: none;
+}

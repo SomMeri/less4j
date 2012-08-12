@@ -2,7 +2,6 @@ package org.porting.less4j.grammar;
 
 import org.junit.Test;
 import org.porting.less4j.core.parser.ANTLRParser;
-import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.debugutils.DebugPrint;
 
 /**

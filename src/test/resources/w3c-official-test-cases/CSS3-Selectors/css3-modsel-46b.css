@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-46b.css
+Indirect adjacent combinator
+*/
+.green {
+  background-color: lime !important;
+}
+div.stub > p ~ p {
+  background-color: red;
+}

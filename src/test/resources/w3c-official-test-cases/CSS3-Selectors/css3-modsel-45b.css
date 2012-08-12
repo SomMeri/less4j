@@ -1,0 +1,12 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-45b.css
+Direct adjacent combinator
+*/
+.green {
+  background-color: lime;
+}
+.white {
+  background-color: transparent !important;
+}
+div.stub > p + p {
+  background-color: red;
+}

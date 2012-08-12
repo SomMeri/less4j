@@ -1,0 +1,6 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-19.css
+:active pseudo-class
+*/
+a:active {
+  background-color: lime;
+}

@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-184e.css
+NEGATED starts-with attribute selector with empty value
+*/
+p {
+  color: red;
+}
+p:not([class^=""]) {
+  color: lime;
+}

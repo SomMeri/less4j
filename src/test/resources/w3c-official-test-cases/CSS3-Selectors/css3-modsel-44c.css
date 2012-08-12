@@ -1,0 +1,11 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-44c.css
+Child combinator and classes
+*/
+.fail > div {
+  background: red;
+  color: yellow;
+}
+.control {
+  background: green;
+  color: white;
+}

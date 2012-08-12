@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-175b.css
+Parsing: Numbers in classes
+*/
+p {
+  color: green;
+}
+.\13 {
+  color: red;
+}

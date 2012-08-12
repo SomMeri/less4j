@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-155d.css
+Syntax and parsing
+*/
+.one\.word {
+  background: lime;
+}
+p {
+  background: red;
+}

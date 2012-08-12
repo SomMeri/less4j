@@ -1,0 +1,15 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-147a.css
+:nth-last-of-type() pseudo-class with collapsed elements
+*/
+line {
+  display: block;
+}
+[type~=match] {
+  background: red;
+}
+line:nth-last-of-type(3n-1) {
+  background: lime;
+}
+[hidden] {
+  visibility: collapse;
+}

@@ -1,0 +1,6 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-50.css
+NEGATED attribute existence selector
+*/
+@namespace a url(http://www.example.org/a);
+a|* { color : red ; display : block ; margin-bottom : 1em }
+div.stub *|*:not([test]) { color : lime }

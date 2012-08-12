@@ -7,7 +7,7 @@ public class SelectorCombinator extends ASTCssNode {
   private Combinator combinator;
 
   public SelectorCombinator(HiddenTokenAwareTree underlyingStructure) {
-    this(underlyingStructure, Combinator.EMPTY);
+    this(underlyingStructure, Combinator.DESCENDANT);
   }
 
   public SelectorCombinator(HiddenTokenAwareTree underlyingStructure, Combinator combinator) {
@@ -29,7 +29,7 @@ public class SelectorCombinator extends ASTCssNode {
   }
 
   public enum Combinator {
-    PLUS, GREATER, EMPTY;
+    ADJACENT_SIBLING, CHILD, DESCENDANT, GENERAL_SIBLING;
   }
 
 }

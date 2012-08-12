@@ -1,0 +1,11 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-66.css
+NEGATED :target pseudo-class
+*/
+p {
+  background-color: navy;
+  color: white;
+}
+p:not(:target) {
+  background-color: white;
+  color: black;
+}

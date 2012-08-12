@@ -1,0 +1,7 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-19b.css
+:active pseudo-class on controls
+*/
+button:active {
+  background: green;
+  color: white;
+}

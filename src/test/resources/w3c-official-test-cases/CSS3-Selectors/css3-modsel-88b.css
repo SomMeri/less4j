@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-88b.css
+Nondeterministic matching of descendant and direct adjacent combinators
+*/
+p {
+  color: green !important;
+}
+blockquote + div p {
+  color: red;
+}

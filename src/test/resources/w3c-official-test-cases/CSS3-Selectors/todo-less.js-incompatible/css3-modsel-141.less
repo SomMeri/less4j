@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-141.css
+NEGATED Substring matching attribute selector on beginning without declared namespace
+*/
+@namespace a url(http://www.example.org/a);
+@namespace b url(http://www.example.org/b);
+@namespace html url(http://www.w3.org/1999/xhtml);
+*|p, *|q, *|r, *|s, *|t{ display : block ; margin-bottom : 1em }
+*|q, *|s, *|t { background-color : red }
+div.stub *|*:not([|title^="si on"]) { background-color : lime }

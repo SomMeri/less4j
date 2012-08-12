@@ -1,0 +1,12 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-33.css
+:last-child pseudo-class
+*/
+.red {
+  background-color: red;
+}
+.t1 td:last-child {
+  background-color: lime;
+}
+p > *:last-child {
+  background-color: lime;
+}

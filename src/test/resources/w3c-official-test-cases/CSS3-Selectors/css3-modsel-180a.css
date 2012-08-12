@@ -1,0 +1,16 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-180a.css
+::first-letter after &lt;br&gt;
+*/
+p {
+  color: green;
+}
+p:first-letter {
+  background: red;
+  color: yellow;
+  font-size: 4em;
+}
+p::first-letter {
+  background: red;
+  color: yellow;
+  font-size: 4em;
+}

@@ -15,13 +15,14 @@ import org.porting.less4j.core.CssPrinter;
 //FIXME: what does less.js do when the charset declaration goes AFTER ruleset? It is incorrect css anyway.
 //if there is a difference I should at least document it
 //TODO: document charset handling, it is easy enough to document
+//TODO: test case for colors, color used in selector should not be translated into hash.
 @RunWith(Parameterized.class)
-public class StrinctCompilerComplianceTest extends AbstractFileBasedTest {
+public class StrictComplianceTest extends AbstractFileBasedTest {
 
   private static final String inputDir = "src\\test\\resources\\compile-valid-css\\";
   private static final String outputDir = inputDir;
 
-  public StrinctCompilerComplianceTest(File inputFile, File outputFile, String testName) {
+  public StrictComplianceTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
   }
 

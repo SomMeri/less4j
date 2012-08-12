@@ -1,0 +1,10 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-120.css
+NEGATED type element selector without declared namespace
+*/
+@namespace html url(http://www.w3.org/1999/xhtml);
+@namespace a url(http://www.example.org/a);
+@namespace b url(http://www.example.org/b);
+div.stub > * { display : block ; margin-bottom : 1em ;
+                            background-color : red }
+div.stub > *:not(|p) { background-color : lime }
+div.stub > *|l > *:not(|p) { background-color : red }

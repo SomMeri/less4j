@@ -1,0 +1,6 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-d3.css
+Dynamic handling of attribute selectors
+*/
+
+   [test] { background: red; display: block; padding: 1em; }
+   stub ~ [|attribute^=start]:not([|attribute~=mid])[|attribute*=dle][|attribute$=end] ~ t { background: lime; }

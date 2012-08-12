@@ -1,0 +1,15 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-24.css
+:disabled pseudo-class
+*/
+button {
+  background-color: red;
+}
+input {
+  background-color: red;
+}
+button:disabled {
+  background-color: lime;
+}
+input:disabled {
+  background-color: lime;
+}

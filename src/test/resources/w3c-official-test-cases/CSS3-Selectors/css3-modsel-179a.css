@@ -1,0 +1,16 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-179a.css
+::first-line after &lt;br&gt;
+*/
+p {
+  color: green;
+}
+p:first-line {
+  background: red;
+  color: yellow;
+  font-size: 4em;
+}
+p::first-line {
+  background: red;
+  color: yellow;
+  font-size: 4em;
+}

@@ -25,8 +25,8 @@ public class HiddenTokenAwareTree extends CommonTree {
   }
   
   @Override
-  public CommonTree getChild(int i) {
-    return (CommonTree) super.getChild(i);
+  public HiddenTokenAwareTree getChild(int i) {
+    return (HiddenTokenAwareTree) super.getChild(i);
   }
 
   @SuppressWarnings("unchecked")

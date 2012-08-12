@@ -1,0 +1,84 @@
+tr:nth-child(2n+1) {
+  /* represents every odd row of an HTML table */
+}
+tr:nth-child(odd) {
+  /* same */
+}
+tr:nth-child(2n+0) {
+  /* represents every even row of an HTML table */
+}
+tr:nth-child(even) {
+  /* same */
+}
+p:nth-child(4n+1) {
+  /* something inside */
+}
+p:nth-child(4n+2) {
+  /* something inside */
+}
+p:nth-child(4n+3) {
+  /* something inside */
+}
+p:nth-child(4n+4) {
+  /* something inside */
+}
+:nth-child(10n-1) {
+  /* represents the 9th, 19th, 29th, etc, element */
+}
+:nth-child(10n+9) {
+  /* Same */
+}
+foo:nth-child(0n+5) {
+  /* represents an element foo that is the 5th child of its parent element */
+}
+foo:nth-child(5) {
+  /* same */
+}
+bar:nth-child(1n+0) {
+  /* represents all bar elements, specificity (0,1,1) */
+}
+bar:nth-child(n+0) {
+  /* same */
+}
+bar:nth-child(n) {
+  /* same */
+}
+tr:nth-child(2n+0) {
+  /* represents every even row of an HTML table */
+}
+tr:nth-child(2n) {
+  /* same */
+}
+:nth-child(3n+1) :nth-child(+3n-2) :nth-child(-n+6) :nth-child(+6) :nth-child(-6) {
+  /* something inside */
+}
+foo:nth-child(-0n+5) {
+  /* something inside */
+}
+foo:nth-child(+0n+5) {
+  /* something inside */
+}
+foo:nth-child(-n+5) {
+  /* something inside */
+}
+foo:nth-child(+n+5) {
+  /* something inside */
+}
+foo:nth-child(-n) {
+  /* something inside */
+}
+foo:nth-child(+n) {
+  /* something inside */
+}
+foo:nth-child(n) {
+  /* something inside */
+}
+foo:nth-child(0n) {
+  /* something inside */
+}
+foo:nth-child(-0n) {
+  /* something inside */
+}
+foo:nth-child(+0n) {
+  /* something inside */
+}

@@ -26,10 +26,6 @@ public abstract class TokenTypeSwitch<T> {
       return postprocess(handleSelector(token));
     }
 
-    if (type==LessLexer.SIMPLE_SELECTOR) {
-      return postprocess(handleSimpleSelector(token));
-    }
-
     if (type==LessLexer.STYLE_SHEET) {
       return postprocess(handleStyleSheet(token));
     }
@@ -61,6 +57,9 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.EXPRESSION) {
       return postprocess(handleExpression(token));
     }
+    if (type==LessLexer.NTH) {
+      return postprocess(handleNth(token));
+    }
     
     if (type==LessLexer.TERM)
       return postprocess(handleTerm(token));
@@ -72,6 +71,10 @@ public abstract class TokenTypeSwitch<T> {
       return postprocess(handleMediumDeclaration(token));
 
     throw new IllegalStateException("Unexpected token type: " + type + " for " + token.getText());
+  }
+
+  public T handleNth(HiddenTokenAwareTree token) {
+    return null;
   }
 
   public T handleDeclarationsBody(HiddenTokenAwareTree token) {
@@ -143,10 +146,6 @@ public abstract class TokenTypeSwitch<T> {
   }
   
   public T handleEOF(HiddenTokenAwareTree token) {
-    return null;
-  }
-
-  public T handleSimpleSelector(HiddenTokenAwareTree first) {
     return null;
   }
 

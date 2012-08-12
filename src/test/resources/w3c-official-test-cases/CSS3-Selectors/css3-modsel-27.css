@@ -1,0 +1,9 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-27.css
+:root pseudo-class
+*/
+html {
+  background-color: red;
+}
+*:root {
+  background-color: lime;
+}

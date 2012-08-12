@@ -1,0 +1,10 @@
+/* http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/xml/tests/css3-modsel-182.css
+Namespaces and \: in selectors
+*/
+p {
+  color: green;
+}
+foo\:bar {
+  background: red;
+  color: yellow;
+}
