@@ -1,0 +1,11 @@
+/*
+ Preceding comment with new line.
+*/
+/* before */ .comments /* after */ {
+  /* 1 */
+  /* 2 */ color: #808080 /* grey */ , /* blue */ #ffa500;
+  margin: 2px /*before comma*/;/* something about declaration*/
+  padding: 2px /*before comma*/;/* after comma */
+  /* Leave me here. */
+} /* Almost last comment. */
+/* Last comment. */
