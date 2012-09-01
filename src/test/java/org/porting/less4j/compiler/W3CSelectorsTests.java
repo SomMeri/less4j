@@ -22,21 +22,25 @@ import org.porting.less4j.debugutils.RhinoCompiler;
  *  we modified less.js output from raw version into less4j compatible version. All this work is done
  *  in {@link RhinoCompiler} utility class.
  *  
+ *  Special cases:
+ *  1.) Less.js crashed on some tests, even as those tests contained valid css. Those stored in 
+ *  less.js-incompatible directory. Expected outputs have been created manually. In general, less.js
+ *  crashed on anything that contains :not(:nth-xxx-xxxx(an+b)) and :not(:lang(xxx)). TODO bug report
+ *  
  *  Ignored cases:
  *  1.) Our compiler does not support namespaces yet, so those tests are not run yet. Tests on
- *  namespaces are in todo-namespaces directory.
+ *  namespaces are in todo-namespaces and less.js-incompatible\namespaces directories. TODO this needs to be implemented
  *  
  *  2.) Some w3c tests test interpreter behavior on malformed css, those are irrelevant and 
- *  stored in incorrect-css directory.
- *  
- *  3.) Less.js crashed on some tests, those stored in todo-less.js-incompatible.  
+ *  stored in incorrect-css and less.js-incompatible\incorrect-css directories.
  *
  */
 @RunWith(Parameterized.class)
 public class W3CSelectorsTests extends AbstractFileBasedTest {
 
-  private static final String inputDir = "src\\test\\resources\\w3c-official-test-cases\\CSS3-Selectors\\";
-  private static final String outputDir = inputDir;
+  private static final String standardCases = "src\\test\\resources\\w3c-official-test-cases\\CSS3-Selectors\\";
+  private static final String lessjsIncompatibleNegatedNth = "src\\test\\resources\\w3c-official-test-cases\\CSS3-Selectors\\less.js-incompatible\\correct-css\\negated-nth";
+  private static final String lessjsIncompatibleNegatedVarious = "src\\test\\resources\\w3c-official-test-cases\\CSS3-Selectors\\less.js-incompatible\\correct-css\\negated-various";
 
   public W3CSelectorsTests(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
@@ -45,12 +49,14 @@ public class W3CSelectorsTests extends AbstractFileBasedTest {
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    Collection<File> allFiles = FileUtils.listFiles(new File(inputDir), new String[] {"less"}, false);
+    Collection<File> allFiles = FileUtils.listFiles(new File(standardCases), new String[] {"less"}, false);
+    allFiles.addAll(FileUtils.listFiles(new File(lessjsIncompatibleNegatedVarious), new String[] {"less"}, false));
+    allFiles.addAll(FileUtils.listFiles(new File(lessjsIncompatibleNegatedNth), new String[] {"less"}, false));
     Collection<Object[]> result = new ArrayList<Object[]>();
     for (File file : allFiles) {
       addFiles(result, file);
     }
-    addFiles(result, new File(inputDir + "css3-modsel-144.less"));
+//    addFiles(result, new File(inputDir + "css3-modsel-144.less"));
 
     return result;
   }
@@ -62,9 +68,9 @@ public class W3CSelectorsTests extends AbstractFileBasedTest {
   }
 
   protected static File findCorrespondingCss(File lessFile) {
-    String lessFileName = lessFile.getName();
+    String lessFileName = lessFile.getPath();
     String cssFileName = convertToOutputFilename(lessFileName);
-    File cssFile = new File(outputDir + cssFileName);
+    File cssFile = new File(cssFileName);
     return cssFile;
   }
 
