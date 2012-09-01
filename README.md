@@ -1,7 +1,6 @@
 Less4j is port of [less.js](http://lesscss.org/) into Java. 
 
 ## In Progress:
-*  Adding comments handling into grammar as exists now. First version is done. It still needs to be reviewed and documented.
 *  CSS3 selectors - namespaces are open.
 
 ## Roadmap:
