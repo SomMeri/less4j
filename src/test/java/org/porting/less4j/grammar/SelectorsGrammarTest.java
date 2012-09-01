@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ANTLRParser.ParseResult;
 import org.porting.less4j.core.parser.LessLexer;
-import org.porting.less4j.debugutils.DebugPrint;
 
 /**
  * Testing selectors parser.
@@ -34,8 +33,7 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ANTLRParser.ParseResult result = compiler.parseSelector("li:after {");
     assertValidSelector(result);
-    //assertChilds(result.getTree(), LessLexer.SIMPLE_SELECTOR);
-    assertChilds(result.getTree().getChild(0), LessLexer.ELEMENT_NAME, LessLexer.PSEUDO);
+    assertChilds(result.getTree(), LessLexer.ELEMENT_NAME, LessLexer.EMPTY_COMBINATOR, LessLexer.ELEMENT_SUBSEQUENT);
   }
 
   @Test
@@ -44,9 +42,7 @@ public class SelectorsGrammarTest {
     String selector = "li::after {";
     ANTLRParser.ParseResult result = compiler.parseSelector(selector);
     assertValidSelector(result);
-    DebugPrint.print(result.getTree());
-    //assertChilds(result.getTree(), LessLexer.SIMPLE_SELECTOR);
-    assertChilds(result.getTree().getChild(0), LessLexer.ELEMENT_NAME, LessLexer.PSEUDO);
+    assertChilds(result.getTree(), LessLexer.ELEMENT_NAME, LessLexer.EMPTY_COMBINATOR, LessLexer.ELEMENT_SUBSEQUENT);
   }
 
   @Test
@@ -123,7 +119,6 @@ public class SelectorsGrammarTest {
   public void formulaMinusNMinus() {
     ANTLRParser compiler = new ANTLRParser();
     String selector = "li:nth-child(-n+2) {";
-    DebugPrint.printTokenStream(selector);
     ANTLRParser.ParseResult result = compiler.parseSelector(selector);
     assertValidSelector(result);
   }
