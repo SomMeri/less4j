@@ -21,7 +21,7 @@ Less4j is port of [less.js](http://lesscss.org/) into Java.
 *  [http://www.w3.org/wiki/CSS3/Selectors]
 
 ## Documentation:
-Architecture and comments handling are described in a [http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html|blog post]. 
+Architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). 
 
 ## Architecture:
 I'm still experimenting with the architecture. 
