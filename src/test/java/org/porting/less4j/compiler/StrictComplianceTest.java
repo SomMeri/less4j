@@ -16,6 +16,8 @@ import org.porting.less4j.core.CssPrinter;
 //if there is a difference I should at least document it
 //TODO: document charset handling, it is easy enough to document
 //TODO: test case for colors, color used in selector should not be translated into hash.
+// FIXME: @@name is OK, is @@@name also OK?
+// FIXME: special URLs url(data:something) are not accepted
 @RunWith(Parameterized.class)
 public class StrictComplianceTest extends AbstractFileBasedTest {
 

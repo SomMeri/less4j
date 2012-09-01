@@ -14,12 +14,13 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.CommonErrorNode;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.porting.less4j.core.parser.ANTLRParser;
+import org.porting.less4j.core.parser.HiddenTokenAwareErrorTree;
 import org.porting.less4j.core.parser.LessLexer;
+import org.porting.less4j.debugutils.DebugPrint;
 
 public class GrammarAsserts {
 
@@ -98,14 +99,19 @@ class CountNodesAction implements TreeVisitorAction {
 
   @Override
   public Object pre(Object t) {
-    if (t instanceof CommonErrorNode) {
-      CommonErrorNode errorNode = (CommonErrorNode)t;
-      int startIndex = errorNode.start.getTokenIndex();
-      int stopIndex = errorNode.stop.getTokenIndex();
-      count+=countOnChannelTokes(startIndex, stopIndex);
+    if (t instanceof HiddenTokenAwareErrorTree) {
+      HiddenTokenAwareErrorTree errorNode = (HiddenTokenAwareErrorTree)t;
+      int startIndex = errorNode.getStart().getTokenIndex();
+      int stopIndex = errorNode.getStop().getTokenIndex();
+      int errorTokens = countOnChannelTokes(startIndex, stopIndex);
+      count+=errorTokens;
+      System.out.println("Error tokens " + errorTokens);
     } else {
-      if (!isDummy(((CommonTree)t).getToken()))
+      if (!isDummy(((CommonTree)t).getToken())) {
         count++;
+        String string = DebugPrint.toString(count, ((CommonTree)t).getToken());
+        System.out.println(string);
+      }
     }
     return t;
   }

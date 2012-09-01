@@ -26,7 +26,7 @@ public class DebugPrint {
     return lexer;
   }
 
-  private static String toString(int count, Token token) {
+  public static String toString(int count, Token token) {
     return "(" + count + ") " + toName(token.getType()) + " " + toOneLine(token.getText());
   }
 

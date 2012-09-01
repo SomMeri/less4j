@@ -30,6 +30,7 @@ public class MalformedCssGrammarTest {
     String crashingSelector = "p:not*()  p:not()";
     ANTLRParser compiler = new ANTLRParser();
     ParseResult result = compiler.parseSelector(crashingSelector);
+    DebugPrint.printTokenStream(crashingSelector);
 
     assertNoTokenMissing(crashingSelector, result.getTree());
   }
