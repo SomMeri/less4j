@@ -297,14 +297,11 @@ ruleset_body
   
   turn into exactly the same token stream. Which is unfortunate, because they mean 
   two different things. The first one is equivalent to "div *:not(:enabled) *:not(:disabled)" 
-  while the second one.
+  while the second not.
   
   We originally wanted to use semantic predicates to guide prediction phase, but we were not 
   succesfull. No matter what we did, unsatified predicates have been either throwing exceptions 
   or generated error nodes.
-  
-  Some of them even apparently exposed some obsure ANTLR bugs and caused errors in entirely 
-  different rules.
   
   Therefore we decided to just parse the thing into as simple structure as possible and solve 
   the rest in ASTSwitchBuilder. Again, it would be possible to add an action to the rule to
@@ -420,8 +417,7 @@ pseudo
       ) -> ^(PSEUDO $c+ $a $b1* $b2*)
     ;
     
-//it can be also that (-)xn+-y thingy    
- pseudoparameters:
+pseudoparameters:
       (IDENT) => IDENT
     | (NUMBER) => NUMBER
     | selector 
@@ -431,19 +427,6 @@ pseudo
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
  
-
-//| simpleSelector| NUMBER
-//see http://www.w3.org/TR/selectors/#nth-child-pseudo
-//nth and other special pseudos are going to be lexer tokens. Their parameters 
-//work differently than anything else and correspondig lexer rules and parser 
-//would have to be too complicated otherwise.
-//nth
-//    : (PLUS | MINUS)? (REPEATER | N) ((PLUS | MINUS) NUMBER)?
-//    | (PLUS | MINUS)? NUMBER
-//    | ODD
-//    | EVEN
-//    ;
-
 //css does not require ; in last declaration
 //declaration can refer also to a mixin - removed for now, I will handle mixins later
 //TODO: what does less.js do if the statement before nested rule miss semicolon?

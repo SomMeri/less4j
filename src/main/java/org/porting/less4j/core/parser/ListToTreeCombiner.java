@@ -60,7 +60,7 @@ public class ListToTreeCombiner {
   }
 
   private void assignFirstCommentsSegment(HiddenTokenAwareTree firstChild, HiddenTokenAwareTree secondChild) {
-    LinkedList<Token> tail = readTillNewLine(hiddenTokens, secondChild.getTokenStartIndex());
+    LinkedList<Token> tail = readTillNewLine(secondChild.getTokenStartIndex());
     if (!tail.isEmpty() && firstChild != null) {
       if (tail.peekLast().getType() == LessLexer.NEW_LINE)
         firstChild.addFollowing(tail);
@@ -71,12 +71,12 @@ public class ListToTreeCombiner {
 
   private void addAllContainedTokens(HiddenTokenAwareTree ast) {
     int stop = ast.getTokenStopIndex();
-    List<Token> result = readPrefix(hiddenTokens, stop);
+    List<Token> result = readPrefix(stop);
     ast.addOrphans(result);
   }
 
   private void addFollowingTokens(HiddenTokenAwareTree target, int stop) {
-    List<Token> result = readPrefix(hiddenTokens, stop);
+    List<Token> result = readPrefix(stop);
     target.addFollowing(result);
   }
 
@@ -92,11 +92,11 @@ public class ListToTreeCombiner {
 
   private void addAllPrecedingTokens(HiddenTokenAwareTree target) {
     int start = target.getTokenStartIndex();
-    List<Token> tokens = readPrefix(hiddenTokens, start);
+    List<Token> tokens = readPrefix(start);
     target.addPreceding(tokens);
   }
 
-  private LinkedList<Token> readTillNewLine(LinkedList<Token> hiddenTokens, int end) {
+  private LinkedList<Token> readTillNewLine(int end) {
     LinkedList<Token> result = new LinkedList<Token>();
     if (hiddenTokens.isEmpty())
       return result;
@@ -115,7 +115,7 @@ public class ListToTreeCombiner {
     return result;
   }
 
-  private List<Token> readPrefix(LinkedList<Token> hiddenTokens, int end) {
+  private List<Token> readPrefix(int end) {
     List<Token> result = new ArrayList<Token>();
     if (hiddenTokens.isEmpty())
       return result;

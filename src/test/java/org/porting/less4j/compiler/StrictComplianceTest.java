@@ -33,9 +33,9 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
   public static Collection<Object[]> allTestsParameters() {
     Collection<File> allFiles = FileUtils.listFiles(new File(inputDir), new String[] {"less"}, false);
     Collection<Object[]> result = new ArrayList<Object[]>();
-    for (File file : allFiles) {
-      addFiles(result, file);
-    }
+//    for (File file : allFiles) {
+//      addFiles(result, file);
+//    }
     addFiles(result, new File(inputDir + "debug-comments-pure-css-simple.less"));
 
     return result;
