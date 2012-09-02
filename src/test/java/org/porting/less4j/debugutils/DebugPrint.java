@@ -8,7 +8,7 @@ import org.porting.less4j.core.parser.LessLexer;
 public class DebugPrint {
 
   private static boolean printIndexes = true;
-  private static boolean printComments = true;
+  private static boolean printComments = false;
 
   public static void printTokenStream(String expression) {
     LessLexer createLexer = createLexer(expression);

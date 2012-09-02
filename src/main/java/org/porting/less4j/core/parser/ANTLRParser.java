@@ -16,7 +16,6 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
-//import org.porting.less4j.debugutils.DebugPrint;
 
 /**
  * 
@@ -47,6 +46,10 @@ public class ANTLRParser {
     return parse(selector, InputType.SELECTOR);
   }
 
+  public ParseResult parseRuleset(String ruleset) {
+    return parse(ruleset, InputType.RULESET);
+  }
+  
   private ParseResult parse(String input, InputType inputType) {
     try {
       //DebugPrint.printTokenStream(input);
@@ -140,11 +143,17 @@ public class ANTLRParser {
       public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
         return parser.styleSheet();
       }
+    }, RULESET {
+      @Override
+      public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
+        return parser.ruleSet();
+      }
     };
 
     public abstract ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException;
 
   }
+
 }
 
 class CollectorTokenSource implements TokenSource {

@@ -60,10 +60,14 @@ public class GrammarAsserts {
   }
 
   public static void assertNoTokenMissing(String crashingSelector, CommonTree tree) {
+    assertNoTokenMissing(crashingSelector, tree, 0);
+  }
+
+  public static void assertNoTokenMissing(String crashingSelector, CommonTree tree, int expectedDummies) {
     CommonTokenStream tokens = createTokenStream(crashingSelector);
-    int expectedNumberOfTokens = countOnChannelTokes(tokens);
+    int onChannelTokens = countOnChannelTokes(tokens);
     int treeTokesCount = countAllTreeTokens(tokens, tree);
-    assertEquals(expectedNumberOfTokens, treeTokesCount);
+    assertEquals(onChannelTokens + expectedDummies, treeTokesCount);
   }
 
   private static int countOnChannelTokes(CommonTokenStream tokens) {

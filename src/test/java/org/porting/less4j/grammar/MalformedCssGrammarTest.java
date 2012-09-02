@@ -6,7 +6,6 @@ import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ANTLRParser.ParseResult;
-import org.porting.less4j.debugutils.DebugPrint;
 
 //TODO: comments
 //TODO: once jUnit 11 comes out, rework tests like these to named repeaters
@@ -27,12 +26,11 @@ public class MalformedCssGrammarTest {
 
   @Test
   public void combinedIncorrectSelector() throws RecognitionException {
-    String crashingSelector = "p:not*()  p:not()";
+    String crashingSelector = "p:not*()  p:not() { }";
     ANTLRParser compiler = new ANTLRParser();
-    ParseResult result = compiler.parseSelector(crashingSelector);
-    DebugPrint.printTokenStream(crashingSelector);
+    ParseResult result = compiler.parseRuleset(crashingSelector);
 
-    assertNoTokenMissing(crashingSelector, result.getTree());
+    assertNoTokenMissing(crashingSelector, result.getTree(), 2);
   }
 
   @Test
@@ -41,9 +39,13 @@ public class MalformedCssGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ParseResult result = compiler.parseStyleSheet(crashingSelector);
 
-    DebugPrint.printTokenStream(crashingSelector);
-    DebugPrint.print(result.getTree());
-    assertNoTokenMissing(crashingSelector, result.getTree());
+    //the -3 is correct, even if it seems like huge hack. It sort of is.
+    //RBRACE }; LBRACE {; RBRACKET ] and LBRACKET [ are (correctly thrown away)
+    //and one dummy node EMPTY_COMBINATOR is added during the translation.
+    //therefore there are -3 dummy nodes
+    //this way of testing malformed trees is bad anyway,this needs to be changed 
+    //for something more readable and stable. (These tests are broken with each tree change)
+    assertNoTokenMissing(crashingSelector, result.getTree(), -3);
   }
 
 
