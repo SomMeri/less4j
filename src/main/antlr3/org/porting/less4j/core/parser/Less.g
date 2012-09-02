@@ -484,8 +484,12 @@ hexColor
     ;
 
 function
-    : a=IDENT LPAREN b=expr RPAREN -> ^(TERM_FUNCTION $a $b*)
+    : a=IDENT LPAREN b=functionParameter RPAREN -> ^(TERM_FUNCTION $a $b*)
     ;
+    
+functionParameter
+    : IDENT OPEQ term -> ^(OPEQ IDENT term)
+    | expr;
     
 // ==============================================================
 // LEXER

@@ -338,16 +338,16 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       first = termBuilder.buildFromTerm(token.getChild(0));
       if (first.getType() == ASTCssNodeType.IDENTIFIER_EXPRESSION) {
         IdentifierExpression ident = (IdentifierExpression) first;
-        if ("even".equals(ident.getName().toLowerCase())) {
+        if ("even".equals(ident.getValue().toLowerCase())) {
           return new Nth(token, null, null, Form.EVEN);
-        } else if ("odd".equals(ident.getName().toLowerCase())) {
+        } else if ("odd".equals(ident.getValue().toLowerCase())) {
           return new Nth(token, null, null, Form.ODD);
-        } else if ("n".equals(ident.getName().toLowerCase())) {
+        } else if ("n".equals(ident.getValue().toLowerCase())) {
           first = new NumberExpression(token.getChild(0), "n", NumberExpression.Sign.NONE, NumberExpression.Dimension.REPEATER);
-        } else if ("-n".equals(ident.getName().toLowerCase())) {
+        } else if ("-n".equals(ident.getValue().toLowerCase())) {
           first = new NumberExpression(token.getChild(0), "n", NumberExpression.Sign.MINUS, NumberExpression.Dimension.REPEATER);
         } else
-          throw new IllegalStateException("Unexpected identifier value for nth: " + ident.getName());
+          throw new IllegalStateException("Unexpected identifier value for nth: " + ident.getValue());
       }
     }
 

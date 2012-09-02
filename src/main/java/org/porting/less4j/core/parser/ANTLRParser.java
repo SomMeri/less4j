@@ -21,7 +21,6 @@ import org.antlr.runtime.tree.CommonTreeAdaptor;
  * 
  * 
  */
-// FIXME: add handling of filter: alpha(opacity=100);
 public class ANTLRParser {
 
   private static final List<Integer> KEEP_HIDDEN_TOKENS = Arrays.asList(LessLexer.COMMENT, LessLexer.NEW_LINE);

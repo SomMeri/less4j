@@ -1,10 +1,4 @@
-#data-uri {
-  background: url(data:image/png;charset=utf-8;base64,
-    kiVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD/
-    k//+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4U
-    kg9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC);
-  background-image: url(data:image/x-png,f9difSSFIIGFIFJD1f982FSDKAA9==);
-}
+@charset "utf-8";
 div {
   color: black;
 }
@@ -30,6 +24,22 @@ div#id {
 }
 .one.two.three {
   color: grey;
+}
+  @media print {
+  font-size: 3em;
+}
+@media screen {
+  font-size: 10px;
+}
+@media screen,print {
+  font-size: 10px;
+}
+@media screen , screen {
+  font-size: 10px;
+}
+@font-face {
+  font-family: 'Garamond Pro';
+  src: url("/fonts/garamond-pro.ttf");
 }
 a:hover,
 a:link {

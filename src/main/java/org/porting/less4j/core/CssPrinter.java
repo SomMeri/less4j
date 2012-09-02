@@ -21,6 +21,7 @@ import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.Medium;
 import org.porting.less4j.core.ast.NamedColorExpression;
+import org.porting.less4j.core.ast.NamedExpression;
 import org.porting.less4j.core.ast.Nth;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.PseudoClass;
@@ -140,6 +141,9 @@ class Builder {
 
     case FONT_FACE:
       return appendFontFace((FontFace) node);
+
+    case NAMED_EXPRESSION:
+      return appendNamedExpression((NamedExpression) node);
 
     case COMPOSED_EXPRESSION:
       return appendComposedExpression((ComposedExpression) node);
@@ -437,6 +441,14 @@ class Builder {
     return true;
   }
 
+  public boolean appendNamedExpression(NamedExpression expression) {
+    builder.append(expression.getName());
+    builder.append("=");
+    append(expression.getExpression());
+
+    return true;
+  }
+
   public boolean appendComposedExpression(ComposedExpression expression) {
     append(expression.getLeft());
     append(expression.getOperator());
@@ -477,7 +489,7 @@ class Builder {
   }
 
   public boolean appendIdentifierExpression(IdentifierExpression expression) {
-    builder.append(expression.getName());
+    builder.append(expression.getValue());
 
     return true;
   }

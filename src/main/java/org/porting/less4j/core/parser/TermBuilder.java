@@ -8,6 +8,7 @@ import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.FunctionExpression;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.NamedColorExpression;
+import org.porting.less4j.core.ast.NamedExpression;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.NumberExpression.Dimension;
 import org.porting.less4j.core.ast.NumberExpression.Sign;
@@ -151,8 +152,20 @@ public class TermBuilder {
   private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     List<HiddenTokenAwareTree> children = first.getChildren();
     String name = children.get(0).getText();
-    Expression parameter = (Expression) parentBuilder.switchOn(children.get(1));
-    return new FunctionExpression(token, name, parameter);
+    HiddenTokenAwareTree parameterNode = children.get(1);
+
+    //TODO not sure if clean
+    if (parameterNode.getType()!=LessLexer.OPEQ) {
+      Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
+      return new FunctionExpression(token, name, parameter);
+    }
+    
+    //first child is a name
+    HiddenTokenAwareTree parameterName = parameterNode.getChild(0);
+    HiddenTokenAwareTree parameterValue = parameterNode.getChild(1);
+    Expression parameter = (Expression) parentBuilder.switchOn(parameterValue);
+    
+    return new FunctionExpression(token, name, new NamedExpression(parameterNode, parameterName.getText(), parameter));
   }
 
 }

@@ -39,6 +39,9 @@ p,
 p:first-child {
   text-transform: none;
 }
+q:lang(no) {
+  quotes: none;
+}
 p + h1 {
   font-size: 2.2em;
 }
@@ -63,6 +66,7 @@ p + h1 {
   background-image: url(images/image.jpg);
   background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), to(#0000ff));
   margin: ;
+  filter: alpha(opacity=100);
 }
 #important {
   color: red !important;

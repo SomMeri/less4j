@@ -8,7 +8,7 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.porting.less4j.core.DummyLessCompiler;
+import org.porting.less4j.core.CssPrinter;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -20,8 +20,12 @@ import org.porting.less4j.core.DummyLessCompiler;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-  private static final String inputLess = "src\\test\\resources\\less.js\\less\\css.less";
-  private static final String outputCss = "src\\test\\resources\\less.js\\css\\css.css";
+//  private static final String inputLess = "src\\test\\resources\\less.js\\less\\css.less";
+//  private static final String outputCss = "src\\test\\resources\\less.js\\css\\css.css";
+//  private static final String inputLess = "src\\test\\resources\\minitests\\css\\css-no-media.less";
+//  private static final String outputCss = "src\\test\\resources\\minitests\\css\\css-no-media.css";
+  private static final String inputLess = "src\\test\\resources\\minitests\\css\\alphaOpacity.css";
+  private static final String outputCss = "src\\test\\resources\\minitests\\css\\alphaOpacity.css";
 
   public SimpleCssTest(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);
@@ -38,7 +42,10 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   }
 
   protected ILessCompiler getCompiler() {
-    return new DummyLessCompiler();
+    return new CssPrinter();
   }
 
+  protected String canonize(String text) {
+    return text.replaceAll("\r\n", "\n").replaceAll("#ff0000", "red").replaceAll("#0000ff", "blue").replaceAll("! important", "!important").replaceAll("%!important", "% !important");
+  }
 }
