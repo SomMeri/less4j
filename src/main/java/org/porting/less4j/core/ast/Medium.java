@@ -1,34 +1,32 @@
 package org.porting.less4j.core.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-//FIXME this will not fry with CSS3 medium definition. It is compliant only with CSS2. 
 public class Medium extends ASTCssNode {
 
-  private List<String> mediums;
-  
-  public Medium(HiddenTokenAwareTree token) {
-    this(token, new ArrayList<String>());
+  private MediumModifier modifier = MediumModifier.NONE;
+  private String mediumType;
+
+  public Medium(HiddenTokenAwareTree underlyingStructure, MediumModifier modifier, String mediumType) {
+    super(underlyingStructure);
+    this.modifier = modifier;
+    this.mediumType = mediumType;
   }
 
-  public Medium(HiddenTokenAwareTree token, List<String> mediums) {
-    super(token);
-    this.mediums =mediums;
+  public MediumModifier getModifier() {
+    return modifier;
   }
 
-  public List<String> getMediums() {
-    return mediums;
+  public void setModifier(MediumModifier modifier) {
+    this.modifier = modifier;
   }
 
-  public void setMediums(List<String> mediums) {
-    this.mediums = mediums;
+  public String getMediumType() {
+    return mediumType;
   }
 
-  public void addMedium(String medium) {
-    mediums.add(medium);
+  public void setMediumType(String mediumType) {
+    this.mediumType = mediumType;
   }
 
   @Override
@@ -36,4 +34,7 @@ public class Medium extends ASTCssNode {
     return ASTCssNodeType.MEDIUM;
   }
 
+  public enum MediumModifier {
+    ONLY, NOT, NONE
+  }
 }

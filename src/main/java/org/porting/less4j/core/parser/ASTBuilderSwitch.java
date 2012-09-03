@@ -20,7 +20,10 @@ import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.Media;
+import org.porting.less4j.core.ast.MediaExpression;
+import org.porting.less4j.core.ast.MediaQuery;
 import org.porting.less4j.core.ast.Medium;
+import org.porting.less4j.core.ast.Medium.MediumModifier;
 import org.porting.less4j.core.ast.Nth;
 import org.porting.less4j.core.ast.Nth.Form;
 import org.porting.less4j.core.ast.NumberExpression;
@@ -45,7 +48,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
 
-  //FIXME: this system that require postprocess everywhere is extremely bad. Desperately needs refactoring.
+  // FIXME: this system that require postprocess everywhere is extremely bad.
+  // Desperately needs refactoring.
   @Override
   public <M extends ASTCssNode> M postprocess(M something) {
     HiddenTokenAwareTree underlyingStructure = something.getUnderlyingStructure();
@@ -244,10 +248,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     HiddenTokenAwareTree nameToken = children.get(0);
 
     String name = nameToken.getText();
-    if (nameToken.getType()!=LessLexer.IDENT && name.length()>1) {
-      name=name.substring(1, name.length());
+    if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
+      name = name.substring(1, name.length());
     }
-    
+
     CssClass result = new CssClass(token, name);
     return result;
   }
@@ -384,22 +388,70 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     Media result = new Media(token);
     for (HiddenTokenAwareTree kid : children) {
-      result.addChild(switchOn(kid));
+      if (kid.getType() == LessLexer.MEDIUM_DECLARATION) {
+        handleMediaDeclaration(result, kid);
+      } else {
+        result.addChild(switchOn(kid));
+      }
 
     }
     return result;
   }
 
-  public Medium handleMediumDeclaration(HiddenTokenAwareTree token) {
-    Medium result = new Medium(token);
-    List<HiddenTokenAwareTree> children = token.getChildren();
+  private void handleMediaDeclaration(Media result, HiddenTokenAwareTree declaration) {
+    List<HiddenTokenAwareTree> children = declaration.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      result.addMedium(kid.getText());
+      result.addChild(switchOn(kid));
+    }
+  }
+
+  public MediaQuery handleMediaQuery(HiddenTokenAwareTree token) {
+    MediaQuery result = new MediaQuery(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    // we have three types of children:
+    // * MEDIUM_TYPE
+    // * identifier AND which is largely useless (TODO except that we should
+    // push its comments to surrounding elements - we ignore that for now)
+    // * MEDIA_EXPRESSION
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType() != LessLexer.IDENT) {
+        result.addMember(switchOn(kid));
+      }
     }
 
     return result;
   }
 
+  public Medium handleMedium(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    if (children.size()==1)
+      return new Medium(token, Medium.MediumModifier.NONE, children.get(0).getText());
+
+    return new Medium(token, toMediumModifier(children.get(0)), children.get(1).getText());
+  }
+
+  public MediaExpression handleMediaExpression(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    HiddenTokenAwareTree featureNode = children.get(0);
+    if (children.size()==1)
+      return new MediaExpression(token, featureNode.getText(), null);
+    
+    Expression expression = (Expression) postprocess(switchOn(children.get(1)));
+    return new MediaExpression(token, featureNode.getText(), expression);
+  }
+
+  private MediumModifier toMediumModifier(HiddenTokenAwareTree hiddenTokenAwareTree) {
+    String modifier = hiddenTokenAwareTree.getText().toLowerCase();
+    
+    if ("not".equals(modifier))
+      return MediumModifier.NOT;
+
+    if ("only".equals(modifier))
+      return MediumModifier.ONLY;
+  
+    throw new IllegalStateException("Unexpected medium modifier: " + modifier);
+  }
+  
 }
 
 // FIXME: do something meaningful instead of this exception

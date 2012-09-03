@@ -61,7 +61,7 @@ public class W3CSelectorsTests extends AbstractFileBasedTest {
     return result;
   }
 
-  private static void addFiles(Collection<Object[]> result, File... files) {
+  protected static void addFiles(Collection<Object[]> result, File... files) {
     for (File file : files) {
       result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
     }

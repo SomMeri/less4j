@@ -19,7 +19,10 @@ import org.porting.less4j.core.ast.FunctionExpression;
 import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.Media;
+import org.porting.less4j.core.ast.MediaExpression;
+import org.porting.less4j.core.ast.MediaQuery;
 import org.porting.less4j.core.ast.Medium;
+import org.porting.less4j.core.ast.Medium.MediumModifier;
 import org.porting.less4j.core.ast.NamedColorExpression;
 import org.porting.less4j.core.ast.NamedExpression;
 import org.porting.less4j.core.ast.Nth;
@@ -36,26 +39,21 @@ import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
 
-/** FIXME: document: nth-is translated differently than less.js does. We strip whitespaces and they do not.
- * Input: 
-:nth-child( 3n + 1 )
-:nth-child( +3n - 2 )
-:nth-child( -n+ 6)
-:nth-child( +6 )
-:nth-child( -6 ) {  
-  padding: 2;
-}
-
- * Less.js output: :nth-child( 3n + 1 ):nth-child( +3n - 2 ):nth-child( -n+ 6):nth-child( +6 ):nth-child( -6 ) {
-  padding: 2;
-
- * Our output: :nth-child(3n+1) :nth-child(+3n-2) :nth-child(-n+6) :nth-child(+6) :nth-child(-6) {
-  padding: 2;
-}
-
+/**
+ * FIXME: document: nth-is translated differently than less.js does. We strip
+ * whitespaces and they do not. Input: :nth-child( 3n + 1 ) :nth-child( +3n - 2
+ * ) :nth-child( -n+ 6) :nth-child( +6 ) :nth-child( -6 ) { padding: 2; }
+ * 
+ * Less.js output: :nth-child( 3n + 1 ):nth-child( +3n - 2 ):nth-child( -n+
+ * 6):nth-child( +6 ):nth-child( -6 ) { padding: 2;
+ * 
+ * Our output: :nth-child(3n+1) :nth-child(+3n-2) :nth-child(-n+6)
+ * :nth-child(+6) :nth-child(-6) { padding: 2; }
+ * 
  * 
  */
-//FIXME document: not matching spaces especially around terms expressions and comments
+// FIXME document: not matching spaces especially around terms expressions and
+// comments
 public class CssPrinter implements ILessCompiler {
   private ANTLRParser parser = new ANTLRParser();
   private ASTBuilder astBuilder = new ASTBuilder();
@@ -92,6 +90,9 @@ class Builder {
   public boolean append(ASTCssNode node) {
     // opening comments should not be docked directly in front of following
     // thing
+    if (node==null)
+      return false;
+    
     appendComments(node.getOpeningComments(), true);
     boolean result = switchOnType(node);
     appendComments(node.getTrailingComments(), false);
@@ -172,8 +173,14 @@ class Builder {
     case MEDIA:
       return appendMedia((Media) node);
 
+    case MEDIA_QUERY:
+      return appendMediaQuery((MediaQuery) node);
+
     case MEDIUM:
       return appendMedium((Medium) node);
+
+    case MEDIA_EXPRESSION:
+      return appendMediaExpression((MediaExpression) node);
 
     case STYLE_SHEET:
       return appendStyleSheet((StyleSheet) node);
@@ -205,36 +212,29 @@ class Builder {
   }
 
   /**
-   * FIXME: DOCUMENT: if the comment after ruleset is not preceded by an empty line, less.js 
-   * does not put new line before it. We handle comments differently, a comment is preceded by
-   * a new line if it was preceded by it in the input.  
+   * FIXME: DOCUMENT: if the comment after ruleset is not preceded by an empty
+   * line, less.js does not put new line before it. We handle comments
+   * differently, a comment is preceded by a new line if it was preceded by it
+   * in the input.
    * 
-   * * Input:
-   *   p ~ * { background: lime; }
-   *   
-   *   /* let's try some pseudos that are not valid CSS but are likely to
-   *   be implemented as extensions in some UAs. These should not be
-   *   recognised, as UAs implementing such extensions should use the
-   *   :-vnd-ident syntax. * /
-   *   
-   * * Less.js output:
-   * }
-   * /* let's try some pseudos that are not valid CSS but are likely to
-   * be implemented as extensions in some UAs. These should not be
-   * recognised, as UAs implementing such extensions should use the
-   * :-vnd-ident syntax. * /
-   *
-   * * Less.js output if there would not be an empty line:
-   * p ~ * {
-   *   background: lime;
-   * } /* let's try some pseudos that are not valid CSS but are likely to
-   * be implemented as extensions in some UAs. These should not be
-   * recognised, as UAs implementing such extensions should use the
-   * :-vnd-ident syntax. * /
+   * * Input: p ~ * { background: lime; }
    * 
-
+   * /* let's try some pseudos that are not valid CSS but are likely to be
+   * implemented as extensions in some UAs. These should not be recognised, as
+   * UAs implementing such extensions should use the :-vnd-ident syntax. * /
+   * 
+   * * Less.js output: } /* let's try some pseudos that are not valid CSS but
+   * are likely to be implemented as extensions in some UAs. These should not be
+   * recognised, as UAs implementing such extensions should use the :-vnd-ident
+   * syntax. * /
+   * 
+   * * Less.js output if there would not be an empty line: p ~ * { background:
+   * lime; } /* let's try some pseudos that are not valid CSS but are likely to
+   * be implemented as extensions in some UAs. These should not be recognised,
+   * as UAs implementing such extensions should use the :-vnd-ident syntax. * /
+   * 
    */
-  
+
   private void appendComments(List<Comment> comments, boolean ensureSeparator) {
     if (comments == null || comments.isEmpty())
       return;
@@ -404,7 +404,7 @@ class Builder {
 
   public boolean appendMedia(Media node) {
     builder.append("@media");
-    appendMedium(node.getMedium());
+    appendMediums(node.getMediums());
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
     // FIXME: DOCUMENTATION less.js reorders statements in @media. It prints
@@ -429,15 +429,67 @@ class Builder {
     return true;
   }
 
-  public boolean appendMedium(Medium medium) {
-    Iterator<String> iterator = medium.getMediums().iterator();
-    if (!iterator.hasNext())
-      return false;
-    builder.ensureSeparator().append(iterator.next());
-    while (iterator.hasNext()) {
-      builder.append(",").ensureSeparator().append(iterator.next());
+  private void appendMediums(List<MediaQuery> mediums) {
+    if (mediums == null || mediums.isEmpty())
+      return;
+
+    boolean needComma = false;
+    for (MediaQuery mediaQuery : mediums) {
+      if (needComma)
+        builder.append(",").ensureSeparator();
+      append(mediaQuery);
+      needComma = true;
+    }
+  }
+
+  public boolean appendMediaQuery(MediaQuery mediaQuery) {
+    builder.ensureSeparator();
+    append(mediaQuery.getMedium());
+    boolean needSeparator = (mediaQuery.getMedium() != null);
+    for (MediaExpression mediaExpression : mediaQuery.getExpressions()) {
+      if (needSeparator) {
+        builder.ensureSeparator().append("and");
+      }
+      append(mediaExpression);
+      needSeparator = true;
     }
 
+    return true;
+  }
+
+  //FIXME: comments will not work!!!
+  public boolean appendMedium(Medium medium) {
+    MediumModifier modifier = medium.getModifier();
+    switch (modifier) {
+    case ONLY:
+      builder.ensureSeparator().append("only");
+      break;
+
+    case NOT:
+      builder.ensureSeparator().append("not");
+      break;
+
+    case NONE:
+      break;
+
+    default:
+      throw new IllegalStateException("Unknown modifier type.");
+    }
+    
+    String mediumType = medium.getMediumType();
+    builder.ensureSeparator().append(mediumType);
+    
+    return true;
+  }
+
+  public boolean appendMediaExpression(MediaExpression expression) {
+    builder.ensureSeparator().append("(");
+    builder.append(expression.getFeature());
+    if (expression.getExpression()!=null) {
+      builder.append(":").ensureSeparator();
+      append(expression.getExpression());
+    }
+    builder.append(")");
     return true;
   }
 
@@ -495,40 +547,25 @@ class Builder {
   }
 
   /**
-   * FIXME: DOCUMENT we do not follow color handling in the same way as less.js. If the input
-   * contains a color name (red, blue, ...), then we place the color name into the output.
+   * FIXME: DOCUMENT we do not follow color handling in the same way as less.js.
+   * If the input contains a color name (red, blue, ...), then we place the
+   * color name into the output.
    * 
-   * Less.js behaviour is bit more complicated:
-   * * if the color name is followed by ;, the less.js preserves the name 
-   * * if the color name is NOT followed by ;, the less.js translates color into the code.
+   * Less.js behaviour is bit more complicated: * if the color name is followed
+   * by ;, the less.js preserves the name * if the color name is NOT followed by
+   * ;, the less.js translates color into the code.
    * 
-   *  E.g.:
-   *  * input: 
-   *  li,p { background-color : lime }
-   *  li,p { background-color : lime; }
-   *  
-   *  * less.js output: 
-   *  li,
-   *  p {
-   *    background-color: #00ff00;
-   *  }
-   *  li,
-   *  p {
-   *    background-color: lime;
-   *  }
-   *  
-   *  * Our output:
-   *  li,
-   *  p {
-   *    background-color: lime;
-   *  }
-   *  li,
-   *  p {
-   *    background-color: lime;
-   *  } 
+   * E.g.: * input: li,p { background-color : lime } li,p { background-color :
+   * lime; }
+   * 
+   * * less.js output: li, p { background-color: #00ff00; } li, p {
+   * background-color: lime; }
+   * 
+   * * Our output: li, p { background-color: lime; } li, p { background-color:
+   * lime; }
    */
   private boolean appendColorExpression(ColorExpression expression) {
-    //if it is named color expression, write out the name
+    // if it is named color expression, write out the name
     if (expression instanceof NamedColorExpression) {
       NamedColorExpression named = (NamedColorExpression) expression;
       builder.append(named.getColorName());

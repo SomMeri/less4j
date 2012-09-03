@@ -70,7 +70,24 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.MEDIUM_DECLARATION)
       return postprocess(handleMediumDeclaration(token));
 
+    if (type==LessLexer.MEDIA_QUERY)
+      return postprocess(handleMediaQuery(token));
+
+    if (type==LessLexer.MEDIUM_TYPE)
+      return postprocess(handleMedium(token));
+
+    if (type==LessLexer.MEDIA_EXPRESSION)
+      return postprocess(handleMediaExpression(token));
+
     throw new IllegalStateException("Unexpected token type: " + type + " for " + token.getText());
+  }
+
+  public T handleMediaExpression(HiddenTokenAwareTree token) {
+    return null;
+  }
+
+  public T handleMedium(HiddenTokenAwareTree token) {
+    return null;
   }
 
   public T handleNth(HiddenTokenAwareTree token) {
@@ -82,6 +99,10 @@ public abstract class TokenTypeSwitch<T> {
   }
 
   public T handleMediumDeclaration(HiddenTokenAwareTree token) {
+    return null;
+  }
+
+  public T handleMediaQuery(HiddenTokenAwareTree token) {
     return null;
   }
 

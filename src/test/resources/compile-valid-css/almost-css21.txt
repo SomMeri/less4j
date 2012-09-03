@@ -1,8 +1,5 @@
-Removed following line: 
-1.)   filter: alpha(opacity=100);
-2.) q:lang(no) {
-  quotes: none;
-}
-3.)     
-  
+Removed following lines:
+1.) everything with font-face
+1.) everything with media 
+
 Not able to handle that for now

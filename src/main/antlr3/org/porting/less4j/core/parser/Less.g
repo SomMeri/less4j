@@ -52,6 +52,9 @@ tokens {
   TERM_FUNCTION;
   TERM;
   MEDIUM_DECLARATION;
+  MEDIA_EXPRESSION;
+  MEDIA_QUERY;
+  MEDIUM_TYPE;
   BODY_OF_DECLARATIONS;
 }  
 
@@ -170,7 +173,7 @@ charSet
 // Import.  Location of an external style sheet to include in the ruleset.
 //
 imports
-    :   IMPORT_SYM (STRING|URI) (medium (COMMA medium)*)? SEMI
+    :   IMPORT_SYM (STRING|URI) (mediaQuery (COMMA mediaQuery)*)? SEMI
     ;
 
 // ---------
@@ -178,8 +181,9 @@ imports
 //          it belongs to the signified medium.
 // Media can also have a ruleset in them.  
 //
+//TODO media part of the grammar is throwing away tokens, so comments will not work correctly. fix that
 media
-    : MEDIA_SYM (m+=medium (COMMA m+=medium)*)
+    : MEDIA_SYM (m+=mediaQuery (COMMA m+=mediaQuery)*)
         LBRACE
             ((declaration) => b+=declaration SEMI 
             | b+=ruleSet )*
@@ -190,10 +194,18 @@ media
 // ---------    
 // Medium.  The name of a medim that are particulare set of rules applies to.
 //
-medium
-    : IDENT 
+mediaQuery
+    : a+=IDENT (a+=IDENT)? (b+=IDENT c+=mediaExpression)* -> ^(MEDIA_QUERY ^(MEDIUM_TYPE $a*) ($b $c)*)
+    | d=mediaExpression (e+=IDENT f+=mediaExpression)* -> ^(MEDIA_QUERY $d ($e $f)*)
     ;
     
+mediaExpression
+    : LPAREN a+=mediaFeature (COLON a+=expr)? RPAREN -> ^(MEDIA_EXPRESSION $a*)
+    ;
+
+mediaFeature
+    : IDENT 
+    ;
 
 bodylist
     : bodyset*
