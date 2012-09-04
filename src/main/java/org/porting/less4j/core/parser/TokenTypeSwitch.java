@@ -7,77 +7,77 @@ public abstract class TokenTypeSwitch<T> {
     int type = token.getType();
     
     if (type==LessLexer.RULESET) {
-      return postprocess(handleRuleSet(token));
+      return handleRuleSet(token);
     }
 
     if (type==LessLexer.CSS_CLASS) {
-      return postprocess(handleCssClass(token));
+      return handleCssClass(token);
     }
     
     if (type==LessLexer.PSEUDO) {
-      return postprocess(handlePseudo(token));
+      return handlePseudo(token);
     }
     
     if (type==LessLexer.EOF) {
-      return postprocess(handleEOF(token));
+      return handleEOF(token);
     }
 
     if (type==LessLexer.SELECTOR) {
-      return postprocess(handleSelector(token));
+      return handleSelector(token);
     }
 
     if (type==LessLexer.STYLE_SHEET) {
-      return postprocess(handleStyleSheet(token));
+      return handleStyleSheet(token);
     }
 
     if (type==LessLexer.ATTRIBUTE) {
-      return postprocess(handleSelectorAttribute(token));
+      return handleSelectorAttribute(token);
     }
 
     if (type==LessLexer.ID_SELECTOR) {
-      return postprocess(handleIdSelector(token));
+      return handleIdSelector(token);
     }
 
     if (type==LessLexer.CHARSET_DECLARATION) {
-      return postprocess(handleCharsetDeclaration(token));
+      return handleCharsetDeclaration(token);
     }
 
     if (type==LessLexer.FONT_FACE_SYM) {
-      return postprocess(handleFontFace(token));
+      return handleFontFace(token);
     }
 
     if (type==LessLexer.DECLARATION) {
-      return postprocess(handleDeclaration(token));
+      return handleDeclaration(token);
     }
 
     if (type==LessLexer.BODY_OF_DECLARATIONS) {
-      return postprocess(handleDeclarationsBody(token));
+      return handleDeclarationsBody(token);
     }
 
     if (type==LessLexer.EXPRESSION) {
-      return postprocess(handleExpression(token));
+      return handleExpression(token);
     }
     if (type==LessLexer.NTH) {
-      return postprocess(handleNth(token));
+      return handleNth(token);
     }
     
     if (type==LessLexer.TERM)
-      return postprocess(handleTerm(token));
+      return handleTerm(token);
 
     if (type==LessLexer.MEDIA_SYM)
-      return postprocess(handleMedia(token));
+      return handleMedia(token);
 
     if (type==LessLexer.MEDIUM_DECLARATION)
-      return postprocess(handleMediumDeclaration(token));
+      return handleMediumDeclaration(token);
 
     if (type==LessLexer.MEDIA_QUERY)
-      return postprocess(handleMediaQuery(token));
+      return handleMediaQuery(token);
 
     if (type==LessLexer.MEDIUM_TYPE)
-      return postprocess(handleMedium(token));
+      return handleMedium(token);
 
     if (type==LessLexer.MEDIA_EXPRESSION)
-      return postprocess(handleMediaExpression(token));
+      return handleMediaExpression(token);
 
     throw new IllegalStateException("Unexpected token type: " + type + " for " + token.getText());
   }
@@ -148,10 +148,6 @@ public abstract class TokenTypeSwitch<T> {
 
   public T handleCssClass(HiddenTokenAwareTree token) {
     return null;
-  }
-
-  public <M extends T> M postprocess(M something) {
-    return something;
   }
 
   public T handleStyleSheet(HiddenTokenAwareTree token) {

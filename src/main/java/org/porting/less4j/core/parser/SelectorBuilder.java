@@ -60,7 +60,7 @@ public class SelectorBuilder {
   }
 
   private void addWithImplicitStar(HiddenTokenAwareTree kid) {
-    currentSimpleSelector = parentBuilder.postprocess(new SimpleSelector(kid, null, true));
+    currentSimpleSelector = new SimpleSelector(kid, null, true);
     currentSimpleSelector.setEmptyForm(true);
     addSubsequent(kid);
     startNewSelector();
@@ -69,13 +69,13 @@ public class SelectorBuilder {
 
   private void addElementName(HiddenTokenAwareTree kid) {
     HiddenTokenAwareTree realName = kid.getChild(0);
-    currentSimpleSelector = parentBuilder.postprocess(new SimpleSelector(kid, realName.getText(), realName.getType()==LessLexer.STAR));
+    currentSimpleSelector = new SimpleSelector(kid, realName.getText(), realName.getType()==LessLexer.STAR);
     startNewSelector();
     currentSelector.setHead(currentSimpleSelector);
   }
 
   private void addSelectorCombinator(HiddenTokenAwareTree kid) {
-    currentSelector.setCombinator(parentBuilder.postprocess(new SelectorCombinator(kid, toSelectorCombinator(kid))));
+    currentSelector.setCombinator(new SelectorCombinator(kid, toSelectorCombinator(kid)));
   }
 
   private SelectorCombinator.Combinator toSelectorCombinator(HiddenTokenAwareTree token) {
@@ -94,7 +94,7 @@ public class SelectorBuilder {
   }
 
   private void startNewSelector() {
-    Selector newSelector = parentBuilder.postprocess(new Selector(token));
+    Selector newSelector = new Selector(token);
     if (currentSelector!=null) {
       addSelectorCombinator(lastCombinator);
       currentSelector.setRight(newSelector);

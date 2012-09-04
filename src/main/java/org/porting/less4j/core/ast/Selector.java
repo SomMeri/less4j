@@ -1,6 +1,9 @@
 package org.porting.less4j.core.ast;
 
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class Selector extends ASTCssNode {
   
@@ -45,6 +48,11 @@ public class Selector extends ASTCssNode {
 
   public void setRight(Selector right) {
     this.right = right;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return ArraysUtils.asNonNullList(head, combinator, right);
   }
 
   public ASTCssNodeType getType() {

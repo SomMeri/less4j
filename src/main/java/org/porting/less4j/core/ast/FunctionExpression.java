@@ -1,6 +1,9 @@
 package org.porting.less4j.core.ast;
 
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class FunctionExpression extends Expression {
 
@@ -34,4 +37,8 @@ public class FunctionExpression extends Expression {
     return ASTCssNodeType.FUNCTION;
   }
 
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return ArraysUtils.asNonNullList(parameter);
+  }
 }

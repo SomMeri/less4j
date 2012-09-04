@@ -8,7 +8,6 @@ import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 public abstract class ASTCssNode {
   
   private HiddenTokenAwareTree underlyingStructure;
-  private List<ASTCssNode> children = new ArrayList<ASTCssNode>();
   private List<Comment> openingComments = new ArrayList<Comment>();
   private List<Comment> orphanComments = new ArrayList<Comment>();
   private List<Comment> trailingComments = new ArrayList<Comment>();
@@ -17,10 +16,7 @@ public abstract class ASTCssNode {
     this.underlyingStructure = underlyingStructure;
   }
   
-  // FIXME: turn to abstract
-  public List<? extends ASTCssNode> getChilds() {
-    return children;
-  }
+  public abstract List<? extends ASTCssNode> getChilds();
   
   //TODO: this class will be an implementation of IASTCssNode or similar interface this method does not belong to that interface 
   public HiddenTokenAwareTree getUnderlyingStructure() {
@@ -31,10 +27,6 @@ public abstract class ASTCssNode {
     this.underlyingStructure = underlyingStructure;
   }
 
-  public void addChild(ASTCssNode kid) {
-    children.add(kid);
-  }
-  
   public List<Comment> getTrailingComments() {
     return trailingComments;
   }

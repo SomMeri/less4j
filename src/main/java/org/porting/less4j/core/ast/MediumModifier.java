@@ -1,5 +1,8 @@
 package org.porting.less4j.core.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class MediumModifier extends ASTCssNode {
@@ -26,6 +29,11 @@ public class MediumModifier extends ASTCssNode {
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.MEDIUM_MODIFIER   ;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return Collections.emptyList();
   }
 
   public enum Modifier {

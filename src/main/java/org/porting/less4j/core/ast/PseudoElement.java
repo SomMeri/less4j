@@ -1,5 +1,8 @@
 package org.porting.less4j.core.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class PseudoElement extends Pseudo {
@@ -22,6 +25,11 @@ public class PseudoElement extends Pseudo {
 
   public void setLevel12Form(boolean level12Form) {
     this.level12Form = level12Form;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return Collections.emptyList();
   }
 
   @Override

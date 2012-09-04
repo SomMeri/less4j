@@ -10,6 +10,7 @@ public abstract class Pseudo extends ASTCssNode {
     super(token);
     this.name = name;
   }
+
   public String getName() {
     return name;
   }

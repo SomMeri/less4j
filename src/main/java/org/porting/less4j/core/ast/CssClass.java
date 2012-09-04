@@ -1,5 +1,8 @@
 package org.porting.less4j.core.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class CssClass extends ASTCssNode {
@@ -22,6 +25,11 @@ public class CssClass extends ASTCssNode {
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.CSS_CLASS;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return Collections.emptyList();
   }
 
 }

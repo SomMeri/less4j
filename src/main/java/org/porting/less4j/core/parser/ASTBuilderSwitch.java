@@ -6,11 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.antlr.runtime.Token;
 import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.ASTCssNodeType;
 import org.porting.less4j.core.ast.CharsetDeclaration;
-import org.porting.less4j.core.ast.Comment;
 import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
@@ -50,44 +48,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
 
-  // FIXME: this system that require postprocess everywhere is extremely bad.
-  // Desperately needs refactoring.
-  @Override
-  public <M extends ASTCssNode> M postprocess(M something) {
-    HiddenTokenAwareTree underlyingStructure = something.getUnderlyingStructure();
-    List<Comment> preceding = convertToComments(underlyingStructure.getPreceding());
-    something.setOpeningComments(preceding);
-
-    List<Comment> following = convertToComments(underlyingStructure.getFollowing());
-    something.setTrailingComments(following);
-
-    List<Comment> orphans = convertToComments(underlyingStructure.getOrphans());
-    something.setOrphanComments(orphans);
-    return something;
-  }
-
-  private List<Comment> convertToComments(List<Token> preceding) {
-    List<Comment> result = new ArrayList<Comment>();
-
-    Comment comment = null;
-    for (Token token : preceding) {
-      if (token.getType() == LessLexer.COMMENT) {
-        comment = new Comment(new HiddenTokenAwareTree(token));
-        result.add(comment);
-      }
-      if (token.getType() == LessLexer.NEW_LINE) {
-        if (comment != null)
-          comment.setHasNewLine(true);
-      }
-    }
-
-    return result;
-  }
-
   public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {
     StyleSheet result = new StyleSheet(token);
     for (HiddenTokenAwareTree kid : token.getChildren()) {
-      result.addChild(switchOn(kid));
+      result.addMember(switchOn(kid));
     }
 
     return result;
@@ -122,7 +86,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
 
     HiddenTokenAwareTree token = members.get(1);
-    ExpressionOperator operator = postprocess(new ExpressionOperator(token, toExpressionOperator(token)));
+    ExpressionOperator operator = new ExpressionOperator(token, toExpressionOperator(token));
 
     if (members.size() < 2)
       return new ComposedExpression(parent, head, operator, null);
@@ -179,7 +143,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<Declaration> declarations = new ArrayList<Declaration>();
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.DECLARATION)
-        declarations.add(postprocess(handleDeclaration(kid)));
+        declarations.add(handleDeclaration(kid));
     }
 
     result.addMembers(declarations);
@@ -203,18 +167,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     ASTCssNode previousKid = null;
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.SELECTOR) {
-        Selector selector = postprocess(handleSelector(kid));
+        Selector selector = handleSelector(kid);
         selectors.add(selector);
         previousKid = selector;
       }
       if (kid.getType() == LessLexer.BODY_OF_DECLARATIONS) {
-        DeclarationsBody body = postprocess(handleDeclarationsBody(kid));
+        DeclarationsBody body = handleDeclarationsBody(kid);
         ruleSet.setBody(body);
         previousKid = body;
       }
       if (kid.getType() == LessLexer.COMMA) {
-        List<Comment> comments = convertToComments(kid.getPreceding());
-        previousKid.addTrailingComments(comments);
+        previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
       }
     }
 
@@ -229,7 +192,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<Declaration> declarations = new ArrayList<Declaration>();
     for (HiddenTokenAwareTree kid : token.getChildren()) {
       if (kid.getType() == LessLexer.DECLARATION)
-        declarations.add(postprocess(handleDeclaration(kid)));
+        declarations.add(handleDeclaration(kid));
     }
 
     return new DeclarationsBody(token, declarations);
@@ -264,7 +227,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.size() < 3)
       throw new IncorrectTreeException();
 
-    return new SelectorAttribute(token, children.get(0).getText(), postprocess(handleSelectorOperator(children.get(1))), children.get(2).getText());
+    return new SelectorAttribute(token, children.get(0).getText(), handleSelectorOperator(children.get(1)), children.get(2).getText());
   }
 
   public SelectorOperator handleSelectorOperator(HiddenTokenAwareTree token) {
@@ -434,11 +397,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 1) {
       HiddenTokenAwareTree type = children.get(0);
-      return postprocess(new Medium(token, new MediumModifier(null), postprocess(new MediumType(type, type.getText()))));
+      return new Medium(token, new MediumModifier(null), new MediumType(type, type.getText()));
     }
 
     HiddenTokenAwareTree type = children.get(1);
-    return postprocess(new Medium(token, toMediumModifier(children.get(0)), postprocess(new MediumType(type, type.getText()))));
+    return new Medium(token, toMediumModifier(children.get(0)), new MediumType(type, type.getText()));
   }
 
   public MediaExpression handleMediaExpression(HiddenTokenAwareTree token) {
@@ -447,7 +410,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.size() == 1)
       return new MediaExpression(token, featureNode.getText(), null);
 
-    Expression expression = (Expression) postprocess(switchOn(children.get(1)));
+    Expression expression = (Expression) switchOn(children.get(1));
     return new MediaExpression(token, featureNode.getText(), expression);
   }
 
@@ -455,10 +418,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     String modifier = token.getText().toLowerCase();
 
     if ("not".equals(modifier))
-      return postprocess(new MediumModifier(token, MediumModifier.Modifier.NOT));
+      return new MediumModifier(token, MediumModifier.Modifier.NOT);
 
     if ("only".equals(modifier))
-      return postprocess(new MediumModifier(token, MediumModifier.Modifier.ONLY));
+      return new MediumModifier(token, MediumModifier.Modifier.ONLY);
 
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }

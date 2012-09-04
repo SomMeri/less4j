@@ -1,5 +1,8 @@
 package org.porting.less4j.core.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class NumberExpression extends Expression {
@@ -45,6 +48,11 @@ public class NumberExpression extends Expression {
 
   public void setDimension(Dimension dimension) {
     this.dimension = dimension;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return Collections.emptyList();
   }
 
   @Override

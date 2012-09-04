@@ -1,6 +1,9 @@
 package org.porting.less4j.core.ast;
 
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class ComposedExpression extends Expression {
 
@@ -42,6 +45,11 @@ public class ComposedExpression extends Expression {
 
   public void setRight(Expression right) {
     this.right = right;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return ArraysUtils.asNonNullList(left, operator, right);
   }
 
 }

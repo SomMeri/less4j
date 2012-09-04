@@ -1,6 +1,9 @@
 package org.porting.less4j.core.ast;
 
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class MediaExpression extends ASTCssNode {
 
@@ -32,5 +35,10 @@ public class MediaExpression extends ASTCssNode {
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.MEDIA_EXPRESSION;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return ArraysUtils.asNonNullList(expression);
   }
 }

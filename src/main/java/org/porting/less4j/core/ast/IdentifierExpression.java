@@ -1,5 +1,8 @@
 package org.porting.less4j.core.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class IdentifierExpression extends Expression {
@@ -21,6 +24,11 @@ public class IdentifierExpression extends Expression {
 
   public void setValue(String value) {
     this.value = value;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return Collections.emptyList();
   }
 
   @Override

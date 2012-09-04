@@ -1,6 +1,9 @@
 package org.porting.less4j.core.ast;
 
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class PseudoClass extends Pseudo {
   
@@ -28,4 +31,9 @@ public class PseudoClass extends Pseudo {
     return ASTCssNodeType.PSEUDO_CLASS;
   }
   
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return ArraysUtils.asNonNullList(parameter);
+  }
+
 }

@@ -1,5 +1,8 @@
 package org.porting.less4j.core.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class Comment extends ASTCssNode {
@@ -41,6 +44,11 @@ public class Comment extends ASTCssNode {
   @Override
   public String toString() {
     return getClass().getName() + " [comment=" + comment + ", hasNewLine=" + hasNewLine + "]";
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return Collections.emptyList();
   }
   
 }

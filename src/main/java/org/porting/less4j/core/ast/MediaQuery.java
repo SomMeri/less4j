@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class MediaQuery extends ASTCssNode {
 
@@ -53,6 +54,13 @@ public class MediaQuery extends ASTCssNode {
     } else {
       addExpression((MediaExpression) member);
     }
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)medium);
+    result.addAll(expressions);
+    return result;
   }
 
   @Override

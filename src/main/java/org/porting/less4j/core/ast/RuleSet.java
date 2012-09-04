@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.core.parser.LessLexer;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class RuleSet extends ASTCssNode {
 
@@ -30,6 +31,13 @@ public class RuleSet extends ASTCssNode {
 
   public void setBody(DeclarationsBody body) {
     this.body = body;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)body);
+    result.addAll(0, selectors);
+    return result;
   }
 
   public ASTCssNodeType getType() {

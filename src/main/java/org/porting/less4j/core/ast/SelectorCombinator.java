@@ -1,5 +1,8 @@
 package org.porting.less4j.core.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class SelectorCombinator extends ASTCssNode {
@@ -26,6 +29,11 @@ public class SelectorCombinator extends ASTCssNode {
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.SELECTOR_COMBINATOR;
+  }
+
+  @Override
+  public List<? extends ASTCssNode> getChilds() {
+    return Collections.emptyList();
   }
 
   public enum Combinator {
