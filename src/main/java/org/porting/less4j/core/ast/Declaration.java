@@ -2,7 +2,6 @@ package org.porting.less4j.core.ast;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-//FIXME: http://en.wikipedia.org/wiki/CSS_filter#.21important_quirks
 public class Declaration extends ASTCssNode {
 
   private String name;

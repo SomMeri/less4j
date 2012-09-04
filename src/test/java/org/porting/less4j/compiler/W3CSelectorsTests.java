@@ -25,7 +25,7 @@ import org.porting.less4j.debugutils.RhinoCompiler;
  *  Special cases:
  *  1.) Less.js crashed on some tests, even as those tests contained valid css. Those are stored in 
  *  less.js-incompatible directory. Expected outputs have been created manually. In general, less.js
- *  crashed on anything that contains :not(:nth-xxx-xxxx(an+b)) and :not(:lang(xxx)). TODO bug report
+ *  crashed on anything that contains :not(:nth-xxx-xxxx(an+b)) and :not(:lang(xxx)). 
  *  
  *  Ignored cases:
  *  1.) Our compiler does not support namespaces yet, so those tests are not run yet. Tests on

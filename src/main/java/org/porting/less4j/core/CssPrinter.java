@@ -312,10 +312,6 @@ class Builder {
     return true;
   }
 
-  // TODO test with empty selector e.g.:
-  // 1.) "something, , else"
-  // 2.) "something, , ,"
-  // 3.) "" - what happen is some rule set has no selector?
   public boolean appendRuleset(RuleSet ruleSet) {
     if (ruleSet.hasEmptyBody())
       return false;

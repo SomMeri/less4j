@@ -43,7 +43,10 @@ public class MediaQuery extends ASTCssNode {
     this.expressions.add(expression);
   }
 
-  // FIXME: document, may throw class cast exception
+  /**
+   * May throw class cast exception if the member in parameter is 
+   * does not have the right type. 
+   */
   public void addMember(ASTCssNode member) {
     if (member.getType() == ASTCssNodeType.MEDIUM) {
       setMedium((Medium) member);

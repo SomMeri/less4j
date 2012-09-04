@@ -16,13 +16,10 @@ import org.porting.less4j.core.CssPrinter;
  *  Testing whether less4j correctly compiles css3 media conforming to 
  *  <a href="http://www.w3.org/TR/css3-mediaqueries/">w3c specification</a>. The test case
  *  goes through official w3c test cases extracted from <a href="http://www.w3.org/Style/CSS/Test/MediaQueries/20120229/">w3.org</a>.
- *  TODO add extracting tools to the project 
  *
- *  As less.js does not support css3 media, we did not run inputs through it. Instead, we assume that the compiler 
+ *  As less.js does not support aspect-ratio in css3 media, we did not run inputs through it. Instead, we assume that the compiler 
  *  output must be the same as its input.
  *   
- *  TODO document that less.js does not support css3 media  
- *  
  *  Ignored cases:
  *  1.) Some w3c tests test interpreter behavior on malformed css, those are irrelevant and 
  *  stored in incorrect-css directory.

@@ -447,7 +447,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
 }
 
-// FIXME: do something meaningful instead of this exception
 @SuppressWarnings("serial")
 class IncorrectTreeException extends RuntimeException {
 
