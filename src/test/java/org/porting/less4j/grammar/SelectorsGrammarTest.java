@@ -134,8 +134,6 @@ public class SelectorsGrammarTest {
     assertValidSelector(result);
   }
 
-  //FIXME: what happens when somebody names a class ODD or EVEN? it is quite likely,
-  //especially in CSS2
   //TODO what does less.js do in this situation: nth-child(@variable+4) ???
   @Test
   public void formulaOdd() {

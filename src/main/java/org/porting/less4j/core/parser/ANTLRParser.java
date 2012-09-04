@@ -17,6 +17,7 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 //import org.porting.less4j.debugutils.DebugPrint;
+import org.porting.less4j.debugutils.DebugPrint;
 
 /**
  * 
@@ -52,7 +53,7 @@ public class ANTLRParser {
   
   private ParseResult parse(String input, InputType inputType) {
     try {
-      //DebugPrint.printTokenStream(input);
+      DebugPrint.printTokenStream(input);
       List<RecognitionException> errors = new ArrayList<RecognitionException>();
       LessLexer lexer = createLexer(input, errors);
 
@@ -62,7 +63,7 @@ public class ANTLRParser {
       
       HiddenTokenAwareTree ast = (HiddenTokenAwareTree) returnScope.getTree();
       merge(ast, tokenSource.getCollectedTokens());
-      //DebugPrint.print(ast);
+      DebugPrint.print(ast);
       return new ParseResultImpl(ast, new ArrayList<RecognitionException>(errors));
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");

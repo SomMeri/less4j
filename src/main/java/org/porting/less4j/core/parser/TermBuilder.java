@@ -147,13 +147,11 @@ public class TermBuilder {
     return new CssString(token, text.substring(4, text.length() - 1));
   }
 
-  // FIXME: write test for this, there is no such case
   private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     List<HiddenTokenAwareTree> children = first.getChildren();
     String name = children.get(0).getText();
     HiddenTokenAwareTree parameterNode = children.get(1);
 
-    //TODO not sure if clean
     if (parameterNode.getType()!=LessLexer.OPEQ) {
       Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
       return new FunctionExpression(token, name, parameter);
