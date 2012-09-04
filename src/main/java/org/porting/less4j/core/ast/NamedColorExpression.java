@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-//the list of colors have been taken from: http://www.w3schools.com/cssref/css_colornames.asp
-//TODO: document: less.js translate color names into codes
+/**
+ * The list of all valid colors is taken from: http://www.w3schools.com/cssref/css_colornames.asp
+ *
+ */
 public class NamedColorExpression extends ColorExpression {
   
   private static final Map<String, String> ALL_NAMES;

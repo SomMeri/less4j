@@ -215,9 +215,6 @@ class Builder {
       builder.ensureSeparator();
   }
 
-  // FIXME: does less.js keeps original cases in charsets and elsewhere or not?
-  // I'm converting it all to
-  // lowercases
   public boolean appendFontFace(FontFace node) {
     builder.append("@font-face {").newLine();
     builder.increaseIndentationLevel();
@@ -228,9 +225,6 @@ class Builder {
     return true;
   }
 
-  // FIXME: does less.js keeps original cases in charsets and elsewhere or not?
-  // I'm converting it all to
-  // lowercases
   public boolean appendCharsetDeclaration(CharsetDeclaration node) {
     builder.append("@charset").ensureSeparator();
     builder.append(node.getCharset());

@@ -10,7 +10,6 @@ public abstract class ASTCssNode {
   private HiddenTokenAwareTree underlyingStructure;
   private List<ASTCssNode> children = new ArrayList<ASTCssNode>();
   private List<Comment> openingComments = new ArrayList<Comment>();
-  //FIXME: document including empty body condition
   private List<Comment> orphanComments = new ArrayList<Comment>();
   private List<Comment> trailingComments = new ArrayList<Comment>();
 
@@ -23,11 +22,6 @@ public abstract class ASTCssNode {
     return children;
   }
   
-  //TODO: this class will be an implementation of IASTCssNode or similar interface this method does not belong to that interface (or must be transformed tosoemthing like getSourceTest that can return null if source not available)
-  public String getUnderlyingText(){
-    return underlyingStructure.getText();
-  }
-
   //TODO: this class will be an implementation of IASTCssNode or similar interface this method does not belong to that interface 
   public HiddenTokenAwareTree getUnderlyingStructure() {
     return underlyingStructure;

@@ -23,13 +23,13 @@ import org.porting.less4j.debugutils.RhinoCompiler;
  *  in {@link RhinoCompiler} utility class.
  *  
  *  Special cases:
- *  1.) Less.js crashed on some tests, even as those tests contained valid css. Those stored in 
+ *  1.) Less.js crashed on some tests, even as those tests contained valid css. Those are stored in 
  *  less.js-incompatible directory. Expected outputs have been created manually. In general, less.js
  *  crashed on anything that contains :not(:nth-xxx-xxxx(an+b)) and :not(:lang(xxx)). TODO bug report
  *  
  *  Ignored cases:
  *  1.) Our compiler does not support namespaces yet, so those tests are not run yet. Tests on
- *  namespaces are in todo-namespaces and less.js-incompatible\namespaces directories. TODO this needs to be implemented
+ *  namespaces are in todo-namespaces and less.js-incompatible\namespaces directories. 
  *  
  *  2.) Some w3c tests test interpreter behavior on malformed css, those are irrelevant and 
  *  stored in incorrect-css and less.js-incompatible\incorrect-css directories.

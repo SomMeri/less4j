@@ -326,7 +326,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new PseudoClass(token, children.get(1).getText(), switchOn(parameter));
     }
 
-    // FIXME: handle this case the same way as less.js
     throw new IncorrectTreeException();
   }
 
@@ -405,8 +404,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     // we have three types of children:
     // * MEDIUM_TYPE
-    // * identifier AND which is largely useless (TODO except that we should
-    // push its comments to surrounding elements - we ignore that for now)
+    // * identifier AND which is largely useless (TODO except that we should push its comments to surrounding elements - we ignore that for now)
     // * MEDIA_EXPRESSION
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() != LessLexer.IDENT) {
@@ -419,7 +417,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public Medium handleMedium(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
-    if (children.size()==1)
+    if (children.size() == 1)
       return new Medium(token, Medium.MediumModifier.NONE, children.get(0).getText());
 
     return new Medium(token, toMediumModifier(children.get(0)), children.get(1).getText());
@@ -428,25 +426,25 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public MediaExpression handleMediaExpression(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree featureNode = children.get(0);
-    if (children.size()==1)
+    if (children.size() == 1)
       return new MediaExpression(token, featureNode.getText(), null);
-    
+
     Expression expression = (Expression) postprocess(switchOn(children.get(1)));
     return new MediaExpression(token, featureNode.getText(), expression);
   }
 
   private MediumModifier toMediumModifier(HiddenTokenAwareTree hiddenTokenAwareTree) {
     String modifier = hiddenTokenAwareTree.getText().toLowerCase();
-    
+
     if ("not".equals(modifier))
       return MediumModifier.NOT;
 
     if ("only".equals(modifier))
       return MediumModifier.ONLY;
-  
+
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }
-  
+
 }
 
 // FIXME: do something meaningful instead of this exception
