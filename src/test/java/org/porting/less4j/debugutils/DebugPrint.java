@@ -7,8 +7,8 @@ import org.porting.less4j.core.parser.LessLexer;
 
 public class DebugPrint {
 
-  private static boolean printIndexes = true;
-  private static boolean printComments = false;
+  private static boolean printIndexes = false;
+  private static boolean printComments = true;
 
   public static void printTokenStream(String expression) {
     LessLexer createLexer = createLexer(expression);
@@ -240,18 +240,10 @@ public class DebugPrint {
       return "HASH_FRAGMENT";
     case LessLexer.WS:
       return "WS";
-//    case LessLexer.HASH_COMBINATOR:
-//      return "HASH_COMBINATOR";
     case LessLexer.REPEATER:
       return "REPEATER";
     case LessLexer.PURE_NUMBER:
       return "PURE_NUMBER";
-//    case LessLexer.NUMBER_UNKNOWN_DIMENSION:
-//      return "NUMBER_UNKNOWN_DIMENSION";
-//    case LessLexer.ODD:
-//      return "ODD";
-//    case LessLexer.EVEN:
-//      return "EVEN";
     case LessLexer.NEW_LINE:
       return "NEW_LINE";
     default:

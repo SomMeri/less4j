@@ -4,10 +4,10 @@ import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class Medium extends ASTCssNode {
 
-  private MediumModifier modifier = MediumModifier.NONE;
-  private String mediumType;
+  private MediumModifier modifier = new MediumModifier(null);
+  private MediumType mediumType;
 
-  public Medium(HiddenTokenAwareTree underlyingStructure, MediumModifier modifier, String mediumType) {
+  public Medium(HiddenTokenAwareTree underlyingStructure, MediumModifier modifier, MediumType mediumType) {
     super(underlyingStructure);
     this.modifier = modifier;
     this.mediumType = mediumType;
@@ -21,11 +21,11 @@ public class Medium extends ASTCssNode {
     this.modifier = modifier;
   }
 
-  public String getMediumType() {
+  public MediumType getMediumType() {
     return mediumType;
   }
 
-  public void setMediumType(String mediumType) {
+  public void setMediumType(MediumType mediumType) {
     this.mediumType = mediumType;
   }
 
@@ -34,7 +34,4 @@ public class Medium extends ASTCssNode {
     return ASTCssNodeType.MEDIUM;
   }
 
-  public enum MediumModifier {
-    ONLY, NOT, NONE
-  }
 }

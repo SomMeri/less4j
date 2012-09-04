@@ -60,13 +60,17 @@ public class ListToTreeCombiner {
   }
 
   private void assignFirstCommentsSegment(HiddenTokenAwareTree firstChild, HiddenTokenAwareTree secondChild) {
+    if (firstChild == null)
+      return;
+
     LinkedList<Token> tail = readTillNewLine(secondChild.getTokenStartIndex());
-    if (!tail.isEmpty() && firstChild != null) {
-      if (tail.peekLast().getType() == LessLexer.NEW_LINE)
-        firstChild.addFollowing(tail);
-      else
-        secondChild.addPreceding(tail);
-    }
+    if (tail.isEmpty())
+      return;
+
+    if (tail.peekLast().getType() == LessLexer.NEW_LINE)
+      firstChild.addFollowing(tail);
+    else
+      secondChild.addPreceding(tail);
   }
 
   private void addAllContainedTokens(HiddenTokenAwareTree ast) {

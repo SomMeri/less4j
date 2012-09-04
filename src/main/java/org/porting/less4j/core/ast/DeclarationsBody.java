@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-//FIXME: page is not done
 public class DeclarationsBody extends Body<Declaration> {
 
   public DeclarationsBody(HiddenTokenAwareTree underlyingStructure) {

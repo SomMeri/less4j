@@ -2,6 +2,7 @@ package org.porting.less4j.core.parser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +24,8 @@ import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.MediaExpression;
 import org.porting.less4j.core.ast.MediaQuery;
 import org.porting.less4j.core.ast.Medium;
-import org.porting.less4j.core.ast.Medium.MediumModifier;
+import org.porting.less4j.core.ast.MediumModifier;
+import org.porting.less4j.core.ast.MediumType;
 import org.porting.less4j.core.ast.Nth;
 import org.porting.less4j.core.ast.Nth.Form;
 import org.porting.less4j.core.ast.NumberExpression;
@@ -185,8 +187,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public CharsetDeclaration handleCharsetDeclaration(HiddenTokenAwareTree token) {
-    // FIXME: just an idea, what does less.js do if charset is followed by a lot
-    // of declarations?
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.isEmpty())
       throw new IncorrectTreeException();
@@ -401,14 +401,29 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public MediaQuery handleMediaQuery(HiddenTokenAwareTree token) {
     MediaQuery result = new MediaQuery(token);
-    List<HiddenTokenAwareTree> children = token.getChildren();
+    List<HiddenTokenAwareTree> originalChildren = token.getChildren();
+    
+    //each AND identifier may hold preceding comments must be pushed to other tokens
+    LinkedList<HiddenTokenAwareTree> children = new LinkedList<HiddenTokenAwareTree>();
+    for (HiddenTokenAwareTree kid : originalChildren) {
+      if (kid.getType() == LessLexer.IDENT) {
+        HiddenTokenAwareTree lastKid = children.peekLast();
+        if (lastKid!=null) {
+          lastKid.addFollowing(kid.getPreceding());
+        }
+      } else {
+        children.add(kid);
+      }
+    }
     // we have three types of children:
     // * MEDIUM_TYPE
-    // * identifier AND which is largely useless (TODO except that we should push its comments to surrounding elements - we ignore that for now)
+    // * identifier AND whose only function is to hold comments
     // * MEDIA_EXPRESSION
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() != LessLexer.IDENT) {
         result.addMember(switchOn(kid));
+      } else {
+        //we have to copy comments from the AND identifier to surrounding elements.
       }
     }
 
@@ -417,10 +432,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public Medium handleMedium(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
-    if (children.size() == 1)
-      return new Medium(token, Medium.MediumModifier.NONE, children.get(0).getText());
+    if (children.size() == 1) {
+      HiddenTokenAwareTree type = children.get(0);
+      return postprocess(new Medium(token, new MediumModifier(null), postprocess(new MediumType(type, type.getText()))));
+    }
 
-    return new Medium(token, toMediumModifier(children.get(0)), children.get(1).getText());
+    HiddenTokenAwareTree type = children.get(1);
+    return postprocess(new Medium(token, toMediumModifier(children.get(0)), postprocess(new MediumType(type, type.getText()))));
   }
 
   public MediaExpression handleMediaExpression(HiddenTokenAwareTree token) {
@@ -433,14 +451,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new MediaExpression(token, featureNode.getText(), expression);
   }
 
-  private MediumModifier toMediumModifier(HiddenTokenAwareTree hiddenTokenAwareTree) {
-    String modifier = hiddenTokenAwareTree.getText().toLowerCase();
+  private MediumModifier toMediumModifier(HiddenTokenAwareTree token) {
+    String modifier = token.getText().toLowerCase();
 
     if ("not".equals(modifier))
-      return MediumModifier.NOT;
+      return postprocess(new MediumModifier(token, MediumModifier.Modifier.NOT));
 
     if ("only".equals(modifier))
-      return MediumModifier.ONLY;
+      return postprocess(new MediumModifier(token, MediumModifier.Modifier.ONLY));
 
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }

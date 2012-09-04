@@ -22,7 +22,9 @@ import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.MediaExpression;
 import org.porting.less4j.core.ast.MediaQuery;
 import org.porting.less4j.core.ast.Medium;
-import org.porting.less4j.core.ast.Medium.MediumModifier;
+import org.porting.less4j.core.ast.MediumModifier;
+import org.porting.less4j.core.ast.MediumModifier.Modifier;
+import org.porting.less4j.core.ast.MediumType;
 import org.porting.less4j.core.ast.NamedColorExpression;
 import org.porting.less4j.core.ast.NamedExpression;
 import org.porting.less4j.core.ast.Nth;
@@ -39,9 +41,6 @@ import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
 
-
-// FIXME document: not matching spaces especially around terms expressions and
-// comments
 public class CssPrinter implements ILessCompiler {
   private ANTLRParser parser = new ANTLRParser();
   private ASTBuilder astBuilder = new ASTBuilder();
@@ -166,6 +165,12 @@ class Builder {
 
     case MEDIUM:
       return appendMedium((Medium) node);
+      
+    case MEDIUM_MODIFIER:
+      return appendMediumModifier((MediumModifier) node);
+
+    case MEDIUM_TYPE:
+      return appendMediumType((MediumType) node);
 
     case MEDIA_EXPRESSION:
       return appendMediaExpression((MediaExpression) node);
@@ -406,10 +411,16 @@ class Builder {
     return true;
   }
 
-  //FIXME: comments will not work!!!
   public boolean appendMedium(Medium medium) {
-    MediumModifier modifier = medium.getModifier();
-    switch (modifier) {
+    append(medium.getModifier());
+    append(medium.getMediumType());
+    
+    return true;
+  }
+
+  public boolean appendMediumModifier(MediumModifier modifier) {
+    Modifier kind = modifier.getModifier();
+    switch (kind) {
     case ONLY:
       builder.ensureSeparator().append("only");
       break;
@@ -425,8 +436,11 @@ class Builder {
       throw new IllegalStateException("Unknown modifier type.");
     }
     
-    String mediumType = medium.getMediumType();
-    builder.ensureSeparator().append(mediumType);
+    return true;
+  }
+
+  public boolean appendMediumType(MediumType medium) {
+    builder.ensureSeparator().append(medium.getName());
     
     return true;
   }
