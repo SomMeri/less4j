@@ -79,9 +79,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       }
     }
 
-    // FIXME DOCUMENT: I do not follow less.js /* A C-style comment */\n\n I
-    // will create 1 new line less 2 new lines
-
     return result;
   }
 
@@ -319,7 +316,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.size() == 2)
       return new PseudoClass(token, children.get(1).getText());
 
-    // TODO: still ugly solution, but works for basic cases
     if (children.size() == 3) {
       HiddenTokenAwareTree parameter = children.get(2);
       if (parameter.getType() == LessLexer.NUMBER)
@@ -327,7 +323,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       if (parameter.getType() == LessLexer.IDENT)
         return new PseudoClass(token, children.get(1).getText(), new IdentifierExpression(parameter, parameter.getText()));
 
-      // FIXME: add test for all possible variants of an+b and cases
       return new PseudoClass(token, children.get(1).getText(), switchOn(parameter));
     }
 

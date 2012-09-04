@@ -18,7 +18,8 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       body.addAll(declarations);
     }
 
-    public List<T> getDeclarations() {
+    @Override
+    public List<T> getChilds() {
       return body;
     }
 

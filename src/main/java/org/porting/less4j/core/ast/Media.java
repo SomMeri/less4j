@@ -6,16 +6,13 @@ import java.util.List;
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class Media extends ASTCssNode {
-  // TODO: review for specification:
-  // http://www.w3.org/TR/2012/REC-css3-mediaqueries-20120619/
-//FIXME: make media body extend it general class Body
+  //FIXME: make media body extend it general class Body
   //TODO document: less.js keeps whitespaces in media and we are not e.g. less.js 
   //* @media screen , screen => @media screen , screen
   //* @media screen,print => media screen,print
   //We:
   //* @media screen , screen => @media screen, screen
   //* @media screen,print => media screen, print
-  //TODO test suite and document: http://www.w3.org/Style/CSS/Test/MediaQueries/20120229/
   private List<ASTCssNode> body = new ArrayList<ASTCssNode>();
   private List<MediaQuery> mediums;
 

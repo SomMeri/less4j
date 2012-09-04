@@ -22,9 +22,6 @@ import org.porting.less4j.core.parser.LessLexer;
  * * http://www.w3.org/wiki/CSS3/Selectors#Pseudo-classes
  * * http://www.w3.org/TR/selectors/
  * 
- * TODO: those :nth-of-type() type selectors are not covered by the grammar
- * TODO add tests for what is in this document: http://www.w3.org/TR/selectors/#nth-child-pseudo
- * 
  */
 public class SelectorsGrammarTest {
 
@@ -126,8 +123,14 @@ public class SelectorsGrammarTest {
   @Test
   public void formulaEven() {
     ANTLRParser compiler = new ANTLRParser();
-    //TODO ako je to s case sensitivity?
     ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(even) {");
+    assertValidSelector(result);
+  }
+
+  @Test
+  public void formulaEvenUppercase() {
+    ANTLRParser compiler = new ANTLRParser();
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:NTH-CHILD(EVEN) {");
     assertValidSelector(result);
   }
 
@@ -137,8 +140,14 @@ public class SelectorsGrammarTest {
   @Test
   public void formulaOdd() {
     ANTLRParser compiler = new ANTLRParser();
-    //TODO ako je to s case sensitivity?
     ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(odd) {");
+    assertValidSelector(result);
+  }
+
+  @Test
+  public void formulaOddUppercase() {
+    ANTLRParser compiler = new ANTLRParser();
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:NTH-CHILD(ODD) {");
     assertValidSelector(result);
   }
 

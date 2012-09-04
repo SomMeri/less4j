@@ -4,11 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonToken;
@@ -23,9 +20,6 @@ import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.debugutils.DebugPrint;
 
 public class GrammarAsserts {
-
-  //TODO move to some helper
-  public static final Set<Integer> DUMMY_TOKENS = new HashSet<Integer>(Arrays.asList(LessLexer.SELECTOR, LessLexer.RULESET,LessLexer.EMPTY_COMBINATOR,LessLexer.EMPTY_SEPARATOR, LessLexer.EXPRESSION ));
 
   public static void assertValidSelector(ANTLRParser.ParseResult result) {
     assertValid(result);
@@ -140,7 +134,6 @@ class CountNodesAction implements TreeVisitorAction {
     return count;
   }
 
-  //TODO move to some helper
   private boolean isDummy(Token token) {
     return token.getType()<LessLexer.CHARSET_SYM;
   }

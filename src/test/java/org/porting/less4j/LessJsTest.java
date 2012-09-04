@@ -28,9 +28,6 @@ public class LessJsTest extends AbstractFileBasedTest {
     super(inputFile, cssFile, testName);
   }
 
-  //TODO: the alternative annotation is going to be useful right after jUnit 11 comes out. It will contain
-  //nicer test name.
-  //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
     Collection<File> allFiles = FileUtils.listFiles(new File(inputLessDir), null, false);

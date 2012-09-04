@@ -81,7 +81,7 @@ public class TermBuilder {
 
   private NumberExpression buildFromNumber(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {
     NumberExpression result = new NumberExpression(token);
-    result.setValueAsString(actual.getText());
+    result.setValueAsString(actual.getText().trim());
     result.setDimension(toDimension(actual));
     return result;
   }
@@ -115,7 +115,6 @@ public class TermBuilder {
     }
   }
 
-  // FIXME: the current grammar does not support escaping
   private Expression buildFromString(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     return new CssString(token, first.getText());
   }

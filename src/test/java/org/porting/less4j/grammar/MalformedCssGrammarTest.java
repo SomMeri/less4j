@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ANTLRParser.ParseResult;
 
-//TODO: comments
-//TODO: once jUnit 11 comes out, rework tests like these to named repeaters
 /**
  * Tests for malformed CSS. For now, we are just checking whether final tree does not miss
  * some tokens and whether the parser does not throw an exception.  

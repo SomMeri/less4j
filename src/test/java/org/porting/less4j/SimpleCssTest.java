@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -15,7 +16,7 @@ import org.porting.less4j.core.CssPrinter;
  * from the master branch.
  * 
  */
-// @Ignore
+@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
@@ -30,10 +31,6 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     super(inputFile, cssFile, testName);
   }
 
-  // TODO: the alternative annotation is going to be useful right after jUnit 11
-  // comes out. It will contain
-  // nicer test name.
-  // @Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
     Collection<Object[]> result = new ArrayList<Object[]>();

@@ -39,19 +39,7 @@ import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
 
-/**
- * FIXME: document: nth-is translated differently than less.js does. We strip
- * whitespaces and they do not. Input: :nth-child( 3n + 1 ) :nth-child( +3n - 2
- * ) :nth-child( -n+ 6) :nth-child( +6 ) :nth-child( -6 ) { padding: 2; }
- * 
- * Less.js output: :nth-child( 3n + 1 ):nth-child( +3n - 2 ):nth-child( -n+
- * 6):nth-child( +6 ):nth-child( -6 ) { padding: 2;
- * 
- * Our output: :nth-child(3n+1) :nth-child(+3n-2) :nth-child(-n+6)
- * :nth-child(+6) :nth-child(-6) { padding: 2; }
- * 
- * 
- */
+
 // FIXME document: not matching spaces especially around terms expressions and
 // comments
 public class CssPrinter implements ILessCompiler {
@@ -211,30 +199,6 @@ class Builder {
     return true;
   }
 
-  /**
-   * FIXME: DOCUMENT: if the comment after ruleset is not preceded by an empty
-   * line, less.js does not put new line before it. We handle comments
-   * differently, a comment is preceded by a new line if it was preceded by it
-   * in the input.
-   * 
-   * * Input: p ~ * { background: lime; }
-   * 
-   * /* let's try some pseudos that are not valid CSS but are likely to be
-   * implemented as extensions in some UAs. These should not be recognised, as
-   * UAs implementing such extensions should use the :-vnd-ident syntax. * /
-   * 
-   * * Less.js output: } /* let's try some pseudos that are not valid CSS but
-   * are likely to be implemented as extensions in some UAs. These should not be
-   * recognised, as UAs implementing such extensions should use the :-vnd-ident
-   * syntax. * /
-   * 
-   * * Less.js output if there would not be an empty line: p ~ * { background:
-   * lime; } /* let's try some pseudos that are not valid CSS but are likely to
-   * be implemented as extensions in some UAs. These should not be recognised,
-   * as UAs implementing such extensions should use the :-vnd-ident syntax. * /
-   * 
-   */
-
   private void appendComments(List<Comment> comments, boolean ensureSeparator) {
     if (comments == null || comments.isEmpty())
       return;
@@ -374,7 +338,7 @@ class Builder {
 
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
-    Iterator<Declaration> iterator = body.getDeclarations().iterator();
+    Iterator<Declaration> iterator = body.getChilds().iterator();
     while (iterator.hasNext()) {
       Declaration declaration = iterator.next();
       append(declaration);
@@ -546,24 +510,6 @@ class Builder {
     return true;
   }
 
-  /**
-   * FIXME: DOCUMENT we do not follow color handling in the same way as less.js.
-   * If the input contains a color name (red, blue, ...), then we place the
-   * color name into the output.
-   * 
-   * Less.js behaviour is bit more complicated: * if the color name is followed
-   * by ;, the less.js preserves the name * if the color name is NOT followed by
-   * ;, the less.js translates color into the code.
-   * 
-   * E.g.: * input: li,p { background-color : lime } li,p { background-color :
-   * lime; }
-   * 
-   * * less.js output: li, p { background-color: #00ff00; } li, p {
-   * background-color: lime; }
-   * 
-   * * Our output: li, p { background-color: lime; } li, p { background-color:
-   * lime; }
-   */
   private boolean appendColorExpression(ColorExpression expression) {
     // if it is named color expression, write out the name
     if (expression instanceof NamedColorExpression) {
@@ -596,8 +542,7 @@ class Builder {
       break;
     }
 
-    // FIXME: why does the number contain also the next space????
-    builder.append(node.getValueAsString().trim());
+    builder.append(node.getValueAsString());
 
     return true;
   }
@@ -624,7 +569,6 @@ class Builder {
     return true;
   }
 
-  // TODO add test to all cases
   private boolean appendSimpleSelector(SimpleSelector selector) {
     appendSimpleSelectorHead(selector);
     appendSimpleSelectorTail(selector);
@@ -654,7 +598,6 @@ class Builder {
 
   }
 
-  // TODO add test on plus greated and empty!!!!!!
   public boolean appendSelectorCombinator(SelectorCombinator combinator) {
     switch (combinator.getCombinator()) {
     case ADJACENT_SIBLING:

@@ -17,7 +17,6 @@ import org.porting.less4j.core.CssPrinter;
 //TODO: document charset handling, it is easy enough to document
 //TODO: test case for colors, color used in selector should not be translated into hash.
 // FIXME: @@name is OK, is @@@name also OK?
-// FIXME: special URLs url(data:something) are not accepted
 //FIXME: comments: many of my grammar rules throw away comments, semicolons and so on. I have to review them all and write test cases for everything.
 @RunWith(Parameterized.class)
 public class StrictComplianceTest extends AbstractFileBasedTest {
