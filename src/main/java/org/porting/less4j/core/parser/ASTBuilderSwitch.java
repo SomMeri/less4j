@@ -180,7 +180,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         declarations.add(postprocess(handleDeclaration(kid)));
     }
 
-    result.addDeclarations(declarations);
+    result.addMembers(declarations);
     return result;
   }
 

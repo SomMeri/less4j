@@ -5,54 +5,33 @@ import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-public class Media extends ASTCssNode {
-  //FIXME: make media body extend it general class Body
+public class Media extends Body<ASTCssNode> {
   //TODO document: less.js keeps whitespaces in media and we are not e.g. less.js 
   //* @media screen , screen => @media screen , screen
   //* @media screen,print => media screen,print
   //We:
   //* @media screen , screen => @media screen, screen
   //* @media screen,print => media screen, print
-  private List<ASTCssNode> body = new ArrayList<ASTCssNode>();
   private List<MediaQuery> mediums;
 
   public Media(HiddenTokenAwareTree token) {
     super(token);
   }
 
-  public List<ASTCssNode> getBody() {
-    return body;
-  }
-
   public List<ASTCssNode> getDeclarations() {
-    return bodyByType(ASTCssNodeType.DECLARATION);
+    return membersByType(ASTCssNodeType.DECLARATION);
   }
 
   public List<ASTCssNode> getRuleSets() {
-    return bodyByType(ASTCssNodeType.RULE_SET);
-  }
-
-  private List<ASTCssNode> bodyByType(ASTCssNodeType type) {
-    List<ASTCssNode> result = new ArrayList<ASTCssNode>();
-    List<ASTCssNode> body = getBody();
-    for (ASTCssNode node : body) {
-      if (node.getType()==type) {
-        result.add(node);
-      }
-    }
-    return result;
-  }
-
-  public boolean hasEmptyBody() {
-    return body.isEmpty();
+    return membersByType(ASTCssNodeType.RULE_SET);
   }
 
   public void addDeclaration(Declaration declaration) {
-    this.body.add(declaration);
+    addMember(declaration);
   }
 
   public void addRuleSet(RuleSet ruleSet) {
-    this.body.add(ruleSet);
+    addMember(ruleSet);
   }
 
   public void addChild(ASTCssNode child) {
@@ -61,7 +40,7 @@ public class Media extends ASTCssNode {
     if (child.getType() == ASTCssNodeType.MEDIA_QUERY)
       addMediaQuery((MediaQuery) child);
     else
-      this.body.add(child);
+      addMember(child);
   }
 
   public void addMediaQuery(MediaQuery medium) {

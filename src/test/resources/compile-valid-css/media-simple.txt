@@ -1,9 +1,0 @@
-@media screen
-  {
-  p.test {font-family:verdana,sans-serif;font-size:14px;}
-  }
-@media print
-  {
-  p.test {font-family:times, serif;font-size:10px;}
-  }
-If the "serif" does not have a space, less.js will not give it ont. For some weird reason, sans-serif workds differently. 

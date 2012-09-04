@@ -350,9 +350,7 @@ class Builder {
     builder.append(":").ensureSeparator();
     if (declaration.getExpression() != null)
       append(declaration.getExpression());
-    // FIXME: zdokumentontovat: less.js prints important as it was, e.g. it may
-    // not have leading space or it may be ! important <- that is important,
-    // because it is one of multiple CSS hacks
+
     if (declaration.isImportant())
       builder.ensureSeparator().append("!important");
     builder.appendIgnoreNull(";");
@@ -365,10 +363,7 @@ class Builder {
     appendMediums(node.getMediums());
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
-    // FIXME: DOCUMENTATION less.js reorders statements in @media. It prints
-    // declarations first and rulesets second
-    // FIXME: DOCUMENTATION no new line for the last declaration
-    // FIXME: DOCUMENTATION media-simple.txt
+
     Iterator<ASTCssNode> declarations = node.getDeclarations().iterator();
     List<ASTCssNode> ruleSets = node.getRuleSets();
     while (declarations.hasNext()) {
