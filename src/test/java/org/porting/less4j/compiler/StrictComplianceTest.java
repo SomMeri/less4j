@@ -14,8 +14,6 @@ import org.porting.less4j.core.CssPrinter;
 
 //FIXME: what does less.js do when the charset declaration goes AFTER ruleset? It is incorrect css anyway.
 //if there is a difference I should at least document it
-//TODO: document charset handling, it is easy enough to document
-//TODO: test case for colors, color used in selector should not be translated into hash.
 // FIXME: @@name is OK, is @@@name also OK?
 //FIXME: comments: many of my grammar rules throw away comments, semicolons and so on. I have to review them all and write test cases for everything.
 @RunWith(Parameterized.class)

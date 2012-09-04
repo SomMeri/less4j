@@ -6,12 +6,7 @@ import java.util.List;
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class Media extends Body<ASTCssNode> {
-  //TODO document: less.js keeps whitespaces in media and we are not e.g. less.js 
-  //* @media screen , screen => @media screen , screen
-  //* @media screen,print => media screen,print
-  //We:
-  //* @media screen , screen => @media screen, screen
-  //* @media screen,print => media screen, print
+
   private List<MediaQuery> mediums;
 
   public Media(HiddenTokenAwareTree token) {

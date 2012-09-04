@@ -81,7 +81,7 @@ tokens {
       this.errors = errors;
     }
 
-  //FIXME: document - what am I doing this for?
+  //This trick allow Lexer to emit multiple tokens per one rule.
   List tokens = new ArrayList();
   public void emit(Token token) {
         state.token = token;
