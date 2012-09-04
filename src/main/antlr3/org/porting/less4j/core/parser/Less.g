@@ -26,9 +26,6 @@ options {
     output = AST;
 }
 
-//this is not official way how to do things, but debugging 
-//stuff when parsing functionality is not all written in
-//parser rules is much easier. 
 tokens {  
 //  VARIABLE_DECLARATION;
   EXPRESSION;
