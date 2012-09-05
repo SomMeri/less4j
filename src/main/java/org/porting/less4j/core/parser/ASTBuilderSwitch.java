@@ -20,6 +20,7 @@ import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.MediaExpression;
+import org.porting.less4j.core.ast.MediaExpressionFeature;
 import org.porting.less4j.core.ast.MediaQuery;
 import org.porting.less4j.core.ast.Medium;
 import org.porting.less4j.core.ast.MediumModifier;
@@ -342,10 +343,20 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Media handleMedia(HiddenTokenAwareTree token) {
-    List<HiddenTokenAwareTree> children = token.getChildren();
+    List<HiddenTokenAwareTree> originalChildren = token.getChildren();
+    List<HiddenTokenAwareTree> children = new ArrayList<HiddenTokenAwareTree>(originalChildren);
+    HiddenTokenAwareTree lbrace = children.remove(1);
+    children.get(0).addFollowing(lbrace.getPreceding());
+    children.get(1).addBeforePreceding(lbrace.getFollowing());
+
+    HiddenTokenAwareTree rbrace = children.remove(children.size()-1);
+    children.get(children.size()-1).addFollowing(rbrace.getPreceding());
+    rbrace.getParent().addBeforeFollowing(rbrace.getFollowing());
+
     Media result = new Media(token);
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.MEDIUM_DECLARATION) {
+        kid.pushHiddenToKids();
         handleMediaDeclaration(result, kid);
       } else {
         result.addChild(switchOn(kid));
@@ -357,8 +368,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private void handleMediaDeclaration(Media result, HiddenTokenAwareTree declaration) {
     List<HiddenTokenAwareTree> children = declaration.getChildren();
+    
+    ASTCssNode previousKid = null;
     for (HiddenTokenAwareTree kid : children) {
-      result.addChild(switchOn(kid));
+      if (kid.getType() == LessLexer.COMMA) {
+        previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
+      } else {
+        previousKid = switchOn(kid);
+        result.addChild(previousKid);
+      }
     }
   }
 
@@ -408,10 +426,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree featureNode = children.get(0);
     if (children.size() == 1)
-      return new MediaExpression(token, featureNode.getText(), null);
+      return new MediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), null);
 
-    Expression expression = (Expression) switchOn(children.get(1));
-    return new MediaExpression(token, featureNode.getText(), expression);
+    if (children.size() == 2)
+      throw new IncorrectTreeException();
+
+    HiddenTokenAwareTree colonNode = children.get(1);
+    featureNode.addFollowing(colonNode.getPreceding());
+
+    HiddenTokenAwareTree expressionNode = children.get(2);
+    Expression expression = (Expression) switchOn(expressionNode);
+    return new MediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), expression);
   }
 
   private MediumModifier toMediumModifier(HiddenTokenAwareTree token) {

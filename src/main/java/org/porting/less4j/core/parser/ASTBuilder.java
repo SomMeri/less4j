@@ -24,8 +24,11 @@ public class ASTBuilder {
     }
   }
 
-  private ASTCssNode inheritCommentsFromToken(ASTCssNode node) {
+  private void inheritCommentsFromToken(ASTCssNode node) {
     HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
+    if (underlyingStructure==null)
+      return ;
+    
     List<Comment> preceding = convertToComments(underlyingStructure.getPreceding());
     node.setOpeningComments(preceding);
 
@@ -34,7 +37,6 @@ public class ASTBuilder {
 
     List<Comment> orphans = convertToComments(underlyingStructure.getOrphans());
     node.setOrphanComments(orphans);
-    return node;
   }
   
   private List<Comment> convertToComments(List<Token> preceding) {

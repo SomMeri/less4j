@@ -1,5 +1,7 @@
 package org.porting.less4j.debugutils;
 
+import java.util.List;
+
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
@@ -278,10 +280,19 @@ public class DebugPrint {
       base = base + optionalsuffix;
     }
     if (printComments) {
-      String optionalsuffix = " PC:" + tree.getPreceding().size() + " FC:" + tree.getFollowing().size();
+      String optionalsuffix = " PC:" + printComments(tree.getPreceding()) + " FC:" + printComments(tree.getFollowing());
       base = base + optionalsuffix;
     }
     System.out.println(base);
+  }
+
+  public static String printComments(List<Token> list) {
+    String result = "" + list.size();
+    for (Token token : list) {
+      if (token.getType()==LessLexer.COMMENT)
+        result+=token.getText();
+    }
+    return result;
   }
 
 }

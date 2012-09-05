@@ -54,6 +54,13 @@ public class Media extends Body<ASTCssNode> {
   }
 
   @Override
+  public List<ASTCssNode> getChilds() {
+    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(super.getChilds());
+    childs.addAll(mediums);
+    return childs;
+  }
+
+  @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.MEDIA;
   }

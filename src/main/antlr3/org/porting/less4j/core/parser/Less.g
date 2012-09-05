@@ -180,12 +180,12 @@ imports
 //
 //TODO media part of the grammar is throwing away tokens, so comments will not work correctly. fix that
 media
-    : MEDIA_SYM (m+=mediaQuery (COMMA m+=mediaQuery)*)
-        LBRACE
+    : MEDIA_SYM (m1+=mediaQuery (n+=COMMA m+=mediaQuery)*)
+        q1=LBRACE
             ((declaration) => b+=declaration SEMI 
             | b+=ruleSet )*
-        RBRACE
-    -> ^(MEDIA_SYM ^(MEDIUM_DECLARATION $m*) $b*) 
+        q2=RBRACE
+    -> ^(MEDIA_SYM ^(MEDIUM_DECLARATION $m1 ($n $m)*) $q1 $b* $q2) 
     ; 
 
 // ---------    
@@ -197,7 +197,7 @@ mediaQuery
     ;
     
 mediaExpression
-    : LPAREN a+=mediaFeature (COLON a+=expr)? RPAREN -> ^(MEDIA_EXPRESSION $a*)
+    : LPAREN a+=mediaFeature (b+=COLON c+=expr)? RPAREN -> ^(MEDIA_EXPRESSION $a* $b* $c*)
     ;
 
 mediaFeature

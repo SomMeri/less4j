@@ -34,6 +34,11 @@ public class HiddenTokenAwareTree extends CommonTree {
     return super.getChildren();
   }
 
+  @Override
+  public HiddenTokenAwareTree getParent() {
+    return (HiddenTokenAwareTree)super.getParent();
+  }
+
   public List<Token> getPreceding() {
     return preceding;
     
@@ -55,6 +60,10 @@ public class HiddenTokenAwareTree extends CommonTree {
     preceding.addAll(tokens);
   }
 
+  public void addBeforePreceding(List<Token> tokens) {
+    preceding.addAll(0, tokens);
+  }
+
   public void addOrphan(Token token) {
     orphans.add(token);
   }
@@ -67,8 +76,23 @@ public class HiddenTokenAwareTree extends CommonTree {
     following.add(token);
   }
 
+  public void addBeforeFollowing(List<Token> tokens) {
+    following.addAll(0, tokens);
+  }
+
   public void addFollowing(List<Token> tokens) {
     following.addAll(tokens);
+  }
+
+  public void pushHiddenToKids() {
+    List<HiddenTokenAwareTree> children = getChildren();
+    if (children==null || children.isEmpty())
+      return ;
+    
+    HiddenTokenAwareTree first = children.get(0);
+    first.addBeforePreceding(getPreceding());
+    HiddenTokenAwareTree last = children.get(children.size()-1);
+    last.addFollowing(getFollowing());
   }
 
 }

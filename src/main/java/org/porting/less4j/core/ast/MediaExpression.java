@@ -7,20 +7,20 @@ import org.porting.less4j.utils.ArraysUtils;
 
 public class MediaExpression extends ASTCssNode {
 
-  private String feature;
+  private MediaExpressionFeature feature;
   private Expression expression;
 
-  public MediaExpression(HiddenTokenAwareTree underlyingStructure, String feature, Expression expression) {
+  public MediaExpression(HiddenTokenAwareTree underlyingStructure, MediaExpressionFeature feature, Expression expression) {
     super(underlyingStructure);
     this.feature = feature;
     this.expression = expression;
   }
 
-  public String getFeature() {
+  public MediaExpressionFeature getFeature() {
     return feature;
   }
 
-  public void setFeature(String feature) {
+  public void setFeature(MediaExpressionFeature feature) {
     this.feature = feature;
   }
 
@@ -39,6 +39,6 @@ public class MediaExpression extends ASTCssNode {
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(expression);
+    return ArraysUtils.asNonNullList(feature, expression);
   }
 }

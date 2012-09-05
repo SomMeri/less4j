@@ -117,8 +117,8 @@ public class HiddenTokenAwareErrorTree extends HiddenTokenAwareTree {
     return errorNode.getChildIndex();
   }
 
-  public Tree getParent() {
-    return errorNode.getParent();
+  public HiddenTokenAwareTree getParent() {
+    return (HiddenTokenAwareTree)errorNode.getParent();
   }
 
   public void freshenParentAndChildIndexes() {

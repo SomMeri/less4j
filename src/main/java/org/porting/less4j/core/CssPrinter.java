@@ -20,6 +20,7 @@ import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.MediaExpression;
+import org.porting.less4j.core.ast.MediaExpressionFeature;
 import org.porting.less4j.core.ast.MediaQuery;
 import org.porting.less4j.core.ast.Medium;
 import org.porting.less4j.core.ast.MediumModifier;
@@ -174,6 +175,9 @@ class Builder {
 
     case MEDIA_EXPRESSION:
       return appendMediaExpression((MediaExpression) node);
+
+    case MEDIUM_EX_FEATURE:
+      return appendMediaExpressionFeature((MediaExpressionFeature) node);
 
     case STYLE_SHEET:
       return appendStyleSheet((StyleSheet) node);
@@ -447,7 +451,7 @@ class Builder {
 
   public boolean appendMediaExpression(MediaExpression expression) {
     builder.ensureSeparator().append("(");
-    builder.append(expression.getFeature());
+    append(expression.getFeature());
     if (expression.getExpression()!=null) {
       builder.append(":").ensureSeparator();
       append(expression.getExpression());
@@ -455,6 +459,12 @@ class Builder {
     builder.append(")");
     return true;
   }
+  
+  public boolean appendMediaExpressionFeature(MediaExpressionFeature feature) {
+    builder.append(feature.getFeature());
+    return true;
+  }
+  
 
   public boolean appendNamedExpression(NamedExpression expression) {
     builder.append(expression.getName());
