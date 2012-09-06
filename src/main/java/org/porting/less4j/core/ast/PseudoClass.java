@@ -26,6 +26,10 @@ public class PseudoClass extends Pseudo {
     return parameter;
   }
 
+  public void setParameter(ASTCssNode parameter) {
+    this.parameter = parameter;
+  }
+
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.PSEUDO_CLASS;

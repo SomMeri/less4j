@@ -1,7 +1,6 @@
 package org.porting.less4j.core.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
@@ -59,8 +58,8 @@ public class SimpleSelector extends ASTCssNode {
   }
 
   @Override
-  public List<? extends ASTCssNode> getChilds() {
-    return Collections.emptyList();
+  public List<ASTCssNode> getChilds() {
+    return new ArrayList<ASTCssNode>(subsequent);
   }
   
   public ASTCssNodeType getType() {

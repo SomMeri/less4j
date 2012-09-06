@@ -27,10 +27,10 @@ options {
 }
 
 tokens {  
-//  VARIABLE_DECLARATION;
+  VARIABLE_DECLARATION;
   EXPRESSION;
   DECLARATION;
-//  VARIABLE_REFERENCE;
+  VARIABLE_REFERENCE;
   RULESET;
   SELECTOR;
   EXPRESSION;
@@ -52,7 +52,7 @@ tokens {
   MEDIA_EXPRESSION;
   MEDIA_QUERY;
   MEDIUM_TYPE;
-  BODY_OF_DECLARATIONS;
+  BODY;
 }  
 
 @lexer::header {
@@ -213,16 +213,16 @@ bodyset
     | media
     | page
     | fontface
-//    | variabledeclaration
+    | variabledeclaration
     ;   
     
-//variabledeclaration
-//    : VARIABLE COLON expr SEMI -> ^(VARIABLE_DECLARATION VARIABLE expr)
-//    ;
-//
-//variablereference
-//    : '@' VARIABLE -> ^(VARIABLE_REFERENCE VARIABLE)
-//    ;
+variabledeclaration
+    : VARIABLE COLON expr SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON expr SEMI)
+    ;
+
+variablereference
+    : VARIABLE | INDIRECT_VARIABLE
+    ;
 
 fontface
     : FONT_FACE_SYM^ 
@@ -281,12 +281,12 @@ ruleSet
 ////the last declaration does not have to have semicolon
 ruleset_body 
     :  LBRACE
-            (  (a+=declaration_both_cases ) /*| b+=variabledeclaration*/ 
+            (  (a+=declaration_both_cases | a+=variabledeclaration ) 
 //               | (b+=combinator b+=ruleSet) 
 //               | ('&' COLON b+=ruleSet)
              )* 
         RBRACE
-     -> ^(BODY_OF_DECLARATIONS $a*);
+     -> ^(BODY $a*);
 
 //selector2
 //    : (EMPTY_COMBINATOR? a+=simpleSelector (a+=combinator a+=simpleSelector)*
@@ -431,14 +431,15 @@ attrib
 pseudo
     : (c+=COLON c+=COLON? a=IDENT
             ( 
-                (LPAREN ( { predicates.isNthPseudoClass($a)}?=> b1=nth | b2=pseudoparameters ) RPAREN)?
+                (LPAREN ( { predicates.isNthPseudoClass($a)}?=> (b1=nth| b2=VARIABLE) | b3=pseudoparameters ) RPAREN)?
             )
-      ) -> ^(PSEUDO $c+ $a $b1* $b2*)
+      ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3*)
     ;
     
 pseudoparameters:
       (IDENT) => IDENT
     | (NUMBER) => NUMBER
+    | (VARIABLE) => VARIABLE
     | selector 
  ;
  
@@ -471,7 +472,7 @@ term
     : (a+=value_term
     | a+=function
     | a+=special_function
-//    | variablereference
+    | a+=variablereference
     | a+=hexColor)
     -> ^(TERM $a*)  
     ;
@@ -898,7 +899,8 @@ MEDIA_SYM       : '@' M E D I A         ;
 FONT_FACE_SYM   : '@' F O N T MINUS F A C E ;
 CHARSET_SYM     : '@charset '           ;
 
-//VARIABLE        : '@' NAME              ;
+VARIABLE        : '@' NAME              ;
+INDIRECT_VARIABLE        : '@' '@' NAME              ;
 
 IMPORTANT_SYM   : '!' (WS|COMMENT)* I M P O R T A N T   ;
 
@@ -977,26 +979,15 @@ NUMBER
     
 // ------------
 // url and uri.
-//TODO this gives warning, but we have to handle it differently thanks to variables
-URI :   U R L
+URI :   (U R L
         '('
             ((WS)=>WS)? (URL|STRING) WS?
-        ')'
+        ')') => (U R L
+        '('
+            ((WS)=>WS)? (URL|STRING) WS?
+        ')')
+        | U R L { $type=IDENT; }
     ;
-
-//TODO escape also '-'
-//TODO document why
-//fragment ODD: O D D;
-//fragment EVEN: E V E N;
-//fragment NTH_IDENT:  COLON (N T H '-' C H I L D |  N T H '-' L A S T '-' C H I L D | N T H '-' O F '-' T Y P E | N T H '-' L A S T '-' O F '-' T Y P E);
-//fragment NTH_ARGUMENT: (PLUS | MINUS)? WS* c=PURE_NUMBER? N WS* ((PLUS | MINUS) WS* PURE_NUMBER)?
-//                       | (PLUS | MINUS)? PURE_NUMBER | ODD | EVEN ;
-//                       
-//NTH_PSEUDO_CLASS: a=NTH_IDENT WS* b=LPAREN WS* c=NTH_ARGUMENT WS* RPAREN {
-//  emit($a);
-//  emit($b);
-//  emit($c);
-//};
 
 // -------------
 // Whitespace.  Though the W3 standard shows a Yacc/Lex style parser and lexer

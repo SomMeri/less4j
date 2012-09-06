@@ -50,8 +50,8 @@ public abstract class TokenTypeSwitch<T> {
       return handleDeclaration(token);
     }
 
-    if (type==LessLexer.BODY_OF_DECLARATIONS) {
-      return handleDeclarationsBody(token);
+    if (type==LessLexer.BODY) {
+      return handleRuleSetsBody(token);
     }
 
     if (type==LessLexer.EXPRESSION) {
@@ -79,7 +79,28 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.MEDIA_EXPRESSION)
       return handleMediaExpression(token);
 
+    if (type==LessLexer.VARIABLE_DECLARATION)
+      return handleVariableDeclaration(token);
+
+    if (type==LessLexer.VARIABLE)
+      return handleVariable(token);
+    
+    if (type==LessLexer.VARIABLE)
+      return handleIndirectVariable(token);
+
     throw new IllegalStateException("Unexpected token type: " + type + " for " + token.getText());
+  }
+
+  public T handleVariableDeclaration(HiddenTokenAwareTree token) {
+    return null;
+  }
+
+  public T handleVariable(HiddenTokenAwareTree token) {
+    return null;
+  }
+
+  public T handleIndirectVariable(HiddenTokenAwareTree token) {
+    return null;
   }
 
   public T handleMediaExpression(HiddenTokenAwareTree token) {
@@ -94,7 +115,7 @@ public abstract class TokenTypeSwitch<T> {
     return null;
   }
 
-  public T handleDeclarationsBody(HiddenTokenAwareTree token) {
+  public T handleRuleSetsBody(HiddenTokenAwareTree token) {
     return null;
   }
 

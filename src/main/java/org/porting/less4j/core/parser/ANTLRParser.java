@@ -58,7 +58,7 @@ public class ANTLRParser {
       LessLexer lexer = createLexer(input, errors);
 
       CollectorTokenSource tokenSource = new CollectorTokenSource(lexer, KEEP_HIDDEN_TOKENS);
-      LessParser parser = createParser(lexer, tokenSource, errors);
+      LessParser parser = createParser(tokenSource, errors);
       ParserRuleReturnScope returnScope = inputType.parseTree(parser);
       
       HiddenTokenAwareTree ast = (HiddenTokenAwareTree) returnScope.getTree();
@@ -70,7 +70,7 @@ public class ANTLRParser {
     }
   }
 
-  private LessParser createParser(LessLexer lexer, TokenSource tokenSource, List<RecognitionException> errors) {
+  private LessParser createParser(TokenSource tokenSource, List<RecognitionException> errors) {
     CommonTokenStream tokens = new CommonTokenStream(tokenSource);
     LessParser parser = new LessParser(tokens, errors);
     parser.setTreeAdaptor(new HiddenTokenAwareTreeAdaptor());

@@ -38,6 +38,18 @@ public class Declaration extends ASTCssNode {
     return important;
   }
   
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setExpression(Expression expression) {
+    this.expression = expression;
+  }
+
+  public void setImportant(boolean important) {
+    this.important = important;
+  }
+
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.DECLARATION;

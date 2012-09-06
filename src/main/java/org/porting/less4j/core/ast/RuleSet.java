@@ -10,7 +10,7 @@ import org.porting.less4j.utils.ArraysUtils;
 public class RuleSet extends ASTCssNode {
 
   private List<Selector> selectors = new ArrayList<Selector>();
-  private DeclarationsBody body;
+  private RuleSetsBody body;
 
   public RuleSet(HiddenTokenAwareTree token) {
     super(token);
@@ -21,7 +21,7 @@ public class RuleSet extends ASTCssNode {
    return selectors;
   }
   
-  public DeclarationsBody getBody() {
+  public RuleSetsBody getBody() {
     return body;
   }
 
@@ -29,7 +29,7 @@ public class RuleSet extends ASTCssNode {
     return body==null? true : body.isEmpty();
   }
 
-  public void setBody(DeclarationsBody body) {
+  public void setBody(RuleSetsBody body) {
     this.body = body;
   }
 

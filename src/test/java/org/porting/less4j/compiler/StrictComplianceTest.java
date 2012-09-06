@@ -1,16 +1,15 @@
 package org.porting.less4j.compiler;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.porting.less4j.AbstractFileBasedTest;
 import org.porting.less4j.ILessCompiler;
 import org.porting.less4j.core.CssPrinter;
+import org.porting.less4j.utils.w3ctestsextractor.TestFileUtils;
 
 //FIXME: what does less.js do when the charset declaration goes AFTER ruleset? It is incorrect css anyway.
 //if there is a difference I should at least document it
@@ -20,7 +19,6 @@ import org.porting.less4j.core.CssPrinter;
 public class StrictComplianceTest extends AbstractFileBasedTest {
 
   private static final String inputDir = "src\\test\\resources\\compile-valid-css\\";
-  private static final String outputDir = inputDir;
 
   public StrictComplianceTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
@@ -31,34 +29,7 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    Collection<File> allFiles = FileUtils.listFiles(new File(inputDir), new String[] {"less"}, false);
-    Collection<Object[]> result = new ArrayList<Object[]>();
-    for (File file : allFiles) {
-      addFiles(result, file);
-    }
-//    addFiles(result, new File(inputDir + "debug-comments-pure-css-simple.less"));
-
-    return result;
-  }
-
-  private static void addFiles(Collection<Object[]> result, File... files) {
-    for (File file : files) {
-      result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
-    }
-  }
-
-  protected static File findCorrespondingCss(File lessFile) {
-    String lessFileName = lessFile.getName();
-    String cssFileName = convertToOutputFilename(lessFileName);
-    File cssFile = new File(outputDir + cssFileName);
-    return cssFile;
-  }
-
-  private static String convertToOutputFilename(String name) {
-    if (name.endsWith(".less"))
-      return name.substring(0, name.length() - 5) + ".css";
-    
-    return name;
+    return TestFileUtils.loadTestFiles(inputDir);
   }
 
   protected ILessCompiler getCompiler() {

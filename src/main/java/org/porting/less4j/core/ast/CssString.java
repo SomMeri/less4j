@@ -7,11 +7,13 @@ import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class CssString extends Expression {
 
+  private String quoteType;
   private String value;
 
-  public CssString(HiddenTokenAwareTree token, String value) {
+  public CssString(HiddenTokenAwareTree token, String value, String quoteType) {
     super(token);
     this.value = value;
+    this.quoteType = quoteType;
   }
 
   public String getValue() {
@@ -20,6 +22,14 @@ public class CssString extends Expression {
 
   public void setValue(String value) {
     this.value = value;
+  }
+
+  public String getQuoteType() {
+    return quoteType;
+  }
+
+  public void setQuoteType(String quoteType) {
+    this.quoteType = quoteType;
   }
 
   @Override

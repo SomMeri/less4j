@@ -13,14 +13,22 @@ public class ASTBuilder {
   public StyleSheet parse(HiddenTokenAwareTree tree) {
     ASTBuilderSwitch builder = new ASTBuilderSwitch();
     ASTCssNode result = builder.switchOn(tree);
-    postprocessComments(result);
+    convertComments(result);
+    solveParentChildRelationShips(result);
     return (StyleSheet) result;
   }
 
-  private void postprocessComments(ASTCssNode node) {
+  private void solveParentChildRelationShips(ASTCssNode node) {
+    for (ASTCssNode kid : node.getChilds()) {
+      kid.setParent(node);
+      solveParentChildRelationShips(kid);
+    }
+  }
+
+  private void convertComments(ASTCssNode node) {
     inheritCommentsFromToken(node);
     for (ASTCssNode kid : node.getChilds()) {
-      postprocessComments(kid);
+      convertComments(kid);
     }
   }
 

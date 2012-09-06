@@ -12,7 +12,7 @@ import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.CssString;
 import org.porting.less4j.core.ast.Declaration;
-import org.porting.less4j.core.ast.DeclarationsBody;
+import org.porting.less4j.core.ast.RuleSetsBody;
 import org.porting.less4j.core.ast.ExpressionOperator;
 import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.FunctionExpression;
@@ -39,12 +39,14 @@ import org.porting.less4j.core.ast.SelectorCombinator;
 import org.porting.less4j.core.ast.SelectorOperator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
+import org.porting.less4j.core.compiler.LessToCssCompiler;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
 
 public class CssPrinter implements ILessCompiler {
   private ANTLRParser parser = new ANTLRParser();
   private ASTBuilder astBuilder = new ASTBuilder();
+  private LessToCssCompiler compiler = new LessToCssCompiler();
 
   @Override
   public String compile(String content) {
@@ -52,9 +54,11 @@ public class CssPrinter implements ILessCompiler {
     ExtendedStringBuilder stringBuilder = new ExtendedStringBuilder("");
 
     ANTLRParser.ParseResult result = parser.parseStyleSheet(content);
-    StyleSheet styleSheet = astBuilder.parse(result.getTree());
+    StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
+    ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet);
+    
     Builder builder = new Builder(stringBuilder);
-    builder.append(styleSheet);
+    builder.append(cssStyleSheet);
     return stringBuilder.toString();
   };
 
@@ -93,7 +97,7 @@ class Builder {
       return appendRuleset((RuleSet) node);
 
     case DECLARATIONS_BODY:
-      return appendDeclarationsBody((DeclarationsBody) node);
+      return appendBody((RuleSetsBody) node);
 
     case CSS_CLASS:
       return appendCssClass((CssClass) node);
@@ -181,6 +185,11 @@ class Builder {
 
     case STYLE_SHEET:
       return appendStyleSheet((StyleSheet) node);
+
+    case VARIABLE:
+    case INDIRECT_VARIABLE:
+    case VARIABLE_DECLARATION:
+      throw new NotACssException(node);
 
     default:
       throw new IllegalStateException("Unknown: " + node.getType());
@@ -331,15 +340,15 @@ class Builder {
     return true;
   }
 
-  public boolean appendDeclarationsBody(DeclarationsBody body) {
+  public boolean appendBody(RuleSetsBody body) {
     if (body.isEmpty())
       return false;
 
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
-    Iterator<Declaration> iterator = body.getChilds().iterator();
+    Iterator<ASTCssNode> iterator = body.getChilds().iterator();
     while (iterator.hasNext()) {
-      Declaration declaration = iterator.next();
+      ASTCssNode declaration = iterator.next();
       append(declaration);
       builder.ensureNewLine();
     }
@@ -508,7 +517,8 @@ class Builder {
   }
 
   public boolean appendCssString(CssString expression) {
-    builder.append(expression.getValue());
+    String quoteType = expression.getQuoteType();
+    builder.append(quoteType+expression.getValue()+quoteType);
 
     return true;
   }

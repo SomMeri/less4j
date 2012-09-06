@@ -27,7 +27,7 @@ public class IdentifierExpression extends Expression {
   }
 
   @Override
-  public List<? extends ASTCssNode> getChilds() {
+  public List<ASTCssNode> getChilds() {
     return Collections.emptyList();
   }
 

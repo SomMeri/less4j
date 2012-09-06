@@ -12,7 +12,8 @@ import org.porting.less4j.core.ast.CharsetDeclaration;
 import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
-import org.porting.less4j.core.ast.DeclarationsBody;
+import org.porting.less4j.core.ast.IndirectVariable;
+import org.porting.less4j.core.ast.RuleSetsBody;
 import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.ExpressionOperator;
 import org.porting.less4j.core.ast.FontFace;
@@ -36,6 +37,8 @@ import org.porting.less4j.core.ast.Selector;
 import org.porting.less4j.core.ast.SelectorAttribute;
 import org.porting.less4j.core.ast.SelectorOperator;
 import org.porting.less4j.core.ast.StyleSheet;
+import org.porting.less4j.core.ast.Variable;
+import org.porting.less4j.core.ast.VariableDeclaration;
 
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
@@ -65,7 +68,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public Expression handleExpression(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0)
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     if (children.size() == 1) {
       Expression head = (Expression) switchOn(children.get(0));
@@ -113,9 +116,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       break;
     }
 
-    throw new IncorrectTreeException();
+    throw new IncorrectTreeException(token);
   }
 
+  public Variable handleVariable(HiddenTokenAwareTree token) {
+    return termBuilder.buildFromVariable(token);
+  }
+  
+  public IndirectVariable handleIndirectVariable(HiddenTokenAwareTree token) {
+    return termBuilder.buildFromIndirectVariable(token);
+  }
+  
   public Declaration handleDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
 
@@ -134,7 +145,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.get(2).getType() == LessLexer.IMPORTANT_SYM)
       return new Declaration(token, name, expression, true);
 
-    throw new IncorrectTreeException();
+    throw new IncorrectTreeException(token);
   }
 
   public FontFace handleFontFace(HiddenTokenAwareTree token) {
@@ -154,7 +165,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public CharsetDeclaration handleCharsetDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.isEmpty())
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     return new CharsetDeclaration(token, children.get(0).getText());
   }
@@ -172,8 +183,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         selectors.add(selector);
         previousKid = selector;
       }
-      if (kid.getType() == LessLexer.BODY_OF_DECLARATIONS) {
-        DeclarationsBody body = handleDeclarationsBody(kid);
+      if (kid.getType() == LessLexer.BODY) {
+        RuleSetsBody body = handleRuleSetsBody(kid);
         ruleSet.setBody(body);
         previousKid = body;
       }
@@ -186,17 +197,16 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return ruleSet;
   }
 
-  public DeclarationsBody handleDeclarationsBody(HiddenTokenAwareTree token) {
+  public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {
     if (token.getChildren() == null)
-      return new DeclarationsBody(token);
+      return new RuleSetsBody(token);
 
-    List<Declaration> declarations = new ArrayList<Declaration>();
+    List<ASTCssNode> members = new ArrayList<ASTCssNode>();
     for (HiddenTokenAwareTree kid : token.getChildren()) {
-      if (kid.getType() == LessLexer.DECLARATION)
-        declarations.add(handleDeclaration(kid));
+      members.add(switchOn(kid));
     }
 
-    return new DeclarationsBody(token, declarations);
+    return new RuleSetsBody(token, members);
   }
 
   public Selector handleSelector(HiddenTokenAwareTree token) {
@@ -220,13 +230,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public SelectorAttribute handleSelectorAttribute(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0)
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     if (children.size() == 1)
       return new SelectorAttribute(token, children.get(0).getText());
 
     if (children.size() < 3)
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     return new SelectorAttribute(token, children.get(0).getText(), handleSelectorOperator(children.get(1)), children.get(2).getText());
   }
@@ -259,13 +269,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       break;
     }
 
-    throw new IncorrectTreeException();
+    throw new IncorrectTreeException(token);
   }
 
   public Pseudo handlePseudo(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0 || children.size() == 1)
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     // the child number 0 is a :
     HiddenTokenAwareTree t = children.get(1);
@@ -290,7 +300,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new PseudoClass(token, children.get(1).getText(), switchOn(parameter));
     }
 
-    throw new IncorrectTreeException();
+    throw new IncorrectTreeException(token);
   }
 
   public Nth handleNth(HiddenTokenAwareTree token) {
@@ -333,11 +343,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public IdSelector handleIdSelector(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() != 1)
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     String text = children.get(0).getText();
     if (text == null || text.length() < 1)
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     return new IdSelector(token, text.substring(1));
   }
@@ -429,7 +439,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new MediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), null);
 
     if (children.size() == 2)
-      throw new IncorrectTreeException();
+      throw new IncorrectTreeException(token);
 
     HiddenTokenAwareTree colonNode = children.get(1);
     featureNode.addFollowing(colonNode.getPreceding());
@@ -450,17 +460,48 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }
+  
+  //TODO we do not support indirections yet
+  public VariableDeclaration handleVariableDeclaration(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    HiddenTokenAwareTree name = children.get(0);
+    HiddenTokenAwareTree colon = children.get(1);
+    HiddenTokenAwareTree expression = children.get(2);
+    HiddenTokenAwareTree semi = children.get(3);
+    
+    colon.giveHidden(name, expression);
+    semi.giveHidden(expression, null);
+    token.addBeforeFollowing(semi.getFollowing());
+    
+    return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression)switchOn(expression));
+  }
 
 }
 
 @SuppressWarnings("serial")
 class IncorrectTreeException extends RuntimeException {
 
-  public IncorrectTreeException() {
+  private final HiddenTokenAwareTree node;
+
+  public IncorrectTreeException(HiddenTokenAwareTree node) {
+    this.node = node;
   }
 
-  public IncorrectTreeException(String message) {
+  public IncorrectTreeException(String message, HiddenTokenAwareTree node) {
     super(message);
+    this.node = node;
   }
 
+  @Override
+  public String getMessage() {
+    return super.getMessage() + getPositionInformation();
+  }
+
+  private String getPositionInformation() {
+    if (node==null)
+      return "";
+    
+    String result = "\n Line: "  + node.getLine() + " Character: " + node.getCharPositionInLine();
+    return result;
+  }
 }

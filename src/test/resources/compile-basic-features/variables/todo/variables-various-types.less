@@ -1,0 +1,17 @@
+@b: 24px;
+//less.js converts this into #888888 as it is probably colors issue (and not variables issue), I will leave it open for now
+@c: #888;
+
+@fonts: "Trebuchet MS", Verdana, sans-serif;
+@f: @fonts;
+
+@quotes: "~" "~";
+@singleQuotes: '~' '~';
+@q: @quotes;
+.variables {
+  height: @b;
+  color: @c;
+  font-family: @f;
+  quotes: @q;
+  singleQuotes: @singleQuotes;
+}

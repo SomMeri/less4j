@@ -7,11 +7,13 @@ import org.porting.less4j.core.ast.CssString;
 import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.FunctionExpression;
 import org.porting.less4j.core.ast.IdentifierExpression;
+import org.porting.less4j.core.ast.IndirectVariable;
 import org.porting.less4j.core.ast.NamedColorExpression;
 import org.porting.less4j.core.ast.NamedExpression;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.NumberExpression.Dimension;
 import org.porting.less4j.core.ast.NumberExpression.Sign;
+import org.porting.less4j.core.ast.Variable;
 import org.porting.less4j.platform.Constants;
 
 public class TermBuilder {
@@ -57,11 +59,18 @@ public class TermBuilder {
     case LessLexer.TERM_FUNCTION:
       return buildFromNormalFunction(token, first);
 
+    case LessLexer.VARIABLE:
+      return buildFromVariable(token, first);
+
+    case LessLexer.INDIRECT_VARIABLE:
+      return buildFromIndirectVariable(token, first);
+
     case LessLexer.TERM:
       return buildFromTerm(first);
+
     }
 
-    throw new IncorrectTreeException("type number: " + first.getType() + " for " + first.getText());
+    throw new IncorrectTreeException("type number: " + first.getType() + " for " + first.getText(), first);
   }
 
   private Expression buildFromColorHash(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
@@ -116,7 +125,12 @@ public class TermBuilder {
   }
 
   private Expression buildFromString(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
-    return new CssString(token, first.getText());
+    String text = first.getText();
+    return createCssString(token, text);
+  }
+
+  public CssString createCssString(HiddenTokenAwareTree token, String quotedText) {
+    return new CssString(token, quotedText.substring(1, quotedText.length()-1), quotedText.substring(0, 1));
   }
 
   private Expression buildFromIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
@@ -142,9 +156,10 @@ public class TermBuilder {
       return null;
 
     if (text.length() < 5)
-      return new CssString(token, "");
+      return new CssString(token, "", "");
 
-    return new CssString(token, text.substring(4, text.length() - 1));
+    String string = text.substring(4, text.length() - 1);
+    return new CssString(token, string, "");
   }
 
   private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
@@ -152,17 +167,40 @@ public class TermBuilder {
     String name = children.get(0).getText();
     HiddenTokenAwareTree parameterNode = children.get(1);
 
-    if (parameterNode.getType()!=LessLexer.OPEQ) {
+    if (parameterNode.getType() != LessLexer.OPEQ) {
       Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
       return new FunctionExpression(token, name, parameter);
     }
-    
+
     //first child is a name
     HiddenTokenAwareTree parameterName = parameterNode.getChild(0);
     HiddenTokenAwareTree parameterValue = parameterNode.getChild(1);
     Expression parameter = (Expression) parentBuilder.switchOn(parameterValue);
-    
+
     return new FunctionExpression(token, name, new NamedExpression(parameterNode, parameterName.getText(), parameter));
   }
 
+  public Variable buildFromVariable(HiddenTokenAwareTree variableToken) {
+    return buildFromVariable(null, variableToken);
+  }
+  
+  private Variable buildFromVariable(HiddenTokenAwareTree expressionToken, HiddenTokenAwareTree variableToken) {
+    if (expressionToken != null) {
+      expressionToken.addFollowing(variableToken.getFollowing());
+      return new Variable(expressionToken, variableToken.getText());
+    }
+    return new Variable(variableToken, variableToken.getText());
+  }
+
+  public IndirectVariable buildFromIndirectVariable(HiddenTokenAwareTree variableToken) {
+    return buildFromIndirectVariable(null, variableToken);
+  }
+  
+  private IndirectVariable buildFromIndirectVariable(HiddenTokenAwareTree expressionToken, HiddenTokenAwareTree variableToken) {
+    if (expressionToken != null) {
+      expressionToken.addFollowing(variableToken.getFollowing());
+      return new IndirectVariable(expressionToken, variableToken.getText().substring(1));
+    }
+    return new IndirectVariable(variableToken, variableToken.getText().substring(1));
+  }
 }

@@ -50,4 +50,8 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return result;
     }
 
+    public boolean removeMember(T node) {
+      return body.remove(node);
+    }
+
 }

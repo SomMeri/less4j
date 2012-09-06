@@ -95,4 +95,11 @@ public class HiddenTokenAwareTree extends CommonTree {
     last.addFollowing(getFollowing());
   }
 
+  public void giveHidden(HiddenTokenAwareTree previous, HiddenTokenAwareTree next) {
+    if (previous!=null)
+      previous.addFollowing(getPreceding());
+    if (next!=null)
+      next.addBeforePreceding(getFollowing());   
+  }
+
 }

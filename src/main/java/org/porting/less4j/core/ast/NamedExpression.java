@@ -1,6 +1,9 @@
 package org.porting.less4j.core.ast;
 
+import java.util.List;
+
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
 public class NamedExpression extends IdentifierExpression {
 
@@ -31,6 +34,13 @@ public class NamedExpression extends IdentifierExpression {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public List<ASTCssNode> getChilds() {
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)expression);
+    result.addAll(super.getChilds());
+    return result;
   }
 
   @Override

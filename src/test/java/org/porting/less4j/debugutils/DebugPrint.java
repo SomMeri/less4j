@@ -72,8 +72,8 @@ public class DebugPrint {
       return "TERM";
     case LessLexer.MEDIUM_DECLARATION:
       return "MEDIUM_DECLARATION";
-    case LessLexer.BODY_OF_DECLARATIONS:
-      return "BODY_OF_DECLARATIONS";
+    case LessLexer.BODY:
+      return "BODY";
     case LessLexer.CHARSET_SYM:
       return "CHARSET_SYM";
     case LessLexer.STRING:
@@ -248,6 +248,8 @@ public class DebugPrint {
       return "PURE_NUMBER";
     case LessLexer.NEW_LINE:
       return "NEW_LINE";
+    case LessLexer.VARIABLE:
+      return "VARIABLE";
     default:
       return "Unknown: " + type;
     }
