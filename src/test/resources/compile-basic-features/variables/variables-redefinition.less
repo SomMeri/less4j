@@ -4,3 +4,13 @@
     @var: 3;
     three: @var;
 }
+
+@a: 2;
+.redefinitionIn {
+    @a: 3;
+    three: @a;
+}
+
+.redefinitionIsScoped {
+    two: @a;
+}

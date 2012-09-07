@@ -20,6 +20,7 @@ Our twitter account: [Less4j](https://twitter.com/Less4j)
 *  [http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/]
 *  [http://www.w3.org/TR/css3-selectors/] 
 *  [http://www.w3.org/wiki/CSS3/Selectors]
+*  Comparison of less and sass: [https://gist.github.com/674726]
 
 ## Documentation:
 Architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). 

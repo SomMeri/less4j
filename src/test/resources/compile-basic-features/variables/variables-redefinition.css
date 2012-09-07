@@ -1,3 +1,9 @@
 .redefinition {
   three: 3;
 }
+.redefinitionIn {
+  three: 3;
+}
+.redefinitionIsScoped {
+  two: 2;
+}

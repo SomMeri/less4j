@@ -242,14 +242,12 @@ pseudoPage
     : COLON IDENT
     ;
     
-//NOTE: opeq here is just a workaround, but it seems to be sufficient for a less -> css compiler 
 operator
-    : SOLIDUS
-    | COMMA
-    | STAR
+    : SOLIDUS //ratio
+    | COMMA  
+//    | STAR
 //    | (PLUS)=>PLUS //TODO:why do I have to do this with plus and minus?
 //    | (MINUS)=>MINUS
-//    | OPEQ
     | ( -> EMPTY_SEPARATOR) 
     ;
     
@@ -418,16 +416,6 @@ attrib
       -> ^(ATTRIBUTE $a* )
 ;
 
-//pseudo
-//    : (c+=COLON c+=COLON? a=IDENT
-//            (  { predicates.isNthPseudoClass($a)}?=> ( LPAREN ( b1=nth ) RPAREN) 
-//               | ( 
-//                  (LPAREN ( b2=pseudoparameters ) RPAREN)?
-//                 )
-//            )
-//      ) -> ^(PSEUDO $c+ $a $b1* $b2*)
-//    ;
-
 pseudo
     : (c+=COLON c+=COLON? a=IDENT
             ( 
@@ -489,7 +477,6 @@ value_term
             | UNKNOWN_DIMENSION
             | TIME
             | FREQ
-//            | VARIABLE
         )
     | STRING
     | IDENT
