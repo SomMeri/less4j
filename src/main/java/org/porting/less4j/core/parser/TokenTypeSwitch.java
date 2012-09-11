@@ -88,7 +88,7 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.VARIABLE)
       return handleIndirectVariable(token);
 
-    throw new IllegalStateException("Unexpected token type: " + type + " for " + token.getText());
+    throw new IncorrectTreeException("Unexpected token type: " + type + " for " + token.getText(), token);
   }
 
   public T handleVariableDeclaration(HiddenTokenAwareTree token) {

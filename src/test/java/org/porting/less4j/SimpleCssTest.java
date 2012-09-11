@@ -24,8 +24,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   // "src\\test\\resources\\less.js\\less\\media.less";
   // private static final String outputCss =
   // "src\\test\\resources\\less.js\\css\\media.css";
-  private static final String inputLess = "src\\test\\resources\\minitests\\css\\css-3.less";
-  private static final String outputCss = "src\\test\\resources\\minitests\\css\\css-3.css";
+  private static final String inputLess = "src\\test\\resources\\minitests\\css\\functions-working-only.less";
+  private static final String outputCss = "src\\test\\resources\\minitests\\css\\functions-working-only.css";
 
   public SimpleCssTest(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);

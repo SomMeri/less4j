@@ -197,7 +197,7 @@ mediaQuery
     ;
     
 mediaExpression
-    : LPAREN a+=mediaFeature (b+=COLON c+=expr)? RPAREN -> ^(MEDIA_EXPRESSION $a* $b* $c*)
+    : LPAREN a+=mediaFeature (b+=COLON c+=expressionTop)? RPAREN -> ^(MEDIA_EXPRESSION $a* $b* $c*)
     ;
 
 mediaFeature
@@ -242,20 +242,28 @@ pseudoPage
     : COLON IDENT
     ;
     
-operator
-    : SOLIDUS //ratio
-    | COMMA  
+topLevelOperator
+    : COMMA  
 //    | STAR
 //    | (PLUS)=>PLUS //TODO:why do I have to do this with plus and minus?
 //    | (MINUS)=>MINUS
     | ( -> EMPTY_SEPARATOR) 
     ;
     
+arithmeticOperatorTop
+    : SOLIDUS //ratio
+    | STAR
+    ;
+
+arithmeticOperatorLower
+    : PLUS //TODO:why do I have to do this with plus and minus?
+    | MINUS
+    ;
+    
 combinator
     : PLUS
     | GREATER
     | TILDE
-//    | (EMPTY_COMBINATOR) => EMPTY_COMBINATOR //suppressing warning
     | ( -> EMPTY_COMBINATOR)
     ;
     
@@ -320,21 +328,6 @@ selector
     -> ^(SELECTOR ($a)* ) )
     ;
 
-//simpleSelector
-//    : (a+=elementName 
-//          ((esPred)=>a+=elementSubsequent)*
-//    | ((esPred)=>a+=elementSubsequent)+
-//    ) -> ^(SIMPLE_SELECTOR ($a)* )
-//    ;
-
-//simpleSelector
-//    : (({1==2}?=>((esPred)=>a+=elementSubsequent) 
-//       |a+=elementName
-//       |
-//       ) ({1==2}?=>(esPred)=>a+=elementSubsequent)*
-//     )-> ^(SIMPLE_SELECTOR ($a)* ) 
-//    ;
-    
 esPred
     : HASH 
     | DOT 
@@ -451,10 +444,44 @@ declaration
 prio
     : IMPORTANT_SYM
     ;
+
+////if it is in parenthesis, then it must be low level thing.
+//expr
+//    :topLevelExpr;
+//  
+//topLevelExpr
+//    : a=expressionTop (b+=topLevelOperator c+=expressionTop)* -> ^(EXPRESSION $a ($b $c)*)
+//    ;
+//
+//expressionTop
+//    : (a=expressionLower | LPAREN a=expressionLower RPAREN) (b+=arithmeticOperatorTop c+=expressionLower)* -> ^(EXPRESSION $a ($b $c)*)
+//    ;
+//    
+//expressionLower
+//    : a=atom (b+=arithmeticOperatorLower c+=atom)* -> ^(EXPRESSION $a ($b $c)*)
+//    ;
+//
+//atom
+//    : term
+////    | b+=LPAREN a+=expressionTop c+=RPAREN
+//    ;
+
+
+operator
+    : COMMA  
+    | SOLIDUS //ratio
+    | STAR
+    | (PLUS) => PLUS
+    | (MINUS) => MINUS
+    | ( -> EMPTY_SEPARATOR) 
+    ;
     
 expr
-    : a=term (b+=operator c+=term)* -> ^(EXPRESSION $a ($b $c)*)
+    : a=term (b+=operator c+=expr)? -> ^(EXPRESSION $a $b* $c*)
     ;
+    
+expressionTop
+    : expr;
     
 term
     : (a+=value_term
@@ -496,7 +523,7 @@ function
     
 functionParameter
     : IDENT OPEQ term -> ^(OPEQ IDENT term)
-    | expr;
+    | expressionTop;
     
 // ==============================================================
 // LEXER

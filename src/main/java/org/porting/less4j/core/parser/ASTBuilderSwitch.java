@@ -54,6 +54,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {
     StyleSheet result = new StyleSheet(token);
+    if (token.getChildren()==null || token.getChildren().isEmpty())
+      return result;
+    
     for (HiddenTokenAwareTree kid : token.getChildren()) {
       result.addMember(switchOn(kid));
     }
@@ -461,7 +464,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }
   
-  //TODO we do not support indirections yet
   public VariableDeclaration handleVariableDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree name = children.get(0);

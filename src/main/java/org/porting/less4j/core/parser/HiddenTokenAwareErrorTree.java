@@ -58,6 +58,9 @@ public class HiddenTokenAwareErrorTree extends HiddenTokenAwareTree {
   }
 
   public int getCharPositionInLine() {
+    if (errorNode.trappedException!=null && errorNode.trappedException.token!=null) {
+      return errorNode.trappedException.token.getCharPositionInLine();
+    }
     return errorNode.getCharPositionInLine();
   }
 
@@ -110,6 +113,9 @@ public class HiddenTokenAwareErrorTree extends HiddenTokenAwareTree {
   }
 
   public int getLine() {
+    if (errorNode.trappedException!=null && errorNode.trappedException.token!=null) {
+      return errorNode.trappedException.token.getLine();
+    }
     return errorNode.getLine();
   }
 
