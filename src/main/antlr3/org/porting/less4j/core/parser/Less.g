@@ -474,7 +474,7 @@ term
     )
     ) | (a+=unsigned_value_term
         | a+=hexColor
-        | a+=special_function)
+        | a+=special_function))
     -> ^(TERM $a*)
     ;
     
