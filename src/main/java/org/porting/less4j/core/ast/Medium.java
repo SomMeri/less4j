@@ -7,7 +7,7 @@ import org.porting.less4j.utils.ArraysUtils;
 
 public class Medium extends ASTCssNode {
 
-  private MediumModifier modifier = new MediumModifier(null);
+  private MediumModifier modifier;
   private MediumType mediumType;
 
   public Medium(HiddenTokenAwareTree underlyingStructure, MediumModifier modifier, MediumType mediumType) {

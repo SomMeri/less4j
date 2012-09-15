@@ -13,7 +13,6 @@ import org.porting.less4j.utils.w3ctestsextractor.TestFileUtils;
 
 //FIXME: what does less.js do when the charset declaration goes AFTER ruleset? It is incorrect css anyway.
 //if there is a difference I should at least document it
-// FIXME: @@name is OK, is @@@name also OK?
 //FIXME: comments: many of my grammar rules throw away comments, semicolons and so on. I have to review them all and write test cases for everything.
 @RunWith(Parameterized.class)
 public class StrictComplianceTest extends AbstractFileBasedTest {

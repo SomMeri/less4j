@@ -12,13 +12,12 @@ import org.porting.less4j.core.ast.CharsetDeclaration;
 import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.Declaration;
-import org.porting.less4j.core.ast.IndirectVariable;
-import org.porting.less4j.core.ast.RuleSetsBody;
 import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.ExpressionOperator;
 import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.IdSelector;
 import org.porting.less4j.core.ast.IdentifierExpression;
+import org.porting.less4j.core.ast.IndirectVariable;
 import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.MediaExpression;
 import org.porting.less4j.core.ast.MediaExpressionFeature;
@@ -33,9 +32,11 @@ import org.porting.less4j.core.ast.Pseudo;
 import org.porting.less4j.core.ast.PseudoClass;
 import org.porting.less4j.core.ast.PseudoElement;
 import org.porting.less4j.core.ast.RuleSet;
+import org.porting.less4j.core.ast.RuleSetsBody;
 import org.porting.less4j.core.ast.Selector;
 import org.porting.less4j.core.ast.SelectorAttribute;
 import org.porting.less4j.core.ast.SelectorOperator;
+import org.porting.less4j.core.ast.SignedExpression;
 import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.ast.Variable;
 import org.porting.less4j.core.ast.VariableDeclaration;
@@ -54,9 +55,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {
     StyleSheet result = new StyleSheet(token);
-    if (token.getChildren()==null || token.getChildren().isEmpty())
+    if (token.getChildren() == null || token.getChildren().isEmpty())
       return result;
-    
+
     for (HiddenTokenAwareTree kid : token.getChildren()) {
       result.addMember(switchOn(kid));
     }
@@ -69,7 +70,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Expression handleExpression(HiddenTokenAwareTree token) {
-    List<HiddenTokenAwareTree> children = token.getChildren();
+    LinkedList<HiddenTokenAwareTree> children = new LinkedList<HiddenTokenAwareTree>(token.getChildren());
     if (children.size() == 0)
       throw new IncorrectTreeException(token);
 
@@ -85,20 +86,24 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return createExpression(token, children);
   }
 
-  private Expression createExpression(HiddenTokenAwareTree parent, List<HiddenTokenAwareTree> members) {
+  private Expression createExpression(HiddenTokenAwareTree parent, LinkedList<HiddenTokenAwareTree> members) {
     // this must represent a term. Otherwise we are doomed anyway.
-    Expression head = (Expression) switchOn(members.get(0));
-    if (members.size() == 1) {
-      return head;
+    Expression head = (Expression) switchOn(members.removeFirst());
+    while (!members.isEmpty()) {
+      ExpressionOperator operator = readExpressionOperator(members);
+      if (members.isEmpty())
+        return new ComposedExpression(parent, head, operator, null);
+
+      Expression next = (Expression) switchOn(members.removeFirst());
+      head = new ComposedExpression(parent, head, operator, next);
     }
+    return head;
+  }
 
-    HiddenTokenAwareTree token = members.get(1);
+  public ExpressionOperator readExpressionOperator(LinkedList<HiddenTokenAwareTree> members) {
+    HiddenTokenAwareTree token = members.removeFirst();
     ExpressionOperator operator = new ExpressionOperator(token, toExpressionOperator(token));
-
-    if (members.size() < 2)
-      return new ComposedExpression(parent, head, operator, null);
-
-    return new ComposedExpression(parent, head, operator, createExpression(parent, members.subList(2, members.size())));
+    return operator;
   }
 
   private ExpressionOperator.Operator toExpressionOperator(HiddenTokenAwareTree token) {
@@ -112,6 +117,12 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     case LessLexer.STAR:
       return ExpressionOperator.Operator.STAR;
 
+    case LessLexer.MINUS:
+      return ExpressionOperator.Operator.MINUS;
+
+    case LessLexer.PLUS:
+      return ExpressionOperator.Operator.PLUS;
+
     case LessLexer.EMPTY_SEPARATOR:
       return ExpressionOperator.Operator.EMPTY_OPERATOR;
 
@@ -119,17 +130,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       break;
     }
 
-    throw new IncorrectTreeException(token);
+    throw new IncorrectTreeException("Unknown operator type. ", token);
   }
 
   public Variable handleVariable(HiddenTokenAwareTree token) {
     return termBuilder.buildFromVariable(token);
   }
-  
+
   public IndirectVariable handleIndirectVariable(HiddenTokenAwareTree token) {
     return termBuilder.buildFromIndirectVariable(token);
   }
-  
+
   public Declaration handleDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
 
@@ -311,16 +322,22 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Expression second = null;
     if (hasChildren(token.getChild(0))) {
       first = termBuilder.buildFromTerm(token.getChild(0));
+      String sign = "";
+      if (first.getType() == ASTCssNodeType.NEGATED_EXPRESSION) {
+        SignedExpression negated = (SignedExpression) first;
+        first = negated.getExpression();
+        sign = negated.getSign().toSymbol();
+      }
       if (first.getType() == ASTCssNodeType.IDENTIFIER_EXPRESSION) {
         IdentifierExpression ident = (IdentifierExpression) first;
-        if ("even".equals(ident.getValue().toLowerCase())) {
+        String lowerCaseValue = ident.getValue().toLowerCase();
+        lowerCaseValue = sign + lowerCaseValue;
+        if ("even".equals(lowerCaseValue)) {
           return new Nth(token, null, null, Form.EVEN);
-        } else if ("odd".equals(ident.getValue().toLowerCase())) {
+        } else if ("odd".equals(lowerCaseValue)) {
           return new Nth(token, null, null, Form.ODD);
-        } else if ("n".equals(ident.getValue().toLowerCase())) {
-          first = new NumberExpression(token.getChild(0), "n", NumberExpression.Sign.NONE, NumberExpression.Dimension.REPEATER);
-        } else if ("-n".equals(ident.getValue().toLowerCase())) {
-          first = new NumberExpression(token.getChild(0), "n", NumberExpression.Sign.MINUS, NumberExpression.Dimension.REPEATER);
+        } else if ("n".equals(lowerCaseValue) || "-n".equals(lowerCaseValue) || "+n".equals(lowerCaseValue)) {
+          first = new NumberExpression(token.getChild(0), lowerCaseValue, NumberExpression.Dimension.REPEATER);
         } else
           throw new IllegalStateException("Unexpected identifier value for nth: " + ident.getValue());
       }
@@ -362,8 +379,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     children.get(0).addFollowing(lbrace.getPreceding());
     children.get(1).addBeforePreceding(lbrace.getFollowing());
 
-    HiddenTokenAwareTree rbrace = children.remove(children.size()-1);
-    children.get(children.size()-1).addFollowing(rbrace.getPreceding());
+    HiddenTokenAwareTree rbrace = children.remove(children.size() - 1);
+    children.get(children.size() - 1).addFollowing(rbrace.getPreceding());
     rbrace.getParent().addBeforeFollowing(rbrace.getFollowing());
 
     Media result = new Media(token);
@@ -381,7 +398,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private void handleMediaDeclaration(Media result, HiddenTokenAwareTree declaration) {
     List<HiddenTokenAwareTree> children = declaration.getChildren();
-    
+
     ASTCssNode previousKid = null;
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.COMMA) {
@@ -396,13 +413,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public MediaQuery handleMediaQuery(HiddenTokenAwareTree token) {
     MediaQuery result = new MediaQuery(token);
     List<HiddenTokenAwareTree> originalChildren = token.getChildren();
-    
+
     //each AND identifier may hold preceding comments must be pushed to other tokens
     LinkedList<HiddenTokenAwareTree> children = new LinkedList<HiddenTokenAwareTree>();
     for (HiddenTokenAwareTree kid : originalChildren) {
       if (kid.getType() == LessLexer.IDENT) {
         HiddenTokenAwareTree lastKid = children.peekLast();
-        if (lastKid!=null) {
+        if (lastKid != null) {
           lastKid.addFollowing(kid.getPreceding());
         }
       } else {
@@ -428,7 +445,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 1) {
       HiddenTokenAwareTree type = children.get(0);
-      return new Medium(token, new MediumModifier(null), new MediumType(type, type.getText()));
+      return new Medium(token, new MediumModifier(type), new MediumType(type, type.getText()));
     }
 
     HiddenTokenAwareTree type = children.get(1);
@@ -463,19 +480,19 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }
-  
+
   public VariableDeclaration handleVariableDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree name = children.get(0);
     HiddenTokenAwareTree colon = children.get(1);
     HiddenTokenAwareTree expression = children.get(2);
     HiddenTokenAwareTree semi = children.get(3);
-    
+
     colon.giveHidden(name, expression);
     semi.giveHidden(expression, null);
     token.addBeforeFollowing(semi.getFollowing());
-    
-    return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression)switchOn(expression));
+
+    return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }
 
 }
@@ -500,10 +517,10 @@ class IncorrectTreeException extends RuntimeException {
   }
 
   private String getPositionInformation() {
-    if (node==null)
+    if (node == null)
       return "";
-    
-    String result = "\n Line: "  + node.getLine() + " Character: " + node.getCharPositionInLine();
+
+    String result = "\n Line: " + node.getLine() + " Character: " + node.getCharPositionInLine();
     return result;
   }
 }

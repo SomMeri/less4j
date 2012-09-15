@@ -1,0 +1,20 @@
+@var: @a;
+@a: 100%;
+
+.lazy-eval {
+  width: @var;
+}
+
+.lazy-eval-scope {
+  @a: 9%;
+  width: @var;
+}
+
+.lazy-eval two {
+  width: @var;
+}
+
+@a: 50%;
+.lazy-eval three {
+  width: @var;
+}

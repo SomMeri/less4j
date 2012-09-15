@@ -52,4 +52,9 @@ public class ComposedExpression extends Expression {
     return ArraysUtils.asNonNullList(left, operator, right);
   }
 
+  @Override
+  public String toString() {
+    return "[" + left + operator + right + "]";
+  }
+
 }

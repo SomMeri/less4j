@@ -36,4 +36,9 @@ public class IdentifierExpression extends Expression {
     return ASTCssNodeType.IDENTIFIER_EXPRESSION;
   }
 
+  @Override
+  public String toString() {
+    return "" + value;
+  }
+
 }

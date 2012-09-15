@@ -1,0 +1,14 @@
+doNotEvaluateFonts {
+  font: 14px+16px;
+  font-style: 30px;
+  grrr: 30px;
+  font: 14px -16px;
+  font-style: -2px;
+  grrr: -2px;
+  font: 14px*16px;
+  font-style: 224px;
+  grrr: 224px;
+  font: 14px/16px;
+  font-style: 0.875px;
+  grrr: 0.875px;
+}

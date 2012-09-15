@@ -102,4 +102,8 @@ public class HiddenTokenAwareTree extends CommonTree {
       next.addBeforePreceding(getFollowing());   
   }
 
+  public HiddenTokenAwareTree getLastChild() {
+    return getChild(getChildCount()-1);
+  }
+
 }

@@ -32,11 +32,17 @@ public class ExpressionOperator extends ASTCssNode {
   }
 
   public enum Operator {
-    SOLIDUS, COMMA, STAR, EMPTY_OPERATOR;
+    SOLIDUS, COMMA, STAR, EMPTY_OPERATOR, MINUS, PLUS;
   }
 
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.EXPRESSION_OPERATOR;
   }
+
+  @Override
+  public String toString() {
+    return "" + operator;
+  }
+  
 }

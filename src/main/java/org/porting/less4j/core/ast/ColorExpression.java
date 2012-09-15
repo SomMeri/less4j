@@ -33,4 +33,9 @@ public class ColorExpression extends Expression {
     return ASTCssNodeType.COLOR_EXPRESSION;
   }
 
+  @Override
+  public String toString() {
+    return "" + value;
+  }
+
 }

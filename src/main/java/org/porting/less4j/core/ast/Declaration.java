@@ -59,4 +59,8 @@ public class Declaration extends ASTCssNode {
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(expression);
   }
+
+  public boolean isFontDeclaration() {
+    return getName()!=null? getName().toLowerCase().equals("font") : false;
+  }
 }

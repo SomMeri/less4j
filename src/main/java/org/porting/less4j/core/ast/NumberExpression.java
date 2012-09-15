@@ -7,47 +7,77 @@ import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
 public class NumberExpression extends Expression {
 
-  private Sign sign = Sign.NONE;
-  private String valueAsString;
+  private String originalString;
   private Dimension dimension = Dimension.NUMBER;
+  private Double valueAsDouble;
+  private String suffix = "";
+  private boolean expliciteSign = false;
 
   public NumberExpression(HiddenTokenAwareTree token) {
     super(token);
   }
 
-  public NumberExpression(HiddenTokenAwareTree token, String valueAsString) {
+  public NumberExpression(HiddenTokenAwareTree token, String originalString) {
     super(token);
-    this.valueAsString = valueAsString;
+    this.originalString = originalString;
   }
 
-  public NumberExpression(HiddenTokenAwareTree token, String valueAsString, Sign sign, Dimension dimension) {
-    this(token, valueAsString);
-    this.sign = sign;
+  public NumberExpression(HiddenTokenAwareTree token, String originalString, Dimension dimension) {
+    this(token, originalString);
     this.dimension = dimension;
   }
 
-  public Sign getSign() {
-    return sign;
+  public NumberExpression(HiddenTokenAwareTree token, Double valueAsDouble, String suffix, String originalString, Dimension dimension) {
+    this(token, originalString, dimension);
+    this.valueAsDouble = valueAsDouble;
+    this.suffix = suffix;
   }
 
-  public void setSign(Sign sign) {
-    this.sign = sign;
+  public String getOriginalString() {
+    return originalString;
   }
 
-  public String getValueAsString() {
-    return valueAsString;
-  }
-
-  public void setValueAsString(String valueAsString) {
-    this.valueAsString = valueAsString;
+  public void setOriginalString(String originalString) {
+    this.originalString = originalString;
   }
 
   public Dimension getDimension() {
     return dimension;
   }
 
+  public Double getValueAsDouble() {
+    return valueAsDouble;
+  }
+
+  public void setValueAsDouble(Double number) {
+    this.valueAsDouble = number;
+  }
+  
   public void setDimension(Dimension dimension) {
     this.dimension = dimension;
+  }
+
+  public String getSuffix() {
+    return suffix;
+  }
+
+  public boolean hasExpliciteSign() {
+    return expliciteSign;
+  }
+
+  public void setExpliciteSign(boolean expliciteSign) {
+    this.expliciteSign = expliciteSign;
+  }
+
+  public void setSuffix(String suffix) {
+    this.suffix = suffix;
+  }
+
+  public void negate() {
+    if (valueAsDouble==null)
+      return ;
+   
+    valueAsDouble = valueAsDouble * -1;
   }
 
   @Override
@@ -55,16 +85,25 @@ public class NumberExpression extends Expression {
     return Collections.emptyList();
   }
 
+  public boolean hasOriginalString() {
+    return getOriginalString()!=null;
+  }
+
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.NUMBER;
   }
 
-  public enum Sign {
-    PLUS, MINUS, NONE
+  public enum Dimension {
+    NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQ, REPEATER, UNKNOWN;
   }
 
-  public enum Dimension {
-    NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQ, REPEATER, NONE;
+  @Override
+  public String toString() {
+    if (originalString!=null)
+      return originalString;
+    
+    return "" + valueAsDouble + suffix;
   }
+
 }

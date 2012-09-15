@@ -20,6 +20,10 @@ Our twitter account: [Less4j](https://twitter.com/Less4j)
 *  [http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/]
 *  [http://www.w3.org/TR/css3-selectors/] 
 *  [http://www.w3.org/wiki/CSS3/Selectors]
+*  [http://www.w3.org/TR/CSS2/]
+*  [http://www.w3.org/TR/CSS2/syndata.html#numbers]
+*  [http://www.w3.org/TR/2012/WD-css3-fonts-20120823/]
+*  [http://www.w3.org/TR/CSS21/fonts.html]
 *  Comparison of less and sass: [https://gist.github.com/674726]
 
 ## Documentation:

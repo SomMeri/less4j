@@ -1,0 +1,15 @@
+* {
+  //comma is not allowed inside a parentheses
+  something: (12 (13 + 10,-23));
+  //plus is not allowed as an unary operator
+  something: (12) +(-23);
+  //returned error: Object doesn't support this property or method
+  something: (12 (13 + 5 -23) + 2);
+
+
+//  something: (12 + (13 + 10 -23));//this one should not compile
+//  something: (12 * (13 + 10 -23));//this one is weird, should it really compile into NaN? -yes or fall
+//  something: (12 * (13 + 5 -23));//this one is weird, should it really compile into NaN? -yes or fall
+//  something: (12 + (13 + 10 -23) 11);
+//  something: (12 * (13 + 5 -23) 11);
+}

@@ -42,4 +42,9 @@ public class CssString extends Expression {
     return Collections.emptyList();
   }
 
+  @Override
+  public String toString() {
+    return "" + quoteType + value + quoteType;
+  }
+
 }

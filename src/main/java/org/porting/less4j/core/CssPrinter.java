@@ -1,5 +1,6 @@
 package org.porting.less4j.core;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,7 +13,6 @@ import org.porting.less4j.core.ast.ComposedExpression;
 import org.porting.less4j.core.ast.CssClass;
 import org.porting.less4j.core.ast.CssString;
 import org.porting.less4j.core.ast.Declaration;
-import org.porting.less4j.core.ast.RuleSetsBody;
 import org.porting.less4j.core.ast.ExpressionOperator;
 import org.porting.less4j.core.ast.FontFace;
 import org.porting.less4j.core.ast.FunctionExpression;
@@ -33,12 +33,14 @@ import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.PseudoClass;
 import org.porting.less4j.core.ast.PseudoElement;
 import org.porting.less4j.core.ast.RuleSet;
+import org.porting.less4j.core.ast.RuleSetsBody;
 import org.porting.less4j.core.ast.Selector;
 import org.porting.less4j.core.ast.SelectorAttribute;
 import org.porting.less4j.core.ast.SelectorCombinator;
 import org.porting.less4j.core.ast.SelectorOperator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
+import org.porting.less4j.core.compiler.CompileException;
 import org.porting.less4j.core.compiler.LessToCssCompiler;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
@@ -67,6 +69,7 @@ public class CssPrinter implements ILessCompiler {
 class Builder {
 
   private final ExtendedStringBuilder builder;
+  private static final DecimalFormat FORMATTER = new DecimalFormat("#.##################");
 
   public Builder(ExtendedStringBuilder builder) {
     super();
@@ -186,6 +189,8 @@ class Builder {
     case STYLE_SHEET:
       return appendStyleSheet((StyleSheet) node);
 
+    case PARENTHESES_EXPRESSION:
+    case NEGATED_EXPRESSION:
     case VARIABLE:
     case INDIRECT_VARIABLE:
     case VARIABLE_DECLARATION:
@@ -502,12 +507,17 @@ class Builder {
       break;
 
     case STAR:
-      builder.ensureSeparator().append("*");
+      builder.append("*");
       break;
 
     case EMPTY_OPERATOR:
       builder.ensureSeparator();
       break;
+
+    //FIXME: these two should not be here. They do not belong to css.
+    case PLUS:
+    case MINUS:
+      throw new CompileException("The operator " + operator.getOperator() + " is not valid CSS.", operator);
 
     default:
       throw new IllegalStateException("Unknown: " + operator);
@@ -551,19 +561,25 @@ class Builder {
   }
 
   private boolean appendNumberExpression(NumberExpression node) {
-    switch (node.getSign()) {
-    case PLUS:
-      builder.append("+");
-      break;
-
-    case MINUS:
-      builder.append("-");
-      break;
+    //FIXME: this is not OK, not at all
+    if (node.hasOriginalString()) {
+      builder.append(node.getOriginalString());
+    } else {
+      //TODO is this necessary> does it ever stops here?
+      if (node.hasExpliciteSign()) {
+        if (0<node.getValueAsDouble())
+          builder.append("+");
+        else 
+          builder.append("-");
+      }
+      builder.append(format(node.getValueAsDouble())+node.getSuffix());
     }
 
-    builder.append(node.getValueAsString());
-
     return true;
+  }
+
+  private String format(Double valueAsDouble) {
+    return FORMATTER.format(valueAsDouble);
   }
 
   public void appendSelectors(List<Selector> selectors) {

@@ -11,6 +11,9 @@ import org.porting.less4j.core.ast.Body;
 public class ASTManipulator {
 
   public void replace(ASTCssNode oldChild, ASTCssNode newChild) {
+    if (oldChild==newChild)
+      return ;
+    
     ASTCssNode parent = oldChild.getParent();
     PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(parent.getClass());
     for (PropertyDescriptor descriptor : propertyDescriptors) {
@@ -18,6 +21,8 @@ public class ASTManipulator {
       if (propertyType.isInstance(newChild)) {
         Object value = getPropertyValue(parent, descriptor);
         if (value == oldChild) {
+          setPropertyValue(newChild, parent, "parent");
+          setPropertyValue(oldChild, null, "parent");
           setPropertyValue(parent, newChild, descriptor);
           return;
         }
@@ -31,9 +36,21 @@ public class ASTManipulator {
     if (!(parent instanceof Body)) {
       throw new CompileException("Parent is not a body instance. " + parent, parent);
     }
-    
+
     Body pBody = (Body) parent;
     pBody.removeMember(node);
+  }
+
+  private void setPropertyValue(ASTCssNode parent, ASTCssNode value, String name) {
+    try {
+      PropertyUtils.setProperty(parent, name, value);
+    } catch (IllegalAccessException e) {
+      throw new CompileException(e, value);
+    } catch (InvocationTargetException e) {
+      throw new CompileException(e, value);
+    } catch (NoSuchMethodException e) {
+      throw new CompileException(e, value);
+    }
   }
 
   private void setPropertyValue(ASTCssNode parent, ASTCssNode value, PropertyDescriptor descriptor) {

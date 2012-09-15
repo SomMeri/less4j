@@ -10,11 +10,13 @@ import org.porting.less4j.core.ast.IdentifierExpression;
 import org.porting.less4j.core.ast.IndirectVariable;
 import org.porting.less4j.core.ast.NamedColorExpression;
 import org.porting.less4j.core.ast.NamedExpression;
+import org.porting.less4j.core.ast.SignedExpression;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.NumberExpression.Dimension;
-import org.porting.less4j.core.ast.NumberExpression.Sign;
+import org.porting.less4j.core.ast.ParenthesesExpression;
 import org.porting.less4j.core.ast.Variable;
 import org.porting.less4j.platform.Constants;
+import org.porting.less4j.utils.PrintUtils;
 
 public class TermBuilder {
 
@@ -25,21 +27,24 @@ public class TermBuilder {
   }
 
   public Expression buildFromTerm(HiddenTokenAwareTree token) {
-    List<HiddenTokenAwareTree> children = token.getChildren();
-    HiddenTokenAwareTree first = children.get(0);
-    switch (first.getType()) {
+    return buildFromTerm(token, 0);
+  }
+
+  public Expression buildFromTerm(HiddenTokenAwareTree token, int offsetChildIndx) {
+    HiddenTokenAwareTree offsetChild = token.getChildren().get(offsetChildIndx);
+    switch (offsetChild.getType()) {
     case LessLexer.IDENT:
-      return buildFromIdentifier(token, first);
+      return buildFromIdentifier(token, offsetChild);
 
     case LessLexer.STRING:
-      return buildFromString(token, first);
+      return buildFromString(token, offsetChild);
 
     case LessLexer.HASH:
-      return buildFromColorHash(token, first);
+      return buildFromColorHash(token, offsetChild);
 
     case LessLexer.PLUS:
     case LessLexer.MINUS:
-      return buildFromSignedNumber(token, children);
+      return negate(buildFromTerm(token, offsetChildIndx + 1), offsetChild);
 
     case LessLexer.NUMBER:
     case LessLexer.PERCENTAGE:
@@ -51,48 +56,81 @@ public class TermBuilder {
     case LessLexer.ANGLE:
     case LessLexer.TIME:
     case LessLexer.FREQ:
-      return buildFromNumber(token, first);
+      return buildFromNumber(token, offsetChild);
 
     case LessLexer.URI:
-      return buildFromSpecialFunction(token, first);
+      return buildFromSpecialFunction(token, offsetChild);
 
     case LessLexer.TERM_FUNCTION:
-      return buildFromNormalFunction(token, first);
+      return buildFromNormalFunction(token, offsetChild);
 
     case LessLexer.VARIABLE:
-      return buildFromVariable(token, first);
+      return buildFromVariable(token, offsetChild);
 
     case LessLexer.INDIRECT_VARIABLE:
-      return buildFromIndirectVariable(token, first);
+      return buildFromIndirectVariable(token, offsetChild);
 
     case LessLexer.TERM:
-      return buildFromTerm(first);
+      return buildFromTerm(offsetChild);
+
+    case LessLexer.EXPRESSION_PARENTHESES:
+      return buildFromParentheses(offsetChild);
+
+    default:
+      throw new IncorrectTreeException("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
 
     }
+  }
 
-    throw new IncorrectTreeException("type number: " + first.getType() + " for " + first.getText(), first);
+  private Expression buildFromParentheses(HiddenTokenAwareTree first) {
+    // FIXME: test comments!
+    first.addBeforeFollowing(first.getLastChild().getFollowing());
+    return new ParenthesesExpression(first, parentBuilder.handleExpression(first.getChild(1)));
   }
 
   private Expression buildFromColorHash(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     return new ColorExpression(token, first.getText());
   }
 
-  private Expression buildFromSignedNumber(HiddenTokenAwareTree token, List<HiddenTokenAwareTree> children) {
-    HiddenTokenAwareTree sign = children.get(0);
-    NumberExpression number = buildFromNumber(token, children.get(1));
-    if (sign.getType() == LessLexer.PLUS)
-      number.setSign(Sign.PLUS);
-    if (sign.getType() == LessLexer.MINUS)
-      number.setSign(Sign.MINUS);
+  private Expression negate(Expression value, HiddenTokenAwareTree sign) {
+    if (value instanceof NumberExpression) {
+      NumberExpression number = (NumberExpression) value;
+      number.setExpliciteSign(true);
 
-    return number;
+      if (sign.getType() == LessLexer.MINUS) {
+        number.negate();
+        number.setOriginalString("-" + number.getOriginalString());
+      } else if (sign.getType() == LessLexer.PLUS) {
+        number.setOriginalString("+" + number.getOriginalString());
+      }
+
+      return number;
+    }
+
+    if (sign.getType() == LessLexer.MINUS) {
+      return new SignedExpression(sign, SignedExpression.Sign.MINUS, value);
+    } 
+    
+    return new SignedExpression(sign, SignedExpression.Sign.PLUS, value);
   }
 
   private NumberExpression buildFromNumber(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {
     NumberExpression result = new NumberExpression(token);
-    result.setValueAsString(actual.getText().trim());
+    String valueAsString = actual.getText().trim();
+    setDoubleAndType(result, valueAsString);
+    result.setOriginalString(valueAsString);
     result.setDimension(toDimension(actual));
     return result;
+  }
+
+  private void setDoubleAndType(NumberExpression result, String value) {
+    value = value.toLowerCase().trim();
+    String numberPart = value.replaceAll("[a-z%]", "");
+    result.setValueAsDouble(Double.valueOf(numberPart));
+    if (numberPart.length() < value.length())
+      result.setSuffix(value.substring(numberPart.length()));
+    else
+      result.setSuffix("");
   }
 
   private Dimension toDimension(HiddenTokenAwareTree actual) {
@@ -102,7 +140,7 @@ public class TermBuilder {
     case LessLexer.PERCENTAGE:
       return Dimension.PERCENTAGE;
     case LessLexer.UNKNOWN_DIMENSION:
-      return Dimension.NONE;
+      return Dimension.UNKNOWN;
     case LessLexer.REPEATER:
       return Dimension.REPEATER;
     case LessLexer.LENGTH:
@@ -119,7 +157,7 @@ public class TermBuilder {
       return Dimension.FREQ;
 
     default:
-      return Dimension.NONE;
+      throw new IncorrectTreeException("Unknown dimension type: " + actual.getType() + " " + actual.getText(), actual);
 
     }
   }
@@ -130,7 +168,7 @@ public class TermBuilder {
   }
 
   public CssString createCssString(HiddenTokenAwareTree token, String quotedText) {
-    return new CssString(token, quotedText.substring(1, quotedText.length()-1), quotedText.substring(0, 1));
+    return new CssString(token, quotedText.substring(1, quotedText.length() - 1), quotedText.substring(0, 1));
   }
 
   private Expression buildFromIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
@@ -162,8 +200,8 @@ public class TermBuilder {
     return new CssString(token, string, "");
   }
 
-  private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
-    List<HiddenTokenAwareTree> children = first.getChildren();
+  private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {
+    List<HiddenTokenAwareTree> children = actual.getChildren();
     String name = children.get(0).getText();
     HiddenTokenAwareTree parameterNode = children.get(1);
 
@@ -183,7 +221,7 @@ public class TermBuilder {
   public Variable buildFromVariable(HiddenTokenAwareTree variableToken) {
     return buildFromVariable(null, variableToken);
   }
-  
+
   private Variable buildFromVariable(HiddenTokenAwareTree expressionToken, HiddenTokenAwareTree variableToken) {
     if (expressionToken != null) {
       expressionToken.addFollowing(variableToken.getFollowing());
@@ -195,7 +233,7 @@ public class TermBuilder {
   public IndirectVariable buildFromIndirectVariable(HiddenTokenAwareTree variableToken) {
     return buildFromIndirectVariable(null, variableToken);
   }
-  
+
   private IndirectVariable buildFromIndirectVariable(HiddenTokenAwareTree expressionToken, HiddenTokenAwareTree variableToken) {
     if (expressionToken != null) {
       expressionToken.addFollowing(variableToken.getFollowing());

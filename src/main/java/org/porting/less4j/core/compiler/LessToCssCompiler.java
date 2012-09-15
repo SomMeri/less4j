@@ -6,8 +6,11 @@ import java.util.List;
 import org.porting.less4j.core.ast.ASTCssNode;
 import org.porting.less4j.core.ast.ASTCssNodeType;
 import org.porting.less4j.core.ast.Body;
+import org.porting.less4j.core.ast.Declaration;
 import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.IndirectVariable;
+import org.porting.less4j.core.ast.MediaExpression;
+import org.porting.less4j.core.ast.MediaExpressionFeature;
 import org.porting.less4j.core.ast.Variable;
 import org.porting.less4j.core.ast.VariableDeclaration;
 
@@ -22,7 +25,50 @@ public class LessToCssCompiler {
     expressionEvaluator = new ExpressionEvaluator(activeVariableScope);
 
     solveVariables(less);
+    evaluateExpressions(less);
     return less;
+  }
+
+  private void evaluateExpressions(ASTCssNode node) {
+    if (node instanceof Expression) {
+      Expression value = expressionEvaluator.evaluate((Expression)node);
+      manipulator.replace(node, value);
+    } else {
+      List<? extends ASTCssNode> childs = node.getChilds();
+      for (ASTCssNode kid : childs) {
+        switch (kid.getType()) {
+        case MEDIA_EXPRESSION:
+          evaluateInMediaExpressions((MediaExpression)kid);
+          break;
+
+        case DECLARATION:
+          evaluateInDeclaration((Declaration)kid);
+          break;
+
+        default:
+          evaluateExpressions(kid);
+          break;
+        }
+        
+      }
+    }
+  }
+
+  //FIXME: document this and media declarations ratios
+  private void evaluateInDeclaration(Declaration node) {
+    if (!node.isFontDeclaration()) {
+      evaluateExpressions(node);
+      return;
+    }
+  }
+
+  private void evaluateInMediaExpressions(MediaExpression node) {
+    MediaExpressionFeature feature = node.getFeature();
+    Expression expression = node.getExpression();
+    if (!feature.isRatioFeature()) {
+      evaluateExpressions(node);
+      return;
+    }
   }
 
   private void solveVariables(ASTCssNode node) {

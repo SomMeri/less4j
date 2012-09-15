@@ -15,6 +15,8 @@ public abstract class ASTCssNode {
 
   public ASTCssNode(HiddenTokenAwareTree underlyingStructure) {
     this.underlyingStructure = underlyingStructure;
+    if (underlyingStructure==null)
+      throw new IllegalArgumentException("Underlying can not be null. It is used for error reporting, so place there the closest token possible.");
   }
   
   /**
@@ -39,7 +41,6 @@ public abstract class ASTCssNode {
     this.parent = parent;
   }
 
-  //TODO: this class will be an implementation of IASTCssNode or similar interface this method does not belong to that interface 
   public HiddenTokenAwareTree getUnderlyingStructure() {
     return underlyingStructure;
   }

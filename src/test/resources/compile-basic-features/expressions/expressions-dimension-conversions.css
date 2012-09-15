@@ -1,0 +1,84 @@
+plusConversions {
+  conversion: 3px;
+  conversion: 3px;
+  conversion: 3px;
+  conversion: 3cm;
+  conversion: 3px;
+  conversion: 3%;
+  conversion: 3px;
+  conversion: 3cm;
+  conversion: 3cm;
+  conversion: 3cm;
+  conversion: 3%;
+  conversion: 3cm;
+  conversion: 3%;
+  conversion: 3%;
+  conversion: 3%;
+  conversion: 6cm;
+  conversion: 6px;
+  conversion: 6cm;
+  conversion: 6px;
+}
+minusConversions {
+  conversion: -1px;
+  conversion: -1px;
+  conversion: -1px;
+  conversion: -1cm;
+  conversion: -1px;
+  conversion: -1%;
+  conversion: -1px;
+  conversion: -1cm;
+  conversion: -1cm;
+  conversion: -1cm;
+  conversion: -1%;
+  conversion: -1cm;
+  conversion: -1%;
+  conversion: -1%;
+  conversion: -1%;
+  conversion: -4cm;
+  conversion: -4px;
+  conversion: 2cm;
+  conversion: 2px;
+}
+multiplicationConversions {
+  conversion: 2px;
+  conversion: 2px;
+  conversion: 2px;
+  conversion: 2cm;
+  conversion: 2px;
+  conversion: 2%;
+  conversion: 2px;
+  conversion: 2cm;
+  conversion: 2cm;
+  conversion: 2cm;
+  conversion: 2%;
+  conversion: 2cm;
+  conversion: 2%;
+  conversion: 2%;
+  conversion: 2%;
+  conversion: 6cm;
+  conversion: 6px;
+  conversion: 6cm;
+  conversion: 6px;
+}
+solidusConversions {
+  conversion: 0.5px;
+  conversion: 0.5px;
+  conversion: 0.5px;
+  conversion: 0.5cm;
+  conversion: 0.5px;
+  conversion: 0.5%;
+  conversion: 0.5px;
+  conversion: 0.5cm;
+  conversion: 0.5cm;
+  conversion: 0.5cm;
+  conversion: 0.5%;
+  conversion: 0.5cm;
+  conversion: 0.5%;
+  conversion: 0.5%;
+  conversion: 0.5%;
+  conversion: 0.16666666666666666cm;
+  conversion: 0.16666666666666666px;
+  conversion: 1.5cm;
+  conversion: 1.5px;
+}
