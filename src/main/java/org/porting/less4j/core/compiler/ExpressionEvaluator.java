@@ -97,7 +97,7 @@ public class ExpressionEvaluator {
 
       
       negation.negate();
-      negation.setOriginalString(null); //technically, we should create a new object. The original string is not interesting anymore.
+      negation.setOriginalString(null); 
       negation.setExpliciteSign(false);
       return negation;
     }
