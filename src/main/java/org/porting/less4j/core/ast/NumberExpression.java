@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-public class NumberExpression extends Expression {
+public class NumberExpression extends Expression implements Cloneable {
 
   private String originalString;
   private Dimension dimension = Dimension.NUMBER;
@@ -52,7 +52,7 @@ public class NumberExpression extends Expression {
   public void setValueAsDouble(Double number) {
     this.valueAsDouble = number;
   }
-  
+
   public void setDimension(Dimension dimension) {
     this.dimension = dimension;
   }
@@ -74,9 +74,9 @@ public class NumberExpression extends Expression {
   }
 
   public void negate() {
-    if (valueAsDouble==null)
-      return ;
-   
+    if (valueAsDouble == null)
+      return;
+
     valueAsDouble = valueAsDouble * -1;
   }
 
@@ -86,7 +86,7 @@ public class NumberExpression extends Expression {
   }
 
   public boolean hasOriginalString() {
-    return getOriginalString()!=null;
+    return getOriginalString() != null;
   }
 
   @Override
@@ -100,10 +100,16 @@ public class NumberExpression extends Expression {
 
   @Override
   public String toString() {
-    if (originalString!=null)
+    if (originalString != null)
       return originalString;
-    
+
     return "" + valueAsDouble + suffix;
+  }
+
+  @Override
+  public NumberExpression clone() {
+    NumberExpression clone = (NumberExpression) super.clone();
+    return clone;
   }
 
 }

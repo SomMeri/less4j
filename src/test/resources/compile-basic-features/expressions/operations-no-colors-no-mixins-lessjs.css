@@ -1,0 +1,30 @@
+#operations {
+  height: 9px;
+  width: 3em;
+  substraction: 0;
+  division: 1;
+}
+.with-variables {
+  height: 16em;
+  width: 24em;
+  size: 1cm;
+}
+.negative {
+  height: 0px;
+  width: 4px;
+}
+.shorthands {
+  padding: -1px 2px 0 -4px;
+}
+.rem-dimensions {
+  font-size: 5.5rem;
+}
+.negations {
+  variable: -4px;
+  variable1: 0px;
+  variable2: 0px;
+  variable3: 8px;
+  variable4: 0px;
+  paren: -4px;
+  paren2: 16px;
+}

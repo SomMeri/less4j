@@ -56,6 +56,7 @@ public class ExpressionEvaluator {
 
     case INDIRECT_VARIABLE:
       return evaluate((IndirectVariable) input);
+
     case VARIABLE:
       return evaluate((Variable) input);
 
@@ -90,10 +91,11 @@ public class ExpressionEvaluator {
   public Expression evaluate(SignedExpression input) {
     Expression evaluate = evaluate(input.getExpression());
     if (evaluate instanceof NumberExpression) {
-      NumberExpression negation = (NumberExpression) evaluate;
+      NumberExpression negation = ((NumberExpression) evaluate).clone();
       if (input.getSign() == Sign.PLUS)
         return negation;
 
+      
       negation.negate();
       negation.setOriginalString(null); //technically, we should create a new object. The original string is not interesting anymore.
       negation.setExpliciteSign(false);

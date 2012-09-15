@@ -86,4 +86,19 @@ public abstract class ASTCssNode {
   public int getCharPositionInSourceLine() {
     return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getCharPositionInLine();
   }
+  
+  @Override
+  protected ASTCssNode clone() {
+    try {
+      ASTCssNode clone = (ASTCssNode) super.clone();
+      clone.setOpeningComments(new ArrayList<Comment>(getOpeningComments()));
+      clone.setOrphanComments(new ArrayList<Comment>(getOrphanComments()));
+      clone.setTrailingComments(new ArrayList<Comment>(getTrailingComments()));
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new IllegalStateException("This is a bug - please submit issue with this stack trace and an input.");
+    }
+  }
+
 }
