@@ -40,7 +40,6 @@ import org.porting.less4j.core.ast.SelectorCombinator;
 import org.porting.less4j.core.ast.SelectorOperator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
-import org.porting.less4j.core.compiler.CompileException;
 import org.porting.less4j.core.compiler.LessToCssCompiler;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
@@ -514,10 +513,15 @@ class Builder {
       builder.ensureSeparator();
       break;
 
-    //FIXME: these two should not be here. They do not belong to css.
     case PLUS:
+      builder.append("+");
+      break;
+
+    //TODO this is a huge hack which goes around "we do not parse fonts and less.js does" lack of feature
+    //left here intentionally, so we can have correct unit test and can come back to it later
     case MINUS:
-      throw new CompileException("The operator " + operator.getOperator() + " is not valid CSS.", operator);
+      builder.ensureSeparator().append("-");
+      break;
 
     default:
       throw new IllegalStateException("Unknown: " + operator);

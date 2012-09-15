@@ -25,8 +25,6 @@ public class ParsersSemanticPredicates {
     return NTH_PSEUDOCLASSES.contains(text.toLowerCase());
   }
 
-  //TODO document 
-  //If anyone knows better solution, I'm willing to listen.
   /**
    * Basically, this is an ugly hack. The parser grammar is unable to tell the difference 
    * between "identifier (expression)" and "identifier(expression)". They differ only 

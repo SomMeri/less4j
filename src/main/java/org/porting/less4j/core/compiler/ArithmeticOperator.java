@@ -8,7 +8,6 @@ import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.NumberExpression.Dimension;
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-//TODO document we support only operations on numbers for now - as is less.js
 public class ArithmeticOperator {
 
   public Expression evalute(ComposedExpression originalExpression, Expression firstNumber, Expression secondNumber) {

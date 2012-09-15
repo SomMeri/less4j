@@ -31,30 +31,29 @@ public class LessToCssCompiler {
 
   private void evaluateExpressions(ASTCssNode node) {
     if (node instanceof Expression) {
-      Expression value = expressionEvaluator.evaluate((Expression)node);
+      Expression value = expressionEvaluator.evaluate((Expression) node);
       manipulator.replace(node, value);
     } else {
       List<? extends ASTCssNode> childs = node.getChilds();
       for (ASTCssNode kid : childs) {
         switch (kid.getType()) {
         case MEDIA_EXPRESSION:
-          evaluateInMediaExpressions((MediaExpression)kid);
+          evaluateInMediaExpressions((MediaExpression) kid);
           break;
 
         case DECLARATION:
-          evaluateInDeclaration((Declaration)kid);
+          evaluateInDeclaration((Declaration) kid);
           break;
 
         default:
           evaluateExpressions(kid);
           break;
         }
-        
+
       }
     }
   }
 
-  //FIXME: document this and media declarations ratios
   private void evaluateInDeclaration(Declaration node) {
     if (!node.isFontDeclaration()) {
       evaluateExpressions(node);
@@ -64,7 +63,6 @@ public class LessToCssCompiler {
 
   private void evaluateInMediaExpressions(MediaExpression node) {
     MediaExpressionFeature feature = node.getFeature();
-    Expression expression = node.getExpression();
     if (!feature.isRatioFeature()) {
       evaluateExpressions(node);
       return;
@@ -78,7 +76,7 @@ public class LessToCssCompiler {
 
     switch (node.getType()) {
     case VARIABLE_DECLARATION: {
-      activeVariableScope.addDeclaration((VariableDeclaration) node); //TODO no reason to go further
+      activeVariableScope.addDeclaration((VariableDeclaration) node); //no reason to go further
       break;
     }
     case VARIABLE: {

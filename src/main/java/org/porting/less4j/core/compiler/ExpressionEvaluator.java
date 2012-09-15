@@ -34,13 +34,14 @@ public class ExpressionEvaluator {
 
   public Expression evaluate(IndirectVariable input) {
     Expression value = variableScope.getDeclaredValue(input);
-    CssString realName = convertToStringExpression(evaluate(value));
+    CssString realName = convertToStringExpression(evaluate(value), input);
     return evaluate(variableScope.getDeclaredValue("@" + realName.getValue(), realName));
   }
 
-  private CssString convertToStringExpression(Expression evaluate) {
-    // FIXME: definitely not finished
-    // TODO error handling
+  private CssString convertToStringExpression(Expression evaluate, Expression errorNode) {
+    if (!(evaluate instanceof CssString))
+      throw new CompileException("Variable indirection works only with string values.", errorNode);
+
     return (CssString) evaluate;
   }
 
@@ -104,7 +105,6 @@ public class ExpressionEvaluator {
 
   public Expression evaluate(ComposedExpression input) {
     System.out.println("Evaluating: " + input);
-    //FIXME not implemented yet
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
 
@@ -114,7 +114,6 @@ public class ExpressionEvaluator {
     return new ComposedExpression(input.getUnderlyingStructure(), leftValue, input.getOperator(), rightValue);
   }
 
-  //TODO document: exception in media ratios and difference to less.js
   public boolean isRatioExpression(Expression expression) {
     if (!(expression instanceof ComposedExpression))
       return false;
