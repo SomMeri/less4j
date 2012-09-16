@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
+//the system would be nicer and more consistent if they all would be cloneable. 
 public class NumberExpression extends Expression implements Cloneable {
 
   private String originalString;

@@ -245,9 +245,6 @@ pseudoPage
     
 topLevelOperator
     : COMMA
-// | STAR
-// | (PLUS)=>PLUS //TODO:why do I have to do this with plus and minus?
-// | (MINUS)=>MINUS
     | ( -> EMPTY_SEPARATOR)
     ;
     
@@ -274,24 +271,14 @@ ruleSet
     ;
     
 // ruleSet can contain other rulesets.
-//TODO: this rule generates warning: Decision can match input such as "IDENT" using multiple alternatives: 1, 2
-////the last declaration does not have to have semicolon
 ruleset_body
     : LBRACE
-            ( (a+=declaration_both_cases | a+=variabledeclaration )
-// | (b+=combinator b+=ruleSet)
+            (  (a+=declaration_both_cases | a+=variabledeclaration )
+//               | (a+=combinator a+=ruleSet)
 // | ('&' COLON b+=ruleSet)
              )*
         RBRACE
      -> ^(BODY $a*);
-
-//selector2
-// : (EMPTY_COMBINATOR? a+=simpleSelector (a+=combinator a+=simpleSelector)*
-// -> ^(SELECTOR ($a)* ) )
-// {
-// predicates.compensateForWrongSimpleSelectorGrammar($tree);
-// }
-// ;
 
 /*TODO add to documentation
   This does not create correct structure for selectors, but neither did the
@@ -463,9 +450,6 @@ mathExprLowPrior
     : a=term (b+=mathOperatorHighPrior c+=term)* -> ^(EXPRESSION $a ($b $c)*)
     ;
 
-//TODO: this can not handle function with unary operator nor variable with unary operator
-//TODO just added unary in from, the term builder was not rewritten yet 
-//TODO strings and idents should not have minus in from of them. Really
 term
     : (( a+=unaryOperator? (a+=value_term
     | ({predicates.isFunctionStart(input.LT(1), input.LT(2))}?=> a+=function)
@@ -923,7 +907,7 @@ fragment LENGTH :; // 'px'. 'cm', 'mm', 'in'. 'pt', 'pc'
 fragment ANGLE :; // 'deg', 'rad', 'grad'
 fragment TIME :; // 'ms', 's'
 fragment FREQ :; // 'khz', 'hz'
-fragment REPEATER :; // n found in n-th child formulas if I would not do that, the dimension would eat it. TODO: maybe multiple small grammars for different css aspects would be nicer.
+fragment REPEATER :; // n found in n-th child formulas if I would not do that, the dimension would eat it. 
 fragment PERCENTAGE :; // '%'
 
 // there is no reason to require a dot inside a number
