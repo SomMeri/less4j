@@ -40,6 +40,7 @@ import org.porting.less4j.core.ast.SelectorCombinator;
 import org.porting.less4j.core.ast.SelectorOperator;
 import org.porting.less4j.core.ast.SimpleSelector;
 import org.porting.less4j.core.ast.StyleSheet;
+import org.porting.less4j.core.compiler.CompileException;
 import org.porting.less4j.core.compiler.LessToCssCompiler;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.ASTBuilder;
@@ -55,6 +56,9 @@ public class CssPrinter implements ILessCompiler {
     ExtendedStringBuilder stringBuilder = new ExtendedStringBuilder("");
 
     ANTLRParser.ParseResult result = parser.parseStyleSheet(content);
+    if (result.hasErrors())
+      throw new CompileException("Parse errors.", null);
+    
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet);
     

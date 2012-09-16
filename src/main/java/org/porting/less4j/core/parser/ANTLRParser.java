@@ -92,6 +92,7 @@ public class ANTLRParser {
   public interface ParseResult {
     HiddenTokenAwareTree getTree();
     List<RecognitionException> getErrors();
+    boolean hasErrors();
   }
 
   private class ParseResultImpl implements ParseResult {
@@ -110,6 +111,11 @@ public class ANTLRParser {
 
     public List<RecognitionException> getErrors() {
       return errors;
+    }
+
+    @Override
+    public boolean hasErrors() {
+      return !(getErrors()==null || getErrors().isEmpty());
     }
 
   }
