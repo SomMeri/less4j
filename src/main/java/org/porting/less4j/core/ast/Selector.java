@@ -52,7 +52,7 @@ public class Selector extends ASTCssNode implements Cloneable {
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(leadingCombinator, head, right);
+    return ArraysUtils.asNonNullList((ASTCssNode)leadingCombinator, head, right);
   }
 
   public ASTCssNodeType getType() {
