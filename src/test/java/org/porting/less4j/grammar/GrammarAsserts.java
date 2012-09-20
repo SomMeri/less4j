@@ -17,7 +17,7 @@ import org.antlr.runtime.tree.TreeVisitorAction;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.HiddenTokenAwareErrorTree;
 import org.porting.less4j.core.parser.LessLexer;
-import org.porting.less4j.debugutils.DebugPrint;
+import org.porting.less4j.utils.DebugPrint;
 import org.porting.less4j.utils.PrintUtils;
 
 public class GrammarAsserts {

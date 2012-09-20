@@ -108,4 +108,18 @@
 			</plugin>
 		</plugins>
 	</build>
+	<url>https://github.com/SomMeri/less4j</url>
+	<inceptionYear>2012</inceptionYear>
+	<scm>
+		<url>https://github.com/SomMeri/less4j</url>
+		<connection>scm:git:https://github.com/SomMeri/less4j.git</connection>
+	</scm>
+	<issueManagement>
+		<system>Github</system>
+		<url>https://github.com/SomMeri/less4j/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<url>http://travis-ci.org/#!/SomMeri/less4j/builds</url>
+		<system>http://travis-ci</system>
+	</ciManagement>
 </project>
