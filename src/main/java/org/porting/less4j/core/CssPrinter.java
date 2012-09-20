@@ -569,11 +569,9 @@ class Builder {
   }
 
   private boolean appendNumberExpression(NumberExpression node) {
-    //FIXME: this is not OK, not at all
     if (node.hasOriginalString()) {
       builder.append(node.getOriginalString());
     } else {
-      //TODO is this necessary> does it ever stops here?
       if (node.hasExpliciteSign()) {
         if (0<node.getValueAsDouble())
           builder.append("+");
