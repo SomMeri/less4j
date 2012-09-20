@@ -31,12 +31,24 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return body.isEmpty() && getOrphanComments().isEmpty();
     }
 
-    public void addMembers(List<T> members) {
-      this.body.addAll(members);
+    public void addMembers(List<? extends T> members) {
+      body.addAll(members);
+    }
+
+    public void addMembersAfter(List<? extends T> nestedRulesets, ASTCssNode kid) {
+      int index = body.indexOf(kid);
+      if (index==-1)
+        index = body.size();
+      else 
+        index++;
+      
+      body.addAll(index, nestedRulesets);
+
+      
     }
 
     public void addMember(T member) {
-      this.body.add(member);
+      body.add(member);
     }
 
     public List<T> membersByType(ASTCssNodeType type) {

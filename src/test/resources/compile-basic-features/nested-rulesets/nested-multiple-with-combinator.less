@@ -1,0 +1,19 @@
+first, second {
+  declaration: value;
+  + nested1, > nested2 {
+    declaration: value;
+  }
+  nested3, ~ nested4 {
+    declaration: value;
+  }
+}
+
+first, second {
+  declaration: value;
+  ~ nested1, > nested2 {
+    declaration: value;
+    + deep1, deep2 {
+      declaration: value;
+    }
+  }
+}

@@ -35,6 +35,7 @@ public class LessTransformerTest {
   /**
    * This test will pass when the ANTLR based processor will be implemented.
    */
+  @Ignore
   @Test
   public void shouldTransformUsingAntlrBasedLessProcessor()
       throws Exception {

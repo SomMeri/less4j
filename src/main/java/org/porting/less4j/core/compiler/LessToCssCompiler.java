@@ -11,6 +11,8 @@ import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.IndirectVariable;
 import org.porting.less4j.core.ast.MediaExpression;
 import org.porting.less4j.core.ast.MediaExpressionFeature;
+import org.porting.less4j.core.ast.RuleSet;
+import org.porting.less4j.core.ast.StyleSheet;
 import org.porting.less4j.core.ast.Variable;
 import org.porting.less4j.core.ast.VariableDeclaration;
 
@@ -19,14 +21,32 @@ public class LessToCssCompiler {
   private ASTManipulator manipulator = new ASTManipulator();
   private ActiveVariableScope activeVariableScope;
   private ExpressionEvaluator expressionEvaluator;
+  private NestedRulesCollector nestedRulesCollector;
 
-  public ASTCssNode compileToCss(ASTCssNode less) {
+  public ASTCssNode compileToCss(StyleSheet less) {
     activeVariableScope = new ActiveVariableScope();
     expressionEvaluator = new ExpressionEvaluator(activeVariableScope);
+    nestedRulesCollector = new NestedRulesCollector();
 
     solveVariables(less);
     evaluateExpressions(less);
+    freeNestedRuleSets(less);
+
     return less;
+  }
+
+  private void freeNestedRuleSets(StyleSheet sheet) {
+    List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(sheet.getChilds());
+    for (ASTCssNode kid : childs) {
+      if (kid.getType() == ASTCssNodeType.RULE_SET) {
+        List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet)kid);
+        sheet.addMembersAfter(nestedRulesets, kid);
+        for (RuleSet ruleSet : nestedRulesets) {
+          ruleSet.setParent(sheet);
+        }
+      }
+
+    }
   }
 
   private void evaluateExpressions(ASTCssNode node) {

@@ -48,4 +48,9 @@ public class RuleSet extends ASTCssNode {
     this.selectors.addAll(selectors);
   }
 
+  public void replaceSelectors(List<Selector> result) {
+    selectors = new ArrayList<Selector>();
+    selectors.addAll(result);
+  }
+
 }

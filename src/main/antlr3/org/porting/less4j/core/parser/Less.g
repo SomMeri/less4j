@@ -32,6 +32,7 @@ tokens {
   DECLARATION;
   VARIABLE_REFERENCE;
   RULESET;
+  NESTED_RULESET;
   SELECTOR;
   EXPRESSION;
   EXPRESSION_PARENTHESES;
@@ -218,7 +219,7 @@ bodyset
     ;
     
 variabledeclaration
-    : VARIABLE COLON expr SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON expr SEMI)
+    : VARIABLE COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* SEMI)
     ;
 
 variablereference
@@ -249,8 +250,8 @@ topLevelOperator
     ;
     
 combinator
-    : PLUS
-    | GREATER
+    : GREATER
+    | PLUS
     | TILDE
     | ( -> EMPTY_COMBINATOR)
     ;
@@ -269,15 +270,26 @@ ruleSet
     : c=selector (COMMA a+=selector)* b=ruleset_body
      -> ^(RULESET $c (COMMA $a)* $b)
     ;
+
+nestedRuleSet
+    : a+=APPENDER? b+=ruleSet
+    -> ^(NESTED_RULESET $a* $b*)
+    ;
     
 // ruleSet can contain other rulesets.
+//css does not require ; in last declaration
+//declaration can refer also to a mixin - removed for now, I will handle mixins later
+//TODO: what does less.js do if the statement before nested rule miss semicolon?
 ruleset_body
     : LBRACE
-            (  (a+=declaration_both_cases | a+=variabledeclaration )
-//               | (a+=combinator a+=ruleSet)
-// | ('&' COLON b+=ruleSet)
+            (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
+               | (nestedRuleSet)=> a+=nestedRuleSet
+               | a+=variabledeclaration
              )*
-        RBRACE
+             (  
+                ( a+=declaration RBRACE)
+                | RBRACE
+             )
      -> ^(BODY $a*);
 
 /*TODO add to documentation
@@ -302,7 +314,7 @@ ruleset_body
   tree into another one.
 */
 selector
-    : ( (a+=elementName | a+=elementSubsequent) (a+=combinator (a+=elementName | a+=elementSubsequent))*
+    : ( (a+=combinator (a+=elementName | a+=elementSubsequent) )*
     -> ^(SELECTOR ($a)* ) )
     ;
 
@@ -388,17 +400,17 @@ attrib
 ;
 
 pseudo
-    : (c+=COLON c+=COLON? a=IDENT
-            (
-                (LPAREN ( { predicates.isNthPseudoClass($a)}?=> (b1=nth| b2=VARIABLE) | b3=pseudoparameters ) RPAREN)?
-            )
+    : (c+=COLON c+=COLON? a=IDENT ((
+        { predicates.isNthPseudoClass(input.LT(-1))}?=> LPAREN (b1=nth| b2=variablereference) RPAREN
+        | LPAREN b3=pseudoparameters RPAREN
+        )?)
       ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3*)
     ;
     
 pseudoparameters:
       (IDENT) => IDENT
     | (NUMBER) => NUMBER
-    | (VARIABLE) => VARIABLE
+    | (variablereference) => variablereference
     | selector
  ;
  
@@ -406,17 +418,15 @@ pseudoparameters:
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
  
-//css does not require ; in last declaration
-//declaration can refer also to a mixin - removed for now, I will handle mixins later
-//TODO: what does less.js do if the statement before nested rule miss semicolon?
-declaration_both_cases
-    : declaration ((RBRACE)=>
-    | SEMI!);
-    
 //The expr is optional, because less.js supports this: "margin: ;" I do not know why, but they have it in
 //their unit tests (so it was intentional)
 declaration
     : property COLON expr? prio? -> ^(DECLARATION property expr? prio?)
+    ;
+
+//I had to do this to put semicolon as a last member of the declaration subtree - comments would be messed up otherwise.
+declarationWithSemicolon
+    : property COLON expr? prio? SEMI -> ^(DECLARATION property expr? prio?)
     ;
     
 prio
@@ -836,6 +846,7 @@ LPAREN : '(' ;
 RPAREN : ')' ;
 COMMA : ',' ;
 DOT : '.' ;
+APPENDER: '&';
 
 // -----------------
 // Literal strings. Delimited by either ' or "

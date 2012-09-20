@@ -45,7 +45,6 @@ public class ArithmeticOperator {
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal - secondVal;
 
-    //FIXME: document: inherits dimension from the first member with the dimension
     return createResultNumber(parentToken, resultVal, first, second);
   }
 

@@ -13,5 +13,13 @@ public class ArraysUtils {
     }
     return result;
   }
+
+  public static <T> List<T> clonedList(List<T> list) {
+    List<T> result = new ArrayList<T>();
+    for (T t : list) {
+      result.add(t);
+    }
+    return result;
+  }
   
 }

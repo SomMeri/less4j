@@ -18,6 +18,7 @@ import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.HiddenTokenAwareErrorTree;
 import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.debugutils.DebugPrint;
+import org.porting.less4j.utils.PrintUtils;
 
 public class GrammarAsserts {
 
@@ -48,7 +49,7 @@ public class GrammarAsserts {
         fail("Some children are missing.");
 
       CommonTree kid = (CommonTree) kids.next();
-      assertEquals(type, kid.getType());
+      assertEquals("Should be: " + PrintUtils.toName(type)+" was: "+ PrintUtils.toName(kid.getType()), type, kid.getType());
     }
 
   }

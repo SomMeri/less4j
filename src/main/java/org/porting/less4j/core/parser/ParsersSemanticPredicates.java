@@ -61,10 +61,6 @@ public class ParsersSemanticPredicates {
    * 
    */
   public boolean isEmptySeparator(Token previousT, Token firstT, Token secondT) {
-//    System.out.println("previous: " + previousT);
-//    System.out.println("first: " + firstT);
-//    System.out.println("second: " + secondT);
-
     //expression can not start with an empty separator
     if (previousT==null)
       return false;

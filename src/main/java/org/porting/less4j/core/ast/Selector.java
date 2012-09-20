@@ -5,29 +5,33 @@ import java.util.List;
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 import org.porting.less4j.utils.ArraysUtils;
 
-public class Selector extends ASTCssNode {
+public class Selector extends ASTCssNode implements Cloneable {
   
+  private SelectorCombinator leadingCombinator;
   private SimpleSelector head;
-  private SelectorCombinator combinator;
   private Selector right;
 
   public Selector(HiddenTokenAwareTree token) {
     super(token);
   }
   
-  public Selector(HiddenTokenAwareTree token, SimpleSelector head, SelectorCombinator combinator, Selector right) {
+  public Selector(HiddenTokenAwareTree token, SelectorCombinator leadingCombinator, SimpleSelector head, SelectorCombinator combinator, Selector right) {
     super(token);
+    this.leadingCombinator = leadingCombinator;
     this.head = head;
-    this.combinator = combinator;
     this.right = right;
   }
 
-  public boolean isCombined() {
-    return combinator!=null;
+  public boolean hasLeadingCombinator() {
+    return leadingCombinator!=null;
   }
   
-  public SelectorCombinator getCombinator() {
-    return combinator;
+  public SelectorCombinator getLeadingCombinator() {
+    return leadingCombinator;
+  }
+
+  public void setLeadingCombinator(SelectorCombinator leadingCombinator) {
+    this.leadingCombinator = leadingCombinator;
   }
 
   public SimpleSelector getHead() {
@@ -42,21 +46,52 @@ public class Selector extends ASTCssNode {
     this.head = head;
   }
 
-  public void setCombinator(SelectorCombinator combinator) {
-    this.combinator = combinator;
-  }
-
   public void setRight(Selector right) {
     this.right = right;
   }
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(head, combinator, right);
+    return ArraysUtils.asNonNullList(leadingCombinator, head, right);
   }
 
   public ASTCssNodeType getType() {
     return ASTCssNodeType.SELECTOR;
+  }
+
+  //FIXME: unit tests na clonning!!!!
+  //FIXME: are the parents really needed? They seem only to complicate things right now
+  @Override
+  public Selector clone() {
+    Selector clone = (Selector) super.clone();
+    clone.setLeadingCombinator(getLeadingCombinator()==null? null : getLeadingCombinator().clone());
+    clone.setHead(getHead().clone());
+    clone.setRight(getRight()==null? null : getRight().clone());
+    
+    return clone;
+  }
+
+  public Selector getRightestPart() {
+    if (getRight()==null)
+      return this;
+    
+    return getRight().getRightestPart();
+  }
+
+  public boolean isCombined() {
+    return getRight()!=null;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Selector [");
+    builder.append(leadingCombinator);
+    builder.append(head);
+    builder.append(" ");
+    builder.append(right);
+    builder.append("]");
+    return builder.toString();
   }
 
 }

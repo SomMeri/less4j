@@ -25,7 +25,9 @@ import org.porting.less4j.core.ast.MediaQuery;
 import org.porting.less4j.core.ast.Medium;
 import org.porting.less4j.core.ast.MediumModifier;
 import org.porting.less4j.core.ast.MediumType;
+import org.porting.less4j.core.ast.NestedRuleSet;
 import org.porting.less4j.core.ast.Nth;
+import org.porting.less4j.core.ast.SelectorCombinator;
 import org.porting.less4j.core.ast.Nth.Form;
 import org.porting.less4j.core.ast.NumberExpression;
 import org.porting.less4j.core.ast.Pseudo;
@@ -211,6 +213,28 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return ruleSet;
   }
 
+  public NestedRuleSet handleNestedRuleSet(HiddenTokenAwareTree token) {
+    boolean hasAppender = false;
+    SelectorCombinator combinator = null;
+    RuleSet ruleSet = null;
+    
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType() == LessLexer.APPENDER) {
+        token.addPreceding(kid.getPreceding());
+        hasAppender = true;
+      } else if (kid.getType() == LessLexer.RULESET) {
+        ruleSet = (RuleSet)switchOn(kid);
+      } else {
+        combinator = ConversionUtils.createSelectorCombinator(kid);
+      }
+      
+    }
+    
+    NestedRuleSet result =  new NestedRuleSet(token, hasAppender, combinator, ruleSet);
+    return result;
+  }
+  
   public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {
     if (token.getChildren() == null)
       return new RuleSetsBody(token);

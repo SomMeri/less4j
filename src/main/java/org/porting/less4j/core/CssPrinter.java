@@ -602,12 +602,14 @@ class Builder {
   }
 
   public boolean appendSelector(Selector selector) {
+    if (selector.hasLeadingCombinator())
+      append(selector.getLeadingCombinator());
+    
     if (!selector.isCombined()) {
       append(selector.getHead());
       return true;
     }
     append(selector.getHead());
-    append(selector.getCombinator());
     append(selector.getRight());
     return true;
   }

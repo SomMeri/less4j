@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
+import org.porting.less4j.utils.ArraysUtils;
 
-public class SimpleSelector extends ASTCssNode {
+public class SimpleSelector extends ASTCssNode implements Cloneable { 
   
   private String elementName;
   private boolean isStar;
@@ -57,6 +58,10 @@ public class SimpleSelector extends ASTCssNode {
     this.subsequent.add(subsequent);
   }
 
+  public void addSubsequent(List<ASTCssNode> subsequent) {
+    this.subsequent.addAll(subsequent);
+  }
+
   @Override
   public List<ASTCssNode> getChilds() {
     return new ArrayList<ASTCssNode>(subsequent);
@@ -65,4 +70,21 @@ public class SimpleSelector extends ASTCssNode {
   public ASTCssNodeType getType() {
     return ASTCssNodeType.SIMPLE_SELECTOR;
   }
+  
+  @Override
+  public SimpleSelector clone() {
+    SimpleSelector clone = (SimpleSelector) super.clone();
+    clone.subsequent=ArraysUtils.clonedList(getSubsequent());
+    
+    return clone;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+      builder.append(isStar?"*":getElementName());
+    builder.append(subsequent);
+    return builder.toString();
+  }
+
 }

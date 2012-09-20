@@ -28,6 +28,7 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
+    //return TestFileUtils.loadTestFile(inputDir, "nth-variants.less");
     return TestFileUtils.loadTestFiles(inputDir);
   }
 

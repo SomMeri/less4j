@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
 
-public class SelectorCombinator extends ASTCssNode {
+public class SelectorCombinator extends ASTCssNode implements Cloneable {
 
   private Combinator combinator;
 
@@ -38,6 +38,16 @@ public class SelectorCombinator extends ASTCssNode {
 
   public enum Combinator {
     ADJACENT_SIBLING, CHILD, DESCENDANT, GENERAL_SIBLING;
+  }
+
+  @Override
+  protected SelectorCombinator clone() {
+    return (SelectorCombinator) super.clone();
+  }
+
+  @Override
+  public String toString() {
+    return "" + combinator;
   }
 
 }

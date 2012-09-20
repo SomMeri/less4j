@@ -5,3 +5,15 @@
 .mixin {
   background-color: #808080;
 }
+one {
+  one: 10 20;
+}
+two {
+  two: 10 20;
+}
+three {
+  three: ;
+}
+four {
+  four: ;
+}

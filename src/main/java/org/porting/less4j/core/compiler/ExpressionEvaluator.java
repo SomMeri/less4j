@@ -106,7 +106,6 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(ComposedExpression input) {
-    System.out.println("Evaluating: " + input);
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
 

@@ -21,7 +21,7 @@ public class TestFileUtils {
   private static Collection<File> getAllLessFiles(String... directories) {
     Collection<File> allFiles = new LinkedList<File>();
     for (String directory : directories) {
-      allFiles.addAll(FileUtils.listFiles(new File(directory), new String[] {"less"}, false));
+      allFiles.addAll(FileUtils.listFiles(new File(directory), new String[] { "less" }, false));
     }
     return allFiles;
   }
@@ -42,9 +42,16 @@ public class TestFileUtils {
   private static String convertToOutputFilename(String name) {
     if (name.endsWith(".less"))
       return name.substring(0, name.length() - 5) + ".css";
-    
+
     return name;
   }
 
+  public static Collection<Object[]> loadTestFile(String directory, String filename) {
+    String name = directory + filename;
+    File input = new File(name);
+    Collection<Object[]> result = new ArrayList<Object[]>();
+    addFiles(result, input);
+    return result;
+  }
 
 }

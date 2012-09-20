@@ -67,6 +67,15 @@ public class SelectorBuilder {
     currentSelector.setHead(currentSimpleSelector);
   }
 
+  private SelectorCombinator consumeLastCombinator() {
+    if (lastCombinator==null)
+      return null;
+    
+    SelectorCombinator result = ConversionUtils.createSelectorCombinator(lastCombinator);
+    lastCombinator = null;
+    return result;
+  }
+
   private void addElementName(HiddenTokenAwareTree kid) {
     HiddenTokenAwareTree realName = kid.getChild(0);
     currentSimpleSelector = new SimpleSelector(kid, realName.getText(), realName.getType()==LessLexer.STAR);
@@ -74,29 +83,10 @@ public class SelectorBuilder {
     currentSelector.setHead(currentSimpleSelector);
   }
 
-  private void addSelectorCombinator(HiddenTokenAwareTree kid) {
-    currentSelector.setCombinator(new SelectorCombinator(kid, toSelectorCombinator(kid)));
-  }
-
-  private SelectorCombinator.Combinator toSelectorCombinator(HiddenTokenAwareTree token) {
-    switch (token.getType()) {
-    case LessLexer.PLUS:
-      return SelectorCombinator.Combinator.ADJACENT_SIBLING;
-    case LessLexer.GREATER:
-      return SelectorCombinator.Combinator.CHILD;
-    case LessLexer.TILDE:
-      return SelectorCombinator.Combinator.GENERAL_SIBLING;
-    case LessLexer.EMPTY_COMBINATOR:
-      return SelectorCombinator.Combinator.DESCENDANT;
-    }
-
-    throw new IllegalStateException("Unknown: " + token.getType());
-  }
-
   private void startNewSelector() {
     Selector newSelector = new Selector(token);
+    newSelector.setLeadingCombinator(consumeLastCombinator());
     if (currentSelector!=null) {
-      addSelectorCombinator(lastCombinator);
       currentSelector.setRight(newSelector);
     }
     

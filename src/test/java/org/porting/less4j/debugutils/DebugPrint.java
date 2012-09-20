@@ -58,7 +58,7 @@ public class DebugPrint {
   }
 
   public static void printSingleNode(HiddenTokenAwareTree tree) {
-    String base = " " + tree.getType() + " " + tree.getText();
+    String base = " " + " " + tree.getText();
     if (printIndexes) {
       String optionalsuffix = " " + tree.getTokenStartIndex() + "-" + tree.getTokenStopIndex() + " " + (tree.getToken() == null ? "" : tree.getToken().getTokenIndex());
       base = base + optionalsuffix;
