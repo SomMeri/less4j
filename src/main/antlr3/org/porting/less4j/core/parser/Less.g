@@ -185,6 +185,7 @@ media
     : MEDIA_SYM (m1+=mediaQuery (n+=COMMA m+=mediaQuery)*)
         q1=LBRACE
             ((declaration) => b+=declaration SEMI
+            | b+=variabledeclaration
             | b+=ruleSet )*
         q2=RBRACE
     -> ^(MEDIA_SYM ^(MEDIUM_DECLARATION $m1 ($n $m)*) $q1 $b* $q2)

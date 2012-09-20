@@ -9,6 +9,7 @@ import org.porting.less4j.core.ast.Body;
 import org.porting.less4j.core.ast.Declaration;
 import org.porting.less4j.core.ast.Expression;
 import org.porting.less4j.core.ast.IndirectVariable;
+import org.porting.less4j.core.ast.Media;
 import org.porting.less4j.core.ast.MediaExpression;
 import org.porting.less4j.core.ast.MediaExpressionFeature;
 import org.porting.less4j.core.ast.RuleSet;
@@ -35,17 +36,19 @@ public class LessToCssCompiler {
     return less;
   }
 
-  private void freeNestedRuleSets(StyleSheet sheet) {
-    List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(sheet.getChilds());
+  private void freeNestedRuleSets(Body<ASTCssNode> body) {
+    List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.RULE_SET) {
         List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet)kid);
-        sheet.addMembersAfter(nestedRulesets, kid);
+        body.addMembersAfter(nestedRulesets, kid);
         for (RuleSet ruleSet : nestedRulesets) {
-          ruleSet.setParent(sheet);
+          ruleSet.setParent(body);
         }
       }
-
+      if (kid.getType() == ASTCssNodeType.MEDIA) {
+        freeNestedRuleSets((Media) kid);
+      }
     }
   }
 

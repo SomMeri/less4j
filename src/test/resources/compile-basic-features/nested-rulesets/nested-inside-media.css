@@ -1,0 +1,12 @@
+@media screen, not all and (orientation) {
+  first:something(10),
+  second:pseudoclass(4px) {
+    declaration: value;
+  }
+  first:something(10) nested1:length(4px),
+  second:pseudoclass(4px) nested1:length(4px),
+  first:something(10) nested2:content(10),
+  second:pseudoclass(4px) nested2:content(10) {
+    declaration: value;
+  }
+}
