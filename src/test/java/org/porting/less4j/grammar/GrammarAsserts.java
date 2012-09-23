@@ -104,12 +104,12 @@ class CountNodesAction implements TreeVisitorAction {
       int stopIndex = errorNode.getStop().getTokenIndex();
       int errorTokens = countOnChannelTokes(startIndex, stopIndex);
       count+=errorTokens;
-      System.out.println("Error tokens " + errorTokens);
+//      System.out.println("Error tokens " + errorTokens);
     } else {
       if (!isDummy(((CommonTree)t).getToken())) {
         count++;
         String string = DebugPrint.toString(count, ((CommonTree)t).getToken());
-        System.out.println(string);
+//        System.out.println(string);
       }
     }
     return t;

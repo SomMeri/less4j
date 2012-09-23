@@ -83,7 +83,6 @@ public class ExpressionEvaluator {
 
   public Expression evaluate(FunctionExpression input) {
     //FIXME not implemented yet
-    System.out.println("Function: " + input.getName());
     return input;
     //throw new IllegalStateException("not implemented yet");
   }
