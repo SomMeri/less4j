@@ -18,11 +18,6 @@ public class VariablesTest extends BasicFeaturesTests {
 
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    try {
-      System.out.println("Travis Directory Experiment: |" + new java.io.File(".").getCanonicalPath());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
     return TestFileUtils.loadTestFiles(standardCases);
   }
 

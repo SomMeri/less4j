@@ -17,7 +17,6 @@ public class SimpleSelector extends ASTCssNode implements Cloneable {
 
   public SimpleSelector(HiddenTokenAwareTree token, String elementName, boolean isStar) {
     super(token);
-    assert token!=null;
     this.elementName = elementName;
     this.isStar = isStar;
   }

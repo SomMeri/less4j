@@ -24,8 +24,9 @@ public abstract class BasicFeaturesTests extends AbstractFileBasedTest {
     text = text.replaceAll("1 */ *1", "1/1");
 
     //ignore occasional end lines
-    if (text.endsWith("\n"))
-      return text.substring(0, text.length()-1);
+    while (text.endsWith("\n"))
+      text=text.substring(0, text.length()-1);
+    
     return text;
   }
 

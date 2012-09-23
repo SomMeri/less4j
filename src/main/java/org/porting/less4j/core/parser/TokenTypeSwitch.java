@@ -76,8 +76,9 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.MEDIA_QUERY)
       return handleMediaQuery(token);
 
-    if (type==LessLexer.MEDIUM_TYPE)
+    if (type==LessLexer.MEDIUM_TYPE) {
       return handleMedium(token);
+    }
 
     if (type==LessLexer.MEDIA_EXPRESSION)
       return handleMediaExpression(token);

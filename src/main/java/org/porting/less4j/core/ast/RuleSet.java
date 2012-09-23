@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.porting.less4j.core.parser.HiddenTokenAwareTree;
-import org.porting.less4j.core.parser.LessLexer;
 import org.porting.less4j.utils.ArraysUtils;
 
 public class RuleSet extends ASTCssNode {
@@ -14,7 +13,6 @@ public class RuleSet extends ASTCssNode {
 
   public RuleSet(HiddenTokenAwareTree token) {
     super(token);
-    assert token!=null && token.getType()==LessLexer.RULESET;
   }
   
   public List<Selector> getSelectors() {

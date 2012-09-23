@@ -30,7 +30,8 @@ public class Media extends Body<ASTCssNode> {
   }
 
   public void addChild(ASTCssNode child) {
-    assert child.getType() == ASTCssNodeType.RULE_SET || child.getType() == ASTCssNodeType.DECLARATION || child.getType() == ASTCssNodeType.MEDIUM;
+    if (!(child.getType() == ASTCssNodeType.RULE_SET || child.getType() == ASTCssNodeType.VARIABLE_DECLARATION ||child.getType() == ASTCssNodeType.DECLARATION || child.getType() == ASTCssNodeType.MEDIUM || child.getType() == ASTCssNodeType.MEDIA_QUERY))
+      throw new IllegalArgumentException("Unexpected media child type: " + child.getType());
 
     if (child.getType() == ASTCssNodeType.MEDIA_QUERY)
       addMediaQuery((MediaQuery) child);

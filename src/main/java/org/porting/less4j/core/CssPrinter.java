@@ -58,7 +58,6 @@ public class CssPrinter implements ILessCompiler {
     ANTLRParser.ParseResult result = parser.parseStyleSheet(content);
     if (result.hasErrors())
       throw new CompileException("Parse errors.", null);
-    
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet);
     

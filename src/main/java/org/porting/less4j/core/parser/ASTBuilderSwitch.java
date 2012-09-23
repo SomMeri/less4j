@@ -461,7 +461,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         //we have to copy comments from the AND identifier to surrounding elements.
       }
     }
-
     return result;
   }
 

@@ -1,11 +1,13 @@
 package org.porting.less4j;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
 
 import org.apache.commons.io.IOUtils;
+import org.jruby.RubyProcess.Sys;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +47,7 @@ public abstract class AbstractFileBasedTest {
         ComparisonFailure fail = (ComparisonFailure)ex;
         throw new ComparisonFailure (testName + " " + fail.getMessage(), fail.getExpected(), fail.getActual());
       }
-      throw new RuntimeException(testName, ex);
+      throw new RuntimeException(testName + " " + ex.getMessage(), ex);
     }
   }
 
