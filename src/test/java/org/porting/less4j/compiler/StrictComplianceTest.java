@@ -17,7 +17,7 @@ import org.porting.less4j.utils.w3ctestsextractor.TestFileUtils;
 @RunWith(Parameterized.class)
 public class StrictComplianceTest extends AbstractFileBasedTest {
 
-  private static final String inputDir = "src\\test\\resources\\compile-valid-css\\";
+  private static final String inputDir = "src/test/resources/compile-valid-css/";
 
   public StrictComplianceTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);

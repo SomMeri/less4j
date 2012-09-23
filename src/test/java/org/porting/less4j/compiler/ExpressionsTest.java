@@ -12,7 +12,7 @@ import org.porting.less4j.utils.w3ctestsextractor.TestFileUtils;
 //TODO operations on colors!!!
 public class ExpressionsTest extends BasicFeaturesTests {
 
-  private static final String standardCases = "src\\test\\resources\\compile-basic-features\\expressions\\";
+  private static final String standardCases = "src/test/resources/compile-basic-features/expressions/";
 
   public ExpressionsTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);

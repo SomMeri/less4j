@@ -21,11 +21,11 @@ import org.porting.less4j.core.CssPrinter;
 public class SimpleCssTest extends AbstractFileBasedTest {
 
   // private static final String inputLess =
-  // "src\\test\\resources\\less.js\\less\\media.less";
+  // "src/test/resources/less.js/less/media.less";
   // private static final String outputCss =
-  // "src\\test\\resources\\less.js\\css\\media.css";
-  private static final String inputLess = "src\\test\\resources\\minitests\\css\\functions-working-only.less";
-  private static final String outputCss = "src\\test\\resources\\minitests\\css\\functions-working-only.css";
+  // "src/test/resources/less.js/css/media.css";
+  private static final String inputLess = "src/test/resources/minitests/css/functions-working-only.less";
+  private static final String outputCss = "src/test/resources/minitests/css/functions-working-only.css";
 
   public SimpleCssTest(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);

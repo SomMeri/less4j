@@ -21,8 +21,8 @@ import org.porting.less4j.core.DummyLessCompiler;
 @RunWith(Parameterized.class)
 public class LessJsTest extends AbstractFileBasedTest {
 
-  private static final String inputLessDir = "src\\test\\resources\\less.js\\less\\";
-  private static final String expectedCssDir = "src\\test\\resources\\less.js\\css\\";
+  private static final String inputLessDir = "src/test/resources/less.js/less/";
+  private static final String expectedCssDir = "src/test/resources/less.js/css/";
 
   public LessJsTest(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);
