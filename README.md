@@ -1,4 +1,4 @@
-Less4j is port of [less.js](http://lesscss.org/) into Java. 
+Less4j is port of [less.js](http://lesscss.org/) into Java. Continuous integration is set up on Travis-CI, its current status is: [![Build Status](https://secure.travis-ci.org/SomMeri/less4j.png)](http://travis-ci.org/SomMeri/less4j)
 
 Our twitter account: [Less4j](https://twitter.com/Less4j)
 
