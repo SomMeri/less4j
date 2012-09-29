@@ -35,7 +35,7 @@ String css = compiler.compile("* { margin: 1 1 1 1; }");
 System.out.println(css);
 </code></pre>
 
-The method may throw either `IncorrectTreeException` or `CompileException` . Both are runtime and their message line and column numbers identifying source place that caused the error.
+The method may throw either `IncorrectTreeException` or `CompileException` . Both are runtime and their message contains line and column numbers identifying source place that caused the error.
 
 ## TODO:
 rewrite ended here
