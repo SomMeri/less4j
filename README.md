@@ -22,7 +22,7 @@ The documentation is kept on Github wiki:
 * [wiki home page](https://github.com/SomMeri/less4j/wiki),
 * [all written wiki pages](https://github.com/SomMeri/less4j/wiki/_pages). 
 
-For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so the current implementation be a bit different.
+For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation be a bit different.
 
 ## TODO:
 rewrite ended here
