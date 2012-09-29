@@ -37,22 +37,6 @@ System.out.println(css);
 
 The method may throw either `IncorrectTreeException` or `CompileException`. Both are unchecked and their message contains line and column numbers identifying source place causing the error.
 
-## TODO:
-rewrite ended here
-
-## In Progress:
-*  CSS3 selectors - namespaces are open.
-
-## Roadmap:
-*  clean up unit tests,
-*  write better README.mf,
-*  add basic CSS hacks into it to see whether it is possible,
-*  add error handling - at least reasonable basic version,
-*  make it compatible with css2.1 and css3,
-*  make API,
-*  add less.js features and document the grammar while doing it,
-*  finalize API.
-
 ## Links:
 *  [http://www.w3.org/Style/CSS/specs.en.html]
 *  [http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/]
