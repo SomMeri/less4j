@@ -5,7 +5,11 @@
 	<artifactId>less4j</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>less4j</name>
-	<description>Port of less.js into java.</description>
+	<description>Less language is an extension of css and this project compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules. 
+
+The original compiler was written in JavaScript and is called less.js. The less language is mostly defined in less.js documentation/issues and by what less.js actually do. Links to less.js:
+* home page: http://lesscss.org/
+* source code &amp; issues: https://github.com/cloudhead/less.js</description>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
