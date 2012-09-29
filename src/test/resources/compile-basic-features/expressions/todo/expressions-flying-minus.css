@@ -1,0 +1,13 @@
+something {
+  margin: - -2;
+  margin: - 2 -2 -2 -2;
+  margin: -1 - 1;
+  parentheses: 12 - 23;
+  simple: - 23;
+}
+
+inFunction {
+  width: 15;
+  width: - 15;
+  width: -round(15);
+}

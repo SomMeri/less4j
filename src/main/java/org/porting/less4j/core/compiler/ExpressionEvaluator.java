@@ -14,9 +14,6 @@ import org.porting.less4j.core.ast.ParenthesesExpression;
 import org.porting.less4j.core.ast.Variable;
 import org.porting.less4j.core.ast.SignedExpression.Sign;
 
-//FIXME and document variables evaluation is lazy. E.g. the declarations keeps only
-//reference and not a value.
-//
 public class ExpressionEvaluator {
 
   private final ActiveVariableScope variableScope;

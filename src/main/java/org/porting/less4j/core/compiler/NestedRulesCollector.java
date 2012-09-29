@@ -12,7 +12,6 @@ import org.porting.less4j.core.ast.NestedRuleSet;
 import org.porting.less4j.core.ast.RuleSet;
 import org.porting.less4j.core.ast.Selector;
 
-//TODO: test appender (and other similar) in combination with multiple selectors asdf, asdf, asdf { & inner } 
 public class NestedRulesCollector {
 
   private Stack<List<Selector>> selectors;

@@ -16,7 +16,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
-//import org.porting.less4j.debugutils.DebugPrint;
+import org.porting.less4j.utils.DebugPrint;
 
 /**
  * 
@@ -52,7 +52,7 @@ public class ANTLRParser {
   
   private ParseResult parse(String input, InputType inputType) {
     try {
-      //DebugPrint.printTokenStream(input);
+      DebugPrint.printTokenStream(input);
       List<RecognitionException> errors = new ArrayList<RecognitionException>();
       LessLexer lexer = createLexer(input, errors);
 

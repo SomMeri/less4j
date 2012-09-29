@@ -1,0 +1,22 @@
+something {
+  margin: -4;
+  margin: -2 -2 -2 -2;
+  margin: 11;
+  margin: 11;
+  margin: -11;
+  /* Try with different properties: */
+  margin: -5 -2 -4;
+  something: -5 -2 -4;
+  padding: -5 -2 -4;
+  /* Two operators: */
+  margin: 0;
+  margin: 0;
+  /* Unary operators: */
+  margin: -3;
+}
+multiply {
+  margin: 6;
+  margin: 6;
+  margin: 6;
+  margin: 6;
+}

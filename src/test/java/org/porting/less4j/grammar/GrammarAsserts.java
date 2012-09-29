@@ -17,7 +17,6 @@ import org.antlr.runtime.tree.TreeVisitorAction;
 import org.porting.less4j.core.parser.ANTLRParser;
 import org.porting.less4j.core.parser.HiddenTokenAwareErrorTree;
 import org.porting.less4j.core.parser.LessLexer;
-import org.porting.less4j.utils.DebugPrint;
 import org.porting.less4j.utils.PrintUtils;
 
 public class GrammarAsserts {
@@ -108,7 +107,7 @@ class CountNodesAction implements TreeVisitorAction {
     } else {
       if (!isDummy(((CommonTree)t).getToken())) {
         count++;
-        String string = DebugPrint.toString(count, ((CommonTree)t).getToken());
+//        String string = DebugPrint.toString(count, ((CommonTree)t).getToken());
 //        System.out.println(string);
       }
     }

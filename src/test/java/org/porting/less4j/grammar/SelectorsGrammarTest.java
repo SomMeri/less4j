@@ -134,7 +134,6 @@ public class SelectorsGrammarTest {
     assertValidSelector(result);
   }
 
-  //TODO what does less.js do in this situation: nth-child(@variable+4) ???
   @Test
   public void formulaOdd() {
     ANTLRParser compiler = new ANTLRParser();
