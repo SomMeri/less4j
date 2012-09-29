@@ -795,7 +795,17 @@ COMMENT : '/*' ( options { greedy=false; } : .*) '*/'
                     }
                 ;
 
-COMMENT_LITTLE : '//' ( options { greedy=false; } : .*) NL { $channel = HIDDEN; };
+//TODO: document: annoying - causes antlr null pointer exception during generation
+//catch in lexer is impossible
+//COMMENT_LITTLE : '//' ~(NL)* { $channel = HIDDEN; };
+//COMMENT_LITTLE : '//' (( options { greedy=false; } : .* ) NL) { $channel = HIDDEN; };
+COMMENT_LITTLE : '//' (~('\r\n'|'\n'))* { $channel = HIDDEN; };
+
+//COMMENT_LITTLE : '//' (
+//  (( options { greedy=false; } : .* ) NL)=>(( options { greedy=false; } : .* ) NL)
+//  | (( options { greedy=false; } : .* ) EOF)=>(( options { greedy=false; } : .* ) EOF) 
+//) { $channel = HIDDEN; };
+
 
 // ---------------------
 // HTML comment open. HTML/XML comments may be placed around style sheets so that they
