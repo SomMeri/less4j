@@ -11,7 +11,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.less4j.AbstractFileBasedTest;
 import com.github.less4j.ILessCompiler;
-import com.github.less4j.core.CssPrinter;
+import com.github.less4j.core.DefaultLessCompiler;
 
 /**
  *  Testing whether less4j correctly compiles css3 media conforming to 
@@ -61,7 +61,7 @@ public class W3CMediaTests extends AbstractFileBasedTest {
   }
 
   protected ILessCompiler getCompiler() {
-    return new CssPrinter();
+    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

@@ -9,7 +9,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.less4j.AbstractFileBasedTest;
 import com.github.less4j.ILessCompiler;
-import com.github.less4j.core.CssPrinter;
+import com.github.less4j.core.DefaultLessCompiler;
 import com.github.less4j.utils.w3ctestsextractor.TestFileUtils;
 
 //FIXME: what does less.js do when the charset declaration goes AFTER ruleset? It is incorrect css anyway.
@@ -34,7 +34,7 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
   }
 
   protected ILessCompiler getCompiler() {
-    return new CssPrinter();
+    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

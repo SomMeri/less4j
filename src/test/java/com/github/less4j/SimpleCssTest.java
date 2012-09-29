@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.less4j.ILessCompiler;
-import com.github.less4j.core.CssPrinter;
+import com.github.less4j.core.DefaultLessCompiler;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -41,7 +41,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   }
 
   protected ILessCompiler getCompiler() {
-    return new CssPrinter();
+    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

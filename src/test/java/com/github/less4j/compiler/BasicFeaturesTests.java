@@ -5,7 +5,7 @@ import java.io.File;
 
 import com.github.less4j.AbstractFileBasedTest;
 import com.github.less4j.ILessCompiler;
-import com.github.less4j.core.CssPrinter;
+import com.github.less4j.core.DefaultLessCompiler;
 
 public abstract class BasicFeaturesTests extends AbstractFileBasedTest {
 
@@ -14,7 +14,7 @@ public abstract class BasicFeaturesTests extends AbstractFileBasedTest {
   }
 
   protected ILessCompiler getCompiler() {
-    return new CssPrinter();
+    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

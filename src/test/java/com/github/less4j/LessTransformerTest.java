@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.github.less4j.core.CssPrinter;
+import com.github.less4j.core.DefaultLessCompiler;
 
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.Resource;
@@ -44,7 +44,7 @@ public class LessTransformerTest {
       @Override
       public void process(Resource resource, Reader reader, Writer writer)
           throws IOException {
-        final String css = new CssPrinter().compile(IOUtils.toString(reader));
+        final String css = new DefaultLessCompiler().compile(IOUtils.toString(reader));
         IOUtils.write(css, writer);
       }
     };
