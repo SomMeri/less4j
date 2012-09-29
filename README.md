@@ -29,14 +29,13 @@ Project is still in alpha and current API is very temporary. It will change in t
 
 Access the copiler through the `String compile(String lessContent)` method of the `com.github.less4j.ILessCompiler` interface. The interface has only one implementation: `com.github.less4j.core.DefaultLessCompiler`.
 
-Input string should contain the content of .less file and output string contains translated css style sheet. 
+Input string should contain the content of .less file and output string contains translated css style sheet:
 <pre><code>ILessCompiler compiler = new DefaultLessCompiler();
 String css = compiler.compile("* { margin: 1 1 1 1; }");
 System.out.println(css);
 </code></pre>
 
-
-Not finished yet. 
+The method may throw either `IncorrectTreeException` or `CompileException` . Both are runtime and their message line and column numbers identifying source place that caused the error.
 
 ## TODO:
 rewrite ended here
