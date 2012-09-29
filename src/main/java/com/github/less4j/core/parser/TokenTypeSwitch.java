@@ -1,6 +1,5 @@
 package com.github.less4j.core.parser;
 
-import org.porting.less4j.core.parser.LessLexer;
 
 
 public abstract class TokenTypeSwitch<T> {

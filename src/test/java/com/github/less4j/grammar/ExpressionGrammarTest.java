@@ -6,10 +6,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.porting.less4j.core.parser.LessLexer;
 
 import com.github.less4j.core.parser.ANTLRParser;
 import com.github.less4j.core.parser.ANTLRParser.ParseResult;
+import com.github.less4j.core.parser.LessLexer;
 
 /**
  * Testing numbers and arithmetic expression parser.

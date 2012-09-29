@@ -2,7 +2,6 @@ package com.github.less4j.core.parser;
 
 import java.util.List;
 
-import org.porting.less4j.core.parser.LessLexer;
 
 import com.github.less4j.core.ast.ColorExpression;
 import com.github.less4j.core.ast.CssString;

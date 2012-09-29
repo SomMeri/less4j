@@ -1,6 +1,7 @@
 package com.github.less4j.utils;
 
-import org.porting.less4j.core.parser.LessParser;
+import com.github.less4j.core.parser.LessParser;
+
 
 public class PrintUtils {
   public static String toName(int tokenType) {

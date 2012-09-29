@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
-import org.porting.less4j.core.parser.LessLexer;
 
 /**
  * This class is NOT thread-safe. 

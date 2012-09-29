@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
-import org.porting.less4j.core.parser.LessLexer;
-import org.porting.less4j.core.parser.LessParser;
 
 public class ParsersSemanticPredicates {
 

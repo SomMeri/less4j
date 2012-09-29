@@ -14,10 +14,10 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
-import org.porting.less4j.core.parser.LessLexer;
 
 import com.github.less4j.core.parser.ANTLRParser;
 import com.github.less4j.core.parser.HiddenTokenAwareErrorTree;
+import com.github.less4j.core.parser.LessLexer;
 import com.github.less4j.utils.PrintUtils;
 
 public class GrammarAsserts {

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
-import org.porting.less4j.core.parser.LessLexer;
 
 import com.github.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.less4j.core.parser.LessLexer;
 import com.github.less4j.utils.PrintUtils;
 
 public class DebugPrint {

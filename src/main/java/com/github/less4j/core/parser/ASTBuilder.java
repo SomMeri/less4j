@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.Token;
-import org.porting.less4j.core.parser.LessLexer;
 
 import com.github.less4j.core.ast.ASTCssNode;
 import com.github.less4j.core.ast.Comment;

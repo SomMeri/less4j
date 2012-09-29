@@ -16,8 +16,6 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
-import org.porting.less4j.core.parser.LessLexer;
-import org.porting.less4j.core.parser.LessParser;
 
 import com.github.less4j.utils.DebugPrint;
 

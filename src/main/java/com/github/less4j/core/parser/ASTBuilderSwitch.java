@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.porting.less4j.core.parser.LessLexer;
 
 import com.github.less4j.core.ast.ASTCssNode;
 import com.github.less4j.core.ast.ASTCssNodeType;

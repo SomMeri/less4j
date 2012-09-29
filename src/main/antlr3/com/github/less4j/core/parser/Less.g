@@ -58,12 +58,12 @@ tokens {
 }
 
 @lexer::header {
-  package org.porting.less4j.core.parser;
+  package com.github.less4j.core.parser;
 }
  
 @parser::header {
-  package org.porting.less4j.core.parser;
-  import org.porting.less4j.core.parser.ParsersSemanticPredicates;
+  package com.github.less4j.core.parser;
+  import com.github.less4j.core.parser.ParsersSemanticPredicates;
 }
 
 //override some methods and add new members to generated lexer
