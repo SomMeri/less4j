@@ -25,11 +25,11 @@ The documentation is kept on Github wiki:
 For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation be a bit different.
 
 ## API:
-Project is still in alpha and current API is very temporary. It will change in the future. 
+Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
 
-Access the copiler through the `String compile(String lessContent)` method of the `com.github.less4j.ILessCompiler` interface. The interface has only one implementation: `com.github.less4j.core.DefaultLessCompiler`.
+Access the compiler through `String compile(String lessContent)` method of the `com.github.less4j.ILessCompiler` interface. The interface has only one implementation: `com.github.less4j.core.DefaultLessCompiler`.
 
-Input string should contain the content of .less file and output string contains translated css style sheet:
+Put the content of .less file into the input string. The method returns translated css style sheet:
 <pre><code>ILessCompiler compiler = new DefaultLessCompiler();
 String css = compiler.compile("* { margin: 1 1 1 1; }");
 System.out.println(css);
