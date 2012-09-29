@@ -9,13 +9,18 @@ Less4j is a port and its behavior should be as close to the original implementat
 * Output files may differ by whitespaces or comments locations.
 * Less4j may do more than less.js in some situations. The input rejected by less.js may be accepted and translated by less4j. 
 
-All known differences are documented on [wiki page](https://github.com/SomMeri/less4j/wiki/Differences-Between-Less.js-and-Less4j). Those differences that cause funcional difference in output css should produce warnings. That feature was not implemented yet.
+All known differences are documented on [wiki page](https://github.com/SomMeri/less4j/wiki/Differences-Between-Less.js-and-Less4j). In the future, Less4j will produces warning any time it produces functionally different CSS. That feature was not implemented yet.
 
 ## Continuous Integration
 Continuous integration is set up on [Travis-CI](http://travis-ci.org/SomMeri/less4j), its current status is: [![Build Status](https://secure.travis-ci.org/SomMeri/less4j.png)](http://travis-ci.org/SomMeri/less4j).
 
 ## Twitter
 Our twitter account: [Less4j](https://twitter.com/Less4j)
+
+## Documentation:
+Architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). 
+
+The rest of the documentation is on [wiki](https://github.com/SomMeri/less4j/wiki/_pages).
 
 ## In Progress:
 *  CSS3 selectors - namespaces are open.
@@ -40,14 +45,6 @@ Our twitter account: [Less4j](https://twitter.com/Less4j)
 *  [http://www.w3.org/TR/2012/WD-css3-fonts-20120823/]
 *  [http://www.w3.org/TR/CSS21/fonts.html]
 *  Comparison of less and sass: [https://gist.github.com/674726]
-
-## Documentation:
-Architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). 
-
-The rest of the documentation is on [wiki](https://github.com/SomMeri/less4j/wiki/_pages).
-
-## Architecture:
-I'm still experimenting with the architecture. 
 
 ## API:
 Not finished yet. 
