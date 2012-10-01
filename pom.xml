@@ -4,6 +4,7 @@
 	<groupId>com.github.less4j</groupId>
 	<artifactId>less4j</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>less4j</name>
 	<description>Less language is an extension of css and this project compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules. 
 
@@ -118,6 +119,7 @@ The original compiler was written in JavaScript and is called less.js. The less 
 	<scm>
 		<url>https://github.com/SomMeri/less4j</url>
 		<connection>scm:git:https://github.com/SomMeri/less4j.git</connection>
+		<developerConnection>scm:git:https://github.com/SomMeri/less4j.git</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>Github</system>
@@ -127,4 +129,13 @@ The original compiler was written in JavaScript and is called less.js. The less 
 		<url>http://travis-ci.org/#!/SomMeri/less4j/builds</url>
 		<system>http://travis-ci</system>
 	</ciManagement>
+	<developers>
+	    <developer>
+	      <id>meri</id>
+	      <name>Maria Jurcovicova</name>
+	      <url>http://meri-stuff.blogspot.com/</url>
+	      <roles><role>developer</role></roles>
+	      <timezone>+2</timezone>
+	    </developer>
+	</developers>
 </project>
