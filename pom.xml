@@ -6,7 +6,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>less4j</name>
-	<description>Less language is an extension of css and this project compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules. 
+	<description>Less language is an extension of css and less4j compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules. 
 
 Less4j is a port. The original compiler was written in JavaScript and is called less.js. The less language is mostly defined in less.js documentation/issues and by what less.js actually do. Links to less.js:
 * home page: http://lesscss.org/
@@ -70,6 +70,14 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.2.2</version>
+				<configuration>
+					<arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr3-maven-plugin</artifactId>
 				<version>3.3</version>
@@ -130,12 +138,60 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 		<system>http://travis-ci</system>
 	</ciManagement>
 	<developers>
-	    <developer>
-	      <id>meri</id>
-	      <name>Maria Jurcovicova</name>
-	      <url>http://meri-stuff.blogspot.com/</url>
-	      <roles><role>developer</role></roles>
-	      <timezone>+2</timezone>
-	    </developer>
+		<developer>
+			<id>meri</id>
+			<name>Maria Jurcovicova</name>
+			<url>http://meri-stuff.blogspot.com/</url>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
 	</developers>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus snapshot repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Sonatype Nexus release repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<profiles>
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<configuration>
+							<passphrase>${gpg.passphrase}</passphrase>
+						</configuration>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
