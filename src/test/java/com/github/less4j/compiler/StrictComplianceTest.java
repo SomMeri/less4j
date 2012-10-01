@@ -38,6 +38,7 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
   }
 
   protected String canonize(String text) {
+	text = text.replace("\r\n", "\n");
     return text;
   }
 

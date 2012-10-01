@@ -57,6 +57,7 @@ public class W3CSelectorsTests extends AbstractFileBasedTest {
   }
 
   protected String canonize(String text) {
+    text = text.replace("\r\n", "\n");
     //ignore occasional end lines
     if (text.endsWith("\n"))
       return text.substring(0, text.length()-1);
