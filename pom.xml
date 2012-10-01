@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.less4j</groupId>
 	<artifactId>less4j</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>less4j</name>
 	<description>Less language is an extension of css and less4j compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules. 
