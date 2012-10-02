@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArraysUtils {
-  
-  @SafeVarargs
+
+  @SuppressWarnings("unchecked")
   public static <T> List<T> asNonNullList(T... a) {
     List<T> result = new ArrayList<T>();
     for (T t : a) {
@@ -22,5 +22,5 @@ public class ArraysUtils {
     }
     return result;
   }
-  
+
 }
