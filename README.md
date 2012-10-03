@@ -9,7 +9,7 @@ Less4j is a port and its behavior should be as close to the original implementat
 * Output files may differ by whitespaces or comments locations.
 * Less4j may do more than less.js in some situations. The input rejected by less.js may be accepted and translated by less4j. 
 
-All known differences are documented on [wiki page](https://github.com/SomMeri/less4j/wiki/Differences-Between-Less.js-and-Less4j). In the future, Less4j will produce warning any time it produce functionally different CSS. That feature was not implemented yet.
+All known differences are documented on [wiki page](https://github.com/SomMeri/less4j/wiki/Differences-Between-Less.js-and-Less4j). In the future, Less4j will produce warning any time it produces functionally different CSS. That feature was not implemented yet.
 
 ## Continuous Integration
 Continuous integration is set up on [Travis-CI](http://travis-ci.org/SomMeri/less4j), its current status is: [![Build Status](https://secure.travis-ci.org/SomMeri/less4j.png)](http://travis-ci.org/SomMeri/less4j).
@@ -23,6 +23,17 @@ The documentation is kept on Github wiki:
 * [all written wiki pages](https://github.com/SomMeri/less4j/wiki/_pages). 
 
 For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation be a bit different.
+
+## Maven
+Less4j is [available](http://search.maven.org/#artifactdetails|com.github.sommeri|less4j|0.0.1|jar) in Maven central repository.
+
+Pom.xml dependency:
+<pre><code><dependency>
+  <groupId>com.github.sommeri</groupId>
+  <artifactId>less4j</artifactId>
+  <version>0.0.1</version>
+</dependency>
+</code></pre>
 
 ## API:
 Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
