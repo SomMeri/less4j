@@ -28,11 +28,11 @@ For those interested about project internals, architecture and comments handling
 Less4j is [available](http://search.maven.org/#artifactdetails|com.github.sommeri|less4j|0.0.1|jar) in Maven central repository.
 
 Pom.xml dependency:
-<pre><code><dependency>
-  <groupId>com.github.sommeri</groupId>
-  <artifactId>less4j</artifactId>
-  <version>0.0.1</version>
-</dependency>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.github.sommeri&lt;/groupId&gt;
+  &lt;artifactId&gt;less4j&lt;/artifactId&gt;
+  &lt;version&gt;0.0.1&lt;/version&gt;
+&lt;/dependency&gt;
 </code></pre>
 
 ## API:
