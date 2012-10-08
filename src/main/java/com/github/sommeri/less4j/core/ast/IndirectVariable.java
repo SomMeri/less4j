@@ -13,4 +13,8 @@ public class IndirectVariable extends Variable {
     return ASTCssNodeType.INDIRECT_VARIABLE;
   }
 
+  @Override
+  public IndirectVariable clone() {
+    return (IndirectVariable) super.clone();
+  }
 }

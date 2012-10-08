@@ -79,7 +79,7 @@ public class TermBuilder {
       return buildFromParentheses(offsetChild);
 
     default:
-      throw new IncorrectTreeException("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
+      throw new TreeBuildingException("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
 
     }
   }
@@ -159,7 +159,7 @@ public class TermBuilder {
       return Dimension.FREQ;
 
     default:
-      throw new IncorrectTreeException("Unknown dimension type: " + actual.getType() + " " + actual.getText(), actual);
+      throw new TreeBuildingException("Unknown dimension type: " + actual.getType() + " " + actual.getText(), actual);
 
     }
   }

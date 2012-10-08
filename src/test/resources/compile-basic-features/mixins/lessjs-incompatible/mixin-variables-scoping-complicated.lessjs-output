@@ -1,0 +1,10 @@
+#allAreUsedHere {
+  declaration: mixinNoParam 'the Parameter' 'inside' 'top level';
+  last: last 'the Parameter' 'inside';
+  this-will-survive-too: funny 'nested 1' 'inside';
+  declaration: nestedMixin 'nested 1' 'inside';
+  declaration: nestedMixinScoped 'inside call' 'inside';
+  this-will-survive-too: funny 'nested 2' 'inside';
+  declaration: nestedMixin 'nested 2' 'inside';
+  declaration: nestedMixinScoped 'inside call' 'inside';
+}

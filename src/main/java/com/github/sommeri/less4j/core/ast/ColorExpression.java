@@ -38,4 +38,8 @@ public class ColorExpression extends Expression {
     return "" + value;
   }
 
+  @Override
+  public ColorExpression clone() {
+    return (ColorExpression) super.clone();
+  }
 }

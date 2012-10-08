@@ -57,4 +57,13 @@ public class ComposedExpression extends Expression {
     return "[" + left + operator + right + "]";
   }
 
+  @Override
+  public ComposedExpression clone() {
+    ComposedExpression result = (ComposedExpression) super.clone();
+    result.left = left==null?null:left.clone();
+    result.operator = operator==null?null:operator.clone();
+    result.right = right==null?null:right.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 }

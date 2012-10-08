@@ -1,0 +1,4 @@
+1:7:mismatched input '(' expecting LBRACE
+5:7:mismatched input '(' expecting LBRACE
+9:13:missing RBRACKET at '*'
+9:14:mismatched input '*=' expecting RPAREN

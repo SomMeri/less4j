@@ -39,5 +39,13 @@ public class PseudoClass extends Pseudo {
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(parameter);
   }
+  
+  @Override
+  public PseudoClass clone() {
+    PseudoClass result = (PseudoClass) super.clone();
+    result.parameter = parameter==null?null:parameter.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 
 }

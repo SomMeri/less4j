@@ -60,5 +60,13 @@ public class SignedExpression extends Expression {
       return symbol;
     }
   }
+  
+  @Override
+  public SignedExpression clone() {
+    SignedExpression result = (SignedExpression) super.clone();
+    result.expression = expression==null?null:expression.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 
 }

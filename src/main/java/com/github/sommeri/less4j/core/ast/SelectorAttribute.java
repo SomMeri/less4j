@@ -55,5 +55,13 @@ public class SelectorAttribute extends ASTCssNode {
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(operator);
   }
+  
+  @Override
+  public SelectorAttribute clone() {
+    SelectorAttribute result = (SelectorAttribute) super.clone();
+    result.operator = operator==null?null:operator.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 
 }

@@ -1,19 +1,15 @@
 package com.github.sommeri.less4j;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
 
 import org.apache.commons.io.IOUtils;
-import org.jruby.RubyProcess.Sys;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import com.github.sommeri.less4j.ILessCompiler;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -38,7 +34,7 @@ public abstract class AbstractFileBasedTest {
   public final void compileAndCompare() throws Throwable {
     try {
       String less = IOUtils.toString(new FileReader(lessFile));
-      ILessCompiler compiler = getCompiler();
+      LessCompiler compiler = getCompiler();
       String actual = compiler.compile(less);
       
       String expected = IOUtils.toString(new FileReader(cssFile));
@@ -57,6 +53,6 @@ public abstract class AbstractFileBasedTest {
     return text.replaceAll("\\s", "");
   }
 
-  protected abstract ILessCompiler getCompiler();
+  protected abstract LessCompiler getCompiler();
 
 }

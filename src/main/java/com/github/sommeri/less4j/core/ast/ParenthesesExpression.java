@@ -36,5 +36,13 @@ public class ParenthesesExpression extends Expression {
   public String toString() {
     return "(" +enclosedExpression+ ")";
   }
+  
+  @Override
+  public ParenthesesExpression clone() {
+    ParenthesesExpression result = (ParenthesesExpression) super.clone();
+    result.enclosedExpression = enclosedExpression==null?null:enclosedExpression.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 
 }

@@ -63,4 +63,17 @@ public class Declaration extends ASTCssNode {
   public boolean isFontDeclaration() {
     return getName()!=null? getName().toLowerCase().equals("font") : false;
   }
+  
+  @Override
+  public String toString() {
+    return ""+ name + ":" + expression;
+  }
+  
+  @Override
+  public Declaration clone() {
+    Declaration result = (Declaration) super.clone();
+    result.expression = expression==null?null:expression.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 }

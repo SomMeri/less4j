@@ -73,8 +73,8 @@ public class SimpleSelector extends ASTCssNode implements Cloneable {
   @Override
   public SimpleSelector clone() {
     SimpleSelector clone = (SimpleSelector) super.clone();
-    clone.subsequent=ArraysUtils.clonedList(getSubsequent());
-    
+    clone.subsequent=ArraysUtils.deeplyClonedList(getSubsequent());
+    clone.configureParentToAllChilds();
     return clone;
   }
 

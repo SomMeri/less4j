@@ -39,4 +39,9 @@ public class MediumModifier extends ASTCssNode {
   public enum Modifier {
     ONLY, NOT, NONE
   }
+  
+  @Override
+  public MediumModifier clone() {
+    return (MediumModifier) super.clone();
+  }
 }

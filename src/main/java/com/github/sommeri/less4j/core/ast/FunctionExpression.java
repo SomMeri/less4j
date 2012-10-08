@@ -41,4 +41,12 @@ public class FunctionExpression extends Expression {
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(parameter);
   }
+  
+  @Override
+  public FunctionExpression clone() {
+    FunctionExpression result = (FunctionExpression) super.clone();
+    result.parameter = parameter==null?null:parameter.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 }

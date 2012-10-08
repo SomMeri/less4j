@@ -1,0 +1,38 @@
+.mixin {
+  declaration: value;
+}
+.mixin() {
+  declaration: value;
+}
+.mixin(@something) {
+  declaration: value;
+}
+.mixin(@something, @other) {
+  declaration: value;
+}
+.mixin(@something, @other: 3) {
+  declaration: value;
+}
+.mixin(@something: 4, @other: 3) {
+  declaration: value;
+}
+.mixin(@something: "a", @other: 3) {
+  declaration: value;
+}
+.mixin(@something: 'hello', @other :3) {
+  declaration: value;
+}
+.mixin(pattern) {
+  declaration: value;
+}
+.mixin(pattern, differentPattern) {
+  declaration: value;
+}
+.mixin(3, -3, "string", 'string') {
+  declaration: value;
+}
+
+@variable: 34;
+.mixin(@something, @other: @variable) {
+  declaration: value;
+}

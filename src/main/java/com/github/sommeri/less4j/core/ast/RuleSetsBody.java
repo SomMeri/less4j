@@ -19,4 +19,7 @@ public class RuleSetsBody extends Body<ASTCssNode> {
     return ASTCssNodeType.DECLARATIONS_BODY;
   }
 
+  public RuleSetsBody clone() {
+    return (RuleSetsBody) super.clone();
+  }
 }

@@ -45,4 +45,8 @@ public class ExpressionOperator extends ASTCssNode {
     return "" + operator;
   }
   
+  @Override
+  public ExpressionOperator clone() {
+    return (ExpressionOperator) super.clone();
+  }
 }

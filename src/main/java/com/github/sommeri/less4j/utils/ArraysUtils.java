@@ -3,9 +3,10 @@ package com.github.sommeri.less4j.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
+
 public class ArraysUtils {
 
-  @SuppressWarnings("unchecked")
   public static <T> List<T> asNonNullList(T... a) {
     List<T> result = new ArrayList<T>();
     for (T t : a) {
@@ -15,10 +16,11 @@ public class ArraysUtils {
     return result;
   }
 
-  public static <T> List<T> clonedList(List<T> list) {
+  @SuppressWarnings("unchecked")
+  public static <T extends ASTCssNode> List<T> deeplyClonedList(List<T> list) {
     List<T> result = new ArrayList<T>();
     for (T t : list) {
-      result.add(t);
+      result.add((T)t.clone());
     }
     return result;
   }

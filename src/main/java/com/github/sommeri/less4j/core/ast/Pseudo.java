@@ -15,4 +15,8 @@ public abstract class Pseudo extends ASTCssNode {
     return name;
   }
 
+  @Override
+  public Pseudo clone() {
+    return (Pseudo) super.clone();
+  }
 }

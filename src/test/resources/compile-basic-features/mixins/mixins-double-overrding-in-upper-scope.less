@@ -1,0 +1,16 @@
+.allAreUsedHere {
+  .nestedMixin() {
+    first: first;
+  }
+  .nestedMixin() {
+    second: second;
+    .nestedMixin() {
+      declaration: nestedSecond;
+    }
+    .nestedMixin;
+  }
+  .nestedMixin;
+  .nestedMixin() {
+    last: last; 
+  }
+}

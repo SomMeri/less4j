@@ -1,0 +1,15 @@
+.parent {
+  .allAreUsedHere {
+    .nestedMixin() {
+      first: first;
+    }
+    .mainMixin() {
+      second: second;
+      .nestedMixin;
+    }
+    .mainMixin;
+    .nestedMixin() {
+      last: last; 
+    }
+  }
+}

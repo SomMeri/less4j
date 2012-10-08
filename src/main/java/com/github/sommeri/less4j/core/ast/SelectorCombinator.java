@@ -41,7 +41,7 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
   }
 
   @Override
-  protected SelectorCombinator clone() {
+  public SelectorCombinator clone() {
     return (SelectorCombinator) super.clone();
   }
 
@@ -49,5 +49,5 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
   public String toString() {
     return "" + combinator;
   }
-
+  
 }

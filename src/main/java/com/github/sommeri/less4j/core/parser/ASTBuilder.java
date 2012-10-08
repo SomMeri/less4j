@@ -5,15 +5,23 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
+import com.github.sommeri.less4j.core.ProblemsCollector;
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 
 public class ASTBuilder {
+  
+  private final ProblemsCollector warningsCollector;
+  
+  public ASTBuilder(ProblemsCollector warningsCollector) {
+    super();
+    this.warningsCollector = warningsCollector;
+  }
 
   public StyleSheet parse(HiddenTokenAwareTree tree) {
-    ASTBuilderSwitch builder = new ASTBuilderSwitch();
+    ASTBuilderSwitch builder = new ASTBuilderSwitch(warningsCollector);
     ASTCssNode result = builder.switchOn(tree);
     convertComments(result);
     solveParentChildRelationShips(result);

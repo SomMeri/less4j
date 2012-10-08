@@ -41,4 +41,9 @@ public class IdentifierExpression extends Expression {
     return "" + value;
   }
 
+  @Override
+  public IdentifierExpression clone() {
+    return (IdentifierExpression) super.clone();
+  }
+
 }

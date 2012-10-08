@@ -68,4 +68,11 @@ public class MediaQuery extends ASTCssNode {
     return ASTCssNodeType.MEDIA_QUERY;
   }
 
+  @Override
+  public MediaQuery clone() {
+    MediaQuery result = (MediaQuery) super.clone();
+    result.medium = medium==null?null:medium.clone();
+    result.expressions = ArraysUtils.deeplyClonedList(expressions);
+    return result;
+  }
 }

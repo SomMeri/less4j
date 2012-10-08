@@ -1,0 +1,88 @@
+#allAreUsedHere {
+  declaration: mixinNoParam;
+  declaration: mixinNoParam;
+  /* next */
+  declaration: mixinOneVariable 3;
+  declaration: mixinOneVariable 3.3;
+  declaration: mixinOneVariable -3;
+  declaration: mixinOneVariable "One";
+  declaration: mixinOneVariable green;
+  declaration: mixinOneVariable #FF0000;
+  declaration: mixinTwoVariables 3 '2';
+  declaration: mixinTwoVariables 3.3 '2';
+  declaration: mixinTwoVariables -3 '2';
+  declaration: mixinTwoVariables "One" '2';
+  declaration: mixinTwoVariables green '2';
+  declaration: mixinTwoVariables #FF0000 '2';
+  /* next */
+  declaration: mixinTwoVariablesOneDef 3 55;
+  declaration: mixinTwoVariablesOneDef 3.3 55;
+  declaration: mixinTwoVariablesOneDef -3 55;
+  declaration: mixinTwoVariablesOneDef "One" 55;
+  declaration: mixinTwoVariablesOneDef green 55;
+  declaration: mixinTwoVariablesOneDef #FF0000 55;
+  declaration: mixinTwoVariablesOneDef 3 '2';
+  declaration: mixinTwoVariablesOneDef 3.3 '2';
+  declaration: mixinTwoVariablesOneDef -3 '2';
+  declaration: mixinTwoVariablesOneDef "One" '2';
+  declaration: mixinTwoVariablesOneDef green '2';
+  declaration: mixinTwoVariablesOneDef #FF0000 '2';
+  /* next */
+  declaration: mixinTwoVariablesTwoDef 4 55;
+  declaration: mixinTwoVariablesTwoDef 4 55;
+  declaration: mixinTwoVariablesTwoDef 3 55;
+  declaration: mixinTwoVariablesTwoDef 3.3 55;
+  declaration: mixinTwoVariablesTwoDef -3 55;
+  declaration: mixinTwoVariablesTwoDef "One" 55;
+  declaration: mixinTwoVariablesTwoDef green 55;
+  declaration: mixinTwoVariablesTwoDef #FF0000 55;
+  declaration: mixinTwoVariablesTwoDef 3 '2';
+  declaration: mixinTwoVariablesTwoDef 3.3 '2';
+  declaration: mixinTwoVariablesTwoDef -3 '2';
+  declaration: mixinTwoVariablesTwoDef "One" '2';
+  declaration: mixinTwoVariablesTwoDef green '2';
+  declaration: mixinTwoVariablesTwoDef #FF0000 '2';
+  /* next */
+  declaration: mixinTwoVariablesStringDef "a" 55;
+  declaration: mixinTwoVariablesStringDef "a" 55;
+  declaration: mixinTwoVariablesStringDef 3 55;
+  declaration: mixinTwoVariablesStringDef 3.3 55;
+  declaration: mixinTwoVariablesStringDef -3 55;
+  declaration: mixinTwoVariablesStringDef "One" 55;
+  declaration: mixinTwoVariablesStringDef green 55;
+  declaration: mixinTwoVariablesStringDef #FF0000 55;
+  declaration: mixinTwoVariablesStringDef 3 '2';
+  declaration: mixinTwoVariablesStringDef 3.3 '2';
+  declaration: mixinTwoVariablesStringDef -3 '2';
+  declaration: mixinTwoVariablesStringDef "One" '2';
+  declaration: mixinTwoVariablesStringDef green '2';
+  declaration: mixinTwoVariablesStringDef #FF0000 '2';
+  /* next */
+  declaration: mixinTwoVariablesOtherStringDef 'hello' 55;
+  declaration: mixinTwoVariablesOtherStringDef 'hello' 55;
+  declaration: mixinTwoVariablesOtherStringDef 3 55;
+  declaration: mixinTwoVariablesOtherStringDef 3.3 55;
+  declaration: mixinTwoVariablesOtherStringDef -3 55;
+  declaration: mixinTwoVariablesOtherStringDef "One" 55;
+  declaration: mixinTwoVariablesOtherStringDef green 55;
+  declaration: mixinTwoVariablesOtherStringDef #FF0000 55;
+  declaration: mixinTwoVariablesOtherStringDef 3 '2';
+  declaration: mixinTwoVariablesOtherStringDef 3.3 '2';
+  declaration: mixinTwoVariablesOtherStringDef -3 '2';
+  declaration: mixinTwoVariablesOtherStringDef "One" '2';
+  declaration: mixinTwoVariablesOtherStringDef green '2';
+  declaration: mixinTwoVariablesOtherStringDef #FF0000 '2';
+  /* next */
+  declaration: mixinDefaultvariable 3 34;
+  declaration: mixinDefaultvariable 3.3 34;
+  declaration: mixinDefaultvariable -3 34;
+  declaration: mixinDefaultvariable "One" 34;
+  declaration: mixinDefaultvariable green 34;
+  declaration: mixinDefaultvariable #FF0000 34;
+  declaration: mixinDefaultvariable 3 '2';
+  declaration: mixinDefaultvariable 3.3 '2';
+  declaration: mixinDefaultvariable -3 '2';
+  declaration: mixinDefaultvariable "One" '2';
+  declaration: mixinDefaultvariable green '2';
+  declaration: mixinDefaultvariable #FF0000 '2';
+}

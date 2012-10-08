@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.ILessCompiler;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.DummyLessCompiler;
 
 /**
@@ -40,7 +40,7 @@ public class LessJsTest extends AbstractFileBasedTest {
     return result;
   }
 
-  protected ILessCompiler getCompiler() {
+  protected LessCompiler getCompiler() {
     return new DummyLessCompiler();
   }
 

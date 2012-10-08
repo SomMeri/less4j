@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.ILessCompiler;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
 
@@ -30,10 +30,10 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
     //return TestFileUtils.loadTestFile(inputDir, "nth-variants.less");
-    return TestFileUtils.loadTestFiles(inputDir);
+    return (new TestFileUtils()).loadTestFiles(inputDir);
   }
 
-  protected ILessCompiler getCompiler() {
+  protected LessCompiler getCompiler() {
     return new DefaultLessCompiler();
   }
 

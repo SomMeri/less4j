@@ -41,4 +41,13 @@ public class Medium extends ASTCssNode {
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(modifier, mediumType);
   }
+  
+  @Override
+  public Medium clone() {
+    Medium result = (Medium) super.clone();
+    result.modifier = modifier==null?null:modifier.clone();
+    result.mediumType = mediumType==null?null:mediumType.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 }

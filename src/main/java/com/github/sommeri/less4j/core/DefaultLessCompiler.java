@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.sommeri.less4j.ILessCompiler;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
@@ -24,6 +24,7 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
+import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
@@ -39,41 +40,48 @@ import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
-import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
-import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
+import com.github.sommeri.less4j.core.parser.ANTLRPhaseErrors;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
 
-public class DefaultLessCompiler implements ILessCompiler {
+public class DefaultLessCompiler implements LessCompiler {
+  private ProblemsCollector problemsCollector = new ProblemsCollector();
   private ANTLRParser parser = new ANTLRParser();
-  private ASTBuilder astBuilder = new ASTBuilder();
+  private ASTBuilder astBuilder = new ASTBuilder(problemsCollector);
   private LessToCssCompiler compiler = new LessToCssCompiler();
 
   @Override
   public String compile(String lessContent) {
     // FIXME: ugly, clean hierarchy and dependencies
+    problemsCollector.clean();
     ExtendedStringBuilder stringBuilder = new ExtendedStringBuilder("");
 
     ANTLRParser.ParseResult result = parser.parseStyleSheet(lessContent);
-    if (result.hasErrors())
-      throw new CompileException("Parse errors.", null);
+    if (result.hasErrors()) {
+      throw new ANTLRPhaseErrors(result.getErrors());
+    }
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet);
     
-    Builder builder = new Builder(stringBuilder);
+    CssPrinter builder = new CssPrinter(stringBuilder);
     builder.append(cssStyleSheet);
     return stringBuilder.toString();
   };
 
+  @Override
+  public List<IProblem> getProblems() {
+    return problemsCollector.getWarnings();
+  }
+  
 }
 
-class Builder {
+class CssPrinter {
 
   private final ExtendedStringBuilder builder;
   private static final DecimalFormat FORMATTER = new DecimalFormat("#.##################");
 
-  public Builder(ExtendedStringBuilder builder) {
+  public CssPrinter(ExtendedStringBuilder builder) {
     super();
     this.builder = builder;
   }

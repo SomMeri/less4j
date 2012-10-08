@@ -41,4 +41,14 @@ public class MediaExpression extends ASTCssNode {
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(feature, expression);
   }
+  
+  @Override
+  public MediaExpression clone() {
+    MediaExpression result = (MediaExpression) super.clone();
+    result.feature = feature==null?null:feature.clone();
+    result.expression = expression==null?null:expression.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
+
 }

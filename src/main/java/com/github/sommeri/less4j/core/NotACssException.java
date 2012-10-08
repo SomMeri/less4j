@@ -8,7 +8,7 @@ public class NotACssException extends RuntimeException {
   private final ASTCssNode node;
 
   public NotACssException(ASTCssNode node) {
-    super("Node type: " + node.getType() + " | " + node);
+    super("Bug happened: compilation result contains less features. Node type: " + node.getType() + " Coordinates: "+ node.getSourceLine() +":" + node.getCharPositionInSourceLine() +"| " + node);
     this.node = node;
   }
 

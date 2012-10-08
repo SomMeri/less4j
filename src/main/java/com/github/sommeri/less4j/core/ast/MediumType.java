@@ -32,4 +32,8 @@ public class MediumType extends ASTCssNode {
     return ASTCssNodeType.MEDIUM_TYPE;
   }
 
+  @Override
+  public MediumType clone() {
+    return (MediumType) super.clone();
+  }
 }

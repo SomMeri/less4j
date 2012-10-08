@@ -59,14 +59,13 @@ public class Selector extends ASTCssNode implements Cloneable {
     return ASTCssNodeType.SELECTOR;
   }
 
-  //FIXME: unit tests na clonning!!!!
-  //FIXME: are the parents really needed? They seem only to complicate things right now
   @Override
   public Selector clone() {
     Selector clone = (Selector) super.clone();
     clone.setLeadingCombinator(getLeadingCombinator()==null? null : getLeadingCombinator().clone());
     clone.setHead(getHead().clone());
     clone.setRight(getRight()==null? null : getRight().clone());
+    clone.configureParentToAllChilds();
     
     return clone;
   }

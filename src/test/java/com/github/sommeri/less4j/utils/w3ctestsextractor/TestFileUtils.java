@@ -9,7 +9,16 @@ import org.apache.commons.io.FileUtils;
 
 public class TestFileUtils {
 
-  public static Collection<Object[]> loadTestFiles(String... directories) {
+  private String expectedDataFileSuffix = ".css";
+  
+  public TestFileUtils() {
+  }
+  
+  public TestFileUtils(String expectedDataFileSuffix) {
+    this.expectedDataFileSuffix = expectedDataFileSuffix;
+  }
+  
+  public Collection<Object[]> loadTestFiles(String... directories) {
     Collection<File> allFiles = getAllLessFiles(directories);
     Collection<Object[]> result = new ArrayList<Object[]>();
     for (File file : allFiles) {
@@ -18,7 +27,7 @@ public class TestFileUtils {
     return result;
   }
 
-  private static Collection<File> getAllLessFiles(String... directories) {
+  private Collection<File> getAllLessFiles(String... directories) {
     Collection<File> allFiles = new LinkedList<File>();
     for (String directory : directories) {
       allFiles.addAll(FileUtils.listFiles(new File(directory), new String[] { "less" }, false));
@@ -26,27 +35,28 @@ public class TestFileUtils {
     return allFiles;
   }
 
-  private static void addFiles(Collection<Object[]> result, File... files) {
+  private void addFiles(Collection<Object[]> result, File... files) {
     for (File file : files) {
-      result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
+      result.add(new Object[] { file, findCorrespondingExpected(file), file.getName() });
     }
   }
 
-  private static File findCorrespondingCss(File lessFile) {
+  private File findCorrespondingExpected(File lessFile) {
     String lessFileName = lessFile.getPath();
     String cssFileName = convertToOutputFilename(lessFileName);
     File cssFile = new File(cssFileName);
     return cssFile;
   }
 
-  private static String convertToOutputFilename(String name) {
-    if (name.endsWith(".less"))
-      return name.substring(0, name.length() - 5) + ".css";
+  private String convertToOutputFilename(String name) {
+    if (name.endsWith(".less")) {
+      return name.substring(0, name.length() - 5) + expectedDataFileSuffix;
+    }
 
     return name;
   }
 
-  public static Collection<Object[]> loadTestFile(String directory, String filename) {
+  public Collection<Object[]> loadTestFile(String directory, String filename) {
     String name = directory + filename;
     File input = new File(name);
     Collection<Object[]> result = new ArrayList<Object[]>();

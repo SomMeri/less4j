@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Set;
 
 
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.core.ProblemsCollector;
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
@@ -27,12 +30,14 @@ import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
+import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
+import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Selector;
@@ -47,6 +52,7 @@ import com.github.sommeri.less4j.core.ast.Nth.Form;
 
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
+  private final ProblemsCollector warningsCollector;
   private final TermBuilder termBuilder = new TermBuilder(this);
   // as stated here: http://www.w3.org/TR/css3-selectors/#pseudo-elements
   private static Set<String> COLONLESS_PSEUDOELEMENTS = new HashSet<String>();
@@ -55,6 +61,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("first-letter");
     COLONLESS_PSEUDOELEMENTS.add("before");
     COLONLESS_PSEUDOELEMENTS.add("after");
+  }
+
+  public ASTBuilderSwitch(ProblemsCollector warningsCollector) {
+    super();
+    this.warningsCollector = warningsCollector;
   }
 
   public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {
@@ -76,7 +87,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public Expression handleExpression(HiddenTokenAwareTree token) {
     LinkedList<HiddenTokenAwareTree> children = new LinkedList<HiddenTokenAwareTree>(token.getChildren());
     if (children.size() == 0)
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     if (children.size() == 1) {
       Expression head = (Expression) switchOn(children.get(0));
@@ -134,7 +145,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       break;
     }
 
-    throw new IncorrectTreeException("Unknown operator type. ", token);
+    throw new TreeBuildingException("Unknown operator type. ", token);
   }
 
   public Variable handleVariable(HiddenTokenAwareTree token) {
@@ -163,7 +174,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.get(2).getType() == LessLexer.IMPORTANT_SYM)
       return new Declaration(token, name, expression, true);
 
-    throw new IncorrectTreeException(token);
+    throw new TreeBuildingException(token);
   }
 
   public FontFace handleFontFace(HiddenTokenAwareTree token) {
@@ -183,7 +194,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public CharsetDeclaration handleCharsetDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.isEmpty())
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     return new CharsetDeclaration(token, children.get(0).getText());
   }
@@ -198,7 +209,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.SELECTOR) {
         Selector selector = handleSelector(kid);
-        selectors.add(selector);
+        if (selector!=null)
+          selectors.add(selector);
         previousKid = selector;
       }
       if (kid.getType() == LessLexer.BODY) {
@@ -207,14 +219,52 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         previousKid = body;
       }
       if (kid.getType() == LessLexer.COMMA) {
-        previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
+        if (previousKid!=null)
+          previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
       }
     }
 
     ruleSet.addSelectors(selectors);
+    //TODO: these kind of warnings could be in a special validation class, no reason to do it here
+    warningsCollector.warnRuleSetWithoutSelector(ruleSet);
     return ruleSet;
   }
 
+  public PureMixin handlePureMixinDeclaration(HiddenTokenAwareTree token) {
+    PureMixin result = new PureMixin(token);
+
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType() == LessLexer.CSS_CLASS) {
+        result.setSelector(handleCssClass(kid));
+      } else if (kid.getType() == LessLexer.BODY) {
+        result.setBody(handleRuleSetsBody(kid));
+      } else { // anything else is a parameter
+        result.addParameter(switchOn(kid));
+      }
+      
+    }
+    return result;
+  }
+  
+  public MixinReference handleMixinReference(HiddenTokenAwareTree token) {
+    MixinReference result = new MixinReference(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType() == LessLexer.CSS_CLASS) {
+        result.setSelector(handleCssClass(kid));
+      } else { // anything else is a parameter
+        result.addParameter((Expression)switchOn(kid));
+      }
+      
+    }
+    return result;
+  }
+  
+  public Expression handleMixinPattern(HiddenTokenAwareTree token) {
+    return termBuilder.buildFromTerm(token.getChild(0));
+  }
+  
   public NestedRuleSet handleNestedRuleSet(HiddenTokenAwareTree token) {
     boolean hasAppender = false;
     SelectorCombinator combinator = null;
@@ -270,13 +320,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public SelectorAttribute handleSelectorAttribute(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0)
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     if (children.size() == 1)
       return new SelectorAttribute(token, children.get(0).getText());
 
     if (children.size() < 3)
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     return new SelectorAttribute(token, children.get(0).getText(), handleSelectorOperator(children.get(1)), children.get(2).getText());
   }
@@ -309,13 +359,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       break;
     }
 
-    throw new IncorrectTreeException(token);
+    throw new TreeBuildingException(token);
   }
 
   public Pseudo handlePseudo(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() == 0 || children.size() == 1)
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     // the child number 0 is a :
     HiddenTokenAwareTree t = children.get(1);
@@ -340,7 +390,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new PseudoClass(token, children.get(1).getText(), switchOn(parameter));
     }
 
-    throw new IncorrectTreeException(token);
+    throw new TreeBuildingException(token);
   }
 
   public Nth handleNth(HiddenTokenAwareTree token) {
@@ -389,11 +439,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public IdSelector handleIdSelector(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     if (children.size() != 1)
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     String text = children.get(0).getText();
     if (text == null || text.length() < 1)
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     return new IdSelector(token, text.substring(1));
   }
@@ -484,7 +534,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new MediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), null);
 
     if (children.size() == 2)
-      throw new IncorrectTreeException(token);
+      throw new TreeBuildingException(token);
 
     HiddenTokenAwareTree colonNode = children.get(1);
     featureNode.addFollowing(colonNode.getPreceding());
@@ -506,13 +556,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }
 
+  //this handles both variable declaration and a mixin parameter with default value
   public VariableDeclaration handleVariableDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree name = children.get(0);
     HiddenTokenAwareTree colon = children.get(1);
     HiddenTokenAwareTree expression = children.get(2);
     HiddenTokenAwareTree semi = children.get(3);
-
     colon.giveHidden(name, expression);
     semi.giveHidden(expression, null);
     token.addBeforeFollowing(semi.getFollowing());
@@ -520,18 +570,31 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }
 
+  public ArgumentDeclaration handleArgumentDeclaration(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    HiddenTokenAwareTree name = children.get(0);
+    
+    if (children.size()==1)
+      return new ArgumentDeclaration(token, new Variable(name, name.getText()), null);
+    
+    HiddenTokenAwareTree colon = children.get(1);
+    HiddenTokenAwareTree expression = children.get(2);
+    colon.giveHidden(name, expression);
+
+    return new ArgumentDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
+  }
 }
 
 @SuppressWarnings("serial")
-class IncorrectTreeException extends RuntimeException {
+class TreeBuildingException extends Less4jException {
 
   private final HiddenTokenAwareTree node;
 
-  public IncorrectTreeException(HiddenTokenAwareTree node) {
+  public TreeBuildingException(HiddenTokenAwareTree node) {
     this.node = node;
   }
 
-  public IncorrectTreeException(String message, HiddenTokenAwareTree node) {
+  public TreeBuildingException(String message, HiddenTokenAwareTree node) {
     super(message);
     this.node = node;
   }
@@ -541,11 +604,24 @@ class IncorrectTreeException extends RuntimeException {
     return super.getMessage() + getPositionInformation();
   }
 
-  private String getPositionInformation() {
-    if (node == null)
-      return "";
+  @Override
+  public boolean hasErrorPosition() {
+    return node==null;
+  }
 
-    String result = "\n Line: " + node.getLine() + " Character: " + node.getCharPositionInLine();
-    return result;
+  @Override
+  public int getCharPositionInLine() {
+    if (!hasErrorPosition())
+      return -1;
+
+    return node.getCharPositionInLine() + 1;
+  }
+
+  @Override
+  public int getLine() {
+    if (!hasErrorPosition())
+      return -1;
+
+    return node.getLine();
   }
 }

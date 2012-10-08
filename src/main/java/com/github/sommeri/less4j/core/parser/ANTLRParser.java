@@ -20,7 +20,7 @@ import org.antlr.runtime.tree.CommonTreeAdaptor;
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.parser.LessParser;
 
-//import com.github.sommeri.less4j.utils.DebugPrint;
+import com.github.sommeri.less4j.utils.DebugPrint;
 
 /**
  * 
@@ -57,7 +57,7 @@ public class ANTLRParser {
   private ParseResult parse(String input, InputType inputType) {
     try {
       //DebugPrint.printTokenStream(input);
-      List<RecognitionException> errors = new ArrayList<RecognitionException>();
+      List<AntlrException> errors = new ArrayList<AntlrException>();
       LessLexer lexer = createLexer(input, errors);
 
       CollectorTokenSource tokenSource = new CollectorTokenSource(lexer, KEEP_HIDDEN_TOKENS);
@@ -66,21 +66,21 @@ public class ANTLRParser {
       
       HiddenTokenAwareTree ast = (HiddenTokenAwareTree) returnScope.getTree();
       merge(ast, tokenSource.getCollectedTokens());
-      //DebugPrint.print(ast);
-      return new ParseResultImpl(ast, new ArrayList<RecognitionException>(errors));
+      DebugPrint.print(ast);
+      return new ParseResultImpl(ast, new ArrayList<AntlrException>(errors));
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");
     }
   }
 
-  private LessParser createParser(TokenSource tokenSource, List<RecognitionException> errors) {
+  private LessParser createParser(TokenSource tokenSource, List<AntlrException> errors) {
     CommonTokenStream tokens = new CommonTokenStream(tokenSource);
     LessParser parser = new LessParser(tokens, errors);
     parser.setTreeAdaptor(new HiddenTokenAwareTreeAdaptor());
     return parser;
   }
 
-  private LessLexer createLexer(String expression, List<RecognitionException> errors) {
+  private LessLexer createLexer(String expression, List<AntlrException> errors) {
     ANTLRStringStream input = new ANTLRStringStream(expression);
     LessLexer lexer = new LessLexer(input, errors);
     return lexer;
@@ -94,15 +94,15 @@ public class ANTLRParser {
 
   public interface ParseResult {
     HiddenTokenAwareTree getTree();
-    List<RecognitionException> getErrors();
+    List<AntlrException> getErrors();
     boolean hasErrors();
   }
 
   private class ParseResultImpl implements ParseResult {
     private final HiddenTokenAwareTree tree;
-    private final List<RecognitionException> errors;
+    private final List<AntlrException> errors;
 
-    public ParseResultImpl(HiddenTokenAwareTree tree, List<RecognitionException> errors) {
+    public ParseResultImpl(HiddenTokenAwareTree tree, List<AntlrException> errors) {
       super();
       this.tree = tree;
       this.errors = errors;
@@ -112,7 +112,7 @@ public class ANTLRParser {
       return tree;
     }
 
-    public List<RecognitionException> getErrors() {
+    public List<AntlrException> getErrors() {
       return errors;
     }
 

@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.ILessCompiler;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.debugutils.RhinoCompiler;
 import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
@@ -49,10 +49,10 @@ public class W3CSelectorsTests extends AbstractFileBasedTest {
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    return TestFileUtils.loadTestFiles(standardCases, lessjsIncompatibleNegatedNth, lessjsIncompatibleNegatedVarious);
+    return (new TestFileUtils()).loadTestFiles(standardCases, lessjsIncompatibleNegatedNth, lessjsIncompatibleNegatedVarious);
   }
 
-  protected ILessCompiler getCompiler() {
+  protected LessCompiler getCompiler() {
     return new DefaultLessCompiler();
   }
 

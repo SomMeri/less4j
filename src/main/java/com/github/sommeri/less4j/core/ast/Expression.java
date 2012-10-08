@@ -8,4 +8,10 @@ public abstract class Expression extends ASTCssNode {
     super(token);
   }
 
+  @Override
+  public Expression clone() {
+    Expression clone = (Expression) super.clone();
+    return clone;
+  }
+
 }

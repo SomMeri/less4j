@@ -51,4 +51,12 @@ public class RuleSet extends ASTCssNode {
     selectors.addAll(result);
   }
 
+  @Override
+  public RuleSet clone() {
+    RuleSet result = (RuleSet) super.clone();
+    result.body = body==null?null:body.clone();
+    result.selectors = ArraysUtils.deeplyClonedList(selectors);
+    result.configureParentToAllChilds();
+    return result;
+  }
 }

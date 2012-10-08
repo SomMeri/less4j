@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
 
@@ -51,6 +52,11 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       body.add(member);
     }
 
+    public void replaceMember(T oldMember, List<T> newMembers) {
+      body.addAll(body.indexOf(oldMember), newMembers);
+      body.remove(oldMember);
+    }
+
     public List<T> membersByType(ASTCssNodeType type) {
       List<T> result = new ArrayList<T>();
       List<T> body = getChilds();
@@ -64,6 +70,14 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
 
     public boolean removeMember(T node) {
       return body.remove(node);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Body<T> clone() {
+      Body<T> result = (Body<T>) super.clone();
+      result.body = ArraysUtils.deeplyClonedList(body);
+      result.configureParentToAllChilds();
+      return result;
     }
 
 }

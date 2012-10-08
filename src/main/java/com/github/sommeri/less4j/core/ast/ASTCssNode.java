@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-public abstract class ASTCssNode {
+public abstract class ASTCssNode implements Cloneable {
   
   private ASTCssNode parent;
   private HiddenTokenAwareTree underlyingStructure;
@@ -69,6 +69,10 @@ public abstract class ASTCssNode {
     this.openingComments = openingComments;
   }
 
+  public void addOpeningComments(List<Comment> openingComments) {
+    this.openingComments.addAll(openingComments);
+  }
+  
   public List<Comment> getOrphanComments() {
     return orphanComments;
   }
@@ -84,20 +88,28 @@ public abstract class ASTCssNode {
   }
 
   public int getCharPositionInSourceLine() {
-    return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getCharPositionInLine();
+    return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getCharPositionInLine() + 1;
   }
   
   @Override
-  protected ASTCssNode clone() {
+  public ASTCssNode clone() {
     try {
       ASTCssNode clone = (ASTCssNode) super.clone();
       clone.setOpeningComments(new ArrayList<Comment>(getOpeningComments()));
       clone.setOrphanComments(new ArrayList<Comment>(getOrphanComments()));
       clone.setTrailingComments(new ArrayList<Comment>(getTrailingComments()));
-
+      //fail soon rather than later
+      clone.setParent(null);
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new IllegalStateException("This is a bug - please submit issue with this stack trace and an input.");
+    }
+  }
+
+  public void configureParentToAllChilds() {
+    List<? extends ASTCssNode> childs = getChilds();
+    for (ASTCssNode kid : childs) {
+      kid.setParent(this);
     }
   }
 

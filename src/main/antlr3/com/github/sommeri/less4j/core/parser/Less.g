@@ -28,6 +28,7 @@ options {
 
 tokens {
   VARIABLE_DECLARATION;
+  ARGUMENT_DECLARATION;
   EXPRESSION;
   DECLARATION;
   VARIABLE_REFERENCE;
@@ -55,27 +56,32 @@ tokens {
   MEDIA_QUERY;
   MEDIUM_TYPE;
   BODY;
+  MIXIN_REFERENCE;
+  PURE_MIXIN;
+  MIXIN_PATTERN;
 }
 
 @lexer::header {
   package com.github.sommeri.less4j.core.parser;
+  import com.github.sommeri.less4j.core.parser.AntlrException;
 }
  
 @parser::header {
   package com.github.sommeri.less4j.core.parser;
   import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
+  import com.github.sommeri.less4j.core.parser.AntlrException;
 }
 
 //override some methods and add new members to generated lexer
 @lexer::members {
-    public LessLexer(List<RecognitionException> errors) {
+    public LessLexer(List<AntlrException> errors) {
       this.errors = errors;
     }
 
-    public LessLexer(CharStream input, List<RecognitionException> errors) {
+    public LessLexer(CharStream input, List<AntlrException> errors) {
       this(input, new RecognizerSharedState(), errors);
     }
-    public LessLexer(CharStream input, RecognizerSharedState state, List<RecognitionException> errors) {
+    public LessLexer(CharStream input, RecognizerSharedState state, List<AntlrException> errors) {
       super(input,state);
       this.errors = errors;
     }
@@ -94,11 +100,11 @@ tokens {
         return (Token)tokens.remove(0);
   }
   //add new field
-  private List<RecognitionException> errors = new ArrayList<RecognitionException>();
+  private List<AntlrException> errors = new ArrayList<AntlrException>();
   
   //add new method
-  public List<RecognitionException> getAllErrors() {
-    return new ArrayList<RecognitionException>(errors);
+  public List<AntlrException> getAllErrors() {
+    return new ArrayList<AntlrException>(errors);
   }
 
   //add new method
@@ -108,7 +114,7 @@ tokens {
   
   //override method
   public void reportError(RecognitionException e) {
-    errors.add(e);
+    errors.add(new AntlrException(e, getErrorMessage(e, getTokenNames())));
     displayRecognitionError(this.getTokenNames(), e);
   }
   
@@ -117,20 +123,20 @@ tokens {
 //override some methods and add new members to generated parser
 @parser::members {
 
-  public LessParser(TokenStream input, List<RecognitionException> errors) {
+  public LessParser(TokenStream input, List<AntlrException> errors) {
     this(input, new RecognizerSharedState(), errors);
   }
-  public LessParser(TokenStream input, RecognizerSharedState state, List<RecognitionException> errors) {
+  public LessParser(TokenStream input, RecognizerSharedState state, List<AntlrException> errors) {
     super(input, state);
     this.errors = errors;
   }
 
   //add new field
-  private List<RecognitionException> errors = new ArrayList<RecognitionException>();
+  private List<AntlrException> errors = new ArrayList<AntlrException>();
   private ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
   
-  public List<RecognitionException> getAllErrors() {
-    return new ArrayList<RecognitionException>(errors);
+  public List<AntlrException> getAllErrors() {
+    return new ArrayList<AntlrException>(errors);
   }
 
   //add new method
@@ -140,7 +146,7 @@ tokens {
 
   //override method
   public void reportError(RecognitionException e) {
-    errors.add(e);
+    errors.add(new AntlrException(e, getErrorMessage(e, getTokenNames())));
     displayRecognitionError(this.getTokenNames(), e);
   }
   
@@ -212,15 +218,21 @@ bodylist
     ;
     
 bodyset
-    : ruleSet
+    : (cssClass LPAREN)=>pureMixinDeclaration
+    | ruleSet
     | media
     | page
     | fontface
     | variabledeclaration
     ;
-    
+
 variabledeclaration
     : VARIABLE COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* SEMI)
+    ;
+
+//This looks like the declaration, but does not allow a comma.
+pureMixinDeclarationParameter
+    : VARIABLE (b=COLON (a+=mathExprHighPrior))? -> ^(ARGUMENT_DECLARATION VARIABLE $b* $a*)
     ;
 
 variablereference
@@ -285,6 +297,9 @@ ruleset_body
     : LBRACE
             (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
                | (nestedRuleSet)=> a+=nestedRuleSet
+               | (mixinReference)=>a+=mixinReference
+               | (pureMixinDeclaration)=>a+=pureMixinDeclaration
+               | (cssClass LPAREN)=>pureMixinDeclaration
                | a+=variabledeclaration
              )*
              (  
@@ -419,6 +434,46 @@ pseudoparameters:
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
  
+mixinReference
+    : a=cssClass (LPAREN c=mixinReferenceArguments? RPAREN)? SEMI
+    -> ^(MIXIN_REFERENCE $a $c*)
+    ; 
+
+mixinReferenceArguments
+    : a+=mixinReferenceArgument ( COMMA a+=mixinReferenceArgument)*
+    -> $a*
+    ;
+
+mixinReferenceArgument
+    : mathExprHighPrior
+    ;
+
+//we can loose parentheses, because comments inside mixin definition are going to be lost anyway
+pureMixinDeclaration 
+    : a=cssClass LPAREN c=pureMixinDeclarationArguments? RPAREN e=ruleset_body
+    -> ^(PURE_MIXIN $a $c* $e)
+    ;
+
+//It is OK to loose commas, because mixins are going to be lost anyway    
+pureMixinDeclarationArguments
+    : a+=pureMixinDeclarationArgument ( COMMA a+=pureMixinDeclarationArgument)*
+    -> $a*
+    ;
+
+pureMixinDeclarationArgument
+    : pureMixinDeclarationParameter
+    | pureMixinDeclarationPattern
+    ;
+
+pureMixinDeclarationPattern
+    : (( a+=unaryOperator? (a+=value_term)
+    ) | (
+       a+=unsigned_value_term
+       | a+=hexColor
+    ))
+    -> ^(MIXIN_PATTERN ^(TERM $a*))
+    ;
+
 //The expr is optional, because less.js supports this: "margin: ;" I do not know why, but they have it in
 //their unit tests (so it was intentional)
 declaration

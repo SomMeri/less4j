@@ -1,0 +1,116 @@
+.mixinNoParam() {
+  declaration: mixinNoParam;
+}
+.mixinOneVariable(@something) {
+  declaration: mixinOneVariable @something;
+}
+.mixinTwoVariables(@something, @other) {
+  declaration: mixinTwoVariables @something @other;
+}
+.mixinTwoVariablesOneDef(@something, @other: 55) {
+  declaration: mixinTwoVariablesOneDef @something @other;
+}
+.mixinTwoVariablesTwoDef(@something: 4, @other: 55) {
+  declaration: mixinTwoVariablesTwoDef @something @other;
+}
+.mixinTwoVariablesStringDef(@something: "a", @other: 55) {
+  declaration: mixinTwoVariablesStringDef @something @other;
+}
+.mixinTwoVariablesOtherStringDef(@something: 'hello', @other :55) {
+  declaration: mixinTwoVariablesOtherStringDef @something @other;
+}
+
+@variable: 34;
+.mixinDefaultvariable(@something, @other: @variable) {
+  declaration: mixinDefaultvariable @something @other;
+}
+
+#allAreUsedHere {
+  .mixinNoParam;
+  .mixinNoParam();
+   /* next */
+  .mixinOneVariable(3);
+  .mixinOneVariable(3.3);
+  .mixinOneVariable(-3);
+  .mixinOneVariable("One");
+  .mixinOneVariable(green);
+  .mixinOneVariable(#FF0000);
+  .mixinTwoVariables(3, '2');
+  .mixinTwoVariables(3.3, '2');
+  .mixinTwoVariables(-3, '2');
+  .mixinTwoVariables("One", '2');
+  .mixinTwoVariables(green, '2');
+  .mixinTwoVariables(#FF0000, '2');
+   /* next */
+  .mixinTwoVariablesOneDef(3);
+  .mixinTwoVariablesOneDef(3.3);
+  .mixinTwoVariablesOneDef(-3);
+  .mixinTwoVariablesOneDef("One");
+  .mixinTwoVariablesOneDef(green);
+  .mixinTwoVariablesOneDef(#FF0000);
+  .mixinTwoVariablesOneDef(3, '2');
+  .mixinTwoVariablesOneDef(3.3, '2');
+  .mixinTwoVariablesOneDef(-3, '2');
+  .mixinTwoVariablesOneDef("One", '2');
+  .mixinTwoVariablesOneDef(green, '2');
+  .mixinTwoVariablesOneDef(#FF0000, '2');
+   /* next */
+  .mixinTwoVariablesTwoDef;
+  .mixinTwoVariablesTwoDef();
+  .mixinTwoVariablesTwoDef(3);
+  .mixinTwoVariablesTwoDef(3.3);
+  .mixinTwoVariablesTwoDef(-3);
+  .mixinTwoVariablesTwoDef("One");
+  .mixinTwoVariablesTwoDef(green);
+  .mixinTwoVariablesTwoDef(#FF0000);
+  .mixinTwoVariablesTwoDef(3, '2');
+  .mixinTwoVariablesTwoDef(3.3, '2');
+  .mixinTwoVariablesTwoDef(-3, '2');
+  .mixinTwoVariablesTwoDef("One", '2');
+  .mixinTwoVariablesTwoDef(green, '2');
+  .mixinTwoVariablesTwoDef(#FF0000, '2');
+   /* next */
+  .mixinTwoVariablesStringDef;
+  .mixinTwoVariablesStringDef();
+  .mixinTwoVariablesStringDef(3);
+  .mixinTwoVariablesStringDef(3.3);
+  .mixinTwoVariablesStringDef(-3);
+  .mixinTwoVariablesStringDef("One");
+  .mixinTwoVariablesStringDef(green);
+  .mixinTwoVariablesStringDef(#FF0000);
+  .mixinTwoVariablesStringDef(3, '2');
+  .mixinTwoVariablesStringDef(3.3, '2');
+  .mixinTwoVariablesStringDef(-3, '2');
+  .mixinTwoVariablesStringDef("One", '2');
+  .mixinTwoVariablesStringDef(green, '2');
+  .mixinTwoVariablesStringDef(#FF0000, '2');
+   /* next */
+  .mixinTwoVariablesOtherStringDef;
+  .mixinTwoVariablesOtherStringDef();
+  .mixinTwoVariablesOtherStringDef(3);
+  .mixinTwoVariablesOtherStringDef(3.3);
+  .mixinTwoVariablesOtherStringDef(-3);
+  .mixinTwoVariablesOtherStringDef("One");
+  .mixinTwoVariablesOtherStringDef(green);
+  .mixinTwoVariablesOtherStringDef(#FF0000);
+  .mixinTwoVariablesOtherStringDef(3, '2');
+  .mixinTwoVariablesOtherStringDef(3.3, '2');
+  .mixinTwoVariablesOtherStringDef(-3, '2');
+  .mixinTwoVariablesOtherStringDef("One", '2');
+  .mixinTwoVariablesOtherStringDef(green, '2');
+  .mixinTwoVariablesOtherStringDef(#FF0000, '2');
+   /* next */
+  .mixinDefaultvariable(3);
+  .mixinDefaultvariable(3.3);
+  .mixinDefaultvariable(-3);
+  .mixinDefaultvariable("One");
+  .mixinDefaultvariable(green);
+  .mixinDefaultvariable(#FF0000);
+  .mixinDefaultvariable(3, '2');
+  .mixinDefaultvariable(3.3, '2');
+  .mixinDefaultvariable(-3, '2');
+  .mixinDefaultvariable("One", '2');
+  .mixinDefaultvariable(green, '2');
+  .mixinDefaultvariable(#FF0000, '2');
+}
+

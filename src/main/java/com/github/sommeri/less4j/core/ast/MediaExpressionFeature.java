@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-//TODO all those one string nodes should really be a one node named NAME or something similar. There are way too many classes by now. This is partially result of comments handling system, but there is no reason to go that far.
 public class MediaExpressionFeature extends ASTCssNode {
 
   private String feature;
@@ -37,4 +36,8 @@ public class MediaExpressionFeature extends ASTCssNode {
     return ASTCssNodeType.MEDIUM_EX_FEATURE;
   }
 
+  @Override
+  public MediaExpressionFeature clone() {
+    return (MediaExpressionFeature) super.clone();
+  }
 }

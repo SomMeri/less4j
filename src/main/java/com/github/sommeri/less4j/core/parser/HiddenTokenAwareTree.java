@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,7 +32,10 @@ public class HiddenTokenAwareTree extends CommonTree {
 
   @SuppressWarnings("unchecked")
   public List<HiddenTokenAwareTree> getChildren() {
-    return super.getChildren();
+    List<HiddenTokenAwareTree> result = super.getChildren();
+    if (result == null)
+      result = Collections.emptyList();
+    return result;
   }
 
   @Override

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -12,7 +13,10 @@ import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
+import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.RuleSet;
+import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
@@ -20,16 +24,16 @@ import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 public class LessToCssCompiler {
 
   private ASTManipulator manipulator = new ASTManipulator();
-  private ActiveVariableScope activeVariableScope;
+  private ActiveScope activeScope;
   private ExpressionEvaluator expressionEvaluator;
   private NestedRulesCollector nestedRulesCollector;
 
   public ASTCssNode compileToCss(StyleSheet less) {
-    activeVariableScope = new ActiveVariableScope();
-    expressionEvaluator = new ExpressionEvaluator(activeVariableScope);
+    activeScope = new ActiveScope();
+    expressionEvaluator = new ExpressionEvaluator(activeScope);
     nestedRulesCollector = new NestedRulesCollector();
 
-    solveVariables(less);
+    solveVariablesAndMixins(less);
     evaluateExpressions(less);
     freeNestedRuleSets(less);
 
@@ -40,7 +44,7 @@ public class LessToCssCompiler {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.RULE_SET) {
-        List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet)kid);
+        List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
         body.addMembersAfter(nestedRulesets, kid);
         for (RuleSet ruleSet : nestedRulesets) {
           ruleSet.setParent(body);
@@ -92,14 +96,14 @@ public class LessToCssCompiler {
     }
   }
 
-  private void solveVariables(ASTCssNode node) {
+  private void solveVariablesAndMixins(ASTCssNode node) {
     boolean hasOwnScope = hasOwnScope(node);
     if (hasOwnScope)
-      increaseScope(node);
+      activeScope.increaseScope();
 
     switch (node.getType()) {
     case VARIABLE_DECLARATION: {
-      activeVariableScope.addDeclaration((VariableDeclaration) node); //no reason to go further
+      manipulator.removeFromBody(node);
       break;
     }
     case VARIABLE: {
@@ -112,35 +116,114 @@ public class LessToCssCompiler {
       manipulator.replace(node, replacement);
       break;
     }
+    case MIXIN_REFERENCE: {
+      MixinReference mixinReference = (MixinReference) node;
+      RuleSetsBody replacement = resolveMixinReference(mixinReference);
+
+      List<ASTCssNode> childs = replacement.getChilds();
+      if (!childs.isEmpty()) {
+        childs.get(0).addOpeningComments(mixinReference.getOpeningComments());
+        childs.get(childs.size() - 1).addTrailingComments(mixinReference.getTrailingComments());
+      }
+      manipulator.replaceInBody(mixinReference, childs);
+      break;
+    }
+    case PURE_MIXIN: {
+      activeScope.enteringPureMixin((PureMixin) node);
+      expressionEvaluator.turnOffEvaluation();
+      break;
+    }
     }
 
-    List<? extends ASTCssNode> childs = node.getChilds();
-    List<ASTCssNode> childsToBeRemoved = new ArrayList<ASTCssNode>();
-    for (ASTCssNode kid : childs) {
-      solveVariables(kid);
-      if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
-        childsToBeRemoved.add(kid);
+    if (node.getType() != ASTCssNodeType.VARIABLE_DECLARATION && node.getType() != ASTCssNodeType.ARGUMENT_DECLARATION) {
+      List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
+      //FIXME: make extensive test case on nested mixins and nested rulesets - pure mixins and simple classes behave diferently
+      //Register all variables and  mixins. We have to do that because every variable and every mixin is valid within 
+      //the whole scope, even before it was defined. 
+      registerAllVariables(childs);
+      registerAllMixins(childs);
+
+      for (ASTCssNode kid : childs) {
+        solveVariablesAndMixins(kid);
       }
     }
 
-    for (ASTCssNode kid : childsToBeRemoved) {
-      manipulator.removeFromBody(kid);
+    switch (node.getType()) {
+    case PURE_MIXIN: {
+      activeScope.leavingPureMixin((PureMixin) node);
+      if (!activeScope.isInPureMixin())
+        expressionEvaluator.turnOnEvaluation();
+      manipulator.removeFromBody(node);
+      break;
     }
-
+    }
     if (hasOwnScope)
-      decreaseScope(node);
+      activeScope.decreaseScope();
   }
 
-  private void decreaseScope(ASTCssNode node) {
-    activeVariableScope.decreaseScope();
+  public void registerAllVariables(List<? extends ASTCssNode> childs) {
+    for (ASTCssNode kid : childs) {
+      if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
+        activeScope.addDeclaration((VariableDeclaration) kid); //no reason to go further
+      }
+    }
   }
 
-  private void increaseScope(ASTCssNode node) {
-    activeVariableScope.increaseScope();
+  public void registerAllMixins(List<? extends ASTCssNode> childs) {
+    for (ASTCssNode kid : childs) {
+      if (kid.getType() == ASTCssNodeType.PURE_MIXIN) {
+        activeScope.registerMixin((PureMixin) kid);
+      }
+    }
   }
 
   private boolean hasOwnScope(ASTCssNode node) {
     return (node instanceof Body);
+  }
+
+  private RuleSetsBody resolveMixinReference(MixinReference reference) {
+    List<MixinWithScope> matchingMixins = activeScope.getAllMatchingMixins(reference);
+    RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
+    for (MixinWithScope mixin : matchingMixins) {
+      initializeMixinVariableScope(reference, mixin);
+
+      RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
+      result.addMembers(body.getChilds());
+      
+      activeScope.leaveMixinVariableScope();
+    }
+
+    return result;
+  }
+
+  private RuleSetsBody solveVariablesAndMixinsInMixin(PureMixin mixin) {
+    RuleSetsBody body = mixin.getBody().clone();
+    boolean evaluatorOn = expressionEvaluator.isTurnedOn();
+    expressionEvaluator.turnOnEvaluation();
+    solveVariablesAndMixins(body);
+    if (!evaluatorOn)
+      expressionEvaluator.turnOffEvaluation();
+    return body;
+  }
+
+  private void initializeMixinVariableScope(MixinReference reference, MixinWithScope mixin) {
+    activeScope.enterMixinVariableScope(mixin.getVariablesUponDefinition());
+    
+    int length = mixin.getMixin().getParameters().size();
+    for (int i = 0; i < length; i++) {
+      ASTCssNode parameter = mixin.getMixin().getParameters().get(i);
+      if (parameter.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
+        ArgumentDeclaration declaration = (ArgumentDeclaration) parameter;
+        if (reference.hasParameter(i)) {
+          activeScope.addDeclaration(declaration, reference.getParameter(i));
+        } else {
+          if (declaration.getValue() == null)
+            CompileException.throwUndefinedMixinParameterValue(mixin.getMixin(), declaration, reference);
+          
+          activeScope.addDeclaration(declaration);
+        }
+      }
+    }
   }
 
 }

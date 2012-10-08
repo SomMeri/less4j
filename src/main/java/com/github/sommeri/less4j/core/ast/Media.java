@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class Media extends Body<ASTCssNode> {
 
@@ -66,4 +67,11 @@ public class Media extends Body<ASTCssNode> {
     return ASTCssNodeType.MEDIA;
   }
 
+  @Override
+  public Media clone() {
+    Media result = (Media) super.clone();
+    result.mediums = ArraysUtils.deeplyClonedList(mediums);
+    result.configureParentToAllChilds();
+    return result;
+  }
 }

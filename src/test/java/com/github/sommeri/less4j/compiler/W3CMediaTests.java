@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.ILessCompiler;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 /**
@@ -60,7 +60,7 @@ public class W3CMediaTests extends AbstractFileBasedTest {
     return cssFile;
   }
 
-  protected ILessCompiler getCompiler() {
+  protected LessCompiler getCompiler() {
     return new DefaultLessCompiler();
   }
 

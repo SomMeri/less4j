@@ -51,5 +51,14 @@ public class NestedRuleSet extends ASTCssNode {
   public ASTCssNodeType getType() {
     return ASTCssNodeType.NESTED_RULESET;
   } 
+  
+  @Override
+  public NestedRuleSet clone() {
+    NestedRuleSet result = (NestedRuleSet) super.clone();
+    result.leadingCombinator = leadingCombinator==null?null:leadingCombinator.clone();
+    result.ruleSet = ruleSet==null?null:ruleSet.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 
 }

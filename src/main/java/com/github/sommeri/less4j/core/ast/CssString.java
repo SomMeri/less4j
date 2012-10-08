@@ -47,4 +47,8 @@ public class CssString extends Expression {
     return "" + quoteType + value + quoteType;
   }
 
+  @Override
+  public CssString clone() {
+    return (CssString) super.clone();
+  }
 }

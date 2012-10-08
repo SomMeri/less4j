@@ -13,4 +13,9 @@ public class StyleSheet extends Body<ASTCssNode> {
     return ASTCssNodeType.STYLE_SHEET;
   }
 
+  @Override
+  public StyleSheet clone() {
+    return (StyleSheet) super.clone();
+  }
+
 }

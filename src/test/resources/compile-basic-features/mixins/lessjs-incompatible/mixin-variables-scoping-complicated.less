@@ -1,0 +1,33 @@
+@first: 'top first - do not use';
+@secondDefault: 'top level redefined down';
+@anotherVariable: 'top level';
+.mixinNoParam(@first, @second: @secondDefault) {
+  declaration: mixinNoParam @first @second @anotherVariable;
+}
+
+#allAreUsedHere {
+  @anotherVariable: 'inside';
+  @secondDefault: 'inside';
+  .nestedMixin(@first, @second: @secondDefault) {
+    this-will-survive-too: funny @first @second;
+  }
+  .nestedMixin(@first, @second: @secondDefault) {
+    declaration: nestedMixin @first @second;
+    .nestedMixin(@first, @second: @secondDefault) {
+      declaration: nestedMixinScoped @first @second;
+    }
+    .nestedMixin('inside call');
+  }
+  .mixinNoParam('the Parameter');
+  .nestedMixin('nested 1');
+  .nestedMixin(@first, @second: @secondDefault) {
+    declaration: redefined @first @second;
+  }
+  .nestedMixin('nested 2');
+}
+
+.mixinNoParam(@first, @second: @secondDefault) {
+  last: last @first @second;
+}
+@first: 'top last - do not use';
+@secondDefault: 'top used';

@@ -1,0 +1,11 @@
+@a: 100%;
+@var: @a;
+
+.lazy-eval {
+  width: @var;
+}
+
+@a: 50%;
+.lazy-eval two {
+  width: @var;
+}

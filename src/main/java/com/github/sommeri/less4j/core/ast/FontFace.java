@@ -19,4 +19,8 @@ public class FontFace extends Body<Declaration> {
     return ASTCssNodeType.FONT_FACE;
   }
 
+  @Override
+  public FontFace clone() {
+    return (FontFace) super.clone();
+  }
 }

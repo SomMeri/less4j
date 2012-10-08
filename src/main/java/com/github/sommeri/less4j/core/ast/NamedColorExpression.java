@@ -189,4 +189,8 @@ public class NamedColorExpression extends ColorExpression {
     return ALL_NAMES;
   }
 
+  @Override
+  public NamedColorExpression clone() {
+    return (NamedColorExpression) super.clone();
+  }
 }

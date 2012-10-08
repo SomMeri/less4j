@@ -32,4 +32,9 @@ public class CharsetDeclaration extends ASTCssNode {
     return ASTCssNodeType.CHARSET_DECLARATION;
   }
 
+  @Override
+  public CharsetDeclaration clone() {
+    return (CharsetDeclaration) super.clone();
+  }
+
 }

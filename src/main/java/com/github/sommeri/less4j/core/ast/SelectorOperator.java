@@ -39,4 +39,9 @@ public class SelectorOperator extends ASTCssNode {
   public enum Operator {
     NONE, EQUALS, INCLUDES, SPECIAL_PREFIX, PREFIXMATCH, SUFFIXMATCH, SUBSTRINGMATCH
   }
+  
+  @Override
+  public SelectorOperator clone() {
+    return (SelectorOperator) super.clone();
+  }
 }

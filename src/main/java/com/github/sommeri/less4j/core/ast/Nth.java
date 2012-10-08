@@ -60,4 +60,13 @@ public class Nth extends ASTCssNode {
     EVEN, ODD, STANDARD;
   }
   
+  @Override
+  public Nth clone() {
+    Nth result = (Nth) super.clone();
+    result.repeater = repeater==null?null:repeater.clone();
+    result.mod = mod==null?null:mod.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
+  
 }

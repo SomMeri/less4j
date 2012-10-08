@@ -19,7 +19,7 @@ public class ExpressionsTest extends BasicFeaturesTests {
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
     //return TestFileUtils.loadTestFile(standardCases+"todo/", "expressions-flying-minus.less");
-    return TestFileUtils.loadTestFiles(standardCases);
+    return (new TestFileUtils()).loadTestFiles(standardCases);
   }
 
 }

@@ -32,4 +32,8 @@ public class CssClass extends ASTCssNode {
     return Collections.emptyList();
   }
 
+  @Override
+  public CssClass clone() {
+    return (CssClass) super.clone();
+  }
 }

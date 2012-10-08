@@ -4,7 +4,7 @@ import java.io.File;
 
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.ILessCompiler;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 public abstract class BasicFeaturesTests extends AbstractFileBasedTest {
@@ -13,7 +13,7 @@ public abstract class BasicFeaturesTests extends AbstractFileBasedTest {
     super(inputFile, outputFile, testName);
   }
 
-  protected ILessCompiler getCompiler() {
+  protected LessCompiler getCompiler() {
     return new DefaultLessCompiler();
   }
 

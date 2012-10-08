@@ -1,40 +1,15 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.List;
-
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
-import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class VariableDeclaration extends ASTCssNode {
+public class VariableDeclaration extends AbstractVariableDeclaration {
 
-  private Variable variable;
-  private Expression value;
+  public VariableDeclaration(AbstractVariableDeclaration copy) {
+    super(copy);
+  }
 
   public VariableDeclaration(HiddenTokenAwareTree underlyingStructure, Variable variable, Expression value) {
-    super(underlyingStructure);
-    this.variable = variable;
-    this.value = value;
-  }
-
-  public Variable getVariable() {
-    return variable;
-  }
-
-  public void setVariable(Variable variable) {
-    this.variable = variable;
-  }
-
-  public Expression getValue() {
-    return value;
-  }
-
-  public void setValue(Expression value) {
-    this.value = value;
-  }
-
-  @Override
-  public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(variable, value);
+    super(underlyingStructure, variable, value);
   }
 
   @Override
@@ -42,4 +17,9 @@ public class VariableDeclaration extends ASTCssNode {
     return ASTCssNodeType.VARIABLE_DECLARATION;
   }
 
+  @Override
+  public VariableDeclaration clone() {
+    VariableDeclaration clone = (VariableDeclaration) super.clone();
+    return clone;
+  }
 }

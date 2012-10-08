@@ -32,4 +32,13 @@ public class Variable extends Expression {
     return ASTCssNodeType.VARIABLE;
   }
 
+  @Override
+  public String toString() {
+    return getName()==null? "Variable" : getName();
+  }
+
+  @Override
+  public Variable clone() {
+    return (Variable) super.clone();
+  }
 }

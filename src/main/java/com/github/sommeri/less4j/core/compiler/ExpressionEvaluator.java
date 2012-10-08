@@ -16,19 +16,108 @@ import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 
 public class ExpressionEvaluator {
 
-  private final ActiveVariableScope variableScope;
+  private final AbstractEngine calculatingEngine;
+  private final AbstractEngine passiveEngine;
+  private AbstractEngine activeEngine;
+
+  public ExpressionEvaluator(ActiveScope activeScope) {
+    calculatingEngine = new CalculatingExpressionEvaluator(activeScope);
+    passiveEngine = new PassiveExpressionEvaluator();
+    turnOnEvaluation();
+  }
+  
+  public boolean isTurnedOn() {
+    return activeEngine==calculatingEngine;
+  }
+
+  public void turnOffEvaluation() {
+    activeEngine = passiveEngine;
+  }
+
+  public void turnOnEvaluation() {
+    activeEngine = calculatingEngine;
+  }
+
+  public Expression evaluate(Variable input) {
+    return activeEngine.evaluate(input);
+  }
+
+  public Expression evaluate(IndirectVariable input) {
+    return activeEngine.evaluate(input);
+  }
+
+  public Expression evaluate(Expression input) {
+    return activeEngine.evaluate(input);
+  }
+
+  public Expression evaluate(FunctionExpression input) {
+    return activeEngine.evaluate(input);
+  }
+
+  public Expression evaluate(SignedExpression input) {
+    return activeEngine.evaluate(input);
+  }
+
+  public Expression evaluate(ComposedExpression input) {
+    return activeEngine.evaluate(input);
+  }
+
+  public boolean isRatioExpression(Expression expression) {
+    return activeEngine.isRatioExpression(expression);
+  }
+
+}
+
+abstract class AbstractEngine {
+
+  public abstract Expression evaluate(Variable input);
+
+  public abstract Expression evaluate(Expression input);
+
+  public abstract Expression evaluate(IndirectVariable input);
+
+  public abstract Expression evaluate(FunctionExpression input);
+
+  public abstract Expression evaluate(SignedExpression input);
+
+  public abstract Expression evaluate(ComposedExpression input);
+
+  public boolean isRatioExpression(Expression expression) {
+    if (!(expression instanceof ComposedExpression))
+      return false;
+
+    ComposedExpression composed = (ComposedExpression) expression;
+    if (composed.getOperator().getOperator() != Operator.SOLIDUS) {
+      return false;
+    }
+
+    if (composed.getLeft().getType() != ASTCssNodeType.NUMBER)
+      return false;
+
+    if (composed.getRight().getType() != ASTCssNodeType.NUMBER)
+      return false;
+
+    return true;
+  }
+
+}
+
+class CalculatingExpressionEvaluator extends AbstractEngine {
+  private final ActiveScope variableScope;
   private ArithmeticOperator arithmeticEngine = new ArithmeticOperator();;
 
-  public ExpressionEvaluator(ActiveVariableScope variableScope) {
+  public CalculatingExpressionEvaluator(ActiveScope variableScope) {
     super();
     this.variableScope = variableScope;
   }
 
+  @Override
   public Expression evaluate(Variable input) {
     Expression value = variableScope.getDeclaredValue(input);
     return evaluate(value);
   }
 
+  @Override
   public Expression evaluate(IndirectVariable input) {
     Expression value = variableScope.getDeclaredValue(input);
     CssString realName = convertToStringExpression(evaluate(value), input);
@@ -43,6 +132,7 @@ public class ExpressionEvaluator {
   }
 
   //FIXME: refactoring change to reusable expression type switch
+  @Override
   public Expression evaluate(Expression input) {
     switch (input.getType()) {
     case FUNCTION:
@@ -78,12 +168,12 @@ public class ExpressionEvaluator {
     }
   }
 
+  @Override
   public Expression evaluate(FunctionExpression input) {
-    //FIXME not implemented yet
     return input;
-    //throw new IllegalStateException("not implemented yet");
   }
 
+  @Override
   public Expression evaluate(SignedExpression input) {
     Expression evaluate = evaluate(input.getExpression());
     if (evaluate instanceof NumberExpression) {
@@ -91,9 +181,8 @@ public class ExpressionEvaluator {
       if (input.getSign() == Sign.PLUS)
         return negation;
 
-      
       negation.negate();
-      negation.setOriginalString(null); 
+      negation.setOriginalString(null);
       negation.setExpliciteSign(false);
       return negation;
     }
@@ -101,6 +190,7 @@ public class ExpressionEvaluator {
     throw new CompileException("The expression does not evaluate to number and can not be negated.", input);
   }
 
+  @Override
   public Expression evaluate(ComposedExpression input) {
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
@@ -111,21 +201,32 @@ public class ExpressionEvaluator {
     return new ComposedExpression(input.getUnderlyingStructure(), leftValue, input.getOperator(), rightValue);
   }
 
-  public boolean isRatioExpression(Expression expression) {
-    if (!(expression instanceof ComposedExpression))
-      return false;
+}
 
-    ComposedExpression composed = (ComposedExpression) expression;
-    if (composed.getOperator().getOperator() != Operator.SOLIDUS) {
-      return false;
-    }
+class PassiveExpressionEvaluator extends AbstractEngine {
 
-    if (composed.getLeft().getType() != ASTCssNodeType.NUMBER)
-      return false;
-
-    if (composed.getRight().getType() != ASTCssNodeType.NUMBER)
-      return false;
-
-    return true;
+  public Expression evaluate(Variable input) {
+    return input;
   }
+
+  public Expression evaluate(IndirectVariable input) {
+    return input;
+  }
+
+  public Expression evaluate(Expression input) {
+    return input;
+  }
+
+  public Expression evaluate(FunctionExpression input) {
+    return input;
+  }
+
+  public Expression evaluate(SignedExpression input) {
+    return input;
+  }
+
+  public Expression evaluate(ComposedExpression input) {
+    return input;
+  }
+
 }

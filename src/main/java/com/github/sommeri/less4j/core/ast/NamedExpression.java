@@ -48,4 +48,11 @@ public class NamedExpression extends IdentifierExpression {
     return ASTCssNodeType.NAMED_EXPRESSION;
   }
 
+  @Override
+  public NamedExpression clone() {
+    NamedExpression result = (NamedExpression) super.clone();
+    result.expression = expression==null?null:expression.clone();
+    result.configureParentToAllChilds();
+    return result;
+  }
 }

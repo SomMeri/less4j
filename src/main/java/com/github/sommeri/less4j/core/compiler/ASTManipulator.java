@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.compiler;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -39,6 +40,21 @@ public class ASTManipulator {
 
     Body pBody = (Body) parent;
     pBody.removeMember(node);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public void replaceInBody(ASTCssNode oldNode, List<ASTCssNode> newNodes) {
+    ASTCssNode parent = oldNode.getParent();
+    if (!(parent instanceof Body)) {
+      throw new CompileException("Parent is not a body instance. " + parent, parent);
+    }
+    
+    Body pBody = (Body) parent;
+    pBody.replaceMember(oldNode, newNodes);
+    oldNode.setParent(null);
+    for (ASTCssNode kid : newNodes) {
+      kid.setParent(pBody);
+    }
   }
 
   private void setPropertyValue(ASTCssNode parent, ASTCssNode value, String name) {

@@ -51,7 +51,6 @@ public class NestedRulesCollector {
   }
 
   public void combine(RuleSet ruleSet, List<Selector> previousSelectors, boolean append) {
-    //FIXME: we need to set parents correctly, and copy old selectors so one node does not belong to two parents
     List<Selector> innerSelectors = ruleSet.getSelectors();
     List<Selector> result = new ArrayList<Selector>();
     for (Selector inner : innerSelectors) {
@@ -60,15 +59,19 @@ public class NestedRulesCollector {
         Selector innerClone = inner.clone();
 
         Selector rightestClone = outerClone.getRightestPart();
-        if (append)
+        if (append) {
           rightestClone.getHead().addSubsequent(innerClone.getHead().getSubsequent());
-        else 
+          rightestClone.getHead().configureParentToAllChilds();
+        } else {
           rightestClone.setRight(innerClone);
+          innerClone.setParent(rightestClone);
+        }
         result.add(outerClone);
       }
 
     }
     ruleSet.replaceSelectors(result);
+    ruleSet.configureParentToAllChilds();
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

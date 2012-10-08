@@ -17,7 +17,7 @@ public class VariablesTest extends BasicFeaturesTests {
 
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    return TestFileUtils.loadTestFiles(standardCases);
+    return (new TestFileUtils()).loadTestFiles(standardCases);
   }
 
 }

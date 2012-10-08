@@ -51,4 +51,8 @@ public class Comment extends ASTCssNode {
     return Collections.emptyList();
   }
   
+  @Override
+  public Comment clone() {
+    return (Comment) super.clone();
+  }
 }

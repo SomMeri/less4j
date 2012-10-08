@@ -37,4 +37,8 @@ public class PseudoElement extends Pseudo {
     return ASTCssNodeType.PSEUDO_ELEMENT;
   }
 
+  @Override
+  public PseudoElement clone() {
+    return (PseudoElement) super.clone();
+  }
 }

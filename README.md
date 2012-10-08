@@ -48,6 +48,8 @@ System.out.println(css);
 
 The method may throw either `IncorrectTreeException` or `CompileException`. Both are unchecked and their message contains line and column numbers identifying source place causing the error.
 
+Note: the class DefaultLessCompiler is currently not thread safe. Issue: https://github.com/SomMeri/less4j/issues/23
+
 ## Links:
 *  [http://www.w3.org/Style/CSS/specs.en.html]
 *  [http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/]

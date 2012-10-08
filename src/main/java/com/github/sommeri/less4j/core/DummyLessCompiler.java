@@ -1,11 +1,19 @@
 package com.github.sommeri.less4j.core;
 
-import com.github.sommeri.less4j.ILessCompiler;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DummyLessCompiler implements ILessCompiler {
+import com.github.sommeri.less4j.LessCompiler;
 
-	public String compile(String cssContent) {
-		return cssContent;
-	}
+public class DummyLessCompiler implements LessCompiler {
+
+  public String compile(String cssContent) {
+    return cssContent;
+  }
+
+  @Override
+  public List<IProblem> getProblems() {
+    return new ArrayList<IProblem>();
+  }
 
 }

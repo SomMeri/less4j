@@ -89,19 +89,47 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.VARIABLE_DECLARATION)
       return handleVariableDeclaration(token);
 
+    if (type==LessLexer.ARGUMENT_DECLARATION)
+      return handleArgumentDeclaration(token);
+    
     if (type==LessLexer.VARIABLE)
       return handleVariable(token);
     
     if (type==LessLexer.VARIABLE)
       return handleIndirectVariable(token);
 
-    throw new IncorrectTreeException("Unexpected token type: " + type + " for " + token.getText(), token);
+    if (type==LessLexer.PURE_MIXIN)
+      return handlePureMixinDeclaration(token);
+
+    if (type==LessLexer.MIXIN_REFERENCE)
+      return handleMixinReference(token);
+
+    if (type==LessLexer.MIXIN_PATTERN)
+      return handleMixinPattern(token);
+
+    throw new TreeBuildingException("Unexpected token type: " + type + " for " + token.getText(), token);
   }
 
+  public T handleMixinPattern(HiddenTokenAwareTree token) {
+    return null;
+  }
+
+  public T handlePureMixinDeclaration(HiddenTokenAwareTree token) {
+    return null;
+  }
+  
+  public T handleMixinReference(HiddenTokenAwareTree token) {
+    return null;
+  }
+  
   public T handleVariableDeclaration(HiddenTokenAwareTree token) {
     return null;
   }
 
+  public T handleArgumentDeclaration(HiddenTokenAwareTree token) {
+    return null;
+  }
+  
   public T handleVariable(HiddenTokenAwareTree token) {
     return null;
   }

@@ -1,9 +1,14 @@
 package com.github.sommeri.less4j.core.compiler;
 
+import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
+import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.ast.Variable;
 
 @SuppressWarnings("serial")
-public class CompileException extends RuntimeException {
+public class CompileException extends Less4jException {
 
   private ASTCssNode node;
 
@@ -32,13 +37,61 @@ public class CompileException extends RuntimeException {
     return super.getMessage() + getPositionInformation();
   }
 
-  private String getPositionInformation() {
-    if (node==null)
-      return "";
-    
-    String result = "\n Line: "  + node.getSourceLine() + " Character: " + node.getCharPositionInSourceLine();
-    return result;
+  @Override
+  public boolean hasErrorPosition() {
+    return node != null;
   }
 
-  
+  @Override
+  public int getCharPositionInLine() {
+    if (!hasErrorPosition())
+      return -1;
+
+    return node.getCharPositionInSourceLine();
+  }
+
+  @Override
+  public int getLine() {
+    if (!hasErrorPosition())
+      return -1;
+
+    return node.getSourceLine();
+  }
+
+  public static void throwUndefinedMixinParameterValue(PureMixin mixin, ArgumentDeclaration declaration, MixinReference reference) {
+    throw createUndefinedMixinParameterValue(mixin, declaration, reference);
+    
+  }
+
+  private static CompileException createUndefinedMixinParameterValue(PureMixin mixin, ArgumentDeclaration declaration, MixinReference reference) {
+    return new CompileException("Undefined parameter " + declaration.getVariable().getName() + " of mixin "+ mixin.getName() +" defined on line " + mixin.getSourceLine(), reference);
+  }
+
+  public static void throwUndeclaredVariable(Variable variable) {
+    throw createUndeclaredVariable(variable.getName(), variable);
+  }
+
+  public static void throwUndeclaredVariable(String name, ASTCssNode ifErrorNode) {
+    throw createUndeclaredVariable(name, ifErrorNode);
+  }
+
+  public static CompileException createUndeclaredVariable(String name, ASTCssNode variable) {
+    return new CompileException("The variable \"" + name + "\" was not declared.", variable);
+  }
+
+  public static void throwUndeclaredMixin(Variable variable) {
+    throw createUndeclaredVariable(variable.getName(), variable);
+  }
+
+  public static void throwUndeclaredMixin(String name, ASTCssNode ifErrorNode) {
+    throw createUndeclaredVariable(name, ifErrorNode);
+  }
+
+  public static CompileException createUndeclaredMixin(MixinReference reference) {
+    return createUndeclaredMixin(reference.getName(), reference);
+  }
+
+  public static CompileException createUndeclaredMixin(String name, MixinReference variable) {
+    return new CompileException("The mixin \"" + name + "\" was not declared.", variable);
+  }
 }

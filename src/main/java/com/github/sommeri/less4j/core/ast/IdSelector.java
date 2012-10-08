@@ -32,4 +32,8 @@ public class IdSelector extends ASTCssNode {
     return ASTCssNodeType.ID_SELECTOR;
   }
 
+  @Override
+  public IdSelector clone() {
+    return (IdSelector) super.clone();
+  }
 }
