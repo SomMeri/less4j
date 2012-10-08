@@ -3,10 +3,6 @@ package com.github.sommeri.less4j;
 @SuppressWarnings("serial")
 public abstract class Less4jException extends RuntimeException {
 
-  protected Less4jException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
-
   public Less4jException(String message, Throwable cause) {
     super(message, cause);
   }
