@@ -5,17 +5,17 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class NestedRuleSet extends ASTCssNode {
+public class NestedRuleSet extends RuleSet {
 
   private boolean appended;
   private SelectorCombinator leadingCombinator;
-  private RuleSet ruleSet;
   
   public NestedRuleSet(HiddenTokenAwareTree underlyingStructure, boolean appended, SelectorCombinator leadingCombinator, RuleSet ruleSet) {
     super(underlyingStructure);
     this.appended = appended;
     this.leadingCombinator = leadingCombinator;
-    this.ruleSet = ruleSet; 
+    this.setBody(ruleSet.getBody());
+    this.addSelectors(ruleSet.getSelectors());
   }
 
   public boolean isAppended() {
@@ -34,17 +34,11 @@ public class NestedRuleSet extends ASTCssNode {
     this.leadingCombinator = leadingCombinator;
   }
 
-  public RuleSet getRuleSet() {
-    return ruleSet;
-  }
-
-  public void setRuleSet(RuleSet ruleSet) {
-    this.ruleSet = ruleSet;
-  }
-
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(leadingCombinator, ruleSet);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)leadingCombinator);
+    result.addAll(super.getChilds());
+    return result;
   }
 
   @Override
@@ -52,11 +46,13 @@ public class NestedRuleSet extends ASTCssNode {
     return ASTCssNodeType.NESTED_RULESET;
   } 
   
+  public RuleSet convertToRuleSet() {
+    return new RuleSet(getUnderlyingStructure(), getBody(), getSelectors());
+  }
   @Override
   public NestedRuleSet clone() {
     NestedRuleSet result = (NestedRuleSet) super.clone();
     result.leadingCombinator = leadingCombinator==null?null:leadingCombinator.clone();
-    result.ruleSet = ruleSet==null?null:ruleSet.clone();
     result.configureParentToAllChilds();
     return result;
   }

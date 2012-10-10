@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
@@ -44,8 +45,8 @@ public class LessToCssCompiler {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.RULE_SET) {
-        List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
-        body.addMembersAfter(nestedRulesets, kid);
+        List<NestedRuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
+        body.addMembersAfter(convertToRulesSets(nestedRulesets), kid);
         for (RuleSet ruleSet : nestedRulesets) {
           ruleSet.setParent(body);
         }
@@ -54,6 +55,14 @@ public class LessToCssCompiler {
         freeNestedRuleSets((Media) kid);
       }
     }
+  }
+
+  private List<RuleSet> convertToRulesSets(List<NestedRuleSet> nestedRulesets) {
+    List<RuleSet> result = new ArrayList<RuleSet>();
+    for (NestedRuleSet nested : nestedRulesets) {
+      result.add(nested.convertToRuleSet());
+    }
+    return result;
   }
 
   private void evaluateExpressions(ASTCssNode node) {
@@ -173,6 +182,18 @@ public class LessToCssCompiler {
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.PURE_MIXIN) {
         activeScope.registerMixin((PureMixin) kid);
+      }
+      if (kid.getType() == ASTCssNodeType.RULE_SET) {
+        RuleSet ruleSet = (RuleSet)kid;
+        if (ruleSet.isMixin()) {
+          activeScope.registerMixin(ruleSet.convertToMixin());
+        }
+      }
+      if (kid.getType() == ASTCssNodeType.NESTED_RULESET) {
+        NestedRuleSet nested = (NestedRuleSet)kid;
+        if (nested.isMixin()) {
+          activeScope.registerMixin(nested.convertToMixin());
+        }
       }
     }
   }

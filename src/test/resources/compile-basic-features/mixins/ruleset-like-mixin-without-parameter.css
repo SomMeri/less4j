@@ -1,0 +1,39 @@
+.mixinNoParam {
+  declaration: mixinNoParam;
+}
+#allAreUsedHere {
+  declaration: mixinNoParam;
+  last: last;
+  declaration: mixinNoParam;
+  last: last;
+  this-will-survive-too: funny;
+  declaration: nestedMixin;
+  declaration: nestedMixinScoped;
+  declaration: redefined;
+  this-will-survive-too: funny;
+  declaration: nestedMixin;
+  declaration: nestedMixinScoped;
+  declaration: redefined;
+}
+#allAreUsedHere .nestedMixin {
+  this-will-survive-too: funny;
+}
+#allAreUsedHere .nestedMixin {
+  declaration: nestedMixin;
+  declaration: nestedMixinScoped;
+}
+#allAreUsedHere .nestedMixin .nestedMixin {
+  declaration: nestedMixinScoped;
+}
+#allAreUsedHere .nestedMixin {
+  declaration: nestedMixinScoped;
+}
+#allAreUsedHere.nestedMixin {
+  declaration: redefined;
+}
+#allAreUsedHere .nestedMixin {
+  declaration: nestedMixinScoped;
+}
+.mixinNoParam {
+  last: last;
+}

@@ -15,11 +15,11 @@ import com.github.sommeri.less4j.core.ast.Selector;
 public class NestedRulesCollector {
 
   private Stack<List<Selector>> selectors;
-  private LinkedList<RuleSet> rulesets;
+  private LinkedList<NestedRuleSet> rulesets;
 
-  public List<RuleSet> collectNestedRuleSets(RuleSet kid) {
+  public List<NestedRuleSet> collectNestedRuleSets(RuleSet kid) {
     selectors = new Stack<List<Selector>>();
-    rulesets = new LinkedList<RuleSet>();
+    rulesets = new LinkedList<NestedRuleSet>();
 
     pushSelectors(kid);
     collectChildRuleSets(kid);
@@ -28,6 +28,7 @@ public class NestedRulesCollector {
     return rulesets;
   }
 
+  //FIXME: less.js does not print empty rulesets, we do document
   private void collectChildRuleSets(ASTCssNode node) {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {
@@ -45,9 +46,8 @@ public class NestedRulesCollector {
   }
 
   private void collect(NestedRuleSet nestedSet) {
-    RuleSet ruleSet = nestedSet.getRuleSet();
-    combine(ruleSet, selectors.peek(), nestedSet.isAppended());
-    rulesets.add(ruleSet);
+    combine(nestedSet, selectors.peek(), nestedSet.isAppended());
+    rulesets.add(nestedSet);
   }
 
   public void combine(RuleSet ruleSet, List<Selector> previousSelectors, boolean append) {
@@ -87,10 +87,6 @@ public class NestedRulesCollector {
 
   private void pushSelectors(RuleSet kid) {
     selectors.push(new ArrayList<Selector>(kid.getSelectors()));
-  }
-
-  private void pushSelectors(NestedRuleSet nestedSet) {
-    pushSelectors(nestedSet.getRuleSet());
   }
 
   private void popSelectors() {

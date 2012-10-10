@@ -17,6 +17,11 @@ public class PureMixin extends ASTCssNode {
     super(token);
   }
   
+  public PureMixin(HiddenTokenAwareTree token, CssClass className) {
+    this(token);
+    selector=className;
+  }
+
   public CssClass getSelector() {
    return selector;
   }

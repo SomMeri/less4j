@@ -202,6 +202,7 @@ class CssPrinter {
     case PARENTHESES_EXPRESSION:
     case NEGATED_EXPRESSION:
     case VARIABLE:
+    case NESTED_RULESET:
     case INDIRECT_VARIABLE:
     case VARIABLE_DECLARATION:
       throw new NotACssException(node);

@@ -21,6 +21,13 @@ public class SimpleSelector extends ASTCssNode implements Cloneable {
     this.isStar = isStar;
   }
   
+  public boolean isSingleClassSelector() {
+    if (!isEmptyForm() || subsequent==null || subsequent.size()!=1)
+      return false;
+    
+    return subsequent.get(0).getType()==ASTCssNodeType.CSS_CLASS;
+  }
+
   public String getElementName() {
     return elementName;
   }

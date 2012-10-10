@@ -1,0 +1,3 @@
+#allAreUsedHere .nestedMixin1 .nestedMixin2 {
+  declaration: nestedMixinScoped;
+}

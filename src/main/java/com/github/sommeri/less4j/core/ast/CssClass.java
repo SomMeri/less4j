@@ -36,4 +36,15 @@ public class CssClass extends ASTCssNode {
   public CssClass clone() {
     return (CssClass) super.clone();
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("CssClass [");
+    builder.append(name);
+    builder.append("]");
+    return builder.toString();
+  }
+  
+  
 }

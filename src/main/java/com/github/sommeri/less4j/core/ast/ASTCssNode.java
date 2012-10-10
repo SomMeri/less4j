@@ -98,7 +98,6 @@ public abstract class ASTCssNode implements Cloneable {
       clone.setOpeningComments(new ArrayList<Comment>(getOpeningComments()));
       clone.setOrphanComments(new ArrayList<Comment>(getOrphanComments()));
       clone.setTrailingComments(new ArrayList<Comment>(getTrailingComments()));
-      //fail soon rather than later
       clone.setParent(null);
       return clone;
     } catch (CloneNotSupportedException e) {

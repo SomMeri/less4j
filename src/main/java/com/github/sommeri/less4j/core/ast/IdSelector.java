@@ -36,4 +36,15 @@ public class IdSelector extends ASTCssNode {
   public IdSelector clone() {
     return (IdSelector) super.clone();
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("IdSelector [");
+    builder.append(name);
+    builder.append("]");
+    return builder.toString();
+  }
+  
+  
 }

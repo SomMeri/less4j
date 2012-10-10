@@ -570,6 +570,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }
 
+  //FIXME: fail on wrong distribution of arguments
   public ArgumentDeclaration handleArgumentDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree name = children.get(0);

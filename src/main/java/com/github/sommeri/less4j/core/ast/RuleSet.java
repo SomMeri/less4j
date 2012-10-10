@@ -14,7 +14,14 @@ public class RuleSet extends ASTCssNode {
   public RuleSet(HiddenTokenAwareTree token) {
     super(token);
   }
-  
+
+  public RuleSet(HiddenTokenAwareTree token, RuleSetsBody body, List<Selector> selectors) {
+    super(token);
+    this.body = body;
+    addSelectors(selectors);
+    configureParentToAllChilds();
+  }
+
   public List<Selector> getSelectors() {
    return selectors;
   }
@@ -31,15 +38,32 @@ public class RuleSet extends ASTCssNode {
     this.body = body;
   }
 
+  public boolean isMixin() {
+    if (selectors==null||selectors.size()!=1)
+      return false;
+    
+    SimpleSelector selector = selectors.get(0).getHead();
+    return selector.isSingleClassSelector();
+  }
+  
+  /**
+   * Behavior of this method is undefined if it is not mixin.
+   * @return 
+   */
+  public PureMixin convertToMixin() {
+    CssClass className = (CssClass)selectors.get(0).getHead().getSubsequent().get(0);
+    PureMixin pureMixin = new PureMixin(getUnderlyingStructure(), className.clone());
+    pureMixin.setBody(getBody().clone());
+    pureMixin.getBody().setParent(pureMixin);
+    pureMixin.getSelector().setParent(pureMixin);
+    return pureMixin;
+  }
+
   @Override
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)body);
     result.addAll(0, selectors);
     return result;
-  }
-
-  public ASTCssNodeType getType() {
-    return ASTCssNodeType.RULE_SET;
   }
 
   public void addSelectors(List<Selector> selectors) {
@@ -59,4 +83,9 @@ public class RuleSet extends ASTCssNode {
     result.configureParentToAllChilds();
     return result;
   }
+
+  public ASTCssNodeType getType() {
+    return ASTCssNodeType.RULE_SET;
+  }
+
 }
