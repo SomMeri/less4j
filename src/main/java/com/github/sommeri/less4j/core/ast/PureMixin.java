@@ -89,4 +89,15 @@ public class PureMixin extends ASTCssNode {
     result.configureParentToAllChilds();
     return result;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("PureMixin [");
+    builder.append(selector);
+    builder.append("]");
+    return builder.toString();
+  }
+  
+  
 }

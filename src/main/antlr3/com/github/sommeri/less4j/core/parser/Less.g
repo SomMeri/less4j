@@ -435,8 +435,8 @@ pseudoparameters:
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
  
 mixinReference
-    : a=cssClass (LPAREN c=mixinReferenceArguments? RPAREN)? SEMI
-    -> ^(MIXIN_REFERENCE $a $c*)
+    : a=cssClass (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
+    -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 
 mixinReferenceArguments

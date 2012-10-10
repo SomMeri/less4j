@@ -144,7 +144,7 @@ public class LessToCssCompiler {
     }
     }
 
-    if (node.getType() != ASTCssNodeType.VARIABLE_DECLARATION && node.getType() != ASTCssNodeType.ARGUMENT_DECLARATION) {
+    if (node.getType() != ASTCssNodeType.PURE_MIXIN && node.getType() != ASTCssNodeType.VARIABLE_DECLARATION && node.getType() != ASTCssNodeType.ARGUMENT_DECLARATION) {
       List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       //FIXME: make extensive test case on nested mixins and nested rulesets - pure mixins and simple classes behave diferently
       //Register all variables and  mixins. We have to do that because every variable and every mixin is valid within 
@@ -184,13 +184,13 @@ public class LessToCssCompiler {
         activeScope.registerMixin((PureMixin) kid);
       }
       if (kid.getType() == ASTCssNodeType.RULE_SET) {
-        RuleSet ruleSet = (RuleSet)kid;
+        RuleSet ruleSet = (RuleSet) kid;
         if (ruleSet.isMixin()) {
           activeScope.registerMixin(ruleSet.convertToMixin());
         }
       }
       if (kid.getType() == ASTCssNodeType.NESTED_RULESET) {
-        NestedRuleSet nested = (NestedRuleSet)kid;
+        NestedRuleSet nested = (NestedRuleSet) kid;
         if (nested.isMixin()) {
           activeScope.registerMixin(nested.convertToMixin());
         }
@@ -210,11 +210,24 @@ public class LessToCssCompiler {
 
       RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
       result.addMembers(body.getChilds());
-      
+
       activeScope.leaveMixinVariableScope();
     }
 
+    if (reference.isImportant()) {
+      declarationsAreImportant(result);
+    }
+
     return result;
+  }
+
+  public void declarationsAreImportant(RuleSetsBody result) {
+    for (ASTCssNode kid : result.getChilds()) {
+      if (kid instanceof Declaration) {
+        Declaration declaration = (Declaration) kid;
+        declaration.setImportant(true);
+      }
+    }
   }
 
   private RuleSetsBody solveVariablesAndMixinsInMixin(PureMixin mixin) {
@@ -229,7 +242,7 @@ public class LessToCssCompiler {
 
   private void initializeMixinVariableScope(MixinReference reference, MixinWithScope mixin) {
     activeScope.enterMixinVariableScope(mixin.getVariablesUponDefinition());
-    
+
     int length = mixin.getMixin().getParameters().size();
     for (int i = 0; i < length; i++) {
       ASTCssNode parameter = mixin.getMixin().getParameters().get(i);
@@ -240,7 +253,7 @@ public class LessToCssCompiler {
         } else {
           if (declaration.getValue() == null)
             CompileException.throwUndefinedMixinParameterValue(mixin.getMixin(), declaration, reference);
-          
+
           activeScope.addDeclaration(declaration);
         }
       }

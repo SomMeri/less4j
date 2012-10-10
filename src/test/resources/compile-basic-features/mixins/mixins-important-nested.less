@@ -1,0 +1,14 @@
+//removed patter matching from the official test, it is not implemented yet
+.mixin (@a: 0) {
+  border: @a;
+  boxer: @a;
+}
+
+.class {
+  .mixin(1);
+  .mixin(2) !important;
+  .mixin(3);
+  .mixin(4) !important;
+  .mixin(5);
+  .mixin !important;
+}

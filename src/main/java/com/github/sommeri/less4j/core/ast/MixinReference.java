@@ -10,6 +10,7 @@ public class MixinReference extends ASTCssNode {
 
   private CssClass selector;
   private List<Expression> parameters = new ArrayList<Expression>();
+  private boolean important = false;
 
   public MixinReference(HiddenTokenAwareTree token) {
     super(token);
@@ -41,6 +42,14 @@ public class MixinReference extends ASTCssNode {
 
   public void addParameter(Expression parameter) {
     this.parameters.add(parameter);
+  }
+
+  public boolean isImportant() {
+    return important;
+  }
+  
+  public void setImportant(boolean important) {
+    this.important = important;
   }
 
   @Override

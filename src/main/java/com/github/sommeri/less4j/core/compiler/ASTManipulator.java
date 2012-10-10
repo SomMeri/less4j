@@ -19,7 +19,7 @@ public class ASTManipulator {
     PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(parent.getClass());
     for (PropertyDescriptor descriptor : propertyDescriptors) {
       Class<?> propertyType = descriptor.getPropertyType();
-      if (propertyType.isInstance(newChild)) {
+      if (propertyType!=null && propertyType.isInstance(newChild)) {
         Object value = getPropertyValue(parent, descriptor);
         if (value == oldChild) {
           setPropertyValue(newChild, parent, "parent");

@@ -253,6 +253,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.CSS_CLASS) {
         result.setSelector(handleCssClass(kid));
+      } else if (kid.getType() == LessLexer.IMPORTANT_SYM) { 
+        result.setImportant(true);
       } else { // anything else is a parameter
         result.addParameter((Expression)switchOn(kid));
       }
@@ -607,7 +609,7 @@ class TreeBuildingException extends Less4jException {
 
   @Override
   public boolean hasErrorPosition() {
-    return node==null;
+    return node!=null;
   }
 
   @Override

@@ -49,8 +49,8 @@ public abstract class AbstractVariableDeclaration extends ASTCssNode {
   @Override
   public AbstractVariableDeclaration clone() {
     AbstractVariableDeclaration clone = (AbstractVariableDeclaration) super.clone();
-    clone.variable = variable.clone();
-    clone.value = value.clone();
+    clone.variable = variable==null? null : variable.clone();
+    clone.value = value==null? null : value.clone();
     clone.configureParentToAllChilds();
     return clone;
   }

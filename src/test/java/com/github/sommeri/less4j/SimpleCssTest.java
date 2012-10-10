@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 /**
@@ -25,9 +24,9 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   // private static final String inputLess =
   // "src/test/resources/less.js/less/media.less";
   // private static final String outputCss =
-  // "src/test/resources/less.js/css/media.css";
-  private static final String inputLess = "src/test/resources/minitests/css/functions-working-only.less";
-  private static final String outputCss = "src/test/resources/minitests/css/functions-working-only.css";
+  // "src/test/resources/less.js/css/media.css";s
+  private static final String inputLess = "src/test/resources/minitests/css/mixins-args.less";
+  private static final String outputCss = "src/test/resources/minitests/css/mixins-args.css";
 
   public SimpleCssTest(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);
