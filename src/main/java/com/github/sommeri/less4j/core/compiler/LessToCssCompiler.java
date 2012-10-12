@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.compiler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -207,12 +208,16 @@ public class LessToCssCompiler {
     List<MixinWithScope> matchingMixins = activeScope.getAllMatchingMixins(reference);
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
     for (MixinWithScope mixin : matchingMixins) {
+      boolean evaluatorOn = expressionEvaluator.turnOnEvaluation();
+      
       initializeMixinVariableScope(reference, mixin);
       
       RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
       result.addMembers(body.getChilds());
 
       activeScope.leaveMixinVariableScope();
+      if (!evaluatorOn)
+        expressionEvaluator.turnOffEvaluation();
     }
 
     if (reference.isImportant()) {
@@ -232,9 +237,6 @@ public class LessToCssCompiler {
   }
 
   private RuleSetsBody solveVariablesAndMixinsInMixin(PureMixin mixin) {
-    boolean evaluatorOn = expressionEvaluator.isTurnedOn();
-    expressionEvaluator.turnOnEvaluation();
-    
     if (!expressionEvaluator.evaluate(mixin.getGuards())) {
       List<ASTCssNode> emptyList = Collections.emptyList();
       return new RuleSetsBody(mixin.getUnderlyingStructure(), emptyList);
@@ -242,29 +244,32 @@ public class LessToCssCompiler {
 
     RuleSetsBody body = mixin.getBody().clone();
     solveVariablesAndMixins(body);
-    if (!evaluatorOn)
-      expressionEvaluator.turnOffEvaluation();
     return body;
   }
 
   private void initializeMixinVariableScope(MixinReference reference, MixinWithScope mixin) {
-    activeScope.enterMixinVariableScope(mixin.getVariablesUponDefinition());
-
+    Map<String, Expression> variableState = mixin.getVariablesUponDefinition();
+    
+   // this is the root of the problem
+    
     int length = mixin.getMixin().getParameters().size();
     for (int i = 0; i < length; i++) {
       ASTCssNode parameter = mixin.getMixin().getParameters().get(i);
       if (parameter.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
         ArgumentDeclaration declaration = (ArgumentDeclaration) parameter;
         if (reference.hasParameter(i)) {
-          activeScope.addDeclaration(declaration, reference.getParameter(i));
+          Expression value = expressionEvaluator.evaluate(reference.getParameter(i));
+          activeScope.addDeclaration(variableState, declaration, value);
         } else {
           if (declaration.getValue() == null)
             CompileException.throwUndefinedMixinParameterValue(mixin.getMixin(), declaration, reference);
 
-          activeScope.addDeclaration(declaration);
+          activeScope.addDeclaration(variableState, declaration);
         }
       }
     }
+    
+    activeScope.enterMixinVariableScope(variableState);
   }
 
 }

@@ -34,7 +34,7 @@ public class ExpressionEvaluator {
     turnOnEvaluation();
   }
 
-  public boolean isTurnedOn() {
+  private boolean isTurnedOn() {
     return activeEngine == calculatingEngine;
   }
 
@@ -42,8 +42,10 @@ public class ExpressionEvaluator {
     activeEngine = passiveEngine;
   }
 
-  public void turnOnEvaluation() {
+  public boolean turnOnEvaluation() {
+    boolean previousState = isTurnedOn();
     activeEngine = calculatingEngine;
+    return previousState;
   }
 
   public boolean evaluate(List<Guard> guards) {

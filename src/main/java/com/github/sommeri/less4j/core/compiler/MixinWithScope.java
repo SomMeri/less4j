@@ -23,4 +23,15 @@ public class MixinWithScope {
     return variablesUponDefinition;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("MixinWithScope [mixin=");
+    builder.append(mixin.getName());
+    builder.append(", variablesUponDefinition=");
+    builder.append(variablesUponDefinition);
+    builder.append("]");
+    return builder.toString();
+  }
+
 }

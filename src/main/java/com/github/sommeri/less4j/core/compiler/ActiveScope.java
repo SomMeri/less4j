@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
+import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.PureMixin;
@@ -31,11 +32,19 @@ public class ActiveScope {
   }
 
   public void addDeclaration(AbstractVariableDeclaration node) {
-    variablesScope.peek().put(node.getVariable().getName(), node.getValue());
+    addDeclaration(variablesScope.peek(), node);
+  }
+
+  public void addDeclaration(Map<String, Expression> variablesState, AbstractVariableDeclaration node) {
+    variablesState.put(node.getVariable().getName(), node.getValue());
   }
 
   public void addDeclaration(AbstractVariableDeclaration node, Expression replacementValue) {
     variablesScope.peek().put(node.getVariable().getName(), replacementValue);
+  }
+
+  public void addDeclaration(Map<String, Expression> variablesState, ArgumentDeclaration node, Expression replacementValue) {
+    variablesState.put(node.getVariable().getName(), replacementValue);
   }
 
   public void decreaseScope() {
@@ -72,7 +81,7 @@ public class ActiveScope {
   }
 
   public boolean isInPureMixin() {
-    return mixinsStack.isEmpty();
+    return !mixinsStack.isEmpty();
   }
 
   public List<MixinWithScope> getAllMatchingMixins(MixinReference reference) {

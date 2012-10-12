@@ -1,0 +1,10 @@
+@top: 10;
+.mixin(@a: (2 + 3)*@top) {
+  declaration: @a;
+  declaration: @a+5;
+}
+
+#result {
+  .mixin();
+  .mixin((1+1)-@top);
+}

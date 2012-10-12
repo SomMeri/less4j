@@ -42,7 +42,11 @@ public class RuleSet extends ASTCssNode {
     if (selectors==null||selectors.size()!=1)
       return false;
     
-    SimpleSelector selector = selectors.get(0).getHead();
+    Selector first = selectors.get(0);
+    if (first.isCombined())
+      return false;
+    
+    SimpleSelector selector = first.getHead();
     return selector.isSingleClassSelector();
   }
   
@@ -54,8 +58,7 @@ public class RuleSet extends ASTCssNode {
     CssClass className = (CssClass)selectors.get(0).getHead().getSubsequent().get(0);
     PureMixin pureMixin = new PureMixin(getUnderlyingStructure(), className.clone());
     pureMixin.setBody(getBody().clone());
-    pureMixin.getBody().setParent(pureMixin);
-    pureMixin.getSelector().setParent(pureMixin);
+    pureMixin.configureParentToAllChilds();
     return pureMixin;
   }
 
