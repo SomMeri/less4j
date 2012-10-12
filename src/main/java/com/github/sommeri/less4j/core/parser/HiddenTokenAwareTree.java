@@ -110,4 +110,8 @@ public class HiddenTokenAwareTree extends CommonTree {
     return getChild(getChildCount()-1);
   }
 
+  public String toString() {
+    return super.toString() +" "+ getLine() + ":"+ getCharPositionInLine()+1;
+}
+
 }

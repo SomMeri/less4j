@@ -90,7 +90,6 @@ public class ActiveScope {
     int requiredNumber = reference.getParameters().size();
     List<MixinWithScope> result = new ArrayList<MixinWithScope>();
     for (MixinWithScope mixinWithScope : list) {
-      //FIXME: Important: this is probably as in less.js, but must be documented. Point: if the current scope contains mixin with the same name but different number of parameter, it will not go deeper and will find nothing 
       int allDefined = mixinWithScope.getMixin().getParameters().size();
       int mandatory = mixinWithScope.getMixin().getMandatoryParameters().size();
       if (requiredNumber>=mandatory && requiredNumber<=allDefined)

@@ -59,6 +59,8 @@ tokens {
   MIXIN_REFERENCE;
   PURE_MIXIN;
   MIXIN_PATTERN;
+  GUARD_CONDITION;
+  GUARD;
 }
 
 @lexer::header {
@@ -450,10 +452,30 @@ mixinReferenceArgument
 
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 pureMixinDeclaration 
-    : a=cssClass LPAREN c=pureMixinDeclarationArguments? RPAREN e=ruleset_body
-    -> ^(PURE_MIXIN $a $c* $e)
+    : a=cssClass LPAREN c=pureMixinDeclarationArguments? RPAREN e=pureMixinGuards? f=ruleset_body
+    -> ^(PURE_MIXIN $a $c* $e* $f)
     ;
 
+pureMixinGuards
+    : ({predicates.isWhenKeyword(input.LT(1))}?) IDENT b+=guard (COMMA d+=guard)*
+    -> $b $d*
+    ;
+    
+guard
+    : a=guardCondition  (b+=IDENT c+=guardCondition)*
+    -> ^(GUARD $a* ($b $c)*)
+    ;    
+
+guardCondition
+    : a+=IDENT? LPAREN b+=mathExprHighPrior (b+=compareOperator b+=mathExprHighPrior)? RPAREN
+    -> ^(GUARD_CONDITION $a* $b*)
+    ;   
+
+//> >= = =< <.     
+compareOperator
+    : GREATER | GREATER_OR_EQUAL | OPEQ | LOWER_OR_EQUAL | LOWER
+    ;     
+    
 //It is OK to loose commas, because mixins are going to be lost anyway    
 pureMixinDeclarationArguments
     : a+=pureMixinDeclarationArgument ( COMMA a+=pureMixinDeclarationArgument)*
@@ -897,6 +919,9 @@ SUBSTRINGMATCH : '*=' ;
 
 TILDE : '~' ;
 GREATER : '>' ;
+GREATER_OR_EQUAL : '>=' ;
+LOWER : '<' ;
+LOWER_OR_EQUAL : '=<' ;
 LBRACE : '{' ;
 RBRACE : '}' ;
 LBRACKET : '[' ;
@@ -949,13 +974,6 @@ IDENT : '-'? NMSTART NMCHAR* ;
 //
 fragment HASH_FRAGMENT : '#' NAME ;
 HASH : HASH_FRAGMENT ;
-//Hopefully, I will not destroy document references too much
-//HASH_COMBINATOR : a=WS b=HASH_FRAGMENT {
-// $a.setType(EMPTY_COMBINATOR);
-// emit($a);
-// $b.setType(HASH);
-// emit($b);
-// };
 
 IMPORT_SYM : '@' I M P O R T ;
 PAGE_SYM : '@' P A G E ;

@@ -11,6 +11,7 @@ public class PureMixin extends ASTCssNode {
   private CssClass selector;
   //Allows: variable, argument declaration, pattern
   private List<ASTCssNode> parameters = new ArrayList<ASTCssNode>();
+  private List<Guard> guards = new ArrayList<Guard>();
   private RuleSetsBody body;
 
   public PureMixin(HiddenTokenAwareTree token) {
@@ -67,6 +68,14 @@ public class PureMixin extends ASTCssNode {
       throw new IllegalArgumentException("The node can not be used as a mixin parameter: " + parameter);
     
     this.parameters.add(parameter);
+  }
+
+  public List<Guard> getGuards() {
+    return guards;
+  }
+
+  public void addGuard(Guard guard) {
+    this.guards.add(guard);
   }
 
   @Override

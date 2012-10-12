@@ -2,24 +2,27 @@ package com.github.sommeri.less4j.core.parser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.core.ProblemsCollector;
-import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
+import com.github.sommeri.less4j.core.ast.ComparisonExpression;
+import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FontFace;
+import com.github.sommeri.less4j.core.ast.Guard;
+import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
@@ -33,6 +36,7 @@ import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.Nth;
+import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
@@ -48,7 +52,6 @@ import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
-import com.github.sommeri.less4j.core.ast.Nth.Form;
 
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
@@ -209,7 +212,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.SELECTOR) {
         Selector selector = handleSelector(kid);
-        if (selector!=null)
+        if (selector != null)
           selectors.add(selector);
         previousKid = selector;
       }
@@ -219,7 +222,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         previousKid = body;
       }
       if (kid.getType() == LessLexer.COMMA) {
-        if (previousKid!=null)
+        if (previousKid != null)
           previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
       }
     }
@@ -239,56 +242,127 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         result.setSelector(handleCssClass(kid));
       } else if (kid.getType() == LessLexer.BODY) {
         result.setBody(handleRuleSetsBody(kid));
+      } else if (kid.getType() == LessLexer.GUARD) {
+        result.addGuard(handleGuard(kid));
       } else { // anything else is a parameter
         result.addParameter(switchOn(kid));
       }
-      
+
     }
     return result;
   }
-  
+
   public MixinReference handleMixinReference(HiddenTokenAwareTree token) {
     MixinReference result = new MixinReference(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.CSS_CLASS) {
         result.setSelector(handleCssClass(kid));
-      } else if (kid.getType() == LessLexer.IMPORTANT_SYM) { 
+      } else if (kid.getType() == LessLexer.IMPORTANT_SYM) {
         result.setImportant(true);
       } else { // anything else is a parameter
-        result.addParameter((Expression)switchOn(kid));
+        result.addParameter((Expression) switchOn(kid));
       }
-      
+
     }
     return result;
   }
-  
+
   public Expression handleMixinPattern(HiddenTokenAwareTree token) {
     return termBuilder.buildFromTerm(token.getChild(0));
   }
-  
+
+  public Guard handleGuard(HiddenTokenAwareTree token) {
+    Guard result = new Guard(token);
+    Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
+    result.addCondition(handleGuardCondition(iterator.next()));
+    while (iterator.hasNext()) {
+      validateGuardAnd(iterator.next());
+      result.addCondition(handleGuardCondition(iterator.next()));
+    }
+
+    return result;
+  }
+
+  public GuardCondition handleGuardCondition(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
+    HiddenTokenAwareTree kid = iterator.next();
+
+    boolean isNegated = false;
+    if (kid.getType() != LessLexer.EXPRESSION) {
+      validateGuardNegation(kid);
+      isNegated = true;
+      kid = iterator.next();
+    }
+
+    Expression condition = handleExpression(kid);
+    if (iterator.hasNext()) {
+      HiddenTokenAwareTree operatorToken = iterator.next();
+      Expression followingExpression = handleExpression(iterator.next());
+      condition = new ComparisonExpression(token, condition, toComparisonOperator(operatorToken), followingExpression);
+    }
+
+    return new GuardCondition(token, isNegated, condition);
+  }
+
+  private ComparisonExpressionOperator toComparisonOperator(HiddenTokenAwareTree token) {
+    switch (token.getType()) {
+    case LessLexer.GREATER:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.GREATER);
+
+    case LessLexer.GREATER_OR_EQUAL:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.GREATER_OR_EQUAL);
+
+    case LessLexer.OPEQ:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.OPEQ);
+
+    case LessLexer.LOWER_OR_EQUAL:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.LOWER_OR_EQUAL);
+
+    case LessLexer.LOWER:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.LOWER);
+
+    default:
+      break;
+    }
+
+    throw new TreeBuildingException("Unknown operator type. ", token);
+  }
+
+  public void validateGuardNegation(HiddenTokenAwareTree token) {
+    String operator = token.getText().trim();
+    if (!"not".equals(operator))
+      throw new TreeBuildingException("Unexpected guard operator ", token);
+  }
+
+  public void validateGuardAnd(HiddenTokenAwareTree token) {
+    String operator = token.getText().trim();
+    if (!"and".equals(operator))
+      throw new TreeBuildingException("Unexpected guard operator ", token);
+  }
+
   public NestedRuleSet handleNestedRuleSet(HiddenTokenAwareTree token) {
     boolean hasAppender = false;
     SelectorCombinator combinator = null;
     RuleSet ruleSet = null;
-    
+
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.APPENDER) {
         token.addPreceding(kid.getPreceding());
         hasAppender = true;
       } else if (kid.getType() == LessLexer.RULESET) {
-        ruleSet = (RuleSet)switchOn(kid);
+        ruleSet = (RuleSet) switchOn(kid);
       } else {
         combinator = ConversionUtils.createSelectorCombinator(kid);
       }
-      
+
     }
-    
-    NestedRuleSet result =  new NestedRuleSet(token, hasAppender, combinator, ruleSet);
+
+    NestedRuleSet result = new NestedRuleSet(token, hasAppender, combinator, ruleSet);
     return result;
   }
-  
+
   public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {
     if (token.getChildren() == null)
       return new RuleSetsBody(token);
@@ -576,10 +650,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public ArgumentDeclaration handleArgumentDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree name = children.get(0);
-    
-    if (children.size()==1)
+
+    if (children.size() == 1)
       return new ArgumentDeclaration(token, new Variable(name, name.getText()), null);
-    
+
     HiddenTokenAwareTree colon = children.get(1);
     HiddenTokenAwareTree expression = children.get(2);
     colon.giveHidden(name, expression);
@@ -609,7 +683,7 @@ class TreeBuildingException extends Less4jException {
 
   @Override
   public boolean hasErrorPosition() {
-    return node!=null;
+    return node != null;
   }
 
   @Override

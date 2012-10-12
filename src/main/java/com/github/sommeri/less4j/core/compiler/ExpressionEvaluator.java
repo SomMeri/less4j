@@ -1,18 +1,26 @@
 package com.github.sommeri.less4j.core.compiler;
 
+import java.util.List;
+
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.ComparisonExpression;
+import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.Guard;
+import com.github.sommeri.less4j.core.ast.GuardCondition;
+import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
-import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
+import com.github.sommeri.less4j.core.ast.Variable;
 
 public class ExpressionEvaluator {
 
@@ -25,9 +33,9 @@ public class ExpressionEvaluator {
     passiveEngine = new PassiveExpressionEvaluator();
     turnOnEvaluation();
   }
-  
+
   public boolean isTurnedOn() {
-    return activeEngine==calculatingEngine;
+    return activeEngine == calculatingEngine;
   }
 
   public void turnOffEvaluation() {
@@ -36,6 +44,10 @@ public class ExpressionEvaluator {
 
   public void turnOnEvaluation() {
     activeEngine = calculatingEngine;
+  }
+
+  public boolean evaluate(List<Guard> guards) {
+    return activeEngine.evaluate(guards);
   }
 
   public Expression evaluate(Variable input) {
@@ -71,6 +83,8 @@ public class ExpressionEvaluator {
 abstract class AbstractEngine {
 
   public abstract Expression evaluate(Variable input);
+
+  public abstract boolean evaluate(List<Guard> guards);
 
   public abstract Expression evaluate(Expression input);
 
@@ -168,6 +182,55 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
     }
   }
 
+  private boolean booleanEvalueate(Expression input) {
+    if (input.getType() == ASTCssNodeType.COMPARISON_EXPRESSION)
+      return booleanEvalueate((ComparisonExpression) input);
+
+    ASTCssNode value = evaluate(input);
+    if (value.getType() != ASTCssNodeType.IDENTIFIER_EXPRESSION)
+      return false;
+
+    //this comparison must be case sensitive! 
+    IdentifierExpression identifier = (IdentifierExpression) value;
+    return "true".equals(identifier.getValue());
+  }
+
+ //FIXME: add also identifiers comparison
+  public boolean booleanEvalueate(ComparisonExpression input) {
+    Expression leftE = evaluate(input.getLeft());
+    Expression rightE = evaluate(input.getRight());
+
+    if (leftE.getType() != ASTCssNodeType.NUMBER)
+      throw new CompileException("The expression must evaluate to number (for now).", leftE);
+
+    if (rightE.getType() != ASTCssNodeType.NUMBER)
+      throw new CompileException("The expression must evaluate to number (for now).", rightE);
+
+    Double left = ((NumberExpression)leftE).getValueAsDouble();
+    Double right = ((NumberExpression)rightE).getValueAsDouble();
+
+    ComparisonExpressionOperator.Operator operator = input.getOperator().getOperator();
+    switch (operator) {
+    case GREATER:
+      return left.compareTo(right)>0;
+
+    case GREATER_OR_EQUAL:
+      return left.compareTo(right)>=0;
+
+    case OPEQ:
+      return left.compareTo(right)==0;
+      
+    case LOWER_OR_EQUAL:
+      return left.compareTo(right)<=0;
+
+    case LOWER:
+      return left.compareTo(right)<0;
+
+    default:
+      throw new CompileException("Unexpected comparison operator", input.getOperator());
+    }
+  }
+
   @Override
   public Expression evaluate(FunctionExpression input) {
     return input;
@@ -201,6 +264,41 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
     return new ComposedExpression(input.getUnderlyingStructure(), leftValue, input.getOperator(), rightValue);
   }
 
+  @Override
+  public boolean evaluate(List<Guard> guards) {
+    if (guards == null || guards.isEmpty())
+      return true;
+
+    //list of guards does or
+    for (Guard guard : guards) {
+      if (evaluate(guard))
+        return true;
+    }
+    
+    return false;
+  }
+
+  public boolean evaluate(Guard guard) {
+    List<GuardCondition> conditions = guard.getConditions();
+    if (conditions == null || conditions.isEmpty())
+      return true;
+
+    //guards can only do and
+    for (GuardCondition condition : conditions) {
+      if (!evaluate(condition))
+        return false;
+    }
+    
+    return true;
+  }
+
+  private boolean evaluate(GuardCondition guardCondition) {
+    Expression condition = guardCondition.getCondition();
+    boolean conditionStatus = booleanEvalueate(condition);
+
+    return guardCondition.isNegated() ? !conditionStatus : conditionStatus;
+  }
+
 }
 
 class PassiveExpressionEvaluator extends AbstractEngine {
@@ -227,6 +325,11 @@ class PassiveExpressionEvaluator extends AbstractEngine {
 
   public Expression evaluate(ComposedExpression input) {
     return input;
+  }
+
+  @Override
+  public boolean evaluate(List<Guard> guards) {
+    return false;
   }
 
 }

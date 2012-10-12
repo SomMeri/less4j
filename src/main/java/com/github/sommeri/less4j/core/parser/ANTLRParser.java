@@ -20,7 +20,7 @@ import org.antlr.runtime.tree.CommonTreeAdaptor;
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.parser.LessParser;
 
-//import com.github.sommeri.less4j.utils.DebugPrint;
+import com.github.sommeri.less4j.utils.DebugPrint;
 
 /**
  * 
@@ -66,7 +66,7 @@ public class ANTLRParser {
       
       HiddenTokenAwareTree ast = (HiddenTokenAwareTree) returnScope.getTree();
       merge(ast, tokenSource.getCollectedTokens());
-      //DebugPrint.print(ast);
+      DebugPrint.print(ast);
       return new ParseResultImpl(ast, new ArrayList<AntlrException>(errors));
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");

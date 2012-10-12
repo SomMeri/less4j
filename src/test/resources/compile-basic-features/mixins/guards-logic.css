@@ -1,0 +1,18 @@
+#directValue {
+  content: true;
+}
+#or {
+  content: true, true;
+  content: true, false;
+  content: false, true;
+}
+#and {
+  content: true and true;
+}
+#not {
+  content: not false;
+}
+#orImportance {
+  content: false and false, true;
+  content: true, false and false;
+}

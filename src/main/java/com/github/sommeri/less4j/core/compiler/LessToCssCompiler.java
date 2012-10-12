@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -207,7 +208,7 @@ public class LessToCssCompiler {
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
     for (MixinWithScope mixin : matchingMixins) {
       initializeMixinVariableScope(reference, mixin);
-
+      
       RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
       result.addMembers(body.getChilds());
 
@@ -231,9 +232,15 @@ public class LessToCssCompiler {
   }
 
   private RuleSetsBody solveVariablesAndMixinsInMixin(PureMixin mixin) {
-    RuleSetsBody body = mixin.getBody().clone();
     boolean evaluatorOn = expressionEvaluator.isTurnedOn();
     expressionEvaluator.turnOnEvaluation();
+    
+    if (!expressionEvaluator.evaluate(mixin.getGuards())) {
+      List<ASTCssNode> emptyList = Collections.emptyList();
+      return new RuleSetsBody(mixin.getUnderlyingStructure(), emptyList);
+    }
+
+    RuleSetsBody body = mixin.getBody().clone();
     solveVariablesAndMixins(body);
     if (!evaluatorOn)
       expressionEvaluator.turnOffEvaluation();

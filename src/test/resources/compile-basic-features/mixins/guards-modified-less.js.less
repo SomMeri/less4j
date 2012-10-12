@@ -1,3 +1,4 @@
+//modified less.js test on guards, we removed every not-yet-implemented feature
 .light (@a) when (@a > 50%) {
   color: white;
 }
@@ -87,7 +88,5 @@
 .bool () when not (true) and not (false)                     { content: not true and not false }
 .bool () when not (true) and not (true)                      { content: not true and not true }
 .bool () when not (false) and (false), not (false)           { content: not false and false, not false }
-.bool () when (true) and (false), (true)                     { content: 1111 } 
-.bool () when (true), (false) and (true)                     { content: 2222 } 
 
 .bool1 { .bool; }

@@ -121,4 +121,12 @@ public class ParsersSemanticPredicates {
     return substring.equals(substring.trim());
   }
 
+  public boolean isWhenKeyword(Token token) {
+    if (token==null || !(token instanceof CommonToken) || token.getType()!=LessParser.IDENT)
+      return false;
+    
+    String word = token.getText().trim().toLowerCase();
+    return "when".equals(word);
+  }
+
 }

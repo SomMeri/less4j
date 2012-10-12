@@ -107,7 +107,21 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.MIXIN_PATTERN)
       return handleMixinPattern(token);
 
+    if (type==LessLexer.GUARD)
+      return handleGuard(token);
+
+    if (type==LessLexer.GUARD_CONDITION)
+      return handleGuardCondition(token);
+
     throw new TreeBuildingException("Unexpected token type: " + type + " for " + token.getText(), token);
+  }
+
+  public T handleGuardCondition(HiddenTokenAwareTree token) {
+    return null;
+  }
+
+  public T handleGuard(HiddenTokenAwareTree token) {
+    return null;
   }
 
   public T handleMixinPattern(HiddenTokenAwareTree token) {

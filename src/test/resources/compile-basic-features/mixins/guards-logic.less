@@ -1,0 +1,38 @@
+.directValue () when (false)                                 { content: false }
+.directValue () when (true)                                  { content: true }
+.directValue () when (FALSE)                                 { content: FALSE }
+.directValue () when (TRUE)                                  { content: TRUE }
+.directValue () when (something)                                  { content: something }
+.directValue () when (10)                                  { content: 10 }
+.directValue () when (10%)                                  { content: 10% }
+.directValue () when (10px)                                  { content: 10px }
+.directValue () when ("value")                                  { content: "value" }
+.directValue () when ('value')                                  { content: 'value' }
+
+#directValue {
+  .directValue;
+}
+
+.or () when (true), (true)             { content: true, true }
+.or () when (true), (false)            { content: true, false }
+.or () when (false), (true)            { content: false, true }
+.or () when (false), (false)           { content: false, false  }
+
+#or { .or; }
+
+.and () when (true) and (true)              { content: true and true }                 
+.and () when (true) and (false)             { content: true and false }                
+.and () when (false) and (true)             { content: false and true }                
+.and () when (false) and (false)            { content: false and false  }              
+
+#and { .and; }
+
+.not () when not (true)             { content: not true }                
+.not () when not (false)            { content: not false  }              
+
+#not { .not; }
+
+.orImportance () when (false) and (false), (true)             { content: false and false, true }
+.orImportance () when (true), (false) and (false)             { content: true, false and false }
+
+#orImportance { .orImportance; }
