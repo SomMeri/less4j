@@ -256,7 +256,6 @@ public class LessToCssCompiler {
     variableState.removeDeclaration(ALL_ARGUMENTS);
     
    // FIXME: tests for collector (unused, one, many), documentation and refactoring! 
-    //FIXME: arguments does not read defaults
     List<Expression> allValues = new ArrayList<Expression>();
 
     int length = mixin.getMixin().getParameters().size();

@@ -1,0 +1,28 @@
+@arguments: "blaaah";
+
+.argumentsArgument(@a: 0, @arguments) {
+  declaration1: @arguments
+}
+
+.argumentsArgument(@a: 0, @b: 1) {
+  declaration2: @arguments
+}
+
+.argumentsArgument(@a: 0, ...) {
+  declaration5: @a @arguments
+}
+
+.argumentsArgument(@a: 0, @arguments...) {
+  declaration6: @arguments
+}
+
+.argumentsArgument(@a: 0, @arguments: 1, ...) {
+  declaration7: @a @arguments
+}
+
+#argumentsArgument {
+  .argumentsArgument(b1, b2);
+  .argumentsArgument(c1, c2, c3);
+  .argumentsArgument(d1, d2, d3, d4);
+  .argumentsArgument(e1, e2, e3, e4, e5);
+}
