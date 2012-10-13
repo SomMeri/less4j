@@ -1,0 +1,11 @@
+.mixin-arguments (@width: 0px, ...) {
+    border: @arguments;
+    width: @width;
+}
+
+.arguments {
+    .mixin-arguments(1px, solid, black);
+}
+.arguments2 {
+    .mixin-arguments();
+}

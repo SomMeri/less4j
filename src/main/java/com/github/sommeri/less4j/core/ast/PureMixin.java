@@ -51,12 +51,23 @@ public class PureMixin extends ASTCssNode {
     return parameters;
   }
 
+  public boolean hasCollectorParameter() {
+    if (parameters==null || parameters.isEmpty())
+      return false;
+    
+    ASTCssNode last = parameters.get(parameters.size()-1);
+    if (last.getType()!=ASTCssNodeType.ARGUMENT_DECLARATION)
+      return false;
+    
+    return ((ArgumentDeclaration) last).isCollector();
+  }
+
   public List<ASTCssNode> getMandatoryParameters() {
     List<ASTCssNode> result = new ArrayList<ASTCssNode>();
     for (ASTCssNode param : getParameters()) {
       if (param.getType()==ASTCssNodeType.ARGUMENT_DECLARATION) {
         ArgumentDeclaration declaration = (ArgumentDeclaration) param;
-        if (!declaration.hasDefaultValue())
+        if (declaration.isMandatory())
           result.add(declaration);
       }
     }

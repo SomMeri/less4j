@@ -1,10 +1,8 @@
 package com.github.sommeri.less4j.core.compiler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -21,28 +19,24 @@ import com.github.sommeri.less4j.core.ast.Variable;
  */
 public class ActiveScope {
 
-  private Stack<Map<String, Expression>> variablesScope = new Stack<Map<String, Expression>>();
+  private Stack<VariablesScope> variablesScope = new Stack<VariablesScope>();
   //mixins catalogues - stores each encountered mixin upon entry and
-  private Stack<Map<String, List<MixinWithScope>>> mixinsScope = new Stack<Map<String, List<MixinWithScope>>>();
+  private Stack<MixinsScope> mixinsScope = new Stack<MixinsScope>();
   private Stack<String> mixinsStack = new Stack<String>();
 
   public ActiveScope() {
-    variablesScope.push(new HashMap<String, Expression>());
-    mixinsScope.push(new HashMap<String, List<MixinWithScope>>());
+    variablesScope.push(new VariablesScope());
+    mixinsScope.push(new MixinsScope());
   }
 
   public void addDeclaration(AbstractVariableDeclaration node) {
-    addDeclaration(variablesScope.peek(), node);
-  }
-
-  public void addDeclaration(Map<String, Expression> variablesState, AbstractVariableDeclaration node) {
-    variablesState.put(node.getVariable().getName(), node.getValue());
+    variablesScope.peek().addDeclaration(node);
   }
 
   public void addDeclaration(AbstractVariableDeclaration node, Expression replacementValue) {
-    variablesScope.peek().put(node.getVariable().getName(), replacementValue);
+    variablesScope.peek().addDeclaration(node, replacementValue);
   }
-
+  
   public void addDeclaration(Map<String, Expression> variablesState, ArgumentDeclaration node, Expression replacementValue) {
     variablesState.put(node.getVariable().getName(), replacementValue);
   }
@@ -53,15 +47,14 @@ public class ActiveScope {
   }
 
   public void increaseScope() {
-    Map<String, Expression> oldVariables = variablesScope.peek();
-    variablesScope.push(new HashMap<String, Expression>(oldVariables));
-    HashMap<String, List<MixinWithScope>> newMixins = new HashMap<String, List<MixinWithScope>>();
-    mixinsScope.push(new HashMap<String, List<MixinWithScope>>(newMixins));
+    VariablesScope oldVariables = variablesScope.peek();
+    variablesScope.push(new VariablesScope(oldVariables));
+    mixinsScope.push(new MixinsScope());
   }
 
   public Expression getDeclaredValue(Variable node) {
     String name = node.getName();
-    Expression expression = variablesScope.peek().get(name);
+    Expression expression = variablesScope.peek().getValue(name);
     if (expression == null)
       CompileException.throwUndeclaredVariable(node);
 
@@ -69,7 +62,7 @@ public class ActiveScope {
   }
 
   public Expression getDeclaredValue(String name, ASTCssNode ifErrorNode) {
-    Expression expression = variablesScope.peek().get(name);
+    Expression expression = variablesScope.peek().getValue(name);
     if (expression == null)
       CompileException.throwUndeclaredVariable(name, ifErrorNode);
 
@@ -84,25 +77,26 @@ public class ActiveScope {
     return !mixinsStack.isEmpty();
   }
 
-  public List<MixinWithScope> getAllMatchingMixins(MixinReference reference) {
+  public List<MixinWithVariablesState> getAllMatchingMixins(MixinReference reference) {
     int idx = mixinsScope.size();
     while (idx > 0) {
       idx--;
-      Map<String, List<MixinWithScope>> idxScope = mixinsScope.elementAt(idx);
-      if (idxScope.containsKey(reference.getName()))
-        return filterByParametersNumber(reference, idxScope.get(reference.getName()));
+      MixinsScope idxScope = mixinsScope.elementAt(idx);
+      if (idxScope.contains(reference.getName()))
+        return filterByParametersNumber(reference, idxScope.getMixins(reference.getName()));
     }
     throw CompileException.createUndeclaredMixin(reference);
   }
 
-  private List<MixinWithScope> filterByParametersNumber(MixinReference reference, List<MixinWithScope> list) {
+  private List<MixinWithVariablesState> filterByParametersNumber(MixinReference reference, List<MixinWithVariablesState> list) {
     int requiredNumber = reference.getParameters().size();
-    List<MixinWithScope> result = new ArrayList<MixinWithScope>();
-    for (MixinWithScope mixinWithScope : list) {
-      int allDefined = mixinWithScope.getMixin().getParameters().size();
-      int mandatory = mixinWithScope.getMixin().getMandatoryParameters().size();
-      if (requiredNumber>=mandatory && requiredNumber<=allDefined)
-        result.add(mixinWithScope);
+    List<MixinWithVariablesState> result = new ArrayList<MixinWithVariablesState>();
+    for (MixinWithVariablesState MixinWithVariablesState : list) {
+      PureMixin mixin = MixinWithVariablesState.getMixin();
+      int allDefined = mixin.getParameters().size();
+      int mandatory = mixin.getMandatoryParameters().size();
+      if (requiredNumber >= mandatory && (requiredNumber <= allDefined || mixin.hasCollectorParameter()))
+        result.add(MixinWithVariablesState);
     }
     return result;
   }
@@ -110,33 +104,18 @@ public class ActiveScope {
   public void leaveMixinVariableScope() {
     variablesScope.pop();
   }
-  
-  private Map<String, Expression> deeplyClonedMap(Map<String, Expression> map) {
-    Map<String, Expression> result = new HashMap<String, Expression>();
-    for (Entry<String, Expression> t : map.entrySet()) {
-      result.put(t.getKey(), t.getValue());
-    }
-    return result;
-  }
 
   public void leavingPureMixin(PureMixin node) {
     mixinsStack.pop();
   }
 
   public void registerMixin(PureMixin node) {
-    Map<String, Expression> variablesState = deeplyClonedMap(variablesScope.peek());
-    Map<String, List<MixinWithScope>> catalogue = mixinsScope.peek();
-    List<MixinWithScope> list = catalogue.get(node.getName());
-    if (list==null) {
-      list=new ArrayList<MixinWithScope>();
-      catalogue.put(node.getName(), list);
-    }
-    list.add(new MixinWithScope(node, variablesState));
+    VariablesScope variablesState = variablesScope.peek().clone();
+    MixinWithVariablesState mixin = new MixinWithVariablesState(node, variablesState);
+    mixinsScope.peek().registerMixin(mixin);
   }
 
-  public void enterMixinVariableScope(Map<String, Expression> variablesUponDefinition) {
+  public void enterMixinVariableScope(VariablesScope variablesUponDefinition) {
     variablesScope.push(variablesUponDefinition);
   }
-
 }
-

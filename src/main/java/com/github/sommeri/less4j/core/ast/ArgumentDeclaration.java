@@ -3,6 +3,8 @@ package com.github.sommeri.less4j.core.ast;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class ArgumentDeclaration extends AbstractVariableDeclaration {
+  
+  private boolean isCollector = false;
 
   public ArgumentDeclaration(AbstractVariableDeclaration copy) {
     super(copy);
@@ -10,6 +12,19 @@ public class ArgumentDeclaration extends AbstractVariableDeclaration {
 
   public ArgumentDeclaration(HiddenTokenAwareTree underlyingStructure, Variable variable, Expression value) {
     super(underlyingStructure, variable, value);
+  }
+
+  public ArgumentDeclaration(HiddenTokenAwareTree underlyingStructure, Variable variable, Expression value, boolean isCollector) {
+    this(underlyingStructure, variable, value);
+    this.isCollector = isCollector;
+  }
+
+  public boolean isCollector() {
+    return isCollector;
+  }
+
+  public void setCollector(boolean isCollector) {
+    this.isCollector = isCollector;
   }
 
   @Override
@@ -24,6 +39,10 @@ public class ArgumentDeclaration extends AbstractVariableDeclaration {
 
   public boolean hasDefaultValue() {
     return getValue()!=null;
+  }
+
+  public boolean isMandatory() {
+    return !hasDefaultValue() && !isCollector();
   }
 
 }

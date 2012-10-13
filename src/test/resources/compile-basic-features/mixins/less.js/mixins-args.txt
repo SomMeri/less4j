@@ -1,0 +1,3 @@
+The test case have been lightly modified:
+* changed #000000 to black because less4j handles colors differently
+* changed #ff0000 to #f00 because less4j handles colors differently

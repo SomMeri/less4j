@@ -3,7 +3,6 @@ package com.github.sommeri.less4j.core.compiler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -26,6 +25,7 @@ import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 
 public class LessToCssCompiler {
 
+  private static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
   private ActiveScope activeScope;
   private ExpressionEvaluator expressionEvaluator;
@@ -205,9 +205,9 @@ public class LessToCssCompiler {
   }
 
   private RuleSetsBody resolveMixinReference(MixinReference reference) {
-    List<MixinWithScope> matchingMixins = activeScope.getAllMatchingMixins(reference);
+    List<MixinWithVariablesState> matchingMixins = activeScope.getAllMatchingMixins(reference);
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
-    for (MixinWithScope mixin : matchingMixins) {
+    for (MixinWithVariablesState mixin : matchingMixins) {
       boolean evaluatorOn = expressionEvaluator.turnOnEvaluation();
       
       initializeMixinVariableScope(reference, mixin);
@@ -247,28 +247,47 @@ public class LessToCssCompiler {
     return body;
   }
 
-  private void initializeMixinVariableScope(MixinReference reference, MixinWithScope mixin) {
-    Map<String, Expression> variableState = mixin.getVariablesUponDefinition();
+  private void initializeMixinVariableScope(MixinReference reference, MixinWithVariablesState mixin) {
+    VariablesScope variableState = mixin.getVariablesUponDefinition();
+    //muddling throug
+    if (variableState.hasVariable(ALL_ARGUMENTS)) {
+      variableState.removeDeclaration(ALL_ARGUMENTS);
+    }
     
-   // this is the root of the problem
-    
+   // FIXME: tests for collector (unused, one, many), documentation and refactoring! 
+    //FIXME: arguments does not read defaults
+    List<Expression> allValues = new ArrayList<Expression>();
+
     int length = mixin.getMixin().getParameters().size();
     for (int i = 0; i < length; i++) {
       ASTCssNode parameter = mixin.getMixin().getParameters().get(i);
       if (parameter.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
         ArgumentDeclaration declaration = (ArgumentDeclaration) parameter;
-        if (reference.hasParameter(i)) {
+        if (declaration.isCollector()) {
+          List<Expression> allArgumentsFrom = reference.getAllArgumentsFrom(i);
+          allValues.addAll(allArgumentsFrom);
+          Expression value = expressionEvaluator.evaluateToList(allArgumentsFrom, reference);
+          variableState.addDeclaration(declaration, value);
+        } else if (reference.hasParameter(i)) {
+          allValues.add(reference.getParameter(i));
           Expression value = expressionEvaluator.evaluate(reference.getParameter(i));
-          activeScope.addDeclaration(variableState, declaration, value);
+          variableState.addDeclaration(declaration, value);
         } else {
           if (declaration.getValue() == null)
             CompileException.throwUndefinedMixinParameterValue(mixin.getMixin(), declaration, reference);
 
-          activeScope.addDeclaration(variableState, declaration);
+          allValues.add(declaration.getValue());
+          variableState.addDeclaration(declaration);
         }
       }
     }
     
+    //FIXME: document: variable with the name "arguments" wins over general variable
+    //FXIME: document general @arguments is not inheritable
+    Expression compoundedValues = expressionEvaluator.evaluateToList(allValues, reference);
+    if (!variableState.hasVariable(ALL_ARGUMENTS)) {
+      variableState.addDeclaration(ALL_ARGUMENTS, compoundedValues);
+    } 
     activeScope.enterMixinVariableScope(variableState);
   }
 

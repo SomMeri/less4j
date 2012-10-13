@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -76,6 +77,13 @@ public class MixinReference extends ASTCssNode {
     result.parameters = ArraysUtils.deeplyClonedList(parameters);
     result.configureParentToAllChilds();
     return result;
+  }
+
+  public List<Expression> getAllArgumentsFrom(int startIndx) {
+    if (hasParameter(startIndx))
+      return parameters.subList(startIndx, parameters.size());
+    
+    return Collections.emptyList();
   }
 
 }

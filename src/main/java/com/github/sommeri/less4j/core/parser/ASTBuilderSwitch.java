@@ -244,6 +244,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         result.setBody(handleRuleSetsBody(kid));
       } else if (kid.getType() == LessLexer.GUARD) {
         result.addGuard(handleGuard(kid));
+      } else if (kid.getType() == LessLexer.DOT3) {
+        //FIXME: @arguments keyword works differently. It is a list with all arguments
+        result.addParameter(new ArgumentDeclaration(kid, new Variable(kid, "@"), null, true));
       } else { // anything else is a parameter
         result.addParameter(switchOn(kid));
       }
@@ -646,7 +649,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }
 
-  //FIXME: fail on wrong distribution of arguments
+  //FIXME: fail on wrong distribution of arguments (e.g. collector must be last, those with default must be last)
   public ArgumentDeclaration handleArgumentDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree name = children.get(0);
@@ -654,9 +657,12 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.size() == 1)
       return new ArgumentDeclaration(token, new Variable(name, name.getText()), null);
 
-    HiddenTokenAwareTree colon = children.get(1);
+    HiddenTokenAwareTree separator = children.get(1);
+    if (separator.getType()==LessLexer.DOT3) {
+      return new ArgumentDeclaration(token, new Variable(name, name.getText()), null, true);
+    }
     HiddenTokenAwareTree expression = children.get(2);
-    colon.giveHidden(name, expression);
+    separator.giveHidden(name, expression);
 
     return new ArgumentDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }

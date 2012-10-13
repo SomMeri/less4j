@@ -1,15 +1,12 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import java.util.Map;
-
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.PureMixin;
 
-public class MixinWithScope {
+public class MixinWithVariablesState {
   private final PureMixin mixin;
-  private final Map<String, Expression> variablesUponDefinition;
+  private final VariablesScope variablesUponDefinition;
 
-  public MixinWithScope(PureMixin mixin, Map<String, Expression> variablesUponDefinition) {
+  public MixinWithVariablesState(PureMixin mixin, VariablesScope variablesUponDefinition) {
     super();
     this.mixin = mixin;
     this.variablesUponDefinition = variablesUponDefinition;
@@ -19,14 +16,14 @@ public class MixinWithScope {
     return mixin;
   }
 
-  public Map<String, Expression> getVariablesUponDefinition() {
+  public VariablesScope getVariablesUponDefinition() {
     return variablesUponDefinition;
   }
 
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("MixinWithScope [mixin=");
+    builder.append("MixinWithVariablesState [mixin=");
     builder.append(mixin.getName());
     builder.append(", variablesUponDefinition=");
     builder.append(variablesUponDefinition);

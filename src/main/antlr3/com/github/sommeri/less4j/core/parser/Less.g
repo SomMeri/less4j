@@ -29,6 +29,7 @@ options {
 tokens {
   VARIABLE_DECLARATION;
   ARGUMENT_DECLARATION;
+  ARGUMENT_COLLECTOR;
   EXPRESSION;
   DECLARATION;
   VARIABLE_REFERENCE;
@@ -234,7 +235,7 @@ variabledeclaration
 
 //This looks like the declaration, but does not allow a comma.
 pureMixinDeclarationParameter
-    : VARIABLE (b=COLON (a+=mathExprHighPrior))? -> ^(ARGUMENT_DECLARATION VARIABLE $b* $a*)
+    : VARIABLE ((b=COLON (a+=mathExprHighPrior)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION VARIABLE $b* $a*)
     ;
 
 variablereference
@@ -478,8 +479,9 @@ compareOperator
     
 //It is OK to loose commas, because mixins are going to be lost anyway    
 pureMixinDeclarationArguments
-    : a+=pureMixinDeclarationArgument ( COMMA a+=pureMixinDeclarationArgument)*
-    -> $a*
+    : a+=pureMixinDeclarationArgument ( COMMA a+=pureMixinDeclarationArgument)* (COMMA b+=DOT3)?
+    -> $a* $b*
+    | DOT3
     ;
 
 pureMixinDeclarationArgument
@@ -937,6 +939,7 @@ LPAREN : '(' ;
 RPAREN : ')' ;
 COMMA : ',' ;
 DOT : '.' ;
+DOT3 : '...' ;
 APPENDER: '&';
 
 // -----------------

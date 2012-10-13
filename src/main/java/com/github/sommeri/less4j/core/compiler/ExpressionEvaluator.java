@@ -1,5 +1,7 @@
 package com.github.sommeri.less4j.core.compiler;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -10,6 +12,7 @@ import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
+import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
@@ -78,6 +81,25 @@ public class ExpressionEvaluator {
 
   public boolean isRatioExpression(Expression expression) {
     return activeEngine.isRatioExpression(expression);
+  }
+
+  public Expression evaluateToList(List<Expression> allArguments, ASTCssNode parent) {
+    //FIXME: overit ci less.js robi to iste v tejto situacii
+    if (allArguments.isEmpty())
+      return new IdentifierExpression(parent.getUnderlyingStructure(), "");
+    
+    List<Expression> values = new ArrayList<Expression>();
+    for (Expression argument : allArguments) {
+      values.add(evaluate(argument));
+    }
+    
+    Iterator<Expression> iterator = values.iterator();
+    Expression result = iterator.next();
+    while (iterator.hasNext()) {
+      result = new ComposedExpression(parent.getUnderlyingStructure(), result, new ExpressionOperator(parent.getUnderlyingStructure()), iterator.next());
+    }
+
+    return result;
   }
 
 }
