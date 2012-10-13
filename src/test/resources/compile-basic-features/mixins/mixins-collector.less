@@ -1,7 +1,43 @@
+@arguments: "blaaah";
+
+.argumentsArgument() {
+  declaration0: @arguments
+}
+
 .argumentsArgument(@a, @arguments) {
-  declaration: @arguments
+  declaration1: @arguments
+}
+
+.argumentsArgument(@a, @b) {
+  declaration2: @arguments
+}
+
+.argumentsArgument(...) {
+  declaration3: @arguments
+}
+
+.argumentsArgument(@a...) {
+  declaration4: @a @arguments
+}
+
+.argumentsArgument(@a, ...) {
+  declaration5: @a @arguments
+}
+
+.argumentsArgument(@a, @arguments...) {
+  declaration6: @arguments
+}
+
+.argumentsArgument(@a, @arguments, ...) {
+  declaration7: @a @arguments
 }
 
 #argumentsArgument {
-  .argumentsArgument(1, 2);
+// I had to comment two lines, because they are less.js incompatible
+//  .argumentsArgument();
+//  .argumentsArgument(a1);
+  .argumentsArgument(b1, b2);
+  .argumentsArgument(c1, c2, c3);
+  .argumentsArgument(d1, d2, d3, d4);
+  .argumentsArgument(e1, e2, e3, e4, e5);
 }

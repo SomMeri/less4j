@@ -252,10 +252,8 @@ public class LessToCssCompiler {
 
   private void initializeMixinVariableScope(MixinReference reference, MixinWithVariablesState mixin) {
     VariablesScope variableState = mixin.getVariablesUponDefinition();
-    //muddling throug
-    if (variableState.hasVariable(ALL_ARGUMENTS)) {
-      variableState.removeDeclaration(ALL_ARGUMENTS);
-    }
+    //We can not use ALL_ARGUMENTS variable from the upper scope, even if it happens to be defined. 
+    variableState.removeDeclaration(ALL_ARGUMENTS);
     
    // FIXME: tests for collector (unused, one, many), documentation and refactoring! 
     //FIXME: arguments does not read defaults

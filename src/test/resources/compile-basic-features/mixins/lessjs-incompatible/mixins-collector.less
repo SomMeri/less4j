@@ -1,0 +1,31 @@
+@arguments: "blaaah";
+
+.argumentsArgument() {
+  declaration0: @arguments
+}
+
+.argumentsArgument(...) {
+  declaration3: @arguments
+}
+
+.argumentsArgument(@a...) {
+  declaration4: @a @arguments
+}
+
+.argumentsArgument(@a, ...) {
+  declaration5: @a @arguments
+}
+
+.argumentsArgument(@a, @arguments...) {
+  declaration6: @arguments
+}
+
+#argumentsArgument1 {
+  //less.js fail on this line
+  .argumentsArgument();
+}
+
+#argumentsArgument2 {
+  //less.js fail on this line
+  .argumentsArgument(a1);
+}
