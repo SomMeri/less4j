@@ -8,8 +8,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.LessCompiler;
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.debugutils.RhinoCompiler;
 import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
 
@@ -50,10 +48,6 @@ public class W3CSelectorsTests extends AbstractFileBasedTest {
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
     return (new TestFileUtils()).loadTestFiles(standardCases, lessjsIncompatibleNegatedNth, lessjsIncompatibleNegatedVarious);
-  }
-
-  protected LessCompiler getCompiler() {
-    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

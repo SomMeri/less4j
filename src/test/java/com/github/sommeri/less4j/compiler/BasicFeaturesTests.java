@@ -2,19 +2,12 @@ package com.github.sommeri.less4j.compiler;
 
 import java.io.File;
 
-
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.LessCompiler;
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 public abstract class BasicFeaturesTests extends AbstractFileBasedTest {
 
   public BasicFeaturesTests(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
-  }
-
-  protected LessCompiler getCompiler() {
-    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

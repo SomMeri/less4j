@@ -10,8 +10,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.LessCompiler;
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 /**
  *  Testing whether less4j correctly compiles css3 media conforming to 
@@ -58,10 +56,6 @@ public class W3CMediaTests extends AbstractFileBasedTest {
     String lessFileName = lessFile.getPath();
     File cssFile = new File(lessFileName);
     return cssFile;
-  }
-
-  protected LessCompiler getCompiler() {
-    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

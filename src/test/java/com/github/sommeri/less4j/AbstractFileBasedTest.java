@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.github.sommeri.less4j.core.DefaultLessCompiler;
+
 /**
  * The test reproduces test files found in original less.js implementation. As
  * less.js has only only one tag and that tag is one year old, we took tests
@@ -53,6 +55,8 @@ public abstract class AbstractFileBasedTest {
     return text.replaceAll("\\s", "");
   }
 
-  protected abstract LessCompiler getCompiler();
+  protected LessCompiler getCompiler() {
+    return new DefaultLessCompiler();
+  }
 
 }

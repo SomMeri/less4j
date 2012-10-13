@@ -8,8 +8,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.LessCompiler;
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
 
 //FIXME: what does less.js do when the charset declaration goes AFTER ruleset? It is incorrect css anyway.
@@ -31,10 +29,6 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
   public static Collection<Object[]> allTestsParameters() {
     //return TestFileUtils.loadTestFile(inputDir, "nth-variants.less");
     return (new TestFileUtils()).loadTestFiles(inputDir);
-  }
-
-  protected LessCompiler getCompiler() {
-    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

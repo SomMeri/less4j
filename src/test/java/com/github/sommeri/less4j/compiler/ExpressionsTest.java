@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
 public class ExpressionsTest extends BasicFeaturesTests {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/expressions/";
+  private static final String lessjs = "src/test/resources/compile-basic-features/expressions/less.js/";
 
   public ExpressionsTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
@@ -19,7 +20,7 @@ public class ExpressionsTest extends BasicFeaturesTests {
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
     //return TestFileUtils.loadTestFile(standardCases+"todo/", "expressions-flying-minus.less");
-    return (new TestFileUtils()).loadTestFiles(standardCases);
+    return (new TestFileUtils()).loadTestFiles(standardCases, lessjs);
   }
 
 }

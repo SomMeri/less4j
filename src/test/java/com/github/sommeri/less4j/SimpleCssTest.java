@@ -9,8 +9,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
-
 /**
  * The test reproduces test files found in original less.js implementation. As
  * less.js has only only one tag and that tag is one year old, we took tests
@@ -22,42 +20,42 @@ import com.github.sommeri.less4j.core.DefaultLessCompiler;
 public class SimpleCssTest extends AbstractFileBasedTest {
 
   //FIXME: document expressions in guards must evaluate to numbers
-      private static final String inputLess = "src/test/resources/minitests/css/debug.less";
-      private static final String outputCss = "src/test/resources/minitests/css/debug.css";
+      private static final String inputLess = "src/test/resources/minitests/debug.less";
+      private static final String outputCss = "src/test/resources/minitests/debug.css";
 
   // ***********************************************************************
   //fail because of pattern matching
 
   // closure feature is not implemented
-  //  private static final String inputLess = "src/test/resources/minitests/css/mixins-closure.less";
-  //  private static final String outputCss = "src/test/resources/minitests/css/mixins-closure.css";
+  //  private static final String inputLess = "src/test/resources/minitests/mixins-closure.less";
+  //  private static final String outputCss = "src/test/resources/minitests/mixins-closure.css";
 
   // *** fail because of identifiers, functions and missing commas
-//    private static final String inputLess = "src/test/resources/minitests/css/mixins-guards.less";
-//    private static final String outputCss = "src/test/resources/minitests/css/mixins-guards.css";
+//    private static final String inputLess = "src/test/resources/minitests/mixins-guards.less";
+//    private static final String outputCss = "src/test/resources/minitests/mixins-guards.css";
 
   // *** fail because of namespaces - those are not implemented
-  //  private static final String inputLess = "src/test/resources/minitests/css/mixins.less";
-  //  private static final String outputCss = "src/test/resources/minitests/css/mixins.css";
+  //  private static final String inputLess = "src/test/resources/minitests/mixins.less";
+  //  private static final String outputCss = "src/test/resources/minitests/mixins.css";
 
   // ***********************************************************************
   // *** work as they are
-  //  private static final String inputLess = "src/test/resources/minitests/css/mixins-nested.less"; 
-  //  private static final String outputCss = "src/test/resources/minitests/css/mixins-nested.css";
+  //  private static final String inputLess = "src/test/resources/minitests/mixins-nested.less"; 
+  //  private static final String outputCss = "src/test/resources/minitests/mixins-nested.css";
 
-  //  private static final String inputLess = "src/test/resources/minitests/css/mixins-important.less";
-  //  private static final String outputCss = "src/test/resources/minitests/css/mixins-important.css";
+  //  private static final String inputLess = "src/test/resources/minitests/mixins-important.less";
+  //  private static final String outputCss = "src/test/resources/minitests/mixins-important.css";
 
-  //  private static final String inputLess = "src/test/resources/minitests/css/mixins-pattern.less";
-  //  private static final String outputCss = "src/test/resources/minitests/css/mixins-pattern.css";
+  //  private static final String inputLess = "src/test/resources/minitests/mixins-pattern.less";
+  //  private static final String outputCss = "src/test/resources/minitests/mixins-pattern.css";
 
   // *** work with minor modification
-  //private static final String inputLess = "src/test/resources/minitests/css/mixins-args.less";
-  //private static final String outputCss = "src/test/resources/minitests/css/mixins-args.css";
+  //private static final String inputLess = "src/test/resources/minitests/mixins-args.less";
+  //private static final String outputCss = "src/test/resources/minitests/mixins-args.css";
   // ***********************************************************************
   // *** fail but it is OK - not implemented in less-1.3.0.js
-  //private static final String inputLess = "src/test/resources/minitests/css/mixins-named-args.less";
-  //private static final String outputCss = "src/test/resources/minitests/css/mixins-named-args.css";
+  //private static final String inputLess = "src/test/resources/minitests/mixins-named-args.less";
+  //private static final String outputCss = "src/test/resources/minitests/mixins-named-args.css";
 
   public SimpleCssTest(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);
@@ -68,10 +66,6 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     Collection<Object[]> result = new ArrayList<Object[]>();
     result.add(new Object[] { new File(inputLess), new File(outputCss), inputLess });
     return result;
-  }
-
-  protected LessCompiler getCompiler() {
-    return new DefaultLessCompiler();
   }
 
   protected String canonize(String text) {

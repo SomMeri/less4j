@@ -10,9 +10,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.LessCompiler;
-import com.github.sommeri.less4j.core.DummyLessCompiler;
-
 /**
  * The test reproduces test files found in original less.js implementation. As
  * less.js has only only one tag and that tag is one year old, we took tests
@@ -38,10 +35,6 @@ public class LessJsTest extends AbstractFileBasedTest {
       result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
     }
     return result;
-  }
-
-  protected LessCompiler getCompiler() {
-    return new DummyLessCompiler();
   }
 
   protected static File findCorrespondingCss(File lessFile) {
