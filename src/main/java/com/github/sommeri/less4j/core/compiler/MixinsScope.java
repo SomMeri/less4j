@@ -7,26 +7,26 @@ import java.util.Map;
 
 public class MixinsScope {
   
-  private Map<String, List<MixinWithVariablesState>> storage = new HashMap<String, List<MixinWithVariablesState>>();
+  private Map<String, List<FullMixinDefinition>> storage = new HashMap<String, List<FullMixinDefinition>>();
   
   public MixinsScope() {
   }
 
   public MixinsScope(MixinsScope scope) {
-    storage = new HashMap<String, List<MixinWithVariablesState>>(scope.storage);
+    storage = new HashMap<String, List<FullMixinDefinition>>(scope.storage);
   }
 
-  public void registerMixin(MixinWithVariablesState mixinWithState) {
+  public void registerMixin(FullMixinDefinition mixinWithState) {
     String name = mixinWithState.getMixin().getName();
-    List<MixinWithVariablesState> list = storage.get(name);
+    List<FullMixinDefinition> list = storage.get(name);
     if (list == null) {
-      list = new ArrayList<MixinWithVariablesState>();
+      list = new ArrayList<FullMixinDefinition>();
       storage.put(name, list);
     }
     list.add(mixinWithState);
   }
 
-  public List<MixinWithVariablesState> getMixins(String name) {
+  public List<FullMixinDefinition> getMixins(String name) {
     return storage.get(name);
   }
 

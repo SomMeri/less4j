@@ -1,0 +1,26 @@
+#tryZero {
+  declare: minus 0;
+  declare: 0;
+}
+#tryMinusZero {
+  declare: minus 0;
+  declare: 0;
+}
+#tryNegatedNumber {
+  declare: -4;
+}
+#tryNumber {
+  declare: 4;
+}
+#tryNumberPx {
+  declare: 4px;
+}
+#tryNumberMinuxPx {
+  declare: minus 4px;
+}
+#tryString1 {
+  declare: 'value';
+}
+#tryString2 {
+  declare: "value";
+}

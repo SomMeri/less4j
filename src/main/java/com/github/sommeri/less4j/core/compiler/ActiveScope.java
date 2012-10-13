@@ -75,7 +75,7 @@ public class ActiveScope {
     return !mixinsStack.isEmpty();
   }
 
-  public List<MixinWithVariablesState> getAllMatchingMixins(MixinsReferenceMatcher matcher, MixinReference reference) {
+  public List<FullMixinDefinition> getAllMatchingMixins(MixinsReferenceMatcher matcher, MixinReference reference) {
     int idx = mixinsScope.size();
     while (idx > 0) {
       idx--;
@@ -96,7 +96,7 @@ public class ActiveScope {
 
   public void registerMixin(PureMixin node) {
     VariablesScope variablesState = variablesScope.peek().clone();
-    MixinWithVariablesState mixin = new MixinWithVariablesState(node, variablesState);
+    FullMixinDefinition mixin = new FullMixinDefinition(node, variablesState);
     mixinsScope.peek().registerMixin(mixin);
   }
 

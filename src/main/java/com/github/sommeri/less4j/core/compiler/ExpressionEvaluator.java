@@ -83,23 +83,26 @@ public class ExpressionEvaluator {
     return activeEngine.isRatioExpression(expression);
   }
 
-  public Expression evaluateToList(List<Expression> allArguments, ASTCssNode parent) {
-    //FIXME: overit ci less.js robi to iste v tejto situacii
+  public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
     if (allArguments.isEmpty())
       return new IdentifierExpression(parent.getUnderlyingStructure(), "");
     
-    List<Expression> values = new ArrayList<Expression>();
-    for (Expression argument : allArguments) {
-      values.add(evaluate(argument));
-    }
-    
-    Iterator<Expression> iterator = values.iterator();
+    Iterator<Expression> iterator = allArguments.iterator();
     Expression result = iterator.next();
     while (iterator.hasNext()) {
       result = new ComposedExpression(parent.getUnderlyingStructure(), result, new ExpressionOperator(parent.getUnderlyingStructure()), iterator.next());
     }
 
     return result;
+  }
+
+  public List<Expression> evaluateAll(List<Expression> expressions) {
+    List<Expression> values = new ArrayList<Expression>();
+    for (Expression argument : expressions) {
+      values.add(evaluate(argument));
+    }
+    
+    return values;
   }
 
 }

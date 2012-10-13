@@ -1,15 +1,18 @@
-.light (@a) when (@a > 50%) {
+
+// Stacking, functions..
+
+.light (@a) when (lightness(@a) > 50%) {
   color: white;
 }
-.light (@a) when (@a < 50%) {
+.light (@a) when (lightness(@a) < 50%) {
   color: black;
 }
 .light (@a) {
   margin: 1px;
 }
 
-.light1 { .light(100); }
-.light2 { .light(10); }
+.light1 { .light(#ddd) }
+.light2 { .light(#444) }
 
 // Arguments against each other
 
@@ -20,17 +23,17 @@
   width: @b;
 }
 
-.max1 { .max(3, 6); }
-.max2 { .max(8, 1); }
+.max1 { .max(3, 6) }
+.max2 { .max(8, 1) }
 
 // Globals inside guards
 
-@g: 10;
+@g: auto;
 
 .glob (@a) when (@a = @g) {
   margin: @a @g;
 }
-.glob1 { .glob(10); }
+.glob1 { .glob(auto) }
 
 // Other operators
 
@@ -43,18 +46,18 @@
 .ops (@a) when not(@a = 0) {
   height: not-eq;
 }
-.ops1 { .ops(0); }
-.ops2 { .ops(1); }
-.ops3 { .ops(-1); }
+.ops1 { .ops(0) }
+.ops2 { .ops(1) }
+.ops3 { .ops(-1) }
 
 // Scope and default values
 
-@a: 10;
+@a: auto;
 
-.default (@a: 12) when (@a = 12) {
+.default (@a: inherit) when (@a = inherit) {
   content: default;
 }
-.default1 { .default; }
+.default1 { .default }
 
 // true & false keywords
 .test (@a) when (@a) {
@@ -64,11 +67,11 @@
     content: "false.";
 }
 
-.test1 { .test(true); }
-.test2 { .test(false); }
-.test3 { .test(1); }
-.test4 { .test(boo); }
-.test5 { .test("true"); }
+.test1 { .test(true) }
+.test2 { .test(false) }
+.test3 { .test(1) }
+.test4 { .test(boo) }
+.test5 { .test("true") }
 
 // Boolean expressions
 
@@ -88,4 +91,4 @@
 .bool () when not (true) and not (true)                      { content: not true and not true }
 .bool () when not (false) and (false), not (false)           { content: not false and false, not false }
 
-.bool1 { .bool; }
+.bool1 { .bool }

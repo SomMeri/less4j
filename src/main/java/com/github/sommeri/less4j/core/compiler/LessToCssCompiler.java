@@ -27,7 +27,7 @@ public class LessToCssCompiler {
 
   private static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
-  private MixinsReferenceMatcher matcher = new MixinsReferenceMatcher();
+  private MixinsReferenceMatcher matcher;
   private ActiveScope activeScope;
   private ExpressionEvaluator expressionEvaluator;
   private NestedRulesCollector nestedRulesCollector;
@@ -36,7 +36,7 @@ public class LessToCssCompiler {
     activeScope = new ActiveScope();
     expressionEvaluator = new ExpressionEvaluator(activeScope);
     nestedRulesCollector = new NestedRulesCollector();
-    matcher = new MixinsReferenceMatcher();
+    matcher = new MixinsReferenceMatcher(activeScope);
 
     solveVariablesAndMixins(less);
     evaluateExpressions(less);
@@ -207,18 +207,21 @@ public class LessToCssCompiler {
   }
 
   private RuleSetsBody resolveMixinReference(MixinReference reference) {
-    List<MixinWithVariablesState> matchingMixins = activeScope.getAllMatchingMixins(matcher, reference);
-    
-    RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
-    for (MixinWithVariablesState mixin : matchingMixins) {
-      boolean evaluatorOn = expressionEvaluator.turnOnEvaluation();
-      
-      initializeMixinVariableScope(reference, mixin);
-      
-      RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
-      result.addMembers(body.getChilds());
+    List<FullMixinDefinition> matchingMixins = activeScope.getAllMatchingMixins(matcher, reference);
 
-      activeScope.leaveMixinVariableScope();
+    RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
+    for (FullMixinDefinition mixin : matchingMixins) {
+      boolean evaluatorOn = expressionEvaluator.turnOnEvaluation();
+
+      if (matcher.patternsMatch(reference, mixin)) {
+        initializeMixinVariableScope(reference, mixin);
+        
+        RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
+        result.addMembers(body.getChilds());
+        
+        activeScope.leaveMixinVariableScope();
+      } 
+
       if (!evaluatorOn)
         expressionEvaluator.turnOffEvaluation();
     }
@@ -250,12 +253,12 @@ public class LessToCssCompiler {
     return body;
   }
 
-  private void initializeMixinVariableScope(MixinReference reference, MixinWithVariablesState mixin) {
+  private void initializeMixinVariableScope(MixinReference reference, FullMixinDefinition mixin) {
     VariablesScope variableState = mixin.getVariablesUponDefinition();
     //We can not use ALL_ARGUMENTS variable from the upper scope, even if it happens to be defined. 
     variableState.removeDeclaration(ALL_ARGUMENTS);
-    
-   // FIXME: tests for collector (unused, one, many), documentation and refactoring! 
+
+    // FIXME: documentation and refactoring! 
     List<Expression> allValues = new ArrayList<Expression>();
 
     int length = mixin.getMixin().getParameters().size();
@@ -264,13 +267,13 @@ public class LessToCssCompiler {
       if (parameter.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
         ArgumentDeclaration declaration = (ArgumentDeclaration) parameter;
         if (declaration.isCollector()) {
-          List<Expression> allArgumentsFrom = reference.getAllArgumentsFrom(i);
+          List<Expression> allArgumentsFrom = expressionEvaluator.evaluateAll(reference.getAllArgumentsFrom(i));
           allValues.addAll(allArgumentsFrom);
-          Expression value = expressionEvaluator.evaluateToList(allArgumentsFrom, reference);
+          Expression value = expressionEvaluator.joinAll(allArgumentsFrom, reference);
           variableState.addDeclaration(declaration, value);
         } else if (reference.hasParameter(i)) {
-          allValues.add(reference.getParameter(i));
           Expression value = expressionEvaluator.evaluate(reference.getParameter(i));
+          allValues.add(value);
           variableState.addDeclaration(declaration, value);
         } else {
           if (declaration.getValue() == null)
@@ -281,13 +284,11 @@ public class LessToCssCompiler {
         }
       }
     }
-    
+
     //FIXME: document: variable with the name "arguments" wins over general variable
     //FXIME: document general @arguments is not inheritable
-    Expression compoundedValues = expressionEvaluator.evaluateToList(allValues, reference);
-    if (!variableState.hasVariable(ALL_ARGUMENTS)) {
-      variableState.addDeclaration(ALL_ARGUMENTS, compoundedValues);
-    } 
+    Expression compoundedValues = expressionEvaluator.joinAll(allValues, reference);
+    variableState.addDeclarationIfNotPresent(ALL_ARGUMENTS, compoundedValues);
     activeScope.enterMixinVariableScope(variableState);
   }
 

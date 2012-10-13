@@ -33,8 +33,9 @@ public class VariablesScope implements Cloneable {
     variables.put(name, replacementValue);
   }
 
-  public boolean hasVariable(String name) {
-    return variables.containsKey(name);
+  public void addDeclarationIfNotPresent(String name, Expression replacementValue) {
+    if (!variables.containsKey(name))
+      variables.put(name, replacementValue);
   }
 
   public void removeDeclaration(String name) {

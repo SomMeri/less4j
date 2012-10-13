@@ -108,6 +108,43 @@ public class NumberExpression extends Expression implements Cloneable {
   }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((dimension == null) ? 0 : dimension.hashCode());
+    result = prime * result + (expliciteSign ? 1231 : 1237);
+    result = prime * result + ((suffix == null) ? 0 : suffix.hashCode());
+    result = prime * result + ((valueAsDouble == null) ? 0 : valueAsDouble.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    NumberExpression other = (NumberExpression) obj;
+    if (dimension != other.dimension)
+      return false;
+    if (expliciteSign != other.expliciteSign)
+      return false;
+    if (suffix == null) {
+      if (other.suffix != null)
+        return false;
+    } else if (!suffix.equals(other.suffix))
+      return false;
+    if (valueAsDouble == null) {
+      if (other.valueAsDouble != null)
+        return false;
+    } else if (!valueAsDouble.equals(other.valueAsDouble))
+      return false;
+    return true;
+  }
+
+  @Override
   public NumberExpression clone() {
     NumberExpression clone = (NumberExpression) super.clone();
     return clone;

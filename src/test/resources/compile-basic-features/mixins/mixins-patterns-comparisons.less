@@ -1,0 +1,84 @@
+.mixin(-0) {
+  declare: minus 0;
+}
+.mixin(0) {
+  declare: 0;
+}
+.mixin(-2) {
+  declare: -2;
+}
+.mixin(-4) {
+  declare: -4;
+}
+.mixin(4) {
+  declare: 4;
+}
+.mixin(4px) {
+  declare: 4px;
+}
+.mixin(-4px) {
+  declare: minus 4px;
+}
+.mixin('wrong') {
+  declare: 'wrong';
+}
+.mixin("wrong") {
+  declare: "wrong";
+}
+.mixin('value') {
+  declare: 'value';
+}
+.mixin("value") {
+  declare: "value";
+}
+.mixin(wrong) {
+  declare: wrong;
+}
+.mixin(-wrong) {
+  declare: -wrong;
+}
+.mixin(identifier) {
+  declare: identifier;
+}
+.mixin(-identifier) {
+  declare: -identifier;
+}
+.mixin(green) {
+  declare: green;
+}
+.mixin(#00ff00) {
+  declare: #00ff00;
+}
+.mixin(red) {
+  declare: red;
+}
+.mixin(#ff0000) {
+  declare: #ff0000;
+}
+
+#tryZero {
+  .mixin(0);
+}
+#tryMinusZero {
+  .mixin(-0);
+}
+#tryNegatedNumber {
+  .mixin(-4);
+}
+#tryNumber {
+  .mixin(4);
+}
+#tryNumberPx {
+  .mixin(4px);
+}
+#tryNumberMinuxPx {
+  .mixin(-4px);
+}
+#tryString1 {
+  .mixin('value');
+}
+#tryString2 {
+  .mixin("value");
+}
+
+
