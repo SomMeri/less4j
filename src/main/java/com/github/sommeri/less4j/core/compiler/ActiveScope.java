@@ -20,7 +20,6 @@ import com.github.sommeri.less4j.core.ast.Variable;
 public class ActiveScope {
 
   private Stack<VariablesScope> variablesScope = new Stack<VariablesScope>();
-  //mixins catalogues - stores each encountered mixin upon entry and
   private Stack<MixinsScope> mixinsScope = new Stack<MixinsScope>();
   private Stack<String> mixinsStack = new Stack<String>();
 

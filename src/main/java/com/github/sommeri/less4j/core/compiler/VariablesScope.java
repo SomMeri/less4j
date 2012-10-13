@@ -2,7 +2,6 @@ package com.github.sommeri.less4j.core.compiler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -44,22 +43,13 @@ public class VariablesScope implements Cloneable {
 
   @Override
   protected VariablesScope clone() {
-    VariablesScope result;
     try {
-      result = (VariablesScope) super.clone();
+      VariablesScope result = (VariablesScope) super.clone();
+      result.variables = new HashMap<String, Expression>(variables);
+      return result;
     } catch (CloneNotSupportedException e) {
       throw new RuntimeException("This should never happen.", e);
     }
-    result.variables = deeplyClonedMap(variables);
-    return result;
-  }
-
-  private Map<String, Expression> deeplyClonedMap(Map<String, Expression> map) {
-    Map<String, Expression> result = new HashMap<String, Expression>();
-    for (Entry<String, Expression> t : map.entrySet()) {
-      result.put(t.getKey(), t.getValue());
-    }
-    return result;
   }
 
 }
