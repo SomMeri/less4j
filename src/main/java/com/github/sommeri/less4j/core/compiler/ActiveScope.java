@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -76,28 +75,15 @@ public class ActiveScope {
     return !mixinsStack.isEmpty();
   }
 
-  public List<MixinWithVariablesState> getAllMatchingMixins(MixinReference reference) {
+  public List<MixinWithVariablesState> getAllMatchingMixins(MixinsReferenceMatcher matcher, MixinReference reference) {
     int idx = mixinsScope.size();
     while (idx > 0) {
       idx--;
       MixinsScope idxScope = mixinsScope.elementAt(idx);
       if (idxScope.contains(reference.getName()))
-        return filterByParametersNumber(reference, idxScope.getMixins(reference.getName()));
+        return matcher.filter(reference, idxScope.getMixins(reference.getName()));
     }
     throw CompileException.createUndeclaredMixin(reference);
-  }
-
-  private List<MixinWithVariablesState> filterByParametersNumber(MixinReference reference, List<MixinWithVariablesState> list) {
-    int requiredNumber = reference.getParameters().size();
-    List<MixinWithVariablesState> result = new ArrayList<MixinWithVariablesState>();
-    for (MixinWithVariablesState MixinWithVariablesState : list) {
-      PureMixin mixin = MixinWithVariablesState.getMixin();
-      int allDefined = mixin.getParameters().size();
-      int mandatory = mixin.getMandatoryParameters().size();
-      if (requiredNumber >= mandatory && (requiredNumber <= allDefined || mixin.hasCollectorParameter()))
-        result.add(MixinWithVariablesState);
-    }
-    return result;
   }
 
   public void leaveMixinVariableScope() {

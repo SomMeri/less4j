@@ -27,6 +27,7 @@ public class LessToCssCompiler {
 
   private static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
+  private MixinsReferenceMatcher matcher = new MixinsReferenceMatcher();
   private ActiveScope activeScope;
   private ExpressionEvaluator expressionEvaluator;
   private NestedRulesCollector nestedRulesCollector;
@@ -35,6 +36,7 @@ public class LessToCssCompiler {
     activeScope = new ActiveScope();
     expressionEvaluator = new ExpressionEvaluator(activeScope);
     nestedRulesCollector = new NestedRulesCollector();
+    matcher = new MixinsReferenceMatcher();
 
     solveVariablesAndMixins(less);
     evaluateExpressions(less);
@@ -205,7 +207,8 @@ public class LessToCssCompiler {
   }
 
   private RuleSetsBody resolveMixinReference(MixinReference reference) {
-    List<MixinWithVariablesState> matchingMixins = activeScope.getAllMatchingMixins(reference);
+    List<MixinWithVariablesState> matchingMixins = activeScope.getAllMatchingMixins(matcher, reference);
+    
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
     for (MixinWithVariablesState mixin : matchingMixins) {
       boolean evaluatorOn = expressionEvaluator.turnOnEvaluation();
