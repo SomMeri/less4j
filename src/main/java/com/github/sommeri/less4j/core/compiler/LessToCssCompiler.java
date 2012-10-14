@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.compiler;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -199,12 +198,16 @@ public class LessToCssCompiler {
     List<FullMixinDefinition> matchingMixins = activeScope.getAllMatchingMixins(matcher, reference);
 
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
-    for (FullMixinDefinition mixin : matchingMixins) {
-      if (matcher.patternsMatch(reference, mixin)) {
-        initializeMixinVariableScope(reference, mixin);
+    for (FullMixinDefinition fullMixin : matchingMixins) {
+      if (matcher.patternsMatch(reference, fullMixin)) {
+        initializeMixinVariableScope(reference, fullMixin);
 
-        RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
-        result.addMembers(body.getChilds());
+        PureMixin mixin = fullMixin.getMixin();
+        if (expressionEvaluator.evaluate(mixin.getGuards())) {
+          RuleSetsBody body = mixin.getBody().clone();
+          solveVariablesAndMixins(body);
+          result.addMembers(body.getChilds());
+        }
 
         activeScope.leaveMixinVariableScope();
       }
@@ -224,17 +227,6 @@ public class LessToCssCompiler {
         declaration.setImportant(true);
       }
     }
-  }
-
-  private RuleSetsBody solveVariablesAndMixinsInMixin(PureMixin mixin) {
-    if (!expressionEvaluator.evaluate(mixin.getGuards())) {
-      List<ASTCssNode> emptyList = Collections.emptyList();
-      return new RuleSetsBody(mixin.getUnderlyingStructure(), emptyList);
-    }
-
-    RuleSetsBody body = mixin.getBody().clone();
-    solveVariablesAndMixins(body);
-    return body;
   }
 
   private void initializeMixinVariableScope(MixinReference reference, FullMixinDefinition mixin) {
