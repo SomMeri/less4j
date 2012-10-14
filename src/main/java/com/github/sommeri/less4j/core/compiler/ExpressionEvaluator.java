@@ -27,66 +27,18 @@ import com.github.sommeri.less4j.core.ast.Variable;
 
 public class ExpressionEvaluator {
 
-  private final AbstractEngine calculatingEngine;
-  private final AbstractEngine passiveEngine;
-  private AbstractEngine activeEngine;
+  private final ActiveScope variableScope;
+  private ArithmeticOperator arithmeticEngine = new ArithmeticOperator();;
 
-  public ExpressionEvaluator(ActiveScope activeScope) {
-    calculatingEngine = new CalculatingExpressionEvaluator(activeScope);
-    passiveEngine = new PassiveExpressionEvaluator();
-    turnOnEvaluation();
-  }
-
-  private boolean isTurnedOn() {
-    return activeEngine == calculatingEngine;
-  }
-
-  public void turnOffEvaluation() {
-    activeEngine = passiveEngine;
-  }
-
-  public boolean turnOnEvaluation() {
-    boolean previousState = isTurnedOn();
-    activeEngine = calculatingEngine;
-    return previousState;
-  }
-
-  public boolean evaluate(List<Guard> guards) {
-    return activeEngine.evaluate(guards);
-  }
-
-  public Expression evaluate(Variable input) {
-    return activeEngine.evaluate(input);
-  }
-
-  public Expression evaluate(IndirectVariable input) {
-    return activeEngine.evaluate(input);
-  }
-
-  public Expression evaluate(Expression input) {
-    return activeEngine.evaluate(input);
-  }
-
-  public Expression evaluate(FunctionExpression input) {
-    return activeEngine.evaluate(input);
-  }
-
-  public Expression evaluate(SignedExpression input) {
-    return activeEngine.evaluate(input);
-  }
-
-  public Expression evaluate(ComposedExpression input) {
-    return activeEngine.evaluate(input);
-  }
-
-  public boolean isRatioExpression(Expression expression) {
-    return activeEngine.isRatioExpression(expression);
+  public ExpressionEvaluator(ActiveScope variableScope) {
+    super();
+    this.variableScope = variableScope;
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
     if (allArguments.isEmpty())
       return new IdentifierExpression(parent.getUnderlyingStructure(), "");
-    
+
     Iterator<Expression> iterator = allArguments.iterator();
     Expression result = iterator.next();
     while (iterator.hasNext()) {
@@ -101,64 +53,15 @@ public class ExpressionEvaluator {
     for (Expression argument : expressions) {
       values.add(evaluate(argument));
     }
-    
+
     return values;
   }
 
-}
-
-abstract class AbstractEngine {
-
-  public abstract Expression evaluate(Variable input);
-
-  public abstract boolean evaluate(List<Guard> guards);
-
-  public abstract Expression evaluate(Expression input);
-
-  public abstract Expression evaluate(IndirectVariable input);
-
-  public abstract Expression evaluate(FunctionExpression input);
-
-  public abstract Expression evaluate(SignedExpression input);
-
-  public abstract Expression evaluate(ComposedExpression input);
-
-  public boolean isRatioExpression(Expression expression) {
-    if (!(expression instanceof ComposedExpression))
-      return false;
-
-    ComposedExpression composed = (ComposedExpression) expression;
-    if (composed.getOperator().getOperator() != Operator.SOLIDUS) {
-      return false;
-    }
-
-    if (composed.getLeft().getType() != ASTCssNodeType.NUMBER)
-      return false;
-
-    if (composed.getRight().getType() != ASTCssNodeType.NUMBER)
-      return false;
-
-    return true;
-  }
-
-}
-
-class CalculatingExpressionEvaluator extends AbstractEngine {
-  private final ActiveScope variableScope;
-  private ArithmeticOperator arithmeticEngine = new ArithmeticOperator();;
-
-  public CalculatingExpressionEvaluator(ActiveScope variableScope) {
-    super();
-    this.variableScope = variableScope;
-  }
-
-  @Override
   public Expression evaluate(Variable input) {
     Expression value = variableScope.getDeclaredValue(input);
     return evaluate(value);
   }
 
-  @Override
   public Expression evaluate(IndirectVariable input) {
     Expression value = variableScope.getDeclaredValue(input);
     CssString realName = convertToStringExpression(evaluate(value), input);
@@ -173,7 +76,6 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
   }
 
   //FIXME: refactoring change to reusable expression type switch
-  @Override
   public Expression evaluate(Expression input) {
     switch (input.getType()) {
     case FUNCTION:
@@ -222,7 +124,7 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
     return "true".equals(identifier.getValue());
   }
 
- //FIXME: add also identifiers comparison
+  //FIXME: add also identifiers comparison
   public boolean booleanEvalueate(ComparisonExpression input) {
     Expression leftE = evaluate(input.getLeft());
     Expression rightE = evaluate(input.getRight());
@@ -233,37 +135,35 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
     if (rightE.getType() != ASTCssNodeType.NUMBER)
       throw new CompileException("The expression must evaluate to number (for now).", rightE);
 
-    Double left = ((NumberExpression)leftE).getValueAsDouble();
-    Double right = ((NumberExpression)rightE).getValueAsDouble();
+    Double left = ((NumberExpression) leftE).getValueAsDouble();
+    Double right = ((NumberExpression) rightE).getValueAsDouble();
 
     ComparisonExpressionOperator.Operator operator = input.getOperator().getOperator();
     switch (operator) {
     case GREATER:
-      return left.compareTo(right)>0;
+      return left.compareTo(right) > 0;
 
     case GREATER_OR_EQUAL:
-      return left.compareTo(right)>=0;
+      return left.compareTo(right) >= 0;
 
     case OPEQ:
-      return left.compareTo(right)==0;
-      
+      return left.compareTo(right) == 0;
+
     case LOWER_OR_EQUAL:
-      return left.compareTo(right)<=0;
+      return left.compareTo(right) <= 0;
 
     case LOWER:
-      return left.compareTo(right)<0;
+      return left.compareTo(right) < 0;
 
     default:
       throw new CompileException("Unexpected comparison operator", input.getOperator());
     }
   }
 
-  @Override
   public Expression evaluate(FunctionExpression input) {
     return input;
   }
 
-  @Override
   public Expression evaluate(SignedExpression input) {
     Expression evaluate = evaluate(input.getExpression());
     if (evaluate instanceof NumberExpression) {
@@ -280,7 +180,6 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
     throw new CompileException("The expression does not evaluate to number and can not be negated.", input);
   }
 
-  @Override
   public Expression evaluate(ComposedExpression input) {
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
@@ -291,7 +190,6 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
     return new ComposedExpression(input.getUnderlyingStructure(), leftValue, input.getOperator(), rightValue);
   }
 
-  @Override
   public boolean evaluate(List<Guard> guards) {
     if (guards == null || guards.isEmpty())
       return true;
@@ -301,7 +199,7 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
       if (evaluate(guard))
         return true;
     }
-    
+
     return false;
   }
 
@@ -315,7 +213,7 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
       if (!evaluate(condition))
         return false;
     }
-    
+
     return true;
   }
 
@@ -326,37 +224,21 @@ class CalculatingExpressionEvaluator extends AbstractEngine {
     return guardCondition.isNegated() ? !conditionStatus : conditionStatus;
   }
 
-}
+  public boolean isRatioExpression(Expression expression) {
+    if (!(expression instanceof ComposedExpression))
+      return false;
 
-class PassiveExpressionEvaluator extends AbstractEngine {
+    ComposedExpression composed = (ComposedExpression) expression;
+    if (composed.getOperator().getOperator() != Operator.SOLIDUS) {
+      return false;
+    }
 
-  public Expression evaluate(Variable input) {
-    return input;
+    if (composed.getLeft().getType() != ASTCssNodeType.NUMBER)
+      return false;
+
+    if (composed.getRight().getType() != ASTCssNodeType.NUMBER)
+      return false;
+
+    return true;
   }
-
-  public Expression evaluate(IndirectVariable input) {
-    return input;
-  }
-
-  public Expression evaluate(Expression input) {
-    return input;
-  }
-
-  public Expression evaluate(FunctionExpression input) {
-    return input;
-  }
-
-  public Expression evaluate(SignedExpression input) {
-    return input;
-  }
-
-  public Expression evaluate(ComposedExpression input) {
-    return input;
-  }
-
-  @Override
-  public boolean evaluate(List<Guard> guards) {
-    return false;
-  }
-
 }

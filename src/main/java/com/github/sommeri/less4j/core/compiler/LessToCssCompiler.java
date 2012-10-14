@@ -143,7 +143,6 @@ public class LessToCssCompiler {
     }
     case PURE_MIXIN: {
       activeScope.enteringPureMixin((PureMixin) node);
-      expressionEvaluator.turnOffEvaluation();
       break;
     }
     }
@@ -164,8 +163,6 @@ public class LessToCssCompiler {
     switch (node.getType()) {
     case PURE_MIXIN: {
       activeScope.leavingPureMixin((PureMixin) node);
-      if (!activeScope.isInPureMixin())
-        expressionEvaluator.turnOnEvaluation();
       manipulator.removeFromBody(node);
       break;
     }
@@ -211,19 +208,14 @@ public class LessToCssCompiler {
 
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
     for (FullMixinDefinition mixin : matchingMixins) {
-      boolean evaluatorOn = expressionEvaluator.turnOnEvaluation();
-
       if (matcher.patternsMatch(reference, mixin)) {
         initializeMixinVariableScope(reference, mixin);
-        
+
         RuleSetsBody body = solveVariablesAndMixinsInMixin(mixin.getMixin());
         result.addMembers(body.getChilds());
-        
-        activeScope.leaveMixinVariableScope();
-      } 
 
-      if (!evaluatorOn)
-        expressionEvaluator.turnOffEvaluation();
+        activeScope.leaveMixinVariableScope();
+      }
     }
 
     if (reference.isImportant()) {
