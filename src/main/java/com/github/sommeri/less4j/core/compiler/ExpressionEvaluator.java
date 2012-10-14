@@ -28,7 +28,9 @@ import com.github.sommeri.less4j.core.ast.Variable;
 public class ExpressionEvaluator {
 
   private final ActiveScope variableScope;
-  private ArithmeticOperator arithmeticEngine = new ArithmeticOperator();;
+  private ArithmeticOperator arithmeticEngine = new ArithmeticOperator();
+  private ExpressionComparator comparator = new GuardsComparator();
+  
 
   public ExpressionEvaluator(ActiveScope variableScope) {
     super();
@@ -93,13 +95,13 @@ public class ExpressionEvaluator {
     case PARENTHESES_EXPRESSION:
       return evaluate(((ParenthesesExpression) input).getEnclosedExpression());
 
-    case NEGATED_EXPRESSION:
+    case SIGNED_EXPRESSION:
       return evaluate((SignedExpression) input);
 
     case NAMED_EXPRESSION:
       return ((NamedExpression) input).getExpression();
 
-      //the value is already there, nothing to evaluate
+    //the value is already there, nothing to evaluate
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:
@@ -129,25 +131,32 @@ public class ExpressionEvaluator {
     Expression leftE = evaluate(input.getLeft());
     Expression rightE = evaluate(input.getRight());
 
+    comparator.validateSimpleExpression(leftE);
+    comparator.validateSimpleExpression(rightE);
+
+    ComparisonExpressionOperator operator = input.getOperator();
+    if (operator.getOperator()==ComparisonExpressionOperator.Operator.OPEQ)
+      return comparator.equal(leftE, rightE);
+
     if (leftE.getType() != ASTCssNodeType.NUMBER)
-      throw new CompileException("The expression must evaluate to number (for now).", leftE);
+      throw new CompileException("The operator " +operator+ " can be used only with numbers.", leftE);
 
     if (rightE.getType() != ASTCssNodeType.NUMBER)
-      throw new CompileException("The expression must evaluate to number (for now).", rightE);
+      throw new CompileException("The operator " +operator+ " can be used only with numbers.", rightE);
 
-    Double left = ((NumberExpression) leftE).getValueAsDouble();
-    Double right = ((NumberExpression) rightE).getValueAsDouble();
+    return compareNumbers((NumberExpression)leftE, (NumberExpression)rightE, operator);
+  }
 
-    ComparisonExpressionOperator.Operator operator = input.getOperator().getOperator();
-    switch (operator) {
+  private boolean compareNumbers(NumberExpression leftE, NumberExpression rightE, ComparisonExpressionOperator operator) {
+    Double left = leftE.getValueAsDouble();
+    Double right = rightE.getValueAsDouble();
+
+    switch (operator.getOperator()) {
     case GREATER:
       return left.compareTo(right) > 0;
 
     case GREATER_OR_EQUAL:
       return left.compareTo(right) >= 0;
-
-    case OPEQ:
-      return left.compareTo(right) == 0;
 
     case LOWER_OR_EQUAL:
       return left.compareTo(right) <= 0;
@@ -156,7 +165,7 @@ public class ExpressionEvaluator {
       return left.compareTo(right) < 0;
 
     default:
-      throw new CompileException("Unexpected comparison operator", input.getOperator());
+      throw new CompileException("Unexpected comparison operator", operator);
     }
   }
 

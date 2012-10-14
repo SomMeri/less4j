@@ -149,9 +149,8 @@ public class LessToCssCompiler {
 
     if (node.getType() != ASTCssNodeType.PURE_MIXIN && node.getType() != ASTCssNodeType.VARIABLE_DECLARATION && node.getType() != ASTCssNodeType.ARGUMENT_DECLARATION) {
       List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-      //FIXME: make extensive test case on nested mixins and nested rulesets - pure mixins and simple classes behave diferently
-      //Register all variables and  mixins. We have to do that because every variable and every mixin is valid within 
-      //the whole scope, even before it was defined. 
+      //Register all variables and  mixins. We have to do that because variables and mixins are valid within 
+      //the whole scope, even before they have been defined. 
       registerAllVariables(childs);
       registerAllMixins(childs);
 

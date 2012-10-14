@@ -1,58 +1,62 @@
-.mixin(-0) {
+.mixin(...) {
+ catch:all;
+}
+.mixin(@var) when (@var=-0) {
   declare: minus 0;
 }
-.mixin(0) {
+.mixin(@var) when (@var=0) {
   declare: 0;
 }
-.mixin(-2) {
+.mixin(@var) when (@var=-2) {
   declare: -2;
 }
-.mixin(-4) {
+.mixin(@var) when (@var=-4) {
   declare: -4;
 }
-.mixin(4) {
+.mixin(@var) when (@var=4) {
   declare: 4;
 }
-.mixin(4px) {
+.mixin(@var) when (@var=4px) {
   declare: 4px;
 }
-.mixin(-4px) {
+.mixin(@var) when (@var=-4px) {
   declare: minus 4px;
 }
-.mixin('wrong') {
+//this is not less.js compatible: Unable to perform comparison
+.mixin(@var) when (@var='wrong') {
   declare: 'wrong';
 }
-.mixin("wrong") {
+.mixin(@var) when (@var="wrong") {
   declare: "wrong";
 }
-.mixin('value') {
+.mixin(@var) when (@var='value') {
   declare: 'value';
 }
-.mixin("value") {
+.mixin(@var) when (@var="value") {
   declare: "value";
 }
-.mixin(wrong) {
+.mixin(@var) when (@var=wrong) {
   declare: wrong;
 }
-.mixin(-wrong) {
+.mixin(@var) when (@var=-wrong) {
   declare: -wrong;
 }
-.mixin(identifier) {
+.mixin(@var) when (@var=identifier) {
   declare: identifier;
 }
-.mixin(-identifier) {
+.mixin(@var) when (@var=-identifier) {
   declare: -identifier;
 }
-.mixin(green) {
+.mixin(@var) when (@var=green) {
   declare: green;
 }
-.mixin(#00ff00) {
+.mixin(@var) when (@var=#00ff00) {
   declare: #00ff00;
 }
-.mixin(red) {
+.mixin(@var) when (@var=red) {
   declare: red;
 }
-.mixin(#ff0000) {
+.mixin(@var) when (@var=#ff0000) {
   declare: #ff0000;
 }
 

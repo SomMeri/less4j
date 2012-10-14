@@ -11,7 +11,7 @@ import com.github.sommeri.less4j.core.ast.PureMixin;
 public class MixinsReferenceMatcher {
 
   private ExpressionEvaluator evaluator;
-  private PatternsComparator comparator;
+  private ExpressionComparator comparator;
 
   public MixinsReferenceMatcher(ActiveScope activeScope) {
     comparator = new PatternsComparator();

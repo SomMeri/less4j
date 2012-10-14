@@ -24,17 +24,3 @@
 #tryString2 {
   declare: "value";
 }
-#tryIdentifier {
-  declare: identifier;
-}
-#tryNegativeIdentifier {
-  declare: identifier;
-}
-#tryColor1 {
-  declare: red;
-  declare: #ff0000;
-}
-#tryColor2 {
-  declare: red;
-  declare: #ff0000;
-}

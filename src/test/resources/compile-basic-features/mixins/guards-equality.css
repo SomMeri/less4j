@@ -1,40 +1,48 @@
 #tryZero {
+  catch: all;
   declare: minus 0;
   declare: 0;
 }
 #tryMinusZero {
+  catch: all;
   declare: minus 0;
   declare: 0;
 }
 #tryNegatedNumber {
+  catch: all;
   declare: -4;
+  declare: minus 4px;
 }
 #tryNumber {
+  catch: all;
   declare: 4;
+  declare: 4px;
 }
 #tryNumberPx {
+  catch: all;
+  declare: 4;
   declare: 4px;
 }
 #tryNumberMinuxPx {
+  catch: all;
+  declare: -4;
   declare: minus 4px;
 }
 #tryString1 {
-  declare: 'value';
+  catch: all;
 }
 #tryString2 {
-  declare: "value";
+  catch: all;
 }
 #tryIdentifier {
-  declare: identifier;
+  catch: all;
 }
 #tryNegativeIdentifier {
-  declare: identifier;
+  catch: all;
 }
 #tryColor1 {
-  declare: red;
-  declare: #ff0000;
+  catch: all;
 }
 #tryColor2 {
-  declare: red;
-  declare: #ff0000;
+  catch: all;
 }

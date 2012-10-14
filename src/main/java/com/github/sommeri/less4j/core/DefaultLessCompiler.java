@@ -200,7 +200,7 @@ class CssPrinter {
       return appendStyleSheet((StyleSheet) node);
 
     case PARENTHESES_EXPRESSION:
-    case NEGATED_EXPRESSION:
+    case SIGNED_EXPRESSION:
     case VARIABLE:
     case NESTED_RULESET:
     case INDIRECT_VARIABLE:

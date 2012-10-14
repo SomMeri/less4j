@@ -39,7 +39,7 @@ public class SignedExpression extends Expression {
 
   @Override
   public ASTCssNodeType getType() {
-    return ASTCssNodeType.NEGATED_EXPRESSION;
+    return ASTCssNodeType.SIGNED_EXPRESSION;
   }
 
   @Override

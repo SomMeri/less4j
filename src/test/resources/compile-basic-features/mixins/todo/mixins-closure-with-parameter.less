@@ -1,0 +1,9 @@
+.scope {
+    .mixin (@var) {
+        width: @var;
+    }
+}
+
+.class {
+    .scope > .mixin(99px);
+}

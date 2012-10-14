@@ -478,7 +478,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (hasChildren(token.getChild(0))) {
       first = termBuilder.buildFromTerm(token.getChild(0));
       String sign = "";
-      if (first.getType() == ASTCssNodeType.NEGATED_EXPRESSION) {
+      if (first.getType() == ASTCssNodeType.SIGNED_EXPRESSION) {
         SignedExpression negated = (SignedExpression) first;
         first = negated.getExpression();
         sign = negated.getSign().toSymbol();
