@@ -142,7 +142,7 @@ public class LessToCssCompiler {
       break;
     }
     case PURE_MIXIN: {
-      activeScope.enteringPureMixin((PureMixin) node);
+      manipulator.removeFromBody(node);
       break;
     }
     }
@@ -159,13 +159,6 @@ public class LessToCssCompiler {
       }
     }
 
-    switch (node.getType()) {
-    case PURE_MIXIN: {
-      activeScope.leavingPureMixin((PureMixin) node);
-      manipulator.removeFromBody(node);
-      break;
-    }
-    }
     if (hasOwnScope)
       activeScope.decreaseScope();
   }

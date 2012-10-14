@@ -20,7 +20,6 @@ public class ActiveScope {
 
   private Stack<VariablesScope> variablesScope = new Stack<VariablesScope>();
   private Stack<MixinsScope> mixinsScope = new Stack<MixinsScope>();
-  private Stack<String> mixinsStack = new Stack<String>();
 
   public ActiveScope() {
     variablesScope.push(new VariablesScope());
@@ -67,14 +66,6 @@ public class ActiveScope {
     return expression;
   }
 
-  public void enteringPureMixin(PureMixin node) {
-    mixinsStack.push(node.getName());
-  }
-
-  public boolean isInPureMixin() {
-    return !mixinsStack.isEmpty();
-  }
-
   public List<FullMixinDefinition> getAllMatchingMixins(MixinsReferenceMatcher matcher, MixinReference reference) {
     int idx = mixinsScope.size();
     while (idx > 0) {
@@ -88,10 +79,6 @@ public class ActiveScope {
 
   public void leaveMixinVariableScope() {
     variablesScope.pop();
-  }
-
-  public void leavingPureMixin(PureMixin node) {
-    mixinsStack.pop();
   }
 
   public void registerMixin(PureMixin node) {
