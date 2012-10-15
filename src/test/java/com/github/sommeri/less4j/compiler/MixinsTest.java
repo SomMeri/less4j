@@ -7,7 +7,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
 
-//TODO document variables scope issue including issue filled to less.js https://github.com/cloudhead/less.js/issues/973
 public class MixinsTest extends BasicFeaturesTests {
   
   private static final String standardCases = "src/test/resources/compile-basic-features/mixins/";

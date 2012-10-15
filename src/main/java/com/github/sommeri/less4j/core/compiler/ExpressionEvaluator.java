@@ -126,7 +126,6 @@ public class ExpressionEvaluator {
     return "true".equals(identifier.getValue());
   }
 
-  //FIXME: add also identifiers comparison
   public boolean booleanEvalueate(ComparisonExpression input) {
     Expression leftE = evaluate(input.getLeft());
     Expression rightE = evaluate(input.getRight());

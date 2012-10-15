@@ -234,7 +234,6 @@ public class LessToCssCompiler {
     //We can not use ALL_ARGUMENTS variable from the upper scope, even if it happens to be defined. 
     variableState.removeDeclaration(ALL_ARGUMENTS);
 
-    // FIXME: documentation and refactoring! 
     List<Expression> allValues = new ArrayList<Expression>();
 
     int length = mixin.getMixin().getParameters().size();
@@ -261,8 +260,6 @@ public class LessToCssCompiler {
       }
     }
 
-    //FIXME: document: variable with the name "arguments" wins over general variable
-    //FXIME: document general @arguments is not inheritable
     Expression compoundedValues = expressionEvaluator.joinAll(allValues, reference);
     variableState.addDeclarationIfNotPresent(ALL_ARGUMENTS, compoundedValues);
     activeScope.enterMixinVariableScope(variableState);

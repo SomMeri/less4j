@@ -22,6 +22,12 @@
 .mixin(@var) when (@var=-4px) {
   declare: minus 4px;
 }
+.mixin(@var) when (@var=identifier) {
+  declare: identifier;
+}
+.mixin(@var) when (@var=-identifier) {
+  declare: minus identifier;
+}
 #tryZero {
   .mixin(0);
 }
@@ -50,7 +56,7 @@
   .mixin(identifier);
 }
 #tryNegativeIdentifier {
-  .mixin(identifier);
+  .mixin(-identifier);
 }
 #tryColor1 {
   .mixin(red);

@@ -19,9 +19,8 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-  //FIXME: document expressions in guards must evaluate to numbers
-      private static final String inputLess = "src/test/resources/minitests/debug.less";
-      private static final String outputCss = "src/test/resources/minitests/debug.css";
+  private static final String inputLess = "src/test/resources/minitests/debug.less";
+  private static final String outputCss = "src/test/resources/minitests/debug.css";
 
   // ***********************************************************************
   //fail because of pattern matching
@@ -31,8 +30,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   //  private static final String outputCss = "src/test/resources/minitests/mixins-closure.css";
 
   // *** fail because of identifiers, functions and missing commas
-//    private static final String inputLess = "src/test/resources/minitests/mixins-guards.less";
-//    private static final String outputCss = "src/test/resources/minitests/mixins-guards.css";
+  //    private static final String inputLess = "src/test/resources/minitests/mixins-guards.less";
+  //    private static final String outputCss = "src/test/resources/minitests/mixins-guards.css";
 
   // *** fail because of namespaces - those are not implemented
   //  private static final String inputLess = "src/test/resources/minitests/mixins.less";

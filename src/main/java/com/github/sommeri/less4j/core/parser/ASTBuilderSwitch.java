@@ -245,7 +245,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       } else if (kid.getType() == LessLexer.GUARD) {
         result.addGuard(handleGuard(kid));
       } else if (kid.getType() == LessLexer.DOT3) {
-        //FIXME: @arguments keyword works differently. It is a list with all arguments
         result.addParameter(new ArgumentDeclaration(kid, new Variable(kid, "@"), null, true));
       } else { // anything else is a parameter
         result.addParameter(switchOn(kid));

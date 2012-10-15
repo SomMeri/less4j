@@ -28,7 +28,6 @@ public class NestedRulesCollector {
     return rulesets;
   }
 
-  //FIXME: less.js does not print empty rulesets, we do document
   private void collectChildRuleSets(ASTCssNode node) {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {

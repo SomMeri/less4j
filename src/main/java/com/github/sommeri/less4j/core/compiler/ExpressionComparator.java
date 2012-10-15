@@ -8,8 +8,6 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 
-//FIXME: pattern must be pattern, not evaluated number of something <- only in top level
-//TODO: document patterns and guards are evaluated a bit differently
 public abstract class ExpressionComparator {
 
   public boolean isSimpleExpression(Expression expression) {
@@ -62,7 +60,6 @@ public abstract class ExpressionComparator {
   private boolean equalString(CssString pattern, Expression expression) {
     if (expression instanceof CssString) {
       CssString string = (CssString) expression;
-      //FIXME: document that matching depends also on quote type
       return equals(pattern.getValue(), string.getValue()) && equals(pattern.getQuoteType(), string.getQuoteType());
     }
 
@@ -97,7 +94,7 @@ public abstract class ExpressionComparator {
 
       if (pattern.getSign() == Sign.MINUS)
         patternClone.setValueAsDouble(patternClone.getValueAsDouble() * -1);
-      //TODO test on negative pixel and other edge cases
+
       NumberExpression number = (NumberExpression) expression;
       return equalNumber(patternClone, number);
     }
