@@ -38,10 +38,10 @@ Pom.xml dependency:
 ## API:
 Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
 
-Access the compiler through `String compile(String lessContent)` method of the `com.github.less4j.ILessCompiler` interface. The interface has only one implementation: `com.github.less4j.core.DefaultLessCompiler`.
+Access the compiler through `String compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. The interface has only one implementation: `com.github.less4j.core.DefaultLessCompiler`.
 
 Put the content of .less file into the input string. The method returns translated css style sheet:
-<pre><code>ILessCompiler compiler = new DefaultLessCompiler();
+<pre><code>LessCompiler compiler = new DefaultLessCompiler();
 String css = compiler.compile("* { margin: 1 1 1 1; }");
 System.out.println(css);
 </code></pre>
