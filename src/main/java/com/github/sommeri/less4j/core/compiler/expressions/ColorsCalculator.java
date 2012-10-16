@@ -9,8 +9,6 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-//TODO document: number minus or divide color is impossible - the same as in less.js
-//TODO document: cutting at max and min
 //TODO document: division by zero generates ff
 //TODO document: color code shortcut
 class ColorsCalculator {
