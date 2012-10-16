@@ -1,0 +1,79 @@
+#hexColorVsFloat {
+  color: #122334;
+  color: #122334;
+  color: #1e1e1e;
+  color: #4488cc;
+  color: #09111a;
+  color: #224466;
+}
+#hexColorVsNumber {
+  color: #152637;
+  color: #152637;
+  color: #1e1e1e;
+  color: #4488cc;
+  color: #4488cc;
+  color: #04090d;
+}
+#hexColorVsNumberTooBig {
+  color: #ffffff;
+  color: #ffffff;
+  color: #000000;
+  color: #ffffff;
+  color: #ffffff;
+  color: #000101;
+}
+#hexColorVsNegativeNumber {
+  color: #0d1e2f;
+  color: #0d1e2f;
+  color: #262626;
+  color: #000000;
+  color: #4488cc;
+  color: #000000;
+}
+#hexColorVsNegativeNumberTooBig {
+  color: #fbfaf9;
+  color: #fbfaf9;
+  color: #050607;
+  color: #000000;
+  color: #000000;
+  color: #000000;
+}
+#hexColorVsHexColor {
+  color: #233547;
+  color: #233547;
+  color: #122232;
+  color: #114499;
+  color: #114499;
+  color: #111111;
+}
+#hexColorVsHexColorTooBig {
+  color: #ffffff;
+  color: #ffffff;
+  color: #000000;
+  color: #ffffff;
+  color: #ffffff;
+  color: #000000;
+}
+#namedColorVsNumber {
+  color: #c1e6ff;
+  color: #c1e6ff;
+  color: #4e361d;
+  color: #69d2ff;
+  color: #69d2ff;
+  color: #020202;
+}
+#namedColorVsNamedColor {
+  color: #ff8000;
+  color: #1e8fe1;
+  color: #ffffff;
+  color: #010209;
+}
+#hashDecoding {
+  color: #334455;
+  color: #132435;
+  color: #334455;
+}
+#divisionByZero {
+  color: #ffffff;
+  color: #ffffff;
+}

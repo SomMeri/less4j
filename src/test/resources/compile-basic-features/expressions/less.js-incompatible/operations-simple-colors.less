@@ -1,0 +1,90 @@
+#hexColorVsFloat {
+  color: #112233 + 0.5;
+  color: 0.5 + #112233;
+  color: #222222 - 4;
+  color: #112233 * 4;
+  color: 0.5 * #112233;
+  color: #112233 / 0.5;
+}
+
+#hexColorVsNumber {
+  color: #112233 + 4;
+  color: 4 + #112233;
+  color: #222222 - 4;
+  //color: 4 - #11223344; Can't substract or divide a color from a number
+  color: #112233 * 4;
+  color: 4 * #112233;
+  color: #112233 / 4;
+  //color: 4 / #11223344; Can't substract or divide a color from a number
+}
+
+#hexColorVsNumberTooBig {
+  color: #fffefd + 4;
+  color: 4 + #fffefd;
+  color: #010203 - 4;
+  color: #99fafb * 4;
+  color: 4 * #99fafb;
+  color: #010203 / 4;
+}
+
+#hexColorVsNegativeNumber {
+  color: #112233 + -4;
+  color: -4 + #112233;
+  color: #222222 - -4;
+  color: #112233 * -4;
+  color: 4 * #112233;
+  color: #112233 / -4;
+}
+
+#hexColorVsNegativeNumberTooBig {
+  color: #fffefd + -4;
+  color: -4 + #fffefd;
+  color: #010203 - -4;
+  color: #99fafb * -4;
+  color: -4 * #99fafb;
+  color: #010203 / -4;
+}
+#hexColorVsHexColor {
+  color: #112233 + #121314;
+  color: #121314 + #112233;
+  color: #223344 - #101112;
+  color: #112233 * #010203;
+  color: #010203 * #112233;
+  color: #112233 / #010203;
+}
+
+#hexColorVsHexColorTooBig {
+  color: #112233 + #fffefd;
+  color: #fffefd + #112233;
+  color: #223344 - #fffefd;
+  color: #112233 * #fffefd;
+  color: #fffefd * #112233;
+  color: #112233 / #fffefd;
+}
+
+//these two are incompatible with less-1.3.0, it has a bug
+#namedColorVsNumber {
+  color: #112233 + lightsteelblue;
+  color: lightsteelblue + #112233;
+  color: #fefafb - lightsteelblue;
+  color: #010203 * dimgray;
+  color: dimgray * #010203;
+  color: #fefafb / dimgray;
+}
+
+#namedColorVsNamedColor {
+  color: red + green;
+  color: aliceblue - chocolate;
+  color: aliceblue * powderblue;
+  color: aliceblue / chocolate;
+}
+#hashDecoding {
+  color: #112233 + #222; 
+  color: #112233 + #020202; 
+  color: #112233 + #222222; 
+}
+
+#divisionByZero {
+  color: #112233 / #000000; 
+  color: #112233 / 0; 
+}

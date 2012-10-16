@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler;
+package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,11 +24,17 @@ import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.ActiveScope;
+import com.github.sommeri.less4j.core.compiler.CompileException;
+import com.github.sommeri.less4j.core.compiler.ExpressionComparator;
+import com.github.sommeri.less4j.core.compiler.GuardsComparator;
 
 public class ExpressionEvaluator {
 
   private final ActiveScope variableScope;
-  private ArithmeticOperator arithmeticEngine = new ArithmeticOperator();
+  private ArithmeticCalculator arithmeticCalculator = new ArithmeticCalculator();
+  private ListCalculator listCalculator = new ListCalculator();
+  private ColorsCalculator colorsCalculator = new ColorsCalculator();
   private ExpressionComparator comparator = new GuardsComparator();
   
 
@@ -192,10 +198,16 @@ public class ExpressionEvaluator {
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
 
-    if (arithmeticEngine.accepts(input.getOperator()))
-      return arithmeticEngine.evalute(input, leftValue, rightValue);
+    if (arithmeticCalculator.accepts(input.getOperator(), leftValue, rightValue))
+      return arithmeticCalculator.evalute(input, leftValue, rightValue);
 
-    return new ComposedExpression(input.getUnderlyingStructure(), leftValue, input.getOperator(), rightValue);
+    if (colorsCalculator.accepts(input.getOperator(), leftValue, rightValue))
+      return colorsCalculator.evalute(input, leftValue, rightValue);
+
+    if (listCalculator.accepts(input.getOperator()))
+      return listCalculator.evalute(input, leftValue, rightValue); 
+      
+    throw new CompileException("Unable to evaluate expression", input);
   }
 
   public boolean evaluate(List<Guard> guards) {

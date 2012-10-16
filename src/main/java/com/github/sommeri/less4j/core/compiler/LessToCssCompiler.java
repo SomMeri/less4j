@@ -21,6 +21,7 @@ import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 
 public class LessToCssCompiler {
 

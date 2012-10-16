@@ -7,6 +7,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 
 public class MixinsReferenceMatcher {
 
