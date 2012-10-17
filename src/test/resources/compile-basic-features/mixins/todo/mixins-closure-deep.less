@@ -1,0 +1,13 @@
+.TopLevel() {
+    float:left;
+    .secondLevel() {
+        display:block;
+        .lastOne() {
+            text-decoration:none;
+        }
+    }
+}
+
+#test {
+  .TopLevel > .secondLevel > .lastOne;
+}

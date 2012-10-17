@@ -1,0 +1,9 @@
+#ns {
+  .box() {
+    width: @width;
+  }
+}
+#mybox {
+  @width: 20px;
+  #ns > .box();
+}

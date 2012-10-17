@@ -1,0 +1,4 @@
+#namespace #foo { color: black; }
+@media (orientation:portrait) {
+    #namespace #bar { color: white; }
+}

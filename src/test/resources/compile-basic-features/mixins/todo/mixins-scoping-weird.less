@@ -1,0 +1,10 @@
+//this should produce warning IMHO it does not seem like the best practice or something
+.ns {
+  .box() {
+    width: @width;
+  }
+}
+.mybox {
+  @width: 20px;
+  .ns > .box();
+}
