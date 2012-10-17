@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -56,7 +56,7 @@ public abstract class AbstractFileBasedTest {
   }
 
   protected LessCompiler getCompiler() {
-    return new DefaultLessCompiler();
+    return new ThreadUnsafeLessCompiler();
   }
 
 }

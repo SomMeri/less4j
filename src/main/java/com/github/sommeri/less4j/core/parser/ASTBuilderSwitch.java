@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.core.ProblemsCollector;
+import com.github.sommeri.less4j.core.TranslationException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
@@ -668,7 +668,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 }
 
 @SuppressWarnings("serial")
-class TreeBuildingException extends Less4jException {
+class TreeBuildingException extends TranslationException {
 
   private final HiddenTokenAwareTree node;
 

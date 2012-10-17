@@ -16,9 +16,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.Less4jException;
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
+import com.github.sommeri.less4j.core.TranslationException;
 import com.github.sommeri.less4j.core.parser.ANTLRPhaseErrors;
 import com.github.sommeri.less4j.core.parser.ANTLRPhaseErrors.SimpleError;
 
@@ -46,7 +47,7 @@ public abstract class AbstractErrorReportingTest {
       ComparisonFailure fail = (ComparisonFailure) ex;
       throw new ComparisonFailure(testName + " " + fail.getMessage(), fail.getExpected(), fail.getActual());
     } catch (Less4jException ex) {
-      validateException(ex);
+      validateException(ex.getCause());
       return;
     } catch (Throwable ex) {
       throw new RuntimeException(testName + " " + ex.getMessage(), ex);
@@ -55,7 +56,7 @@ public abstract class AbstractErrorReportingTest {
     fail(testName + " no exception has been thrown");
   }
 
-  private void validateException(Less4jException ex) {
+  private void validateException(TranslationException ex) {
     List<SimpleError> result = parseExpectedOutput(ex);
     if (ex instanceof ANTLRPhaseErrors) {
       ANTLRPhaseErrors ant = (ANTLRPhaseErrors) ex;
@@ -65,7 +66,7 @@ public abstract class AbstractErrorReportingTest {
     }
   }
 
-  private void validateSingle(Less4jException ex, List<SimpleError> result) {
+  private void validateSingle(TranslationException ex, List<SimpleError> result) {
     assertEquals(1, result.size());
     SimpleError expectedError = result.get(0);
     assertEquals(expectedError.getLine(), ex.getLine());
@@ -78,9 +79,9 @@ public abstract class AbstractErrorReportingTest {
     assertEquals(expectedResult, simpleErrors);
   }
 
-  public List<SimpleError> parseExpectedOutput(Less4jException ex) {
+  public List<SimpleError> parseExpectedOutput(TranslationException ex) {
     List<SimpleError> result = new ArrayList<SimpleError>();
-    
+
     try {
       String description = IOUtils.toString(new FileReader(errorList));
       String[] lines = description.split("\n");
@@ -88,8 +89,8 @@ public abstract class AbstractErrorReportingTest {
         String[] parts = line.split(":", 3);
         int errorLine = Integer.parseInt(parts[0]);
         int errorChar = Integer.parseInt(parts[1]);
-        String message = parts[2]==null? null : parts[2].trim();
-        
+        String message = parts[2] == null ? null : parts[2].trim();
+
         result.add(new SimpleError(errorLine, errorChar, message));
       }
     } catch (FileNotFoundException e) {
@@ -105,8 +106,7 @@ public abstract class AbstractErrorReportingTest {
   }
 
   protected LessCompiler getCompiler() {
-    return new DefaultLessCompiler();
+    return new ThreadUnsafeLessCompiler();
   }
 
 }
-

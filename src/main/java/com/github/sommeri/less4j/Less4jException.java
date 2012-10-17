@@ -1,46 +1,18 @@
 package com.github.sommeri.less4j;
 
+import com.github.sommeri.less4j.core.TranslationException;
+
 @SuppressWarnings("serial")
-public abstract class Less4jException extends RuntimeException {
+public class Less4jException extends Exception {
 
-  public Less4jException(String message, Throwable cause) {
-    super(message, cause);
+  public Less4jException(TranslationException ex) {
+    super(ex);
+    // TODO do something reasonable here
   }
 
-  public Less4jException(String message) {
-    super(message);
+  @Override
+  public synchronized TranslationException getCause() {
+    return (TranslationException) super.getCause();
   }
-
-  public Less4jException(Throwable cause) {
-    super(cause);
-  }
-
-  public Less4jException() {
-  }
-
-  protected String getPositionInformation() {
-    if (!hasErrorPosition())
-      return "";
-
-    String result = "\n Line: " + getLine() + " Character: " + getCharPositionInLine();
-    return result;
-  }
-
-  /**
-   * @return <code>true</code> if the position of the error in the input file is known.
-   */
-  public abstract boolean hasErrorPosition();
-
-  /**
-   * @return position of the first character that caused the error. First character in line has number 1. If the causing character
-   * number is not known, returns -1; 
-   */
-  public abstract int getCharPositionInLine();
-
-  /**
-   * @return number of line that caused the error. The number of the first line in the file is 1. If the causing line
-   * number is not known, returns -1; 
-   */
-  public abstract int getLine();
-
+  
 }

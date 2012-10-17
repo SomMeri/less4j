@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.Resource;
@@ -44,7 +44,12 @@ public class LessTransformerTest {
       @Override
       public void process(Resource resource, Reader reader, Writer writer)
           throws IOException {
-        final String css = new DefaultLessCompiler().compile(IOUtils.toString(reader));
+        String css;
+        try {
+          css = new ThreadUnsafeLessCompiler().compile(IOUtils.toString(reader));
+        } catch (Less4jException e) {
+         throw new RuntimeException(e);
+        }
         IOUtils.write(css, writer);
       }
     };

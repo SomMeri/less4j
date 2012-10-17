@@ -3,19 +3,19 @@ package com.github.sommeri.less4j.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.sommeri.less4j.LessCompiler.IProblem;
+import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 
 public class ProblemsCollector {
 
-  private List<IProblem> warnings = new ArrayList<IProblem>();
+  private List<Problem> warnings = new ArrayList<Problem>();
 
   public ProblemsCollector() {
   }
 
   public void clean() {
-    warnings = new ArrayList<IProblem>();
+    warnings = new ArrayList<Problem>();
   }
 
   public void warnRuleSetWithoutSelector(RuleSet ruleSet) {
@@ -23,13 +23,13 @@ public class ProblemsCollector {
     warnings.add(new AstNodeWarning(ruleSet, "Ruleset without selector: "));
   }
 
-  public List<IProblem> getWarnings() {
+  public List<Problem> getWarnings() {
     return warnings;
   }
 
 }
 
-class AstNodeWarning implements IProblem {
+class AstNodeWarning implements Problem {
 
   private final ASTCssNode node;
   private final String message;
@@ -56,6 +56,11 @@ class AstNodeWarning implements IProblem {
   @Override
   public int getCharacter() {
     return node.getCharPositionInSourceLine();
+  }
+
+  @Override
+  public Type getType() {
+    return Type.WARNING;
   }
 
 }

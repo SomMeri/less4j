@@ -1,6 +1,6 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.core.TranslationException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.MixinReference;
@@ -8,7 +8,7 @@ import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.Variable;
 
 @SuppressWarnings("serial")
-public class CompileException extends Less4jException {
+public class CompileException extends TranslationException {
 
   private ASTCssNode node;
 

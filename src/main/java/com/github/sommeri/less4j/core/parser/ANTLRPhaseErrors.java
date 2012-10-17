@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.core.TranslationException;
 
 @SuppressWarnings("serial")
-public class ANTLRPhaseErrors extends Less4jException {
+public class ANTLRPhaseErrors extends TranslationException {
 
   private final List<AntlrException> errors;
   private String message;

@@ -1,15 +1,13 @@
 package com.github.sommeri.less4j;
 
-import java.util.List;
 
 public interface LessCompiler {
 
-  public String compile(String lessContent);
+  public String compile(String lessContent) throws Less4jException;
 
-  //TODO: Warning: untested unfinished feature
-  public List<IProblem> getProblems();
-  
-  public interface IProblem {
+  public interface Problem {
+    
+    public Type getType();
 
     public int getLine();
 
@@ -17,6 +15,10 @@ public interface LessCompiler {
 
     public String getMessage();
     
+    public enum Type {
+      WARNING, ERROR
+   }
   }
+  
   
 }
