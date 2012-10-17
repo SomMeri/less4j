@@ -1,0 +1,15 @@
+// variable defined inside the namespace
+#ns {
+   @size: 10px;
+  .square() {
+    width: @size;
+    height: @size;
+  }
+  .box() {
+    .square();
+  }
+}
+
+#mybox {
+  #ns > .box();
+}

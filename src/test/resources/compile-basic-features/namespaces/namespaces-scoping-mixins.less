@@ -1,0 +1,27 @@
+/* namespaces scope is treated differently than variables and mixins */
+/* variant 1 */
+#abc1 { #space1 > .test1(); }
+#space1 {
+ .mixin1() { color: red; }
+ .test1() { .mixin1(); }
+ .mixin1() { margin: 2 2 2 2; }
+}
+.mixin1() { content: "conflict"; }
+
+/* variant 2 */
+#space2 {
+ .mixin2() { color: red; }
+ .test2() { .mixin2(); }
+ .mixin2() { margin: 2 2 2 2; }
+}
+#abc2 { #space2 > .test2(); }
+.mixin2() { content: "conflict"; }
+
+/* variant 3 */
+#space3 {
+ .mixin3() { color: red; }
+ .test3() { .mixin3(); }
+ .mixin3() { margin: 2 2 2 2; }
+}
+.mixin3() { content: "conflict"; }
+#abc3 { #space3 > .test3(); }
