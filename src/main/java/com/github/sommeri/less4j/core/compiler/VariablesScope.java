@@ -17,6 +17,11 @@ public class VariablesScope implements Cloneable {
   public VariablesScope() {
   }
 
+  public VariablesScope(VariablesScope peek, VariablesScope variablesUponDefinition) {
+    this(peek);
+    variables.putAll(variablesUponDefinition.variables);
+  }
+
   public Expression getValue(String name) {
     return variables.get(name);
   }

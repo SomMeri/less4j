@@ -1,0 +1,12 @@
+.mixin() {
+  declaration: @scope;
+  .test();
+}
+
+selector {
+  @scope: 10;
+  .test() {
+    variable: declaration;
+  }
+  .mixin();
+}

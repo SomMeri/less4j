@@ -201,7 +201,7 @@ public class LessToCssCompiler {
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
     for (FullMixinDefinition fullMixin : matchingMixins) {
       if (matcher.patternsMatch(reference, fullMixin)) {
-        initializeMixinVariableScope(reference, fullMixin);
+        activeScope.enterMixinVariableScope(calculateMixinsOwnVariables(reference, fullMixin));
 
         PureMixin mixin = fullMixin.getMixin();
         if (expressionEvaluator.evaluate(mixin.getGuards())) {
@@ -230,7 +230,7 @@ public class LessToCssCompiler {
     }
   }
 
-  private void initializeMixinVariableScope(MixinReference reference, FullMixinDefinition mixin) {
+  private VariablesScope calculateMixinsOwnVariables(MixinReference reference, FullMixinDefinition mixin) {
     VariablesScope variableState = mixin.getVariablesUponDefinition();
     //We can not use ALL_ARGUMENTS variable from the upper scope, even if it happens to be defined. 
     variableState.removeDeclaration(ALL_ARGUMENTS);
@@ -263,7 +263,7 @@ public class LessToCssCompiler {
 
     Expression compoundedValues = expressionEvaluator.joinAll(allValues, reference);
     variableState.addDeclarationIfNotPresent(ALL_ARGUMENTS, compoundedValues);
-    activeScope.enterMixinVariableScope(variableState);
+    return variableState;
   }
 
 }

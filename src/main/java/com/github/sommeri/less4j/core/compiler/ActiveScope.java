@@ -88,6 +88,8 @@ public class ActiveScope {
   }
 
   public void enterMixinVariableScope(VariablesScope variablesUponDefinition) {
-    variablesScope.push(variablesUponDefinition);
+    //each mixin inherits both caller variable scope and caller mixins scope
+    VariablesScope peek = variablesScope.peek();
+    variablesScope.push(new VariablesScope(peek, variablesUponDefinition));
   }
 }
