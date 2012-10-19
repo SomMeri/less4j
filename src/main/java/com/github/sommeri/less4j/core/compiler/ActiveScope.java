@@ -81,6 +81,8 @@ public class ActiveScope {
     variablesScope.pop();
   }
 
+  //TODO: document - namespaces are valid only after being declared 
+  
   public void registerMixin(PureMixin node) {
     VariablesScope variablesState = variablesScope.peek().clone();
     FullMixinDefinition mixin = new FullMixinDefinition(node, variablesState);

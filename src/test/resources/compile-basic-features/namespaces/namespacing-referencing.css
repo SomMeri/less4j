@@ -1,0 +1,16 @@
+#ns {
+  width: 10px;
+  height: 10px;
+}
+#ns #inner {
+  width: "normal square";
+  height: "normal square";
+  width: "ns square";
+  height: "ns square";
+  declaration1: "normal mixin";
+  declaration2: "normal mixin";
+  declaration1: "inner mixin";
+  declaration2: "inner mixin";
+  declaration1: "ns inner mixin";
+  declaration2: "ns inner mixin";
+}

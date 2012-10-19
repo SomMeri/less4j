@@ -1,0 +1,26 @@
+#ns {
+  #ns > .square(10px);
+  .square(@param) {
+    width: @param;
+  }
+  .square(@param) {
+    height: @param;
+  }
+  #inner {
+    // various ways to call the square
+    .square("normal square");
+    #ns > .square("ns square");
+    // various ways to call the mixin
+    .mixin("normal mixin");
+    #inner > .mixin("inner mixin");
+    #ns > #inner > .mixin("ns inner mixin");
+    //define mixin
+    .mixin(@param) {
+      declaration1: @param;
+    }
+    .mixin(@param) {
+      declaration2: @param;
+    }
+  }
+}
+
