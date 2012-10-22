@@ -1,5 +1,8 @@
 /* namespaces scope is treated differently than variables and mixins */
-/* variant 1 - moved to todo */
+/* variant 1 */
+#abc1 {
+  content: "conflict";
+}
 /* variant 2 */
 #abc2 {
   color: red;

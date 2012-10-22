@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler;
+package com.github.sommeri.less4j.core.compiler.scopes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +17,9 @@ public class VariablesScope implements Cloneable {
   public VariablesScope() {
   }
 
-  public VariablesScope(VariablesScope peek, VariablesScope variablesUponDefinition) {
-    this(peek);
-    variables.putAll(variablesUponDefinition.variables);
+  public VariablesScope(VariablesScope scope1, VariablesScope scope2) {
+    this(scope1);
+    variables.putAll(scope2.variables);
   }
 
   public Expression getValue(String name) {

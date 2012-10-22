@@ -58,6 +58,8 @@ tokens {
   MEDIUM_TYPE;
   BODY;
   MIXIN_REFERENCE;
+  NAMESPACE_REFERENCE;
+  PURE_NAMESPACE;
   PURE_MIXIN;
   MIXIN_PATTERN;
   GUARD_CONDITION;
@@ -222,6 +224,7 @@ bodylist
     
 bodyset
     : (cssClass LPAREN)=>pureMixinDeclaration
+    | (HASH LPAREN)=>pureNamespace
     | ruleSet
     | media
     | page
@@ -301,7 +304,9 @@ ruleset_body
             (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
                | (nestedRuleSet)=> a+=nestedRuleSet
                | (mixinReference)=>a+=mixinReference
-               | (pureMixinDeclaration)=>a+=pureMixinDeclaration
+               | (namespaceReference)=>a+=namespaceReference
+               | (pureMixinDeclaration)=>a+=pureMixinDeclaration //TODO: VYMAZAT a zistit preco to po vymazani neide
+               | (HASH LPAREN) => pureNamespace
                | (cssClass LPAREN)=>pureMixinDeclaration
                | a+=variabledeclaration
              )*
@@ -436,7 +441,18 @@ pseudoparameters:
  nth: ((a+=PLUS | a+=MINUS)? (a+=REPEATER | a+=IDENT) ((b+=PLUS | b+=MINUS) b+=NUMBER)?
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
- 
+
+pureNamespace 
+    : a=HASH LPAREN RPAREN f=ruleset_body
+    -> ^(PURE_NAMESPACE ^(ID_SELECTOR $a) $f)
+    ;
+
+namespaceReference
+    : (a+=namespaceName GREATER)* c+=mixinReference -> ^(NAMESPACE_REFERENCE $a* $c);
+
+namespaceName
+    : cssClass | HASH;
+
 mixinReference
     : a=cssClass (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)

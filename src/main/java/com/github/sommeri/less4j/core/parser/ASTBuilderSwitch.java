@@ -34,6 +34,7 @@ import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
@@ -42,6 +43,7 @@ import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
 import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.ast.PureNamespace;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Selector;
@@ -270,6 +272,23 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return result;
   }
 
+  public NamespaceReference handleNamespaceReference(HiddenTokenAwareTree token) {
+    NamespaceReference result = new NamespaceReference(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType()==LessLexer.HASH) {
+        result.addName(kid.getText().trim());
+      } else if (kid.getType()==LessLexer.CSS_CLASS) {
+        CssClass name = (CssClass)switchOn(kid);
+        result.addName(name.getName());
+      } else {
+        MixinReference reference = (MixinReference)switchOn(kid);
+        result.setFinalReference(reference);
+      }
+    }
+    return result;
+  }
+  
   public Expression handleMixinPattern(HiddenTokenAwareTree token) {
     return termBuilder.buildFromTerm(token.getChild(0));
   }
@@ -365,6 +384,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return result;
   }
 
+  public PureNamespace handlePureNamespace(HiddenTokenAwareTree token) {
+    IdSelector selector = handleIdSelector(token.getChild(0));
+    RuleSetsBody body = handleRuleSetsBody(token.getChild(1));
+    
+    PureNamespace namespace = new PureNamespace(token, selector, body);
+    return namespace;
+  }
+  
   public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {
     if (token.getChildren() == null)
       return new RuleSetsBody(token);

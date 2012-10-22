@@ -1,0 +1,63 @@
+//variant A
+#one { 
+  #two {
+    .mixin() {
+      declaration1: value1; 
+    }
+    #two > .mixin;
+  }
+}
+
+#two { 
+  .mixin() {
+    declaration2: value2; 
+  }
+  #two > .mixin;
+}
+
+//variant B
+#zero1 {
+  #one1 { 
+    #two1 {
+      .mixin1() {
+        declaration1: value1; 
+      }
+      #two1 > .mixin1;
+    }
+  }
+
+  #two1 { 
+    .mixin1() {
+      declaration2: value2; 
+    }
+    #two1 > .mixin1;
+  }
+}
+
+//variant C
+#zero2 {
+  #one2 { 
+    #two2 {
+      .mixin2() {
+        declaration1: value1; 
+      }
+      #two2 > .mixin2;
+    }
+  }
+  #one2 { 
+    #two2 {
+      .mixin2() {
+        declaration2: value2; 
+      }
+      #two2 > .mixin2;
+    }
+  }
+
+  #two2 { 
+    .mixin2() {
+      declaration3: value3; 
+    }
+    #one2 > #two2 > .mixin2;
+  }
+}
+

@@ -1,0 +1,16 @@
+.mixin {
+  #ns {
+    #ns > .square(10px);
+    .square(@param) {
+      width: @param;
+    }
+    .square(@param) {
+      height: @param;
+    }
+  }
+  #ns > .square(20px);
+}
+
+selector {
+  .mixin > #ns > .square(20px);
+}

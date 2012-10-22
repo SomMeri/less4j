@@ -1,5 +1,13 @@
 /* namespaces scope is treated differently than variables and mixins */
-/* variant 1 - moved to todo */
+/* variant 1 */
+#abc1 { #space1 > .test1(); }
+#space1 {
+ .mixin1() { color: red; }
+ .test1() { .mixin1(); }
+ .mixin1() { margin: 2 2 2 2; }
+}
+.mixin1() { content: "conflict"; }
+
 /* variant 2 */
 #space2 {
  .mixin2() { color: red; }

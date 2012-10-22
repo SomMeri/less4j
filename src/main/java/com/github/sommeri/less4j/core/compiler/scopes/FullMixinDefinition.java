@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler;
+package com.github.sommeri.less4j.core.compiler.scopes;
 
 import com.github.sommeri.less4j.core.ast.PureMixin;
 

@@ -49,6 +49,7 @@ public class NestedRuleSet extends RuleSet {
   public RuleSet convertToRuleSet() {
     return new RuleSet(getUnderlyingStructure(), getBody(), getSelectors());
   }
+
   @Override
   public NestedRuleSet clone() {
     NestedRuleSet result = (NestedRuleSet) super.clone();

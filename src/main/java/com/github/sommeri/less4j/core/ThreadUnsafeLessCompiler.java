@@ -78,6 +78,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return stringBuilder.toString();
   };
 
+  @SuppressWarnings("unused")
   private List<Problem> getProblems() {
     return problemsCollector.getWarnings();
   }
@@ -216,7 +217,7 @@ class CssPrinter {
       throw new NotACssException(node);
 
     default:
-      throw new IllegalStateException("Unknown: " + node.getType());
+      throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getCharPositionInSourceLine());
     }
   }
 

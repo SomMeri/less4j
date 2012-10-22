@@ -4,6 +4,7 @@ import com.github.sommeri.less4j.core.TranslationException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.Variable;
 
@@ -93,5 +94,9 @@ public class CompileException extends TranslationException {
 
   public static CompileException createUndeclaredMixin(String name, MixinReference variable) {
     return new CompileException("The mixin \"" + name + "\" was not declared.", variable);
+  }
+
+  public static void throwUnknownNamespace(NamespaceReference reference) {
+    throw new CompileException("The namespace \"" + reference + "\" was not found.", reference);
   }
 }

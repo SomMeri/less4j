@@ -8,6 +8,8 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.scopes.ActiveScope;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 
 public class MixinsReferenceMatcher {
 
@@ -20,14 +22,10 @@ public class MixinsReferenceMatcher {
   }
 
   public List<FullMixinDefinition> filter(MixinReference reference, List<FullMixinDefinition> mixins) {
-    return filterByParametersNumber(reference, mixins);
-  }
-
-  private List<FullMixinDefinition> filterByParametersNumber(MixinReference reference, List<FullMixinDefinition> mixins) {
     int requiredNumber = reference.getParameters().size();
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixinDefinition : mixins) {
-      if (hasRightNumberOfParameters(mixinDefinition, requiredNumber))
+      if (hasRightNumberOfParameters(mixinDefinition, requiredNumber) && patternsMatch(reference, mixinDefinition))
         result.add(mixinDefinition);
     }
     return result;
@@ -41,7 +39,7 @@ public class MixinsReferenceMatcher {
     return hasRightNumberOfParameters;
   }
 
-  public boolean patternsMatch(MixinReference reference, FullMixinDefinition mixin) {
+  private boolean patternsMatch(MixinReference reference, FullMixinDefinition mixin) {
     int i = 0;
     for (ASTCssNode parameter : mixin.getMixin().getParameters()) {
       if (parameter instanceof Expression) {

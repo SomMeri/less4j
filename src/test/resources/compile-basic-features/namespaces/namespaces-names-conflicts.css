@@ -1,0 +1,22 @@
+#one #two {
+  declaration1: value1;
+}
+#two {
+  declaration2: value2;
+}
+#zero1 #one1 #two1 {
+  declaration1: value1;
+}
+#zero1 #two1 {
+  declaration2: value2;
+}
+#zero2 #one2 #two2 {
+  declaration1: value1;
+}
+#zero2 #one2 #two2 {
+  declaration2: value2;
+}
+#zero2 #two2 {
+  declaration1: value1;
+  declaration2: value2;
+}

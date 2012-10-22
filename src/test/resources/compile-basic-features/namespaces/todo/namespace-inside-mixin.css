@@ -1,0 +1,12 @@
+.mixin {
+  width: 20px;
+  height: 20px;
+}
+.mixin #ns {
+  width: 10px;
+  height: 10px;
+}
+selector {
+  width: 20px;
+  height: 20px;
+}

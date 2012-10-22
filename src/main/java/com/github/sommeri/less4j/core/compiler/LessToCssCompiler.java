@@ -14,14 +14,20 @@ import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.ast.PureNamespace;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.scopes.ActiveScope;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.NamespaceTree;
+import com.github.sommeri.less4j.core.compiler.scopes.VariablesScope;
 
 public class LessToCssCompiler {
 
@@ -114,6 +120,11 @@ public class LessToCssCompiler {
     if (hasOwnScope)
       activeScope.increaseScope();
 
+    String representedNamespace = representedNamespace(node);
+    if (representedNamespace!=null) {
+      activeScope.openNamespace(representedNamespace);
+    }
+
     switch (node.getType()) {
     case VARIABLE_DECLARATION: {
       manipulator.removeFromBody(node);
@@ -132,33 +143,40 @@ public class LessToCssCompiler {
     case MIXIN_REFERENCE: {
       MixinReference mixinReference = (MixinReference) node;
       RuleSetsBody replacement = resolveMixinReference(mixinReference);
-
-      List<ASTCssNode> childs = replacement.getChilds();
-      if (!childs.isEmpty()) {
-        childs.get(0).addOpeningComments(mixinReference.getOpeningComments());
-        childs.get(childs.size() - 1).addTrailingComments(mixinReference.getTrailingComments());
-      }
-      manipulator.replaceInBody(mixinReference, childs);
+      manipulator.replaceInBody(mixinReference, replacement.getChilds());
+      break;
+    }
+    case NAMESPACE_REFERENCE: {
+      NamespaceReference namespaceReference = (NamespaceReference) node;
+      RuleSetsBody replacement = resolveNamespaceReference(namespaceReference);
+      manipulator.replaceInBody(namespaceReference, replacement.getChilds());
       break;
     }
     case PURE_MIXIN: {
       manipulator.removeFromBody(node);
       break;
     }
+    case PURE_NAMESPACE:
+      manipulator.removeFromBody(node);
+      break;
     }
 
-    if (node.getType() != ASTCssNodeType.PURE_MIXIN && node.getType() != ASTCssNodeType.VARIABLE_DECLARATION && node.getType() != ASTCssNodeType.ARGUMENT_DECLARATION) {
+    if (node.getType() != ASTCssNodeType.NAMESPACE_REFERENCE && node.getType() != ASTCssNodeType.PURE_MIXIN && node.getType() != ASTCssNodeType.VARIABLE_DECLARATION && node.getType() != ASTCssNodeType.ARGUMENT_DECLARATION) {
       List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       //Register all variables and  mixins. We have to do that because variables and mixins are valid within 
       //the whole scope, even before they have been defined. 
       registerAllVariables(childs);
       registerAllMixins(childs);
+      //registerAllNamespaces(childs);
 
       for (ASTCssNode kid : childs) {
         solveVariablesAndMixins(kid);
       }
     }
 
+    if (representedNamespace!=null) {
+      activeScope.closeNamespace();
+    }
     if (hasOwnScope)
       activeScope.decreaseScope();
   }
@@ -191,31 +209,63 @@ public class LessToCssCompiler {
     }
   }
 
+//  public void registerAllNamespaces(List<? extends ASTCssNode> childs) {
+//    for (ASTCssNode kid : childs) {
+//      String name = representedNamespace(kid);
+//      if (name!=null) {
+//        activeScope.registerNamespace(name);
+//      }
+//    }
+//  }
+
+  
   private boolean hasOwnScope(ASTCssNode node) {
     return (node instanceof Body);
   }
 
-  private RuleSetsBody resolveMixinReference(MixinReference reference) {
-    List<FullMixinDefinition> matchingMixins = activeScope.getAllMatchingMixins(matcher, reference);
-
+  private RuleSetsBody resolveNamespaceReference(NamespaceReference reference) {
+    List<NamespaceTree> namespaces = activeScope.findReferencedNamespace(reference);
+    if (namespaces.isEmpty())
+      CompileException.throwUnknownNamespace(reference);
+    
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
-    for (FullMixinDefinition fullMixin : matchingMixins) {
-      if (matcher.patternsMatch(reference, fullMixin)) {
-        activeScope.enterMixinVariableScope(calculateMixinsOwnVariables(reference, fullMixin));
+    for (NamespaceTree namespace : namespaces) {
+      activeScope.enterNamespace(namespace);
+      List<FullMixinDefinition> mixins = activeScope.getMixinsWithinNamespace(matcher, reference);
+      resolveReferencedMixins(reference.getFinalReference(), mixins, result);
+      activeScope.leaveNamespace();
+    }
+    return result;
+  }
 
-        PureMixin mixin = fullMixin.getMixin();
-        if (expressionEvaluator.evaluate(mixin.getGuards())) {
-          RuleSetsBody body = mixin.getBody().clone();
-          solveVariablesAndMixins(body);
-          result.addMembers(body.getChilds());
-        }
+  private RuleSetsBody resolveMixinReference(MixinReference reference) {
+    List<FullMixinDefinition> mixins = activeScope.getAllMatchingMixins(matcher, reference);
+    RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
+    return resolveReferencedMixins(reference, mixins, result);
+  }
 
-        activeScope.leaveMixinVariableScope();
+  private RuleSetsBody resolveReferencedMixins(MixinReference reference, List<FullMixinDefinition> mixins, RuleSetsBody result) {
+    for (FullMixinDefinition fullMixin : mixins) {
+      activeScope.overrideScope(calculateMixinsOwnVariables(reference, fullMixin));
+
+      PureMixin mixin = fullMixin.getMixin();
+      if (expressionEvaluator.evaluate(mixin.getGuards())) {
+        RuleSetsBody body = mixin.getBody().clone();
+        solveVariablesAndMixins(body);
+        result.addMembers(body.getChilds());
       }
+
+      activeScope.removeVariablesOverride();
     }
 
     if (reference.isImportant()) {
       declarationsAreImportant(result);
+    }
+
+    List<ASTCssNode> childs = result.getChilds();
+    if (!childs.isEmpty()) {
+      childs.get(0).addOpeningComments(reference.getOpeningComments());
+      childs.get(childs.size() - 1).addTrailingComments(reference.getTrailingComments());
     }
 
     return result;
@@ -264,6 +314,25 @@ public class LessToCssCompiler {
     Expression compoundedValues = expressionEvaluator.joinAll(allValues, reference);
     variableState.addDeclarationIfNotPresent(ALL_ARGUMENTS, compoundedValues);
     return variableState;
+  }
+
+  private String representedNamespace(ASTCssNode node) {
+    switch (node.getType()) {
+    case PURE_NAMESPACE:
+      return ((PureNamespace) node).getName();
+
+    case RULE_SET:
+    case NESTED_RULESET: {
+      RuleSet ruleSet = (RuleSet) node;
+      if (ruleSet.isNamespace())
+        return ruleSet.extractNamespaceName();
+      
+      return null;
+    }
+
+    default:
+      return null;
+    }
   }
 
 }

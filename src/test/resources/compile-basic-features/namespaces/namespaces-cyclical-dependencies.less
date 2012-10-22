@@ -1,0 +1,16 @@
+#space2 {
+ .mixin2() { color: red; }
+ .test2() { 
+   #abc2 > .dependency(); 
+   .mixin2();
+  }
+ .mixin2() { margin: 2 2 2 2; }
+}
+#abc2 { 
+  .dependency() {
+    voila: voila;
+  }
+  #space2 > .test2(); 
+}
+.mixin2() { content: "conflict"; }
+

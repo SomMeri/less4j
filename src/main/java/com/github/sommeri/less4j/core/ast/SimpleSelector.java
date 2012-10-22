@@ -22,10 +22,18 @@ public class SimpleSelector extends ASTCssNode implements Cloneable {
   }
   
   public boolean isSingleClassSelector() {
-    if (!isEmptyForm() || subsequent==null || subsequent.size()!=1)
+    return isOnePurposeSelector(ASTCssNodeType.CSS_CLASS);
+  }
+
+  public boolean isSingleIdSelector() {
+    return isOnePurposeSelector(ASTCssNodeType.ID_SELECTOR);
+  }
+
+  private boolean isOnePurposeSelector(ASTCssNodeType purpose) {
+    if (elementName!=null || !isEmptyForm() || subsequent==null || subsequent.size()!=1)
       return false;
     
-    return subsequent.get(0).getType()==ASTCssNodeType.CSS_CLASS;
+    return subsequent.get(0).getType()==purpose;
   }
 
   public String getElementName() {

@@ -104,6 +104,9 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.MIXIN_REFERENCE)
       return handleMixinReference(token);
 
+    if (type==LessLexer.NAMESPACE_REFERENCE)
+      return handleNamespaceReference(token);
+
     if (type==LessLexer.MIXIN_PATTERN)
       return handleMixinPattern(token);
 
@@ -113,7 +116,14 @@ public abstract class TokenTypeSwitch<T> {
     if (type==LessLexer.GUARD_CONDITION)
       return handleGuardCondition(token);
 
+    if (type==LessLexer.PURE_NAMESPACE)
+      return handlePureNamespace(token);
+
     throw new TreeBuildingException("Unexpected token type: " + type + " for " + token.getText(), token);
+  }
+
+  public T handlePureNamespace(HiddenTokenAwareTree token) {
+    return null;
   }
 
   public T handleGuardCondition(HiddenTokenAwareTree token) {
@@ -131,11 +141,15 @@ public abstract class TokenTypeSwitch<T> {
   public T handlePureMixinDeclaration(HiddenTokenAwareTree token) {
     return null;
   }
-  
+    
   public T handleMixinReference(HiddenTokenAwareTree token) {
     return null;
   }
-  
+
+  public T handleNamespaceReference(HiddenTokenAwareTree token) {
+    return null;
+  }
+
   public T handleVariableDeclaration(HiddenTokenAwareTree token) {
     return null;
   }

@@ -39,6 +39,22 @@ public class RuleSet extends ASTCssNode {
   }
 
   public boolean isMixin() {
+    if (!hasSimpleSelecor())
+      return false;
+    
+    SimpleSelector selector = selectors.get(0).getHead();
+    return selector.isSingleClassSelector();
+  }
+
+  public boolean isNamespace() {
+    if (!hasSimpleSelecor())
+      return false;
+    
+    SimpleSelector selector = selectors.get(0).getHead();
+    return selector.isSingleIdSelector();
+  }
+
+  private boolean hasSimpleSelecor() {
     if (selectors==null||selectors.size()!=1)
       return false;
     
@@ -46,10 +62,9 @@ public class RuleSet extends ASTCssNode {
     if (first.isCombined())
       return false;
     
-    SimpleSelector selector = first.getHead();
-    return selector.isSingleClassSelector();
+    return true;
   }
-  
+
   /**
    * Behavior of this method is undefined if it is not mixin.
    * @return 
@@ -62,6 +77,16 @@ public class RuleSet extends ASTCssNode {
     return pureMixin;
   }
 
+  /**
+   * Behavior of this method is undefined if it is not a namespace.
+   * @return 
+   */
+  public String extractNamespaceName() {
+    IdSelector name = (IdSelector)selectors.get(0).getHead().getSubsequent().get(0);
+    //TODO this would be cleaner solved in ASTSwitch 
+    return "#"+name.getName();
+  }
+
   @Override
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)body);
@@ -71,6 +96,10 @@ public class RuleSet extends ASTCssNode {
 
   public void addSelectors(List<Selector> selectors) {
     this.selectors.addAll(selectors);
+  }
+
+  public void addSelector(Selector selector) {
+    this.selectors.add(selector);
   }
 
   public void replaceSelectors(List<Selector> result) {
