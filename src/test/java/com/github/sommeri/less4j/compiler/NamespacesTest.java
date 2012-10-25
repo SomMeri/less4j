@@ -3,7 +3,6 @@ package com.github.sommeri.less4j.compiler;
 import java.io.File;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
