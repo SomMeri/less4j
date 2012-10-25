@@ -20,7 +20,14 @@ public class IteratedScope {
   }
 
   public Scope getNextChild() {
-    return childsIterator.next();
+    Scope child = null;
+    do {
+      if (childsIterator.hasNext())
+        child = childsIterator.next();
+      else 
+        System.out.println("wtf");
+    } while (!child.isPresentInTree());
+    return child;
   }
 
   @Override

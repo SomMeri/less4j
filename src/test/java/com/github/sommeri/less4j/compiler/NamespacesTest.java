@@ -8,7 +8,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
 
-@Ignore
 public class NamespacesTest extends BasicFeaturesTests {
   
   private static final String standardCases = "src/test/resources/compile-basic-features/namespaces/";

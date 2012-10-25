@@ -8,12 +8,14 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.Variable;
 
 public class Scope {
   
   private final ASTCssNode owner;
+  private boolean presentInTree = true;
   private VariablesScope variables = new VariablesScope();
   private MixinsScope mixins = new MixinsScope(); 
 
@@ -42,21 +44,6 @@ public class Scope {
 
   public MixinsScope getMixinsScope() {
     return mixins;
-  }
-
-  public List<Scope> findMatchingChilds(List<String> nameChain) {
-    if (nameChain.isEmpty())
-      return Arrays.asList(this);
-    
-    String fistName = nameChain.get(0);
-    List<String> theRest = nameChain.subList(1, nameChain.size()); 
-    List<Scope> result = new ArrayList<Scope>();
-    for (Scope kid : getChilds()) {
-      if (kid.getName().equals(fistName)) {
-        result.addAll(kid.findMatchingChilds(theRest));
-      }
-    }
-    return result;
   }
 
   public List<Scope> getChilds() {
@@ -134,6 +121,41 @@ public class Scope {
     return value==null? new ArrayList<FullMixinDefinition>() : value;
   }
 
+  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference) {
+    List<Scope> namespaces = getNearestNamespaces(reference);
+    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
+    for (Scope scope : namespaces) {
+      result.addAll(scope.getNearestMixins(reference.getFinalReference()));
+    }
+    return result;
+  }
+
+  private List<Scope> getNearestNamespaces(NamespaceReference reference) {
+    List<String> nameChain = reference.getNameChain();
+    Scope space = this;
+    List<Scope> result = findMatchingChilds(nameChain);
+    while (result.isEmpty()) {
+      space = space.getParent();
+      result = space.findMatchingChilds(nameChain);
+    }
+    return result;
+  }
+
+  public List<Scope> findMatchingChilds(List<String> nameChain) {
+    if (nameChain.isEmpty())
+      return Arrays.asList(this);
+    
+    String fistName = nameChain.get(0);
+    List<String> theRest = nameChain.subList(1, nameChain.size()); 
+    List<Scope> result = new ArrayList<Scope>();
+    for (Scope kid : getChilds()) {
+      if (kid.getName().equals(fistName)) {
+        result.addAll(kid.findMatchingChilds(theRest));
+      }
+    }
+    return result;
+  }
+
   public static Scope createDefaultScope(ASTCssNode owner) {
     return new Scope(owner, "#default#");
   }
@@ -174,6 +196,7 @@ public class Scope {
     Scope result = new Scope(owner, getName(), parent);
     result.variables=variables;
     result.mixins=mixins;
+    result.presentInTree = presentInTree;
     for (Scope kid : getChilds()) {
       kid.copyWithChildChain(result);
     }
@@ -186,6 +209,7 @@ public class Scope {
     Scope result = new Scope(owner, getName(), parent);
     result.variables=variables;
     result.mixins=mixins;
+    result.presentInTree = presentInTree;
     return result;
   }
 
@@ -200,10 +224,12 @@ public class Scope {
       parent.addChild(this);
   }
 
-  public void setAsSilent() {
-    if (hasParent()) {
-      getParent().getChilds().remove(this);
-    }
+  public void removedFromTree() {
+    presentInTree = false;
+  }
+
+  public boolean isPresentInTree() {
+    return presentInTree;
   }
 
   public Scope getRootScope() {

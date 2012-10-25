@@ -76,23 +76,6 @@ public class ScopeExtractor {
   }
 
   private void removeUsedNodes(ASTCssNode node, IteratedScope scope) {
-    switch (node.getType()) {
-    case VARIABLE_DECLARATION:
-      manipulator.removeFromBody(node);
-      break;
-    case PURE_MIXIN: {
-      Scope bodyScope = scope.getScope().getChildOwnerOf(((PureMixin)node).getBody());
-      bodyScope.setAsSilent();
-      manipulator.removeFromBody(node);
-      break;
-    } case PURE_NAMESPACE: {
-      Scope bodyScope = scope.getScope().getChildOwnerOf(((PureNamespace)node).getBody());
-      bodyScope.setAsSilent();
-      manipulator.removeFromBody(node);
-      break;
-    }
-    }
-    
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {
       if (AstLogic.hasOwnScope(kid)) {
@@ -100,6 +83,23 @@ public class ScopeExtractor {
       } else {
         removeUsedNodes(kid, scope);
       }
+    }
+
+    switch (node.getType()) {
+    case VARIABLE_DECLARATION:
+      manipulator.removeFromBody(node);
+      break;
+    case PURE_MIXIN: {
+      Scope bodyScope = scope.getScope().getChildOwnerOf(((PureMixin)node).getBody());
+      bodyScope.removedFromTree();
+      manipulator.removeFromBody(node);
+      break;
+    } case PURE_NAMESPACE: {
+      Scope bodyScope = scope.getScope().getChildOwnerOf(((PureNamespace)node).getBody());
+      bodyScope.removedFromTree();
+      manipulator.removeFromBody(node);
+      break;
+    }
     }
   }
 
