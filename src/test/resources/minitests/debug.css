@@ -1,58 +1,142 @@
-.light1 {
-  color: white;
-  margin: 1px;
+.mixin {
+  border: 1px solid black;
 }
-.light2 {
+.mixout {
+  border-color: orange;
+}
+.borders {
+  border-style: dashed;
+}
+#namespace .borders {
+  border-style: dotted;
+}
+#namespace .biohazard {
+  content: "death";
+}
+#namespace .biohazard .man {
+  color: transparent;
+}
+#theme > .mixin {
+  background-color: grey;
+}
+#container {
   color: black;
-  margin: 1px;
+  border: 1px solid black;
+  border-color: orange;
+  background-color: grey;
 }
-.max1 {
-  width: 6;
+#header .milk {
+  color: white;
+  border: 1px solid black;
+  background-color: grey;
 }
-.max2 {
-  width: 8;
+#header #cookie {
+  border-style: dashed;
 }
-.glob1 {
-  margin: auto auto;
+#header #cookie .chips {
+  border-style: dotted;
 }
-.ops1 {
-  height: gt-or-eq;
-  height: lt-or-eq;
+#header #cookie .chips .calories {
+  color: black;
+  border: 1px solid black;
+  border-color: orange;
+  background-color: grey;
 }
-.ops2 {
-  height: gt-or-eq;
-  height: not-eq;
+.secure-zone {
+  color: transparent;
 }
-.ops3 {
-  height: lt-or-eq;
-  height: not-eq;
+.direct {
+  border-style: dotted;
 }
-.default1 {
-  content: default;
+.bo,
+.bar {
+  width: 100%;
 }
-.test1 {
-  content: "true.";
+.bo {
+  border: 1px;
 }
-.test2 {
-  content: "false.";
+.ar.bo.ca {
+  color: black;
 }
-.test3 {
-  content: "false.";
+.jo.ki {
+  background: none;
 }
-.test4 {
-  content: "false.";
+.extended {
+  width: 100%;
+  border: 1px;
+  background: none;
 }
-.test5 {
-  content: "false.";
+.foo .bar {
+  width: 100%;
 }
-.bool1 {
-  content: true and true;
-  content: true;
-  content: false, true;
-  content: false and true and true, true;
-  content: false, true and true;
-  content: false, false, true;
-  content: false, true and true and true, false;
-  content: not false;
-  content: not false and false, not false;
+.mixin {
+  border: 1px solid black;
+}
+.mixout {
+  border-color: orange;
+}
+.borders {
+  border-style: dashed;
+}
+#namespace .borders {
+  border-style: dotted;
+}
+#namespace .biohazard {
+  content: "death";
+}
+#namespace .biohazard .man {
+  color: transparent;
+}
+#theme > .mixin {
+  background-color: grey;
+}
+#container {
+  color: black;
+  border: 1px solid black;
+  border-color: orange;
+  background-color: grey;
+}
+#header .milk {
+  color: white;
+  border: 1px solid black;
+  background-color: grey;
+}
+#header #cookie {
+  border-style: dashed;
+}
+#header #cookie .chips {
+  border-style: dotted;
+}
+#header #cookie .chips .calories {
+  color: black;
+  border: 1px solid black;
+  border-color: orange;
+  background-color: grey;
+}
+.secure-zone {
+  color: transparent;
+}
+.direct {
+  border-style: dotted;
+}
+.bo,
+.bar {
+  width: 100%;
+}
+.bo {
+  border: 1px;
+}
+.ar.bo.ca {
+  color: black;
+}
+.jo.ki {
+  background: none;
+}
+.extended {
+  width: 100%;
+  border: 1px;
+  background: none;
+}
+.foo .bar {
+  width: 100%;
 }

@@ -30,6 +30,12 @@ public class ScopeExtractor {
   }
 
   public Scope extractScope(ASTCssNode node) {
+    Scope result = buildScope(node);
+    removeUsedNodes(node, result);
+    return result;
+  }
+
+  private Scope buildScope(ASTCssNode node) {
     boolean hasOwnScope = AstLogic.hasOwnScope(node);
     if (hasOwnScope)
       increaseScope(node);
@@ -41,7 +47,7 @@ public class ScopeExtractor {
 
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {
-      extractScope(kid);
+      buildScope(kid);
       if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
         currentScope.registerVariable((VariableDeclaration) kid);
       } else if (kid.getType() == ASTCssNodeType.PURE_MIXIN) {
@@ -70,7 +76,7 @@ public class ScopeExtractor {
     return result;
   }
 
-  public void removeUsedNodes(ASTCssNode node, Scope scope) {
+  private void removeUsedNodes(ASTCssNode node, Scope scope) {
     removeUsedNodes(node, new IteratedScope(scope));
   }
 

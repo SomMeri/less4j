@@ -9,10 +9,8 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-//TODO document: division by zero generates ff
 //TODO document: color code shortcut
-//FIXME: make protected
-public class ColorsCalculator {
+class ColorsCalculator {
 
   private static final int MIN = 0;
   private static final int MAX = 255;
@@ -48,7 +46,6 @@ public class ColorsCalculator {
   }
 
   private ColorExpression subtract(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
-    //TODO document: we do this to be compatible with less.js
     if (first.getType()==ASTCssNodeType.NUMBER)
       throw new CompileException("Can't substract or divide a color from a number", first);
     
@@ -60,7 +57,6 @@ public class ColorsCalculator {
   }
 
   private ColorExpression divide(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
-    //TODO document: we do this to be compatible with less.js
     if (first.getType()==ASTCssNodeType.NUMBER)
       throw new CompileException("Can't substract or divide a color from a number", first);
     

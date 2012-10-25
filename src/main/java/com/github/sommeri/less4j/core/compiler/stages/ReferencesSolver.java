@@ -18,7 +18,6 @@ import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
-import com.github.sommeri.less4j.core.compiler.scopes.ReferencedMixinScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
 public class ReferencesSolver {
@@ -130,13 +129,21 @@ public class ReferencesSolver {
   }
 
   private Scope calculateMixinsOwnVariables(MixinReference reference, Scope referenceScope, FullMixinDefinition mixin) {
-    //FIXME: createDefaultScope is a BUUUUUUUUUUUUUUUUUUUUUG
-    Scope joinScopes = ReferencedMixinScope.joinScopes(mixin.getScope(), buildMixinsArgumentsScope(reference, referenceScope, mixin), referenceScope);
+    Scope joinScopes = joinScopes(mixin.getScope(), buildMixinsArgumentsScope(reference, referenceScope, mixin), referenceScope);
     return joinScopes;
   }
 
+  public static Scope joinScopes(Scope mixinsScope, Scope arguments, Scope callerScope) {
+    Scope result = mixinsScope.copyWithChildChain(arguments);
+    Scope mixinsScopeParent = mixinsScope.getParent();
+    if (mixinsScopeParent!=null)
+      arguments.setParent(mixinsScopeParent.copyWithParentsChain());
+    Scope rootOfTheMixinsScope = result.getRootScope();
+    rootOfTheMixinsScope.setParent(callerScope.copyWithParentsChain());
+    return result;
+  }
   private Scope buildMixinsArgumentsScope(MixinReference reference, Scope referenceScope, FullMixinDefinition mixin) {
-    Scope variablesScope = Scope.createScope(reference, "#arguments-" + reference + "#", null);
+    Scope argumentsScope = Scope.createScope(reference, "#arguments-" + reference + "#", null);
     ExpressionEvaluator referenceEvaluator = new ExpressionEvaluator(referenceScope);
 
     List<Expression> allValues = new ArrayList<Expression>();
@@ -150,24 +157,24 @@ public class ReferencesSolver {
           List<Expression> allArgumentsFrom = referenceEvaluator.evaluateAll(reference.getAllArgumentsFrom(i));
           allValues.addAll(allArgumentsFrom);
           Expression value = referenceEvaluator.joinAll(allArgumentsFrom, reference);
-          variablesScope.registerVariable(declaration, value);
+          argumentsScope.registerVariable(declaration, value);
         } else if (reference.hasParameter(i)) {
           Expression value = referenceEvaluator.evaluate(reference.getParameter(i));
           allValues.add(value);
-          variablesScope.registerVariable(declaration, value);
+          argumentsScope.registerVariable(declaration, value);
         } else {
           if (declaration.getValue() == null)
             CompileException.throwUndefinedMixinParameterValue(mixin.getMixin(), declaration, reference);
 
           allValues.add(declaration.getValue());
-          variablesScope.registerVariable(declaration);
+          argumentsScope.registerVariable(declaration);
         }
       }
     }
 
     Expression compoundedValues = referenceEvaluator.joinAll(allValues, reference);
-    variablesScope.registerVariableIfNotPresent(ALL_ARGUMENTS, compoundedValues);
-    return variablesScope;
+    argumentsScope.registerVariableIfNotPresent(ALL_ARGUMENTS, compoundedValues);
+    return argumentsScope;
   }
 
   private RuleSetsBody resolveNamespaceReference(NamespaceReference reference, Scope scope) {

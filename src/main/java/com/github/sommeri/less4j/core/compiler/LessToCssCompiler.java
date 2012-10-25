@@ -23,29 +23,14 @@ import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
 
 public class LessToCssCompiler {
 
-  private ASTManipulator manipulator = new ASTManipulator();
-  private ExpressionEvaluator expressionEvaluator;
-  private NestedRulesCollector nestedRulesCollector;
-
   public ASTCssNode compileToCss(StyleSheet less) {
-    
-    nestedRulesCollector = new NestedRulesCollector();
-
     ScopeExtractor scopeBuilder = new ScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
-    scopeBuilder.removeUsedNodes(less, scope);
-    expressionEvaluator = new ExpressionEvaluator(scope);
-    System.out.println(scope.toLongString());
     
     ReferencesSolver referencesSolver = new ReferencesSolver();
     referencesSolver.solveReferences(less, scope);
     
-    
-    
-//    LocalSolver localSolver = new LocalSolver();
-//    localSolver.solveLocalReferences(less);
     //just a safety measure
-    expressionEvaluator = new ExpressionEvaluator(null);
     evaluateExpressions(less);
     freeNestedRuleSets(less);
 
@@ -53,6 +38,8 @@ public class LessToCssCompiler {
   }
 
   private void freeNestedRuleSets(Body<ASTCssNode> body) {
+    NestedRulesCollector nestedRulesCollector = new NestedRulesCollector();
+    
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.RULE_SET) {
@@ -77,6 +64,10 @@ public class LessToCssCompiler {
   }
 
   private void evaluateExpressions(ASTCssNode node) {
+    ASTManipulator manipulator = new ASTManipulator();
+    //variables are not supposed to be there now
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(null);
+
     if (node instanceof Expression) {
       Expression value = expressionEvaluator.evaluate((Expression) node);
       manipulator.replace(node, value);

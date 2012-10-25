@@ -31,18 +31,6 @@ public class MixinsScope {
     return storage.containsKey(name);
   }
 
-  @Override
-  protected MixinsScope clone() {
-    //FIXME: this cloning method is suspicios, either I do not need clonning or I need really deep clonning - is it ever used?
-    try {
-      MixinsScope result = (MixinsScope) super.clone();
-      result.storage = new HashMap<String, List<FullMixinDefinition>>(storage);
-      return result;
-    } catch (CloneNotSupportedException e) {
-      throw new RuntimeException("This should never happen.", e);
-    }
-  }
-
   public int size() {
     return storage.size();
   }
