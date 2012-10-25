@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler;
+package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
+import com.github.sommeri.less4j.core.compiler.CompileException;
 
 public class NestedRulesCollector {
 

@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler;
+package com.github.sommeri.less4j.core.compiler.expressions;
 
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
@@ -7,6 +7,7 @@ import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
+import com.github.sommeri.less4j.core.compiler.CompileException;
 
 public abstract class ExpressionComparator {
 

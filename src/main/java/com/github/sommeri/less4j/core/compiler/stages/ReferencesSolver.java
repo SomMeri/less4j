@@ -14,9 +14,7 @@ import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.CompileException;
-import com.github.sommeri.less4j.core.compiler.MixinsReferenceMatcher;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
@@ -175,29 +173,5 @@ public class ReferencesSolver {
   private RuleSetsBody resolveNamespaceReference(NamespaceReference reference, Scope scope) {
     List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference);
     return resolveReferencedMixins(reference.getFinalReference(), scope, sameNameMixins);
-//    if (nearestMixins.isEmpty())
-//      throw CompileException.createUndeclaredMixin(reference);
-//
-//    List<FullMixinDefinition> mixins = (new MixinsReferenceMatcher(scope)).filter(reference, nearestMixins);
-//    if (mixins.isEmpty())
-//      CompileException.warnNoMixinsMatch(reference);
-//
-//    RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
-//    return resolveReferencedMixins(reference, scope, mixins, result);
-
-    
-//    Scope namespace = scope.getNearestScope(reference);
-//    List<NamespaceTree> namespaces = scope.findReferencedNamespace(reference);
-//    if (namespaces.isEmpty())
-//      CompileException.throwUnknownNamespace(reference);
-//    
-//    RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
-//    for (NamespaceTree namespace : namespaces) {
-//      activeScope.enterNamespace(namespace);
-//      List<FullMixinDefinitionOld> mixins = activeScope.getMixinsWithinNamespace(matcher, reference);
-//      resolveReferencedMixins(reference.getFinalReference(), mixins, result);
-//      activeScope.leaveNamespace();
-//    }
-//    return result;
   }
 }

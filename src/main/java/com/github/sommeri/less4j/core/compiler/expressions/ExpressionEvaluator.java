@@ -25,8 +25,6 @@ import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.CompileException;
-import com.github.sommeri.less4j.core.compiler.ExpressionComparator;
-import com.github.sommeri.less4j.core.compiler.GuardsComparator;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
 public class ExpressionEvaluator {

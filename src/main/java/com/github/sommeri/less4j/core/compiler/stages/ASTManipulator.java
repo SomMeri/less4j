@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler;
+package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +8,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.compiler.CompileException;
 
 public class ASTManipulator {
 

@@ -10,7 +10,6 @@ import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.PureNamespace;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
-import com.github.sommeri.less4j.core.compiler.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
