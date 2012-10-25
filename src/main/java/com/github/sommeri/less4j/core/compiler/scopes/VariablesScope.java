@@ -48,7 +48,8 @@ public class VariablesScope implements Cloneable {
   }
 
   @Override
-  protected VariablesScope clone() {
+  //FIXME: change to protected
+  public VariablesScope clone() {
     try {
       VariablesScope result = (VariablesScope) super.clone();
       result.variables = new HashMap<String, Expression>(variables);
@@ -56,6 +57,10 @@ public class VariablesScope implements Cloneable {
     } catch (CloneNotSupportedException e) {
       throw new RuntimeException("This should never happen.", e);
     }
+  }
+
+  public int size() {
+    return variables.size();
   }
 
 }

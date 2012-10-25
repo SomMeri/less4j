@@ -32,6 +32,10 @@ public class PureNamespace extends ASTCssNode {
     return "#"+selector.getName();
   }
 
+  public RuleSetsBody getBody() {
+    return body;
+  }
+
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.PURE_NAMESPACE;

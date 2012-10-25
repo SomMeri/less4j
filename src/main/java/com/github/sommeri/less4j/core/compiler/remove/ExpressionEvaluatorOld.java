@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.expressions;
+package com.github.sommeri.less4j.core.compiler.remove;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,8 +11,8 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
+import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
@@ -27,19 +27,22 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.compiler.ExpressionComparator;
 import com.github.sommeri.less4j.core.compiler.GuardsComparator;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.expressions.ArithmeticCalculator;
+import com.github.sommeri.less4j.core.compiler.expressions.ColorsCalculator;
+import com.github.sommeri.less4j.core.compiler.expressions.ListCalculator;
+import com.github.sommeri.less4j.core.compiler.remove.ActiveScope;
 
-public class ExpressionEvaluator {
+public class ExpressionEvaluatorOld {
 
-  private final Scope scope;
+  private final ActiveScope variableScope;
   private ArithmeticCalculator arithmeticCalculator = new ArithmeticCalculator();
   private ListCalculator listCalculator = new ListCalculator();
   private ColorsCalculator colorsCalculator = new ColorsCalculator();
   private ExpressionComparator comparator = new GuardsComparator();
   
-  public ExpressionEvaluator(Scope scope) {
+  public ExpressionEvaluatorOld(ActiveScope variableScope) {
     super();
-    this.scope = scope;
+    this.variableScope = variableScope;
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
@@ -65,22 +68,14 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(Variable input) {
-    Expression value = scope.getValue(input);
-    if (value==null)
-      CompileException.throwUndeclaredVariable(input);
-    
+    Expression value = variableScope.getDeclaredValue(input);
     return evaluate(value);
   }
 
   public Expression evaluate(IndirectVariable input) {
-    Expression value = scope.getValue(input);
+    Expression value = variableScope.getDeclaredValue(input);
     CssString realName = convertToStringExpression(evaluate(value), input);
-    String realVariableName = "@" + realName.getValue();
-    value = scope.getValue(realVariableName);
-    if (value==null)
-      CompileException.throwUndeclaredVariable(realVariableName, realName);
-    
-    return evaluate(value);
+    return evaluate(variableScope.getDeclaredValue("@" + realName.getValue(), realName));
   }
 
   private CssString convertToStringExpression(Expression evaluate, Expression errorNode) {

@@ -4,20 +4,20 @@ import com.github.sommeri.less4j.core.ast.PureMixin;
 
 public class FullMixinDefinition {
   private final PureMixin mixin;
-  private final VariablesScope variablesUponDefinition;
+  private final Scope bodyScope;
 
-  public FullMixinDefinition(PureMixin mixin, VariablesScope variablesUponDefinition) {
+  public FullMixinDefinition(PureMixin mixin, Scope mixinsBodyScope) {
     super();
     this.mixin = mixin;
-    this.variablesUponDefinition = variablesUponDefinition;
+    this.bodyScope = mixinsBodyScope;
   }
 
   public PureMixin getMixin() {
     return mixin;
   }
 
-  public VariablesScope getVariablesUponDefinition() {
-    return variablesUponDefinition;
+  public Scope getScope() {
+    return bodyScope;
   }
 
   @Override
@@ -25,8 +25,8 @@ public class FullMixinDefinition {
     StringBuilder builder = new StringBuilder();
     builder.append("FullMixinDefinition [mixin=");
     builder.append(mixin.getName());
-    builder.append(", variablesUponDefinition=");
-    builder.append(variablesUponDefinition);
+    builder.append(", bodyScope=");
+    builder.append(bodyScope);
     builder.append("]");
     return builder.toString();
   }

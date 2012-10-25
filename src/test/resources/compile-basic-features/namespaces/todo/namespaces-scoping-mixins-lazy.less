@@ -1,0 +1,11 @@
+/* variant  */
+#abc { 
+  @pattern: 10;
+  #space > .test(); 
+}
+#space {
+ .mixin(10) { color: red; }
+ .test() { .mixin(@pattern); }
+ .mixin() { margin: 2 2 2 2; }
+}
+.mixin() { content: "conflict"; }

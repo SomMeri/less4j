@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes;
+package com.github.sommeri.less4j.core.compiler.remove;
 
 import java.util.List;
 import java.util.Map;
@@ -14,20 +14,23 @@ import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.compiler.MixinsReferenceMatcher;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.VariablesScope;
 
 /**
  * Not exactly memory effective, but lets create working version first.  
  *
  */
+@Deprecated
 public class ActiveScope {
 
   private Stack<VariablesScope> variablesScope = new Stack<VariablesScope>();
-  private Stack<MixinsScope> mixinsScope = new Stack<MixinsScope>();
+  private Stack<MixinsScopeOld> MixinsScopeOld = new Stack<MixinsScopeOld>();
   private Stack<NamespaceTree> namespaces = new Stack<NamespaceTree>();
 
   public ActiveScope() {
     variablesScope.push(new VariablesScope());
-    mixinsScope.push(new MixinsScope());
+    MixinsScopeOld.push(new MixinsScopeOld());
     namespaces.push(new NamespaceTree("#default#"));
   }
 
@@ -45,16 +48,16 @@ public class ActiveScope {
 
   public void decreaseScope() {
     variablesScope.pop();
-    mixinsScope.pop();
+    MixinsScopeOld.pop();
   }
 
   public void increaseScope() {
     VariablesScope oldVariables = variablesScope.peek();
     variablesScope.push(new VariablesScope(oldVariables));
-    mixinsScope.push(new MixinsScope());
+    MixinsScopeOld.push(new MixinsScopeOld());
     //TODO explain this line 
     if (!getCurrentNamespace().hasScope()) {
-      getCurrentNamespace().setScope(mixinsScope.peek());
+      getCurrentNamespace().setScope(MixinsScopeOld.peek());
     }
   }
 
@@ -62,6 +65,12 @@ public class ActiveScope {
     return namespaces.peek();
   }
 
+  /**
+   * Returns null on unknown variable.
+   * 
+   * @param node
+   * @return
+   */
   public Expression getDeclaredValue(Variable node) {
     String name = node.getName();
     Expression expression = variablesScope.peek().getValue(name);
@@ -79,11 +88,11 @@ public class ActiveScope {
     return expression;
   }
 
-  public List<FullMixinDefinition> getAllMatchingMixins(MixinsReferenceMatcher matcher, MixinReference reference) {
-    int idx = mixinsScope.size();
+  public List<FullMixinDefinitionOld> getAllMatchingMixins(MixinsReferenceMatcherOld matcher, MixinReference reference) {
+    int idx = MixinsScopeOld.size();
     while (idx > 0) {
       idx--;
-      MixinsScope idxScope = mixinsScope.elementAt(idx);
+      MixinsScopeOld idxScope = MixinsScopeOld.elementAt(idx);
       if (idxScope.contains(reference.getName()))
         return matcher.filter(reference, idxScope.getMixins(reference.getName()));
     }
@@ -91,10 +100,10 @@ public class ActiveScope {
     throw CompileException.createUndeclaredMixin(reference);
   }
 
-  public List<FullMixinDefinition> getMixinsWithinNamespace(MixinsReferenceMatcher matcher, NamespaceReference reference) {
+  public List<FullMixinDefinitionOld> getMixinsWithinNamespace(MixinsReferenceMatcherOld matcher, NamespaceReference reference) {
     //TODO what if noting is found NullPointer
     String mixin = reference.getFinalReference().getName();
-    MixinsScope scope = getCurrentNamespace().getMixinsScope();
+    MixinsScopeOld scope = getCurrentNamespace().getMixinsScope();
     if (scope.contains(mixin))
       return matcher.filter(reference.getFinalReference(), scope.getMixins(mixin));
 
@@ -119,24 +128,24 @@ public class ActiveScope {
   }
 
   public void removeMixinsOverride() {
-    mixinsScope.pop();
+    MixinsScopeOld.pop();
   }
 
   public void registerMixin(PureMixin node) {
     VariablesScope variablesState = variablesScope.peek().clone();
-    FullMixinDefinition mixin = new FullMixinDefinition(node, variablesState);
-    mixinsScope.peek().registerMixin(mixin);
+    FullMixinDefinitionOld mixin = new FullMixinDefinitionOld(node, variablesState);
+    MixinsScopeOld.peek().registerMixin(mixin);
   }
 
-  public void overrideScopes(VariablesScope variables, MixinsScope mixins) {
+  public void overrideScopes(VariablesScope variables, MixinsScopeOld mixins) {
     overrideScope(variables);
     overrideScope(mixins);
   }
 
-  private void overrideScope(MixinsScope mixins) {
-    MixinsScope mixinsPeek = mixinsScope.peek();
+  private void overrideScope(MixinsScopeOld mixins) {
+    MixinsScopeOld mixinsPeek = MixinsScopeOld.peek();
     mixins = mixins == null ? mixinsPeek : mixins;
-    mixinsScope.push(new MixinsScope(mixinsPeek, mixins));
+    MixinsScopeOld.push(new MixinsScopeOld(mixinsPeek, mixins));
   }
 
   public void overrideScope(VariablesScope variables) {

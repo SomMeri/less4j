@@ -1,17 +1,18 @@
-package com.github.sommeri.less4j.core.compiler.scopes;
+package com.github.sommeri.less4j.core.compiler.remove;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Deprecated
 public class NamespaceTree {
 
   private final String name;
   private final NamespaceTree parent;
   private List<NamespaceTree> childs = new ArrayList<NamespaceTree>();
-  private MixinsScope mixinsScope;
+  private MixinsScopeOld mixinsScope;
 
-  public NamespaceTree(String name, NamespaceTree parent, MixinsScope mixinsScope) {
+  public NamespaceTree(String name, NamespaceTree parent, MixinsScopeOld mixinsScope) {
     super();
     this.name = name;
     this.parent = parent;
@@ -36,7 +37,7 @@ public class NamespaceTree {
     return parent;
   }
 
-  public MixinsScope getMixinsScope() {
+  public MixinsScopeOld getMixinsScope() {
     return mixinsScope;
   }
 
@@ -70,7 +71,7 @@ public class NamespaceTree {
     return getName();
   }
 
-  public void setScope(MixinsScope scope) {
+  public void setScope(MixinsScopeOld scope) {
     this.mixinsScope = scope;
   }
 

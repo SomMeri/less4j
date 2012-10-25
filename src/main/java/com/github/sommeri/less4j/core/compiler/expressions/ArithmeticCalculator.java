@@ -9,7 +9,8 @@ import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-class ArithmeticCalculator {
+//FIXME: make protected
+public class ArithmeticCalculator {
 
   public NumberExpression evalute(ComposedExpression originalExpression, Expression firstNumber, Expression secondNumber) {
     NumberExpression first = (NumberExpression) firstNumber;

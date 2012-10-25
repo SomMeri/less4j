@@ -4,7 +4,8 @@ import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 
-class ListCalculator {
+//FIXME: make protected
+public class ListCalculator {
 
   public boolean accepts(ExpressionOperator operator) {
     return operator.getOperator()== ExpressionOperator.Operator.COMMA || operator.getOperator() == ExpressionOperator.Operator.EMPTY_OPERATOR;

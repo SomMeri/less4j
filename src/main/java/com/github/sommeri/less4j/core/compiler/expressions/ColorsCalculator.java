@@ -11,7 +11,8 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 //TODO document: division by zero generates ff
 //TODO document: color code shortcut
-class ColorsCalculator {
+//FIXME: make protected
+public class ColorsCalculator {
 
   private static final int MIN = 0;
   private static final int MAX = 255;

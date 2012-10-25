@@ -72,6 +72,10 @@ public class CompileException extends TranslationException {
     throw createUndeclaredVariable(variable.getName(), variable);
   }
 
+  public static CompileException createUndeclaredVariable(Variable variable) {
+    return createUndeclaredVariable(variable.getName(), variable);
+  }
+
   public static void throwUndeclaredVariable(String name, ASTCssNode ifErrorNode) {
     throw createUndeclaredVariable(name, ifErrorNode);
   }
@@ -96,7 +100,22 @@ public class CompileException extends TranslationException {
     return new CompileException("The mixin \"" + name + "\" was not declared.", variable);
   }
 
+  public static CompileException createUnmatchedMixin(MixinReference reference) {
+    return createUnmatchedMixin(reference.getName(), reference);
+  }
+
+  public static CompileException createUnmatchedMixin(String name, MixinReference variable) {
+    return new CompileException("The mixin \"" + name + "\" was not matched.", variable);
+  }
+
   public static void throwUnknownNamespace(NamespaceReference reference) {
     throw new CompileException("The namespace \"" + reference + "\" was not found.", reference);
+  }
+
+  public static void warnNoMixinsMatch(MixinReference reference) {
+    CompileException ex = createUndeclaredMixin(reference);
+    System.out.println(ex.getMessage());
+    //FIXME:  create real warning
+    
   }
 }
