@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.sommeri</groupId>
 	<artifactId>less4j</artifactId>
@@ -40,12 +41,6 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>ro.isdc.wro4j</groupId>
-			<artifactId>wro4j-extensions</artifactId>
-			<version>${wro4j.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
@@ -56,14 +51,14 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.8.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.29</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -118,6 +113,19 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-jar-plugin</artifactId>
+			    <version>2.4</version>
+			    <configuration>
+			    <archive>
+			      <manifest>
+			        <addClasspath>true</addClasspath>
+			        <mainClass>com.github.sommeri.less4j.commandline.CommandLine</mainClass>
+			      </manifest>
+			    </archive>
+			    </configuration>
 			</plugin>
 		</plugins>
 	</build>

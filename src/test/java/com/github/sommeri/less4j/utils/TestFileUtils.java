@@ -1,11 +1,16 @@
-package com.github.sommeri.less4j.utils.w3ctestsextractor;
+package com.github.sommeri.less4j.utils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 public class TestFileUtils {
 
@@ -62,6 +67,31 @@ public class TestFileUtils {
     Collection<Object[]> result = new ArrayList<Object[]>();
     addFiles(result, input);
     return result;
+  }
+
+  public void removeFile(String filename) {
+    File file = new File(filename);
+    if (file.exists())
+      file.delete();
+  }
+
+  public void assertFileContent(String lessFile, String expectedContent) {
+    File file = new File(lessFile);
+    if (!file.exists())
+      fail("File " + lessFile + " was not created.");
+    
+    try {
+      String realContent = IOUtils.toString(new FileReader(file)).replace("\r\n", "\n");
+      assertEquals(expectedContent, realContent);
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    } 
+  }
+
+  public void removeFiles(String... files) {
+    for (String file : files) {
+      removeFile(file);
+    }
   }
 
 }

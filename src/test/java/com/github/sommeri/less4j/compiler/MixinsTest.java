@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
+import com.github.sommeri.less4j.utils.TestFileUtils;
 
 public class MixinsTest extends BasicFeaturesTests {
   

@@ -3,13 +3,10 @@ package com.github.sommeri.less4j.compiler;
 import java.io.File;
 import java.util.Collection;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.utils.w3ctestsextractor.TestFileUtils;
+import com.github.sommeri.less4j.utils.TestFileUtils;
 
-@RunWith(Parameterized.class)
 //@Ignore //not really sure yet how do I want to handle errors
 public class ErrorReportingTest extends AbstractErrorReportingTest {
 

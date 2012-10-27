@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
@@ -24,7 +22,6 @@ import com.github.sommeri.less4j.AbstractFileBasedTest;
  *  stored in incorrect-css directory.
  *
  */
-@RunWith(Parameterized.class)
 public class W3CMediaTests extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/w3c-official-test-cases/CSS3-Media/";
