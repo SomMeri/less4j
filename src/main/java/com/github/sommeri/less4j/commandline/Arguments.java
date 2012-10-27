@@ -19,7 +19,7 @@ public class Arguments {
   @Parameter(names={"-m", "--multiMode"}, description="Turn on multi less files mode.")
   private boolean multiMode;
   
-  @Parameter(names={"-o", "--outputDir"}, description="Specify the output directory. If not present, Less4j will place output files into current directory. This option is available only in single input file mode.")
+  @Parameter(names={"-o", "--outputDir"}, description="Specify the output directory. If not present, Less4j will place output files into current directory. This option is available only in multiple files mode.")
   private String outputDirectory;
 
   public boolean isHelp() {
