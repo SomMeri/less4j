@@ -7,7 +7,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
-public class MixinsTest extends BasicFeaturesTests {
+public class MixinsTest extends BasicFeaturesTest {
   
   private static final String standardCases = "src/test/resources/compile-basic-features/mixins/";
   private static final String lessjsIncompatible = "src/test/resources/compile-basic-features/mixins/lessjs-incompatible";

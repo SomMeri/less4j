@@ -30,13 +30,13 @@ import com.github.sommeri.less4j.utils.TestFileUtils;
  *  stored in incorrect-css and less.js-incompatible\incorrect-css directories.
  *
  */
-public class W3CSelectorsTests extends AbstractFileBasedTest {
+public class W3CSelectorsTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/w3c-official-test-cases/CSS3-Selectors/";
   private static final String lessjsIncompatibleNegatedNth = "src/test/resources/w3c-official-test-cases/CSS3-Selectors/less.js-incompatible/correct-css/negated-nth";
   private static final String lessjsIncompatibleNegatedVarious = "src/test/resources/w3c-official-test-cases/CSS3-Selectors/less.js-incompatible/correct-css/negated-various";
 
-  public W3CSelectorsTests(File inputFile, File outputFile, String testName) {
+  public W3CSelectorsTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
   }
 

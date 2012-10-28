@@ -7,7 +7,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
-public class VariablesTest extends BasicFeaturesTests {
+public class VariablesTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/variables/";
 

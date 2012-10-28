@@ -22,11 +22,11 @@ import com.github.sommeri.less4j.AbstractFileBasedTest;
  *  stored in incorrect-css directory.
  *
  */
-public class W3CMediaTests extends AbstractFileBasedTest {
+public class W3CMediaTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/w3c-official-test-cases/CSS3-Media/";
 
-  public W3CMediaTests(File inputFile, File outputFile, String testName) {
+  public W3CMediaTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);
   }
 

@@ -7,7 +7,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
-public class NamespacesTest extends BasicFeaturesTests {
+public class NamespacesTest extends BasicFeaturesTest {
   
   private static final String standardCases = "src/test/resources/compile-basic-features/namespaces/";
   private static final String lessjsIncompatible = "src/test/resources/compile-basic-features/namespaces/lessjs-incompatible";
