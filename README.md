@@ -24,6 +24,9 @@ The documentation is kept on Github wiki:
 
 For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation be a bit different.
 
+## Command Line
+Less4j can run from [command line](https://github.com/SomMeri/less4j/wiki/Command-Line-Options). Latest complete jar with all dependencies is available in ... directory.
+
 ## Maven
 Less4j is [available](http://search.maven.org/#artifactdetails|com.github.sommeri|less4j|0.0.1|jar) in Maven central repository.
 
@@ -48,7 +51,7 @@ System.out.println(css);
 
 The method may throw either `IncorrectTreeException` or `CompileException`. Both are unchecked and their message contains line and column numbers identifying source place causing the error.
 
-Note: the class DefaultLessCompiler is currently not thread safe. Issue: https://github.com/SomMeri/less4j/issues/23
+The class DefaultLessCompiler is thread safe.
 
 ## Links:
 *  [http://www.w3.org/Style/CSS/specs.en.html]
