@@ -1,0 +1,8 @@
+.box .box {
+  priority1: "inside mixin";
+  priority2: "argument";
+  priority3: "declaration scope";
+  priority4: "declaration scope - deeper";
+  priority5: "caller scope";
+  priority6: "caller scope - deeper";
+}

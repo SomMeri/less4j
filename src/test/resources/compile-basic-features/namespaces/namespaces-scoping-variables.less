@@ -1,0 +1,39 @@
+    #outer {
+      #ns {
+        .square(@priority1, @priority2) {
+          priority1: @priority1;
+          priority2: @priority2;
+          priority3: @priority3;
+          priority4: @priority4;
+          priority5: @priority5;
+          priority6: @priority6;
+          @priority1: "inside mixin";
+        } 
+      }
+      @priority1: "declaration scope";
+      @priority2: "declaration scope";
+      @priority3: "declaration scope";
+    }
+
+    .box {
+      .box {
+        //call the mixin
+        #outer > #ns > .square("argument", "argument");
+        @priority1: "caller scope";
+        @priority2: "caller scope";
+        @priority3: "caller scope";
+        @priority4: "caller scope";
+        @priority5: "caller scope";
+      }     
+      @priority1: "caller scope - deeper";
+      @priority2: "caller scope - deeper";
+      @priority3: "caller scope - deeper";
+      @priority4: "caller scope - deeper";
+      @priority6: "caller scope - deeper";
+    }
+
+    @priority1: "declaration scope - deeper";
+    @priority2: "declaration scope - deeper";
+    @priority3: "declaration scope - deeper";
+    @priority4: "declaration scope - deeper";
+
