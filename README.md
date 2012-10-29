@@ -41,7 +41,7 @@ Pom.xml dependency:
 ## API:
 Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
 
-Access the compiler through `String compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. The interface has only one implementation: `com.github.less4j.core.DefaultLessCompiler`.
+Access the compiler through `String compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. The thread safe implementation of the interface is: `com.github.less4j.core.DefaultLessCompiler`.
 
 Put the content of .less file into the input string. The method returns translated css style sheet:
 <pre><code>LessCompiler compiler = new DefaultLessCompiler();
@@ -50,8 +50,6 @@ System.out.println(css);
 </code></pre>
 
 The method may throw either `IncorrectTreeException` or `CompileException`. Both are unchecked and their message contains line and column numbers identifying source place causing the error.
-
-The class DefaultLessCompiler is thread safe.
 
 ## Links:
 *  [http://www.w3.org/Style/CSS/specs.en.html]
