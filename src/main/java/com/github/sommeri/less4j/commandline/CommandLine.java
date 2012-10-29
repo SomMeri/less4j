@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 
@@ -14,6 +16,7 @@ import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 public class CommandLine {
+  private static final String NAME = "less4j";
   private static final String INTRO = "Less4j compiles less files into css files. It can run in two " + "modes: single input file mode or in multiple input files mode. Less4j uses single file mode by default. " + "\n\n" + "Single file mode: Less4j expects one or two arguments. First one contains input less filename and the second one contains " + "the output css filename. If the output file argument is not present, less4j will print the result into standard output." + "\n\n" + "Multiple files mode: Must be turned on by '-m' or '--multiMode' parameter. Less4j assumes that all input files are " + "less files. All are going to be compiled into css files. Each input file will generate " + "an output file with the same name and suffix '.css'." + "\n\n";
   private static final String OUTRO = "\nExamples:\n" + " - Compile 'test.less' file and print the result into standard output:\n  # less4j test.less\n\n" + " - Compile 'test.less' file and print the result into 'test.css' file:\n  # less4j test.less test.css\n\n" + " - Compile 't1.less', 't2.less' and 't3.less' files into 't1.css', 't2.css' and 't3.css':\n  # less4j -m t1.less t2.less t3.less\n\n" + " - Compile 't1.less', 't2.less', 't3.less' files into 't1.css', 't2.css', 't3.css'. Place the result \n  into '..\\css\\' directory:\n  # less4j -m -o ..\\css\\ t1.less t2.less t3.less\n\n";
   private static final String SEPARATOR = java.io.File.separator;
@@ -26,10 +29,20 @@ public class CommandLine {
 
     try {
       JCommander jCommander = new JCommander(arguments, args);
-      jCommander.setProgramName("less4j");
+      jCommander.setProgramName(NAME);
 
       if (arguments.isHelp()) {
         printHelp(jCommander);
+        return;
+      }
+
+      if (arguments.isHelp()) {
+        printHelp(jCommander);
+        return;
+      }
+
+      if (arguments.isVersion()) {
+        printVersion(jCommander);
         return;
       }
 
@@ -173,6 +186,12 @@ public class CommandLine {
     return null;
   }
 
+  private static void printVersion(JCommander jCommander) {
+    StringBuilder builder = new StringBuilder(NAME);
+    builder.append(" ").append(getVersion());
+    System.out.println(builder);
+  }
+
   private static void printHelp(JCommander jCommander) {
     StringBuilder builder = new StringBuilder();
     wrapDescription(builder, jCommander.getColumnSize(), INTRO);
@@ -213,4 +232,20 @@ public class CommandLine {
     e.printStackTrace();
   }
 
+  public static String getVersion()
+  {
+      String path = "/version.prop";
+      
+      InputStream stream = path.getClass().getResourceAsStream(path);
+      if (stream == null)
+          return "UNKNOWN";
+      Properties props = new Properties();
+      try {
+          props.load(stream);
+          stream.close();
+          return (String) props.get("version");
+      } catch (IOException e) {
+          return "UNKNOWN";
+      }
+  }
 }

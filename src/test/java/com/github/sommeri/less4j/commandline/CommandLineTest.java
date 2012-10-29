@@ -40,6 +40,11 @@ public abstract class CommandLineTest {
     assertTrue(output.contains("less4j test.less"));
   }
 
+  protected void assertVersion() {
+    String output = outContent.toString();
+    assertTrue(output.contains("less4j " + CommandLine.getVersion()));
+  }
+
   protected void assertMissingFilesError() {
     String output = outContent.toString();
     assertEquals("", output);

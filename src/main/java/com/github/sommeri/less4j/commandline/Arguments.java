@@ -16,6 +16,9 @@ public class Arguments {
   @Parameter(names = {"-h", "--help"}, help = true, description="Print this help screen.")
   private boolean help;
 
+  @Parameter(names = {"-v", "--version"}, help = true, description="Print version.")
+  private boolean version;
+
   @Parameter(names={"-m", "--multiMode"}, description="Turn on multi less files mode.")
   private boolean multiMode;
   
@@ -32,6 +35,10 @@ public class Arguments {
 
   public String getOutputDirectory() {
     return outputDirectory;
+  }
+
+  public boolean isVersion() {
+    return version;
   }
   
 }

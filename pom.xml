@@ -62,6 +62,22 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 		</dependency>
 	</dependencies>
 	<build>
+	    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+                <include>**/version.prop</include>
+            </includes>
+        </resource>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>false</filtering>
+            <excludes>
+                <exclude>**/version.prop</exclude>
+            </excludes>
+        </resource>
+    </resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -114,19 +130,30 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			<!-- releasing as standalone app -->
 			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-jar-plugin</artifactId>
-			    <version>2.4</version>
-			    <configuration>
-			    <archive>
-			      <manifest>
-			        <addClasspath>true</addClasspath>
-			        <mainClass>com.github.sommeri.less4j.commandline.CommandLine</mainClass>
-			      </manifest>
-			    </archive>
-			    </configuration>
-			</plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>com.github.sommeri.less4j.commandline.CommandLine</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+			
+			
+			
 		</plugins>
 	</build>
 	<url>https://github.com/SomMeri/less4j</url>
