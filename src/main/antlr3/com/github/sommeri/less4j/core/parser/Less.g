@@ -305,6 +305,7 @@ ruleset_body
                | (nestedRuleSet)=> a+=nestedRuleSet
                | (mixinReference)=>a+=mixinReference
                | (namespaceReference)=>a+=namespaceReference
+               | (pureMixinDeclaration)=>a+=pureMixinDeclaration 
                | (HASH LPAREN) => pureNamespace
                | a+=variabledeclaration
              )*
