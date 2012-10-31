@@ -305,9 +305,7 @@ ruleset_body
                | (nestedRuleSet)=> a+=nestedRuleSet
                | (mixinReference)=>a+=mixinReference
                | (namespaceReference)=>a+=namespaceReference
-               | (pureMixinDeclaration)=>a+=pureMixinDeclaration //TODO: VYMAZAT a zistit preco to po vymazani neide
                | (HASH LPAREN) => pureNamespace
-               | (cssClass LPAREN)=>pureMixinDeclaration
                | a+=variabledeclaration
              )*
              (  
