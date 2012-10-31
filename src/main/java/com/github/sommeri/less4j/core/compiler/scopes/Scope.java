@@ -134,7 +134,7 @@ public class Scope {
     List<String> nameChain = reference.getNameChain();
     Scope space = this;
     List<Scope> result = findMatchingChilds(nameChain);
-    while (result.isEmpty()) {
+    while (result.isEmpty() && space.hasParent()) {
       space = space.getParent();
       result = space.findMatchingChilds(nameChain);
     }

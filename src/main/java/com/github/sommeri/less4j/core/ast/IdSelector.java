@@ -18,6 +18,10 @@ public class IdSelector extends ASTCssNode {
     return name;
   }
 
+  public String getFullName() {
+    return "#" + name;
+  }
+
   public void setName(String name) {
     this.name = name;
   }
@@ -41,7 +45,7 @@ public class IdSelector extends ASTCssNode {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("IdSelector [");
-    builder.append(name);
+    builder.append(getFullName());
     builder.append("]");
     return builder.toString();
   }

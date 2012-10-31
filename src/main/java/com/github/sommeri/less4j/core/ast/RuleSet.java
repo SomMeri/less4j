@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -39,6 +40,14 @@ public class RuleSet extends ASTCssNode {
   }
 
   public boolean isMixin() {
+    return hasSingleClassSelector();
+  }
+
+  public boolean isNamespace() {
+    return hasSingleClassSelector() || hasSingleIdSelector();
+  }
+
+  private boolean hasSingleClassSelector() {
     if (!hasSimpleSelecor())
       return false;
     
@@ -46,7 +55,7 @@ public class RuleSet extends ASTCssNode {
     return selector.isSingleClassSelector();
   }
 
-  public boolean isNamespace() {
+  private boolean hasSingleIdSelector() {
     if (!hasSimpleSelecor())
       return false;
     
@@ -82,9 +91,18 @@ public class RuleSet extends ASTCssNode {
    * @return 
    */
   public String extractNamespaceName() {
-    IdSelector name = (IdSelector)selectors.get(0).getHead().getSubsequent().get(0);
-    //TODO this would be cleaner solved in ASTSwitch 
-    return "#"+name.getName();
+    SimpleSelector selector = selectors.get(0).getHead();
+    if (hasSingleClassSelector()) {
+      CssClass name = (CssClass)selector.getSubsequent().get(0);
+      return name.getFullName();
+    }
+    if (hasSingleIdSelector()) {
+      IdSelector name = (IdSelector)selector.getSubsequent().get(0);
+      return name.getFullName();
+    }
+    
+    //TODO throw special programming exception or something
+    throw new CompileException("Not a namespace, can not extract the name.", this);
   }
 
   @Override

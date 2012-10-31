@@ -280,7 +280,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         result.addName(kid.getText().trim());
       } else if (kid.getType()==LessLexer.CSS_CLASS) {
         CssClass name = (CssClass)switchOn(kid);
-        result.addName(name.getName());
+        result.addName(name.getFullName());
       } else {
         MixinReference reference = (MixinReference)switchOn(kid);
         result.setFinalReference(reference);

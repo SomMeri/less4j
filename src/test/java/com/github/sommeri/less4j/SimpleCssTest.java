@@ -23,12 +23,6 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   private static final String outputCss = "src/test/resources/minitests/debug.css";
 
   // ***********************************************************************
-  //fail because of pattern matching
-
-  // closure feature is not implemented
-  //  private static final String inputLess = "src/test/resources/minitests/mixins-closure.less";
-  //  private static final String outputCss = "src/test/resources/minitests/mixins-closure.css";
-
   // *** fail because of identifiers, functions and missing commas
   //    private static final String inputLess = "src/test/resources/minitests/mixins-guards.less";
   //    private static final String outputCss = "src/test/resources/minitests/mixins-guards.css";
@@ -47,6 +41,9 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 
   //  private static final String inputLess = "src/test/resources/minitests/mixins-pattern.less";
   //  private static final String outputCss = "src/test/resources/minitests/mixins-pattern.css";
+
+//  private static final String inputLess = "src/test/resources/minitests/mixins-closure.less";
+//  private static final String outputCss = "src/test/resources/minitests/mixins-closure.css";
 
   // *** work with minor modification
   //private static final String inputLess = "src/test/resources/minitests/mixins-args.less";

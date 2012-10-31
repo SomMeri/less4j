@@ -18,6 +18,10 @@ public class CssClass extends ASTCssNode {
     return name;
   }
 
+  public String getFullName() {
+    return "." + name;
+  }
+
   public void setName(String name) {
     this.name = name;
   }
@@ -41,7 +45,7 @@ public class CssClass extends ASTCssNode {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("CssClass [");
-    builder.append(name);
+    builder.append(getFullName());
     builder.append("]");
     return builder.toString();
   }
