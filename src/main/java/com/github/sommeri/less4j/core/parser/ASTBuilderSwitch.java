@@ -35,7 +35,6 @@ import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
-import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
@@ -48,7 +47,6 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
-import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
@@ -204,6 +202,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new CharsetDeclaration(token, children.get(0).getText());
   }
 
+  //TODO add validation: top level ruleset can not be nested
   public RuleSet handleRuleSet(HiddenTokenAwareTree token) {
     RuleSet ruleSet = new RuleSet(token);
 
@@ -276,19 +275,19 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     NamespaceReference result = new NamespaceReference(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType()==LessLexer.HASH) {
+      if (kid.getType() == LessLexer.HASH) {
         result.addName(kid.getText().trim());
-      } else if (kid.getType()==LessLexer.CSS_CLASS) {
-        CssClass name = (CssClass)switchOn(kid);
+      } else if (kid.getType() == LessLexer.CSS_CLASS) {
+        CssClass name = (CssClass) switchOn(kid);
         result.addName(name.getFullName());
       } else {
-        MixinReference reference = (MixinReference)switchOn(kid);
+        MixinReference reference = (MixinReference) switchOn(kid);
         result.setFinalReference(reference);
       }
     }
     return result;
   }
-  
+
   public Expression handleMixinPattern(HiddenTokenAwareTree token) {
     return termBuilder.buildFromTerm(token.getChild(0));
   }
@@ -362,36 +361,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       throw new TreeBuildingException("Unexpected guard operator ", token);
   }
 
-  public NestedRuleSet handleNestedRuleSet(HiddenTokenAwareTree token) {
-    boolean hasAppender = false;
-    SelectorCombinator combinator = null;
-    RuleSet ruleSet = null;
-
-    List<HiddenTokenAwareTree> children = token.getChildren();
-    for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() == LessLexer.APPENDER) {
-        token.addPreceding(kid.getPreceding());
-        hasAppender = true;
-      } else if (kid.getType() == LessLexer.RULESET) {
-        ruleSet = (RuleSet) switchOn(kid);
-      } else {
-        combinator = ConversionUtils.createSelectorCombinator(kid);
-      }
-
-    }
-
-    NestedRuleSet result = new NestedRuleSet(token, hasAppender, combinator, ruleSet);
-    return result;
-  }
-
   public PureNamespace handlePureNamespace(HiddenTokenAwareTree token) {
     IdSelector selector = handleIdSelector(token.getChild(0));
     RuleSetsBody body = handleRuleSetsBody(token.getChild(1));
-    
+
     PureNamespace namespace = new PureNamespace(token, selector, body);
     return namespace;
   }
-  
+
   public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {
     if (token.getChildren() == null)
       return new RuleSetsBody(token);
@@ -684,7 +661,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new ArgumentDeclaration(token, new Variable(name, name.getText()), null);
 
     HiddenTokenAwareTree separator = children.get(1);
-    if (separator.getType()==LessLexer.DOT3) {
+    if (separator.getType() == LessLexer.DOT3) {
       return new ArgumentDeclaration(token, new Variable(name, name.getText()), null, true);
     }
     HiddenTokenAwareTree expression = children.get(2);

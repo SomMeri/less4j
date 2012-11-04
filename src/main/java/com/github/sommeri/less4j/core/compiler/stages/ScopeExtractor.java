@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.PureNamespace;
 import com.github.sommeri.less4j.core.ast.RuleSet;
@@ -60,13 +59,7 @@ public class ScopeExtractor {
           Scope bodyScope = currentScope.getChildOwnerOf(ruleSet.getBody());
           currentScope.registerMixin(ruleSet.convertToMixin(), bodyScope);
         }
-      } else if (kid.getType() == ASTCssNodeType.NESTED_RULESET) {
-        NestedRuleSet nested = (NestedRuleSet) kid;
-        if (nested.isMixin()) {
-          Scope bodyScope = currentScope.getChildOwnerOf(nested.getBody());
-          currentScope.registerMixin(nested.convertToMixin(), bodyScope);
-        }
-      }
+      } 
     }
 
     Scope result = currentScope;
@@ -113,8 +106,7 @@ public class ScopeExtractor {
     case PURE_NAMESPACE:
       return ((PureNamespace) node).getName();
 
-    case RULE_SET:
-    case NESTED_RULESET: {
+    case RULE_SET: {
       RuleSet ruleSet = (RuleSet) node;
       if (ruleSet.isNamespace())
         return ruleSet.extractNamespaceName();

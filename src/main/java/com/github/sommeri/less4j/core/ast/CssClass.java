@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-public class CssClass extends ASTCssNode {
+public class CssClass extends ElementSubsequent {
 
   private String name;
 

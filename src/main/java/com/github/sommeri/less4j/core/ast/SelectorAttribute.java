@@ -5,7 +5,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class SelectorAttribute extends ASTCssNode {
+public class SelectorAttribute extends ElementSubsequent {
 
   private String name;
   private SelectorOperator operator;

@@ -11,7 +11,6 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
-import com.github.sommeri.less4j.core.ast.NestedRuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
@@ -43,8 +42,9 @@ public class LessToCssCompiler {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.RULE_SET) {
-        List<NestedRuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
-        body.addMembersAfter(convertToRulesSets(nestedRulesets), kid);
+        List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
+        //TODO: may I should clone them???
+        body.addMembersAfter(nestedRulesets, kid);
         for (RuleSet ruleSet : nestedRulesets) {
           ruleSet.setParent(body);
         }
@@ -53,14 +53,6 @@ public class LessToCssCompiler {
         freeNestedRuleSets((Media) kid);
       }
     }
-  }
-
-  private List<RuleSet> convertToRulesSets(List<NestedRuleSet> nestedRulesets) {
-    List<RuleSet> result = new ArrayList<RuleSet>();
-    for (NestedRuleSet nested : nestedRulesets) {
-      result.add(nested.convertToRuleSet());
-    }
-    return result;
   }
 
   private void evaluateExpressions(ASTCssNode node) {

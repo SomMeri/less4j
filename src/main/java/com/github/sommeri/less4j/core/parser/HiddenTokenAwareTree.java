@@ -8,7 +8,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 
 public class HiddenTokenAwareTree extends CommonTree {
-  
+
   private List<Token> preceding = new LinkedList<Token>();
   private List<Token> orphans = new LinkedList<Token>();
   private List<Token> following = new LinkedList<Token>();
@@ -24,7 +24,7 @@ public class HiddenTokenAwareTree extends CommonTree {
   public HiddenTokenAwareTree(CommonTree node) {
     super(node);
   }
-  
+
   @Override
   public HiddenTokenAwareTree getChild(int i) {
     return (HiddenTokenAwareTree) super.getChild(i);
@@ -40,12 +40,12 @@ public class HiddenTokenAwareTree extends CommonTree {
 
   @Override
   public HiddenTokenAwareTree getParent() {
-    return (HiddenTokenAwareTree)super.getParent();
+    return (HiddenTokenAwareTree) super.getParent();
   }
 
   public List<Token> getPreceding() {
     return preceding;
-    
+
   }
 
   public List<Token> getFollowing() {
@@ -90,28 +90,46 @@ public class HiddenTokenAwareTree extends CommonTree {
 
   public void pushHiddenToKids() {
     List<HiddenTokenAwareTree> children = getChildren();
-    if (children==null || children.isEmpty())
-      return ;
-    
+    if (children == null || children.isEmpty())
+      return;
+
     HiddenTokenAwareTree first = children.get(0);
     first.addBeforePreceding(getPreceding());
-    HiddenTokenAwareTree last = children.get(children.size()-1);
+    HiddenTokenAwareTree last = children.get(children.size() - 1);
     last.addFollowing(getFollowing());
   }
 
   public void giveHidden(HiddenTokenAwareTree previous, HiddenTokenAwareTree next) {
-    if (previous!=null)
+    if (previous != null)
       previous.addFollowing(getPreceding());
-    if (next!=null)
-      next.addBeforePreceding(getFollowing());   
+    if (next != null)
+      next.addBeforePreceding(getFollowing());
   }
 
   public HiddenTokenAwareTree getLastChild() {
-    return getChild(getChildCount()-1);
+    return getChild(getChildCount() - 1);
   }
 
   public String toString() {
-    return super.toString() +" "+ getLine() + ":"+ getCharPositionInLine()+1;
-}
+    return super.toString() + " " + getLine() + ":" + getCharPositionInLine() + 1;
+  }
+
+  public HiddenTokenAwareTree getNextSibling() {
+    if (getParent() == null)
+      return null;
+
+    List<HiddenTokenAwareTree> siblings = getParent().getChildren();
+    int indx = siblings.indexOf(this) + 1;
+    return indx >= siblings.size() ? null : siblings.get(indx);
+  }
+
+  public HiddenTokenAwareTree getPreviousSibling() {
+    if (getParent() == null)
+      return null;
+
+    List<HiddenTokenAwareTree> siblings = getParent().getChildren();
+    int indx = siblings.indexOf(this) - 1;
+    return indx < 0 ? null : siblings.get(indx);
+  }
 
 }

@@ -2,8 +2,9 @@ package com.github.sommeri.less4j.core.parser;
 
 import java.util.List;
 
-
 import com.github.sommeri.less4j.core.parser.LessLexer;
+import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
@@ -14,7 +15,9 @@ public class SelectorBuilder {
   private Selector result;
   private Selector currentSelector;
   private final HiddenTokenAwareTree token;
-  
+  private NestedSelectorAppender beforeAppender;
+  private NestedSelectorAppender afterAppender;
+
   private final ASTBuilderSwitch parentBuilder;
   private HiddenTokenAwareTree lastCombinator;
 
@@ -28,6 +31,16 @@ public class SelectorBuilder {
     HiddenTokenAwareTree previousNonCombinator = null;
     for (HiddenTokenAwareTree kid : members) {
       switch (kid.getType()) {
+      case LessLexer.APPENDER_BOTH_WS:
+      case LessLexer.APPENDER_WS_AFTER:
+      case LessLexer.APPENDER_WS_BEFORE:
+      case LessLexer.DIRECT_APPENDER: {
+        if (result == null)
+          beforeAppender = createBeforeAppender(kid);
+        else
+          afterAppender = createAfterAppender(kid);
+      }
+        break;
       case LessLexer.ELEMENT_NAME:
         addElementName(kid);
         previousNonCombinator = kid;
@@ -39,26 +52,55 @@ public class SelectorBuilder {
       default:
         lastCombinator = kid;
       }
-      
+
     }
+
+    result.addBeforeAppender(beforeAppender);
+    result.addAfterAppender(afterAppender);
     return result;
   }
 
+  private NestedSelectorAppender createBeforeAppender(HiddenTokenAwareTree kid) {
+    switch (kid.getType()) {
+    case LessLexer.DIRECT_APPENDER:
+    case LessLexer.APPENDER_WS_BEFORE:
+      return new NestedSelectorAppender(kid, true);
+    case LessLexer.APPENDER_BOTH_WS:
+    case LessLexer.APPENDER_WS_AFTER:
+      return new NestedSelectorAppender(kid, false);
+    default:
+      throw new IllegalStateException("" + kid.getType());
+    }
+  }
+
+  private NestedSelectorAppender createAfterAppender(HiddenTokenAwareTree kid) {
+    switch (kid.getType()) {
+    case LessLexer.DIRECT_APPENDER:
+    case LessLexer.APPENDER_WS_AFTER:
+      return new NestedSelectorAppender(kid, true);
+    case LessLexer.APPENDER_WS_BEFORE:
+    case LessLexer.APPENDER_BOTH_WS:
+      return new NestedSelectorAppender(kid, false);
+    default:
+      throw new IllegalStateException("" + kid.getType());
+    }
+  }
+
   private void addElementSubsequent(HiddenTokenAwareTree previousNonCombinator, HiddenTokenAwareTree kid) {
-    if (previousNonCombinator==null) {
+    if (previousNonCombinator == null) {
       addWithImplicitStar(kid);
-      return ;
+      return;
     }
     if (previousNonCombinator.getTokenStopIndex() + 1 < kid.getTokenStartIndex()) {
       addWithImplicitStar(kid);
-      return ;
+      return;
     }
     //finally, add subsequent element to the previous simple selector
     addSubsequent(kid);
   }
 
   public void addSubsequent(HiddenTokenAwareTree kid) {
-    currentSimpleSelector.addSubsequent(parentBuilder.switchOn(kid.getChild(0)));
+    currentSimpleSelector.addSubsequent((ElementSubsequent)parentBuilder.switchOn(kid.getChild(0)));
   }
 
   private void addWithImplicitStar(HiddenTokenAwareTree kid) {
@@ -70,9 +112,9 @@ public class SelectorBuilder {
   }
 
   private SelectorCombinator consumeLastCombinator() {
-    if (lastCombinator==null)
+    if (lastCombinator == null)
       return null;
-    
+
     SelectorCombinator result = ConversionUtils.createSelectorCombinator(lastCombinator);
     lastCombinator = null;
     return result;
@@ -80,7 +122,7 @@ public class SelectorBuilder {
 
   private void addElementName(HiddenTokenAwareTree kid) {
     HiddenTokenAwareTree realName = kid.getChild(0);
-    currentSimpleSelector = new SimpleSelector(kid, realName.getText(), realName.getType()==LessLexer.STAR);
+    currentSimpleSelector = new SimpleSelector(kid, realName.getText(), realName.getType() == LessLexer.STAR);
     startNewSelector();
     currentSelector.setHead(currentSimpleSelector);
   }
@@ -88,13 +130,13 @@ public class SelectorBuilder {
   private void startNewSelector() {
     Selector newSelector = new Selector(token);
     newSelector.setLeadingCombinator(consumeLastCombinator());
-    if (currentSelector!=null) {
+    if (currentSelector != null) {
       currentSelector.setRight(newSelector);
     }
-    
+
     currentSelector = newSelector;
-    
-    if (result==null)
+
+    if (result == null)
       result = currentSelector;
   }
 

@@ -44,13 +44,13 @@ public class ParsersSemanticPredicates {
    * @return <code>true</code> if it is possible for a function to start with these two tokens.
    */
   public boolean isFunctionStart(Token first, Token second) {
-    if (first==null || second==null)
+    if (first == null || second == null)
       return false;
-    
+
     //identifier contains function name and is followed by a parenthesis
-    if (first.getType()!=LessParser.IDENT || second.getType()!=LessParser.LPAREN)
+    if (first.getType() != LessParser.IDENT || second.getType() != LessParser.LPAREN)
       return false;
-    
+
     //there must be no space between function name and parenthesis with arguments
     return directlyFollows(first, second);
   }
@@ -65,24 +65,24 @@ public class ParsersSemanticPredicates {
    */
   public boolean isEmptySeparator(Token previousT, Token firstT, Token secondT) {
     //expression can not start with an empty separator
-    if (previousT==null)
+    if (previousT == null)
       return false;
-    
+
     if (!(previousT instanceof CommonToken) || !(firstT instanceof CommonToken) || !(secondT instanceof CommonToken))
       return false;
-    
+
     CommonToken previous = (CommonToken) previousT;
     CommonToken first = (CommonToken) firstT;
     CommonToken second = (CommonToken) secondT;
 
     //Separator can not follow an operator. It must follow an expression.
-    if (isArithmeticOperator(previous)) 
+    if (isArithmeticOperator(previous))
       return false;
-    
+
     //there must be a whitespace in order to have an empty separator
     if (directlyFollows(previous, first))
       return false;
-    
+
     //easy case: "10 + -23"  => plus is the operation
     if (isArithmeticOperator(first) && isArithmeticOperator(second))
       return false;
@@ -95,36 +95,36 @@ public class ParsersSemanticPredicates {
   }
 
   private boolean isArithmeticOperator(CommonToken previous) {
-    return previous.getType()==LessLexer.MINUS || previous.getType()==LessLexer.PLUS || previous.getType()==LessLexer.STAR  || previous.getType()==LessLexer.SOLIDUS;
+    return previous.getType() == LessLexer.MINUS || previous.getType() == LessLexer.PLUS || previous.getType() == LessLexer.STAR || previous.getType() == LessLexer.SOLIDUS;
   }
 
   public boolean directlyFollows(Token first, Token second) {
     if (!(first instanceof CommonToken) || !(second instanceof CommonToken))
       return false;
-    
+
     CommonToken firstT = (CommonToken) first;
     CommonToken secondT = (CommonToken) second;
-    
+
     return directlyFollows(firstT, secondT);
   }
 
   public boolean directlyFollows(CommonToken firstT, CommonToken secondT) {
-    if (firstT.getStopIndex()+1!= secondT.getStartIndex())
+    if (firstT.getStopIndex() + 1 != secondT.getStartIndex())
       return false;
 
     //some tokens tend to eat up following whitespaces too
     String text = firstT.getText();
-    if (text==null || text.isEmpty())
+    if (text == null || text.isEmpty())
       return true;
-    
-    String substring = text.substring(text.length()-1);
+
+    String substring = text.substring(text.length() - 1);
     return substring.equals(substring.trim());
   }
 
   public boolean isWhenKeyword(Token token) {
-    if (token==null || !(token instanceof CommonToken) || token.getType()!=LessParser.IDENT)
+    if (token == null || !(token instanceof CommonToken) || token.getType() != LessParser.IDENT)
       return false;
-    
+
     String word = token.getText().trim().toLowerCase();
     return "when".equals(word);
   }

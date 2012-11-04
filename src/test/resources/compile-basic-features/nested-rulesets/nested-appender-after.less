@@ -1,0 +1,29 @@
+:after1, :after2 {
+  declaration: value;
+  nested1&, nested2 & {
+    declaration: value;
+  }
+  nested3 &, nested4& {
+    declaration: value;
+  }
+}
+
+:after1, :after2 {
+  declaration: value;
+  nested1, nested2& {
+    declaration: value;
+  }
+  nested3, nested4 & {
+    declaration: value;
+  }
+}
+
+:after1, :after2 {
+  declaration: value;
+  nested1&, nested2 {
+    declaration: value;
+  }
+  nested3 &, nested4 {
+    declaration: value;
+  }
+}

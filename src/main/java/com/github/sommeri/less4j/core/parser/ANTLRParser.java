@@ -17,9 +17,6 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 
-import com.github.sommeri.less4j.core.parser.LessLexer;
-import com.github.sommeri.less4j.core.parser.LessParser;
-
 //import com.github.sommeri.less4j.utils.DebugPrint;
 
 /**

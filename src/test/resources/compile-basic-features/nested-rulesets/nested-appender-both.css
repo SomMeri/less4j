@@ -1,0 +1,84 @@
+:before1,
+:before2 {
+  declaration: value;
+}
+:before1:nested1 :before1,
+:before1:nested1 :before2,
+:before2:nested1 :before1,
+:before2:nested1 :before2,
+:before1 :nested2:before1,
+:before1 :nested2:before2,
+:before2 :nested2:before1,
+:before2 :nested2:before2 {
+  declaration: 1 2;
+}
+before1,
+before2 {
+  declaration: value;
+}
+before1nested1 before1,
+before1nested1 before2,
+before2nested1 before1,
+before2nested1 before2,
+before1 nested2before1,
+before1 nested2before2,
+before2 nested2before1,
+before2 nested2before2 {
+  declaration: 1 2;
+}
+element1:before1,
+element2:before2 {
+  declaration: value;
+}
+element1:before1nested1 element1:before1,
+element1:before1nested1 element2:before2,
+element2:before2nested1 element1:before1,
+element2:before2nested1 element2:before2,
+element1:before1 nested2element1:before1,
+element1:before1 nested2element2:before2,
+element2:before2 nested2element1:before1,
+element2:before2 nested2element2:before2 {
+  declaration: 1 2;
+}
+before1,
+before2 {
+  declaration: value;
+}
+before1:nested1 before1,
+before1:nested1 before2,
+before2:nested1 before1,
+before2:nested1 before2,
+before1 :nested2before1,
+before1 :nested2before2,
+before2 :nested2before1,
+before2 :nested2before2 {
+  declaration: 1 2;
+}
+before1,
+before2 {
+  declaration: value;
+}
+before1* before1,
+before1* before2,
+before2* before1,
+before2* before2,
+before1 *before1,
+before1 *before2,
+before2 *before1,
+before2 *before2 {
+  declaration: 1 2;
+}
+*,
+* {
+  declaration: value;
+}
+*:nested1 *,
+*:nested1 *,
+*:nested1 *,
+*:nested1 *,
+* :nested2*,
+* :nested2*,
+* :nested2*,
+* :nested2* {
+  declaration: 1 2;
+}

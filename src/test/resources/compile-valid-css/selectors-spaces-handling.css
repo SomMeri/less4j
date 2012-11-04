@@ -1,0 +1,6 @@
+div :not(:enabled) :not(:disabled) {
+  padding: 1 1 1 1;
+}
+div:not(:enabled):not(:disabled) {
+  padding: 2 2 2 2;
+}

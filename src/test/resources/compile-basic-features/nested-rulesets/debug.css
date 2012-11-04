@@ -1,0 +1,10 @@
+element1:before1,
+element2:before2 {
+  declaration: value;
+}
+element1:before1 nested2element1:before1,
+element1:before1 nested2element2:before2,
+element2:before2 nested2element1:before1,
+element2:before2 nested2element2:before2 {
+  declaration: 1 2;
+}

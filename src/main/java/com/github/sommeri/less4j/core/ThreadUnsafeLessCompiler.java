@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
@@ -211,7 +212,6 @@ class CssPrinter {
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
-    case NESTED_RULESET:
     case INDIRECT_VARIABLE:
     case VARIABLE_DECLARATION:
       throw new NotACssException(node);
@@ -636,8 +636,8 @@ class CssPrinter {
   }
 
   private void appendSimpleSelectorTail(SimpleSelector selector) {
-    List<ASTCssNode> allChilds = selector.getSubsequent();
-    for (ASTCssNode astCssNode : allChilds) {
+    List<ElementSubsequent> allChilds = selector.getSubsequent();
+    for (ElementSubsequent astCssNode : allChilds) {
       append(astCssNode);
     }
   }

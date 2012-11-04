@@ -13,9 +13,6 @@ public abstract class TokenTypeSwitch<T> {
       return handleRuleSet(token);
     }
 
-    if (type==LessLexer.NESTED_RULESET)
-      return handleNestedRuleSet(token);
-
     if (type==LessLexer.CSS_CLASS) {
       return handleCssClass(token);
     }
@@ -243,10 +240,6 @@ public abstract class TokenTypeSwitch<T> {
   }
 
   public T handleRuleSet(HiddenTokenAwareTree token) {
-    return null;
-  }
-  
-  public T handleNestedRuleSet(HiddenTokenAwareTree token) {
     return null;
   }
   

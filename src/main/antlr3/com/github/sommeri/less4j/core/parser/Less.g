@@ -34,7 +34,6 @@ tokens {
   DECLARATION;
   VARIABLE_REFERENCE;
   RULESET;
-  NESTED_RULESET;
   SELECTOR;
   EXPRESSION;
   EXPRESSION_PARENTHESES;
@@ -285,16 +284,12 @@ property
     ;
     
 //we need to put comma into the tree so we can collect comments to it
+//TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet
     : c=selector (COMMA a+=selector)* b=ruleset_body
      -> ^(RULESET $c (COMMA $a)* $b)
     ;
 
-nestedRuleSet
-    : a+=APPENDER? b+=ruleSet
-    -> ^(NESTED_RULESET $a* $b*)
-    ;
-    
 // ruleSet can contain other rulesets.
 //css does not require ; in last declaration
 //declaration can refer also to a mixin - removed for now, I will handle mixins later
@@ -302,7 +297,7 @@ nestedRuleSet
 ruleset_body
     : LBRACE
             (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
-               | (nestedRuleSet)=> a+=nestedRuleSet
+               | (ruleSet)=> a+=ruleSet
                | (mixinReference)=>a+=mixinReference
                | (namespaceReference)=>a+=namespaceReference
                | (pureMixinDeclaration)=>a+=pureMixinDeclaration 
@@ -336,11 +331,23 @@ ruleset_body
   modify the tree in the parser, but it is unnecessary given that we are translating ANTLR
   tree into another one.
 */
+//TODO: Nested and top level selectors are different: top level one does NOT allow appenders
 selector
-    : ( (a+=combinator (a+=elementName | a+=elementSubsequent) )*
-    -> ^(SELECTOR ($a)* ) )
+    : 
+       before+=selectorAppender
+       (a+=combinator (a+=elementName | a+=elementSubsequent) )* 
+       after+=selectorAppender
+    -> ^(SELECTOR $before* ($a)*  $after* ) 
     ;
 
+selectorAppender:
+       ( (APPENDER_WS_AFTER)=> before+=APPENDER_WS_AFTER 
+       | (APPENDER_WS_BEFORE)=> before+=APPENDER_WS_BEFORE  
+       | (APPENDER_BOTH_WS)=> before+=APPENDER_BOTH_WS  
+       | (DIRECT_APPENDER)=> before+=DIRECT_APPENDER  
+       | )
+;
+       
 esPred
     : HASH
     | DOT
@@ -955,7 +962,29 @@ RPAREN : ')' ;
 COMMA : ',' ;
 DOT : '.' ;
 DOT3 : '...' ;
-APPENDER: '&';
+//TODO: change to emit APPENDER MEANINGFULL_WS <- the grammer will be much nicer then
+//TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
+fragment APPENDER: '&';
+APPENDER_WS_AFTER: APPENDER WS_FRAGMENT;
+//The rule emits multiple tokens because final appender token can be used in error and therefore its start index must show appender place 
+APPENDER_WS_BEFORE: ws=WS_FRAGMENT app=APPENDER {
+  $ws.setType(WS);
+  $ws.setChannel(HIDDEN);
+  emit($ws);
+  $app.setType(APPENDER_WS_BEFORE);
+  emit($app);
+};
+APPENDER_BOTH_WS: ws1=WS_FRAGMENT app=APPENDER ws2=WS_FRAGMENT {
+  $ws1.setType(WS);
+  $ws1.setChannel(HIDDEN);
+  emit($ws1);
+  $ws2.setType(WS);
+  $ws2.setChannel(HIDDEN);
+  emit($ws2);
+  $app.setType(APPENDER_BOTH_WS);
+  emit($app);
+};
+DIRECT_APPENDER: APPENDER;
 
 // -----------------
 // Literal strings. Delimited by either ' or "
@@ -1094,7 +1123,8 @@ URI : (U R L
 // that process the whitespace within the parser, ANTLR does not
 // need to deal with the whitespace directly in the parser.
 //
-WS : (' '|'\t')+ { $channel = HIDDEN; } ;
+fragment WS_FRAGMENT : (' '|'\t')+ ;
+WS : WS_FRAGMENT { $channel = HIDDEN; } ;
 fragment NL : ('\r' '\n'? | '\n');
 NEW_LINE: NL { $channel = HIDDEN; } ;
 

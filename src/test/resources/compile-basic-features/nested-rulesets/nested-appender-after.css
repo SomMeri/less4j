@@ -1,0 +1,48 @@
+:after1,
+:after2 {
+  declaration: value;
+}
+nested1:after1,
+nested1:after2,
+nested2 :after1,
+nested2 :after2 {
+  declaration: value;
+}
+nested3 :after1,
+nested3 :after2,
+nested4:after1,
+nested4:after2 {
+  declaration: value;
+}
+:after1,
+:after2 {
+  declaration: value;
+}
+:after1 nested1,
+:after2 nested1,
+nested2:after1,
+nested2:after2 {
+  declaration: value;
+}
+:after1 nested3,
+:after2 nested3,
+nested4 :after1,
+nested4 :after2 {
+  declaration: value;
+}
+:after1,
+:after2 {
+  declaration: value;
+}
+nested1:after1,
+nested1:after2,
+:after1 nested2,
+:after2 nested2 {
+  declaration: value;
+}
+nested3 :after1,
+nested3 :after2,
+:after1 nested4,
+:after2 nested4 {
+  declaration: value;
+}

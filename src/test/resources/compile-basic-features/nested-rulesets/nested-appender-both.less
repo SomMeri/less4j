@@ -1,0 +1,36 @@
+:before1, :before2 {
+  declaration: value;
+  &:nested1 &, & :nested2& {
+    declaration: 1 2;
+  }
+}
+before1, before2 {
+  declaration: value;
+  &nested1 &, & nested2& {
+    declaration: 1 2;
+  }
+}
+element1:before1, element2:before2 {
+  declaration: value;
+  &nested1 &, & nested2& {
+    declaration: 1 2;
+  }
+}
+before1, before2 {
+  declaration: value;
+  &:nested1 &, & :nested2& {
+    declaration: 1 2;
+  }
+}
+before1, before2 {
+  declaration: value;
+  &* &, & *& {
+    declaration: 1 2;
+  }
+}
+*, * {
+  declaration: value;
+  &:nested1 &, & :nested2& {
+    declaration: 1 2;
+  }
+}

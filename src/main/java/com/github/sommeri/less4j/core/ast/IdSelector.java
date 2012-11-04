@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-public class IdSelector extends ASTCssNode {
+public class IdSelector extends ElementSubsequent {
 
   private String name;
 
