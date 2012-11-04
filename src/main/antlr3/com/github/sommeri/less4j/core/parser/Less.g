@@ -975,14 +975,12 @@ RPAREN : ')' ;
 COMMA : ',' ;
 DOT : '.' ;
 DOT3 : '...' ;
-//TODO: change to emit APPENDER MEANINGFULL_WS <- the grammer will be much nicer then
 //TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
 fragment MEANINGFULL_WHITESPACE: ;
 fragment APPENDER_FRAGMENT: '&';
 APPENDER: ws1=WS_FRAGMENT? app=APPENDER_FRAGMENT ws2=WS_FRAGMENT? {
   emitAs($ws1, MEANINGFULL_WHITESPACE);
-  $app.setType(APPENDER);
-  emit($app);
+  emitAs($app, APPENDER);
   emitAs($ws2, MEANINGFULL_WHITESPACE);
 };
 
