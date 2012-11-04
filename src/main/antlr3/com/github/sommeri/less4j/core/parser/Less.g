@@ -63,6 +63,8 @@ tokens {
   MIXIN_PATTERN;
   GUARD_CONDITION;
   GUARD;
+  INDIRECT_APPENDER;
+  DIRECT_APPENDER;
 }
 
 @lexer::header {
@@ -95,6 +97,12 @@ tokens {
   public void emit(Token token) {
         state.token = token;
         tokens.add(token);
+  }
+  public void emitAs(Token token, int type) {
+        if (token==null)
+          return ;
+        token.setType(type);
+        emit(token);
   }
   public Token nextToken() {
         super.nextToken();
@@ -332,22 +340,27 @@ ruleset_body
   tree into another one.
 */
 //TODO: Nested and top level selectors are different: top level one does NOT allow appenders
-selector
-    : 
-       before+=selectorAppender
+selector 
+    :  ((beforeSelectorAppender)=>before+=beforeSelectorAppender | )
        (a+=combinator (a+=elementName | a+=elementSubsequent) )* 
-       after+=selectorAppender
+       after+=afterSelectorAppender?
     -> ^(SELECTOR $before* ($a)*  $after* ) 
     ;
+    
+beforeSelectorAppender
+    :  MEANINGFULL_WHITESPACE?
+       ((APPENDER MEANINGFULL_WHITESPACE)=>APPENDER MEANINGFULL_WHITESPACE -> ^(INDIRECT_APPENDER APPENDER)
+      | APPENDER  -> ^(DIRECT_APPENDER APPENDER)
+      )
+    ; 
 
-selectorAppender:
-       ( (APPENDER_WS_AFTER)=> before+=APPENDER_WS_AFTER 
-       | (APPENDER_WS_BEFORE)=> before+=APPENDER_WS_BEFORE  
-       | (APPENDER_BOTH_WS)=> before+=APPENDER_BOTH_WS  
-       | (DIRECT_APPENDER)=> before+=DIRECT_APPENDER  
-       | )
-;
-       
+afterSelectorAppender
+    : ((MEANINGFULL_WHITESPACE APPENDER )=>MEANINGFULL_WHITESPACE APPENDER -> ^(INDIRECT_APPENDER APPENDER)
+      | APPENDER  -> ^(DIRECT_APPENDER APPENDER)
+      ) 
+      MEANINGFULL_WHITESPACE?
+    ; 
+
 esPred
     : HASH
     | DOT
@@ -964,27 +977,14 @@ DOT : '.' ;
 DOT3 : '...' ;
 //TODO: change to emit APPENDER MEANINGFULL_WS <- the grammer will be much nicer then
 //TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
-fragment APPENDER: '&';
-APPENDER_WS_AFTER: APPENDER WS_FRAGMENT;
-//The rule emits multiple tokens because final appender token can be used in error and therefore its start index must show appender place 
-APPENDER_WS_BEFORE: ws=WS_FRAGMENT app=APPENDER {
-  $ws.setType(WS);
-  $ws.setChannel(HIDDEN);
-  emit($ws);
-  $app.setType(APPENDER_WS_BEFORE);
+fragment MEANINGFULL_WHITESPACE: ;
+fragment APPENDER_FRAGMENT: '&';
+APPENDER: ws1=WS_FRAGMENT? app=APPENDER_FRAGMENT ws2=WS_FRAGMENT? {
+  emitAs($ws1, MEANINGFULL_WHITESPACE);
+  $app.setType(APPENDER);
   emit($app);
+  emitAs($ws2, MEANINGFULL_WHITESPACE);
 };
-APPENDER_BOTH_WS: ws1=WS_FRAGMENT app=APPENDER ws2=WS_FRAGMENT {
-  $ws1.setType(WS);
-  $ws1.setChannel(HIDDEN);
-  emit($ws1);
-  $ws2.setType(WS);
-  $ws2.setChannel(HIDDEN);
-  emit($ws2);
-  $app.setType(APPENDER_BOTH_WS);
-  emit($app);
-};
-DIRECT_APPENDER: APPENDER;
 
 // -----------------
 // Literal strings. Delimited by either ' or "

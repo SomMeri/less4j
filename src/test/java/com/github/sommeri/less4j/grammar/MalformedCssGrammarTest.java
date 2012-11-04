@@ -20,7 +20,7 @@ public class MalformedCssGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ParseResult result = compiler.parseSelector(crashingSelector);
     
-    assertNoTokenMissing(crashingSelector, result.getTree(), 3);
+    assertNoTokenMissing(crashingSelector, result.getTree(), 1);
   }
 
   @Test
@@ -29,7 +29,7 @@ public class MalformedCssGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ParseResult result = compiler.parseRuleset(crashingSelector);
 
-    assertNoTokenMissing(crashingSelector, result.getTree(), 1);
+    assertNoTokenMissing(crashingSelector, result.getTree(), 3);
   }
 
   @Test
@@ -44,7 +44,7 @@ public class MalformedCssGrammarTest {
     //therefore there are -3 dummy nodes
     //this way of testing malformed trees is bad anyway,this needs to be changed 
     //for something more readable and stable. (These tests are broken with each tree change)
-    assertNoTokenMissing(crashingSelector, result.getTree(), -3);
+    assertNoTokenMissing(crashingSelector, result.getTree(), -2);
   }
 
 

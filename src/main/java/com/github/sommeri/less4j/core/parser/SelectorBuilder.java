@@ -31,15 +31,11 @@ public class SelectorBuilder {
     HiddenTokenAwareTree previousNonCombinator = null;
     for (HiddenTokenAwareTree kid : members) {
       switch (kid.getType()) {
-      case LessLexer.APPENDER_BOTH_WS:
-      case LessLexer.APPENDER_WS_AFTER:
-      case LessLexer.APPENDER_WS_BEFORE:
-      case LessLexer.DIRECT_APPENDER: {
-        if (result == null)
-          beforeAppender = createBeforeAppender(kid);
-        else
-          afterAppender = createAfterAppender(kid);
-      }
+      case LessLexer.INDIRECT_APPENDER:
+        addIndirectAppender(kid);
+        break;
+      case LessLexer.DIRECT_APPENDER:
+        addDirectAppender(kid);
         break;
       case LessLexer.ELEMENT_NAME:
         addElementName(kid);
@@ -60,30 +56,19 @@ public class SelectorBuilder {
     return result;
   }
 
-  private NestedSelectorAppender createBeforeAppender(HiddenTokenAwareTree kid) {
-    switch (kid.getType()) {
-    case LessLexer.DIRECT_APPENDER:
-    case LessLexer.APPENDER_WS_BEFORE:
-      return new NestedSelectorAppender(kid, true);
-    case LessLexer.APPENDER_BOTH_WS:
-    case LessLexer.APPENDER_WS_AFTER:
-      return new NestedSelectorAppender(kid, false);
-    default:
-      throw new IllegalStateException("" + kid.getType());
-    }
+  private void addIndirectAppender(HiddenTokenAwareTree kid) {
+    addAppender(new NestedSelectorAppender(kid.getChild(0), false));
   }
 
-  private NestedSelectorAppender createAfterAppender(HiddenTokenAwareTree kid) {
-    switch (kid.getType()) {
-    case LessLexer.DIRECT_APPENDER:
-    case LessLexer.APPENDER_WS_AFTER:
-      return new NestedSelectorAppender(kid, true);
-    case LessLexer.APPENDER_WS_BEFORE:
-    case LessLexer.APPENDER_BOTH_WS:
-      return new NestedSelectorAppender(kid, false);
-    default:
-      throw new IllegalStateException("" + kid.getType());
-    }
+  private void addDirectAppender(HiddenTokenAwareTree kid) {
+    addAppender(new NestedSelectorAppender(kid.getChild(0), true));
+  }
+
+  private void addAppender(NestedSelectorAppender appender) {
+    if (result == null)
+      beforeAppender = appender;
+    else
+      afterAppender = appender;
   }
 
   private void addElementSubsequent(HiddenTokenAwareTree previousNonCombinator, HiddenTokenAwareTree kid) {
