@@ -9,7 +9,6 @@ import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.PureNamespace;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
-import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
 /**
@@ -30,7 +29,6 @@ public class ScopeExtractor {
 
   public Scope extractScope(ASTCssNode node) {
     Scope result = buildScope(node);
-    removeUsedNodes(node, result);
     return result;
   }
 
@@ -47,19 +45,29 @@ public class ScopeExtractor {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {
       buildScope(kid);
+      
       if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
         currentScope.registerVariable((VariableDeclaration) kid);
+        manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.PURE_MIXIN) {
         PureMixin mixin = (PureMixin) kid;
         Scope bodyScope = currentScope.getChildOwnerOf(mixin.getBody());
         currentScope.registerMixin(mixin, bodyScope);
+        
+        bodyScope.removedFromTree();
+        manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.RULE_SET) {
         RuleSet ruleSet = (RuleSet) kid;
         if (ruleSet.isMixin()) { 
           Scope bodyScope = currentScope.getChildOwnerOf(ruleSet.getBody());
           currentScope.registerMixin(ruleSet.convertToMixin(), bodyScope);
         }
-      } 
+      } else if (kid.getType() == ASTCssNodeType.PURE_NAMESPACE) {
+        PureNamespace namespace = (PureNamespace) kid;
+        Scope bodyScope = currentScope.getChildOwnerOf(namespace.getBody());
+        bodyScope.removedFromTree();
+        manipulator.removeFromBody(kid);
+      }
     }
 
     Scope result = currentScope;
@@ -67,38 +75,6 @@ public class ScopeExtractor {
       decreaseScope();
 
     return result;
-  }
-
-  private void removeUsedNodes(ASTCssNode node, Scope scope) {
-    removeUsedNodes(node, new IteratedScope(scope));
-  }
-
-  private void removeUsedNodes(ASTCssNode node, IteratedScope scope) {
-    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-    for (ASTCssNode kid : childs) {
-      if (AstLogic.hasOwnScope(kid)) {
-        removeUsedNodes(kid, new IteratedScope(scope.getNextChild()));
-      } else {
-        removeUsedNodes(kid, scope);
-      }
-    }
-
-    switch (node.getType()) {
-    case VARIABLE_DECLARATION:
-      manipulator.removeFromBody(node);
-      break;
-    case PURE_MIXIN: {
-      Scope bodyScope = scope.getScope().getChildOwnerOf(((PureMixin)node).getBody());
-      bodyScope.removedFromTree();
-      manipulator.removeFromBody(node);
-      break;
-    } case PURE_NAMESPACE: {
-      Scope bodyScope = scope.getScope().getChildOwnerOf(((PureNamespace)node).getBody());
-      bodyScope.removedFromTree();
-      manipulator.removeFromBody(node);
-      break;
-    }
-    }
   }
 
   private String representedNamedScope(ASTCssNode node) {

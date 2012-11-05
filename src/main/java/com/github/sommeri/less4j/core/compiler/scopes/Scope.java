@@ -42,10 +42,6 @@ public class Scope {
     return parent;
   }
 
-  public MixinsScope getMixinsScope() {
-    return mixins;
-  }
-
   public List<Scope> getChilds() {
     return childs;
   }
@@ -63,22 +59,6 @@ public class Scope {
     if (hasParent())
       return getParent() + " > " + getName();
     return getName();
-  }
-
-  public void setMixins(MixinsScope scope) {
-    this.mixins = scope;
-  }
-
-  public boolean hasMixins() {
-    return mixins!=null;
-  }
-
-  public void setVariables(VariablesScope variables) {
-    this.variables = variables;
-  }
-
-  public boolean hasVariables() {
-    return variables!=null;
   }
 
   public void registerVariable(AbstractVariableDeclaration declaration) {

@@ -58,7 +58,7 @@ public class LessToCssCompiler {
   private void evaluateExpressions(ASTCssNode node) {
     ASTManipulator manipulator = new ASTManipulator();
     //variables are not supposed to be there now
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(null);
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator();
 
     if (node instanceof Expression) {
       Expression value = expressionEvaluator.evaluate((Expression) node);

@@ -1,11 +1,13 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
@@ -18,13 +20,17 @@ import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
+import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
+import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
+import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.CompileException;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
 public class ExpressionEvaluator {
@@ -35,9 +41,13 @@ public class ExpressionEvaluator {
   private ColorsCalculator colorsCalculator = new ColorsCalculator();
   private ExpressionComparator comparator = new GuardsComparator();
   
+  public ExpressionEvaluator() {
+    this(new NullScope());
+  }
+
   public ExpressionEvaluator(Scope scope) {
     super();
-    this.scope = scope;
+    this.scope = scope==null? new NullScope() : scope;
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
@@ -265,6 +275,118 @@ public class ExpressionEvaluator {
       return false;
 
     return true;
+  }
+  
+}
+
+class NullScope extends Scope {
+
+  protected NullScope() {
+    super(null, "empty scope");
+  }
+
+  @Override
+  public Scope getParent() {
+    return this;
+  }
+
+  @Override
+  public List<Scope> getChilds() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String getName() {
+    return super.getName();
+  }
+
+  @Override
+  public boolean hasParent() {
+    return false;
+  }
+
+  @Override
+  public void registerVariable(AbstractVariableDeclaration declaration) {
+  }
+
+  @Override
+  public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue) {
+  }
+
+  @Override
+  public void registerVariableIfNotPresent(String name, Expression replacementValue) {
+  }
+
+  @Override
+  public Expression getValue(Variable variable) {
+    return null;
+  }
+
+  @Override
+  public Expression getValue(String name) {
+    return null;
+  }
+
+  @Override
+  public void registerMixin(PureMixin mixin, Scope mixinsBodyScope) {
+  }
+
+  @Override
+  public List<FullMixinDefinition> getNearestMixins(MixinReference reference) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getNearestMixins(String name) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<Scope> findMatchingChilds(List<String> nameChain) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Scope copyWithChildChain() {
+    return this;
+  }
+
+  @Override
+  public Scope copyWithChildChain(Scope parent) {
+    return this;
+  }
+
+  @Override
+  public Scope copyWithParentsChain() {
+    return this;
+  }
+
+  @Override
+  public void setParent(Scope parent) {
+  }
+
+  @Override
+  public void removedFromTree() {
+  }
+
+  @Override
+  public boolean isPresentInTree() {
+    return false;
+  }
+
+  @Override
+  public Scope getRootScope() {
+    return this;
+  }
+
+  @Override
+  public Scope getChildOwnerOf(ASTCssNode body) {
+    return null;
   }
   
 }
