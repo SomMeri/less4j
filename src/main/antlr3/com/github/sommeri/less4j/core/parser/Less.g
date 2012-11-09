@@ -34,6 +34,7 @@ tokens {
   DECLARATION;
   VARIABLE_REFERENCE;
   RULESET;
+  NESTED_APPENDER;
   SELECTOR;
   EXPRESSION;
   EXPRESSION_PARENTHESES;
@@ -63,8 +64,7 @@ tokens {
   MIXIN_PATTERN;
   GUARD_CONDITION;
   GUARD;
-  INDIRECT_APPENDER;
-  DIRECT_APPENDER;
+  DUMMY_MEANINGFULL_WHITESPACE; //ANTLR, please
 }
 
 @lexer::header {
@@ -294,10 +294,38 @@ property
 //we need to put comma into the tree so we can collect comments to it
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet
-    : c=selector (COMMA a+=selector)* b=ruleset_body
-     -> ^(RULESET $c (COMMA $a)* $b)
+    : a+=selector ( a+=ruleSetSeparator a+=selector)*
+       b=ruleset_body
+     -> ^(RULESET $a* $b)
     ;
 
+//ruleSet
+//    : ((nestedAppender)=>a+=nestedAppender | ) 
+//      (
+//          a+=selector (
+//            (a+=ruleSetSeparator a+=nestedAppender?| a+=nestedAppender (a+=ruleSetSeparator a+=nestedAppender?)?) 
+//             a+=selector
+//          )* 
+//          a+=nestedAppender?
+//       )?   
+//    b=ruleset_body
+//     -> ^(RULESET $a* $b)
+//    ;
+    
+ruleSetSeparator
+    : COMMA ;
+
+nestedAppender // this must be here because of special case & & <- the space belongs to both appenders
+    :  ((MEANINGFULL_WHITESPACE? APPENDER MEANINGFULL_WHITESPACE APPENDER)=>a+=MEANINGFULL_WHITESPACE? a+=APPENDER) -> ^(NESTED_APPENDER $a* DUMMY_MEANINGFULL_WHITESPACE)
+       | (
+         a+=MEANINGFULL_WHITESPACE? 
+         a+=APPENDER
+         ( 
+           (MEANINGFULL_WHITESPACE)=>a+=MEANINGFULL_WHITESPACE 
+           | 
+         ) 
+      ) -> ^(NESTED_APPENDER $a*)
+    ;
 // ruleSet can contain other rulesets.
 //css does not require ; in last declaration
 //declaration can refer also to a mixin - removed for now, I will handle mixins later
@@ -341,25 +369,9 @@ ruleset_body
 */
 //TODO: Nested and top level selectors are different: top level one does NOT allow appenders
 selector 
-    :  ((beforeSelectorAppender)=>before+=beforeSelectorAppender | )
-       (a+=combinator (a+=elementName | a+=elementSubsequent) )* 
-       after+=afterSelectorAppender?
-    -> ^(SELECTOR $before* ($a)*  $after* ) 
+    : ((nestedAppender)=>a+=nestedAppender | ) ((a+=combinator ) (a+=elementName | a+=elementSubsequent | a+=nestedAppender) )*
+    -> ^(SELECTOR $a* ) 
     ;
-    
-beforeSelectorAppender
-    :  MEANINGFULL_WHITESPACE?
-       ((APPENDER MEANINGFULL_WHITESPACE)=>APPENDER MEANINGFULL_WHITESPACE -> ^(INDIRECT_APPENDER APPENDER)
-      | APPENDER  -> ^(DIRECT_APPENDER APPENDER)
-      )
-    ; 
-
-afterSelectorAppender
-    : ((MEANINGFULL_WHITESPACE APPENDER )=>MEANINGFULL_WHITESPACE APPENDER -> ^(INDIRECT_APPENDER APPENDER)
-      | APPENDER  -> ^(DIRECT_APPENDER APPENDER)
-      ) 
-      MEANINGFULL_WHITESPACE?
-    ; 
 
 esPred
     : HASH
@@ -976,8 +988,9 @@ COMMA : ',' ;
 DOT : '.' ;
 DOT3 : '...' ;
 //TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
-fragment MEANINGFULL_WHITESPACE: ;
 fragment APPENDER_FRAGMENT: '&';
+fragment MEANINGFULL_WHITESPACE: ;
+//TODO explain why I need appender fragment
 APPENDER: ws1=WS_FRAGMENT? app=APPENDER_FRAGMENT ws2=WS_FRAGMENT? {
   emitAs($ws1, MEANINGFULL_WHITESPACE);
   emitAs($app, APPENDER);

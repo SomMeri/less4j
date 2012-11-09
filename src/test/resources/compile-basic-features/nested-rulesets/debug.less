@@ -1,6 +1,28 @@
-element1:before1, element2:before2 {
-  declaration: value;
-  & nested2& {
-    declaration: 1 2;
-  }
+.mixinNoParam {
+  declaration: mixinNoParam;
 }
+
+#allAreUsedHere {
+  .nestedMixin {
+    this-will-survive-too: funny;
+  }
+  .nestedMixin {
+    declaration: nestedMixin;
+    .nestedMixin {
+      declaration: nestedMixinScoped;
+    }
+    .nestedMixin;
+  }
+  .mixinNoParam;
+  .mixinNoParam;
+  .nestedMixin;
+  &.nestedMixin {
+    declaration: redefined;
+  }
+  .nestedMixin;
+}
+
+.mixinNoParam {
+  last: last;
+}
+

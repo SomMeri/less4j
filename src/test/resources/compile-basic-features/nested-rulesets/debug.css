@@ -1,10 +1,37 @@
-element1:before1,
-element2:before2 {
-  declaration: value;
+.mixinNoParam {
+  declaration: mixinNoParam;
 }
-element1:before1 nested2element1:before1,
-element1:before1 nested2element2:before2,
-element2:before2 nested2element1:before1,
-element2:before2 nested2element2:before2 {
-  declaration: 1 2;
+#allAreUsedHere {
+  declaration: mixinNoParam;
+  last: last;
+  declaration: mixinNoParam;
+  last: last;
+  this-will-survive-too: funny;
+  declaration: nestedMixin;
+  declaration: nestedMixinScoped;
+  this-will-survive-too: funny;
+  declaration: nestedMixin;
+  declaration: nestedMixinScoped;
+}
+#allAreUsedHere .nestedMixin {
+  this-will-survive-too: funny;
+}
+#allAreUsedHere .nestedMixin {
+  declaration: nestedMixin;
+  declaration: nestedMixinScoped;
+}
+#allAreUsedHere .nestedMixin .nestedMixin {
+  declaration: nestedMixinScoped;
+}
+#allAreUsedHere .nestedMixin {
+  declaration: nestedMixinScoped;
+}
+#allAreUsedHere.nestedMixin {
+  declaration: redefined;
+}
+#allAreUsedHere .nestedMixin {
+  declaration: nestedMixinScoped;
+}
+.mixinNoParam {
+  last: last;
 }

@@ -43,7 +43,6 @@ public class LessToCssCompiler {
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.RULE_SET) {
         List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
-        //TODO: may I should clone them???
         body.addMembersAfter(nestedRulesets, kid);
         for (RuleSet ruleSet : nestedRulesets) {
           ruleSet.setParent(body);

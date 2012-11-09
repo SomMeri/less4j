@@ -1,0 +1,48 @@
+h1, h2 {
+  declaration: value;
+  em & h3 & h4 & {
+   declaration: 3 4;
+  }
+}
+
+h1, h2 {
+  declaration: value;
+  p & + & em {
+   declaration: 3 4;
+  }
+}
+
+h1, h2 {
+  declaration: value;
+  p &   & em {
+   declaration: 3 4;
+  }
+}
+
+h1, h2 {
+  declaration: value;
+  name&   &:hover {
+   declaration: 3 4;
+  }
+}
+
+h1, h2 {
+  declaration: value;
+  p:nth-child(3n+1) &   & :hover {
+   declaration: 3 4;
+  }
+}
+
+h1, h2 {
+  declaration: value;
+  .name&+&:hover {
+   declaration: 3 4;
+  }
+}
+
+:visit, :nth-child(4n+2) {
+  declaration: value;
+  .name&:hover, .class&:hover {
+   declaration: 3 4;
+  }
+}

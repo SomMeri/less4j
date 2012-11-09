@@ -7,7 +7,9 @@ import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
+import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
+import com.github.sommeri.less4j.core.ast.SelectorCombinator.Combinator;
 
 public class SelectorBuilder {
 
@@ -15,8 +17,6 @@ public class SelectorBuilder {
   private Selector result;
   private Selector currentSelector;
   private final HiddenTokenAwareTree token;
-  private NestedSelectorAppender beforeAppender;
-  private NestedSelectorAppender afterAppender;
 
   private final ASTBuilderSwitch parentBuilder;
   private HiddenTokenAwareTree lastCombinator;
@@ -31,15 +31,13 @@ public class SelectorBuilder {
     HiddenTokenAwareTree previousNonCombinator = null;
     for (HiddenTokenAwareTree kid : members) {
       switch (kid.getType()) {
-      case LessLexer.INDIRECT_APPENDER:
-        addIndirectAppender(kid);
-        break;
-      case LessLexer.DIRECT_APPENDER:
-        addDirectAppender(kid);
-        break;
       case LessLexer.ELEMENT_NAME:
         addElementName(kid);
         previousNonCombinator = kid;
+        break;
+      case LessLexer.NESTED_APPENDER:
+        addAppender(kid);
+        previousNonCombinator = null;
         break;
       case LessLexer.ELEMENT_SUBSEQUENT:
         addElementSubsequent(previousNonCombinator, kid);
@@ -50,33 +48,15 @@ public class SelectorBuilder {
       }
 
     }
-
-    result.addBeforeAppender(beforeAppender);
-    result.addAfterAppender(afterAppender);
     return result;
   }
 
-  private void addIndirectAppender(HiddenTokenAwareTree kid) {
-    addAppender(new NestedSelectorAppender(kid.getChild(0), false));
-  }
-
-  private void addDirectAppender(HiddenTokenAwareTree kid) {
-    addAppender(new NestedSelectorAppender(kid.getChild(0), true));
-  }
-
-  private void addAppender(NestedSelectorAppender appender) {
-    if (result == null)
-      beforeAppender = appender;
-    else
-      afterAppender = appender;
-  }
-
-  private void addElementSubsequent(HiddenTokenAwareTree previousNonCombinator, HiddenTokenAwareTree kid) {
-    if (previousNonCombinator == null) {
+  private void addElementSubsequent(HiddenTokenAwareTree previousNonSeparator, HiddenTokenAwareTree kid) {
+    if (previousNonSeparator == null) {
       addWithImplicitStar(kid);
       return;
     }
-    if (previousNonCombinator.getTokenStopIndex() + 1 < kid.getTokenStartIndex()) {
+    if (previousNonSeparator.getTokenStopIndex() + 1 < kid.getTokenStartIndex()) {
       addWithImplicitStar(kid);
       return;
     }
@@ -92,34 +72,70 @@ public class SelectorBuilder {
     currentSimpleSelector = new SimpleSelector(kid, null, true);
     currentSimpleSelector.setEmptyForm(true);
     addSubsequent(kid);
-    startNewSelector();
-    currentSelector.setHead(currentSimpleSelector);
+    startNewSelector(currentSimpleSelector);
   }
 
   private SelectorCombinator consumeLastCombinator() {
     if (lastCombinator == null)
       return null;
 
-    SelectorCombinator result = ConversionUtils.createSelectorCombinator(lastCombinator);
+    SelectorCombinator combinator = ConversionUtils.createSelectorCombinator(lastCombinator);
     lastCombinator = null;
-    return result;
+
+    //if it is not descendant, everything is OK, it was explicitly written in the input.
+    if (!isDescendant(combinator))
+      return combinator;
+    
+    // Descendant combinator before first selector should be ignored.
+    // Descendant combinator after appender should be ignored. That information is stored in appender itself.
+    if (currentSelector==null || currentSelector.getHead().isAppender())
+      return null;
+    
+    return combinator;
   }
 
   private void addElementName(HiddenTokenAwareTree kid) {
     HiddenTokenAwareTree realName = kid.getChild(0);
     currentSimpleSelector = new SimpleSelector(kid, realName.getText(), realName.getType() == LessLexer.STAR);
-    startNewSelector();
-    currentSelector.setHead(currentSimpleSelector);
+    startNewSelector(currentSimpleSelector);
   }
 
-  private void startNewSelector() {
+  private void addAppender(HiddenTokenAwareTree kid) {
+    currentSimpleSelector = null;
+    boolean directlyBefore = true;
+    boolean directlyAfter = true;
+    if  (kid.getChildren().size()==2) {
+      directlyBefore = isMeaningfullWhitespace(kid);
+      directlyAfter = !directlyBefore;
+    } else if (kid.getChildren().size()==3) {
+      directlyBefore = false;
+      directlyAfter = false;
+    }
+      
+    startNewSelector(new NestedSelectorAppender(kid, directlyBefore, directlyAfter));
+    // Ignore descendant combinator before appender. This info is already hidden in appender.isDirectlyBefore. 
+    if (isDescendant(currentSelector.getLeadingCombinator()))
+      currentSelector.setLeadingCombinator(null);
+  }
+
+  private boolean isDescendant(SelectorCombinator combinator) {
+    return combinator!=null && combinator.getCombinator()==Combinator.DESCENDANT;
+  }
+
+  private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {
+    int type = kid.getChild(0).getType();
+    return type == LessLexer.MEANINGFULL_WHITESPACE || type == LessLexer.DUMMY_MEANINGFULL_WHITESPACE;
+  }
+
+  private void startNewSelector(SelectorPart head) {
     Selector newSelector = new Selector(token);
     newSelector.setLeadingCombinator(consumeLastCombinator());
     if (currentSelector != null) {
       currentSelector.setRight(newSelector);
-    }
+    } 
 
     currentSelector = newSelector;
+    currentSelector.setHead(head);
 
     if (result == null)
       result = currentSelector;

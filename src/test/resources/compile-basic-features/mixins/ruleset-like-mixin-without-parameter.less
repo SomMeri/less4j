@@ -1,3 +1,25 @@
+//this will break after issue #47
+//this:
+//#allAreUsedHere {
+//  declaration: mixinNoParam;
+//  last: last;
+//  declaration: mixinNoParam;
+//  last: last;
+//  this-will-survive-too: funny;
+//  declaration: nestedMixin;
+//  declaration: nestedMixinScoped;
+//  this-will-survive-too: funny;
+//  declaration: nestedMixin;
+//  declaration: nestedMixinScoped;
+//}
+//will change into:
+//#allAreUsedHere {
+//  declaration: mixinNoParam;
+//  last: last;
+//  this-will-survive-too: funny;
+//  declaration: nestedMixin;
+//  declaration: nestedMixinScoped;
+//}
 .mixinNoParam {
   declaration: mixinNoParam;
 }

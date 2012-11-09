@@ -1,0 +1,74 @@
+h1,
+h2 {
+  declaration: value;
+}
+em h1 h3 h1 h4 h1,
+em h1 h3 h1 h4 h2,
+em h1 h3 h2 h4 h1,
+em h1 h3 h2 h4 h2,
+em h2 h3 h1 h4 h1,
+em h2 h3 h1 h4 h2,
+em h2 h3 h2 h4 h1,
+em h2 h3 h2 h4 h2 {
+  declaration: 3 4;
+}
+h1,
+h2 {
+  declaration: value;
+}
+p h1 + h1 em,
+p h1 + h2 em,
+p h2 + h1 em,
+p h2 + h2 em {
+  declaration: 3 4;
+}
+h1,
+h2 {
+  declaration: value;
+}
+p h1 h1 em,
+p h1 h2 em,
+p h2 h1 em,
+p h2 h2 em {
+  declaration: 3 4;
+}
+h1,
+h2 {
+  declaration: value;
+}
+nameh1 h1:hover,
+nameh1 h2:hover,
+nameh2 h1:hover,
+nameh2 h2:hover {
+  declaration: 3 4;
+}
+h1,
+h2 {
+  declaration: value;
+}
+p:nth-child(3n+1) h1 h1 :hover,
+p:nth-child(3n+1) h1 h2 :hover,
+p:nth-child(3n+1) h2 h1 :hover,
+p:nth-child(3n+1) h2 h2 :hover {
+  declaration: 3 4;
+}
+h1,
+h2 {
+  declaration: value;
+}
+.nameh1 + h1:hover,
+.nameh1 + h2:hover,
+.nameh2 + h1:hover,
+.nameh2 + h2:hover {
+  declaration: 3 4;
+}
+:visit,
+:nth-child(4n+2) {
+  declaration: value;
+}
+.name:visit:hover,
+.name:nth-child(4n+2):hover,
+.class:visit:hover,
+.class:nth-child(4n+2):hover {
+  declaration: 3 4;
+}

@@ -6,7 +6,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class SimpleSelector extends ASTCssNode implements Cloneable {
+public class SimpleSelector extends SelectorPart implements Cloneable {
 
   private String elementName;
   private boolean isStar;

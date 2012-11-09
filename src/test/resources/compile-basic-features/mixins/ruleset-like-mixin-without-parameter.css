@@ -9,11 +9,9 @@
   this-will-survive-too: funny;
   declaration: nestedMixin;
   declaration: nestedMixinScoped;
-  declaration: redefined;
   this-will-survive-too: funny;
   declaration: nestedMixin;
   declaration: nestedMixinScoped;
-  declaration: redefined;
 }
 #allAreUsedHere .nestedMixin {
   this-will-survive-too: funny;

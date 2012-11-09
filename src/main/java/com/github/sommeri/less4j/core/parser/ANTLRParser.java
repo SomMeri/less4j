@@ -53,7 +53,7 @@ public class ANTLRParser {
   
   private ParseResult parse(String input, InputType inputType) {
     try {
-      //DebugPrint.printTokenStream(input);
+//      DebugPrint.printTokenStream(input);
       List<AntlrException> errors = new ArrayList<AntlrException>();
       LessLexer lexer = createLexer(input, errors);
 
@@ -63,7 +63,7 @@ public class ANTLRParser {
       
       HiddenTokenAwareTree ast = (HiddenTokenAwareTree) returnScope.getTree();
       merge(ast, tokenSource.getCollectedTokens());
-      //DebugPrint.print(ast);
+//      DebugPrint.print(ast);
       return new ParseResultImpl(ast, new ArrayList<AntlrException>(errors));
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");

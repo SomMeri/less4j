@@ -51,7 +51,7 @@ public class RuleSet extends ASTCssNode {
     if (!hasSimpleSelecor())
       return false;
     
-    SimpleSelector selector = selectors.get(0).getHead();
+    SelectorPart selector = selectors.get(0).getHead();
     return selector.isSingleClassSelector();
   }
 
@@ -59,7 +59,7 @@ public class RuleSet extends ASTCssNode {
     if (!hasSimpleSelecor())
       return false;
     
-    SimpleSelector selector = selectors.get(0).getHead();
+    SelectorPart selector = selectors.get(0).getHead();
     return selector.isSingleIdSelector();
   }
 
@@ -79,7 +79,11 @@ public class RuleSet extends ASTCssNode {
    * @return 
    */
   public PureMixin convertToMixin() {
-    CssClass className = (CssClass)selectors.get(0).getHead().getSubsequent().get(0);
+    if (!isMixin()) //TODO throw warning here
+      return null;
+    
+    SimpleSelector head = (SimpleSelector) selectors.get(0).getHead();
+    CssClass className = (CssClass)head.getSubsequent().get(0);
     PureMixin pureMixin = new PureMixin(getUnderlyingStructure(), className.clone());
     pureMixin.setBody(getBody().clone());
     pureMixin.configureParentToAllChilds();
@@ -91,7 +95,10 @@ public class RuleSet extends ASTCssNode {
    * @return 
    */
   public String extractNamespaceName() {
-    SimpleSelector selector = selectors.get(0).getHead();
+    if (!isNamespace())
+      return "#error#"; //TODO throw some warning or whatever
+    
+    SimpleSelector selector = (SimpleSelector)selectors.get(0).getHead();
     if (hasSingleClassSelector()) {
       CssClass name = (CssClass)selector.getSubsequent().get(0);
       return name.getFullName();
@@ -121,6 +128,7 @@ public class RuleSet extends ASTCssNode {
   }
 
   public void replaceSelectors(List<Selector> result) {
+    //TODO: make old selectors forget the parent
     selectors = new ArrayList<Selector>();
     selectors.addAll(result);
   }
