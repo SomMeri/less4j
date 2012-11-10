@@ -8,7 +8,6 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
 //TODO write to some antlr document about token names in parser!!!
-//TODO: operations-no-colors-no-mixins-lessjs.less <- check whether it started to work or not
 public class ExpressionsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/expressions/";

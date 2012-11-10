@@ -97,4 +97,19 @@ public class Selector extends ASTCssNode implements Cloneable {
     return builder.toString();
   }
 
+  public NestedSelectorAppender findFirstAppender() {
+    if (getHead().isAppender()) {
+      return (NestedSelectorAppender) getHead();
+    }
+
+    if (!hasRight())
+      return null;
+
+    return getRight().findFirstAppender();
+  }
+
+  public boolean containsAppender() {
+    return findFirstAppender() != null;
+  }
+
 }

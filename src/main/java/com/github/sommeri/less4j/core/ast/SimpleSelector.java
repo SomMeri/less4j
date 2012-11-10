@@ -113,7 +113,6 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
   }
 
   public void extendName(String extension) {
-    //FIXME: handle star
     if (isStar) {
       isStar=false;
       setElementName("*" + extension);

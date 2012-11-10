@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-//FIXME: test special case: & & and &&
 public class NestedSelectorAppender extends SelectorPart {
 
   private boolean directlyBefore;

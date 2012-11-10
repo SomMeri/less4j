@@ -41,6 +41,7 @@ public class ASTManipulator {
 
     Body pBody = (Body) parent;
     pBody.removeMember(node);
+    node.setParent(null);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

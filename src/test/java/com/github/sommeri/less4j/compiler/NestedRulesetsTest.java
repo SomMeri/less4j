@@ -7,11 +7,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
-//TODO: document css pasring issues and solutions
-//FIXME: split appender into three: before after combined
-//TODO: less.js can not pass this &<& It can pass & < & 
-//TODO: document difference in the name+& handling of spaces (us: name + h1 less.js: name+h1)
-//TODO: document difference in "h1 + {" handling (us: fail, less.js ignore that plus entirely)
+//TODO: document css parsing issues and solutions
 public class NestedRulesetsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/nested-rulesets/";

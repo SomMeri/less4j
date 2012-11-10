@@ -98,7 +98,6 @@ public class ExpressionEvaluator {
     return (CssString) evaluate;
   }
 
-  //FIXME: refactoring change to reusable expression type switch
   public Expression evaluate(Expression input) {
     switch (input.getType()) {
     case FUNCTION:
