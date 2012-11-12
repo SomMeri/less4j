@@ -27,7 +27,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   //    private static final String inputLess = "src/test/resources/minitests/mixins-guards.less";
   //    private static final String outputCss = "src/test/resources/minitests/mixins-guards.css";
 
-  // *** fail because of namespaces - those are not implemented
+  // *** fail because of wrong mixins reference - does not accept #mixin see debug.less
 //    private static final String inputLess = "src/test/resources/minitests/mixins.less";
 //    private static final String outputCss = "src/test/resources/minitests/mixins.css";
 
