@@ -339,14 +339,16 @@ ruleset_body
     : LBRACE
             (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
                | (ruleSet)=> a+=ruleSet
-               | (mixinReference)=>a+=mixinReference
-               | (namespaceReference)=>a+=namespaceReference
+               | (mixinReferenceWithSemi)=>a+=mixinReferenceWithSemi
+               | (namespaceReferenceWithSemi)=>a+=namespaceReferenceWithSemi
                | (pureMixinDeclaration)=>a+=pureMixinDeclaration 
                | (HASH LPAREN) => pureNamespace
                | a+=variabledeclaration
              )*
              (  
-                ( a+=declaration RBRACE)
+                ( (declaration)=>a+=declaration RBRACE)
+                | ( (mixinReference)=>a+=mixinReference RBRACE)
+                | ( (namespaceReference)=>a+=namespaceReference RBRACE)
                 | RBRACE
              )
      -> ^(BODY $a*);
@@ -484,12 +486,20 @@ pureNamespace
     ;
 
 namespaceReference
-    : (a+=namespaceName GREATER)* c+=mixinReference -> ^(NAMESPACE_REFERENCE $a* $c);
+    : (a+=namespaceName GREATER)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
+
+namespaceReferenceWithSemi
+    : (a+=namespaceName GREATER)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
 
 namespaceName
     : cssClass | HASH;
 
 mixinReference
+    : a=cssClass (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
+    -> ^(MIXIN_REFERENCE $a $b* $c*)
+    ; 
+
+mixinReferenceWithSemi
     : a=cssClass (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
