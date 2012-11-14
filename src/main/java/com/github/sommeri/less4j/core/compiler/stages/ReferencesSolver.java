@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -19,10 +20,11 @@ import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class ReferencesSolver {
 
-  private static final String ALL_ARGUMENTS = "@arguments";
+  public static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
 
   public void solveReferences(ASTCssNode node, Scope scope) {
@@ -61,7 +63,7 @@ public class ReferencesSolver {
     }
     }
 
-    if (node.getType()!=ASTCssNodeType.NAMESPACE_REFERENCE) {
+    if (node.getType() != ASTCssNodeType.NAMESPACE_REFERENCE) {
       List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       for (ASTCssNode kid : childs) {
         if (AstLogic.hasOwnScope(kid)) {
@@ -136,49 +138,121 @@ public class ReferencesSolver {
   public static Scope joinScopes(Scope mixinsScope, Scope arguments, Scope callerScope) {
     Scope result = mixinsScope.copyWithChildChain(arguments);
     Scope mixinsScopeParent = mixinsScope.getParent();
-    if (mixinsScopeParent!=null)
+    if (mixinsScopeParent != null)
       arguments.setParent(mixinsScopeParent.copyWithParentsChain());
     Scope rootOfTheMixinsScope = result.getRootScope();
     rootOfTheMixinsScope.setParent(callerScope.copyWithParentsChain());
     return result;
   }
+
   private Scope buildMixinsArgumentsScope(MixinReference reference, Scope referenceScope, FullMixinDefinition mixin) {
-    Scope argumentsScope = Scope.createScope(reference, "#arguments-" + reference + "#", null);
-    ExpressionEvaluator referenceEvaluator = new ExpressionEvaluator(referenceScope);
-
-    List<Expression> allValues = new ArrayList<Expression>();
-
-    int length = mixin.getMixin().getParameters().size();
-    for (int i = 0; i < length; i++) {
-      ASTCssNode parameter = mixin.getMixin().getParameters().get(i);
-      if (parameter.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
-        ArgumentDeclaration declaration = (ArgumentDeclaration) parameter;
-        if (declaration.isCollector()) {
-          List<Expression> allArgumentsFrom = referenceEvaluator.evaluateAll(reference.getAllArgumentsFrom(i));
-          allValues.addAll(allArgumentsFrom);
-          Expression value = referenceEvaluator.joinAll(allArgumentsFrom, reference);
-          argumentsScope.registerVariable(declaration, value);
-        } else if (reference.hasParameter(i)) {
-          Expression value = referenceEvaluator.evaluate(reference.getParameter(i));
-          allValues.add(value);
-          argumentsScope.registerVariable(declaration, value);
-        } else {
-          if (declaration.getValue() == null)
-            CompileException.throwUndefinedMixinParameterValue(mixin.getMixin(), declaration, reference);
-
-          allValues.add(declaration.getValue());
-          argumentsScope.registerVariable(declaration);
-        }
-      }
-    }
-
-    Expression compoundedValues = referenceEvaluator.joinAll(allValues, reference);
-    argumentsScope.registerVariableIfNotPresent(ALL_ARGUMENTS, compoundedValues);
-    return argumentsScope;
+    ArgumentsBuilder builder = new ArgumentsBuilder(new ExpressionEvaluator(referenceScope), reference, mixin.getMixin());
+    return builder.build();
   }
 
   private RuleSetsBody resolveNamespaceReference(NamespaceReference reference, Scope scope) {
     List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference);
     return resolveReferencedMixins(reference.getFinalReference(), scope, sameNameMixins);
   }
+  
+}
+
+class ArgumentsBuilder {
+
+  //utils
+  private final ExpressionEvaluator referenceEvaluator;
+  private final String ALL_ARGUMENTS = ReferencesSolver.ALL_ARGUMENTS;
+
+  //input
+  private Iterator<Expression> positionalParameters;
+  private PureMixin mixin;
+  private MixinReference reference;
+
+  //results
+  private List<Expression> allValues = new ArrayList<Expression>();
+  private Scope argumentsScope;
+
+  public ArgumentsBuilder(ExpressionEvaluator referenceEvaluator, MixinReference reference, PureMixin pureMixin) {
+    super();
+    this.referenceEvaluator = referenceEvaluator;
+    positionalParameters = reference.getPositionalParameters().iterator();
+    argumentsScope = Scope.createScope(reference, "#arguments-" + reference + "#", null);
+    mixin = pureMixin;
+    this.reference = reference;
+  }
+
+  public Scope build() {
+    int length = mixin.getParameters().size();
+    for (int i = 0; i < length; i++) {
+      ASTCssNode parameter = mixin.getParameters().get(i);
+      if (parameter.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
+        add((ArgumentDeclaration) parameter);
+      } else {
+        skipPositionalParameter();
+      }
+          
+    } 
+    
+    Expression compoundedValues = referenceEvaluator.joinAll(allValues, reference);
+    argumentsScope.registerVariableIfNotPresent(ALL_ARGUMENTS, compoundedValues);
+    return argumentsScope;
+  }
+
+  private void skipPositionalParameter() {
+    positionalParameters.next();
+  }
+
+  private void add(ArgumentDeclaration declaration) {
+    if (canFillFromNamed(declaration)) {
+      fillFromNamed(declaration);
+    } else if (declaration.isCollector()) {
+      addAsCollector(declaration);
+    } else if (canFillFromPositional()) {
+      fillFromPositional(declaration);
+    } else if (hasDefault(declaration)) {
+      fillFromDefault(declaration);
+    } else {
+      if (declaration.getValue() == null)
+        CompileException.throwUndefinedMixinParameterValue(mixin, declaration, reference);
+    }
+
+  }
+
+  private void fillFromNamed(ArgumentDeclaration declaration) {
+    Expression value = referenceEvaluator.evaluate(reference.getNamedParameter(declaration.getVariable()));
+    allValues.add(value);
+    argumentsScope.registerVariable(declaration, value);
+  }
+
+  private boolean canFillFromNamed(ArgumentDeclaration declaration) {
+    return reference.hasNamedParameter(declaration.getVariable());
+  }
+
+  private void fillFromDefault(ArgumentDeclaration declaration) {
+    allValues.add(declaration.getValue());
+    argumentsScope.registerVariable(declaration);
+  }
+
+  private boolean hasDefault(ArgumentDeclaration declaration) {
+    return declaration.getValue() != null;
+  }
+
+  private void fillFromPositional(ArgumentDeclaration declaration) {
+    Expression value = referenceEvaluator.evaluate(positionalParameters.next());
+    allValues.add(value);
+    argumentsScope.registerVariable(declaration, value);
+  }
+
+  private boolean canFillFromPositional() {
+    return positionalParameters.hasNext();
+  }
+
+  private void addAsCollector(ArgumentDeclaration declaration) {
+    List<Expression> allArgumentsFrom = referenceEvaluator.evaluateAll(ArraysUtils.remaining(positionalParameters));
+    allValues.addAll(allArgumentsFrom);
+    Expression value = referenceEvaluator.joinAll(allArgumentsFrom, reference);
+    argumentsScope.registerVariable(declaration, value);
+
+  }
+
 }

@@ -264,7 +264,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       } else if (kid.getType() == LessLexer.IMPORTANT_SYM) {
         result.setImportant(true);
       } else { // anything else is a parameter
-        result.addParameter((Expression) switchOn(kid));
+        ASTCssNode parameter = switchOn(kid);
+        if (parameter.getType() == ASTCssNodeType.VARIABLE_DECLARATION)
+          result.addNamedParameter((VariableDeclaration) parameter);
+        else
+          result.addPositionalParameter((Expression) parameter);
       }
 
     }
@@ -644,10 +648,12 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     HiddenTokenAwareTree name = children.get(0);
     HiddenTokenAwareTree colon = children.get(1);
     HiddenTokenAwareTree expression = children.get(2);
-    HiddenTokenAwareTree semi = children.get(3);
-    colon.giveHidden(name, expression);
-    semi.giveHidden(expression, null);
-    token.addBeforeFollowing(semi.getFollowing());
+    if (children.size() > 3) {
+      HiddenTokenAwareTree semi = children.get(3);
+      colon.giveHidden(name, expression);
+      semi.giveHidden(expression, null);
+      token.addBeforeFollowing(semi.getFollowing());
+    }
 
     return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }

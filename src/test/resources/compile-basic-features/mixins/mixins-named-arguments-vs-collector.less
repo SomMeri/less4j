@@ -1,0 +1,33 @@
+.mixin(@a:defA, @b:defB, @c...) {
+  arguments: @a, @b;
+  collector: @c;
+  all: @arguments;
+}
+
+#all-unnamed {
+  .mixin();
+  .mixin(11);
+  .mixin(21, 22);
+  .mixin(31, 32, 33);
+  .mixin(41, 42, 43, 44);
+}
+
+#all-named {
+  .mixin(@a: 11);
+  .mixin(@b: 21, @a: 22);
+}
+
+#override-collector {
+  .mixin(@c: 11);
+  .mixin(@c: 21, 1);
+  .mixin(1, @c: 31);
+  .mixin(@c: 41, @b: 42, @a: 43);
+  .mixin(@c: 51, 1, 2, 3);
+  .mixin(1, 2, 3, @c: 61);
+}
+
+#combined {
+  .mixin(11, 12, 13, @a: a, @b: b);
+  .mixin(@a: a, @b: b, 21, 22, 23);
+}
+

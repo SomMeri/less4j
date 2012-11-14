@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.utils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -22,6 +23,14 @@ public class ArraysUtils {
     for (T t : list) {
       result.add((T)t.clone());
     }
+    return result;
+  }
+
+  public static <T> List<T> remaining(Iterator<T> iterator) {
+    List<T> result = new ArrayList<T>();
+    while (iterator.hasNext())
+      result.add(iterator.next());
+
     return result;
   }
 

@@ -243,6 +243,11 @@ variabledeclaration
     : VARIABLE COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* SEMI)
     ;
 
+//used in mixinReferenceArgument
+variabledeclarationLimitedNoSemi
+    : VARIABLE COLON (a+=mathExprHighPrior) -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* )
+    ;
+
 //This looks like the declaration, but does not allow a comma.
 pureMixinDeclarationParameter
     : VARIABLE ((b=COLON (a+=mathExprHighPrior)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION VARIABLE $b* $a*)
@@ -495,7 +500,7 @@ mixinReferenceArguments
     ;
 
 mixinReferenceArgument
-    : mathExprHighPrior
+    : mathExprHighPrior | variabledeclarationLimitedNoSemi
     ;
 
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway

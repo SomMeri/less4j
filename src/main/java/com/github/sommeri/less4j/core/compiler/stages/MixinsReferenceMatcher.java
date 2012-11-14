@@ -23,7 +23,7 @@ public class MixinsReferenceMatcher {
   }
 
   public List<FullMixinDefinition> filter(MixinReference reference, List<FullMixinDefinition> mixins) {
-    int requiredNumber = reference.getParameters().size();
+    int requiredNumber = reference.getNumberOfDeclaredParameters();
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixin : mixins) {
       if (hasRightNumberOfParameters(mixin.getMixin(), requiredNumber) && patternsMatch(reference, mixin.getMixin()))
@@ -39,15 +39,16 @@ public class MixinsReferenceMatcher {
     return hasRightNumberOfParameters;
   }
 
+  //FIXME: how does pattern matching and named arguments mix? This is most likely faulty
   private boolean patternsMatch(MixinReference reference, PureMixin mixin) {
     int i = 0;
     for (ASTCssNode parameter : mixin.getParameters()) {
       if (parameter instanceof Expression) {
-        if (!reference.hasParameter(i))
+        if (!reference.hasPositionalParameter(i))
           return false;
 
         Expression pattern = (Expression) parameter;
-        if (!comparator.equal(pattern, evaluator.evaluate(reference.getParameter(i))))
+        if (!comparator.equal(pattern, evaluator.evaluate(reference.getPositionalParameter(i))))
           return false;
       }
       i++;

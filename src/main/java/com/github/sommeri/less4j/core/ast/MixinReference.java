@@ -2,7 +2,9 @@ package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -10,7 +12,8 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 public class MixinReference extends ASTCssNode {
 
   private CssClass selector;
-  private List<Expression> parameters = new ArrayList<Expression>();
+  private List<Expression> positionalParameters = new ArrayList<Expression>();
+  private Map<String, Expression> namedParameters = new HashMap<String, Expression>();
   private boolean important = false;
 
   public MixinReference(HiddenTokenAwareTree token) {
@@ -29,20 +32,36 @@ public class MixinReference extends ASTCssNode {
     this.selector = selector;
   }
 
-  public List<Expression> getParameters() {
-    return parameters;
+  public List<Expression> getPositionalParameters() {
+    return positionalParameters;
   }
 
-  public boolean hasParameter(int parameterNumber) {
-    return getParameters().size() > parameterNumber;
+  public int getNumberOfDeclaredParameters() {
+    return positionalParameters.size() + namedParameters.size();
+  }
+
+  public boolean hasNamedParameter(Variable variable) {
+    return namedParameters.containsKey(variable.getName());
+  }
+
+  public Expression getNamedParameter(Variable variable) {
+    return namedParameters.get(variable.getName());
+  }
+
+  public boolean hasPositionalParameter(int parameterNumber) {
+    return getPositionalParameters().size() > parameterNumber;
   }
   
-  public Expression getParameter(int parameterNumber) {
-    return getParameters().get(parameterNumber);
+  public Expression getPositionalParameter(int parameterNumber) {
+    return getPositionalParameters().get(parameterNumber);
   }
 
-  public void addParameter(Expression parameter) {
-    this.parameters.add(parameter);
+  public void addPositionalParameter(Expression parameter) {
+    this.positionalParameters.add(parameter);
+  }
+
+  public void addNamedParameter(VariableDeclaration parameter) {
+    this.namedParameters.put(parameter.getVariable().getName(), parameter.getValue());
   }
 
   public boolean isImportant() {
@@ -56,7 +75,7 @@ public class MixinReference extends ASTCssNode {
   @Override
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)selector);
-    result.addAll(parameters);
+    result.addAll(positionalParameters);
     return result;
   }
 
@@ -74,14 +93,14 @@ public class MixinReference extends ASTCssNode {
   public MixinReference clone() {
     MixinReference result = (MixinReference) super.clone();
     result.selector = selector==null?null:selector.clone();
-    result.parameters = ArraysUtils.deeplyClonedList(parameters);
+    result.positionalParameters = ArraysUtils.deeplyClonedList(positionalParameters);
     result.configureParentToAllChilds();
     return result;
   }
 
-  public List<Expression> getAllArgumentsFrom(int startIndx) {
-    if (hasParameter(startIndx))
-      return parameters.subList(startIndx, parameters.size());
+  public List<Expression> getAllPositionalArgumentsFrom(int startIndx) {
+    if (hasPositionalParameter(startIndx))
+      return positionalParameters.subList(startIndx, positionalParameters.size());
     
     return Collections.emptyList();
   }

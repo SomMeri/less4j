@@ -1,0 +1,60 @@
+.mixin(@a:defA, @b:defB, @c:defC) {
+  arguments1: @a, @b, @c;
+  collector1: @arguments;
+}
+
+.mixinWithLastDefault(@a, @b:defB, @c:defC) {
+  arguments2: @a, @b, @c;
+  collector2: @arguments;
+}
+
+.mixinWithHole(@a:defA, @b, @c:defC) {
+  arguments3: @a, @b, @c;
+  collector3: @arguments;
+}
+
+#allUnnamed {
+  .mixin(1, 2, 3);
+}
+
+#allNamed {
+  .mixin(@c:1, @b:2, @a:3);
+}
+
+#conflicts-first-named {
+  .mixin(@a:a1);
+  .mixin(@a:a2, 1);
+  .mixin(@a:a3, 1, 2);
+  .mixin(@b:b1);
+  .mixin(@b:b2, 1);
+  .mixin(@b:b3, 1, 2);
+  .mixin(@c:c1);
+  .mixin(@c:c2, 1);
+  .mixin(@c:c3, 1, 2);
+}
+
+#conflicts-second-named {
+  .mixin(1, @a:a1);
+  .mixin(1, @a:a2, 2);
+  .mixin(1, @b:b1);
+  .mixin(1, @b:b2, 2);
+  .mixin(1, @c:c1);
+  .mixin(1, @c:c2, 2);
+}
+
+#conflicts-third-named {
+  .mixin(1, 2, @a:a);
+  .mixin(1, 2, @b:b);
+  .mixin(1, 2, @c:c);
+}
+
+#wrong-name-tolerance {
+  .mixin(@d: d);
+}
+
+#if-missing-default {
+  .mixinWithHole(@c:11, @b:12, @a:13);
+  .mixinWithHole(1, 2, 3);
+  .mixinWithLastDefault(@c:11, @b:12, @a:13);
+  .mixinWithLastDefault(1, 2, 3);
+}

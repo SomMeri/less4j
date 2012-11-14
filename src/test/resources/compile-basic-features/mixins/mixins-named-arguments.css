@@ -1,0 +1,64 @@
+#allUnnamed {
+  arguments1: 1, 2, 3;
+  collector1: 1 2 3;
+}
+#allNamed {
+  arguments1: 3, 2, 1;
+  collector1: 3 2 1;
+}
+#conflicts-first-named {
+  arguments1: a1, defB, defC;
+  collector1: a1 defB defC;
+  arguments1: a2, 1, defC;
+  collector1: a2 1 defC;
+  arguments1: a3, 1, 2;
+  collector1: a3 1 2;
+  arguments1: defA, b1, defC;
+  collector1: defA b1 defC;
+  arguments1: 1, b2, defC;
+  collector1: 1 b2 defC;
+  arguments1: 1, b3, 2;
+  collector1: 1 b3 2;
+  arguments1: defA, defB, c1;
+  collector1: defA defB c1;
+  arguments1: 1, defB, c2;
+  collector1: 1 defB c2;
+  arguments1: 1, 2, c3;
+  collector1: 1 2 c3;
+}
+#conflicts-second-named {
+  arguments1: a1, 1, defC;
+  collector1: a1 1 defC;
+  arguments1: a2, 1, 2;
+  collector1: a2 1 2;
+  arguments1: 1, b1, defC;
+  collector1: 1 b1 defC;
+  arguments1: 1, b2, 2;
+  collector1: 1 b2 2;
+  arguments1: 1, defB, c1;
+  collector1: 1 defB c1;
+  arguments1: 1, 2, c2;
+  collector1: 1 2 c2;
+}
+#conflicts-third-named {
+  arguments1: a, 1, 2;
+  collector1: a 1 2;
+  arguments1: 1, b, 2;
+  collector1: 1 b 2;
+  arguments1: 1, 2, c;
+  collector1: 1 2 c;
+}
+#wrong-name-tolerance {
+  arguments1: defA, defB, defC;
+  collector1: defA defB defC;
+}
+#if-missing-default {
+  arguments3: 13, 12, 11;
+  collector3: 13 12 11;
+  arguments3: 1, 2, 3;
+  collector3: 1 2 3;
+  arguments2: 13, 12, 11;
+  collector2: 13 12 11;
+  arguments2: 1, 2, 3;
+  collector2: 1 2 3;
+}
