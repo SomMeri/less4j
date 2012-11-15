@@ -230,7 +230,7 @@ bodylist
     ;
     
 bodyset
-    : (cssClass LPAREN)=>pureMixinDeclaration
+    : (mixinName LPAREN)=>pureMixinDeclaration
     | (HASH LPAREN)=>pureNamespace
     | ruleSet
     | media
@@ -495,12 +495,12 @@ namespaceName
     : cssClass | HASH;
 
 mixinReference
-    : a=cssClass (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
+    : a=mixinName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 
 mixinReferenceWithSemi
-    : a=cssClass (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
+    : a=mixinName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 
@@ -512,10 +512,13 @@ mixinReferenceArguments
 mixinReferenceArgument
     : mathExprHighPrior | variabledeclarationLimitedNoSemi
     ;
+    
+mixinName
+    : cssClass ;
 
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 pureMixinDeclaration 
-    : a=cssClass LPAREN c=pureMixinDeclarationArguments? RPAREN e=pureMixinGuards? f=ruleset_body
+    : a=mixinName LPAREN c=pureMixinDeclarationArguments? RPAREN e=pureMixinGuards? f=ruleset_body
     -> ^(PURE_MIXIN $a $c* $e* $f)
     ;
 
