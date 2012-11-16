@@ -59,8 +59,7 @@ tokens {
   BODY;
   MIXIN_REFERENCE;
   NAMESPACE_REFERENCE;
-  PURE_NAMESPACE;
-  PURE_MIXIN;
+  REUSABLE_STRUCTURE;
   MIXIN_PATTERN;
   GUARD_CONDITION;
   GUARD;
@@ -230,8 +229,7 @@ bodylist
     ;
     
 bodyset
-    : (mixinName LPAREN)=>pureMixinDeclaration
-    | (HASH LPAREN)=>pureNamespace
+    : (reusableStructureName LPAREN)=>reusableStructure
     | ruleSet
     | media
     | page
@@ -249,7 +247,7 @@ variabledeclarationLimitedNoSemi
     ;
 
 //This looks like the declaration, but does not allow a comma.
-pureMixinDeclarationParameter
+reusableStructureParameter
     : VARIABLE ((b=COLON (a+=mathExprHighPrior)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION VARIABLE $b* $a*)
     ;
 
@@ -341,8 +339,7 @@ ruleset_body
                | (ruleSet)=> a+=ruleSet
                | (mixinReferenceWithSemi)=>a+=mixinReferenceWithSemi
                | (namespaceReferenceWithSemi)=>a+=namespaceReferenceWithSemi
-               | (pureMixinDeclaration)=>a+=pureMixinDeclaration 
-               | (HASH LPAREN) => pureNamespace
+               | (reusableStructure)=>a+=reusableStructure 
                | a+=variabledeclaration
              )*
              (  
@@ -386,12 +383,20 @@ esPred
     | LBRACKET
     | COLON
     ;
+
+hashOrCssClass    
+    :   HASH -> ^(ELEMENT_SUBSEQUENT ^(ID_SELECTOR HASH))
+        | cssClass -> ^(ELEMENT_SUBSEQUENT cssClass)
+    ;
     
+attribOrPseudo
+    :   attrib -> ^(ELEMENT_SUBSEQUENT attrib)
+        | pseudo -> ^(ELEMENT_SUBSEQUENT pseudo)
+    ;
+
 elementSubsequent
-    : HASH -> ^(ELEMENT_SUBSEQUENT ^(ID_SELECTOR HASH))
-      | cssClass -> ^(ELEMENT_SUBSEQUENT cssClass)
-      | attrib -> ^(ELEMENT_SUBSEQUENT attrib)
-      | pseudo -> ^(ELEMENT_SUBSEQUENT pseudo)
+    :   hashOrCssClass
+      | attribOrPseudo
     ;
 
 //TODO Document: a class name can be also a number e.g., .56 or .5cm
@@ -480,27 +485,19 @@ pseudoparameters:
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
 
-pureNamespace 
-    : a=HASH LPAREN RPAREN f=ruleset_body
-    -> ^(PURE_NAMESPACE ^(ID_SELECTOR $a) $f)
-    ;
-
 namespaceReference
-    : (a+=namespaceName GREATER)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
+    : (a+=reusableStructureName GREATER)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
 
 namespaceReferenceWithSemi
-    : (a+=namespaceName GREATER)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
-
-namespaceName
-    : cssClass | HASH;
+    : (a+=reusableStructureName GREATER)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
 
 mixinReference
-    : a=mixinName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
+    : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 
 mixinReferenceWithSemi
-    : a=mixinName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
+    : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 
@@ -513,16 +510,16 @@ mixinReferenceArgument
     : mathExprHighPrior | variabledeclarationLimitedNoSemi
     ;
     
-mixinName
-    : cssClass ;
+reusableStructureName
+    : hashOrCssClass;
 
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
-pureMixinDeclaration 
-    : a=mixinName LPAREN c=pureMixinDeclarationArguments? RPAREN e=pureMixinGuards? f=ruleset_body
-    -> ^(PURE_MIXIN $a $c* $e* $f)
+reusableStructure 
+    : a=reusableStructureName LPAREN c=reusableStructureArguments? RPAREN e=reusableStructureGuards? f=ruleset_body
+    -> ^(REUSABLE_STRUCTURE $a $c* $e* $f)
     ;
 
-pureMixinGuards
+reusableStructureGuards
     : ({predicates.isWhenKeyword(input.LT(1))}?) IDENT b+=guard (COMMA d+=guard)*
     -> $b $d*
     ;
@@ -543,18 +540,18 @@ compareOperator
     ;     
     
 //It is OK to loose commas, because mixins are going to be lost anyway    
-pureMixinDeclarationArguments
-    : a+=pureMixinDeclarationArgument ( COMMA a+=pureMixinDeclarationArgument)* (COMMA b+=DOT3)?
+reusableStructureArguments
+    : a+=reusableStructureArgument ( COMMA a+=reusableStructureArgument)* (COMMA b+=DOT3)?
     -> $a* $b*
     | DOT3
     ;
 
-pureMixinDeclarationArgument
-    : pureMixinDeclarationParameter
-    | pureMixinDeclarationPattern
+reusableStructureArgument
+    : reusableStructureParameter
+    | reusableStructurePattern
     ;
 
-pureMixinDeclarationPattern
+reusableStructurePattern
     : (( a+=unaryOperator? (a+=value_term)
     ) | (
        a+=unsigned_value_term

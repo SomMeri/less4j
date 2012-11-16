@@ -18,7 +18,10 @@ public class PseudoElement extends Pseudo {
     this.level12Form = level12Form;
   }
 
-  
+  public String getFullName() {
+    return "::"+getName();
+  }
+
   public boolean isLevel12Form() {
     return level12Form;
   }

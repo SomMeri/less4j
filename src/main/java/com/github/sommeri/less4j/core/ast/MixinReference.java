@@ -11,7 +11,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class MixinReference extends ASTCssNode {
 
-  private CssClass selector;
+  private ElementSubsequent selector;
   private List<Expression> positionalParameters = new ArrayList<Expression>();
   private Map<String, Expression> namedParameters = new HashMap<String, Expression>();
   private boolean important = false;
@@ -20,15 +20,15 @@ public class MixinReference extends ASTCssNode {
     super(token);
   }
 
-  public CssClass getSelector() {
+  public ElementSubsequent getSelector() {
     return selector;
   }
 
   public String getName() {
-    return getSelector().getName();
+    return getSelector().getFullName();
   }
 
-  public void setSelector(CssClass selector) {
+  public void setSelector(ElementSubsequent selector) {
     this.selector = selector;
   }
 

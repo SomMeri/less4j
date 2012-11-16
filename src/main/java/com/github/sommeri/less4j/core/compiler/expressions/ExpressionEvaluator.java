@@ -25,9 +25,9 @@ import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
-import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
@@ -327,7 +327,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public void registerMixin(PureMixin mixin, Scope mixinsBodyScope) {
+  public void registerMixin(ReusableStructure mixin, Scope mixinsBodyScope) {
   }
 
   @Override

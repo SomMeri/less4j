@@ -10,9 +10,18 @@ public abstract class ElementSubsequent extends ASTCssNode {
 
   public abstract String getName();
 
+  public abstract String getFullName();
+
   public abstract void setName(String name);
 
   public void extendName(String extension) {
     setName(getName() + extension);
   }
+  
+  @Override
+  public ElementSubsequent clone() {
+    ElementSubsequent result = (ElementSubsequent) super.clone();
+    return result;
+  }
+
 }

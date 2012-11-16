@@ -5,9 +5,8 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.PureMixin;
-import com.github.sommeri.less4j.core.ast.PureNamespace;
 import com.github.sommeri.less4j.core.ast.RuleSet;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
@@ -49,8 +48,8 @@ public class ScopeExtractor {
       if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
         currentScope.registerVariable((VariableDeclaration) kid);
         manipulator.removeFromBody(kid);
-      } else if (kid.getType() == ASTCssNodeType.PURE_MIXIN) {
-        PureMixin mixin = (PureMixin) kid;
+      } else if (kid.getType() == ASTCssNodeType.REUSABLE_STRUCTURE) {
+        ReusableStructure mixin = (ReusableStructure) kid;
         Scope bodyScope = currentScope.getChildOwnerOf(mixin.getBody());
         currentScope.registerMixin(mixin, bodyScope);
         
@@ -58,16 +57,11 @@ public class ScopeExtractor {
         manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.RULE_SET) {
         RuleSet ruleSet = (RuleSet) kid;
-        if (ruleSet.isMixin()) { 
+        if (ruleSet.isReusableStructure()) { 
           Scope bodyScope = currentScope.getChildOwnerOf(ruleSet.getBody());
-          currentScope.registerMixin(ruleSet.convertToMixin(), bodyScope);
+          currentScope.registerMixin(ruleSet.convertToReusableStructure(), bodyScope);
         }
-      } else if (kid.getType() == ASTCssNodeType.PURE_NAMESPACE) {
-        PureNamespace namespace = (PureNamespace) kid;
-        Scope bodyScope = currentScope.getChildOwnerOf(namespace.getBody());
-        bodyScope.removedFromTree();
-        manipulator.removeFromBody(kid);
-      }
+      } 
     }
 
     Scope result = currentScope;
@@ -79,13 +73,13 @@ public class ScopeExtractor {
 
   private String representedNamedScope(ASTCssNode node) {
     switch (node.getType()) {
-    case PURE_NAMESPACE:
-      return ((PureNamespace) node).getName();
+    case REUSABLE_STRUCTURE:
+      return ((ReusableStructure) node).getName();
 
     case RULE_SET: {
       RuleSet ruleSet = (RuleSet) node;
-      if (ruleSet.isNamespace())
-        return ruleSet.extractNamespaceName();
+      if (ruleSet.isReusableStructure())
+        return ruleSet.extractReusableStructureName();
 
       return null;
     }

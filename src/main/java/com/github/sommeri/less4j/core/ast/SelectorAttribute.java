@@ -26,6 +26,10 @@ public class SelectorAttribute extends ElementSubsequent {
     return name;
   }
 
+  public String getFullName() {
+    return getName();
+  }
+  
   public SelectorOperator getOperator() {
     return operator;
   }

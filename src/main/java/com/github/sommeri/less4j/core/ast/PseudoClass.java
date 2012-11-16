@@ -18,6 +18,10 @@ public class PseudoClass extends Pseudo {
     super(token, name);
   }
 
+  public String getFullName() {
+    return ":"+getName();
+  }
+
   public boolean hasParameters() {
     return getParameter()!=null;
   }

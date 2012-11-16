@@ -65,7 +65,7 @@ public class SelectorBuilder {
   }
 
   public void addSubsequent(HiddenTokenAwareTree kid) {
-    currentSimpleSelector.addSubsequent((ElementSubsequent)parentBuilder.switchOn(kid.getChild(0)));
+    currentSimpleSelector.addSubsequent((ElementSubsequent)parentBuilder.switchOn(kid));
   }
 
   private void addWithImplicitStar(HiddenTokenAwareTree kid) {

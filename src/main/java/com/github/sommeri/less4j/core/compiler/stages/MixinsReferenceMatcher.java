@@ -6,7 +6,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
-import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionComparator;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
@@ -32,7 +32,7 @@ public class MixinsReferenceMatcher {
     return result;
   }
 
-  private boolean hasRightNumberOfParameters(PureMixin mixin, int requiredNumber) {
+  private boolean hasRightNumberOfParameters(ReusableStructure mixin, int requiredNumber) {
     int allDefined = mixin.getParameters().size();
     int mandatory = mixin.getMandatoryParameters().size();
     boolean hasRightNumberOfParameters = requiredNumber >= mandatory && (requiredNumber <= allDefined || mixin.hasCollectorParameter());
@@ -40,7 +40,7 @@ public class MixinsReferenceMatcher {
   }
 
   //FIXME: how does pattern matching and named arguments mix? This is most likely faulty
-  private boolean patternsMatch(MixinReference reference, PureMixin mixin) {
+  private boolean patternsMatch(MixinReference reference, ReusableStructure mixin) {
     int i = 0;
     for (ASTCssNode parameter : mixin.getParameters()) {
       if (parameter instanceof Expression) {

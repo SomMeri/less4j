@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
-import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
 
 public class Scope {
@@ -85,7 +85,7 @@ public class Scope {
     return value;
   }
   
-  public void registerMixin(PureMixin mixin, Scope mixinsBodyScope) {
+  public void registerMixin(ReusableStructure mixin, Scope mixinsBodyScope) {
     mixins.registerMixin(new FullMixinDefinition(mixin, mixinsBodyScope));
   }
 

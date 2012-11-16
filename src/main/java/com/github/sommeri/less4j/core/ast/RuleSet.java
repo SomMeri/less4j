@@ -3,7 +3,6 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -39,11 +38,7 @@ public class RuleSet extends ASTCssNode {
     this.body = body;
   }
 
-  public boolean isMixin() {
-    return hasSingleClassSelector();
-  }
-
-  public boolean isNamespace() {
+  public boolean isReusableStructure() {
     return hasSingleClassSelector() || hasSingleIdSelector();
   }
 
@@ -78,38 +73,29 @@ public class RuleSet extends ASTCssNode {
    * Behavior of this method is undefined if it is not mixin.
    * @return 
    */
-  public PureMixin convertToMixin() {
-    if (!isMixin()) //TODO throw warning here
+  public ReusableStructure convertToReusableStructure() {
+    if (!isReusableStructure()) //TODO throw warning here
       return null;
     
     SimpleSelector head = (SimpleSelector) selectors.get(0).getHead();
-    CssClass className = (CssClass)head.getSubsequent().get(0);
-    PureMixin pureMixin = new PureMixin(getUnderlyingStructure(), className.clone());
-    pureMixin.setBody(getBody().clone());
-    pureMixin.configureParentToAllChilds();
-    return pureMixin;
+    ElementSubsequent className = (ElementSubsequent)head.getSubsequent().get(0);
+    ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), className.clone());
+    reusable.setBody(getBody().clone());
+    reusable.configureParentToAllChilds();
+    return reusable;
   }
 
   /**
    * Behavior of this method is undefined if it is not a namespace.
    * @return 
    */
-  public String extractNamespaceName() {
-    if (!isNamespace())
+  public String extractReusableStructureName() {
+    if (!isReusableStructure())
       return "#error#"; //TODO throw some warning or whatever
     
     SimpleSelector selector = (SimpleSelector)selectors.get(0).getHead();
-    if (hasSingleClassSelector()) {
-      CssClass name = (CssClass)selector.getSubsequent().get(0);
-      return name.getFullName();
-    }
-    if (hasSingleIdSelector()) {
-      IdSelector name = (IdSelector)selector.getSubsequent().get(0);
-      return name.getFullName();
-    }
-    
-    //TODO throw special programming exception or something
-    throw new CompileException("Not a namespace, can not extract the name.", this);
+    ElementSubsequent name = selector.getSubsequent().get(0);
+    return name.getFullName();
   }
 
   @Override

@@ -2,247 +2,184 @@ package com.github.sommeri.less4j.core.parser;
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
 
-
-
 public abstract class TokenTypeSwitch<T> {
-  
+
   public T switchOn(HiddenTokenAwareTree token) {
     int type = token.getType();
-    
-    if (type==LessLexer.RULESET) {
+
+    if (type == LessLexer.ELEMENT_SUBSEQUENT) {
+      return handleElementSubsequent(token);
+    }
+
+    if (type == LessLexer.RULESET) {
       return handleRuleSet(token);
     }
 
-    if (type==LessLexer.CSS_CLASS) {
+    if (type == LessLexer.CSS_CLASS) {
       return handleCssClass(token);
     }
-    
-    if (type==LessLexer.PSEUDO) {
+
+    if (type == LessLexer.PSEUDO) {
       return handlePseudo(token);
     }
-    
-    if (type==LessLexer.EOF) {
+
+    if (type == LessLexer.EOF) {
       return handleEOF(token);
     }
 
-    if (type==LessLexer.SELECTOR) {
+    if (type == LessLexer.SELECTOR) {
       return handleSelector(token);
     }
 
-    if (type==LessLexer.STYLE_SHEET) {
+    if (type == LessLexer.STYLE_SHEET) {
       return handleStyleSheet(token);
     }
 
-    if (type==LessLexer.ATTRIBUTE) {
+    if (type == LessLexer.ATTRIBUTE) {
       return handleSelectorAttribute(token);
     }
 
-    if (type==LessLexer.ID_SELECTOR) {
+    if (type == LessLexer.ID_SELECTOR) {
       return handleIdSelector(token);
     }
 
-    if (type==LessLexer.CHARSET_DECLARATION) {
+    if (type == LessLexer.CHARSET_DECLARATION) {
       return handleCharsetDeclaration(token);
     }
 
-    if (type==LessLexer.FONT_FACE_SYM) {
+    if (type == LessLexer.FONT_FACE_SYM) {
       return handleFontFace(token);
     }
 
-    if (type==LessLexer.DECLARATION) {
+    if (type == LessLexer.DECLARATION) {
       return handleDeclaration(token);
     }
 
-    if (type==LessLexer.BODY) {
+    if (type == LessLexer.BODY) {
       return handleRuleSetsBody(token);
     }
 
-    if (type==LessLexer.EXPRESSION) {
+    if (type == LessLexer.EXPRESSION) {
       return handleExpression(token);
     }
-    if (type==LessLexer.NTH) {
+    if (type == LessLexer.NTH) {
       return handleNth(token);
     }
-    
-    if (type==LessLexer.TERM)
+
+    if (type == LessLexer.TERM)
       return handleTerm(token);
 
-    if (type==LessLexer.MEDIA_SYM)
+    if (type == LessLexer.MEDIA_SYM)
       return handleMedia(token);
 
-    if (type==LessLexer.MEDIUM_DECLARATION)
-      return handleMediumDeclaration(token);
-
-    if (type==LessLexer.MEDIA_QUERY)
+//    if (type == LessLexer.MEDIUM_DECLARATION)
+//      return handleMediumDeclaration(token);
+//
+    if (type == LessLexer.MEDIA_QUERY)
       return handleMediaQuery(token);
 
-    if (type==LessLexer.MEDIUM_TYPE) {
+    if (type == LessLexer.MEDIUM_TYPE) {
       return handleMedium(token);
     }
 
-    if (type==LessLexer.MEDIA_EXPRESSION)
+    if (type == LessLexer.MEDIA_EXPRESSION)
       return handleMediaExpression(token);
 
-    if (type==LessLexer.VARIABLE_DECLARATION)
+    if (type == LessLexer.VARIABLE_DECLARATION)
       return handleVariableDeclaration(token);
 
-    if (type==LessLexer.ARGUMENT_DECLARATION)
+    if (type == LessLexer.ARGUMENT_DECLARATION)
       return handleArgumentDeclaration(token);
-    
-    if (type==LessLexer.VARIABLE)
+
+    if (type == LessLexer.VARIABLE)
       return handleVariable(token);
-    
-    if (type==LessLexer.VARIABLE)
+
+    if (type == LessLexer.VARIABLE)
       return handleIndirectVariable(token);
 
-    if (type==LessLexer.PURE_MIXIN)
-      return handlePureMixinDeclaration(token);
+    if (type == LessLexer.REUSABLE_STRUCTURE)
+      return handleReusableStructureDeclaration(token);
 
-    if (type==LessLexer.MIXIN_REFERENCE)
+    if (type == LessLexer.MIXIN_REFERENCE)
       return handleMixinReference(token);
 
-    if (type==LessLexer.NAMESPACE_REFERENCE)
+    if (type == LessLexer.NAMESPACE_REFERENCE)
       return handleNamespaceReference(token);
 
-    if (type==LessLexer.MIXIN_PATTERN)
+    if (type == LessLexer.MIXIN_PATTERN)
       return handleMixinPattern(token);
 
-    if (type==LessLexer.GUARD)
+    if (type == LessLexer.GUARD)
       return handleGuard(token);
 
-    if (type==LessLexer.GUARD_CONDITION)
+    if (type == LessLexer.GUARD_CONDITION)
       return handleGuardCondition(token);
-
-    if (type==LessLexer.PURE_NAMESPACE)
-      return handlePureNamespace(token);
 
     throw new TreeBuildingException("Unexpected token type: " + type + " for " + token.getText(), token);
   }
 
-  public T handlePureNamespace(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleElementSubsequent(HiddenTokenAwareTree token);
 
-  public T handleGuardCondition(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleGuardCondition(HiddenTokenAwareTree token);
 
-  public T handleGuard(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleGuard(HiddenTokenAwareTree token);
 
-  public T handleMixinPattern(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleMixinPattern(HiddenTokenAwareTree token);
 
-  public T handlePureMixinDeclaration(HiddenTokenAwareTree token) {
-    return null;
-  }
-    
-  public T handleMixinReference(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleReusableStructureDeclaration(HiddenTokenAwareTree token);
 
-  public T handleNamespaceReference(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleMixinReference(HiddenTokenAwareTree token);
 
-  public T handleVariableDeclaration(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleNamespaceReference(HiddenTokenAwareTree token);
 
-  public T handleArgumentDeclaration(HiddenTokenAwareTree token) {
-    return null;
-  }
-  
-  public T handleVariable(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleVariableDeclaration(HiddenTokenAwareTree token);
 
-  public T handleIndirectVariable(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleArgumentDeclaration(HiddenTokenAwareTree token);
 
-  public T handleMediaExpression(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleVariable(HiddenTokenAwareTree token);
 
-  public T handleMedium(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleIndirectVariable(HiddenTokenAwareTree token);
 
-  public T handleNth(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleMediaExpression(HiddenTokenAwareTree token);
 
-  public T handleRuleSetsBody(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleMedium(HiddenTokenAwareTree token);
 
-  public T handleMediumDeclaration(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleNth(HiddenTokenAwareTree token);
 
-  public T handleMediaQuery(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleRuleSetsBody(HiddenTokenAwareTree token);
 
-  public T handleMedia(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleMediaQuery(HiddenTokenAwareTree token);
 
-  public T handleTerm(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleMedia(HiddenTokenAwareTree token);
 
-  public T handleExpression(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleTerm(HiddenTokenAwareTree token);
 
-  public T handleDeclaration(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleExpression(HiddenTokenAwareTree token);
 
-  public T handleFontFace(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleDeclaration(HiddenTokenAwareTree token);
 
-  public T handleCharsetDeclaration(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleFontFace(HiddenTokenAwareTree token);
 
-  public T handleIdSelector(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleCharsetDeclaration(HiddenTokenAwareTree token);
 
-  public T handleSelectorAttribute(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleIdSelector(HiddenTokenAwareTree token);
 
-  public T handleSelectorOperator(HiddenTokenAwareTree token) {
-    return null;
-  }
-  
-  public T handlePseudo(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleSelectorAttribute(HiddenTokenAwareTree token);
 
-  public T handleCssClass(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleSelectorOperator(HiddenTokenAwareTree token);
 
-  public T handleStyleSheet(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handlePseudo(HiddenTokenAwareTree token);
 
-  public T handleSelector(HiddenTokenAwareTree token) {
-    return null;
-  }
+  public abstract T handleCssClass(HiddenTokenAwareTree token);
 
-  public T handleRuleSet(HiddenTokenAwareTree token) {
-    return null;
-  }
-  
+  public abstract T handleStyleSheet(HiddenTokenAwareTree token);
+
+  public abstract T handleSelector(HiddenTokenAwareTree token);
+
+  public abstract T handleRuleSet(HiddenTokenAwareTree token);
+
+//  public abstract T handleMediumDeclaration(HiddenTokenAwareTree token);
+
   public T handleEOF(HiddenTokenAwareTree token) {
     return null;
   }

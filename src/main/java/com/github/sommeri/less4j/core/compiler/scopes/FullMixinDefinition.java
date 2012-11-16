@@ -1,18 +1,18 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
-import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 
 public class FullMixinDefinition {
-  private final PureMixin mixin;
+  private final ReusableStructure mixin;
   private final Scope bodyScope;
 
-  public FullMixinDefinition(PureMixin mixin, Scope mixinsBodyScope) {
+  public FullMixinDefinition(ReusableStructure mixin, Scope mixinsBodyScope) {
     super();
     this.mixin = mixin;
     this.bodyScope = mixinsBodyScope;
   }
 
-  public PureMixin getMixin() {
+  public ReusableStructure getMixin() {
     return mixin;
   }
 

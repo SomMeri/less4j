@@ -5,7 +5,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
-import com.github.sommeri.less4j.core.ast.PureMixin;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
 
 @SuppressWarnings("serial")
@@ -59,12 +59,12 @@ public class CompileException extends TranslationException {
     return node.getSourceLine();
   }
 
-  public static void throwUndefinedMixinParameterValue(PureMixin mixin, ArgumentDeclaration declaration, MixinReference reference) {
+  public static void throwUndefinedMixinParameterValue(ReusableStructure mixin, ArgumentDeclaration declaration, MixinReference reference) {
     throw createUndefinedMixinParameterValue(mixin, declaration, reference);
     
   }
 
-  private static CompileException createUndefinedMixinParameterValue(PureMixin mixin, ArgumentDeclaration declaration, MixinReference reference) {
+  private static CompileException createUndefinedMixinParameterValue(ReusableStructure mixin, ArgumentDeclaration declaration, MixinReference reference) {
     return new CompileException("Undefined parameter " + declaration.getVariable().getName() + " of mixin "+ mixin.getName() +" defined on line " + mixin.getSourceLine(), reference);
   }
 

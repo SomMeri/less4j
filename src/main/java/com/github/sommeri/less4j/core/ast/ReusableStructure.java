@@ -6,32 +6,32 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class PureMixin extends ASTCssNode {
+public class ReusableStructure extends ASTCssNode {
 
-  private CssClass selector;
+  private ElementSubsequent selector;
   //Allows: variable, argument declaration, pattern
   private List<ASTCssNode> parameters = new ArrayList<ASTCssNode>();
   private List<Guard> guards = new ArrayList<Guard>();
   private RuleSetsBody body;
 
-  public PureMixin(HiddenTokenAwareTree token) {
+  public ReusableStructure(HiddenTokenAwareTree token) {
     super(token);
   }
   
-  public PureMixin(HiddenTokenAwareTree token, CssClass className) {
+  public ReusableStructure(HiddenTokenAwareTree token, ElementSubsequent className) {
     this(token);
     selector=className;
   }
 
-  public CssClass getSelector() {
+  public ElementSubsequent getSelector() {
    return selector;
   }
   
   public String getName() {
-    return getSelector().getName();
+    return getSelector().getFullName();
    }
   
-  public void setSelector(CssClass selector) {
+  public void setSelector(ElementSubsequent selector) {
     this.selector = selector;
   }
 
@@ -97,12 +97,12 @@ public class PureMixin extends ASTCssNode {
   }
 
   public ASTCssNodeType getType() {
-    return ASTCssNodeType.PURE_MIXIN;
+    return ASTCssNodeType.REUSABLE_STRUCTURE;
   }
 
   @Override
-  public PureMixin clone() {
-    PureMixin result = (PureMixin) super.clone();
+  public ReusableStructure clone() {
+    ReusableStructure result = (ReusableStructure) super.clone();
     result.selector = selector==null?null:selector.clone();
     result.parameters = ArraysUtils.deeplyClonedList(parameters);
     result.body = body==null?null:body.clone();
@@ -113,7 +113,7 @@ public class PureMixin extends ASTCssNode {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("PureMixin [");
+    builder.append("ReusableStructure [");
     builder.append(selector);
     builder.append("]");
     return builder.toString();

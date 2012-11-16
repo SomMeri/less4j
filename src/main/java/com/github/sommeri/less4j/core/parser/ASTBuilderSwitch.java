@@ -18,6 +18,7 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FontFace;
@@ -41,14 +42,13 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
-import com.github.sommeri.less4j.core.ast.PureMixin;
-import com.github.sommeri.less4j.core.ast.PureNamespace;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
@@ -234,14 +234,16 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return ruleSet;
   }
 
-  public PureMixin handlePureMixinDeclaration(HiddenTokenAwareTree token) {
-    PureMixin result = new PureMixin(token);
+  public ReusableStructure handleReusableStructureDeclaration(HiddenTokenAwareTree token) {
+    ReusableStructure result = new ReusableStructure(token);
 
-    List<HiddenTokenAwareTree> children = token.getChildren();
-    for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() == LessLexer.CSS_CLASS) {
-        result.setSelector(handleCssClass(kid));
-      } else if (kid.getType() == LessLexer.BODY) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    HiddenTokenAwareTree kid = children.next();
+    result.setSelector(handleElementSubsequent(kid));
+    
+    while (children.hasNext()) {
+      kid = children.next();
+      if (kid.getType() == LessLexer.BODY) {
         result.setBody(handleRuleSetsBody(kid));
       } else if (kid.getType() == LessLexer.GUARD) {
         result.addGuard(handleGuard(kid));
@@ -255,12 +257,16 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return result;
   }
 
+  public ElementSubsequent handleElementSubsequent(HiddenTokenAwareTree token) {
+    return (ElementSubsequent) switchOn(token.getChild(0));
+  }
+
   public MixinReference handleMixinReference(HiddenTokenAwareTree token) {
     MixinReference result = new MixinReference(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() == LessLexer.CSS_CLASS) {
-        result.setSelector(handleCssClass(kid));
+      if (kid.getType() == LessLexer.ELEMENT_SUBSEQUENT) {
+        result.setSelector(handleElementSubsequent(kid));
       } else if (kid.getType() == LessLexer.IMPORTANT_SYM) {
         result.setImportant(true);
       } else { // anything else is a parameter
@@ -279,14 +285,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     NamespaceReference result = new NamespaceReference(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() == LessLexer.HASH) {
-        result.addName(kid.getText().trim());
-      } else if (kid.getType() == LessLexer.CSS_CLASS) {
-        CssClass name = (CssClass) switchOn(kid);
-        result.addName(name.getFullName());
-      } else {
+      ASTCssNode buildKid = switchOn(kid);
+      if (buildKid.getType()==ASTCssNodeType.MIXIN_REFERENCE) {
         MixinReference reference = (MixinReference) switchOn(kid);
         result.setFinalReference(reference);
+      } else if (buildKid instanceof ElementSubsequent) {
+        ElementSubsequent name = (ElementSubsequent) switchOn(kid);
+        result.addName(name.getFullName());
+      } else {
+        throw new TreeBuildingException("Unexpected namespace reference member. ", kid);
       }
     }
     return result;
@@ -363,14 +370,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     String operator = token.getText().trim();
     if (!"and".equals(operator))
       throw new TreeBuildingException("Unexpected guard operator ", token);
-  }
-
-  public PureNamespace handlePureNamespace(HiddenTokenAwareTree token) {
-    IdSelector selector = handleIdSelector(token.getChild(0));
-    RuleSetsBody body = handleRuleSetsBody(token.getChild(1));
-
-    PureNamespace namespace = new PureNamespace(token, selector, body);
-    return namespace;
   }
 
   public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {

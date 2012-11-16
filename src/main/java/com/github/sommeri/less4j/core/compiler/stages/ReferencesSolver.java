@@ -12,8 +12,8 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
-import com.github.sommeri.less4j.core.ast.PureMixin;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
@@ -93,7 +93,7 @@ public class ReferencesSolver {
       Scope combinedScope = calculateMixinsOwnVariables(reference, referenceScope, fullMixin);
       ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(combinedScope);
 
-      PureMixin mixin = fullMixin.getMixin();
+      ReusableStructure mixin = fullMixin.getMixin();
       if (expressionEvaluator.evaluate(mixin.getGuards())) {
         RuleSetsBody body = mixin.getBody().clone();
         doSolveReferences(body, combinedScope);
@@ -165,14 +165,14 @@ class ArgumentsBuilder {
 
   //input
   private Iterator<Expression> positionalParameters;
-  private PureMixin mixin;
+  private ReusableStructure mixin;
   private MixinReference reference;
 
   //results
   private List<Expression> allValues = new ArrayList<Expression>();
   private Scope argumentsScope;
 
-  public ArgumentsBuilder(ExpressionEvaluator referenceEvaluator, MixinReference reference, PureMixin pureMixin) {
+  public ArgumentsBuilder(ExpressionEvaluator referenceEvaluator, MixinReference reference, ReusableStructure pureMixin) {
     super();
     this.referenceEvaluator = referenceEvaluator;
     positionalParameters = reference.getPositionalParameters().iterator();
