@@ -114,7 +114,9 @@ public class RuleSet extends ASTCssNode {
   }
 
   public void replaceSelectors(List<Selector> result) {
-    //TODO: make old selectors forget the parent
+    for (Selector oldSelector : selectors) {
+      oldSelector.setParent(null);
+    }
     selectors = new ArrayList<Selector>();
     selectors.addAll(result);
   }

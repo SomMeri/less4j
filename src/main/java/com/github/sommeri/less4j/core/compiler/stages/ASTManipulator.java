@@ -8,7 +8,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Body;
-import com.github.sommeri.less4j.core.compiler.CompileException;
+import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
 
 public class ASTManipulator {
 
@@ -36,7 +36,7 @@ public class ASTManipulator {
   public void removeFromBody(ASTCssNode node) {
     ASTCssNode parent = node.getParent();
     if (!(parent instanceof Body)) {
-      throw new CompileException("Parent is not a body instance. " + parent, parent);
+      throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
 
     Body pBody = (Body) parent;
@@ -48,7 +48,7 @@ public class ASTManipulator {
   public void replaceInBody(ASTCssNode oldNode, List<ASTCssNode> newNodes) {
     ASTCssNode parent = oldNode.getParent();
     if (!(parent instanceof Body)) {
-      throw new CompileException("Parent is not a body instance. " + parent, parent);
+      throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
     
     Body pBody = (Body) parent;
@@ -63,11 +63,11 @@ public class ASTManipulator {
     try {
       PropertyUtils.setProperty(parent, name, value);
     } catch (IllegalAccessException e) {
-      throw new CompileException(e, value);
+      throw new BugHappened(e, value);
     } catch (InvocationTargetException e) {
-      throw new CompileException(e, value);
+      throw new BugHappened(e, value);
     } catch (NoSuchMethodException e) {
-      throw new CompileException(e, value);
+      throw new BugHappened(e, value);
     }
   }
 
@@ -75,11 +75,11 @@ public class ASTManipulator {
     try {
       PropertyUtils.setProperty(parent, descriptor.getName(), value);
     } catch (IllegalAccessException e) {
-      throw new CompileException(e, value);
+      throw new BugHappened(e, value);
     } catch (InvocationTargetException e) {
-      throw new CompileException(e, value);
+      throw new BugHappened(e, value);
     } catch (NoSuchMethodException e) {
-      throw new CompileException(e, value);
+      throw new BugHappened(e, value);
     }
 
   }
@@ -89,11 +89,11 @@ public class ASTManipulator {
       Object result = PropertyUtils.getProperty(object, descriptor.getName());
       return result;
     } catch (IllegalAccessException e) {
-      throw new CompileException(e, object);
+      throw new BugHappened(e, object);
     } catch (InvocationTargetException e) {
-      throw new CompileException(e, object);
+      throw new BugHappened(e, object);
     } catch (NoSuchMethodException e) {
-      throw new CompileException(e, object);
+      throw new BugHappened(e, object);
     }
   }
 

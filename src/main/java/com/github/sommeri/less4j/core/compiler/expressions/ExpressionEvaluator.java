@@ -15,6 +15,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
@@ -25,29 +26,33 @@ import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
-import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.CompileException;
+import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
 public class ExpressionEvaluator {
 
   private final Scope scope;
+  private final ProblemsHandler problemsHandler;
   private ArithmeticCalculator arithmeticCalculator = new ArithmeticCalculator();
   private ListCalculator listCalculator = new ListCalculator();
-  private ColorsCalculator colorsCalculator = new ColorsCalculator();
+  private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
-  
-  public ExpressionEvaluator() {
-    this(new NullScope());
+
+  public ExpressionEvaluator(ProblemsHandler problemsHandler) {
+    this(new NullScope(), problemsHandler);
   }
 
-  public ExpressionEvaluator(Scope scope) {
+  public ExpressionEvaluator(Scope scope, ProblemsHandler problemsHandler) {
     super();
-    this.scope = scope==null? new NullScope() : scope;
+    this.scope = scope == null ? new NullScope() : scope;
+    this.problemsHandler = problemsHandler;
+    colorsCalculator = new ColorsCalculator(problemsHandler);
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
@@ -74,28 +79,29 @@ public class ExpressionEvaluator {
 
   public Expression evaluate(Variable input) {
     Expression value = scope.getValue(input);
-    if (value==null)
-      CompileException.throwUndeclaredVariable(input);
-    
+    if (value == null) {
+      problemsHandler.undefinedVariable(input);
+      return new FaultyExpression(input);
+    }
+
     return evaluate(value);
   }
 
   public Expression evaluate(IndirectVariable input) {
     Expression value = scope.getValue(input);
-    CssString realName = convertToStringExpression(evaluate(value), input);
+    if (!(value instanceof CssString)) {
+      problemsHandler.nonStringIndirection(input);
+      return new FaultyExpression(input);
+    }
+    
+    CssString realName = (CssString) value;
     String realVariableName = "@" + realName.getValue();
     value = scope.getValue(realVariableName);
-    if (value==null)
-      CompileException.throwUndeclaredVariable(realVariableName, realName);
-    
+    if (value == null) {
+      problemsHandler.undefinedVariable(realVariableName, realName);
+      return new FaultyExpression(realName.getUnderlyingStructure());
+    }
     return evaluate(value);
-  }
-
-  private CssString convertToStringExpression(Expression evaluate, Expression errorNode) {
-    if (!(evaluate instanceof CssString))
-      throw new CompileException("Variable indirection works only with string values.", errorNode);
-
-    return (CssString) evaluate;
   }
 
   public Expression evaluate(Expression input) {
@@ -121,7 +127,7 @@ public class ExpressionEvaluator {
     case NAMED_EXPRESSION:
       return ((NamedExpression) input).getExpression();
 
-    //the value is already there, nothing to evaluate
+      //the value is already there, nothing to evaluate
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:
@@ -129,7 +135,7 @@ public class ExpressionEvaluator {
       return input;
 
     default:
-      throw new CompileException("Unknown expression type", input);
+      throw new BugHappened("Unknown expression type", input);
     }
   }
 
@@ -150,20 +156,21 @@ public class ExpressionEvaluator {
     Expression leftE = evaluate(input.getLeft());
     Expression rightE = evaluate(input.getRight());
 
-    comparator.validateSimpleExpression(leftE);
-    comparator.validateSimpleExpression(rightE);
-
     ComparisonExpressionOperator operator = input.getOperator();
-    if (operator.getOperator()==ComparisonExpressionOperator.Operator.OPEQ)
+    if (operator.getOperator() == ComparisonExpressionOperator.Operator.OPEQ)
       return comparator.equal(leftE, rightE);
 
-    if (leftE.getType() != ASTCssNodeType.NUMBER)
-      throw new CompileException("The operator " +operator+ " can be used only with numbers.", leftE);
+    if (leftE.getType() != ASTCssNodeType.NUMBER) {
+      problemsHandler.incompatibleComparisonOperand(leftE, operator);
+      return false;
+    }
 
-    if (rightE.getType() != ASTCssNodeType.NUMBER)
-      throw new CompileException("The operator " +operator+ " can be used only with numbers.", rightE);
+    if (rightE.getType() != ASTCssNodeType.NUMBER) {
+      problemsHandler.incompatibleComparisonOperand(rightE, operator);
+      return false;
+    }
 
-    return compareNumbers((NumberExpression)leftE, (NumberExpression)rightE, operator);
+    return compareNumbers((NumberExpression) leftE, (NumberExpression) rightE, operator);
   }
 
   private boolean compareNumbers(NumberExpression leftE, NumberExpression rightE, ComparisonExpressionOperator operator) {
@@ -184,7 +191,7 @@ public class ExpressionEvaluator {
       return left.compareTo(right) < 0;
 
     default:
-      throw new CompileException("Unexpected comparison operator", operator);
+      throw new BugHappened("Unexpected comparison operator", operator);
     }
   }
 
@@ -204,8 +211,9 @@ public class ExpressionEvaluator {
       negation.setExpliciteSign(false);
       return negation;
     }
-
-    throw new CompileException("The expression does not evaluate to number and can not be negated.", input);
+    
+    problemsHandler.nonNumberNegation(input);
+    return new FaultyExpression(input);
   }
 
   public Expression evaluate(ComposedExpression input) {
@@ -219,9 +227,10 @@ public class ExpressionEvaluator {
       return colorsCalculator.evalute(input, leftValue, rightValue);
 
     if (listCalculator.accepts(input.getOperator()))
-      return listCalculator.evalute(input, leftValue, rightValue); 
-      
-    throw new CompileException("Unable to evaluate expression", input);
+      return listCalculator.evalute(input, leftValue, rightValue);
+
+    problemsHandler.cannotEvaluate(input);
+    return new FaultyExpression(input);
   }
 
   public boolean evaluate(List<Guard> guards) {
@@ -275,7 +284,7 @@ public class ExpressionEvaluator {
 
     return true;
   }
-  
+
 }
 
 class NullScope extends Scope {
@@ -387,5 +396,5 @@ class NullScope extends Scope {
   public Scope getChildOwnerOf(ASTCssNode body) {
     return null;
   }
-  
+
 }

@@ -7,26 +7,8 @@ import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
-import com.github.sommeri.less4j.core.compiler.CompileException;
 
 public abstract class ExpressionComparator {
-
-  public boolean isSimpleExpression(Expression expression) {
-    switch (expression.getType()) {
-    case SIGNED_EXPRESSION:
-    case IDENTIFIER_EXPRESSION:
-    case NUMBER:
-    case STRING_EXPRESSION:
-    case COLOR_EXPRESSION:
-      return true;
-    }
-    return false;
-  }
-
-  public void validateSimpleExpression(Expression expression) {
-    if (!isSimpleExpression(expression))
-      throw new CompileException("The expression must evaluate to simple expression (e.g. identifier, number, string or color).", expression);
-  }
 
   public boolean equal(Expression pattern, Expression expression) {
     switch (pattern.getType()) {

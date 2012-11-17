@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core;
 
 @SuppressWarnings("serial")
+@Deprecated
 public abstract class TranslationException extends RuntimeException {
 
   public TranslationException(String message, Throwable cause) {

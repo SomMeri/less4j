@@ -5,17 +5,25 @@ import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
-import com.github.sommeri.less4j.core.compiler.CompileException;
+import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 //TODO document: color code shortcut
 class ColorsCalculator {
 
+  private final ProblemsHandler problemsHandler;
   private static final int MIN = 0;
   private static final int MAX = 255;
+  
+  public ColorsCalculator(ProblemsHandler problemsHandler) {
+    super();
+    this.problemsHandler = problemsHandler;
+  }
 
-  public ColorExpression evalute(ComposedExpression originalExpression, Expression first, Expression second) {
+  public Expression evalute(ComposedExpression originalExpression, Expression first, Expression second) {
     double red1 = calcRed(first);
     double green1 = calcGreen(first);
     double blue1 = calcBlue(first);
@@ -37,17 +45,19 @@ class ColorsCalculator {
 
     case COMMA:
     case EMPTY_OPERATOR:
-      throw new CompileException("Not a color operator.", operator);
+      throw new BugHappened("Not a color operator.", operator);
 
     default:
-      throw new CompileException("Unknown operator.", operator);
+      throw new BugHappened("Unknown operator.", operator);
     }
 
   }
 
-  private ColorExpression subtract(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
-    if (first.getType()==ASTCssNodeType.NUMBER)
-      throw new CompileException("Can't substract or divide a color from a number", first);
+  private Expression subtract(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
+    if (first.getType()==ASTCssNodeType.NUMBER) {
+      problemsHandler.substractOrDiveColorFromNumber(first);
+      return new FaultyExpression(first);
+    }
     
     return createResultColor(parentToken, round(red1 - red2), round(green1 - green2), round(blue1 - blue2));
   }
@@ -56,9 +66,11 @@ class ColorsCalculator {
     return createResultColor(parentToken, round(red1 * red2), round(green1 * green2), round(blue1 * blue2));
   }
 
-  private ColorExpression divide(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
-    if (first.getType()==ASTCssNodeType.NUMBER)
-      throw new CompileException("Can't substract or divide a color from a number", first);
+  private Expression divide(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
+    if (first.getType()==ASTCssNodeType.NUMBER) {
+      problemsHandler.substractOrDiveColorFromNumber(first);
+      return new FaultyExpression(first);
+    }
     
     return createResultColor(parentToken, round(red1 / red2), round(green1 / green2), round(blue1 / blue2));
   }

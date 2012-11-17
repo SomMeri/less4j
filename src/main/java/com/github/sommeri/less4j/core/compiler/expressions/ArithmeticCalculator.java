@@ -6,7 +6,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
-import com.github.sommeri.less4j.core.compiler.CompileException;
+import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 class ArithmeticCalculator {
@@ -28,10 +28,10 @@ class ArithmeticCalculator {
 
     case COMMA:
     case EMPTY_OPERATOR:
-      throw new CompileException("Not an arithmetic operator.", operator);
+      throw new BugHappened("Not an arithmetic operator.", operator);
 
     default:
-      throw new CompileException("Unknown operator.", operator);
+      throw new BugHappened("Unknown operator.", operator);
     }
 
   }

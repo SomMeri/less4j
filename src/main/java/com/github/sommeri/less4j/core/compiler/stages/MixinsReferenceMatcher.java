@@ -10,6 +10,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionComparator;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
@@ -18,8 +19,8 @@ public class MixinsReferenceMatcher {
   private ExpressionEvaluator evaluator;
   private ExpressionComparator comparator = new PatternsComparator();
 
-  public MixinsReferenceMatcher(Scope scope) {
-    evaluator = new ExpressionEvaluator(scope);
+  public MixinsReferenceMatcher(Scope scope, ProblemsHandler problemsHandler) {
+    evaluator = new ExpressionEvaluator(scope, problemsHandler);
   }
 
   public List<FullMixinDefinition> filter(MixinReference reference, List<FullMixinDefinition> mixins) {

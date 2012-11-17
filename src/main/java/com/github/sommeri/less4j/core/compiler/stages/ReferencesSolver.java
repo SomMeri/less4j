@@ -12,11 +12,11 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
-import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.CompileException;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
@@ -26,6 +26,11 @@ public class ReferencesSolver {
 
   public static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
+  private final ProblemsHandler problemsHandler;
+  
+  public ReferencesSolver(ProblemsHandler problemsHandler) {
+    this.problemsHandler = problemsHandler;
+  }
 
   public void solveReferences(ASTCssNode node, Scope scope) {
     doSolveReferences(node, new IteratedScope(scope));
@@ -36,7 +41,7 @@ public class ReferencesSolver {
   }
 
   private void doSolveReferences(ASTCssNode node, IteratedScope scope) {
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope.getScope());
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope.getScope(), problemsHandler);
 
     switch (node.getType()) {
     case VARIABLE: {
@@ -82,16 +87,16 @@ public class ReferencesSolver {
 
   private RuleSetsBody resolveReferencedMixins(MixinReference reference, Scope referenceScope, List<FullMixinDefinition> sameNameMixins) {
     if (sameNameMixins.isEmpty())
-      throw CompileException.createUndeclaredMixin(reference);
+      problemsHandler.undefinedMixin(reference);
 
-    List<FullMixinDefinition> mixins = (new MixinsReferenceMatcher(referenceScope)).filter(reference, sameNameMixins);
+    List<FullMixinDefinition> mixins = (new MixinsReferenceMatcher(referenceScope, problemsHandler)).filter(reference, sameNameMixins);
     if (mixins.isEmpty())
-      CompileException.warnNoMixinsMatch(reference);
+      problemsHandler.unmatchedMixin(reference);
 
     RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
     for (FullMixinDefinition fullMixin : mixins) {
       Scope combinedScope = calculateMixinsOwnVariables(reference, referenceScope, fullMixin);
-      ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(combinedScope);
+      ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(combinedScope, problemsHandler);
 
       ReusableStructure mixin = fullMixin.getMixin();
       if (expressionEvaluator.evaluate(mixin.getGuards())) {
@@ -146,7 +151,7 @@ public class ReferencesSolver {
   }
 
   private Scope buildMixinsArgumentsScope(MixinReference reference, Scope referenceScope, FullMixinDefinition mixin) {
-    ArgumentsBuilder builder = new ArgumentsBuilder(new ExpressionEvaluator(referenceScope), reference, mixin.getMixin());
+    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new ExpressionEvaluator(referenceScope, problemsHandler), problemsHandler);
     return builder.build();
   }
 
@@ -160,6 +165,7 @@ public class ReferencesSolver {
 class ArgumentsBuilder {
 
   //utils
+  private final ProblemsHandler problemsHandler;
   private final ExpressionEvaluator referenceEvaluator;
   private final String ALL_ARGUMENTS = ReferencesSolver.ALL_ARGUMENTS;
 
@@ -172,9 +178,10 @@ class ArgumentsBuilder {
   private List<Expression> allValues = new ArrayList<Expression>();
   private Scope argumentsScope;
 
-  public ArgumentsBuilder(ExpressionEvaluator referenceEvaluator, MixinReference reference, ReusableStructure pureMixin) {
+  public ArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, ExpressionEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
     super();
     this.referenceEvaluator = referenceEvaluator;
+    this.problemsHandler = problemsHandler;
     positionalParameters = reference.getPositionalParameters().iterator();
     argumentsScope = Scope.createScope(reference, "#arguments-" + reference + "#", null);
     mixin = pureMixin;
@@ -213,7 +220,7 @@ class ArgumentsBuilder {
       fillFromDefault(declaration);
     } else {
       if (declaration.getValue() == null)
-        CompileException.throwUndefinedMixinParameterValue(mixin, declaration, reference);
+        problemsHandler.undefinedMixinParameterValue(mixin, declaration, reference);
     }
 
   }

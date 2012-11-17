@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
@@ -22,11 +23,13 @@ import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
 
 public class LessToCssCompiler {
 
+  private ProblemsHandler problemsHandler = new ProblemsHandler();
+
   public ASTCssNode compileToCss(StyleSheet less) {
     ScopeExtractor scopeBuilder = new ScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
     
-    ReferencesSolver referencesSolver = new ReferencesSolver();
+    ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);
     
     //just a safety measure
@@ -57,7 +60,7 @@ public class LessToCssCompiler {
   private void evaluateExpressions(ASTCssNode node) {
     ASTManipulator manipulator = new ASTManipulator();
     //variables are not supposed to be there now
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator();
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler);
 
     if (node instanceof Expression) {
       Expression value = expressionEvaluator.evaluate((Expression) node);

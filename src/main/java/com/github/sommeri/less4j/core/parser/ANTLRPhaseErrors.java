@@ -7,6 +7,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.TranslationException;
 
 @SuppressWarnings("serial")
+@Deprecated
 public class ANTLRPhaseErrors extends TranslationException {
 
   private final List<AntlrException> errors;
