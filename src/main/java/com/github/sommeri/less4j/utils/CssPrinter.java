@@ -16,6 +16,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdSelector;
@@ -166,6 +167,9 @@ public class CssPrinter {
     case STYLE_SHEET:
       return appendStyleSheet((StyleSheet) node);
 
+    case FAULTY_EXPRESSION:
+      return appendFaultyExpression((FaultyExpression) node);
+
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
@@ -176,6 +180,11 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getCharPositionInSourceLine());
     }
+  }
+
+  private boolean appendFaultyExpression(FaultyExpression node) {
+    builder.append("!#error#!");
+    return true;
   }
 
   private boolean appendNth(Nth node) {

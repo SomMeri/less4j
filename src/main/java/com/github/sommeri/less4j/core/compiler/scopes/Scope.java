@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 
 public class Scope {
   
@@ -101,8 +102,11 @@ public class Scope {
     return value==null? new ArrayList<FullMixinDefinition>() : value;
   }
 
-  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference) {
+  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference, ProblemsHandler problemsHandler) {
     List<Scope> namespaces = getNearestNamespaces(reference);
+    if (namespaces.isEmpty())
+      problemsHandler.undefinedNamespace(reference);
+    
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (Scope scope : namespaces) {
       result.addAll(scope.getNearestMixins(reference.getFinalReference()));

@@ -16,7 +16,6 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
   
-  //FIXME: test whether the thing survives undefined mixin parameter correctly
   public void undefinedMixinParameterValue(ReusableStructure mixin, ArgumentDeclaration declaration, MixinReference reference) {
     collector.addError(createUndefinedMixinParameterValue(mixin, declaration, reference));
   }
@@ -25,7 +24,6 @@ public class ProblemsHandler {
     return new CompilationError(reference, "Undefined parameter " + declaration.getVariable().getName() + " of mixin "+ mixin.getName() +" defined on line " + mixin.getSourceLine());
   }
 
-  //FIXME: test whether the thing survives undefined variable
   public void undefinedVariable(Variable variable) {
     collector.addError(createUndefinedVariable(variable.getName(), variable));
   }
@@ -43,7 +41,6 @@ public class ProblemsHandler {
     return new CompilationError(variable, "The variable \"" + name + "\" was not declared.");
   }
 
-  //FIXME: test whether the thing survives undefined mixins
   public void undefinedMixin(MixinReference reference) {
     collector.addError(createUndefinedMixin(reference));
   }
@@ -56,7 +53,6 @@ public class ProblemsHandler {
     return new CompilationError(reference, "The mixin \"" + name + "\" was not declared.");
   }
 
-  //FIXME: test whether the thing survives unmatched mixins
   public void unmatchedMixin(MixinReference reference) {
     collector.addError(createUnmatchedMixin(reference));
   }
@@ -69,8 +65,6 @@ public class ProblemsHandler {
     return new CompilationError(reference, "The mixin \"" + name + "\" was not matched.");
   }
 
-  //FIXME: test whether the thing survives undefined namespaces
-  //FIXME: this method is never called, apparent bug
   public void undefinedNamespace(NamespaceReference reference) {
     collector.addError(createUndefinedNamespace(reference));
   }
@@ -83,7 +77,6 @@ public class ProblemsHandler {
     return new CompilationError(reference, "The namespace \"" + name + "\" was not declared.");
   }
 
-  //FIXME: test whether the thing survives non string indirection
   public void nonStringIndirection(Expression errorNode) {
     collector.addError(createNonStringIndirection(errorNode));
   }
@@ -92,22 +85,18 @@ public class ProblemsHandler {
     return new CompilationError(errorNode, "Variable indirection works only with string values.");
   }
   
-  //FIXME: test whether the thing survives
   public void nonNumberNegation(SignedExpression errorNode) {
     collector.addError(new CompilationError(errorNode, "Cannot negate non number."));
   }
 
-  //FIXME: test whether the thing survives
   public void substractOrDiveColorFromNumber(Expression errorNode) {
     collector.addError(new CompilationError(errorNode, "Can't substract or divide a color from a number"));
   }
 
-  //FIXME: test whether the thing survives
   public void cannotEvaluate(Expression errorNode) {
     collector.addError(new CompilationError(errorNode, "Unable to evaluate expression"));
   }
 
-  //FIXME: test whether the thing survives
   public void incompatibleComparisonOperand(Expression errorNode, ComparisonExpressionOperator operator) {
     collector.addError(new CompilationError(errorNode, "The operator " + operator + " can be used only with numbers."));
     

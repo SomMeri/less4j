@@ -1,0 +1,43 @@
+#undefinedVariable {
+  margin: !#error#!;
+}
+#undefinedNamespace {
+  padding: 2 2 2 2;
+}
+#undefinedNamespaceFar {
+  padding: 2 2 2 2;
+}
+#nonStringIndirection {
+  padding: 11 11;
+  margin: !#error#!;
+}
+#nonNumberNegation {
+  padding: 2 2 2 2;
+  margin: !#error#!;
+}
+#substractColorFromNumber {
+  padding: !#error#!;
+  margin: !#error#!;
+}
+#divideNumberByColor {
+  padding: !#error#!;
+  margin: !#error#!;
+}
+#operationOnString-cannotEvaluate {
+  text: !#error#!;
+}
+#incompatibleComparisonOperand {
+  padding: 2 2 2 2;
+}
+#undefinedMixinParameter {
+  padding: 2 2 2 2;
+}
+#undefinedMixin {
+  padding: 2 2 2 2;
+}
+#undefinedMixinFar {
+  padding: 2 2 2 2;
+}
+#unmatchedMixin {
+  padding: 2 2 2 2;
+}

@@ -132,6 +132,7 @@ public class ExpressionEvaluator {
     case COLOR_EXPRESSION:
     case NUMBER:
     case STRING_EXPRESSION:
+    case FAULTY_EXPRESSION:
       return input;
 
     default:
@@ -350,7 +351,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference) {
+  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference, ProblemsHandler problemsHandler) {
     return Collections.emptyList();
   }
 

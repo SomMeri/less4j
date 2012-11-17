@@ -1,0 +1,64 @@
+#undefinedVariable {
+  margin: @undefinedVariable;
+}
+#undefinedNamespace {
+  padding: 2 2 2 2;
+  #doesNotExists > .mixin();
+}
+#undefinedNamespaceFar {
+  padding: 2 2 2 2;
+  #undefinedNamespace > #doesNotExists > .mixin();
+}
+@nonString: 12-1;
+#nonStringIndirection {
+  padding: @nonString @nonString;
+  margin: @@nonString;
+}
+#nonNumberNegation {
+  padding: 2 2 2 2;
+  margin: -("hello");
+}
+#substractColorFromNumber {
+  padding: 2 - #003300;
+  margin: 2 - green;
+}
+#divideNumberByColor {
+  padding: 2/#003300;
+  margin: 2/green;
+}
+#operationOnString-cannotEvaluate {
+  text: "input" - "output";
+}
+.guardedMixin(@a) when (@a > 3) {
+  margin: @a @a @a @a;
+}
+#incompatibleComparisonOperand {
+  padding: 2 2 2 2;
+  .guardedMixin("string");
+}
+#undefinedMixinParameter {
+  padding: 2 2 2 2;
+  .guardedMixin(@b:4);
+}
+#undefinedMixin {
+  padding: 2 2 2 2;
+  .doesNotExists();
+}
+#undefinedMixinFar {
+  padding: 2 2 2 2;
+  #undefinedNamespace > .doesNotExists();
+}
+.mixinWithPattern(correctpattern) {
+  margin: 2 2 2 2;
+}
+#unmatchedMixin {
+  padding: 2 2 2 2;
+  .mixinWithPattern(wrongpattern);
+}
+
+//#antlrError {
+//  padding: 2  > 3;
+//}
+//#wtf {
+//  margin: 2-green;
+//}

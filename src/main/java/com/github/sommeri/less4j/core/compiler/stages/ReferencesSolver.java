@@ -156,7 +156,7 @@ public class ReferencesSolver {
   }
 
   private RuleSetsBody resolveNamespaceReference(NamespaceReference reference, Scope scope) {
-    List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference);
+    List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference, problemsHandler);
     return resolveReferencedMixins(reference.getFinalReference(), scope, sameNameMixins);
   }
   
