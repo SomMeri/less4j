@@ -4,14 +4,22 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 class ArithmeticCalculator {
+  
+  private ProblemsHandler problemsHandler;
 
-  public NumberExpression evalute(ComposedExpression originalExpression, Expression firstNumber, Expression secondNumber) {
+  public ArithmeticCalculator(ProblemsHandler problemsHandler) {
+    this.problemsHandler = problemsHandler;
+  }
+
+  public Expression evalute(ComposedExpression originalExpression, Expression firstNumber, Expression secondNumber) {
     NumberExpression first = (NumberExpression) firstNumber;
     NumberExpression second = (NumberExpression) secondNumber;
 
@@ -36,11 +44,11 @@ class ArithmeticCalculator {
 
   }
 
-  private NumberExpression subtract(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression subtract(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
     return subtractNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
-  private NumberExpression subtractNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression subtractNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal - secondVal;
@@ -48,11 +56,11 @@ class ArithmeticCalculator {
     return createResultNumber(parentToken, resultVal, first, second);
   }
 
-  private NumberExpression multiply(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression multiply(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
     return multiplyNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
-  private NumberExpression multiplyNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression multiplyNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal * secondVal;
@@ -60,23 +68,23 @@ class ArithmeticCalculator {
     return createResultNumber(parentToken, resultVal, first, second);
   }
 
-  private NumberExpression divide(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression divide(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
     return divideNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
-  private NumberExpression divideNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression divideNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal / secondVal;
-
+    
     return createResultNumber(parentToken, resultVal, first, second);
   }
 
-  private NumberExpression add(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression add(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
     return addNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
-  private NumberExpression addNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression addNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal + secondVal;
@@ -84,7 +92,12 @@ class ArithmeticCalculator {
     return createResultNumber(parentToken, resultVal, first, second);
   }
 
-  private NumberExpression createResultNumber(HiddenTokenAwareTree parentToken, Double resultVal, NumberExpression first, NumberExpression second) {
+  private Expression createResultNumber(HiddenTokenAwareTree parentToken, Double resultVal, NumberExpression first, NumberExpression second) {
+    if (resultVal.isInfinite()) {
+      problemsHandler.divisionByZero(second);
+      return new FaultyExpression(second);
+    }
+    
     Dimension dimension = null;
     String suffix = null;
     if (first.getDimension()!=Dimension.NUMBER) {

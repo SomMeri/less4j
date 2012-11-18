@@ -39,7 +39,7 @@ public class ExpressionEvaluator {
 
   private final Scope scope;
   private final ProblemsHandler problemsHandler;
-  private ArithmeticCalculator arithmeticCalculator = new ArithmeticCalculator();
+  private ArithmeticCalculator arithmeticCalculator;
   private ListCalculator listCalculator = new ListCalculator();
   private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
@@ -52,6 +52,7 @@ public class ExpressionEvaluator {
     super();
     this.scope = scope == null ? new NullScope() : scope;
     this.problemsHandler = problemsHandler;
+    arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
   }
 

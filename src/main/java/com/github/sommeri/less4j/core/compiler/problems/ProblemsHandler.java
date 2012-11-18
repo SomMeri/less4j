@@ -9,6 +9,7 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
+import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
@@ -111,6 +112,10 @@ public class ProblemsHandler {
     collector.addWarning(new CompilationWarning(errorNode, "Ruleset without selector encountered."));
   }
 
+  public void divisionByZero(NumberExpression errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "Division by zero."));
+  }
+  
   public boolean hasErrors() {
     return collector.hasErrors();
   }
@@ -126,6 +131,6 @@ public class ProblemsHandler {
   public List<Problem> getErrors() {
     return collector.getErrors();
   }
-  
+
 }
 
