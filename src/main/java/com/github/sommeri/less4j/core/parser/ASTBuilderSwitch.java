@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.github.sommeri.less4j.core.ProblemsCollector;
 import com.github.sommeri.less4j.core.TranslationException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -52,10 +51,11 @@ import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
-  private final ProblemsCollector warningsCollector;
+  private final ProblemsHandler problemsHandler;
   private final TermBuilder termBuilder = new TermBuilder(this);
   // as stated here: http://www.w3.org/TR/css3-selectors/#pseudo-elements
   private static Set<String> COLONLESS_PSEUDOELEMENTS = new HashSet<String>();
@@ -66,9 +66,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
 
-  public ASTBuilderSwitch(ProblemsCollector warningsCollector) {
+  public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
-    this.warningsCollector = warningsCollector;
+    this.problemsHandler = problemsHandler;
   }
 
   public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {
@@ -230,7 +230,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     ruleSet.addSelectors(selectors);
     //TODO: these kind of warnings could be in a special validation class, no reason to do it here
-    warningsCollector.warnRuleSetWithoutSelector(ruleSet);
+    if (ruleSet.getSelectors()==null || ruleSet.getSelectors().isEmpty())
+      problemsHandler.rulesetWithoutSelector(ruleSet);
+    
     return ruleSet;
   }
 

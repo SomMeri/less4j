@@ -1,27 +1,35 @@
 package com.github.sommeri.less4j.core;
 
-import java.util.List;
-
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
+import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ANTLRPhaseErrors;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
 import com.github.sommeri.less4j.utils.CssPrinter;
 
 public class ThreadUnsafeLessCompiler implements LessCompiler {
-  private ProblemsCollector problemsCollector = new ProblemsCollector();
+  private ProblemsHandler problemsHandler;
+  private ASTBuilder astBuilder;
+  private LessToCssCompiler compiler;
+
   private ANTLRParser parser = new ANTLRParser();
-  private ASTBuilder astBuilder = new ASTBuilder(problemsCollector);
-  private LessToCssCompiler compiler = new LessToCssCompiler();
 
   @Override
-  public String compile(String lessContent) throws Less4jException {
+  public CompilationResult compile(String lessContent) throws Less4jException {
     try {
-      return doCompile(lessContent);
+      problemsHandler = new ProblemsHandler();
+      astBuilder = new ASTBuilder(problemsHandler);
+      compiler = new LessToCssCompiler(problemsHandler);
+      String css = doCompile(lessContent);
+      CompilationResult compilationResult = new CompilationResult(css, problemsHandler.getWarnings());
+      if (problemsHandler.hasErrors()) {
+        throw new Less4jException(problemsHandler.getErrors(), compilationResult);
+      }
+      return compilationResult;
     } catch (TranslationException ex) {
       throw new Less4jException(ex);
     }
@@ -29,7 +37,6 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   private String doCompile(String lessContent) {
     // FIXME: ugly, clean hierarchy and dependencies
-    problemsCollector.clean();
     ExtendedStringBuilder stringBuilder = new ExtendedStringBuilder("");
 
     ANTLRParser.ParseResult result = parser.parseStyleSheet(lessContent);
@@ -44,10 +51,5 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return stringBuilder.toString();
   };
 
-  @SuppressWarnings("unused")
-  private List<Problem> getProblems() {
-    return problemsCollector.getWarnings();
-  }
-  
 }
 

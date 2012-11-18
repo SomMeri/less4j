@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -14,15 +15,15 @@ import org.apache.commons.io.IOUtils;
 
 public class TestFileUtils {
 
-  private String expectedDataFileSuffix = ".css";
-  
+  private String additionalDataFileSuffix;
+
   public TestFileUtils() {
   }
-  
-  public TestFileUtils(String expectedDataFileSuffix) {
-    this.expectedDataFileSuffix = expectedDataFileSuffix;
+
+  public TestFileUtils(String additionalDataFileSuffix) {
+    this.additionalDataFileSuffix = additionalDataFileSuffix;
   }
-  
+
   public Collection<Object[]> loadTestFiles(String... directories) {
     Collection<File> allFiles = getAllLessFiles(directories);
     Collection<Object[]> result = new ArrayList<Object[]>();
@@ -42,8 +43,15 @@ public class TestFileUtils {
 
   private void addFiles(Collection<Object[]> result, File... files) {
     for (File file : files) {
-      result.add(new Object[] { file, findCorrespondingExpected(file), file.getName() });
+      result.add(createParameters(file));
     }
+  }
+
+  private Object[] createParameters(File file) {
+    if (additionalDataFileSuffix != null)
+      return new Object[] { file, findCorrespondingExpected(file), findCorrespondingAdditional(file), file.getName() };
+    else
+      return new Object[] { file, findCorrespondingExpected(file), file.getName() };
   }
 
   private File findCorrespondingExpected(File lessFile) {
@@ -55,7 +63,22 @@ public class TestFileUtils {
 
   private String convertToOutputFilename(String name) {
     if (name.endsWith(".less")) {
-      return name.substring(0, name.length() - 5) + expectedDataFileSuffix;
+      return name.substring(0, name.length() - 5) + ".css";
+    }
+
+    return name;
+  }
+
+  private File findCorrespondingAdditional(File lessFile) {
+    String lessFileName = lessFile.getPath();
+    String cssFileName = convertToAdditionalFilename(lessFileName);
+    File cssFile = new File(cssFileName);
+    return cssFile;
+  }
+
+  private String convertToAdditionalFilename(String name) {
+    if (name.endsWith(".less")) {
+      return name.substring(0, name.length() - 5) + additionalDataFileSuffix;
     }
 
     return name;
@@ -79,13 +102,38 @@ public class TestFileUtils {
     File file = new File(lessFile);
     if (!file.exists())
       fail("File " + lessFile + " was not created.");
-    
+
     try {
       String realContent = IOUtils.toString(new FileReader(file)).replace("\r\n", "\n");
       assertEquals(expectedContent, realContent);
     } catch (Exception ex) {
       throw new RuntimeException(ex);
-    } 
+    }
+  }
+
+  public void assertFileNotExists(String filename) {
+    File file = new File(filename);
+    assertFalse("File " + filename + " should not exists.", file.exists());
+  }
+
+  public String readFile(String filename) {
+    File inputFile = new File(filename);
+    try {
+      FileReader input = new FileReader(inputFile);
+      String expected = IOUtils.toString(input).replace("\r\n", "\n");
+      input.close();
+      return expected;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public String concatenateFiles(String... files) {
+    String result = "";
+    for (String file : files) {
+      result += readFile(file);
+    }
+    return result;
   }
 
   public void removeFiles(String... files) {

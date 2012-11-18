@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.problems;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 
 public class CompilationWarning implements Problem {
   
@@ -12,6 +13,13 @@ public class CompilationWarning implements Problem {
     super();
     this.line = line;
     this.character = character;
+    this.message = message;
+  }
+
+  public CompilationWarning(ASTCssNode offendingNode, String message) {
+    super();
+    this.line = offendingNode.getSourceLine();
+    this.character = offendingNode.getCharPositionInSourceLine();
     this.message = message;
   }
 

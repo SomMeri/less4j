@@ -23,7 +23,12 @@ import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
 
 public class LessToCssCompiler {
 
-  private ProblemsHandler problemsHandler = new ProblemsHandler();
+  private ProblemsHandler problemsHandler;
+
+  public LessToCssCompiler(ProblemsHandler problemsHandler) {
+    super();
+    this.problemsHandler = problemsHandler;
+  }
 
   public ASTCssNode compileToCss(StyleSheet less) {
     ScopeExtractor scopeBuilder = new ScopeExtractor();

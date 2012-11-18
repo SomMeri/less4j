@@ -48,4 +48,9 @@ public class LessJsTest extends AbstractFileBasedTest {
     return name.substring(0, name.length() - 5) + ".css";
   }
 
+  @Override
+  protected String canonize(String text) {
+    return text;
+  }
+
 }

@@ -2,19 +2,15 @@ package com.github.sommeri.less4j.commandline;
 
 import org.junit.Test;
 
-import com.github.sommeri.less4j.utils.TestFileUtils;
-
 public class SingleModeTest extends CommandLineTest {
 
-  private TestFileUtils fileUtils = new TestFileUtils();
-   
   @Test
   public void oneInputFile() {
     String lessFile = inputDir+"one.less";
     String cssFile = inputDir+"one.css";
     fileUtils.removeFile(cssFile);
     CommandLine.main(new String[] {lessFile});
-    assertSysout(expectedCss("one"));
+    assertSysout(correctCss("one"));
     assertNoErrors();
   }
 
@@ -24,7 +20,7 @@ public class SingleModeTest extends CommandLineTest {
     String cssFile = inputDir+"oneNew.css";
     fileUtils.removeFile(cssFile);
     CommandLine.main(new String[] {lessFile, cssFile});
-    fileUtils.assertFileContent(cssFile, expectedCss("one"));
+    fileUtils.assertFileContent(cssFile, correctCss("one"));
     assertNoErrors();
   }
 
@@ -43,4 +39,33 @@ public class SingleModeTest extends CommandLineTest {
     assertError(FILE_DOES_NOT_EXISTS);
   }
 
+  @Test
+  public void fileWithErrors() {
+    String lessFile = inputDir+"errors.less";
+    String cssFile = inputDir+"errors.css";
+    fileUtils.removeFile(cssFile);
+    CommandLine.main(new String[] {lessFile});
+    assertSysout(incorrectCss());
+    assertErrorsAsInFile(inputDir+"errors.err");
+  }
+
+  @Test
+  public void fileWithWarnings() {
+    String lessFile = inputDir+"warnings.less";
+    String cssFile = inputDir+"warnings.css";
+    fileUtils.removeFile(cssFile);
+    CommandLine.main(new String[] {lessFile});
+    assertSysout(warningsCss());
+    assertErrorsAsInFile(inputDir+"warnings.err");
+  }
+
+  @Test
+  public void fileWithErrorsAndWarnings() {
+    String lessFile = inputDir+"errorsandwarnings.less";
+    String cssFile = inputDir+"errorsandwarnings.css";
+    fileUtils.removeFile(cssFile);
+    CommandLine.main(new String[] {lessFile});
+    assertSysout(incorrectCss());
+    assertErrorsAsInFile(inputDir+"errorsandwarnings.err");
+  }
 }

@@ -1,5 +1,8 @@
 package com.github.sommeri.less4j.core.compiler.problems;
 
+import java.util.List;
+
+import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
@@ -7,10 +10,12 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.utils.LessPrinter;
 
+//TODO: this could benefit from some kind of dependency injection framework.
 public class ProblemsHandler {
   
   private ProblemsCollector collector = new ProblemsCollector();
@@ -100,6 +105,26 @@ public class ProblemsHandler {
   public void incompatibleComparisonOperand(Expression errorNode, ComparisonExpressionOperator operator) {
     collector.addError(new CompilationError(errorNode, "The operator " + operator + " can be used only with numbers."));
     
+  }
+
+  public void rulesetWithoutSelector(RuleSet errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "Ruleset without selector encountered."));
+  }
+
+  public boolean hasErrors() {
+    return collector.hasErrors();
+  }
+
+  public boolean hasWarnings() {
+    return collector.hasWarnings();
+  }
+
+  public List<Problem> getWarnings() {
+    return collector.getWarnings();
+  }
+
+  public List<Problem> getErrors() {
+    return collector.getErrors();
   }
   
 }

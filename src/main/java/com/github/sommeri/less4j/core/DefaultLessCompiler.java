@@ -6,7 +6,7 @@ import com.github.sommeri.less4j.LessCompiler;
 public class DefaultLessCompiler implements LessCompiler {
 
   @Override
-  public String compile(String lessContent) throws Less4jException {
+  public CompilationResult compile(String lessContent) throws Less4jException {
     ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
     return compiler.compile(lessContent);
   }

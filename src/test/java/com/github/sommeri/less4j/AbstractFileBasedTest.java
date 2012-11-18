@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
 /**
@@ -37,10 +38,10 @@ public abstract class AbstractFileBasedTest {
     try {
       String less = IOUtils.toString(new FileReader(lessFile));
       LessCompiler compiler = getCompiler();
-      String actual = compiler.compile(less);
+      CompilationResult actual = compiler.compile(less);
       
       String expected = IOUtils.toString(new FileReader(cssFile));
-      assertEquals(lessFile.toString(), canonize(expected), canonize(actual));
+      assertEquals(lessFile.toString(), canonize(expected), canonize(actual.getCss()));
       
     } catch (Throwable ex) {
       if (ex instanceof ComparisonFailure) {
@@ -51,9 +52,7 @@ public abstract class AbstractFileBasedTest {
     }
   }
 
-  protected String canonize(String text) {
-    return text.replaceAll("\\s", "");
-  }
+  protected abstract String canonize(String text);
 
   protected LessCompiler getCompiler() {
     return new ThreadUnsafeLessCompiler();
