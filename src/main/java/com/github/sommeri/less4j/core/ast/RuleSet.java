@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -74,8 +75,8 @@ public class RuleSet extends ASTCssNode {
    * @return 
    */
   public ReusableStructure convertToReusableStructure() {
-    if (!isReusableStructure()) //TODO throw warning here
-      return null;
+    if (!isReusableStructure()) 
+      throw new BugHappened("Caller is supposed to check for this.", this);
     
     SimpleSelector head = (SimpleSelector) selectors.get(0).getHead();
     ElementSubsequent className = (ElementSubsequent)head.getSubsequent().get(0);
@@ -91,7 +92,7 @@ public class RuleSet extends ASTCssNode {
    */
   public String extractReusableStructureName() {
     if (!isReusableStructure())
-      return "#error#"; //TODO throw some warning or whatever
+      throw new BugHappened("Caller is supposed to check for this.", this);
     
     SimpleSelector selector = (SimpleSelector)selectors.get(0).getHead();
     ElementSubsequent name = selector.getSubsequent().get(0);

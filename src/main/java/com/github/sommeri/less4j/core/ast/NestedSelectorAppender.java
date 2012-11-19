@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.Collections;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class NestedSelectorAppender extends SelectorPart {
@@ -54,7 +55,7 @@ public class NestedSelectorAppender extends SelectorPart {
   @Override
   public void setParent(ASTCssNode parent) {
     if (parent!=null && !(parent instanceof Selector))
-      throw new IllegalArgumentException("Nested selector appender must belong to selector."); //TODO throw correct exception
+      throw new BugHappened("Nested selector appender must belong to selector.", this); 
     super.setParent(parent);
   }
 

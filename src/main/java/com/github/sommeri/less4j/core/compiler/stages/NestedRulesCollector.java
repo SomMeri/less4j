@@ -15,6 +15,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
+import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
 
 public class NestedRulesCollector {
 
@@ -127,7 +128,7 @@ public class NestedRulesCollector {
     //appender somewhere in the middle
     NestedSelectorAppender appender = selector.findFirstAppender();
     if (appender == null)
-      throw new IllegalStateException("This is very weird error and should not happen."); //TODO throw correct exception
+      throw new BugHappened("This is very weird error and should not happen.", selector);
 
     Selector rightSelectorBeginning = appender.getParentAsSelector();
     Selector leftSelectorBeginning = splitOn(rightSelectorBeginning);
