@@ -28,16 +28,20 @@ public class CommandLinePrint {
 
   public void printToSysout(CompilationResult content, String inputfile) {
     if (content == null || content.getCss() == null) {
-      reportError("Could not compile the file " + inputfile);
+      reportCouldNotCompileTheFile(inputfile);
       return ;
     }
     standardOut.print(content.getCss());
     printWarnings(inputfile, content);
   }
 
+   void reportCouldNotCompileTheFile(String inputfile) {
+    reportError("Could not compile the file " + inputfile);
+  }
+
   public void printToFile(CompilationResult content, String outputFile, String inputfile) {
     if (content == null || content.getCss() == null) {
-      reportError("Could not compile the file " + inputfile);
+      reportCouldNotCompileTheFile(inputfile);
       return ;
     }
     outputFile(outputFile, content.getCss());
@@ -94,10 +98,12 @@ public class CommandLinePrint {
     standardErr.println(message);
   }
 
+  public void reportErrorsAndWarnings(Less4jException ex, String inputfile) {
+    printWarnings(inputfile, ex.getPartialResult());
+    reportErrors(ex, inputfile);
+  }
+
   public void reportErrors(Less4jException ex, String inputfile) {
-    CompilationResult partialResult = ex.getPartialResult();
-    printWarnings(inputfile, partialResult);
-    
     if (!ex.getErrors().isEmpty())
       standardErr.println("Errors produced by compilation of " + inputfile);
     

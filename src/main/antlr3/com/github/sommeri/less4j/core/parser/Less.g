@@ -302,19 +302,6 @@ ruleSet
      -> ^(RULESET $a* $b)
     ;
 
-//ruleSet
-//    : ((nestedAppender)=>a+=nestedAppender | ) 
-//      (
-//          a+=selector (
-//            (a+=ruleSetSeparator a+=nestedAppender?| a+=nestedAppender (a+=ruleSetSeparator a+=nestedAppender?)?) 
-//             a+=selector
-//          )* 
-//          a+=nestedAppender?
-//       )?   
-//    b=ruleset_body
-//     -> ^(RULESET $a* $b)
-//    ;
-    
 ruleSetSeparator
     : COMMA ;
 
@@ -329,10 +316,8 @@ nestedAppender // this must be here because of special case & & <- the space bel
          ) 
       ) -> ^(NESTED_APPENDER $a*)
     ;
-// ruleSet can contain other rulesets.
+
 //css does not require ; in last declaration
-//declaration can refer also to a mixin - removed for now, I will handle mixins later
-//TODO: what does less.js do if the statement before nested rule miss semicolon?
 ruleset_body
     : LBRACE
             (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
@@ -534,7 +519,6 @@ guardCondition
     -> ^(GUARD_CONDITION $a* $b*)
     ;   
 
-//> >= = =< <.     
 compareOperator
     : GREATER | GREATER_OR_EQUAL | OPEQ | LOWER_OR_EQUAL | LOWER
     ;     
@@ -731,7 +715,7 @@ fragment NAME : NMCHAR+ ;
 fragment UNKNOWN_DIMENSION : NMSTART NMCHAR* ;
 
 // The original URL did not allowed characters, '.', '=', ':', ';', ',' and so on
-// TODO: For now, I added only those characters that appear in less.js css test case.
+// I added those characters that appear in less.js css test case.
 fragment URL : (
                               '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'|'='|':'|';'|','|'\r'|'\n'|'\t'|' '|'+'
                             | NMCHAR

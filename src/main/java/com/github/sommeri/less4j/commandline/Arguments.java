@@ -25,6 +25,9 @@ public class Arguments {
   @Parameter(names={"-o", "--outputDir"}, description="Specify the output directory. If not present, Less4j will place output files into current directory. This option is available only in multiple files mode.")
   private String outputDirectory;
 
+  @Parameter(names={"-pi", "--printIncorrect"}, description="Print result of syntactically incorrect input file. If not present, syntactically incorrect input files produce no result. If present, less4j prints whatever came out of the compilation as a compilation result - most likely an invalid CSS. ")
+  private boolean printIncorrect;
+
   public boolean isHelp() {
     return help;
   }
@@ -41,4 +44,8 @@ public class Arguments {
     return version;
   }
   
+  public boolean isPrintIncorrect() {
+    return printIncorrect;
+  }
+
 }

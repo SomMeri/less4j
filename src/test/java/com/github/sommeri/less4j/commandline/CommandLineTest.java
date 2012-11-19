@@ -69,10 +69,16 @@ public abstract class CommandLineTest {
     String error = errContent.toString();
     assertEquals(expected, error.replace("\r\n", "\n"));
   }
-
+  
   protected void assertErrorsAsInFile(String filename) {
     String expected = fileUtils.readFile(filename);
     String error = errContent.toString();
+    assertEquals(expected, error.replace("\r\n", "\n"));
+  }
+
+  protected void assertSysoutAsInFile(String filename) {
+    String expected = fileUtils.readFile(filename);
+    String error = outContent.toString();
     assertEquals(expected, error.replace("\r\n", "\n"));
   }
 

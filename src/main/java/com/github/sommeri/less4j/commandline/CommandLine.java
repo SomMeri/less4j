@@ -20,9 +20,9 @@ public class CommandLine {
   private static final String INTRO = "Less4j compiles less files into css files. It can run in two " + "modes: single input file mode or in multiple input files mode. Less4j uses single file mode by default. " + "\n\n" + "Single file mode: Less4j expects one or two arguments. First one contains input less filename and the second one contains " + "the output css filename. If the output file argument is not present, less4j will print the result into standard output." + "\n\n" + "Multiple files mode: Must be turned on by '-m' or '--multiMode' parameter. Less4j assumes that all input files are " + "less files. All are going to be compiled into css files. Each input file will generate " + "an output file with the same name and suffix '.css'." + "\n\n";
   private static final String OUTRO = "\nExamples:\n" + " - Compile 'test.less' file and print the result into standard output:\n  # less4j test.less\n\n" + " - Compile 'test.less' file and print the result into 'test.css' file:\n  # less4j test.less test.css\n\n" + " - Compile 't1.less', 't2.less' and 't3.less' files into 't1.css', 't2.css' and 't3.css':\n  # less4j -m t1.less t2.less t3.less\n\n" + " - Compile 't1.less', 't2.less', 't3.less' files into 't1.css', 't2.css', 't3.css'. Place the result \n  into '..\\css\\' directory:\n  # less4j -m -o ..\\css\\ t1.less t2.less t3.less\n\n";
   private static final String SEPARATOR = java.io.File.separator;
-  
+
   private CommandLinePrint print;
-  
+
   public CommandLine() {
     print = new CommandLinePrint();
   }
@@ -63,37 +63,62 @@ public class CommandLine {
     }
 
     if (arguments.isMultiMode()) {
-      runAsMultimode(arguments.getFiles(), arguments.getOutputDirectory());
+      runAsMultimode(arguments.getFiles(), arguments.getOutputDirectory(), arguments.isPrintIncorrect());
     } else {
-      runAsSinglemode(arguments.getFiles());
+      runAsSinglemode(arguments.getFiles(), arguments.isPrintIncorrect());
     }
   }
 
-  private void runAsSinglemode(List<String> files) {
+  private void runAsSinglemode(List<String> files, boolean printPartial) {
     if (files.isEmpty()) {
       print.reportError("No file available.");
       return;
     }
 
     String inputfile = files.get(0);
-    CompilationResult content = compile(inputfile);
+    try {
+      CompilationResult content = compile(inputfile);
+      singleModePrint(files, inputfile, content);
+    } catch (Less4jException ex) {
+      CompilationResult partialResult = ex.getPartialResult();
+      if (printPartial) {
+        singleModePrint(files, inputfile, partialResult);
+        print.reportErrors(ex, inputfile);
+      } else {
+        print.reportErrorsAndWarnings(ex, inputfile);
+      }
+      print.reportCouldNotCompileTheFile(inputfile);
+    }
 
+  }
+
+  private void singleModePrint(List<String> files, String inputfile, CompilationResult content) {
     if (files.size() == 1) {
       print.printToSysout(content, inputfile);
-      return;
     } else {
       print.printToFile(content, files.get(1), inputfile);
     }
-    
   }
 
-  private void runAsMultimode(List<String> files, String outputDirectory) {
+  private void runAsMultimode(List<String> files, String outputDirectory, boolean printPartial) {
     if (!ensureDirectory(outputDirectory))
       return;
 
     for (String filename : files) {
-      CompilationResult content = compile(filename);
-      print.printToFile(content, toOutputFilename(outputDirectory, filename), filename);
+      try {
+        CompilationResult content = compile(filename);
+        print.printToFile(content, toOutputFilename(outputDirectory, filename), filename);
+      } catch (Less4jException ex) {
+        CompilationResult partialResult = ex.getPartialResult();
+        if (printPartial) {
+          print.printToFile(partialResult, toOutputFilename(outputDirectory, filename), filename);
+          print.reportErrors(ex, filename);
+        } else {
+          print.reportErrorsAndWarnings(ex, filename);
+        }
+        print.reportCouldNotCompileTheFile(filename);
+      }
+
     }
   }
 
@@ -138,7 +163,7 @@ public class CommandLine {
     return filename.substring(0, lastIndexOf) + ".css";
   }
 
-  private CompilationResult compile(String filename) {
+  private CompilationResult compile(String filename) throws Less4jException {
     File inputFile = new File(filename);
     if (!inputFile.exists()) {
       print.reportError("The file " + filename + " does not exists.");
@@ -158,12 +183,7 @@ public class CommandLine {
     }
 
     DefaultLessCompiler compiler = new DefaultLessCompiler();
-    try {
-      return compiler.compile(content);
-    } catch (Less4jException e) {
-      print.reportErrors(e, filename);
-    }
-    return null;
+    return compiler.compile(content);
   }
 
   private void printVersion(JCommander jCommander) {

@@ -92,4 +92,28 @@ public class MultiModeTest extends CommandLineTest {
     fileUtils.assertFileNotExists(multiCssFile3);
     assertError(fileUtils.concatenateFiles(multiErrFile1, multiErrFile2, multiErrFile3));
   }
+  
+  @Test
+  public void partialOutputWithErrorsAndWarnings() {
+    String multiLessFile1 = inputDir+"errors.less";
+    String multiCssFile1 = inputDir+"errors.css";
+    String multiErrFile1 = inputDir+"errors.err";
+    String multiExpectedCssFile1 = inputDir+"errors.expcss";
+    String multiLessFile2 = inputDir+"warnings.less";
+    String multiCssFile2 = inputDir+"warnings.css";
+    String multiErrFile2 = inputDir+"warnings.err";
+    String multiExpectedCssFile2 = inputDir+"warnings.expcss";
+    String multiLessFile3 = inputDir+"errorsandwarnings.less";
+    String multiCssFile3 = inputDir+"errorsandwarnings.css";
+    String multiErrFile3 = inputDir+"errorsandwarnings.err";
+    String multiExpectedCssFile3 = inputDir+"errorsandwarnings.expcss";
+
+    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiCssFile3);
+    CommandLine.main(new String[] {"-m", "-pi", multiLessFile1, multiLessFile2, multiLessFile3});
+    fileUtils.assertSameFileContent(multiExpectedCssFile1, multiCssFile1);
+    fileUtils.assertFileContent(multiCssFile2, warningsCss());
+    fileUtils.assertSameFileContent(multiExpectedCssFile3, multiCssFile3);
+    assertError(fileUtils.concatenateFiles(multiErrFile1, multiErrFile2, multiErrFile3));
+  }
+
 }

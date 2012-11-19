@@ -68,4 +68,15 @@ public class SingleModeTest extends CommandLineTest {
     assertSysout(incorrectCss());
     assertErrorsAsInFile(inputDir+"errorsandwarnings.err");
   }
+
+  @Test
+  public void partialOutputWithErrorsAndWarnings() {
+    String lessFile = inputDir+"errorsandwarnings.less";
+    String cssFile = inputDir+"errorsandwarnings.css";
+    String expectedCssFile = inputDir+"errorsandwarnings.expcss";
+    fileUtils.removeFile(cssFile);
+    CommandLine.main(new String[] {"-pi", lessFile});
+    assertSysoutAsInFile(expectedCssFile);
+    assertErrorsAsInFile(inputDir+"errorsandwarnings.err");
+  }
 }

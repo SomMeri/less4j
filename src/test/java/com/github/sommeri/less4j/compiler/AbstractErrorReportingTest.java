@@ -97,7 +97,7 @@ public abstract class AbstractErrorReportingTest {
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
     CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
-    printer.reportErrors(error, "testCase");
+    printer.reportErrorsAndWarnings(error, "testCase");
     
     String completeErrorReport = errContent.toString();
     return completeErrorReport;

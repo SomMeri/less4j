@@ -99,16 +99,14 @@ public class TestFileUtils {
   }
 
   public void assertFileContent(String lessFile, String expectedContent) {
-    File file = new File(lessFile);
-    if (!file.exists())
-      fail("File " + lessFile + " was not created.");
+    String realContent = readFile(lessFile);
+    assertEquals(expectedContent, realContent);
+  }
 
-    try {
-      String realContent = IOUtils.toString(new FileReader(file)).replace("\r\n", "\n");
-      assertEquals(expectedContent, realContent);
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
-    }
+  public void assertSameFileContent(String expectedFile, String actualFile) {
+    String actualContent = readFile(actualFile);
+    String expectedContent = readFile(expectedFile);
+    assertEquals(expectedContent, actualContent);
   }
 
   public void assertFileNotExists(String filename) {
@@ -118,6 +116,9 @@ public class TestFileUtils {
 
   public String readFile(String filename) {
     File inputFile = new File(filename);
+    if (!inputFile.exists())
+      fail("File " + filename + " was not created.");
+
     try {
       FileReader input = new FileReader(inputFile);
       String expected = IOUtils.toString(input).replace("\r\n", "\n");
