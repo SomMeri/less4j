@@ -37,11 +37,26 @@ public class SelectorOperator extends ASTCssNode {
   }
 
   public enum Operator {
-    NONE, EQUALS, INCLUDES, SPECIAL_PREFIX, PREFIXMATCH, SUFFIXMATCH, SUBSTRINGMATCH
+    NONE("none"), EQUALS("="), INCLUDES("~="), SPECIAL_PREFIX("|="), PREFIXMATCH("^="), SUFFIXMATCH("$="), SUBSTRINGMATCH("*=");
+    
+    private final String symbol;
+
+    private Operator(String symbol) {
+      this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+      return symbol;
+    }
   }
   
   @Override
   public SelectorOperator clone() {
     return (SelectorOperator) super.clone();
+  }
+
+  @Override
+  public String toString() {
+    return "" + operator.getSymbol();
   }
 }

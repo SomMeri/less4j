@@ -7,10 +7,10 @@ ERRORs 10:3 The namespace "#undefinedNamespace > #doesNotExists > .mixin(...)" w
 ERRORs 10:43 The mixin ".mixin" was not declared.
 ERRORs 10:43 The mixin ".mixin" was not matched.
 ERRORs 15:11 Variable indirection works only with string values.
-ERRORs 37:17 The operator GREATER can be used only with numbers.
+ERRORs 37:17 The operator '>' can be used only with numbers.
 ERRORs 41:4 Undefined parameter @a of mixin .guardedMixin defined on line 32
 ERRORs 32:25 The variable "@a" was not declared.
-ERRORs 32:25 The operator GREATER can be used only with numbers.
+ERRORs 32:25 The operator '>' can be used only with numbers.
 ERRORs 45:4 The mixin ".doesNotExists" was not declared.
 ERRORs 45:4 The mixin ".doesNotExists" was not matched.
 ERRORs 49:26 The mixin ".doesNotExists" was not declared.

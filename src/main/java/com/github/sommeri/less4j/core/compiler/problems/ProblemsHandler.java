@@ -104,7 +104,7 @@ public class ProblemsHandler {
   }
 
   public void incompatibleComparisonOperand(Expression errorNode, ComparisonExpressionOperator operator) {
-    collector.addError(new CompilationError(errorNode, "The operator " + operator + " can be used only with numbers."));
+    collector.addError(new CompilationError(errorNode, "The operator '" + operator + "' can be used only with numbers."));
     
   }
 

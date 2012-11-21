@@ -37,7 +37,17 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
   }
 
   public enum Combinator {
-    ADJACENT_SIBLING, CHILD, DESCENDANT, GENERAL_SIBLING;
+    ADJACENT_SIBLING("+"), CHILD(">"), DESCENDANT("' '"), GENERAL_SIBLING("~");
+    
+    private final String symbol;
+
+    private Combinator(String symbol) {
+      this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+      return symbol;
+    }
   }
 
   @Override
@@ -47,7 +57,7 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
 
   @Override
   public String toString() {
-    return "" + combinator;
+    return "" + combinator.getSymbol();
   }
   
 }

@@ -102,7 +102,6 @@ public class MultiModeTest extends CommandLineTest {
     String multiLessFile2 = inputDir+"warnings.less";
     String multiCssFile2 = inputDir+"warnings.css";
     String multiErrFile2 = inputDir+"warnings.err";
-    String multiExpectedCssFile2 = inputDir+"warnings.expcss";
     String multiLessFile3 = inputDir+"errorsandwarnings.less";
     String multiCssFile3 = inputDir+"errorsandwarnings.css";
     String multiErrFile3 = inputDir+"errorsandwarnings.err";

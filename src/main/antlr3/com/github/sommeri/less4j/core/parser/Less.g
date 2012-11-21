@@ -24,6 +24,8 @@ options {
     language = Java;
     // generated parser should create abstract syntax tree
     output = AST;
+    // parser will extend special super class
+    superClass = SuperLessParser;
 }
 
 tokens {
@@ -73,8 +75,7 @@ tokens {
  
 @parser::header {
   package com.github.sommeri.less4j.core.parser;
-  import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
-  import com.github.sommeri.less4j.core.parser.AntlrException;
+  import com.github.sommeri.less4j.core.parser.SuperLessParser;
 }
 
 //override some methods and add new members to generated lexer
@@ -133,32 +134,12 @@ tokens {
 
 //override some methods and add new members to generated parser
 @parser::members {
-
   public LessParser(TokenStream input, List<AntlrException> errors) {
-    this(input, new RecognizerSharedState(), errors);
+    super(input, errors);
   }
-  public LessParser(TokenStream input, RecognizerSharedState state, List<AntlrException> errors) {
-    super(input, state);
-    this.errors = errors;
-  }
-
-  //add new field
-  private List<AntlrException> errors = new ArrayList<AntlrException>();
-  private ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
   
-  public List<AntlrException> getAllErrors() {
-    return new ArrayList<AntlrException>(errors);
-  }
-
-  //add new method
-  public boolean hasErrors() {
-    return !errors.isEmpty();
-  }
-
-  //override method
-  public void reportError(RecognitionException e) {
-    errors.add(new AntlrException(e, getErrorMessage(e, getTokenNames())));
-    displayRecognitionError(this.getTokenNames(), e);
+  public LessParser(TokenStream input, RecognizerSharedState state, List<AntlrException> errors) {
+    super(input, state, errors);
   }
   
 }
@@ -171,6 +152,8 @@ tokens {
 // of imports, and then the main body of style rules.
 //
 styleSheet
+@init {enterRule(retval, RULE_STYLESHEET);}
+@after { leaveRule(); }
     : ( a+=charSet* //the original ? was replaced by *, because it is possible (even if it makes no sense) and less.js is able to handle such situation
         a+=imports*
         a+=bodylist
@@ -182,6 +165,8 @@ styleSheet
 // Removed an empty option from this rule, ANTLR seems to have problems with this.
 // https://developer.mozilla.org/en/CSS/@charset
 charSet
+@init {enterRule(retval, RULE_CHARSET);}
+@after { leaveRule(); }
     : CHARSET_SYM STRING SEMI -> ^(CHARSET_DECLARATION STRING)
     ;
 
@@ -189,6 +174,8 @@ charSet
 // Import. Location of an external style sheet to include in the ruleset.
 //
 imports
+@init {enterRule(retval, RULE_IMPORTS);}
+@after { leaveRule(); }
     : IMPORT_SYM (STRING|URI) (mediaQuery (COMMA mediaQuery)*)? SEMI
     ;
 
@@ -199,6 +186,8 @@ imports
 //
 //TODO media part of the grammar is throwing away tokens, so comments will not work correctly. fix that
 media
+@init {enterRule(retval, RULE_MEDIA);}
+@after { leaveRule(); }
     : MEDIA_SYM (m1+=mediaQuery (n+=COMMA m+=mediaQuery)*)
         q1=LBRACE
             ((declaration) => b+=declaration SEMI
@@ -212,6 +201,8 @@ media
 // Medium. The name of a medim that are particulare set of rules applies to.
 //
 mediaQuery
+@init {enterRule(retval, RULE_MEDIUM);}
+@after { leaveRule(); }
     : a+=IDENT (a+=IDENT)? (b+=IDENT c+=mediaExpression)* -> ^(MEDIA_QUERY ^(MEDIUM_TYPE $a*) ($b $c)*)
     | d=mediaExpression (e+=IDENT f+=mediaExpression)* -> ^(MEDIA_QUERY $d ($e $f)*)
     ;
@@ -238,11 +229,15 @@ bodyset
     ;
 
 variabledeclaration
+@init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
+@after { leaveRule(); }
     : VARIABLE COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* SEMI)
     ;
 
 //used in mixinReferenceArgument
 variabledeclarationLimitedNoSemi
+@init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
+@after { leaveRule(); }
     : VARIABLE COLON (a+=mathExprHighPrior) -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* )
     ;
 
@@ -252,10 +247,14 @@ reusableStructureParameter
     ;
 
 variablereference
+@init {enterRule(retval, RULE_VARIABLE_REFERENCE);}
+@after { leaveRule(); }
     : VARIABLE | INDIRECT_VARIABLE
     ;
 
 fontface
+@init {enterRule(retval, RULE_FONT_FACE);}
+@after { leaveRule(); }
     : FONT_FACE_SYM^
         LBRACE!
             declaration SEMI! (declaration SEMI!)*
@@ -263,6 +262,8 @@ fontface
     ;
 
 page
+@init {enterRule(retval, RULE_PAGE);}
+@after { leaveRule(); }
     : PAGE_SYM pseudoPage?
         LBRACE
             declaration SEMI (declaration SEMI)*
@@ -270,6 +271,8 @@ page
     ;
     
 pseudoPage
+@init {enterRule(retval, RULE_PSEUDO_PAGE);}
+@after { leaveRule(); }
     : COLON IDENT
     ;
     
@@ -297,6 +300,8 @@ property
 //we need to put comma into the tree so we can collect comments to it
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet
+@init {enterRule(retval, RULE_RULESET);}
+@after { leaveRule(); }
     : a+=selector ( a+=ruleSetSeparator a+=selector)*
        b=ruleset_body
      -> ^(RULESET $a* $b)
@@ -358,6 +363,8 @@ ruleset_body
 */
 //TODO: Nested and top level selectors are different: top level one does NOT allow appenders
 selector 
+@init {enterRule(retval, RULE_SELECTOR);}
+@after { leaveRule(); }
     : ((nestedAppender)=>a+=nestedAppender | ) ((a+=combinator ) (a+=elementName | a+=elementSubsequent | a+=nestedAppender) )*
     -> ^(SELECTOR $a* ) 
     ;
@@ -471,17 +478,25 @@ pseudoparameters:
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
 
 namespaceReference
+@init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
+@after { leaveRule(); }
     : (a+=reusableStructureName GREATER)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
 
 namespaceReferenceWithSemi
+@init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
+@after { leaveRule(); }
     : (a+=reusableStructureName GREATER)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
 
 mixinReference
+@init {enterRule(retval, RULE_MIXIN_REFERENCE);}
+@after { leaveRule(); }
     : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 
 mixinReferenceWithSemi
+@init {enterRule(retval, RULE_MIXIN_REFERENCE);}
+@after { leaveRule(); }
     : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
@@ -500,6 +515,8 @@ reusableStructureName
 
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 
+@init {enterRule(retval, RULE_ABSTRACT_MIXIN_OR_NAMESPACE);}
+@after { leaveRule(); }
     : a=reusableStructureName LPAREN c=reusableStructureArguments? RPAREN e=reusableStructureGuards? f=ruleset_body
     -> ^(REUSABLE_STRUCTURE $a $c* $e* $f)
     ;
@@ -547,11 +564,15 @@ reusableStructurePattern
 //The expr is optional, because less.js supports this: "margin: ;" I do not know why, but they have it in
 //their unit tests (so it was intentional)
 declaration
+@init {enterRule(retval, RULE_DECLARATION);}
+@after { leaveRule(); }
     : property COLON expr? prio? -> ^(DECLARATION property expr? prio?)
     ;
 
 //I had to do this to put semicolon as a last member of the declaration subtree - comments would be messed up otherwise.
 declarationWithSemicolon
+@init {enterRule(retval, RULE_DECLARATION);}
+@after { leaveRule(); }
     : property COLON expr? prio? SEMI -> ^(DECLARATION property expr? prio?)
     ;
     
@@ -574,15 +595,21 @@ mathOperatorLowPrior
     | MINUS
     ;
 
-expr
+expr 
+@init {enterRule(retval, RULE_EXPRESSION);}
+@after { leaveRule(); }
     : a=mathExprHighPrior (b+=operator c+=mathExprHighPrior)* -> ^(EXPRESSION $a ($b $c)*)
     ;
     
 mathExprHighPrior
+@init {enterRule(retval, RULE_EXPRESSION);}
+@after { leaveRule(); }
     : a=mathExprLowPrior (b+=mathOperatorLowPrior c+=mathExprLowPrior)* -> ^(EXPRESSION $a ($b $c)*)
     ;
 
 mathExprLowPrior
+@init {enterRule(retval, RULE_EXPRESSION);}
+@after { leaveRule(); }
     : a=term (b+=mathOperatorHighPrior c+=term)* -> ^(EXPRESSION $a ($b $c)*)
     ;
 

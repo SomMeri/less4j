@@ -32,7 +32,17 @@ public class ExpressionOperator extends ASTCssNode {
   }
 
   public enum Operator {
-    SOLIDUS, COMMA, STAR, EMPTY_OPERATOR, MINUS, PLUS;
+    SOLIDUS("/"), COMMA(","), STAR("*"), EMPTY_OPERATOR("' '"), MINUS("-"), PLUS("+");
+    
+    private final String symbol;
+
+    private Operator(String symbol) {
+      this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+      return symbol;
+    }
   }
 
   @Override
@@ -42,7 +52,7 @@ public class ExpressionOperator extends ASTCssNode {
 
   @Override
   public String toString() {
-    return "" + operator;
+    return "" + operator.getSymbol();
   }
   
   @Override

@@ -35,7 +35,7 @@ public class DebugPrint {
   }
 
   private static String toOneLine(String text) {
-    return text.replace("\n", "");
+    return text.replace("\r\n", "").replace("\n", "");
   }
 
   public static void print(HiddenTokenAwareTree ast) {
@@ -59,7 +59,11 @@ public class DebugPrint {
   }
 
   public static void printSingleNode(HiddenTokenAwareTree tree) {
-    String base = " " + " " + tree.getText();
+    String invalid = "";
+    if (tree.getType()==0)
+      invalid = " (" + PrintUtils.toName(tree.getType()) + ")";
+    
+    String base = " " + " " + toOneLine(tree.getText()) + invalid;
     if (printIndexes) {
       String optionalsuffix = " " + tree.getTokenStartIndex() + "-" + tree.getTokenStopIndex() + " " + (tree.getToken() == null ? "" : tree.getToken().getTokenIndex());
       base = base + optionalsuffix;

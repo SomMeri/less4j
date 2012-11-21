@@ -27,6 +27,7 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
+import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
@@ -42,7 +43,6 @@ import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
-import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
 
 public class CssPrinter {
 
@@ -63,9 +63,9 @@ public class CssPrinter {
   public boolean append(ASTCssNode node) {
     // opening comments should not be docked directly in front of following
     // thing
-    if (node==null)
+    if (node == null)
       return false;
-    
+
     appendComments(node.getOpeningComments(), true);
     boolean result = switchOnType(node);
     appendComments(node.getTrailingComments(), false);
@@ -151,7 +151,7 @@ public class CssPrinter {
 
     case MEDIUM:
       return appendMedium((Medium) node);
-      
+
     case MEDIUM_MODIFIER:
       return appendMediumModifier((MediumModifier) node);
 
@@ -260,36 +260,13 @@ public class CssPrinter {
   }
 
   private boolean appendSelectorOperator(SelectorOperator operator) {
-    switch (operator.getOperator()) {
+    SelectorOperator.Operator realOperator = operator.getOperator();
+    switch (realOperator) {
     case NONE:
       break;
 
-    case EQUALS:
-      builder.append("=");
-      break;
-
-    case INCLUDES:
-      builder.append("~=");
-      break;
-
-    case SPECIAL_PREFIX:
-      builder.append("|=");
-      break;
-
-    case PREFIXMATCH:
-      builder.append("^=");
-      break;
-
-    case SUFFIXMATCH:
-      builder.append("$=");
-      break;
-
-    case SUBSTRINGMATCH:
-      builder.append("*=");
-      break;
-
     default:
-      throw new IllegalStateException("Unknown: " + operator);
+      builder.append(realOperator.getSymbol());
     }
     return true;
   }
@@ -418,7 +395,7 @@ public class CssPrinter {
   public boolean appendMedium(Medium medium) {
     append(medium.getModifier());
     append(medium.getMediumType());
-    
+
     return true;
   }
 
@@ -439,32 +416,31 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown modifier type.");
     }
-    
+
     return true;
   }
 
   public boolean appendMediumType(MediumType medium) {
     builder.ensureSeparator().append(medium.getName());
-    
+
     return true;
   }
 
   public boolean appendMediaExpression(MediaExpression expression) {
     builder.ensureSeparator().append("(");
     append(expression.getFeature());
-    if (expression.getExpression()!=null) {
+    if (expression.getExpression() != null) {
       builder.append(":").ensureSeparator();
       append(expression.getExpression());
     }
     builder.append(")");
     return true;
   }
-  
+
   public boolean appendMediaExpressionFeature(MediaExpressionFeature feature) {
     builder.append(feature.getFeature());
     return true;
   }
-  
 
   public boolean appendNamedExpression(NamedExpression expression) {
     builder.append(expression.getName());
@@ -483,25 +459,14 @@ public class CssPrinter {
   }
 
   public boolean appendExpressionOperator(ExpressionOperator operator) {
-    switch (operator.getOperator()) {
+    ExpressionOperator.Operator realOperator = operator.getOperator();
+    switch (realOperator) {
     case COMMA:
-      builder.append(",").ensureSeparator();
-      break;
-
-    case SOLIDUS:
-      builder.append("/");
-      break;
-
-    case STAR:
-      builder.append("*");
+      builder.append(realOperator.getSymbol()).ensureSeparator();
       break;
 
     case EMPTY_OPERATOR:
       builder.ensureSeparator();
-      break;
-
-    case PLUS:
-      builder.append("+");
       break;
 
     //TODO this is a huge hack which goes around "we do not parse fonts and less.js does" lack of feature
@@ -511,7 +476,7 @@ public class CssPrinter {
       break;
 
     default:
-      throw new IllegalStateException("Unknown: " + operator);
+      builder.append(realOperator.getSymbol());
     }
 
     return true;
@@ -519,7 +484,7 @@ public class CssPrinter {
 
   public boolean appendCssString(CssString expression) {
     String quoteType = expression.getQuoteType();
-    builder.append(quoteType+expression.getValue()+quoteType);
+    builder.append(quoteType + expression.getValue() + quoteType);
 
     return true;
   }
@@ -556,12 +521,12 @@ public class CssPrinter {
       builder.append(node.getOriginalString());
     } else {
       if (node.hasExpliciteSign()) {
-        if (0<node.getValueAsDouble())
+        if (0 < node.getValueAsDouble())
           builder.append("+");
-        else 
+        else
           builder.append("-");
       }
-      builder.append(format(node.getValueAsDouble())+node.getSuffix());
+      builder.append(format(node.getValueAsDouble()) + node.getSuffix());
     }
 
     return true;
@@ -585,7 +550,7 @@ public class CssPrinter {
   public boolean appendSelector(Selector selector) {
     if (selector.hasLeadingCombinator())
       append(selector.getLeadingCombinator());
-    
+
     if (!selector.isCombined()) {
       append(selector.getHead());
       return true;
@@ -625,22 +590,14 @@ public class CssPrinter {
   }
 
   public boolean appendSelectorCombinator(SelectorCombinator combinator) {
-    switch (combinator.getCombinator()) {
-    case ADJACENT_SIBLING:
-      builder.ensureSeparator().append("+");
-      break;
-
-    case CHILD:
-      builder.ensureSeparator().append(">");
-      break;
-
-    case GENERAL_SIBLING:
-      builder.ensureSeparator().append("~");
-      break;
-
+    SelectorCombinator.Combinator realCombinator = combinator.getCombinator();
+    switch (realCombinator) {
     case DESCENDANT:
       builder.ensureSeparator();
       break;
+
+    default:
+      builder.ensureSeparator().append(realCombinator.getSymbol());
 
     }
 

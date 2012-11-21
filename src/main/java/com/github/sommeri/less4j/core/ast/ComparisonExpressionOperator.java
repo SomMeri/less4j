@@ -28,7 +28,17 @@ public class ComparisonExpressionOperator extends ASTCssNode {
   }
 
   public enum Operator {
-    GREATER, GREATER_OR_EQUAL, OPEQ, LOWER_OR_EQUAL, LOWER;
+    GREATER(">"), GREATER_OR_EQUAL(">="), OPEQ("="), LOWER_OR_EQUAL("<="), LOWER("<");
+    
+    private final String symbol;
+    private Operator(String symbol) {
+      this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+      return symbol;
+    }
+    
   }
 
   @Override
@@ -38,7 +48,7 @@ public class ComparisonExpressionOperator extends ASTCssNode {
 
   @Override
   public String toString() {
-    return "" + operator;
+    return "" + operator.getSymbol();
   }
   
   @Override

@@ -1,15 +1,8 @@
-#container {
-  color: black;
-}
-
-#mixin {
-  #cookie {
-     #container;
-  }
-}
-
 #namespace {
-  #cookie {
-     #mixin > #cookie;
+  .borders {
+    border-style: dotted;
   }
+}
+.chips {
+  #namespace .borders;
 }

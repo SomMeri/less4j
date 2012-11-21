@@ -72,9 +72,6 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.MEDIA_SYM)
       return handleMedia(token);
 
-//    if (type == LessLexer.MEDIUM_DECLARATION)
-//      return handleMediumDeclaration(token);
-//
     if (type == LessLexer.MEDIA_QUERY)
       return handleMediaQuery(token);
 
@@ -177,8 +174,6 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleSelector(HiddenTokenAwareTree token);
 
   public abstract T handleRuleSet(HiddenTokenAwareTree token);
-
-//  public abstract T handleMediumDeclaration(HiddenTokenAwareTree token);
 
   public T handleEOF(HiddenTokenAwareTree token) {
     return null;
