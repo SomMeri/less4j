@@ -14,12 +14,12 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class LessToCssCompiler {
 

@@ -62,7 +62,7 @@ public class CommandLinePrint {
   }
 
   private String toError(Problem warning) {
-    return "ERRORs " + toString(warning);
+    return "ERROR " + toString(warning);
   }
 
   private String toString(Problem problem) {

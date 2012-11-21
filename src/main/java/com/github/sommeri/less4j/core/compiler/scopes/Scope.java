@@ -11,7 +11,7 @@ import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class Scope {
   

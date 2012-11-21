@@ -30,10 +30,10 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
-import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.problems.BugHappened;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class ExpressionEvaluator {
 

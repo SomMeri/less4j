@@ -8,7 +8,7 @@ import org.antlr.runtime.Token;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
-import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class ASTBuilder {
   

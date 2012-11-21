@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface LessCompiler {
@@ -10,6 +11,14 @@ public interface LessCompiler {
 
     private final String css;
     private final List<Problem> warnings;
+
+    public CompilationResult(String css) {
+      this(css, emptyList());
+    }
+
+    private static List<Problem> emptyList() {
+      return Collections.emptyList();
+    }
 
     public CompilationResult(String css, List<Problem> warnings) {
       super();

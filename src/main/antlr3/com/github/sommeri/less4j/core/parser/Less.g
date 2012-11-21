@@ -71,23 +71,25 @@ tokens {
 @lexer::header {
   package com.github.sommeri.less4j.core.parser;
   import com.github.sommeri.less4j.core.parser.AntlrException;
+  import com.github.sommeri.less4j.LessCompiler.Problem;
 }
  
 @parser::header {
   package com.github.sommeri.less4j.core.parser;
   import com.github.sommeri.less4j.core.parser.SuperLessParser;
+  import com.github.sommeri.less4j.LessCompiler.Problem;
 }
 
 //override some methods and add new members to generated lexer
 @lexer::members {
-    public LessLexer(List<AntlrException> errors) {
+    public LessLexer(List<Problem> errors) {
       this.errors = errors;
     }
 
-    public LessLexer(CharStream input, List<AntlrException> errors) {
+    public LessLexer(CharStream input, List<Problem> errors) {
       this(input, new RecognizerSharedState(), errors);
     }
-    public LessLexer(CharStream input, RecognizerSharedState state, List<AntlrException> errors) {
+    public LessLexer(CharStream input, RecognizerSharedState state, List<Problem> errors) {
       super(input,state);
       this.errors = errors;
     }
@@ -112,11 +114,11 @@ tokens {
         return (Token)tokens.remove(0);
   }
   //add new field
-  private List<AntlrException> errors = new ArrayList<AntlrException>();
+  private List<Problem> errors = new ArrayList<Problem>();
   
   //add new method
-  public List<AntlrException> getAllErrors() {
-    return new ArrayList<AntlrException>(errors);
+  public List<Problem> getAllErrors() {
+    return new ArrayList<Problem>(errors);
   }
 
   //add new method
@@ -127,18 +129,17 @@ tokens {
   //override method
   public void reportError(RecognitionException e) {
     errors.add(new AntlrException(e, getErrorMessage(e, getTokenNames())));
-    displayRecognitionError(this.getTokenNames(), e);
   }
   
 }
 
 //override some methods and add new members to generated parser
 @parser::members {
-  public LessParser(TokenStream input, List<AntlrException> errors) {
+  public LessParser(TokenStream input, List<Problem> errors) {
     super(input, errors);
   }
   
-  public LessParser(TokenStream input, RecognizerSharedState state, List<AntlrException> errors) {
+  public LessParser(TokenStream input, RecognizerSharedState state, List<Problem> errors) {
     super(input, state, errors);
   }
   

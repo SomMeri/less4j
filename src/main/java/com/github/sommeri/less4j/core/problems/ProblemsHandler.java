@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.problems;
+package com.github.sommeri.less4j.core.problems;
 
 import java.util.List;
 

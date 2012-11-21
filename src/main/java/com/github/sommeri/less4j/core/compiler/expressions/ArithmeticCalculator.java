@@ -7,9 +7,9 @@ import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
-import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
-import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.core.problems.BugHappened;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 class ArithmeticCalculator {
   

@@ -2,8 +2,10 @@ package com.github.sommeri.less4j;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
+import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.ComparisonFailure;
@@ -12,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+import com.github.sommeri.less4j.commandline.CommandLinePrint;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
 /**
@@ -42,7 +45,10 @@ public abstract class AbstractFileBasedTest {
       
       String expected = IOUtils.toString(new FileReader(cssFile));
       assertEquals(lessFile.toString(), canonize(expected), canonize(actual.getCss()));
-      
+    } catch (Less4jException ex) {
+      String errorReport = generateErrorReport(ex);
+      System.err.println(errorReport);
+      throw new RuntimeException(testName + " " + errorReport, ex);
     } catch (Throwable ex) {
       if (ex instanceof ComparisonFailure) {
         ComparisonFailure fail = (ComparisonFailure)ex;
@@ -56,6 +62,17 @@ public abstract class AbstractFileBasedTest {
 
   protected LessCompiler getCompiler() {
     return new ThreadUnsafeLessCompiler();
+  }
+
+  private String generateErrorReport(Less4jException error) {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+
+    CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
+    printer.reportErrorsAndWarnings(error, testName);
+    
+    String completeErrorReport = errContent.toString();
+    return completeErrorReport;
   }
 
 }

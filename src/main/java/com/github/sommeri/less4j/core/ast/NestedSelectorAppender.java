@@ -3,8 +3,8 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class NestedSelectorAppender extends SelectorPart {
 

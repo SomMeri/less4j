@@ -12,11 +12,13 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
+
+import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
 import com.github.sommeri.less4j.core.parser.AntlrException;
 
 public class SuperLessParser extends Parser {
-  
+
   public final String[] tokenErrorNames;
   //TODO: write about this to error handling post, it would be cool if I could do this declaratively in grammar 
   private static final Map<String, String> ALTERNATIVE_NAMES_FOR_ERROR_REPORTING = new HashMap<String, String>();
@@ -64,7 +66,8 @@ public class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EMPTY_COMBINATOR", "/");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("URL", "empty combinator");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NL", "url");
-    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NEW_LINE", "new line");  }
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NEW_LINE", "new line");
+  }
 
   protected static final String RULE_STYLESHEET = "stylesheet";
   protected static final String RULE_FONT_FACE = "font-face";
@@ -84,16 +87,16 @@ public class SuperLessParser extends Parser {
   protected static final String RULE_SELECTOR = "selector";
   protected static final String RULE_MEDIUM = "medium";
 
-  protected List<AntlrException> errors = new ArrayList<AntlrException>();
+  protected List<Problem> errors = new ArrayList<Problem>();
   protected ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
   //more helpfull error reporting
   protected Stack<EnterRuleInfo> paraphrases = new Stack<EnterRuleInfo>();
 
-  public SuperLessParser(TokenStream input, List<AntlrException> errors) {
+  public SuperLessParser(TokenStream input, List<Problem> errors) {
     this(input, new RecognizerSharedState(), errors);
   }
 
-  public SuperLessParser(TokenStream input, RecognizerSharedState state, List<AntlrException> errors) {
+  public SuperLessParser(TokenStream input, RecognizerSharedState state, List<Problem> errors) {
     super(input, state);
     this.errors = errors;
     this.tokenErrorNames = generateTokenErrorNames();
@@ -103,18 +106,18 @@ public class SuperLessParser extends Parser {
     String[] result = getTokenNames().clone();
     for (int i = 0; i < result.length; i++) {
       if (ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.containsKey(result[i])) {
-        result[i] = "'"+ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.get(result[i])+"'";
+        result[i] = "'" + ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.get(result[i]) + "'";
       }
     }
     return result;
   }
 
   public SuperLessParser(TokenStream input, RecognizerSharedState state) {
-    this(input, state, new ArrayList<AntlrException>());
+    this(input, state, new ArrayList<Problem>());
   }
 
-  public List<AntlrException> getAllErrors() {
-    return new ArrayList<AntlrException>(errors);
+  public List<Problem> getAllErrors() {
+    return new ArrayList<Problem>(errors);
   }
 
   //add new method
@@ -122,21 +125,25 @@ public class SuperLessParser extends Parser {
     return !errors.isEmpty();
   }
 
-  //override method
   public void reportError(RecognitionException e) {
     errors.add(new AntlrException(e, getErrorMessage(e, tokenErrorNames)));
-    displayRecognitionError(tokenErrorNames, e);
+  }
+
+  public String getErrorHeader(RecognitionException e) {
+    if (getSourceName() != null)
+      return getSourceName() + " line " + e.line + ":" + (e.charPositionInLine + 1);
+
+    return "line " + e.line + ":" + (e.charPositionInLine + 1);
   }
 
   @Override
   public String getErrorMessage(RecognitionException e, String[] tokenNames) {
-    String result = super.getErrorMessage(e, tokenNames);
-    if (result == null)
-      return result;
+    String result = "" + super.getErrorMessage(e, tokenNames);
 
     if (!paraphrases.isEmpty()) {
       EnterRuleInfo info = paraphrases.peek();
-      result = result + " in " + info.getRulename() + " (which started at "+info.getStart().getLine()+":"+(info.getStart().getCharPositionInLine()+1)+")";
+      String position = info.getStart().getLine() + ":" + (info.getStart().getCharPositionInLine() + 1);
+      result = result + " in " + info.getRulename() + " (which started at " + position + ")";
     }
     return result;
   }
@@ -144,7 +151,7 @@ public class SuperLessParser extends Parser {
   protected void enterRule(ParserRuleReturnScope retval, String rulename) {
     paraphrases.add(new EnterRuleInfo(retval.start, rulename));
   }
-  
+
   protected void leaveRule() {
     paraphrases.pop();
   }
@@ -167,5 +174,5 @@ class EnterRuleInfo {
   public String getRulename() {
     return rulename;
   }
-  
+
 }

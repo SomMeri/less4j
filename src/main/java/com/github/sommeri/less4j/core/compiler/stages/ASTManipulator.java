@@ -8,7 +8,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Body;
-import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class ASTManipulator {
 

@@ -3,8 +3,8 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class RuleSet extends ASTCssNode {

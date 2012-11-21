@@ -1,5 +1,5 @@
 Errors produced by compilation of src/test/resources/command-line/errors.less
-ERRORs 2:16 The variable "@variable" was not declared.
-ERRORs 4:4 The mixin ".mixin" was not declared.
-ERRORs 4:4 The mixin ".mixin" was not matched.
+ERROR 2:16 The variable "@variable" was not declared.
+ERROR 4:4 The mixin ".mixin" was not declared.
+ERROR 4:4 The mixin ".mixin" was not matched.
 Could not compile the file src/test/resources/command-line/errors.less

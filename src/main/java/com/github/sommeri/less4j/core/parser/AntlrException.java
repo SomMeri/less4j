@@ -2,7 +2,9 @@ package com.github.sommeri.less4j.core.parser;
 
 import org.antlr.runtime.RecognitionException;
 
-public class AntlrException {
+import com.github.sommeri.less4j.LessCompiler.Problem;
+
+public class AntlrException implements Problem {
   
   private final RecognitionException delegee;
   private String message;
@@ -27,6 +29,11 @@ public class AntlrException {
 
   public int getCharacter() {
     return delegee.charPositionInLine+1;
+  }
+
+  @Override
+  public Type getType() {
+    return Type.ERROR;
   }
   
 }

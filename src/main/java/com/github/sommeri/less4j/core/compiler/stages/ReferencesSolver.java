@@ -16,10 +16,10 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class ReferencesSolver {

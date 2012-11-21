@@ -15,7 +15,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
-import com.github.sommeri.less4j.core.compiler.problems.BugHappened;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class NestedRulesCollector {
 

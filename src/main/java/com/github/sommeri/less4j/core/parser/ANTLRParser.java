@@ -17,6 +17,7 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 
+import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.utils.DebugPrint;
 
 /**
@@ -56,7 +57,7 @@ public class ANTLRParser {
     try {
       if (isDebug)
         DebugPrint.printTokenStream(input);
-      List<AntlrException> errors = new ArrayList<AntlrException>();
+      List<Problem> errors = new ArrayList<Problem>();
       LessLexer lexer = createLexer(input, errors);
 
       CollectorTokenSource tokenSource = new CollectorTokenSource(lexer, KEEP_HIDDEN_TOKENS);
@@ -67,20 +68,20 @@ public class ANTLRParser {
       merge(ast, tokenSource.getCollectedTokens());
       if (isDebug)
         DebugPrint.print(ast);
-      return new ParseResultImpl(ast, new ArrayList<AntlrException>(errors));
+      return new ParseResultImpl(ast, new ArrayList<Problem>(errors));
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");
     }
   }
 
-  private LessParser createParser(TokenSource tokenSource, List<AntlrException> errors) {
+  private LessParser createParser(TokenSource tokenSource, List<Problem> errors) {
     CommonTokenStream tokens = new CommonTokenStream(tokenSource);
     LessParser parser = new LessParser(tokens, errors);
     parser.setTreeAdaptor(new HiddenTokenAwareTreeAdaptor());
     return parser;
   }
 
-  private LessLexer createLexer(String expression, List<AntlrException> errors) {
+  private LessLexer createLexer(String expression, List<Problem> errors) {
     ANTLRStringStream input = new ANTLRStringStream(expression);
     LessLexer lexer = new LessLexer(input, errors);
     return lexer;
@@ -94,15 +95,15 @@ public class ANTLRParser {
 
   public interface ParseResult {
     HiddenTokenAwareTree getTree();
-    List<AntlrException> getErrors();
+    List<Problem> getErrors();
     boolean hasErrors();
   }
 
   private class ParseResultImpl implements ParseResult {
     private final HiddenTokenAwareTree tree;
-    private final List<AntlrException> errors;
+    private final List<Problem> errors;
 
-    public ParseResultImpl(HiddenTokenAwareTree tree, List<AntlrException> errors) {
+    public ParseResultImpl(HiddenTokenAwareTree tree, List<Problem> errors) {
       super();
       this.tree = tree;
       this.errors = errors;
@@ -112,7 +113,7 @@ public class ANTLRParser {
       return tree;
     }
 
-    public List<AntlrException> getErrors() {
+    public List<Problem> getErrors() {
       return errors;
     }
 
@@ -207,7 +208,7 @@ class CollectorTokenSource implements TokenSource {
 
   @Override
   public String getSourceName() {
-    return "Collect hidden channel " + source.getSourceName();
+    return source.getSourceName();
   }
 
 }

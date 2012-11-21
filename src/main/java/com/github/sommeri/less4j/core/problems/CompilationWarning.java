@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.problems;
+package com.github.sommeri.less4j.core.problems;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;

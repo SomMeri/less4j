@@ -10,9 +10,9 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionComparator;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
-import com.github.sommeri.less4j.core.compiler.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class MixinsReferenceMatcher {
 
