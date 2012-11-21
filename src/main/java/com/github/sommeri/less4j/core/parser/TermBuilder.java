@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -79,7 +80,7 @@ public class TermBuilder {
       return buildFromParentheses(offsetChild);
 
     default:
-      throw new TreeBuildingException("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
+      throw new BugHappened("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
 
     }
   }
@@ -159,7 +160,7 @@ public class TermBuilder {
       return Dimension.FREQ;
 
     default:
-      throw new TreeBuildingException("Unknown dimension type: " + actual.getType() + " " + actual.getText(), actual);
+      throw new BugHappened("Unknown dimension type: " + actual.getType() + " " + actual.getText(), actual);
 
     }
   }

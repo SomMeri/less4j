@@ -19,19 +19,15 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(String lessContent) throws Less4jException {
-    try {
-      problemsHandler = new ProblemsHandler();
-      astBuilder = new ASTBuilder(problemsHandler);
-      compiler = new LessToCssCompiler(problemsHandler);
-      String css = doCompile(lessContent);
-      CompilationResult compilationResult = new CompilationResult(css, problemsHandler.getWarnings());
-      if (problemsHandler.hasErrors()) {
-        throw new Less4jException(problemsHandler.getErrors(), compilationResult);
-      }
-      return compilationResult;
-    } catch (TranslationException ex) {
-      throw new Less4jException(ex);
+    problemsHandler = new ProblemsHandler();
+    astBuilder = new ASTBuilder(problemsHandler);
+    compiler = new LessToCssCompiler(problemsHandler);
+    String css = doCompile(lessContent);
+    CompilationResult compilationResult = new CompilationResult(css, problemsHandler.getWarnings());
+    if (problemsHandler.hasErrors()) {
+      throw new Less4jException(problemsHandler.getErrors(), compilationResult);
     }
+    return compilationResult;
   }
 
   private String doCompile(String lessContent) throws Less4jException {
@@ -45,11 +41,10 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     }
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet);
-    
+
     CssPrinter builder = new CssPrinter(stringBuilder);
     builder.append(cssStyleSheet);
     return stringBuilder.toString();
   }
 
 }
-

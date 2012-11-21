@@ -1,11 +1,9 @@
 package com.github.sommeri.less4j;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Problem;
-import com.github.sommeri.less4j.core.TranslationException;
 
 @SuppressWarnings("serial")
 public class Less4jException extends Exception {
@@ -17,17 +15,6 @@ public class Less4jException extends Exception {
     super();
     this.errors = errors;
     this.partialResult = partialResult;
-  }
-
-  public Less4jException(TranslationException ex) {
-    super(ex);
-    this.errors = Collections.emptyList();
-    this.partialResult = null;
-  }
-
-  @Override
-  public synchronized TranslationException getCause() {
-    return (TranslationException) super.getCause();
   }
 
   public CompilationResult getPartialResult() {

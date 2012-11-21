@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.parser;
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public abstract class TokenTypeSwitch<T> {
 
@@ -112,7 +113,7 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.GUARD_CONDITION)
       return handleGuardCondition(token);
 
-    throw new TreeBuildingException("Unexpected token type: " + type + " for " + token.getText(), token);
+    throw new BugHappened("Unexpected token type: " + type + " for " + token.getText(), token);
   }
 
   public abstract T handleElementSubsequent(HiddenTokenAwareTree token);
