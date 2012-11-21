@@ -55,7 +55,7 @@ class ColorsCalculator {
 
   private Expression subtract(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
     if (first.getType()==ASTCssNodeType.NUMBER) {
-      problemsHandler.substractOrDiveColorFromNumber(first);
+      problemsHandler.subtractOrDiveColorFromNumber(first);
       return new FaultyExpression(first);
     }
     
@@ -68,7 +68,7 @@ class ColorsCalculator {
 
   private Expression divide(Expression first, double red1, double green1, double blue1, double red2, double green2, double blue2, HiddenTokenAwareTree parentToken) {
     if (first.getType()==ASTCssNodeType.NUMBER) {
-      problemsHandler.substractOrDiveColorFromNumber(first);
+      problemsHandler.subtractOrDiveColorFromNumber(first);
       return new FaultyExpression(first);
     }
     

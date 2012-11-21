@@ -17,8 +17,8 @@ ERRORs 49:26 The mixin ".doesNotExists" was not declared.
 ERRORs 49:26 The mixin ".doesNotExists" was not matched.
 ERRORs 56:4 The mixin ".mixinWithPattern" was not matched.
 ERRORs 19:11 Cannot negate non number.
-ERRORs 22:12 Can't substract or divide a color from a number
-ERRORs 23:11 Can't substract or divide a color from a number
-ERRORs 26:12 Can't substract or divide a color from a number
-ERRORs 27:11 Can't substract or divide a color from a number
+ERRORs 22:12 Can't subtract or divide a color from a number
+ERRORs 23:11 Can't subtract or divide a color from a number
+ERRORs 26:12 Can't subtract or divide a color from a number
+ERRORs 27:11 Can't subtract or divide a color from a number
 ERRORs 30:9 Unable to evaluate expression

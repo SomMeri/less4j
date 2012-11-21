@@ -95,8 +95,8 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(errorNode, "Cannot negate non number."));
   }
 
-  public void substractOrDiveColorFromNumber(Expression errorNode) {
-    collector.addError(new CompilationError(errorNode, "Can't substract or divide a color from a number"));
+  public void subtractOrDiveColorFromNumber(Expression errorNode) {
+    collector.addError(new CompilationError(errorNode, "Can't subtract or divide a color from a number"));
   }
 
   public void cannotEvaluate(Expression errorNode) {
