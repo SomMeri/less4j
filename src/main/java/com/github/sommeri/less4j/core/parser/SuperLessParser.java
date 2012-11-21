@@ -89,7 +89,6 @@ public class SuperLessParser extends Parser {
 
   protected List<Problem> errors = new ArrayList<Problem>();
   protected ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
-  //more helpfull error reporting
   protected Stack<EnterRuleInfo> paraphrases = new Stack<EnterRuleInfo>();
 
   public SuperLessParser(TokenStream input, List<Problem> errors) {
@@ -120,7 +119,6 @@ public class SuperLessParser extends Parser {
     return new ArrayList<Problem>(errors);
   }
 
-  //add new method
   public boolean hasErrors() {
     return !errors.isEmpty();
   }

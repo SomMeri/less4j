@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 
@@ -107,8 +109,13 @@ public class CommandLinePrint {
     if (!ex.getErrors().isEmpty())
       standardErr.println("Errors produced by compilation of " + inputfile);
     
+    Set<String> previousMessages = new HashSet<String>();
     for (Problem error : ex.getErrors()) {
-      standardErr.println(toError(error));
+      String message = toError(error);
+      if (!previousMessages.contains(message)) {
+        standardErr.println(message);
+        previousMessages.add(message);
+      }
     }
   }
 
