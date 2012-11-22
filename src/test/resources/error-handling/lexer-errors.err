@@ -1,0 +1,4 @@
+Errors produced by compilation of testCase
+ERROR 2:29 no viable alternative at character ';'
+ERROR 7:2 mismatched character '<EOF>' expecting '*'
+ERROR 0:0 no viable alternative at input '<EOF>' in ruleset (which started at 5:1)

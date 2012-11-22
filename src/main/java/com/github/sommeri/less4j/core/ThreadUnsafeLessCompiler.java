@@ -36,7 +36,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
     ANTLRParser.ParseResult result = parser.parseStyleSheet(lessContent);
     if (result.hasErrors()) {
-      CompilationResult compilationResult = new CompilationResult("Errors during parsing phase, partial results is not available.");
+      CompilationResult compilationResult = new CompilationResult("Errors during parsing phase, partial result is not available.");
       throw new Less4jException(result.getErrors(), compilationResult);
     }
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());

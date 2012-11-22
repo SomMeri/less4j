@@ -1,0 +1,4 @@
+Errors produced by compilation of testCase
+ERROR 2:4 no viable alternative at input '{' in expression (which started at 2:1)
+ERROR 2:4 missing ';' at '{' in variable declaration (which started at 1:1)
+ERROR 0:0 no viable alternative at input '<EOF>' in ruleset (which started at 2:4)

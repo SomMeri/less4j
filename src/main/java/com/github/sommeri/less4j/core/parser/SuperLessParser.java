@@ -147,6 +147,7 @@ public class SuperLessParser extends Parser {
   }
 
   protected void enterRule(ParserRuleReturnScope retval, String rulename) {
+    //the init block is done always but the after block is done only if the thing is not backtracking 
     paraphrases.add(new EnterRuleInfo(retval.start, rulename));
   }
 
@@ -171,6 +172,15 @@ class EnterRuleInfo {
 
   public String getRulename() {
     return rulename;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("[");
+    builder.append(rulename);
+    builder.append("]");
+    return builder.toString();
   }
 
 }

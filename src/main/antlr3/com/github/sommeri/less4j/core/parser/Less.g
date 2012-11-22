@@ -154,12 +154,12 @@ tokens {
 //
 styleSheet
 @init {enterRule(retval, RULE_STYLESHEET);}
-@after { leaveRule(); }
     : ( a+=charSet* //the original ? was replaced by *, because it is possible (even if it makes no sense) and less.js is able to handle such situation
         a+=imports*
         a+=bodylist
         EOF ) -> ^(STYLE_SHEET ($a)*)
     ;
+finally { leaveRule(); }
     
 // -----------------
 // Character set. Picks up the user specified character set, should it be present.
@@ -167,18 +167,18 @@ styleSheet
 // https://developer.mozilla.org/en/CSS/@charset
 charSet
 @init {enterRule(retval, RULE_CHARSET);}
-@after { leaveRule(); }
     : CHARSET_SYM STRING SEMI -> ^(CHARSET_DECLARATION STRING)
     ;
+finally { leaveRule(); }
 
 // ---------
 // Import. Location of an external style sheet to include in the ruleset.
 //
 imports
 @init {enterRule(retval, RULE_IMPORTS);}
-@after { leaveRule(); }
     : IMPORT_SYM (STRING|URI) (mediaQuery (COMMA mediaQuery)*)? SEMI
     ;
+finally { leaveRule(); }
 
 // ---------
 // Media. Introduce a set of rules that are to be used if the consumer indicates
@@ -188,7 +188,6 @@ imports
 //TODO media part of the grammar is throwing away tokens, so comments will not work correctly. fix that
 media
 @init {enterRule(retval, RULE_MEDIA);}
-@after { leaveRule(); }
     : MEDIA_SYM (m1+=mediaQuery (n+=COMMA m+=mediaQuery)*)
         q1=LBRACE
             ((declaration) => b+=declaration SEMI
@@ -197,16 +196,17 @@ media
         q2=RBRACE
     -> ^(MEDIA_SYM ^(MEDIUM_DECLARATION $m1 ($n $m)*) $q1 $b* $q2)
     ;
+finally { leaveRule(); }
 
 // ---------
 // Medium. The name of a medim that are particulare set of rules applies to.
 //
 mediaQuery
 @init {enterRule(retval, RULE_MEDIUM);}
-@after { leaveRule(); }
     : a+=IDENT (a+=IDENT)? (b+=IDENT c+=mediaExpression)* -> ^(MEDIA_QUERY ^(MEDIUM_TYPE $a*) ($b $c)*)
     | d=mediaExpression (e+=IDENT f+=mediaExpression)* -> ^(MEDIA_QUERY $d ($e $f)*)
     ;
+finally { leaveRule(); }
     
 mediaExpression
     : LPAREN a+=mediaFeature (b+=COLON c+=expr)? RPAREN -> ^(MEDIA_EXPRESSION $a* $b* $c*)
@@ -231,16 +231,16 @@ bodyset
 
 variabledeclaration
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-@after { leaveRule(); }
     : VARIABLE COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* SEMI)
     ;
+finally { leaveRule(); }
 
 //used in mixinReferenceArgument
 variabledeclarationLimitedNoSemi
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-@after { leaveRule(); }
     : VARIABLE COLON (a+=mathExprHighPrior) -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* )
     ;
+finally { leaveRule(); }
 
 //This looks like the declaration, but does not allow a comma.
 reusableStructureParameter
@@ -249,33 +249,33 @@ reusableStructureParameter
 
 variablereference
 @init {enterRule(retval, RULE_VARIABLE_REFERENCE);}
-@after { leaveRule(); }
     : VARIABLE | INDIRECT_VARIABLE
     ;
+finally { leaveRule(); }
 
 fontface
 @init {enterRule(retval, RULE_FONT_FACE);}
-@after { leaveRule(); }
     : FONT_FACE_SYM^
         LBRACE!
             declaration SEMI! (declaration SEMI!)*
         RBRACE!
     ;
+finally { leaveRule(); }
 
 page
 @init {enterRule(retval, RULE_PAGE);}
-@after { leaveRule(); }
     : PAGE_SYM pseudoPage?
         LBRACE
             declaration SEMI (declaration SEMI)*
         RBRACE
     ;
+finally { leaveRule(); }
     
 pseudoPage
 @init {enterRule(retval, RULE_PSEUDO_PAGE);}
-@after { leaveRule(); }
     : COLON IDENT
     ;
+finally { leaveRule(); }
     
 topLevelOperator
     : COMMA
@@ -302,11 +302,11 @@ property
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet
 @init {enterRule(retval, RULE_RULESET);}
-@after { leaveRule(); }
     : a+=selector ( a+=ruleSetSeparator a+=selector)*
        b=ruleset_body
      -> ^(RULESET $a* $b)
     ;
+finally { leaveRule(); }
 
 ruleSetSeparator
     : COMMA ;
@@ -365,10 +365,10 @@ ruleset_body
 //TODO: Nested and top level selectors are different: top level one does NOT allow appenders
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
-@after { leaveRule(); }
     : ((nestedAppender)=>a+=nestedAppender | ) ((a+=combinator ) (a+=elementName | a+=elementSubsequent | a+=nestedAppender) )*
     -> ^(SELECTOR $a* ) 
     ;
+finally { leaveRule(); }
 
 esPred
     : HASH
@@ -480,27 +480,27 @@ pseudoparameters:
 
 namespaceReference
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
-@after { leaveRule(); }
     : (a+=reusableStructureName GREATER)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
+finally { leaveRule(); }
 
 namespaceReferenceWithSemi
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
-@after { leaveRule(); }
     : (a+=reusableStructureName GREATER)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
+finally { leaveRule(); }
 
 mixinReference
 @init {enterRule(retval, RULE_MIXIN_REFERENCE);}
-@after { leaveRule(); }
     : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
     -> ^(MIXIN_REFERENCE $a $b* $c*)
-    ; 
+    ;
+finally { leaveRule(); }
 
 mixinReferenceWithSemi
 @init {enterRule(retval, RULE_MIXIN_REFERENCE);}
-@after { leaveRule(); }
     : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
+finally { leaveRule(); }
 
 mixinReferenceArguments
     : a+=mixinReferenceArgument ( COMMA a+=mixinReferenceArgument)*
@@ -517,10 +517,10 @@ reusableStructureName
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 
 @init {enterRule(retval, RULE_ABSTRACT_MIXIN_OR_NAMESPACE);}
-@after { leaveRule(); }
     : a=reusableStructureName LPAREN c=reusableStructureArguments? RPAREN e=reusableStructureGuards? f=ruleset_body
     -> ^(REUSABLE_STRUCTURE $a $c* $e* $f)
     ;
+finally { leaveRule(); }
 
 reusableStructureGuards
     : ({predicates.isWhenKeyword(input.LT(1))}?) IDENT b+=guard (COMMA d+=guard)*
@@ -566,16 +566,16 @@ reusableStructurePattern
 //their unit tests (so it was intentional)
 declaration
 @init {enterRule(retval, RULE_DECLARATION);}
-@after { leaveRule(); }
     : property COLON expr? prio? -> ^(DECLARATION property expr? prio?)
     ;
+finally { leaveRule(); }
 
 //I had to do this to put semicolon as a last member of the declaration subtree - comments would be messed up otherwise.
 declarationWithSemicolon
 @init {enterRule(retval, RULE_DECLARATION);}
-@after { leaveRule(); }
     : property COLON expr? prio? SEMI -> ^(DECLARATION property expr? prio?)
     ;
+finally { leaveRule(); }
     
 prio
     : IMPORTANT_SYM
@@ -598,21 +598,21 @@ mathOperatorLowPrior
 
 expr 
 @init {enterRule(retval, RULE_EXPRESSION);}
-@after { leaveRule(); }
     : a=mathExprHighPrior (b+=operator c+=mathExprHighPrior)* -> ^(EXPRESSION $a ($b $c)*)
     ;
+finally { leaveRule(); }
     
 mathExprHighPrior
 @init {enterRule(retval, RULE_EXPRESSION);}
-@after { leaveRule(); }
     : a=mathExprLowPrior (b+=mathOperatorLowPrior c+=mathExprLowPrior)* -> ^(EXPRESSION $a ($b $c)*)
     ;
+finally { leaveRule(); }
 
 mathExprLowPrior
 @init {enterRule(retval, RULE_EXPRESSION);}
-@after { leaveRule(); }
     : a=term (b+=mathOperatorHighPrior c+=term)* -> ^(EXPRESSION $a ($b $c)*)
     ;
+finally { leaveRule(); }
 
 term
     : (( a+=unaryOperator? (a+=value_term

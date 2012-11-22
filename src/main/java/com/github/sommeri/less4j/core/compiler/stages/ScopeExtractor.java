@@ -20,13 +20,15 @@ public class ScopeExtractor {
   private ASTManipulator manipulator = new ASTManipulator();
 
   private Scope currentScope;
-  private String nextChildScopeName = null;
+  private String nextChildScopeName;
 
   public ScopeExtractor() {
-    //FIXME: this is one use only class,fix it once it works
   }
 
   public Scope extractScope(ASTCssNode node) {
+    currentScope = null;
+    nextChildScopeName = null;
+    
     Scope result = buildScope(node);
     return result;
   }
