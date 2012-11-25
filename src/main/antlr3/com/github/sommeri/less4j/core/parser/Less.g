@@ -388,8 +388,8 @@ selector
 finally { leaveRule(); }
 
 simpleSelector
-    : ( (a+=elementName ( ({!predicates.onEmptyCombinator(input)}?)=>  ((elementSubsequent)=>a+=elementSubsequent))*)
-        | (a+=elementSubsequent ( ({!predicates.onEmptyCombinator(input)}?)=>  ((elementSubsequent)=>a+=elementSubsequent))*)
+    : ( (a+=elementName ( ({!predicates.onEmptyCombinator(input)}?)=>a+=elementSubsequent)*)
+        | (a+=elementSubsequent ( ({!predicates.onEmptyCombinator(input)}?)=>a+=elementSubsequent)*)
       )
     -> ^(SIMPLE_SELECTOR $a*)
     ;
