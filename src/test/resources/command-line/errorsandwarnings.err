@@ -1,5 +1,5 @@
 Warnings produced by compilation of src/test/resources/command-line/errorsandwarnings.less
-WARNING 0:1 Ruleset without selector encountered.
+WARNING 1:1 Ruleset without selector encountered.
 Errors produced by compilation of src/test/resources/command-line/errorsandwarnings.less
 ERROR 2:16 The variable "@variable" was not declared.
 ERROR 4:4 The mixin ".mixin" was not declared.

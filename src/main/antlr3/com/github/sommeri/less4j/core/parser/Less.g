@@ -38,6 +38,7 @@ tokens {
   RULESET;
   NESTED_APPENDER;
   SELECTOR;
+  SIMPLE_SELECTOR;
   EXPRESSION;
   EXPRESSION_PARENTHESES;
   STYLE_SHEET;
@@ -282,11 +283,18 @@ topLevelOperator
     | ( -> EMPTY_SEPARATOR)
     ;
     
+//combinator
+//    : GREATER
+//    | PLUS
+//    | TILDE
+//    | ( -> EMPTY_COMBINATOR)
+//    ;
+
 combinator
     : GREATER
     | PLUS
     | TILDE
-    | ( -> EMPTY_COMBINATOR)
+    | ({predicates.onEmptyCombinator(input)}?)=> -> EMPTY_COMBINATOR
     ;
     
 unaryOperator
@@ -302,13 +310,13 @@ property
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet
 @init {enterRule(retval, RULE_RULESET);}
-    : a+=selector ( a+=ruleSetSeparator a+=selector)*
+    : (a+=selector ( a+=selectorSeparator a+=selector)*)?
        b=ruleset_body
      -> ^(RULESET $a* $b)
     ;
 finally { leaveRule(); }
 
-ruleSetSeparator
+selectorSeparator
     : COMMA ;
 
 nestedAppender // this must be here because of special case & & <- the space belongs to both appenders
@@ -339,7 +347,8 @@ ruleset_body
                 | ( (namespaceReference)=>a+=namespaceReference RBRACE)
                 | RBRACE
              )
-     -> ^(BODY $a*);
+     //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
+     -> ^(BODY LBRACE $a*); 
 
 /*TODO add to documentation
   This does not create correct structure for selectors, but neither did the
@@ -353,30 +362,38 @@ ruleset_body
   two different things. The first one is equivalent to "div *:not(:enabled) *:not(:disabled)"
   while the second not.
   
-  We originally wanted to use semantic predicates to guide prediction phase, but we were not
-  succesfull. No matter what we did, unsatified predicates have been either throwing exceptions
-  or generated error nodes.
-  
   Therefore we decided to just parse the thing into as simple structure as possible and solve
   the rest in ASTSwitchBuilder. Again, it would be possible to add an action to the rule to
   modify the tree in the parser, but it is unnecessary given that we are translating ANTLR
   tree into another one.
 */
 //TODO: Nested and top level selectors are different: top level one does NOT allow appenders
+//selector 
+//@init {enterRule(retval, RULE_SELECTOR);}
+//    : ((nestedAppender)=>a+=nestedAppender | ) ((a+=combinator ) (a+=elementName | a+=elementSubsequent | a+=nestedAppender) )*
+//    -> ^(SELECTOR $a* ) 
+//    ;
+//finally { leaveRule(); }
+
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
-    : ((nestedAppender)=>a+=nestedAppender | ) ((a+=combinator ) (a+=elementName | a+=elementSubsequent | a+=nestedAppender) )*
+    : ((combinator)=>a+=combinator | ) 
+      (a+=simpleSelector | a+=nestedAppender) 
+      ( 
+        ((combinator)=>a+=combinator | ) 
+        (a+=simpleSelector | a+=nestedAppender)
+      )*
     -> ^(SELECTOR $a* ) 
     ;
 finally { leaveRule(); }
 
-esPred
-    : HASH
-    | DOT
-    | LBRACKET
-    | COLON
+simpleSelector
+    : ( (a+=elementName ( ({!predicates.onEmptyCombinator(input)}?)=>  ((elementSubsequent)=>a+=elementSubsequent))*)
+        | (a+=elementSubsequent ( ({!predicates.onEmptyCombinator(input)}?)=>  ((elementSubsequent)=>a+=elementSubsequent))*)
+      )
+    -> ^(SIMPLE_SELECTOR $a*)
     ;
-
+    
 hashOrCssClass    
     :   HASH -> ^(ELEMENT_SUBSEQUENT ^(ID_SELECTOR HASH))
         | cssClass -> ^(ELEMENT_SUBSEQUENT cssClass)
@@ -402,6 +419,8 @@ elementSubsequent
 //then predicates.isNthPseudoClass($a) from pseudoclass starts to be copied all over the
 //place including places where variable a is not accessible. End result: he parser stops
 //being compilable.
+
+// YEP, I was confused about predicates when I wrote the above. Maybe write some post about predicates?
 
 //A class name can be also a number e.g., .56 or .5cm or anything else that starts with ..
 //unfortunately, those can be turned into numbers by lexer. This feels like an ugly hack,
@@ -461,7 +480,7 @@ attrib
 
 pseudo
     : (c+=COLON c+=COLON? a=IDENT ((
-        { predicates.isNthPseudoClass(input.LT(-1))}?=> LPAREN (b1=nth| b2=variablereference) RPAREN
+        { predicates.insideNth(input)}?=> LPAREN (b1=nth| b2=variablereference) RPAREN
         | LPAREN b3=pseudoparameters RPAREN
         )?)
       ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3*)
@@ -583,7 +602,7 @@ prio
 
 operator
     : COMMA
-    | ({predicates.isEmptySeparator(input.LT(-1), input.LT(1), input.LT(2))}?=> -> EMPTY_SEPARATOR)
+    | ({predicates.onEmptySeparator(input)}?=> -> EMPTY_SEPARATOR)
     ;
     
 mathOperatorHighPrior
@@ -616,7 +635,7 @@ finally { leaveRule(); }
 
 term
     : (( a+=unaryOperator? (a+=value_term
-    | ({predicates.isFunctionStart(input.LT(1), input.LT(2))}?=> a+=function)
+    | ({predicates.onFunctionStart(input)}?=> a+=function)
     | a+=expr_in_parentheses
     | a+=variablereference
     )

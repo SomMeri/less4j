@@ -27,11 +27,32 @@ import com.github.sommeri.less4j.core.parser.ANTLRParser.ParseResult;
 public class SelectorsGrammarTest {
 
   @Test
+  public void emptyCombinator() {
+    ANTLRParser compiler = new ANTLRParser();
+    ANTLRParser.ParseResult result = compiler.parseSelector("h1 h2 {");
+    assertValidSelector(result);
+  }
+
+  @Test
+  public void spacelessCombinator() {
+    ANTLRParser compiler = new ANTLRParser();
+    ANTLRParser.ParseResult result = compiler.parseSelector("h1>h2 {");
+    assertValidSelector(result);
+  }
+
+  @Test
+  public void spacedCombinator() {
+    ANTLRParser compiler = new ANTLRParser();
+    ANTLRParser.ParseResult result = compiler.parseSelector("h1 + h2 {");
+    assertValidSelector(result);
+  }
+
+  @Test
   public void afterCSS2() {
     ANTLRParser compiler = new ANTLRParser();
     ANTLRParser.ParseResult result = compiler.parseSelector("li:after {");
     assertValidSelector(result);
-    assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.ELEMENT_NAME, LessLexer.EMPTY_COMBINATOR, LessLexer.ELEMENT_SUBSEQUENT);
+    assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.SIMPLE_SELECTOR);
   }
 
   @Test
@@ -40,7 +61,7 @@ public class SelectorsGrammarTest {
     String selector = "li::after {";
     ANTLRParser.ParseResult result = compiler.parseSelector(selector);
     assertValidSelector(result);
-    assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.ELEMENT_NAME, LessLexer.EMPTY_COMBINATOR, LessLexer.ELEMENT_SUBSEQUENT);
+    assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.SIMPLE_SELECTOR);
   }
 
   @Test

@@ -15,7 +15,11 @@ public class Selector extends ASTCssNode implements Cloneable {
     super(token);
   }
   
-  public Selector(HiddenTokenAwareTree token, SelectorCombinator leadingCombinator, SimpleSelector head, SelectorCombinator combinator, Selector right) {
+  public Selector(HiddenTokenAwareTree token, SelectorCombinator leadingCombinator, SelectorPart head) {
+    this(token, leadingCombinator, head, null);
+  }
+
+  public Selector(HiddenTokenAwareTree token, SelectorCombinator leadingCombinator, SelectorPart head, Selector right) {
     super(token);
     this.leadingCombinator = leadingCombinator;
     this.head = head;

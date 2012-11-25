@@ -1,37 +1,10 @@
-.mixinNoParam {
-  declaration: mixinNoParam;
+before1,
+before2 {
+  declaration: value;
 }
-#allAreUsedHere {
-  declaration: mixinNoParam;
-  last: last;
-  declaration: mixinNoParam;
-  last: last;
-  this-will-survive-too: funny;
-  declaration: nestedMixin;
-  declaration: nestedMixinScoped;
-  this-will-survive-too: funny;
-  declaration: nestedMixin;
-  declaration: nestedMixinScoped;
-}
-#allAreUsedHere .nestedMixin {
-  this-will-survive-too: funny;
-}
-#allAreUsedHere .nestedMixin {
-  declaration: nestedMixin;
-  declaration: nestedMixinScoped;
-}
-#allAreUsedHere .nestedMixin .nestedMixin {
-  declaration: nestedMixinScoped;
-}
-#allAreUsedHere .nestedMixin {
-  declaration: nestedMixinScoped;
-}
-#allAreUsedHere.nestedMixin {
-  declaration: redefined;
-}
-#allAreUsedHere .nestedMixin {
-  declaration: nestedMixinScoped;
-}
-.mixinNoParam {
-  last: last;
+before1:nested1,
+before2:nested1,
+before1 :nested2,
+before2 :nested2 {
+  declaration: value;
 }

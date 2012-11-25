@@ -34,7 +34,9 @@ import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
+import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Nth;
+import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Pseudo;
@@ -53,6 +55,7 @@ import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
+//FIXME: better error message for required (...)+ loop did not match anything at input errors
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
@@ -217,13 +220,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         if (selector != null)
           selectors.add(selector);
         previousKid = selector;
-      }
-      if (kid.getType() == LessLexer.BODY) {
+      } else if (kid.getType() == LessLexer.BODY) {
         RuleSetsBody body = handleRuleSetsBody(kid);
         ruleSet.setBody(body);
         previousKid = body;
-      }
-      if (kid.getType() == LessLexer.COMMA) {
+      } else if (kid.getType() == LessLexer.COMMA) {
         if (previousKid != null)
           previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
       }
@@ -231,9 +232,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     ruleSet.addSelectors(selectors);
     //TODO: these kind of warnings could be in a special validation class, no reason to do it here
-    if (ruleSet.getSelectors()==null || ruleSet.getSelectors().isEmpty())
+    if (ruleSet.getSelectors() == null || ruleSet.getSelectors().isEmpty())
       problemsHandler.rulesetWithoutSelector(ruleSet);
-    
+
     return ruleSet;
   }
 
@@ -243,7 +244,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     HiddenTokenAwareTree kid = children.next();
     result.setSelector(handleElementSubsequent(kid));
-    
+
     while (children.hasNext()) {
       kid = children.next();
       if (kid.getType() == LessLexer.BODY) {
@@ -289,7 +290,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
       ASTCssNode buildKid = switchOn(kid);
-      if (buildKid.getType()==ASTCssNodeType.MIXIN_REFERENCE) {
+      if (buildKid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
         MixinReference reference = (MixinReference) switchOn(kid);
         result.setFinalReference(reference);
       } else if (buildKid instanceof ElementSubsequent) {
@@ -380,8 +381,18 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new RuleSetsBody(token);
 
     List<ASTCssNode> members = new ArrayList<ASTCssNode>();
-    for (HiddenTokenAwareTree kid : token.getChildren()) {
-      members.add(switchOn(kid));
+    Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
+    
+    HiddenTokenAwareTree lbrace = iterator.next();
+    token.addPreceding(lbrace.getPreceding());
+    if (iterator.hasNext()) {
+      token.getChildren().get(1).addBeforePreceding(lbrace.getFollowing());
+    } else {
+      token.addOrphans(lbrace.getFollowing());
+    }
+    
+    while (iterator.hasNext()) {
+      members.add(switchOn(iterator.next()));
     }
 
     return new RuleSetsBody(token, members);
@@ -676,5 +687,53 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     separator.giveHidden(name, expression);
 
     return new ArgumentDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
+  }
+
+  @Override
+  public ASTCssNode handleNestedAppender(HiddenTokenAwareTree token) {
+    boolean directlyBefore = true;
+    boolean directlyAfter = true;
+    if (token.getChildren().size() == 2) {
+      directlyBefore = isMeaningfullWhitespace(token);
+      directlyAfter = !directlyBefore;
+    } else if (token.getChildren().size() == 3) {
+      directlyBefore = false;
+      directlyAfter = false;
+    }
+
+    return new NestedSelectorAppender(token, directlyBefore, directlyAfter);
+  }
+
+  public ASTCssNode handleSimpleSelector(HiddenTokenAwareTree token) {
+    SimpleSelector result = null;
+    token.pushHiddenToKids();
+    Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
+    HiddenTokenAwareTree kid = iterator.next();
+    if (kid.getType() == LessLexer.ELEMENT_NAME) {
+      HiddenTokenAwareTree realName = kid.getChild(0);
+      result = new SimpleSelector(kid, realName.getText(), realName.getType() == LessLexer.STAR);
+      if (iterator.hasNext())
+        kid = iterator.next();
+      else return result;
+    } else {
+      result = new SimpleSelector(kid, null, true);
+      result.setEmptyForm(true);
+    }
+
+    do {
+      result.addSubsequent((ElementSubsequent)switchOn(kid));
+
+      if (iterator.hasNext())
+        kid = iterator.next();
+      else
+        kid = null;
+    } while (kid != null);
+
+    return result;
+  }
+
+  private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {
+    int type = kid.getChild(0).getType();
+    return type == LessLexer.MEANINGFULL_WHITESPACE || type == LessLexer.DUMMY_MEANINGFULL_WHITESPACE;
   }
 }

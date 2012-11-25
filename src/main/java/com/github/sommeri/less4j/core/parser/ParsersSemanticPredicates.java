@@ -5,6 +5,8 @@ import java.util.Set;
 
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.parser.LessParser;
@@ -18,8 +20,12 @@ public class ParsersSemanticPredicates {
     NTH_PSEUDOCLASSES.add("nth-of-type");
     NTH_PSEUDOCLASSES.add("nth-last-of-type");
   }
-
-  public boolean isNthPseudoClass(Token a) {
+                 
+  public boolean insideNth(TokenStream input) {
+    return isNthPseudoClass(input.LT(-1));
+  }
+  
+  private boolean isNthPseudoClass(Token a) {
     if (a == null)
       return false;
     String text = a.getText();
@@ -43,7 +49,11 @@ public class ParsersSemanticPredicates {
    * 
    * @return <code>true</code> if it is possible for a function to start with these two tokens.
    */
-  public boolean isFunctionStart(Token first, Token second) {
+  public boolean onFunctionStart(TokenStream input) {
+    return isFunctionStart(input.LT(1), input.LT(2));
+  }
+  
+  private boolean isFunctionStart(Token first, Token second) {
     if (first == null || second == null)
       return false;
 
@@ -63,7 +73,11 @@ public class ParsersSemanticPredicates {
    * other context.
    * 
    */
-  public boolean isEmptySeparator(Token previousT, Token firstT, Token secondT) {
+  public boolean onEmptySeparator(TokenStream input) {
+    return isEmptySeparator(input.LT(-1), input.LT(1), input.LT(2));
+  }
+  
+  private boolean isEmptySeparator(Token previousT, Token firstT, Token secondT) {
     //expression can not start with an empty separator
     if (previousT == null)
       return false;
@@ -98,7 +112,7 @@ public class ParsersSemanticPredicates {
     return previous.getType() == LessLexer.MINUS || previous.getType() == LessLexer.PLUS || previous.getType() == LessLexer.STAR || previous.getType() == LessLexer.SOLIDUS;
   }
 
-  public boolean directlyFollows(Token first, Token second) {
+  private boolean directlyFollows(Token first, Token second) {
     if (!(first instanceof CommonToken) || !(second instanceof CommonToken))
       return false;
 
@@ -108,7 +122,7 @@ public class ParsersSemanticPredicates {
     return directlyFollows(firstT, secondT);
   }
 
-  public boolean directlyFollows(CommonToken firstT, CommonToken secondT) {
+  private boolean directlyFollows(CommonToken firstT, CommonToken secondT) {
     if (firstT.getStopIndex() + 1 != secondT.getStartIndex())
       return false;
 
@@ -127,6 +141,14 @@ public class ParsersSemanticPredicates {
 
     String word = token.getText().trim().toLowerCase();
     return "when".equals(word);
+  }
+
+  public boolean onEmptyCombinator(TokenStream input) {
+    return isEmptyCombinator(input.LT(-1), input.LT(1));
+  }
+  
+  private boolean isEmptyCombinator(Token first, Token second) {
+    return !directlyFollows(first, second);
   }
 
 }

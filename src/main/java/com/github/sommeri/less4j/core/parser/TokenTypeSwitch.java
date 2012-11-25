@@ -113,8 +113,18 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.GUARD_CONDITION)
       return handleGuardCondition(token);
 
+    if (type == LessLexer.NESTED_APPENDER)
+      return handleNestedAppender(token);
+
+    if (type == LessLexer.SIMPLE_SELECTOR)
+      return handleSimpleSelector(token);
+
     throw new BugHappened("Unexpected token type: " + type + " for " + token.getText(), token);
   }
+
+  public abstract T handleSimpleSelector(HiddenTokenAwareTree token);
+
+  public abstract T handleNestedAppender(HiddenTokenAwareTree token);
 
   public abstract T handleElementSubsequent(HiddenTokenAwareTree token);
 
