@@ -492,7 +492,8 @@ pseudoparameters:
     | (variablereference) => variablereference
     | selector
  ;
- 
+
+//TODO: add special error message here 
  nth: ((a+=PLUS | a+=MINUS)? (a+=REPEATER | a+=IDENT) ((b+=PLUS | b+=MINUS) b+=NUMBER)?
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
