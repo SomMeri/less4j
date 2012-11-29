@@ -41,9 +41,7 @@ Pom.xml dependency:
 ## API:
 Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
 
-Access the compiler through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. The thread safe implementation of the interface is: `com.github.less4j.core.DefaultLessCompiler`.
-
-Return object `CompilationResult` provides has two methods: 
+Access the compiler through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. Thread safe implementation of the interface is `com.github.less4j.core.DefaultLessCompiler`. Return object `CompilationResult` provides has two methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list compilation warnings or an empty list. 
 
