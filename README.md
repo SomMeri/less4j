@@ -41,13 +41,12 @@ Pom.xml dependency:
 ## API:
 Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
 
-Access the compiler through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. Thread safe implementation of the interface is `com.github.less4j.core.DefaultLessCompiler`. Return object `CompilationResult` provides has two methods: 
+Access the compiler through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. Thread safe implementation of the interface is `com.github.less4j.core.DefaultLessCompiler`. Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list compilation warnings or an empty list. 
 
-Each warning is described by an error message and knows both line and character number of the place that caused an error.  
+Each warning is described by an error message and knows both line and character number of the place that caused it.  
 
-Put the content of .less file into the input string. The method returns translated css style sheet:
 <pre><code>LessCompiler compiler = new ThreadUnsafeLessCompiler();
 CompilationResult compilationResult = compiler.compile("* { margin: 1 1 1 1; }");
 
