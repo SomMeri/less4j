@@ -43,7 +43,7 @@ Warning: Project is still in alpha and current API is very temporary. It will ch
 
 Access the compiler through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. Thread safe implementation of the interface is `com.github.less4j.core.DefaultLessCompiler`. Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
-* `getWarnings` - returns list compilation warnings or an empty list. 
+* `getWarnings` - returns list of compilation warnings or an empty list. 
 
 Each warning is described by an error message and knows both line and character number of the place that caused it.  
 
@@ -60,7 +60,10 @@ private static String format(Problem warning) {
 }
 </code></pre>
 
-The method may throw `Less4jException`. The exception is checked and its message contains line and column numbers identifying source place causing the error.
+The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input. 
+
+* `List<Problem> getErrors` - list of all found compilation errors.
+* `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
 
 ## Links:
 *  [http://www.w3.org/Style/CSS/specs.en.html]
