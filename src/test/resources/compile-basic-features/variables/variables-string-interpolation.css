@@ -29,6 +29,7 @@
   sum: "15";
   named: "#008000";
   color: "#114488";
+  units: "10%";
 }
 #useUnderdefinedMixin {
   text: 'Hi DoNotForget :-)';
