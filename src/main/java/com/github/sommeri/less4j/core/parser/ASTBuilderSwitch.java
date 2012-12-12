@@ -17,6 +17,8 @@ import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.EscapedSelector;
+import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FontFace;
@@ -56,6 +58,7 @@ import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 //FIXME: better error message for required (...)+ loop did not match anything at input errors
+//FIXME: better error message missing EOF at blahblah
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
@@ -732,8 +735,16 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return result;
   }
 
+  public EscapedSelector handleEscapedSelector(HiddenTokenAwareTree token) {
+    token.pushHiddenToKids();
+    HiddenTokenAwareTree valueToken = token.getChild(0);
+    String quotedText = valueToken.getText();
+    return new EscapedSelector(valueToken, quotedText.substring(3, quotedText.length() - 2));
+  }
+
   private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {
     int type = kid.getChild(0).getType();
     return type == LessLexer.MEANINGFULL_WHITESPACE || type == LessLexer.DUMMY_MEANINGFULL_WHITESPACE;
   }
+  
 }

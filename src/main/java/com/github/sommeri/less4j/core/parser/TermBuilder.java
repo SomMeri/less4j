@@ -2,11 +2,11 @@ package com.github.sommeri.less4j.core.parser;
 
 import java.util.List;
 
-
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
@@ -79,6 +79,9 @@ public class TermBuilder {
     case LessLexer.EXPRESSION_PARENTHESES:
       return buildFromParentheses(offsetChild);
 
+    case LessLexer.ESCAPED_VALUE:
+      return buildFromEscapedValue(token, offsetChild);
+
     default:
       throw new BugHappened("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
 
@@ -112,8 +115,8 @@ public class TermBuilder {
 
     if (sign.getType() == LessLexer.MINUS) {
       return new SignedExpression(sign, SignedExpression.Sign.MINUS, value);
-    } 
-    
+    }
+
     return new SignedExpression(sign, SignedExpression.Sign.PLUS, value);
   }
 
@@ -163,6 +166,14 @@ public class TermBuilder {
       throw new BugHappened("Unknown dimension type: " + actual.getType() + " " + actual.getText(), actual);
 
     }
+  }
+
+  public EscapedValue buildFromEscapedValue(HiddenTokenAwareTree token, HiddenTokenAwareTree offsetChild) {
+    token.pushHiddenToKids();
+    offsetChild.pushHiddenToKids();
+    HiddenTokenAwareTree valueToken = offsetChild.getChild(0);
+    String quotedText = valueToken.getText();
+    return new EscapedValue(valueToken, quotedText.substring(2, quotedText.length() - 1));
   }
 
   private Expression buildFromString(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {

@@ -39,8 +39,10 @@ tokens {
   NESTED_APPENDER;
   SELECTOR;
   SIMPLE_SELECTOR;
+  ESCAPED_SELECTOR;
   EXPRESSION;
   EXPRESSION_PARENTHESES;
+  ESCAPED_VALUE;
   STYLE_SHEET;
   //ANTLR seems to generate null pointers exceptions on malformed css if
   //rules match nothig and generate an empty token
@@ -353,14 +355,16 @@ ruleset_body
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
     : ((combinator)=>a+=combinator | ) 
-      (a+=simpleSelector | a+=nestedAppender) 
+      (a+=simpleSelector | a+=nestedAppender | a+=escapedSelector) 
       ( 
         ((combinator)=>a+=combinator | ) 
-        (a+=simpleSelector | a+=nestedAppender)
+        (a+=simpleSelector | a+=nestedAppender | a+=escapedSelector)
       )*
     -> ^(SELECTOR $a* ) 
     ;
 finally { leaveRule(); }
+
+escapedSelector: SELECTOR_ESCAPE -> ^(ESCAPED_SELECTOR SELECTOR_ESCAPE);
 
 simpleSelector
     : ( (a+=elementName ( {!predicates.onEmptyCombinator(input)}?=>a+=elementSubsequent)*)
@@ -604,9 +608,12 @@ term
     )
     ) | (a+=unsigned_value_term
         | a+=hexColor
+        | a+=escapedValue
         | a+=special_function))
     -> ^(TERM $a*)
     ;
+
+escapedValue: VALUE_ESCAPE -> ^(ESCAPED_VALUE VALUE_ESCAPE);
     
 expr_in_parentheses
     : LPAREN expr RPAREN -> ^(EXPRESSION_PARENTHESES LPAREN expr RPAREN );
@@ -1029,6 +1036,32 @@ STRING : '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                         | { $type = INVALID; }
                     )
                 ;
+                
+VALUE_ESCAPE : '~' '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+                    (
+                          '\''
+                        | { $type = INVALID; }
+                    )
+                    
+                | '~' '"' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
+                    (
+                          '"'
+                        | { $type = INVALID; }
+                    )
+                ;   
+                
+SELECTOR_ESCAPE : '(' '~' '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+                    (
+                          '\'' ')'
+                        | { $type = INVALID; }
+                    )
+                    
+                | '(' '~' '"' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
+                    (
+                          '"' ')'
+                        | { $type = INVALID; }
+                    )
+                ;                                
 
 // -------------
 // Identifier. Identifier tokens pick up properties names and values

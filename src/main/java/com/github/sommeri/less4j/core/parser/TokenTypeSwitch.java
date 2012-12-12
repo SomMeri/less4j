@@ -119,8 +119,13 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.SIMPLE_SELECTOR)
       return handleSimpleSelector(token);
 
+    if (type == LessLexer.ESCAPED_SELECTOR)
+      return handleEscapedSelector(token);
+
     throw new BugHappened("Unexpected token type: " + type + " for " + token.getText(), token);
   }
+
+  public abstract T handleEscapedSelector(HiddenTokenAwareTree token);
 
   public abstract T handleSimpleSelector(HiddenTokenAwareTree token);
 

@@ -1,0 +1,15 @@
+h1 {
+  margin: 1 2 2 3;
+  padding: 2 2;
+}
+h1,
+h2,
+h3 {
+  margin: 2;
+}
+.span {
+  text: span;
+}
+.whatever {
+  text: whatever;
+}

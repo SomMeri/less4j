@@ -15,6 +15,8 @@ import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.EscapedSelector;
+import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FontFace;
@@ -168,6 +170,12 @@ public class CssPrinter {
 
     case FAULTY_EXPRESSION:
       return appendFaultyExpression((FaultyExpression) node);
+
+    case ESCAPED_SELECTOR:
+      return appendEscapedSelector((EscapedSelector) node);
+
+    case ESCAPED_VALUE:
+      return appendEscapedValue((EscapedValue) node);
 
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
@@ -484,6 +492,18 @@ public class CssPrinter {
   public boolean appendCssString(CssString expression) {
     String quoteType = expression.getQuoteType();
     builder.append(quoteType).append(expression.getValue()).append(quoteType);
+
+    return true;
+  }
+
+  public boolean appendEscapedSelector(EscapedSelector escaped) {
+    builder.append(escaped.getValue());
+
+    return true;
+  }
+
+  public boolean appendEscapedValue(EscapedValue escaped) {
+    builder.append(escaped.getValue());
 
     return true;
   }

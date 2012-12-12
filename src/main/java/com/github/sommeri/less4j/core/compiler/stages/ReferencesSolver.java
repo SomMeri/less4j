@@ -9,6 +9,8 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.EscapedSelector;
+import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.MixinReference;
@@ -74,6 +76,16 @@ public class ReferencesSolver {
       manipulator.replace(node, replacement);
       break;
     }
+    case ESCAPED_SELECTOR: {
+      EscapedSelector replacement = replaceInEscapedSelector((EscapedSelector) node, expressionEvaluator); 
+      manipulator.replace(node, replacement);
+      break;
+    }
+    case ESCAPED_VALUE: {
+      EscapedValue replacement = replaceInEscapedValue((EscapedValue) node, expressionEvaluator); 
+      manipulator.replace(node, replacement);
+      break;
+    }
     }
 
     if (node.getType() != ASTCssNodeType.NAMESPACE_REFERENCE) {
@@ -91,6 +103,16 @@ public class ReferencesSolver {
   private CssString replaceInString(CssString input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
     return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
+  }
+  
+  private EscapedSelector replaceInEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
+    String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
+    return new EscapedSelector(input.getUnderlyingStructure(), value);
+  }
+
+  private EscapedValue replaceInEscapedValue(EscapedValue input, ExpressionEvaluator expressionEvaluator) {
+    String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
+    return new EscapedValue(input.getUnderlyingStructure(), value);
   }
 
   private RuleSetsBody resolveMixinReference(MixinReference reference, Scope scope) {

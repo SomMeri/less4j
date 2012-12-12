@@ -143,6 +143,7 @@ public class ExpressionEvaluator {
     case COLOR_EXPRESSION:
     case NUMBER:
     case FAULTY_EXPRESSION:
+    case ESCAPED_VALUE:
       return input;
 
     default:
