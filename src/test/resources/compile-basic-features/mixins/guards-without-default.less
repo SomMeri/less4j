@@ -1,0 +1,12 @@
+.mixin(@var) when (@var=0) {
+  declare: 0;
+}
+
+#pass {
+  .mixin(0);
+}
+
+#fail {
+  .mixin(1);
+  color: black;
+}
