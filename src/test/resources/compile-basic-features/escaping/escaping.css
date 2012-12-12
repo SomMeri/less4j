@@ -13,3 +13,6 @@ h3 {
 .whatever {
   text: whatever;
 }
+#nested .something {
+  margin: 2 2 2 2;
+}

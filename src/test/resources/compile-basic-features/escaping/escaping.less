@@ -16,3 +16,14 @@
 (~".@{escapedVariable}") { 
   text: ~'@{escapedVariable}';
 }
+
+.call-me () {
+  @a: '.something';
+  (~'@{a}') {
+    margin: 2 2 2 2;
+  }
+}
+
+#nested {
+  .call-me ();
+}
