@@ -69,9 +69,10 @@ public abstract class AbstractFileBasedTest {
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
     CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
+    printer.printToSysout(error.getPartialResult(), testName);
     printer.reportErrorsAndWarnings(error, testName);
     
-    String completeErrorReport = errContent.toString();
+    String completeErrorReport = outContent.toString() + errContent.toString();
     return completeErrorReport;
   }
 

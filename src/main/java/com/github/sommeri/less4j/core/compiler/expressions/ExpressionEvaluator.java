@@ -36,7 +36,7 @@ import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class ExpressionEvaluator {
-
+  
   private final Scope scope;
   private final ProblemsHandler problemsHandler;
   private ArithmeticCalculator arithmeticCalculator;
@@ -88,13 +88,22 @@ public class ExpressionEvaluator {
     return evaluate(value);
   }
 
+  public Expression evaluateIfPresent(Variable input) {
+    Expression value = scope.getValue(input);
+    if (value == null) {
+      return null;
+    }
+
+    return evaluate(value);
+  }
+
   public Expression evaluate(IndirectVariable input) {
     Expression value = scope.getValue(input);
     if (!(value instanceof CssString)) {
       problemsHandler.nonStringIndirection(input);
       return new FaultyExpression(input);
     }
-    
+
     CssString realName = (CssString) value;
     String realVariableName = "@" + realName.getValue();
     value = scope.getValue(realVariableName);
@@ -129,10 +138,10 @@ public class ExpressionEvaluator {
       return ((NamedExpression) input).getExpression();
 
       //the value is already there, nothing to evaluate
+    case STRING_EXPRESSION:
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:
-    case STRING_EXPRESSION:
     case FAULTY_EXPRESSION:
       return input;
 
@@ -213,7 +222,7 @@ public class ExpressionEvaluator {
       negation.setExpliciteSign(false);
       return negation;
     }
-    
+
     problemsHandler.nonNumberNegation(input);
     return new FaultyExpression(input);
   }

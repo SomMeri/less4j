@@ -46,12 +46,11 @@ import com.github.sommeri.less4j.core.ast.StyleSheet;
 
 public class CssPrinter {
 
-  private final ExtendedStringBuilder builder;
+  protected final ExtendedStringBuilder builder = new ExtendedStringBuilder("");
   private static final DecimalFormat FORMATTER = new DecimalFormat("#.##################");
 
-  public CssPrinter(ExtendedStringBuilder builder) {
+  public CssPrinter() {
     super();
-    this.builder = builder;
   }
 
   /**
@@ -208,7 +207,7 @@ public class CssPrinter {
     return true;
   }
 
-  private void appendComments(List<Comment> comments, boolean ensureSeparator) {
+  protected void appendComments(List<Comment> comments, boolean ensureSeparator) {
     if (comments == null || comments.isEmpty())
       return;
 
@@ -484,7 +483,7 @@ public class CssPrinter {
 
   public boolean appendCssString(CssString expression) {
     String quoteType = expression.getQuoteType();
-    builder.append(quoteType + expression.getValue() + quoteType);
+    builder.append(quoteType).append(expression.getValue()).append(quoteType);
 
     return true;
   }
@@ -495,7 +494,7 @@ public class CssPrinter {
     return true;
   }
 
-  private boolean appendColorExpression(ColorExpression expression) {
+  protected boolean appendColorExpression(ColorExpression expression) {
     // if it is named color expression, write out the name
     if (expression instanceof NamedColorExpression) {
       NamedColorExpression named = (NamedColorExpression) expression;
@@ -530,10 +529,6 @@ public class CssPrinter {
     }
 
     return true;
-  }
-
-  private String format(Double valueAsDouble) {
-    return FORMATTER.format(valueAsDouble);
   }
 
   public void appendSelectors(List<Selector> selectors) {
@@ -610,6 +605,14 @@ public class CssPrinter {
       if (append(kid))
         builder.ensureNewLine();
     }
+  }
+
+  private String format(Double valueAsDouble) {
+    return FORMATTER.format(valueAsDouble);
+  }
+
+  public String toString() {
+    return builder.toString();
   }
 
 }

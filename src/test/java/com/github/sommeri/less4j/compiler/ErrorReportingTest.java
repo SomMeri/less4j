@@ -7,7 +7,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
-//FIXME: add tests for parser errors and lexer errors
 public class ErrorReportingTest extends AbstractErrorReportingTest {
 
   private static final String cases = "src/test/resources/error-handling/";

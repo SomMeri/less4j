@@ -350,31 +350,6 @@ ruleset_body
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
      -> ^(BODY LBRACE $a*); 
 
-/*TODO add to documentation
-  This does not create correct structure for selectors, but neither did the
-  original http://www.antlr.org/grammar/1240941192304/css21.g
-
-  The problem is that whitespaces are hidden and therefore following inputs:
-  * "div :not(:enabled) :not(:disabled)"
-  * "div:not(:enabled):not(:disabled)"
-  
-  turn into exactly the same token stream. Which is unfortunate, because they mean
-  two different things. The first one is equivalent to "div *:not(:enabled) *:not(:disabled)"
-  while the second not.
-  
-  Therefore we decided to just parse the thing into as simple structure as possible and solve
-  the rest in ASTSwitchBuilder. Again, it would be possible to add an action to the rule to
-  modify the tree in the parser, but it is unnecessary given that we are translating ANTLR
-  tree into another one.
-*/
-//TODO: Nested and top level selectors are different: top level one does NOT allow appenders
-//selector 
-//@init {enterRule(retval, RULE_SELECTOR);}
-//    : ((nestedAppender)=>a+=nestedAppender | ) ((a+=combinator ) (a+=elementName | a+=elementSubsequent | a+=nestedAppender) )*
-//    -> ^(SELECTOR $a* ) 
-//    ;
-//finally { leaveRule(); }
-
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
     : ((combinator)=>a+=combinator | ) 
@@ -388,8 +363,8 @@ selector
 finally { leaveRule(); }
 
 simpleSelector
-    : ( (a+=elementName ( ({!predicates.onEmptyCombinator(input)}?)=>a+=elementSubsequent)*)
-        | (a+=elementSubsequent ( ({!predicates.onEmptyCombinator(input)}?)=>a+=elementSubsequent)*)
+    : ( (a+=elementName ( {!predicates.onEmptyCombinator(input)}?=>a+=elementSubsequent)*)
+        | (a+=elementSubsequent ( {!predicates.onEmptyCombinator(input)}?=>a+=elementSubsequent)*)
       )
     -> ^(SIMPLE_SELECTOR $a*)
     ;
@@ -408,19 +383,6 @@ elementSubsequent
     :   hashOrCssClass
       | attribOrPseudo
     ;
-
-//TODO Document: a class name can be also a number e.g., .56 or .5cm
-//if that is the case, then the lexer spits out some kind of number instead of IDENT
-//this could be solved by a semantic predicate, but if I do this:
-//cssClass
-// : {1==2}?=>(a=. -> ^(CSS_CLASS $a))
-// | ((DOT) => DOT IDENT -> ^(CSS_CLASS IDENT))
-// ;
-//then predicates.isNthPseudoClass($a) from pseudoclass starts to be copied all over the
-//place including places where variable a is not accessible. End result: he parser stops
-//being compilable.
-
-// YEP, I was confused about predicates when I wrote the above. Maybe write some post about predicates?
 
 //A class name can be also a number e.g., .56 or .5cm or anything else that starts with ..
 //unfortunately, those can be turned into numbers by lexer. This feels like an ugly hack,

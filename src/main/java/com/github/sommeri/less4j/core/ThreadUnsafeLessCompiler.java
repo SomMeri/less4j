@@ -31,8 +31,6 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private String doCompile(String lessContent) throws Less4jException {
-    // FIXME: ugly, clean hierarchy and dependencies
-    ExtendedStringBuilder stringBuilder = new ExtendedStringBuilder("");
 
     ANTLRParser.ParseResult result = parser.parseStyleSheet(lessContent);
     if (result.hasErrors()) {
@@ -42,9 +40,10 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet);
 
-    CssPrinter builder = new CssPrinter(stringBuilder);
+    
+    CssPrinter builder = new CssPrinter();
     builder.append(cssStyleSheet);
-    return stringBuilder.toString();
+    return builder.toString();
   }
 
 }

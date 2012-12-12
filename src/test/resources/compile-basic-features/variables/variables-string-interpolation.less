@@ -1,0 +1,61 @@
+@chained: "outer";
+@different: "@{chained}";
+@variable: "@{different}";
+#workingChain {
+  @chained: "inner";
+  text: "@{variable}";
+}
+
+#faultyChain {
+  @bbb: "ccc";
+  @aaa: "bbb";
+  text: "@{@{aaa}}";
+  text2: "@{@{aaa}} @{bbb}";
+}
+
+#trick {
+  @ccc: "ddd";
+  @bbb: "ccc";
+  @aaa: "@{";
+  text: "@{aaa}bbb}";
+}
+
+#variousQuoting {
+  text1: "@{variable}";
+  text2: '@{variable}';
+}
+
+#malformed {
+  text1: "@ {variable}";
+  text2: "@{ variable}";
+  text3: "@{variable }";
+  text4: "@\{variable}";
+  text5: "@/{variable}";
+  text6: "@{variable";
+}
+
+#multiple {
+  text1: "@{chained} @{different} @{variable}";
+  text2: "prefix @{chained} after first @{different} after second @{variable} suffix";
+}
+
+#nonString {
+  @plus: 5 + 10; 
+  plus: "@{plus}";
+  @a: 5;
+  @sum: @a + 10; 
+  sum: "@{sum}";
+  @namedColor: green; 
+  named: "@{namedColor}";
+  @color: #114488; 
+  color: "@{color}";
+}
+
+.underdefinedMixin() {
+  text: 'Hi @{callerDefined} :-)';
+}
+
+#useUnderdefinedMixin {
+   @callerDefined: "DoNotForget";
+  .underdefinedMixin();
+}

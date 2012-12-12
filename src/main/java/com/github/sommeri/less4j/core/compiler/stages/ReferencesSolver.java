@@ -7,6 +7,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
+import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
@@ -16,6 +17,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
@@ -27,6 +29,7 @@ public class ReferencesSolver {
   public static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
   private final ProblemsHandler problemsHandler;
+  private StringInterpolator stringInterpolator = new StringInterpolator();
   
   public ReferencesSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
@@ -66,6 +69,11 @@ public class ReferencesSolver {
       manipulator.replaceInBody(namespaceReference, replacement.getChilds());
       break;
     }
+    case STRING_EXPRESSION: {
+      CssString replacement = replaceInString((CssString) node, expressionEvaluator); 
+      manipulator.replace(node, replacement);
+      break;
+    }
     }
 
     if (node.getType() != ASTCssNodeType.NAMESPACE_REFERENCE) {
@@ -78,6 +86,11 @@ public class ReferencesSolver {
         }
       }
     }
+  }
+
+  private CssString replaceInString(CssString input, ExpressionEvaluator expressionEvaluator) {
+    String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
+    return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
   }
 
   private RuleSetsBody resolveMixinReference(MixinReference reference, Scope scope) {

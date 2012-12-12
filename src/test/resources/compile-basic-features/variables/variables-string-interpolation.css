@@ -1,0 +1,35 @@
+#workingChain {
+  text: "inner";
+}
+#faultyChain {
+  text: "@{bbb}";
+  text2: "@{bbb} ccc";
+}
+#trick {
+  text: "@{bbb}";
+}
+#variousQuoting {
+  text1: "outer";
+  text2: 'outer';
+}
+#malformed {
+  text1: "@ {variable}";
+  text2: "@{ variable}";
+  text3: "@{variable }";
+  text4: "@\{variable}";
+  text5: "@/{variable}";
+  text6: "@{variable";
+}
+#multiple {
+  text1: "outer outer outer";
+  text2: "prefix outer after first outer after second outer suffix";
+}
+#nonString {
+  plus: "15";
+  sum: "15";
+  named: "#008000";
+  color: "#114488";
+}
+#useUnderdefinedMixin {
+  text: 'Hi DoNotForget :-)';
+}
