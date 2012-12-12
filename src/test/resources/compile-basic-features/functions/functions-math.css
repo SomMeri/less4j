@@ -1,0 +1,51 @@
+#percentage {
+  padding1: NaN%;
+  padding2: 50%;
+  padding3: 30%;
+  padding4: 100%;
+  padding5: 100%;
+  padding6: 130%;
+}
+#percentageVariable {
+  padding1: NaN%;
+  padding2: 50%;
+  padding3: 30%;
+  padding4: 100%;
+  padding5: 100%;
+}
+#floor {
+  padding3: 0;
+  padding4: 1;
+  padding4: 0%;
+  padding5: 2px;
+  padding6: 3;
+}
+#floorVariable {
+  padding3: 0;
+  padding4: 0%;
+  padding5: 2cm;
+}
+#ceil {
+  padding3: 1;
+  padding4: 2;
+  padding4: 1%;
+  padding5: 3px;
+  padding6: 4;
+}
+#ceilVariable {
+  padding3: 1;
+  padding4: 1%;
+  padding5: 3cm;
+}
+#round {
+  padding3: 0;
+  padding4: 2;
+  padding4: 0%;
+  padding5: 3px;
+  padding6: 3;
+}
+#roundVariable {
+  padding3: 0;
+  padding4: 0%;
+  padding5: 2cm;
+}

@@ -1,0 +1,91 @@
+#percentage {
+  padding1: percentage(something); 
+  padding2: percentage("0.5"); 
+  padding3: percentage(0.3);
+  padding4: percentage(1%);
+  padding5: percentage(1px);
+  padding6: percentage(1+0.3);
+}
+
+@percentBad: "string";
+@percentString: "0.5";
+@percentNumber: 0.3;
+@percentPercent: 1%;
+@percentCm: 1cm;
+#percentageVariable {
+  padding1: percentage(@percentBad); 
+  padding2: percentage(@percentString); 
+  padding3: percentage(@percentNumber);
+  padding4: percentage(@percentPercent);
+  padding5: percentage(@percentCm);
+}
+
+#floor {
+//  padding1: floor(something); - error evaluating function `floor`: argument must be a number
+//  padding2: floor("0.5"); - error evaluating function `floor`: argument must be a number
+  padding3: floor(0.8);
+  padding4: floor(1.5); 
+  padding4: floor(1.5%); //report bug - evaluates to 0%
+  padding5: floor(2.9px);
+  padding6: floor(3+0.03);
+}
+
+@floorBad: "string";
+@floorString: "0.5";
+@floorNumber: 0.8;
+@floorPercent: 1.5%;
+@floorCm: 2.02cm;
+#floorVariable {
+//  padding1: floor(@floorBad); - error evaluating function `floor`: argument must be a number
+//  padding2: floor(@floorString); - error evaluating function `floor`: argument must be a number
+  padding3: floor(@floorNumber);
+  padding4: floor(@floorPercent); //report bug - evaluates to 0%
+  padding5: floor(@floorCm);
+}
+
+#ceil {
+//  padding1: ceil(something); - error evaluating function `ceil`: argument must be a number
+//  padding2: ceil("0.5"); - error evaluating function `ceil`: argument must be a number
+  padding3: ceil(0.8);
+  padding4: ceil(1.5); 
+  padding4: ceil(1.5%); //report bug - evaluates to 1%
+  padding5: ceil(2.9px);
+  padding6: ceil(3+0.03);
+}
+
+@ceilBad: "string";
+@ceilString: "0.5";
+@ceilNumber: 0.8;
+@ceilPercent: 1.5%;
+@ceilCm: 2.02cm;
+#ceilVariable {
+//  padding1: ceil(@ceilBad); - error evaluating function `ceil`: argument must be a number
+//  padding2: ceil(@ceilString); - error evaluating function `ceil`: argument must be a number
+  padding3: ceil(@ceilNumber);
+  padding4: ceil(@ceilPercent); //report bug - evaluates to 1%
+  padding5: ceil(@ceilCm);
+}
+
+#round {
+//  padding1: round(something); - error evaluating function `round`: argument must be a number
+//  padding2: round("0.5"); - error evaluating function `round`: argument must be a number
+  padding3: round(0.8);
+  padding4: round(1.5); 
+  padding4: round(1.5%); //report bug - evaluates to 0%
+  padding5: round(2.9px);
+  padding6: round(3+0.03);
+}
+
+@roundBad: "string";
+@roundString: "0.5";
+@roundNumber: 0.8;
+@roundPercent: 1.5%;
+@roundCm: 2.02cm;
+#roundVariable {
+//  padding1: round(@roundBad); - error evaluating function `round`: argument must be a number
+//  padding2: round(@roundString); - error evaluating function `round`: argument must be a number
+  padding3: round(@roundNumber);
+  padding4: round(@roundPercent); //report bug - evaluates to 0%
+  padding5: round(@roundCm);
+}
+//BUG report @@variable in declaration does not report line number
