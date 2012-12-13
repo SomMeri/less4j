@@ -1,10 +1,11 @@
 #percentage {
   padding1: NaN%;
-  padding2: 50%;
-  padding3: 30%;
-  padding4: 100%;
+  padding2: NaN%;
+  padding3: 50%;
+  padding4: 30%;
   padding5: 100%;
-  padding6: 130%;
+  padding6: 100%;
+  padding7: 130%;
 }
 #percentageVariable {
   padding1: NaN%;
@@ -16,36 +17,42 @@
 #floor {
   padding3: 0;
   padding4: 1;
-  padding4: 0%;
-  padding5: 2px;
-  padding6: 3;
+  padding5: 1%;
+  padding6: 2px;
+  padding7: 3;
 }
 #floorVariable {
   padding3: 0;
-  padding4: 0%;
+  padding4: 1%;
   padding5: 2cm;
 }
 #ceil {
   padding3: 1;
   padding4: 2;
-  padding4: 1%;
-  padding5: 3px;
-  padding6: 4;
+  padding5: 2%;
+  padding6: 3px;
+  padding7: 4;
 }
 #ceilVariable {
   padding3: 1;
-  padding4: 1%;
+  padding4: 2%;
   padding5: 3cm;
 }
 #round {
-  padding3: 0;
+  padding3: 1;
   padding4: 2;
-  padding4: 0%;
-  padding5: 3px;
-  padding6: 3;
+  padding5: 2%;
+  padding6: 3px;
+  padding7: 3;
 }
 #roundVariable {
-  padding3: 0;
-  padding4: 0%;
+  padding3: 1;
+  padding4: 2%;
   padding5: 2cm;
+}
+#caseSensitivity {
+  padding1: Percentage(0.3);
+  padding1: Floor(0.3);
+  padding1: Round(0.3);
+  padding1: Ceil(0.3);
 }

@@ -1,10 +1,11 @@
 #percentage {
   padding1: percentage(something); 
-  padding2: percentage("0.5"); 
-  padding3: percentage(0.3);
-  padding4: percentage(1%);
-  padding5: percentage(1px);
-  padding6: percentage(1+0.3);
+  padding2: percentage("invalid"); 
+  padding3: percentage("0.5"); 
+  padding4: percentage(0.3);
+  padding5: percentage(1%);
+  padding6: percentage(1px);
+  padding7: percentage(1+0.3);
 }
 
 @percentBad: "string";
@@ -25,9 +26,9 @@
 //  padding2: floor("0.5"); - error evaluating function `floor`: argument must be a number
   padding3: floor(0.8);
   padding4: floor(1.5); 
-  padding4: floor(1.5%); //report bug - evaluates to 0%
-  padding5: floor(2.9px);
-  padding6: floor(3+0.03);
+  padding5: floor(1.5%); 
+  padding6: floor(2.9px);
+  padding7: floor(3+0.03);
 }
 
 @floorBad: "string";
@@ -39,7 +40,7 @@
 //  padding1: floor(@floorBad); - error evaluating function `floor`: argument must be a number
 //  padding2: floor(@floorString); - error evaluating function `floor`: argument must be a number
   padding3: floor(@floorNumber);
-  padding4: floor(@floorPercent); //report bug - evaluates to 0%
+  padding4: floor(@floorPercent); 
   padding5: floor(@floorCm);
 }
 
@@ -48,9 +49,9 @@
 //  padding2: ceil("0.5"); - error evaluating function `ceil`: argument must be a number
   padding3: ceil(0.8);
   padding4: ceil(1.5); 
-  padding4: ceil(1.5%); //report bug - evaluates to 1%
-  padding5: ceil(2.9px);
-  padding6: ceil(3+0.03);
+  padding5: ceil(1.5%); 
+  padding6: ceil(2.9px);
+  padding7: ceil(3+0.03);
 }
 
 @ceilBad: "string";
@@ -62,7 +63,7 @@
 //  padding1: ceil(@ceilBad); - error evaluating function `ceil`: argument must be a number
 //  padding2: ceil(@ceilString); - error evaluating function `ceil`: argument must be a number
   padding3: ceil(@ceilNumber);
-  padding4: ceil(@ceilPercent); //report bug - evaluates to 1%
+  padding4: ceil(@ceilPercent); 
   padding5: ceil(@ceilCm);
 }
 
@@ -71,9 +72,9 @@
 //  padding2: round("0.5"); - error evaluating function `round`: argument must be a number
   padding3: round(0.8);
   padding4: round(1.5); 
-  padding4: round(1.5%); //report bug - evaluates to 0%
-  padding5: round(2.9px);
-  padding6: round(3+0.03);
+  padding5: round(1.5%); 
+  padding6: round(2.9px);
+  padding7: round(3+0.03);
 }
 
 @roundBad: "string";
@@ -89,3 +90,11 @@
   padding5: round(@roundCm);
 }
 //BUG report @@variable in declaration does not report line number
+
+#caseSensitivity {
+  padding1: Percentage(0.3);
+  padding1: Floor(0.3);
+  padding1: Round(0.3);
+  padding1: Ceil(0.3);
+}
+

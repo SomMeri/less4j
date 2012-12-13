@@ -628,6 +628,9 @@ public class CssPrinter {
   }
 
   private String format(Double valueAsDouble) {
+    if (valueAsDouble.isNaN())
+      return "NaN";
+    
     return FORMATTER.format(valueAsDouble);
   }
 

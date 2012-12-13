@@ -43,6 +43,7 @@ public class ExpressionEvaluator {
   private ListCalculator listCalculator = new ListCalculator();
   private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
+  private MathFunctions mathFunctions;
 
   public ExpressionEvaluator(ProblemsHandler problemsHandler) {
     this(new NullScope(), problemsHandler);
@@ -54,6 +55,7 @@ public class ExpressionEvaluator {
     this.problemsHandler = problemsHandler;
     arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
+    mathFunctions = new MathFunctions(problemsHandler);
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
@@ -208,7 +210,7 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(FunctionExpression input) {
-    return input;
+    return mathFunctions.evaluate(input, evaluate(input.getParameter()));
   }
 
   public Expression evaluate(SignedExpression input) {

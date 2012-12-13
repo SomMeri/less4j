@@ -1,0 +1,19 @@
+#percentage {
+  padding1: NaN%;
+  padding2: NaN%;
+}
+#floor {
+  padding1: !#error#!;
+  padding2: !#error#!;
+}
+#ceil {
+  padding1: !#error#!;
+  padding2: !#error#!;
+}
+#round {
+  padding1: !#error#!;
+  padding2: !#error#!;
+}
+#compiledThis {
+  yes: "it did";
+}

@@ -99,6 +99,14 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(errorNode, "Can't subtract or divide a color from a number"));
   }
 
+  public void mathFunctionParameterNotANumber(String functionName, Expression errorNode) {
+    collector.addError(new CompilationError(errorNode, "function '" +functionName+ "' requires number as a parameter."));
+  }
+
+  public void mathFunctionParameterNotANumberWarn(String functionName, Expression errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "function '" +functionName+ "' requires number as a parameter."));
+  }
+
   public void cannotEvaluate(Expression errorNode) {
     collector.addError(new CompilationError(errorNode, "Unable to evaluate expression"));
   }
