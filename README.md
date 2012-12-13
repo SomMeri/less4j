@@ -25,7 +25,7 @@ The documentation is kept on Github wiki:
 For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation be a bit different.
 
 ## Command Line
-Less4j can run from [command line](https://github.com/SomMeri/less4j/wiki/Command-Line-Options). Latest complete jar with all dependencies is stored in [distribution](https://github.com/SomMeri/less4j/downloads) page.
+Less4j can run from [command line](https://github.com/SomMeri/less4j/wiki/Command-Line-Options). Older complete jars with all dependencies up to version 0.0.5 are stored in [distribution](https://github.com/SomMeri/less4j/downloads) page. As Github deprecated the download page, it was impossible to upload there newer versions. We will update this readme after we find a suitable replacement.
 
 ## Maven
 Less4j is [available](http://search.maven.org/#artifactdetails|com.github.sommeri|less4j|0.0.1|jar) in Maven central repository.
