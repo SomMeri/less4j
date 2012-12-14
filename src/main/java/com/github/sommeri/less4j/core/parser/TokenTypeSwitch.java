@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.parser;
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.problems.BugHappened;
+import com.github.sommeri.less4j.utils.PrintUtils;
 
 public abstract class TokenTypeSwitch<T> {
 
@@ -122,7 +123,7 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.ESCAPED_SELECTOR)
       return handleEscapedSelector(token);
 
-    throw new BugHappened("Unexpected token type: " + type + " for " + token.getText(), token);
+    throw new BugHappened("Unexpected token type: " + type +"("+PrintUtils.toName(type)+ ") for " + token.getText(), token);
   }
 
   public abstract T handleEscapedSelector(HiddenTokenAwareTree token);

@@ -305,7 +305,8 @@ unaryOperator
     ;
     
 property
-    : IDENT
+    : {predicates.directlyFollows(input.LT(1), input.LT(2))}?=> STAR IDENT // support for star prefix
+    | IDENT // normal property
     ;
     
 //we need to put comma into the tree so we can collect comments to it

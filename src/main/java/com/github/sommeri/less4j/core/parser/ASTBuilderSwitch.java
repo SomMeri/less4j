@@ -166,21 +166,28 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Declaration handleDeclaration(HiddenTokenAwareTree token) {
-    List<HiddenTokenAwareTree> children = token.getChildren();
-
-    String name = children.get(0).getText();
-    if (children.size() == 1)
+    Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
+    HiddenTokenAwareTree nameToken = iterator.next();
+    
+    String name = nameToken.getText();
+    if (nameToken.getType()==LessLexer.STAR) {
+      // handling star prefix browser hack
+      nameToken = iterator.next();
+      name += nameToken.getText();
+    }
+    if (!iterator.hasNext())
       return new Declaration(token, name);
 
-    HiddenTokenAwareTree expressionToken = children.get(1);
+    HiddenTokenAwareTree expressionToken = iterator.next();
     if (expressionToken.getType() == LessLexer.IMPORTANT_SYM)
       return new Declaration(token, name, null, true);
 
     Expression expression = (Expression) switchOn(expressionToken);
-    if (children.size() == 2)
+    if (!iterator.hasNext())
       return new Declaration(token, name, expression);
 
-    if (children.get(2).getType() == LessLexer.IMPORTANT_SYM)
+    HiddenTokenAwareTree importantToken = iterator.next();
+    if (importantToken.getType() == LessLexer.IMPORTANT_SYM)
       return new Declaration(token, name, expression, true);
 
     throw new BugHappened(GRAMMAR_MISMATCH, token);
