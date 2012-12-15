@@ -301,6 +301,7 @@ public class CssPrinter {
   }
 
   public boolean appendStyleSheet(StyleSheet styleSheet) {
+    appendComments(styleSheet.getOrphanComments(), false);
     appendAllChilds(styleSheet);
     return true;
   }

@@ -16,3 +16,6 @@ h3 {
 #nested .something {
   margin: 2 2 2 2;
 }
+#escapeAsParameter {
+  color: test, test;
+}

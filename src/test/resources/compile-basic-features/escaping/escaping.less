@@ -27,3 +27,11 @@
 #nested {
   .call-me ();
 }
+
+.mixin(@a) {
+  color: @a;
+}
+
+#escapeAsParameter {
+  .mixin(~"test, test");
+}

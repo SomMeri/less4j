@@ -745,7 +745,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     token.pushHiddenToKids();
     HiddenTokenAwareTree valueToken = token.getChild(0);
     String quotedText = valueToken.getText();
-    return new EscapedSelector(valueToken, quotedText.substring(3, quotedText.length() - 2));
+    return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1));
   }
 
   private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {

@@ -365,7 +365,7 @@ selector
     ;
 finally { leaveRule(); }
 
-escapedSelector: SELECTOR_ESCAPE -> ^(ESCAPED_SELECTOR SELECTOR_ESCAPE);
+escapedSelector: LPAREN VALUE_ESCAPE RPAREN-> ^(ESCAPED_SELECTOR VALUE_ESCAPE);
 
 simpleSelector
     : ( (a+=elementName ( {!predicates.onEmptyCombinator(input)}?=>a+=elementSubsequent)*)
@@ -1051,19 +1051,6 @@ VALUE_ESCAPE : '~' '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                     )
                 ;   
                 
-SELECTOR_ESCAPE : '(' '~' '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
-                    (
-                          '\'' ')'
-                        | { $type = INVALID; }
-                    )
-                    
-                | '(' '~' '"' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
-                    (
-                          '"' ')'
-                        | { $type = INVALID; }
-                    )
-                ;                                
-
 // -------------
 // Identifier. Identifier tokens pick up properties names and values
 //

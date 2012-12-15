@@ -20,7 +20,7 @@ public class MalformedCssGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ParseResult result = compiler.parseSelector(crashingSelector);
     
-    assertNoTokenMissing(crashingSelector, result.getTree(), 1);
+    assertNoTokenMissing(crashingSelector, result.getTree(), 0);
   }
 
   @Test
@@ -29,7 +29,7 @@ public class MalformedCssGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ParseResult result = compiler.parseRuleset(crashingSelector);
 
-    assertNoTokenMissing(crashingSelector, result.getTree(), 1);
+    assertNoTokenMissing(crashingSelector, result.getTree(), -1);
   }
 
   @Test
