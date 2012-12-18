@@ -24,10 +24,16 @@ public class ASTBuilder {
     ASTCssNode result = builder.switchOn(tree);
     convertComments(result);
     solveParentChildRelationShips(result);
+    checkForWarnings(result);
     return (StyleSheet) result;
   }
 
-  private void solveParentChildRelationShips(ASTCssNode node) {
+ private void checkForWarnings(ASTCssNode result) {
+   AstValidator validator = new AstValidator(problemsHandler);
+   validator.validate(result);
+  }
+
+ private void solveParentChildRelationShips(ASTCssNode node) {
     for (ASTCssNode kid : node.getChilds()) {
       kid.setParent(node);
       solveParentChildRelationShips(kid);

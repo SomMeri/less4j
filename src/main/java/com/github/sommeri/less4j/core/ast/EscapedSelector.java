@@ -8,10 +8,20 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 public class EscapedSelector extends SelectorPart {
 
   private String value;
+  private String quoteType;
 
-  public EscapedSelector(HiddenTokenAwareTree underlyingStructure, String value) {
+  public EscapedSelector(HiddenTokenAwareTree underlyingStructure, String value, String quoteTypes) {
     super(underlyingStructure);
     this.value = value;
+    this.quoteType = quoteTypes;
+  }
+
+  public String getQuoteType() {
+    return quoteType;
+  }
+
+  public void setQuoteTypes(String quoteTypes) {
+    this.quoteType = quoteTypes;
   }
 
   public String getValue() {

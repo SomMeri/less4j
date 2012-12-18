@@ -132,7 +132,7 @@ public class ReferencesSolver {
   
   private EscapedSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
-    return new EscapedSelector(input.getUnderlyingStructure(), value);
+    return new EscapedSelector(input.getUnderlyingStructure(), value, input.getQuoteType());
   }
 
   private EscapedValue interpolateEscapedValue(EscapedValue input, ExpressionEvaluator expressionEvaluator) {

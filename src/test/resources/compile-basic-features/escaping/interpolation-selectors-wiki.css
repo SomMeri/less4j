@@ -1,0 +1,11 @@
+h3:nth-child(1),
+#id-42,
+.class-name-42 {
+  color: red;
+}
+h3:nth-child(2) {
+  color: red;
+}
+h1[text="content"] {
+  padding: 2 2 2 2;
+}

@@ -39,7 +39,6 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     }
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet);
-
     
     CssPrinter builder = new CssPrinter();
     builder.append(cssStyleSheet);

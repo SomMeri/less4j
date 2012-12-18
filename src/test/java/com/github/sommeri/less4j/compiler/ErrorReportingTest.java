@@ -11,6 +11,7 @@ public class ErrorReportingTest extends AbstractErrorReportingTest {
 
   private static final String basicCases = "src/test/resources/error-handling/";
   private static final String functionsCases = "src/test/resources/error-handling/functions/";
+  private static final String deprecatedWarnings = "src/test/resources/error-handling/deprecated-warnings/";
 
   public ErrorReportingTest(File lessFile, File partialCssFile, File errorList, String testName) {
     super(lessFile, partialCssFile, errorList, testName);
@@ -18,6 +19,6 @@ public class ErrorReportingTest extends AbstractErrorReportingTest {
 
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    return (new TestFileUtils(".err")).loadTestFiles(basicCases, functionsCases);
+    return (new TestFileUtils(".err")).loadTestFiles(basicCases, functionsCases, deprecatedWarnings);
   }
 }

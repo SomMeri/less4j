@@ -64,6 +64,7 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
+  @SuppressWarnings("unused")
   private final ProblemsHandler problemsHandler;
   private final TermBuilder termBuilder = new TermBuilder(this);
   // as stated here: http://www.w3.org/TR/css3-selectors/#pseudo-elements
@@ -243,10 +244,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
 
     ruleSet.addSelectors(selectors);
-    //TODO: these kind of warnings could be in a special validation class, no reason to do it here
-    if (ruleSet.getSelectors() == null || ruleSet.getSelectors().isEmpty())
-      problemsHandler.rulesetWithoutSelector(ruleSet);
-
     return ruleSet;
   }
 
@@ -775,7 +772,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     token.pushHiddenToKids();
     HiddenTokenAwareTree valueToken = token.getChild(0);
     String quotedText = valueToken.getText();
-    return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1));
+    return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), ""+quotedText.charAt(1));
   }
 
   private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {

@@ -1,0 +1,4 @@
+Warnings produced by compilation of testCase
+WARNING 1:2 Selector fragment (~"h1") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 4:2 Selector fragment (~'h2') uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 8:14 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.

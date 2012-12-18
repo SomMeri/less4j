@@ -6,10 +6,12 @@ import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
+import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
+import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
@@ -22,6 +24,14 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
   
+  public void deprecatedSyntaxEscapedSelector(EscapedSelector errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "Selector fragment (~"+errorNode.getQuoteType()+errorNode.getValue()+errorNode.getQuoteType()+ ") uses deprecated (~\"escaped-selector\") syntax. Use selector interpolation @{variableName} instead."));
+  }
+
+  public void variableAsPseudoclassParameter(PseudoClass errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode.getParameter(), "Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead."));
+  }
+
   public void undefinedMixinParameterValue(ReusableStructure mixin, ArgumentDeclaration declaration, MixinReference reference) {
     collector.addError(createUndefinedMixinParameterValue(mixin, declaration, reference));
   }

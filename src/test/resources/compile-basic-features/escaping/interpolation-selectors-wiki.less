@@ -1,0 +1,19 @@
+@headingLevel: 3;
+@headingPosition: 1;
+@id: 42;
+h@{headingLevel}:nth-child(@{headingPosition}), #id-@{id}, .class-name-@{id} {
+  color: red;
+}
+@pseudoClass: ~"nth-child";
+//workaround
+@fullPseudo: ~":@{pseudoClass}(2)";
+h3@{fullPseudo} {
+  color: red;
+}
+//workaround
+@variable: "content";
+@attribute: ~'[text="@{variable}"]';
+h1@{attribute} {
+  padding: 2 2 2 2;
+}
+

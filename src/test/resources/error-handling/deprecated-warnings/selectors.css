@@ -1,0 +1,9 @@
+h1 {
+  margin: 1;
+}
+h2 {
+  margin: 1;
+}
+h1:nth-child(2) {
+  padding: 2;
+}
