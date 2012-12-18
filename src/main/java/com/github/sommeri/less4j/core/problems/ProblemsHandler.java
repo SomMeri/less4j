@@ -24,6 +24,11 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
   
+  public void composedMixinReferenceSelector(MixinReference reference) {
+    collector.addError(new CompilationError(reference, "Mixin reference is composed of multiple parts."));
+    
+  }
+
   public void deprecatedSyntaxEscapedSelector(EscapedSelector errorNode) {
     collector.addWarning(new CompilationWarning(errorNode, "Selector fragment (~"+errorNode.getQuoteType()+errorNode.getValue()+errorNode.getQuoteType()+ ") uses deprecated (~\"escaped-selector\") syntax. Use selector interpolation @{variableName} instead."));
   }

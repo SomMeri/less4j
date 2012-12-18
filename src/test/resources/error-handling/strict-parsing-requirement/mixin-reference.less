@@ -1,0 +1,19 @@
+.mixin() {
+  color: blue;
+}
+
+#usePlace {
+  @variable: ~"in";
+  .mix@{variable}();
+}
+
+#namespace {
+  .mixin2() {
+    color: blue;
+  }
+}
+
+#usePlace2 {
+  @variable: ~"in";
+  #namespace > .mix@{variable}2();
+}

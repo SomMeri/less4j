@@ -6,6 +6,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
+import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -24,6 +25,10 @@ public class AstValidator {
       checkEmptySelector((RuleSet) node);
       break;
     }
+    case MIXIN_REFERENCE: {
+      checkComposedSimpleMixinName((MixinReference)node);
+      break;
+    }
     case PSEUDO_CLASS: {
       checkDeprecatedParameterType((PseudoClass) node);
       break;
@@ -39,6 +44,11 @@ public class AstValidator {
       validate(kid);
     }
 
+  }
+
+  private void checkComposedSimpleMixinName(MixinReference reference) {
+    if (!reference.getSelector().isSimple())
+      problemsHandler.composedMixinReferenceSelector(reference);
   }
 
   private void checkDeprecatedParameterType(PseudoClass pseudo) {
