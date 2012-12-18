@@ -28,7 +28,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
-import com.github.sommeri.less4j.utils.InStringCssPrinter;
+import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
 
 public class ReferencesSolver {
 
@@ -99,7 +99,6 @@ public class ReferencesSolver {
     case VARIABLE_NAME_PART: {
       VariableNamePart part = (VariableNamePart) node;
       Expression value = expressionEvaluator.evaluate(part.getVariable());
-      //FIXME: this is wrong, different printer because strings need quotes
       FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure());
       part.getParent().replaceMember(part, interpolateFixedNamePart(fixedName, expressionEvaluator));
       break;
@@ -119,7 +118,7 @@ public class ReferencesSolver {
   }
 
   private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent) {
-    InStringCssPrinter printer = new InStringCssPrinter();
+    QuotesKeepingInStringCssPrinter printer = new QuotesKeepingInStringCssPrinter();
     printer.append(value);    
     //property based alternative would be nice, but does not seem to be needed
     FixedNamePart fixedName = new FixedNamePart(parent, printer.toString());

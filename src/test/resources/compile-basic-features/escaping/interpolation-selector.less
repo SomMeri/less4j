@@ -71,6 +71,16 @@ re@{selector}@{theme}d {
     color:black;
   }
 }
+//nested in mixin
+.mixin(@className) {
+  .@{className} {
+    padding: 2 2 2 2;
+  }
+}
+
+pre {
+  .mixin(~"java")
+}
 //as argument
 @num: 3;
 :nth-child(@{num}):nth-child(@num) {
@@ -124,6 +134,18 @@ Numbers @{number1} @{number2} @{percentage} @{pixels} {
 @function: function(34);
 @parentheses: (3+2);
 Math @{expression} @{function} @{parentheses} {
+  margin: 2 2 2 2;
+}
+
+@singleQuoteString: 'string';
+@doubleQuoteString: "string";
+Strings @{singleQuoteString} @{doubleQuoteString} {
+  margin: 2 2 2 2;
+}
+
+@hexColor: #ff00ff;
+@namedColor: green;
+Color @{hexColor} @{namedColor} {
   margin: 2 2 2 2;
 }
 

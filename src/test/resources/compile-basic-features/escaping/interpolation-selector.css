@@ -61,6 +61,9 @@ re.bloodbloodd {
 #blood.blood.red.black {
   color: black;
 }
+pre .java {
+  padding: 2 2 2 2;
+}
 :nth-child(3):nth-child(3) {
   second-use: depreciated;
 }
@@ -98,6 +101,12 @@ Numbers 15 -15 7% 7px {
   margin: 2 2 2 2;
 }
 Math 49 function(34) 5 {
+  margin: 2 2 2 2;
+}
+Strings 'string' "string" {
+  margin: 2 2 2 2;
+}
+Color #ff00ff #008000 {
   margin: 2 2 2 2;
 }
 Various identifier variable {
