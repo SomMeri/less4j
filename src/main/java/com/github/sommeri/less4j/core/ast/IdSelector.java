@@ -1,34 +1,40 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class IdSelector extends ElementSubsequent {
 
-  private String name;
+  private InterpolableName name;
 
-  public IdSelector(HiddenTokenAwareTree token, String name) {
+  public IdSelector(HiddenTokenAwareTree token, InterpolableName name) {
     super(token);
     this.name = name;
   }
 
   public String getName() {
-    return name;
+    return name.getName();
   }
 
   public String getFullName() {
-    return "#" + name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
+    return "#" + getName();
   }
 
   @Override
+  public boolean isSimple() {
+    return name.isSimple();
+  }
+
+  @Override
+  public void extendName(String extension) {
+    name.extendName(extension);
+  }
+  
+  @Override
   public List<? extends ASTCssNode> getChilds() {
-    return Collections.emptyList();
+    return ArraysUtils.asNonNullList(name);
   }
 
   @Override
@@ -38,7 +44,10 @@ public class IdSelector extends ElementSubsequent {
 
   @Override
   public IdSelector clone() {
-    return (IdSelector) super.clone();
+    IdSelector clone = (IdSelector)super.clone();
+    clone.name = name.clone();
+    clone.configureParentToAllChilds();
+    return clone;
   }
 
   @Override
@@ -49,6 +58,6 @@ public class IdSelector extends ElementSubsequent {
     builder.append("]");
     return builder.toString();
   }
-  
+
   
 }

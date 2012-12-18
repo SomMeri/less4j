@@ -26,6 +26,7 @@ public class ASTManipulator {
           setPropertyValue(newChild, parent, "parent");
           setPropertyValue(oldChild, null, "parent");
           setPropertyValue(parent, newChild, descriptor);
+          //todo maybe set parents to childs?
           return;
         }
       }

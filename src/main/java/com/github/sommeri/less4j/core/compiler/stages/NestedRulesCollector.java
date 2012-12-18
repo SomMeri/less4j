@@ -198,7 +198,7 @@ public class NestedRulesCollector {
     if (!secondHead.hasElement()) {
       attachToHead.addSubsequent(secondHead.getSubsequent());
     } else {
-      String secondName = secondHead.hasElement() ? secondHead.getElementName() : "";
+      String secondName = secondHead.hasElement() ? secondHead.getElementName().getName() : "";
       if (attachToHead.hasSubsequent()) {
         ElementSubsequent subsequent = attachToHead.getLastSubsequent();
         subsequent.extendName(secondName);

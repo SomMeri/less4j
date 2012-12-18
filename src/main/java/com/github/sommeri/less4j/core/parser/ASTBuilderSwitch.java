@@ -20,12 +20,14 @@ import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
+import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
@@ -53,6 +55,7 @@ import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
+import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -414,15 +417,16 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public CssClass handleCssClass(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
-    HiddenTokenAwareTree nameToken = children.get(0);
-
-    String name = nameToken.getText();
-    if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
-      name = name.substring(1, name.length());
-    }
-
-    CssClass result = new CssClass(token, name);
-    return result;
+    return new CssClass(token, toInterpolableName(token, children));
+//    HiddenTokenAwareTree nameToken = children.get(0);
+//
+//    String name = nameToken.getText();
+//    if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
+//      name = name.substring(1, name.length());
+//    }
+//
+//    CssClass result = new CssClass(token, name);
+//    return result;
   }
 
   public SelectorAttribute handleSelectorAttribute(HiddenTokenAwareTree token) {
@@ -546,14 +550,32 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public IdSelector handleIdSelector(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
-    if (children.size() != 1)
-      throw new BugHappened(GRAMMAR_MISMATCH, token);
+    return new IdSelector(token, toInterpolableName(token, children));
+  }
 
-    String text = children.get(0).getText();
-    if (text == null || text.length() < 1)
-      throw new BugHappened(GRAMMAR_MISMATCH, token);
+  private InterpolableName toInterpolableName(HiddenTokenAwareTree token, List<HiddenTokenAwareTree> children) {
+    InterpolableName result = new InterpolableName(token);
+    for (HiddenTokenAwareTree kid : children) {
+      String text = kid.getText();
+      if (text == null || text.length() < 1)
+        throw new BugHappened(GRAMMAR_MISMATCH, kid);
+      
+      if (kid.getType()==LessLexer.INTERPOLATED_VARIABLE) {
+        result.add(new VariableNamePart(kid, new Variable(kid, "@"+ text.substring(2, text.length()-1))));
+      } else if (kid.getType()==LessLexer.HASH_SYMBOL) {
+        //do nothing
+      } else {
+        result.add(new FixedNamePart(kid, toFixedName(kid.getType(), text)));
+      }
+    }
+    return result;
+  }
 
-    return new IdSelector(token, text.substring(1));
+  private String toFixedName(int typeCode, String text) {
+    if (typeCode==LessLexer.HASH)
+      return text.substring(1);
+    
+    return text;
   }
 
   public Media handleMedia(HiddenTokenAwareTree token) {
@@ -719,8 +741,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
     HiddenTokenAwareTree kid = iterator.next();
     if (kid.getType() == LessLexer.ELEMENT_NAME) {
-      HiddenTokenAwareTree realName = kid.getChild(0);
-      result = new SimpleSelector(kid, realName.getText(), realName.getType() == LessLexer.STAR);
+      List<HiddenTokenAwareTree> elementNameParts = kid.getChildren();
+      InterpolableName interpolableName = toInterpolableName(kid, elementNameParts);
+      result = new SimpleSelector(kid, interpolableName, isStarElementName(elementNameParts));
       if (iterator.hasNext())
         kid = iterator.next();
       else return result;
@@ -739,6 +762,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     } while (kid != null);
 
     return result;
+  }
+
+  private boolean isStarElementName(List<HiddenTokenAwareTree> elementNameParts) {
+    if (elementNameParts.size()!=1)
+      return false;
+    
+    return elementNameParts.get(0).getType()==LessLexer.STAR;
   }
 
   public EscapedSelector handleEscapedSelector(HiddenTokenAwareTree token) {

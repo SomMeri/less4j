@@ -8,35 +8,37 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class SimpleSelector extends SelectorPart implements Cloneable {
 
-  private String elementName;
+  private InterpolableName elementName;
   private boolean isStar;
   //*.warning and .warning are equivalent http://www.w3.org/TR/css3-selectors/#universal-selector
   //relevant only if the selector is a star
   private boolean isEmptyForm = false;
   private List<ElementSubsequent> subsequent = new ArrayList<ElementSubsequent>();
 
-  public SimpleSelector(HiddenTokenAwareTree token, String elementName, boolean isStar) {
+  public SimpleSelector(HiddenTokenAwareTree token, InterpolableName elementName, boolean isStar) {
     super(token);
     this.elementName = elementName;
     this.isStar = isStar;
   }
 
   public boolean isSingleClassSelector() {
-    return isOnePurposeSelector(ASTCssNodeType.CSS_CLASS);
+    return isSimpleOnePurposeSelector(ASTCssNodeType.CSS_CLASS);
   }
 
   public boolean isSingleIdSelector() {
-    return isOnePurposeSelector(ASTCssNodeType.ID_SELECTOR);
+    return isSimpleOnePurposeSelector(ASTCssNodeType.ID_SELECTOR);
   }
 
-  private boolean isOnePurposeSelector(ASTCssNodeType purpose) {
+  private boolean isSimpleOnePurposeSelector(ASTCssNodeType purpose) {
     if (elementName != null || !isEmptyForm() || subsequent == null || subsequent.size() != 1)
       return false;
 
-    return subsequent.get(0).getType() == purpose;
+    ElementSubsequent es = subsequent.get(0);
+    
+    return es.getType() == purpose && es.isSimple();
   }
 
-  public String getElementName() {
+  public InterpolableName getElementName() {
     return elementName;
   }
 
@@ -52,7 +54,7 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     this.isEmptyForm = isEmptyForm;
   }
 
-  public void setElementName(String elementName) {
+  public void setElementName(InterpolableName elementName) {
     this.elementName = elementName;
   }
 
@@ -82,7 +84,9 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
 
   @Override
   public List<ASTCssNode> getChilds() {
-    return new ArrayList<ASTCssNode>(subsequent);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)elementName);
+    result.addAll(subsequent);
+    return result;
   }
 
   public ASTCssNodeType getType() {
@@ -93,6 +97,7 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
   public SimpleSelector clone() {
     SimpleSelector clone = (SimpleSelector) super.clone();
     clone.subsequent = ArraysUtils.deeplyClonedList(getSubsequent());
+    clone.elementName = elementName==null? null : elementName.clone();
     clone.configureParentToAllChilds();
     return clone;
   }
@@ -115,10 +120,8 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
   public void extendName(String extension) {
     if (isStar) {
       isStar=false;
-      setElementName("*" + extension);
-    } else {
-      setElementName(getElementName() + extension);
     }
+    getElementName().extendName(extension);
   }
 
 }

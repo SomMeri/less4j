@@ -1,31 +1,37 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class CssClass extends ElementSubsequent {
 
-  private String name;
+  private InterpolableName name;
 
-  public CssClass(HiddenTokenAwareTree token, String name) {
+  public CssClass(HiddenTokenAwareTree token, InterpolableName name) {
     super(token);
     this.name = name;
   }
 
   public String getName() {
-    return name;
+    return name.getName();
   }
 
   public String getFullName() {
-    return "." + name;
+    return "." + getName();
   }
 
-  public void setName(String name) {
-    this.name = name;
+  @Override
+  public boolean isSimple() {
+    return name.isSimple();
   }
 
+  @Override
+  public void extendName(String extension) {
+    name.extendName(extension);
+  }
+  
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.CSS_CLASS;
@@ -33,12 +39,15 @@ public class CssClass extends ElementSubsequent {
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return Collections.emptyList();
+    return ArraysUtils.asNonNullList(name);
   }
 
   @Override
   public CssClass clone() {
-    return (CssClass) super.clone();
+    CssClass clone = (CssClass)super.clone();
+    clone.name = name.clone();
+    clone.configureParentToAllChilds();
+    return clone;
   }
 
   @Override
@@ -49,6 +58,5 @@ public class CssClass extends ElementSubsequent {
     builder.append("]");
     return builder.toString();
   }
-  
-  
+
 }

@@ -1,0 +1,155 @@
+//based on less.js test case
+@theme: ~"blood";
+@selector: ~".@{theme}";
+//full selector
+@{selector} {
+  color:red;
+}
+@{selector}@{theme} {
+  color:red;
+}
+//part of name
+@{selector}red {
+  color: green;
+}
+red@{selector} {
+  color: green;
+}
+re@{selector}d {
+  color: green;
+}
+@{selector}@{theme}red {
+  color: green;
+}
+red@{selector}@{theme} {
+  color: green;
+}
+re@{selector}@{theme}d {
+  color: green;
+}
+//part of name #
+#@{selector}red {
+  color: green;
+}
+#red@{selector} {
+  color: green;
+}
+#re@{selector}d {
+  color: green;
+}
+#@{selector}@{theme}red {
+  color: green;
+}
+#red@{selector}@{theme} {
+  color: green;
+}
+#re@{selector}@{theme}d {
+  color: green;
+}
+//part of name .
+.@{selector}red {
+  color: green;
+}
+.red@{selector} {
+  color: green;
+}
+.re@{selector}d {
+  color: green;
+}
+.@{selector}@{theme}red {
+  color: green;
+}
+.red@{selector}@{theme} {
+  color: green;
+}
+.re@{selector}@{theme}d {
+  color: green;
+}
+//nested with appender
+.red {
+  #@{theme}.@{theme}&.black {
+    color:black;
+  }
+}
+//as argument
+@num: 3;
+:nth-child(@{num}):nth-child(@num) {
+second-use: depreciated;
+}
+//additional cases
+@variable: ~"variable";
+.@{variable}-1 {
+  padding: 2 2 2 2;
+}
+
+1-.@{variable}-1 {
+  padding: 2 2 2 2;
+}
+
+1-@{variable}-1 {
+  padding: 2 2 2 2;
+}
+
+@{variable}* @{variable}, @{variable} *@{variable} {
+  padding: 2 2 2 2;
+}
+
+@{variable} name@{variable}:hover, @{variable}h2 @{variable}, @{variable} @{variable}, @{variable}@{variable}, @{variable} + @{variable} @{variable}+@{variable}, @{variable} {
+    declaration: 1 2;
+  }
+
+h1 @{variable}:not(.class) {
+  padding: 2 2 2 2;
+}
+
+@work: ~":";
+h2@{work}@{variable} {
+  padding: 2 2 2 2;
+}
+
+@workaround: ~":";
+h2@{workaround}@{variable} {
+  padding: 2 2 2 2;
+}
+
+@number1: 15;
+@number2: -15;
+@percentage: 7%;
+@pixels: 7px;
+Numbers @{number1} @{number2} @{percentage} @{pixels} {
+  margin: 2 2 2 2;
+}
+
+@expression: 4+45;
+@function: function(34);
+@parentheses: (3+2);
+Math @{expression} @{function} @{parentheses} {
+  margin: 2 2 2 2;
+}
+
+@identifier: identifier;
+@otherVariable: @variable;
+Various @{identifier} @{otherVariable} {
+  margin: 2 2 2 2;
+}
+
+// interpolated variable vs appender
+@{selector} {
+  @{theme}&@{theme} {
+    color:red;
+  }
+  @{theme} & @{theme} {
+    color:blue;
+  }
+}
+//TODO document
+//does not work
+//h1[text=@{variable}] {
+//  padding: 2 2 2 2;
+//}
+//TODO warning na deprecated syntax
+//does not work
+//h2:@{variable} {
+//  padding: 2 2 2 2;
+//}
+

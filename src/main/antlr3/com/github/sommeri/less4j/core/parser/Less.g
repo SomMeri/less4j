@@ -356,16 +356,17 @@ ruleset_body
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
     : ((combinator)=>a+=combinator | ) 
-      (a+=simpleSelector | a+=nestedAppender | a+=escapedSelector) 
+      (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax) 
       ( 
         ((combinator)=>a+=combinator | ) 
-        (a+=simpleSelector | a+=nestedAppender | a+=escapedSelector)
+        (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax)
       )*
     -> ^(SELECTOR $a* ) 
     ;
 finally { leaveRule(); }
 
-escapedSelector: LPAREN VALUE_ESCAPE RPAREN-> ^(ESCAPED_SELECTOR VALUE_ESCAPE);
+//TODO clean up, this version is just a proof of concept
+escapedSelectorOldSyntax: LPAREN VALUE_ESCAPE RPAREN-> ^(ESCAPED_SELECTOR VALUE_ESCAPE);
 
 simpleSelector
     : ( (a+=elementName ( {!predicates.onEmptyCombinator(input)}?=>a+=elementSubsequent)*)
@@ -374,8 +375,8 @@ simpleSelector
     -> ^(SIMPLE_SELECTOR $a*)
     ;
     
-hashOrCssClass    
-    :   HASH -> ^(ELEMENT_SUBSEQUENT ^(ID_SELECTOR HASH))
+cssClassOrId    
+    :   idSelector -> ^(ELEMENT_SUBSEQUENT idSelector)
         | cssClass -> ^(ELEMENT_SUBSEQUENT cssClass)
     ;
     
@@ -385,41 +386,30 @@ attribOrPseudo
     ;
 
 elementSubsequent
-    :   hashOrCssClass
+    :   cssClassOrId
       | attribOrPseudo
     ;
 
-//A class name can be also a number e.g., .56 or .5cm or anything else that starts with ..
-//unfortunately, those can be turned into numbers by lexer. This feels like an ugly hack,
-//but I do not know how to solve the problem otherwise.
-cssClass
-    : DOT IDENT -> ^(CSS_CLASS IDENT)
-    | DOT NUMBER -> ^(CSS_CLASS NUMBER)
-    | DOT EMS -> ^(CSS_CLASS EMS)
-    | DOT EXS -> ^(CSS_CLASS EXS)
-    | DOT LENGTH -> ^(CSS_CLASS LENGTH)
-    | DOT ANGLE -> ^(CSS_CLASS ANGLE)
-    | DOT TIME -> ^(CSS_CLASS TIME)
-    | DOT FREQ -> ^(CSS_CLASS FREQ)
-    | DOT REPEATER -> ^(CSS_CLASS REPEATER)
-    | DOT PERCENTAGE -> ^(CSS_CLASS PERCENTAGE)
-    | DOT UNKNOWN_DIMENSION -> ^(CSS_CLASS UNKNOWN_DIMENSION)
+idSelector: 
+      (b+=HASH | b+=HASH_SYMBOL b+=INTERPOLATED_VARIABLE) 
+      ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=idOrClassNamePart)* 
+   -> ^(ID_SELECTOR $b* $a*)
     ;
     
+//A class name can be also a number e.g., .56 or .5cm or anything else that starts with a dot '.'.
+cssClass
+    : DOT a+=idOrClassNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=idOrClassNamePart)* -> ^(CSS_CLASS $a*); 
+    
+idOrClassNamePart
+    : IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
+    
 elementName
-    : (IDENT -> ^(ELEMENT_NAME IDENT))
-    | (STAR -> ^(ELEMENT_NAME STAR))
-    | (NUMBER -> ^(ELEMENT_NAME NUMBER))
-    | (EMS -> ^(ELEMENT_NAME EMS))
-    | (EXS -> ^(ELEMENT_NAME EXS))
-    | (LENGTH -> ^(ELEMENT_NAME LENGTH))
-    | (ANGLE -> ^(ELEMENT_NAME ANGLE))
-    | (TIME -> ^(ELEMENT_NAME TIME))
-    | (FREQ -> ^(ELEMENT_NAME FREQ))
-    | (REPEATER -> ^(ELEMENT_NAME REPEATER))
-    | (PERCENTAGE -> ^(ELEMENT_NAME PERCENTAGE))
-    | (UNKNOWN_DIMENSION -> ^(ELEMENT_NAME UNKNOWN_DIMENSION))
-    ;
+    :  a+=elementNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=elementNamePart)* -> ^(ELEMENT_NAME $a*);
+    
+elementNamePart
+    : IDENT | MINUS | STAR | allNumberKinds | INTERPOLATED_VARIABLE;
+        
+allNumberKinds: NUMBER | EMS | EXS | LENGTH | ANGLE | TIME | FREQ | REPEATER | PERCENTAGE | UNKNOWN_DIMENSION;
 
 attrib
     : (LBRACKET
@@ -497,9 +487,10 @@ mixinReferenceArguments
 mixinReferenceArgument
     : mathExprHighPrior | variabledeclarationLimitedNoSemi
     ;
-    
+
+//FIXME: add additional chech - these should NOT trigger interpolation    
 reusableStructureName
-    : hashOrCssClass;
+    : cssClassOrId;
 
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 
@@ -1002,6 +993,7 @@ STAR : '*' ;
 LPAREN : '(' ;
 RPAREN : ')' ;
 COMMA : ',' ;
+HASH_SYMBOL: '#';
 DOT : '.' ;
 DOT3 : '...' ;
 //TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
@@ -1071,6 +1063,7 @@ CHARSET_SYM : '@charset ' ;
 
 VARIABLE : '@' NAME ;
 INDIRECT_VARIABLE : '@' '@' NAME ;
+INTERPOLATED_VARIABLE : '@' LBRACE NAME RBRACE;
 
 IMPORTANT_SYM : '!' (WS|COMMENT)* I M P O R T A N T ;
 

@@ -20,6 +20,16 @@ public abstract class Pseudo extends ElementSubsequent {
   }
 
   @Override
+  public void extendName(String extension) {
+    setName(getName() + extension);
+  }
+
+  @Override
+  public boolean isSimple() {
+    return true;
+  }
+
+  @Override
   public Pseudo clone() {
     return (Pseudo) super.clone();
   }

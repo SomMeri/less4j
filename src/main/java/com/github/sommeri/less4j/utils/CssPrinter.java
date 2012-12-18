@@ -600,7 +600,7 @@ public class CssPrinter {
       if (!selector.isEmptyForm())
         builder.append("*");
     } else {
-      builder.appendIgnoreNull(selector.getElementName());
+      builder.appendIgnoreNull(selector.getElementName().getName());
     }
 
   }

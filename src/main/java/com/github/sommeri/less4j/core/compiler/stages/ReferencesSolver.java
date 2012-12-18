@@ -12,19 +12,23 @@ import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
+import com.github.sommeri.less4j.utils.InStringCssPrinter;
 
 public class ReferencesSolver {
 
@@ -77,18 +81,32 @@ public class ReferencesSolver {
       break;
     }
     case ESCAPED_SELECTOR: {
-      EscapedSelector replacement = replaceInEscapedSelector((EscapedSelector) node, expressionEvaluator); 
+      EscapedSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator); 
       manipulator.replace(node, replacement);
       break;
     }
     case ESCAPED_VALUE: {
-      EscapedValue replacement = replaceInEscapedValue((EscapedValue) node, expressionEvaluator); 
+      EscapedValue replacement = interpolateEscapedValue((EscapedValue) node, expressionEvaluator); 
       manipulator.replace(node, replacement);
+      break;
+    }
+    case FIXED_NAME_PART: {
+      FixedNamePart part = (FixedNamePart) node;
+      FixedNamePart replacement = interpolateFixedNamePart(part, expressionEvaluator); 
+      part.getParent().replaceMember(part, replacement);
+      break;
+    }
+    case VARIABLE_NAME_PART: {
+      VariableNamePart part = (VariableNamePart) node;
+      Expression value = expressionEvaluator.evaluate(part.getVariable());
+      //FIXME: this is wrong, different printer because strings need quotes
+      FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure());
+      part.getParent().replaceMember(part, interpolateFixedNamePart(fixedName, expressionEvaluator));
       break;
     }
     }
 
-    if (node.getType() != ASTCssNodeType.NAMESPACE_REFERENCE) {
+    if (node.getType() != ASTCssNodeType.NAMESPACE_REFERENCE && node.getType() != ASTCssNodeType.VARIABLE_NAME_PART) {
       List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       for (ASTCssNode kid : childs) {
         if (AstLogic.hasOwnScope(kid)) {
@@ -100,19 +118,32 @@ public class ReferencesSolver {
     }
   }
 
+  private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent) {
+    InStringCssPrinter printer = new InStringCssPrinter();
+    printer.append(value);    
+    //property based alternative would be nice, but does not seem to be needed
+    FixedNamePart fixedName = new FixedNamePart(parent, printer.toString());
+    return fixedName;
+  }
+
   private CssString replaceInString(CssString input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
     return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
   }
   
-  private EscapedSelector replaceInEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
+  private EscapedSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
     return new EscapedSelector(input.getUnderlyingStructure(), value);
   }
 
-  private EscapedValue replaceInEscapedValue(EscapedValue input, ExpressionEvaluator expressionEvaluator) {
+  private EscapedValue interpolateEscapedValue(EscapedValue input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceInterpolatedVariables(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
     return new EscapedValue(input.getUnderlyingStructure(), value);
+  }
+  
+  private FixedNamePart interpolateFixedNamePart(FixedNamePart input, ExpressionEvaluator expressionEvaluator) {
+    String value = stringInterpolator.replaceInterpolatedVariables(input.getName(), expressionEvaluator, input.getUnderlyingStructure());
+    return new FixedNamePart(input.getUnderlyingStructure(), value);
   }
 
   private RuleSetsBody resolveMixinReference(MixinReference reference, Scope scope) {

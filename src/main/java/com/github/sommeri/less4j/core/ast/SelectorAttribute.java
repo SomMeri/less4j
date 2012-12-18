@@ -30,6 +30,11 @@ public class SelectorAttribute extends ElementSubsequent {
     return getName();
   }
   
+  @Override
+  public void extendName(String extension) {
+    setName(getName() + extension);
+  }
+
   public SelectorOperator getOperator() {
     return operator;
   }
@@ -66,6 +71,11 @@ public class SelectorAttribute extends ElementSubsequent {
     result.operator = operator==null?null:operator.clone();
     result.configureParentToAllChilds();
     return result;
+  }
+
+  @Override
+  public boolean isSimple() {
+    return true;
   }
 
 }

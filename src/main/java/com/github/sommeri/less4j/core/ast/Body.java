@@ -55,6 +55,8 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
     public void replaceMember(T oldMember, List<T> newMembers) {
       body.addAll(body.indexOf(oldMember), newMembers);
       body.remove(oldMember);
+      oldMember.setParent(null);
+      configureParentToAllChilds();
     }
 
     public List<T> membersByType(ASTCssNodeType type) {

@@ -12,16 +12,16 @@ public abstract class ElementSubsequent extends ASTCssNode {
 
   public abstract String getFullName();
 
-  public abstract void setName(String name);
+  public abstract boolean isSimple();
 
-  public void extendName(String extension) {
-    setName(getName() + extension);
-  }
-  
+  public abstract void extendName(String extension);
+
+ 
   @Override
   public ElementSubsequent clone() {
     ElementSubsequent result = (ElementSubsequent) super.clone();
     return result;
   }
+
 
 }
