@@ -25,9 +25,7 @@ The documentation is kept on Github wiki:
 For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation be a bit different.
 
 ## Command Line
-Less4j can run from [command line](https://github.com/SomMeri/less4j/wiki/Command-Line-Options). Latest versions are shared via [less4j dropbox account](https://www.dropbox.com/sh/zcb8p27db9ou4x1/keQWIZziH8). Shared folder always contains at least two latest versions, but we may remove older ones. 
-
-Note: If you need an old version for some reason, checkout appropriate tag from git and use `mvn package -P standalone` command to generate and `target/less4j-<version>-shaded.jar`. 
+Less4j can run from [command line](https://github.com/SomMeri/less4j/wiki/Command-Line-Options). Latest versions are shared via [less4j dropbox account](https://www.dropbox.com/sh/zcb8p27db9ou4x1/keQWIZziH8). Shared folder always contains at least two latest versions, but we may remove older ones. If you need an old version for some reason, checkout appropriate tag from git and use `mvn package -P standalone` command. The command compiles less4j and all its dependencies into `target/less4j-<version>-shaded.jar` file. 
 
 ## Maven
 Less4j is [available](http://search.maven.org/#artifactdetails|com.github.sommeri|less4j|0.0.1|jar) in Maven central repository.
