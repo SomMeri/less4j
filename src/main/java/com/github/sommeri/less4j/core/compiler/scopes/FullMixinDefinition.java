@@ -24,7 +24,7 @@ public class FullMixinDefinition {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("FullMixinDefinition [mixin=");
-    builder.append(mixin.getName());
+    builder.append(mixin.getNames().get(0)).append(" ...");
     builder.append(", bodyScope=");
     builder.append(bodyScope);
     builder.append("]");

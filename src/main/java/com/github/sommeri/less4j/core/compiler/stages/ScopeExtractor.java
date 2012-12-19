@@ -20,14 +20,14 @@ public class ScopeExtractor {
   private ASTManipulator manipulator = new ASTManipulator();
 
   private Scope currentScope;
-  private String nextChildScopeName;
+  private List<String> nextChildScopeNames;
 
   public ScopeExtractor() {
   }
 
   public Scope extractScope(ASTCssNode node) {
     currentScope = null;
-    nextChildScopeName = null;
+    nextChildScopeNames = null;
     
     Scope result = buildScope(node);
     return result;
@@ -38,9 +38,9 @@ public class ScopeExtractor {
     if (hasOwnScope)
       increaseScope(node);
 
-    String representedNamespace = representedNamedScope(node);
-    if (representedNamespace != null) {
-      nextChildScopeName = representedNamespace;
+    List<String> representedNamespaces = representedNamedScope(node);
+    if (representedNamespaces != null) {
+      nextChildScopeNames = representedNamespaces;
     }
 
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
@@ -59,7 +59,7 @@ public class ScopeExtractor {
         manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.RULE_SET) {
         RuleSet ruleSet = (RuleSet) kid;
-        if (ruleSet.isReusableStructure()) { 
+        if (ruleSet.usableAsReusableStructure()) { 
           Scope bodyScope = currentScope.getChildOwnerOf(ruleSet.getBody());
           currentScope.registerMixin(ruleSet.convertToReusableStructure(), bodyScope);
         }
@@ -73,15 +73,15 @@ public class ScopeExtractor {
     return result;
   }
 
-  private String representedNamedScope(ASTCssNode node) {
+  private List<String> representedNamedScope(ASTCssNode node) {
     switch (node.getType()) {
     case REUSABLE_STRUCTURE:
-      return ((ReusableStructure) node).getName();
+      return ((ReusableStructure) node).getNames();
 
     case RULE_SET: {
       RuleSet ruleSet = (RuleSet) node;
-      if (ruleSet.isReusableStructure())
-        return ruleSet.extractReusableStructureName();
+      if (ruleSet.usableAsReusableStructure())
+        return ruleSet.extractReusableStructureNames();
 
       return null;
     }
@@ -96,7 +96,7 @@ public class ScopeExtractor {
   }
 
   private void increaseScope(ASTCssNode owner) {
-    if (nextChildScopeName == null) {
+    if (nextChildScopeNames == null) {
       if (currentScope==null)
         currentScope = Scope.createDefaultScope(owner);
       else 
@@ -105,8 +105,8 @@ public class ScopeExtractor {
       return;
     }
 
-    currentScope = Scope.createScope(owner, nextChildScopeName, currentScope);
-    nextChildScopeName = null;
+    currentScope = Scope.createScope(owner, nextChildScopeNames, currentScope);
+    nextChildScopeNames = null;
   }
 
 }

@@ -1,0 +1,13 @@
+#h1, #h2, .noNamespace {
+  .mixin() {
+    something: something;
+  }
+}
+
+.max1 { 
+  #h1 > .mixin();
+}
+
+.max2 { 
+  #h2 > .mixin();
+}

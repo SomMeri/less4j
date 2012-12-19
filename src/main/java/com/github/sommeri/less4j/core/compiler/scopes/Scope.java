@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.compiler.scopes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -22,17 +23,25 @@ public class Scope {
 
   private Scope parent;
   private List<Scope> childs = new ArrayList<Scope>();
-  private String name;
+  private List<String> names;
 
-  protected Scope(ASTCssNode owner, String name, Scope parent) {
+  protected Scope(ASTCssNode owner, List<String> names, Scope parent) {
     super();
-    this.name = name;
+    this.names = names;
     this.owner = owner;
     setParent(parent);
   }
 
+  private Scope(ASTCssNode owner, String name, Scope parent) {
+    this(owner, Arrays.asList(name), parent);
+  }
+
+  protected Scope(ASTCssNode owner, List<String> names) {
+    this(owner, names, null);
+  }
+
   protected Scope(ASTCssNode owner, String name) {
-    this(owner, name, null);
+    this(owner, Arrays.asList(name), null);
   }
 
   private void addChild(Scope child) {
@@ -47,8 +56,8 @@ public class Scope {
     return childs;
   }
 
-  public String getName() {
-    return name;
+  public List<String> getNames() {
+    return names;
   }
 
   public boolean hasParent() {
@@ -58,8 +67,8 @@ public class Scope {
   @Override
   public String toString() {
     if (hasParent())
-      return getParent() + " > " + getName();
-    return getName();
+      return getParent() + " > " + getNames();
+    return getNames().toString();
   }
 
   public void registerVariable(AbstractVariableDeclaration declaration) {
@@ -133,7 +142,7 @@ public class Scope {
     List<String> theRest = nameChain.subList(1, nameChain.size()); 
     List<Scope> result = new ArrayList<Scope>();
     for (Scope kid : getChilds()) {
-      if (kid.getName().equals(fistName)) {
+      if (kid.getNames().contains(fistName)) {
         result.addAll(kid.findMatchingChilds(theRest));
       }
     }
@@ -146,6 +155,10 @@ public class Scope {
 
   public static Scope createUnnamedScope(ASTCssNode owner, Scope parent) {
     return new Scope(owner, "#unnamed#", parent);
+  }
+
+  public static Scope createScope(ASTCssNode owner, List<String> names, Scope parent) {
+    return new Scope(owner, names, parent);
   }
 
   public static Scope createScope(ASTCssNode owner, String name, Scope parent) {
@@ -162,7 +175,14 @@ public class Scope {
       prefix +="  ";
     }
     StringBuilder text = new StringBuilder(prefix);
-    text.append(getName()).append("(").append(variables.size()).append(", ").append(mixins.size());
+    
+    Iterator<String> iNames = getNames().iterator();
+    text.append(iNames.next());
+    while (iNames.hasNext()) {
+      text.append(", ").append(iNames.next());
+    }
+    
+    text.append("(").append(variables.size()).append(", ").append(mixins.size());
     text.append(") {").append("\n");
     
     for (Scope kid : getChilds()) {
@@ -177,7 +197,7 @@ public class Scope {
   }
   
   public Scope copyWithChildChain(Scope parent) {
-    Scope result = new Scope(owner, getName(), parent);
+    Scope result = new Scope(owner, getNames(), parent);
     result.variables=variables;
     result.mixins=mixins;
     result.presentInTree = presentInTree;
@@ -190,7 +210,7 @@ public class Scope {
 
   public Scope copyWithParentsChain() {
     Scope parent = hasParent()? getParent().copyWithParentsChain() : null;
-    Scope result = new Scope(owner, getName(), parent);
+    Scope result = new Scope(owner, getNames(), parent);
     result.variables=variables;
     result.mixins=mixins;
     result.presentInTree = presentInTree;

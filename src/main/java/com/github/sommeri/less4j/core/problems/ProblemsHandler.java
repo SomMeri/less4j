@@ -42,7 +42,7 @@ public class ProblemsHandler {
   }
 
   private CompilationError createUndefinedMixinParameterValue(ReusableStructure mixin, ArgumentDeclaration declaration, MixinReference reference) {
-    return new CompilationError(reference, "Undefined parameter " + declaration.getVariable().getName() + " of mixin "+ mixin.getName() +" defined on line " + mixin.getSourceLine());
+    return new CompilationError(reference, "Undefined parameter " + declaration.getVariable().getName() + " of mixin "+ reference.getName() +" defined on line " + mixin.getSourceLine());
   }
 
   public void undefinedVariable(Variable variable) {

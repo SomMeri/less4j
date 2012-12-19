@@ -39,35 +39,45 @@ public class RuleSet extends ASTCssNode {
     this.body = body;
   }
 
-  public boolean isReusableStructure() {
+  public boolean usableAsReusableStructure() {
     return hasSingleClassSelector() || hasSingleIdSelector();
   }
 
   private boolean hasSingleClassSelector() {
-    if (!hasSimpleSelecor())
-      return false;
-    
-    SelectorPart selector = selectors.get(0).getHead();
-    return selector.isSingleClassSelector();
+    for (Selector selector : selectors) {
+      if (isSingleClassSelector(selector))
+        return true;
+    }
+
+    return false;
+  }
+
+  private boolean isSingleClassSelector(Selector selector) {
+    if (!selector.isCombined()) {
+      SelectorPart head = selector.getHead();
+      if (head.isSingleClassSelector())
+        return true;
+    }
+    return false;
   }
 
   private boolean hasSingleIdSelector() {
-    if (!hasSimpleSelecor())
-      return false;
-    
-    SelectorPart selector = selectors.get(0).getHead();
-    return selector.isSingleIdSelector();
+    for (Selector selector : selectors) {
+      if (isSingleIdSelector(selector))
+        return true;
+    }
+
+    return false;
   }
 
-  private boolean hasSimpleSelecor() {
-    if (selectors==null||selectors.size()!=1)
-      return false;
+  private boolean isSingleIdSelector(Selector selector) {
+    if (!selector.isCombined()) {
+      SelectorPart head = selector.getHead();
+      if (head.isSingleIdSelector())
+        return true;
+    }
     
-    Selector first = selectors.get(0);
-    if (first.isCombined())
-      return false;
-    
-    return true;
+    return false;
   }
 
   /**
@@ -75,7 +85,7 @@ public class RuleSet extends ASTCssNode {
    * @return 
    */
   public ReusableStructure convertToReusableStructure() {
-    if (!isReusableStructure()) 
+    if (!usableAsReusableStructure()) 
       throw new BugHappened("Caller is supposed to check for this.", this);
     
     SimpleSelector head = (SimpleSelector) selectors.get(0).getHead();
@@ -90,13 +100,20 @@ public class RuleSet extends ASTCssNode {
    * Behavior of this method is undefined if it is not a namespace.
    * @return 
    */
-  public String extractReusableStructureName() {
-    if (!isReusableStructure())
-      throw new BugHappened("Caller is supposed to check for this.", this);
+  public List<String> extractReusableStructureNames() {
+    List<String> result = new ArrayList<String>();
+    for (Selector selector : selectors) {
+      if (isSingleClassSelector(selector) || isSingleIdSelector(selector)) {
+        SimpleSelector simpleSelector = (SimpleSelector)selector.getHead();
+        result.add(simpleSelector.getSubsequent().get(0).getFullName());
+      }
+    }
+
+    if (result.isEmpty()) {
+        throw new BugHappened("Not convertible to resusable structure - caller was supposed to check for this.", this);
+    }
     
-    SimpleSelector selector = (SimpleSelector)selectors.get(0).getHead();
-    ElementSubsequent name = selector.getSubsequent().get(0);
-    return name.getFullName();
+    return result;
   }
 
   @Override

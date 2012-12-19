@@ -318,8 +318,8 @@ class NullScope extends Scope {
   }
 
   @Override
-  public String getName() {
-    return super.getName();
+  public List<String> getNames() {
+    return super.getNames();
   }
 
   @Override

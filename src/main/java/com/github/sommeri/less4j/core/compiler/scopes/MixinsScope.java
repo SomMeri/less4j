@@ -14,7 +14,13 @@ public class MixinsScope {
   }
 
   public void registerMixin(FullMixinDefinition mixin) {
-    String name = mixin.getMixin().getName();
+    List<String> names = mixin.getMixin().getNames();
+    for (String name : names) {
+      registerMixin(name, mixin);
+    }
+  }
+
+  private void registerMixin(String name, FullMixinDefinition mixin) {
     List<FullMixinDefinition> list = storage.get(name);
     if (list == null) {
       list = new ArrayList<FullMixinDefinition>();

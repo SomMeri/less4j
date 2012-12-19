@@ -84,7 +84,7 @@ public class SuperLessParser extends Parser {
   protected static final String RULE_CHARSET = "charset";
   protected static final String RULE_PAGE = "page";
   protected static final String RULE_RULESET = "ruleset";
-  protected static final String RULE_SELECTOR = "selector";
+  protected static final String RULE_SELECTOR = "selectors";
   protected static final String RULE_MEDIUM = "medium";
 
   protected List<Problem> errors = new ArrayList<Problem>();

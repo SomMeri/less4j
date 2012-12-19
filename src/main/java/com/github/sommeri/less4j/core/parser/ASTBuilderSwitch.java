@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -252,7 +253,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     HiddenTokenAwareTree kid = children.next();
-    result.setSelector(handleElementSubsequent(kid));
+    result.setSelectors(Arrays.asList(handleElementSubsequent(kid)));
 
     while (children.hasNext()) {
       kid = children.next();
