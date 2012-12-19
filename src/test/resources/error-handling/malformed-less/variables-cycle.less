@@ -1,0 +1,8 @@
+@first: @second + 1;
+@second: @third + 1;
+@third: @first + 1;
+
+#usePlace {
+  padding: @second;
+  margin: 2;
+}

@@ -1,7 +1,0 @@
-Errors produced by compilation of testCase
-ERROR 7:4 Mixin reference is composed of multiple parts.
-ERROR 18:17 Mixin reference is composed of multiple parts.
-ERROR 7:4 The mixin ".mix@variable" was not declared.
-ERROR 7:4 The mixin ".mix@variable" was not matched.
-ERROR 18:17 The mixin ".mix@variable2" was not declared.
-ERROR 18:17 The mixin ".mix@variable2" was not matched.

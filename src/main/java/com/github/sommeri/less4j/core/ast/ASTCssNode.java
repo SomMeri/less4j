@@ -82,6 +82,10 @@ public abstract class ASTCssNode implements Cloneable {
   }
 
   public abstract ASTCssNodeType getType();
+  
+  public boolean isFaulty() {
+    return false;
+  }
 
   public int getSourceLine() {
     return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getLine();

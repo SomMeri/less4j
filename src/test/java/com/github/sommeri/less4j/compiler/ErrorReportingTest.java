@@ -12,7 +12,7 @@ public class ErrorReportingTest extends AbstractErrorReportingTest {
   private static final String basicCases = "src/test/resources/error-handling/";
   private static final String functionsCases = "src/test/resources/error-handling/functions/";
   private static final String deprecatedWarnings = "src/test/resources/error-handling/deprecated-warnings/";
-  private static final String strict = "src/test/resources/error-handling/strict-parsing-requirement/";
+  private static final String strict = "src/test/resources/error-handling/malformed-less/";
 
   public ErrorReportingTest(File lessFile, File partialCssFile, File errorList, String testName) {
     super(lessFile, partialCssFile, errorList, testName);

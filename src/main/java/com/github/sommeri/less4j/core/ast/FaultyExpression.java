@@ -25,6 +25,10 @@ public class FaultyExpression extends Expression {
     return ASTCssNodeType.FAULTY_EXPRESSION;
   }
 
+  public boolean isFaulty() {
+    return true;
+  }
+
   @Override
   public FaultyExpression clone() {
     FaultyExpression clone = (FaultyExpression) super.clone();

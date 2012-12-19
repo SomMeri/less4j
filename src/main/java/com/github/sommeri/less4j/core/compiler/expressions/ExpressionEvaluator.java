@@ -36,7 +36,8 @@ import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class ExpressionEvaluator {
-  
+
+  private VariablesInEvaluationStack variablesInEvaluationStack = new VariablesInEvaluationStack();
   private final Scope scope;
   private final ProblemsHandler problemsHandler;
   private ArithmeticCalculator arithmeticCalculator;
@@ -81,13 +82,21 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(Variable input) {
+    if (variablesInEvaluationStack.wouldCycle(input)) {
+      problemsHandler.variablesCycle(variablesInEvaluationStack.getCycleFor(input));
+      return new FaultyExpression(input);
+    }
+      
     Expression value = scope.getValue(input);
     if (value == null) {
       problemsHandler.undefinedVariable(input);
       return new FaultyExpression(input);
     }
 
-    return evaluate(value);
+    variablesInEvaluationStack.enteringVariableValue(input);
+    Expression result = evaluate(value);
+    variablesInEvaluationStack.leftVariableValue();
+    return result;
   }
 
   public Expression evaluateIfPresent(Variable input) {
@@ -233,6 +242,8 @@ public class ExpressionEvaluator {
   public Expression evaluate(ComposedExpression input) {
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
+    if (leftValue.isFaulty() || rightValue.isFaulty())
+      return new FaultyExpression(input);
 
     if (arithmeticCalculator.accepts(input.getOperator(), leftValue, rightValue))
       return arithmeticCalculator.evalute(input, leftValue, rightValue);

@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.problems;
 
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
@@ -24,9 +25,25 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
   
+  public void variablesCycle(List<Variable> cycle) {
+    collector.addError(new CompilationError(cycle.get(0), "Cyclic references among variables: " + toString(cycle)));
+  }
+
+  private String toString(List<Variable> cycle) {
+    String result = "";
+    Iterator<Variable> iCycle = cycle.iterator();
+    while (iCycle.hasNext()) {
+      Variable variable = iCycle.next();
+      result += variable.getName() + " ("+ variable.getSourceLine()+":"+variable.getCharPositionInSourceLine()+") ";
+      if (iCycle.hasNext())
+        result +="-> ";
+    }
+    
+    return result;
+  }
+
   public void composedMixinReferenceSelector(MixinReference reference) {
     collector.addError(new CompilationError(reference, "Mixin reference is composed of multiple parts."));
-    
   }
 
   public void deprecatedSyntaxEscapedSelector(EscapedSelector errorNode) {
