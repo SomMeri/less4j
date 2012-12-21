@@ -1,0 +1,6 @@
+Errors produced by compilation of testCase
+ERROR 14:4 Cyclic references among mixins: .first (14:4) -> .second (2:4) -> .third (6:4) -> .first (10:4) 
+ERROR 18:4 Cyclic references among mixins: .secondRuleset (18:4) -> .thirdRuleset (22:4) -> .firstRuleset (26:4) -> .secondRuleset (18:4) 
+ERROR 22:4 Cyclic references among mixins: .thirdRuleset (22:4) -> .firstRuleset (26:4) -> .secondRuleset (18:4) -> .thirdRuleset (22:4) 
+ERROR 26:4 Cyclic references among mixins: .firstRuleset (26:4) -> .secondRuleset (18:4) -> .thirdRuleset (22:4) -> .firstRuleset (26:4) 
+ERROR 36:6 Cyclic references among mixins: .withNested (36:6) -> .withNested (36:6) 

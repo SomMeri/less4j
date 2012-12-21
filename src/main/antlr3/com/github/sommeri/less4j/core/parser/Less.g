@@ -457,12 +457,12 @@ pseudoparameters:
 
 namespaceReference
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
-    : (a+=reusableStructureName GREATER)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
+    : (a+=reusableStructureName GREATER?)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
 finally { leaveRule(); }
 
 namespaceReferenceWithSemi
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
-    : (a+=reusableStructureName GREATER)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
+    : (a+=reusableStructureName GREATER?)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
 finally { leaveRule(); }
 
 mixinReference

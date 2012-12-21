@@ -37,7 +37,7 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class ExpressionEvaluator {
 
-  private VariablesInEvaluationStack variablesInEvaluationStack = new VariablesInEvaluationStack();
+  private VariableCycleDetector cycleDetector = new VariableCycleDetector();
   private final Scope scope;
   private final ProblemsHandler problemsHandler;
   private ArithmeticCalculator arithmeticCalculator;
@@ -82,8 +82,8 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(Variable input) {
-    if (variablesInEvaluationStack.wouldCycle(input)) {
-      problemsHandler.variablesCycle(variablesInEvaluationStack.getCycleFor(input));
+    if (cycleDetector.wouldCycle(input)) {
+      problemsHandler.variablesCycle(cycleDetector.getCycleFor(input));
       return new FaultyExpression(input);
     }
       
@@ -93,9 +93,9 @@ public class ExpressionEvaluator {
       return new FaultyExpression(input);
     }
 
-    variablesInEvaluationStack.enteringVariableValue(input);
+    cycleDetector.enteringVariableValue(input);
     Expression result = evaluate(value);
-    variablesInEvaluationStack.leftVariableValue();
+    cycleDetector.leftVariableValue();
     return result;
   }
 

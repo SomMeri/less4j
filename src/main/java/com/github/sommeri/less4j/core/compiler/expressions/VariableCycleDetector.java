@@ -7,15 +7,13 @@ import java.util.Stack;
 
 import com.github.sommeri.less4j.core.ast.Variable;
 
-//FIXME: !!! rename to names cycle detector
-//FIXME: test for variable references itself
-public class VariablesInEvaluationStack {
+public class VariableCycleDetector {
 
   // since names are evaluated lazily, we can ignore the scope and consider variable name only
   private Stack<String> names = new Stack<String>();
   private Stack<Variable> variables = new Stack<Variable>();
 
-  protected VariablesInEvaluationStack() {
+  protected VariableCycleDetector() {
   }
 
   public boolean wouldCycle(Variable input) {

@@ -13,4 +13,8 @@
   declaration2: "inner mixin";
   declaration1: "ns inner mixin";
   declaration2: "ns inner mixin";
+  declaration1: "alternative: inner mixin";
+  declaration2: "alternative: inner mixin";
+  declaration1: "alternative: ns inner mixin";
+  declaration2: "alternative: ns inner mixin";
 }

@@ -19,8 +19,8 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-  private static final String inputLess = "src/test/resources/minitests/debug.less";
-  private static final String outputCss = "src/test/resources/minitests/debug.css";
+//  private static final String inputLess = "src/test/resources/minitests/debug.less";
+//  private static final String outputCss = "src/test/resources/minitests/debug.css";
 
   // ***********************************************************************
   // *** fail because of identifiers, functions and missing commas
@@ -28,8 +28,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   //    private static final String outputCss = "src/test/resources/minitests/mixins-guards.css";
 
   // *** fail because of wrong mixins reference - does not accept #mixin see debug.less
-//    private static final String inputLess = "src/test/resources/minitests/mixins.less";
-//    private static final String outputCss = "src/test/resources/minitests/mixins.css";
+    private static final String inputLess = "src/test/resources/minitests/mixins.less";
+    private static final String outputCss = "src/test/resources/minitests/mixins.css";
 
   // ***********************************************************************
   // *** work as they are

@@ -1,0 +1,4 @@
+Errors produced by compilation of testCase
+ERROR 6:12 Cyclic references among variables: @second (6:12) -> @third (2:10) -> @first (3:9) -> @second (1:9) 
+ERROR 14:12 Cyclic references among variables: @variable (14:12) -> @variable (10:12) 
+ERROR 15:11 Cyclic references among variables: @expression (15:11) -> @expression (11:18) 

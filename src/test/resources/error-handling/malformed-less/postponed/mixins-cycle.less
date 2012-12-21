@@ -1,0 +1,42 @@
+.first() {
+  .second();
+}
+
+.second() {
+  .third();
+}
+
+.third() {
+  .first();
+}
+
+#usePlace {
+  .first();
+}
+
+.firstRuleset {
+  .secondRuleset;
+}
+
+.secondRuleset {
+  .thirdRuleset;
+}
+
+.thirdRuleset {
+  .firstRuleset;
+}
+
+.selfReferencing(@parameter) {
+  color: @parameter;
+  .selfReferencing(red);
+}
+
+.withNested {
+  & h1 {
+    .withNested();
+  } 
+}
+
+#showThis {
+  color: red;
+}
