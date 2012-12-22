@@ -1,0 +1,11 @@
+#theme > .mixin {
+  background-color: grey;
+}
+#container {
+  color: black;
+  background-color: grey;
+}
+#header {
+  color: black;
+  background-color: grey;
+}

@@ -1,0 +1,16 @@
+// nested mixin with leading combinator is still mixin 
+#theme {
+  > .mixin {
+    background-color: grey;
+  }
+}
+
+// testing for scope copying bug 
+#container {
+  color: black;
+  #theme > .mixin;
+}
+
+#header {
+  #container;
+}

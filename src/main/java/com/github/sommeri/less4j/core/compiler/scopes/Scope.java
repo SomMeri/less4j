@@ -209,7 +209,13 @@ public class Scope {
   }
 
   public Scope copyWithParentsChain() {
-    Scope parent = hasParent()? getParent().copyWithParentsChain() : null;
+    Scope parent = null;
+    if (hasParent()) {
+      parent = getParent().copyWithParentsChain();
+      for (Scope kid : getParent().getChilds()) if (kid!=this) {
+        kid.copyWithChildChain(parent);
+      }
+    }
     Scope result = new Scope(owner, getNames(), parent);
     result.variables=variables;
     result.mixins=mixins;

@@ -208,8 +208,9 @@ public class ReferencesSolver {
   public static Scope joinScopes(Scope mixinsScope, Scope arguments, Scope callerScope) {
     Scope result = mixinsScope.copyWithChildChain(arguments);
     Scope mixinsScopeParent = mixinsScope.getParent();
-    if (mixinsScopeParent != null)
+    if (mixinsScopeParent != null) {
       arguments.setParent(mixinsScopeParent.copyWithParentsChain());
+    }
     Scope rootOfTheMixinsScope = result.getRootScope();
     rootOfTheMixinsScope.setParent(callerScope.copyWithParentsChain());
     return result;
