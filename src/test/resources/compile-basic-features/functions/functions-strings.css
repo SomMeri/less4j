@@ -1,0 +1,20 @@
+#escape {
+  escape1: abcdefghijklmnopqrstuvxyz%20ABCDEFGHIJKLMNOPQRSTUVXYZ09;
+  escape2: %3B%20,%20/%20?%20%3A%20@%20&%20%3D%20+%20$%20-%20_%20.%20!%20~%20*%20'%20%28%20%29;
+  escape3: ~!@%23$%5E&*%28%29_+%7D%7B%7C%3A%3E%3C.,'%3B%5D%5Bp;
+  escape4: %5C%5C;
+  escape5: //;
+  escape6: ;
+  escape7: test;
+}
+#escapeNonString {
+  escape1: abcdefghijklmnopqrstuvxyz%20ABCDEFGHIJKLMNOPQRSTUVXYZ09;
+  escape2: %3B%20,%20/%20?%20%3A%20@%20&%20%3D%20+%20$%20-%20_%20.%20!%20~%20*%20'%20%28%20%29;
+  escape3: ~!@%23$%5E&*%28%29_+%7D%7B%7C%3A%3E%3C.,'%3B%5D%5Bp;
+  escape4: %5C%5C;
+  escape5: //;
+  escape6: undefined;
+  escape6b: undefined;
+  escape7: identifier;
+  escape8: 11;
+}

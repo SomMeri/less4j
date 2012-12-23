@@ -1,0 +1,31 @@
+#e {
+  
+}
+
+#escape {
+  escape1: escape("abcdefghijklmnopqrstuvxyz ABCDEFGHIJKLMNOPQRSTUVXYZ09");
+  escape2: escape("; , / ? : @ & = + $ - _ . ! ~ * ' ( )");
+  escape3: escape("~!@#$^&*()_+}{|:><.,';][p");
+  escape4: escape("\\");
+  escape5: escape("//");
+  escape6: escape("");
+  @variable: "test";
+  escape7: escape("@{variable}");
+}
+#escapeNonString {
+  escape1: escape(~"abcdefghijklmnopqrstuvxyz ABCDEFGHIJKLMNOPQRSTUVXYZ09");
+  escape2: escape(~"; , / ? : @ & = + $ - _ . ! ~ * ' ( )");
+  escape3: escape(~"~!@#$^&*()_+}{|:><.,';][p");
+  escape4: escape(~"\\");
+  escape5: escape(~"//");
+  escape6: escape(#ff8877);
+  escape6b: escape(green);
+  escape7: escape(identifier);
+  escape8: escape(11);
+//  escape9: escape(11 12 14 "test");
+}
+
+#format {
+//  format1: %("something");
+}
+

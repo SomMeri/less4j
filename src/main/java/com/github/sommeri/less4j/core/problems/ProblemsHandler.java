@@ -40,6 +40,10 @@ public class ProblemsHandler {
     collector.addWarning(new CompilationWarning(errorNode, "Selector fragment (~"+errorNode.getQuoteType()+errorNode.getValue()+errorNode.getQuoteType()+ ") uses deprecated (~\"escaped-selector\") syntax. Use selector interpolation @{variableName} instead."));
   }
 
+  public void warnEscapeFunctionArgument(Expression errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "Escape function argument should be a string."));
+  }
+
   public void variableAsPseudoclassParameter(PseudoClass errorNode) {
     collector.addWarning(new CompilationWarning(errorNode.getParameter(), "Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead."));
   }

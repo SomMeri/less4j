@@ -13,7 +13,7 @@ import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-public class MathFunctions {
+public class MathFunctions implements FunctionsPackage {
 
   protected static final String PERCENTAGE = "percentage";
   protected static final String ROUND = "round";
@@ -34,18 +34,26 @@ public class MathFunctions {
     this.problemsHandler = problemsHandler;
   }
 
+  /* (non-Javadoc)
+   * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#canEvaluate(com.github.sommeri.less4j.core.ast.FunctionExpression, com.github.sommeri.less4j.core.ast.Expression)
+   */
+  @Override
+  public boolean canEvaluate(FunctionExpression input, Expression parameters) {
+    return FUNCTIONS.containsKey(input.getName());
+  }
+  
+  /* (non-Javadoc)
+   * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#evaluate(com.github.sommeri.less4j.core.ast.FunctionExpression, com.github.sommeri.less4j.core.ast.Expression)
+   */
+  @Override
   public Expression evaluate(FunctionExpression input, Expression parameters) {
-    if (!FUNCTIONS.containsKey(input.getName()))
+    if (!canEvaluate(input, parameters))
       return input;
 
     Function function = FUNCTIONS.get(input.getName());
     return function.evaluate(parameters, problemsHandler);
   }
 
-}
-
-interface Function {
-  Expression evaluate(Expression parameters, ProblemsHandler problemsHandler);
 }
 
 class Percentage implements Function {
