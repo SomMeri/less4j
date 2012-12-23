@@ -1,5 +1,20 @@
 #e {
-  
+  content1: e("'") e("\"") e("\'") e('"') e('\"') e('\'');
+  content2: e("this is something {}");
+  something1: e("1+2;");
+//  something2: e(`1+2`); TODO javascript is not implemented yet
+}
+
+#e-NonString {
+  e1: e(~"abcdefghijklmnopqrstuvxyz ABCDEFGHIJKLMNOPQRSTUVXYZ09");
+  e2: e(~"~!@#$^&*()_+}{|:> <.,';][p/\"");
+  e3: e(~"\\");
+  e4: e(~"//");
+  e5: e(11);
+  e5: e(11+22);
+//  e5: e(green); returns weird objects
+//  e5: e(#ff8877); returns weird objects
+//  e9: e(11 12 14 "test"); returns weird objects
 }
 
 #escape {
@@ -23,6 +38,10 @@
   escape7: escape(identifier);
   escape8: escape(11);
 //  escape9: escape(11 12 14 "test");
+}
+
+#e-escape {
+  something1: escape(e("1+2;"));
 }
 
 #format {

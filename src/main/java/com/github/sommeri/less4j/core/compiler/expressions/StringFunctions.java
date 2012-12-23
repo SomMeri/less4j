@@ -10,16 +10,21 @@ import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.utils.InStringCssPrinter;
 
 public class StringFunctions implements FunctionsPackage {
 
   protected static final String ESCAPE = "escape";
+  protected static final String E = "e";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
     FUNCTIONS.put(ESCAPE, new Escape());
+    FUNCTIONS.put(E, new E());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -38,6 +43,40 @@ public class StringFunctions implements FunctionsPackage {
 
     Function function = FUNCTIONS.get(input.getName());
     return function.evaluate(parameters, problemsHandler);
+  }
+
+}
+
+class E implements Function {
+
+  @Override
+  public Expression evaluate(Expression parameters, ProblemsHandler problemsHandler) {
+    if (parameters.getType()==ASTCssNodeType.STRING_EXPRESSION) 
+      return evaluate((CssString) parameters);
+
+    if (parameters.getType()==ASTCssNodeType.ESCAPED_VALUE) 
+      return evaluate((EscapedValue) parameters);
+
+    if (parameters.getType()==ASTCssNodeType.NUMBER) 
+      return evaluate((NumberExpression) parameters);
+
+    problemsHandler.warnEFunctionArgument(parameters);
+
+    return new FaultyExpression(parameters);
+  }
+
+  private Expression evaluate(NumberExpression parameters) {
+    InStringCssPrinter printer = new InStringCssPrinter();
+    printer.append(parameters);
+    return new CssString(parameters.getUnderlyingStructure(), printer.toString(), "");
+  }
+
+  private Expression evaluate(EscapedValue parameters) {
+    return parameters;
+  }
+
+  private CssString evaluate(CssString parameters) {
+    return new CssString(parameters.getUnderlyingStructure(), parameters.getValue(), "");
   }
 
 }

@@ -44,6 +44,10 @@ public class ProblemsHandler {
     collector.addWarning(new CompilationWarning(errorNode, "Escape function argument should be a string."));
   }
 
+  public void warnEFunctionArgument(Expression errorNode) {
+    collector.addError(new CompilationError(errorNode, "e function argument should be a string."));
+  }
+
   public void variableAsPseudoclassParameter(PseudoClass errorNode) {
     collector.addWarning(new CompilationWarning(errorNode.getParameter(), "Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead."));
   }

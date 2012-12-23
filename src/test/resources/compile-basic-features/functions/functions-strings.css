@@ -1,3 +1,16 @@
+#e {
+  content1: ' \" \' " \" \';
+  content2: this is something {};
+  something1: 1+2;;
+}
+#e-NonString {
+  e1: abcdefghijklmnopqrstuvxyz ABCDEFGHIJKLMNOPQRSTUVXYZ09;
+  e2: ~!@#$^&*()_+}{|:> <.,';][p/\";
+  e3: \\;
+  e4: //;
+  e5: 11;
+  e5: 33;
+}
 #escape {
   escape1: abcdefghijklmnopqrstuvxyz%20ABCDEFGHIJKLMNOPQRSTUVXYZ09;
   escape2: %3B%20,%20/%20?%20%3A%20@%20&%20%3D%20+%20$%20-%20_%20.%20!%20~%20*%20'%20%28%20%29;
@@ -17,4 +30,7 @@
   escape6b: undefined;
   escape7: identifier;
   escape8: 11;
+}
+#e-escape {
+  something1: 1+2%3B;
 }
