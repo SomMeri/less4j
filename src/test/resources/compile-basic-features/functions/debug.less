@@ -1,0 +1,9 @@
+.formattingMixinNoS(@parameter, @useless) {
+  format1: @useless @parameter;
+}
+
+#format-list {
+ @variable: ~"whatever";
+ .formattingMixinNoS("0 @{variable}", "1 @{variable}" "2 @{variable}");
+ .formattingMixinNoS(@variable, @variable @variable);
+}

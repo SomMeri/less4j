@@ -12,6 +12,7 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
@@ -30,6 +31,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.problems.BugHappened;
@@ -45,6 +47,7 @@ public class ExpressionEvaluator {
   private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
   private List<FunctionsPackage> functions = new ArrayList<FunctionsPackage>();
+  private StringInterpolator stringInterpolator = new StringInterpolator();
 
   public ExpressionEvaluator(ProblemsHandler problemsHandler) {
     this(new NullScope(), problemsHandler);
@@ -82,6 +85,16 @@ public class ExpressionEvaluator {
     return values;
   }
 
+  public Expression evaluate(CssString input) {
+    String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
+    return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
+  }
+  
+  public Expression evaluate(EscapedValue input) {
+    String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
+    return new EscapedValue(input.getUnderlyingStructure(), value);
+  }
+  
   public Expression evaluate(Variable input) {
     if (cycleDetector.wouldCycle(input)) {
       problemsHandler.variablesCycle(cycleDetector.getCycleFor(input));
@@ -148,14 +161,18 @@ public class ExpressionEvaluator {
 
     case NAMED_EXPRESSION:
       return ((NamedExpression) input).getExpression();
+      
+    case STRING_EXPRESSION:
+      return evaluate((CssString) input);
+
+    case ESCAPED_VALUE:
+      return evaluate((EscapedValue) input);
 
       //the value is already there, nothing to evaluate
-    case STRING_EXPRESSION:
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:
     case FAULTY_EXPRESSION:
-    case ESCAPED_VALUE:
       return input;
 
     default:

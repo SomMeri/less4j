@@ -43,8 +43,6 @@ public class ASTBuilder {
   private void convertComments(ASTCssNode node) {
     inheritCommentsFromToken(node);
     for (ASTCssNode kid : node.getChilds()) {
-      if (kid==null)
-        System.out.println(node);
       convertComments(kid);
     }
   }

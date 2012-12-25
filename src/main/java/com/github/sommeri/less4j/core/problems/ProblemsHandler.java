@@ -25,7 +25,7 @@ public class ProblemsHandler {
   private LessPrinter printer = new LessPrinter();
   
   public void errFormatWrongFirstParameter(Expression param) {
-    collector.addError(new CompilationError(param, "First argument of format function must be either a string or escaped value."));
+    collector.addError(new CompilationError(param, "First argument of format function must be either string or escaped value."));
   }
 
   public void variablesCycle(List<Variable> cycle) {

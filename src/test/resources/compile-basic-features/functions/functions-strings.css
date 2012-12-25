@@ -98,3 +98,20 @@
 #format-interpolated-replacement {
   format-exact: "variable:  - it worked! - ";
 }
+#format-list {
+  format1: list1 "% d: 1 2 3 4";
+  format2: list1 "% D: 1%202%203%204";
+  format3: list1 "% a: 1 2 3 4";
+  format4: list1 "% A: 1%202%203%204";
+  format1: list2 "% d: "1 whatever" "2 whatever" "3 whatever" "4 whatever"";
+  format2: list2 "% D: %221%20whatever%22%20%222%20whatever%22%20%223%20whatever%22%20%224%20whatever%22";
+  format3: list2 "% a: "1 whatever" "2 whatever" "3 whatever" "4 whatever"";
+  format4: list2 "% A: %221%20whatever%22%20%222%20whatever%22%20%223%20whatever%22%20%224%20whatever%22";
+  format1: list3 "% d: 1 5 3 4";
+  format2: list3 "% D: 1%205%203%204";
+  format3: list3 "% a: 1 5 3 4";
+  format4: list3 "% A: 1%205%203%204";
+}
+#format-list-split {
+  format2: "d: "1 whatever" "2 whatever" 5";
+}

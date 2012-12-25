@@ -21,7 +21,6 @@ import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.expressions.strings.AbstractStringReplacer;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
@@ -36,7 +35,7 @@ public class ReferencesSolver {
   public static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
   private final ProblemsHandler problemsHandler;
-  private AbstractStringReplacer stringInterpolator = new StringInterpolator();
+  private StringInterpolator stringInterpolator = new StringInterpolator();
   
   public ReferencesSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
@@ -64,6 +63,16 @@ public class ReferencesSolver {
       manipulator.replace(node, replacement);
       break;
     }
+    case STRING_EXPRESSION: {
+      Expression replacement = expressionEvaluator.evaluate((CssString) node); 
+      manipulator.replace(node, replacement);
+      break;
+    }
+    case ESCAPED_VALUE: {
+      Expression replacement = expressionEvaluator.evaluate((EscapedValue) node); 
+      manipulator.replace(node, replacement);
+      break;
+    }
     case MIXIN_REFERENCE: {
       MixinReference mixinReference = (MixinReference) node;
       RuleSetsBody replacement = resolveMixinReference(mixinReference, scope.getScope());
@@ -76,18 +85,8 @@ public class ReferencesSolver {
       manipulator.replaceInBody(namespaceReference, replacement.getChilds());
       break;
     }
-    case STRING_EXPRESSION: {
-      CssString replacement = replaceInString((CssString) node, expressionEvaluator); 
-      manipulator.replace(node, replacement);
-      break;
-    }
     case ESCAPED_SELECTOR: {
       EscapedSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator); 
-      manipulator.replace(node, replacement);
-      break;
-    }
-    case ESCAPED_VALUE: {
-      EscapedValue replacement = interpolateEscapedValue((EscapedValue) node, expressionEvaluator); 
       manipulator.replace(node, replacement);
       break;
     }
@@ -126,21 +125,11 @@ public class ReferencesSolver {
     return fixedName;
   }
 
-  private CssString replaceInString(CssString input, ExpressionEvaluator expressionEvaluator) {
-    String value = stringInterpolator.replaceIn(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
-    return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
-  }
-  
   private EscapedSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceIn(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
     return new EscapedSelector(input.getUnderlyingStructure(), value, input.getQuoteType());
   }
 
-  private EscapedValue interpolateEscapedValue(EscapedValue input, ExpressionEvaluator expressionEvaluator) {
-    String value = stringInterpolator.replaceIn(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
-    return new EscapedValue(input.getUnderlyingStructure(), value);
-  }
-  
   private FixedNamePart interpolateFixedNamePart(FixedNamePart input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceIn(input.getName(), expressionEvaluator, input.getUnderlyingStructure());
     return new FixedNamePart(input.getUnderlyingStructure(), value);

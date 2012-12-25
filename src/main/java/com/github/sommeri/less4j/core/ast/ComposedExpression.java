@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
@@ -51,23 +52,34 @@ public class ComposedExpression extends Expression {
 
   public List<Expression> splitByComma() {
     List<Expression> result = new ArrayList<Expression>();
-    if (operator.getOperator()!=Operator.COMMA) {
+    if (operator.getOperator()!=Operator.COMMA && operator.getOperator()!=Operator.EMPTY_OPERATOR) {
       result.add(this);
       return result;
     }
+
+    List<Expression> left = splitByComma(getLeft());
+    List<Expression> right = splitByComma(getRight());
+    if (operator.getOperator()!=Operator.EMPTY_OPERATOR) {
+      result.addAll(left);
+      result.addAll(right);
+      return result;
+    }
     
-    splitByComma(result, getLeft());
-    splitByComma(result, getRight());
-    
+    Expression lastLeft = left.get(left.size()-1);
+    Expression firstRight = right.get(0);
+    result.addAll(left.subList(0, left.size()-1));
+    result.add(new ComposedExpression(lastLeft.getUnderlyingStructure(), lastLeft, operator, firstRight));
+    result.addAll(right.subList(1, right.size()));
+
     return result;
   }
 
-  private void splitByComma(List<Expression> result, Expression expression) {
+  private List<Expression> splitByComma(Expression expression) {
     if (expression.getType()==ASTCssNodeType.COMPOSED_EXPRESSION) {
       ComposedExpression composed = (ComposedExpression) expression;
-      result.addAll(composed.splitByComma());
+      return composed.splitByComma();
     } else {
-      result.add(expression);
+      return Arrays.asList(expression);
     }
   }
   

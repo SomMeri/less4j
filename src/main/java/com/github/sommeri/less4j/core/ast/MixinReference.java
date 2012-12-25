@@ -76,6 +76,7 @@ public class MixinReference extends ASTCssNode {
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)selector);
     result.addAll(positionalParameters);
+    result.addAll(namedParameters.values());
     return result;
   }
 

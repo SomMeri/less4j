@@ -82,3 +82,27 @@
   @variable: "it worked!";
   format-exact: %("variable: %s", " - @{variable} - ");
 }
+
+.formattingMixinNoS(@name, @parameter, @useless) {
+  format1: @name %("%% d: %d", @parameter);
+  format2: @name %("%% D: %D", @parameter);
+  format3: @name %("%% a: %a", @parameter);
+  format4: @name %('%% A: %A', @parameter);
+}
+
+#format-list {
+ @variable: ~"whatever";
+ .formattingMixinNoS(list1, 1 2 3 4, 3 4 4 5);
+ .formattingMixinNoS(list2, "1 @{variable}" "2 @{variable}" "3 @{variable}" "4 @{variable}", 3 4 4 5);
+ .formattingMixinNoS(list3, 1 2+3 3 4, 3 4 4 5);
+}
+
+#format-list-split {
+ @variable: ~"whatever";
+ format2: %("d: %d %d", "1 @{variable}" "2 @{variable}", 5); //TODO this gives suspect result <- it is unescaped
+}
+
+//not accepted by less.js
+//#format-list-split {
+//  list-split: %("%d - %d - %d - %d", 1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4);
+//}
