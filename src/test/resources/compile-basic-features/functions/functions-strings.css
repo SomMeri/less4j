@@ -34,3 +34,67 @@
 #e-escape {
   something1: 1+2%3B;
 }
+#format {
+  format1: string1 "% s: directory/file.less";
+  format2: string1 "% S: directory%2Ffile.less";
+  format3: string1 "% d: "directory/file.less"";
+  format4: string1 "% D: %22directory%2Ffile.less%22";
+  format5: string1 "% a: "directory/file.less"";
+  format6: string1 "% A: %22directory%2Ffile.less%22";
+  format1: string2 "% s: directory/file.less";
+  format2: string2 "% S: directory%2Ffile.less";
+  format3: string2 "% d: 'directory/file.less'";
+  format4: string2 "% D: 'directory%2Ffile.less'";
+  format5: string2 "% a: 'directory/file.less'";
+  format6: string2 "% A: 'directory%2Ffile.less'";
+  format1: expression "% s: 3";
+  format2: expression "% S: 3";
+  format3: expression "% d: 3";
+  format4: expression "% D: 3";
+  format5: expression "% a: 3";
+  format6: expression "% A: 3";
+  format1: escape "% s: size-10%";
+  format2: escape "% S: size-10%25";
+  format3: escape "% d: size-10%";
+  format4: escape "% D: size-10%25";
+  format5: escape "% a: size-10%";
+  format6: escape "% A: size-10%25";
+  format1: named color "% s: ";
+  format2: named color "% S: undefined";
+  format3: named color "% d: #008000";
+  format4: named color "% D: %23008000";
+  format5: named color "% a: #008000";
+  format6: named color "% A: %23008000";
+  format1: hex color "% s: ";
+  format2: hex color "% S: undefined";
+  format3: hex color "% d: #ff00ff";
+  format4: hex color "% D: %23ff00ff";
+  format5: hex color "% a: #ff00ff";
+  format6: hex color "% A: %23ff00ff";
+}
+#format-specialCharacters {
+  format1: special1 "% s: ~!@#$^&*()_+}{|:> <.,';][p/\"";
+  format2: special1 "% S: ~!%40%23%24%5E%26*()_%2B%7D%7B%7C%3A%3E%20%3C.%2C'%3B%5D%5Bp%2F%5C%22";
+  format3: special1 "% d: "~!@#$^&*()_+}{|:> <.,';][p/\""";
+  format4: special1 "% D: %22~!%40%23%24%5E%26*()_%2B%7D%7B%7C%3A%3E%20%3C.%2C'%3B%5D%5Bp%2F%5C%22%22";
+  format5: special1 "% a: "~!@#$^&*()_+}{|:> <.,';][p/\""";
+  format6: special1 "% A: %22~!%40%23%24%5E%26*()_%2B%7D%7B%7C%3A%3E%20%3C.%2C'%3B%5D%5Bp%2F%5C%22%22";
+  format1: special2 "% s: ; , / ? : @ & = + $ - _ . ! ~ * ' ( )";
+  format2: special2 "% S: %3B%20%2C%20%2F%20%3F%20%3A%20%40%20%26%20%3D%20%2B%20%24%20-%20_%20.%20!%20~%20*%20'%20(%20)";
+  format3: special2 "% d: "; , / ? : @ & = + $ - _ . ! ~ * ' ( )"";
+  format4: special2 "% D: %22%3B%20%2C%20%2F%20%3F%20%3A%20%40%20%26%20%3D%20%2B%20%24%20-%20_%20.%20!%20~%20*%20'%20(%20)%22";
+  format5: special2 "% a: "; , / ? : @ & = + $ - _ . ! ~ * ' ( )"";
+  format6: special2 "% A: %22%3B%20%2C%20%2F%20%3F%20%3A%20%40%20%26%20%3D%20%2B%20%24%20-%20_%20.%20!%20~%20*%20'%20(%20)%22";
+}
+#format-a-lot-of-placeholders {
+  format-exact: "1 2 3 4";
+  format-missing: "1 2 %d %D";
+  format-additional: "1 2 3 4";
+}
+#format-notString {
+  format-wrong1: "repetitions: 3 file: "directory/file.less"";
+  format-wrong2: "repetitions: %q file: %1";
+}
+#format-interpolated-replacement {
+  format-exact: "variable:  - it worked! - ";
+}

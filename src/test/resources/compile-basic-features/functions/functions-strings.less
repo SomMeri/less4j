@@ -44,7 +44,41 @@
   something1: escape(e("1+2;"));
 }
 
-#format {
-//  format1: %("something");
+.formattingMixin(@name, @parameter) {
+  format1: @name %("%% s: %s", @parameter);
+  format2: @name %("%% S: %S", @parameter);
+  format3: @name %("%% d: %d", @parameter);
+  format4: @name %("%% D: %D", @parameter);
+  format5: @name %("%% a: %a", @parameter);
+  format6: @name %('%% A: %A', @parameter);
 }
 
+#format {
+  .formattingMixin(~"string1", "directory/file.less");
+  .formattingMixin(~"string2", 'directory/file.less');
+  .formattingMixin(~"expression", 1+2);
+  .formattingMixin(~"escape", ~"size-10%");
+  .formattingMixin(~"named color", green);
+  .formattingMixin(~"hex color", #ff00ff);
+}
+
+#format-specialCharacters {
+  .formattingMixin(~"special1", "~!@#$^&*()_+}{|:> <.,';][p/\"");
+  .formattingMixin(~"special2", "; , / ? : @ & = + $ - _ . ! ~ * ' ( )");
+}
+
+#format-a-lot-of-placeholders {
+  format-exact: %("%s %S %d %D", "1", "2", 3, 4);
+  format-missing: %("%s %S %d %D", "1", "2");
+  format-additional: %("%s %S %d %D", "1", "2", 3, 4, 5, 6);
+}
+
+#format-notString {
+  format-wrong1: %(~"repetitions: %a file: %d", 1 + 2, "directory/file.less");
+  format-wrong2: %("repetitions: %q file: %1", 1 + 2, "directory/file.less");
+}
+
+#format-interpolated-replacement {
+  @variable: "it worked!";
+  format-exact: %("variable: %s", " - @{variable} - ");
+}

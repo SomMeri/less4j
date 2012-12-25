@@ -636,7 +636,7 @@ hexColor
     ;
 
 function
-    : a=IDENT LPAREN b=functionParameter RPAREN -> ^(TERM_FUNCTION $a $b*)
+    : (a=IDENT | a=PERCENT) LPAREN b=functionParameter RPAREN -> ^(TERM_FUNCTION $a $b*)
     ;
     
 functionParameter
@@ -986,6 +986,7 @@ RBRACKET : ']' ;
 OPEQ : '=' ;
 SEMI : ';' ;
 COLON : ':' ;
+PERCENT: '%';
 SOLIDUS : '/' ;
 MINUS : '-' ;
 PLUS : '+' ;
@@ -1134,7 +1135,7 @@ NUMBER
             | (N ~('a'..'z'|'A'..'Z')|'0'..'9')=>
                 N { $type = REPEATER; }
             
-            | '%' { $type = PERCENTAGE; }
+            | PERCENT { $type = PERCENTAGE; }
             | UNKNOWN_DIMENSION { $type = UNKNOWN_DIMENSION; }
             | // Just a number
         )

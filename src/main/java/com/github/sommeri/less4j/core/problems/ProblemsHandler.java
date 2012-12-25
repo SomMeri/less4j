@@ -24,6 +24,10 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
   
+  public void errFormatWrongFirstParameter(Expression param) {
+    collector.addError(new CompilationError(param, "First argument of format function must be either a string or escaped value."));
+  }
+
   public void variablesCycle(List<Variable> cycle) {
     collector.addError(new CompilationError(cycle.get(0), "Cyclic references among variables: " + printer.toVariablesString(cycle)));
   }

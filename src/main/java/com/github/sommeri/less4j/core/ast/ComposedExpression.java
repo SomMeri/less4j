@@ -1,7 +1,9 @@
 package com.github.sommeri.less4j.core.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -47,6 +49,28 @@ public class ComposedExpression extends Expression {
     this.right = right;
   }
 
+  public List<Expression> splitByComma() {
+    List<Expression> result = new ArrayList<Expression>();
+    if (operator.getOperator()!=Operator.COMMA) {
+      result.add(this);
+      return result;
+    }
+    
+    splitByComma(result, getLeft());
+    splitByComma(result, getRight());
+    
+    return result;
+  }
+
+  private void splitByComma(List<Expression> result, Expression expression) {
+    if (expression.getType()==ASTCssNodeType.COMPOSED_EXPRESSION) {
+      ComposedExpression composed = (ComposedExpression) expression;
+      result.addAll(composed.splitByComma());
+    } else {
+      result.add(expression);
+    }
+  }
+  
   @Override
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(left, operator, right);
