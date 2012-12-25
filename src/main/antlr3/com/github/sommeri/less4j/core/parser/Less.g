@@ -241,7 +241,7 @@ finally { leaveRule(); }
 //used in mixinReferenceArgument
 variabledeclarationLimitedNoSemi
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : VARIABLE COLON (a+=mathExprHighPrior) -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* )
+    : VARIABLE COLON (a+=exprNoComma) -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* )
     ;
 finally { leaveRule(); }
 
@@ -485,7 +485,7 @@ mixinReferenceArguments
     ;
 
 mixinReferenceArgument
-    : mathExprHighPrior | variabledeclarationLimitedNoSemi
+    : exprNoComma | variabledeclarationLimitedNoSemi
     ;
 
 //FIXME: add additional chech - these should NOT trigger interpolation    
@@ -564,6 +564,10 @@ operator
     | ({predicates.onEmptySeparator(input)}?=> -> EMPTY_SEPARATOR)
     ;
     
+operatorNoComma    
+    : ({predicates.onEmptySeparator(input)}?=> -> EMPTY_SEPARATOR)
+    ;
+    
 mathOperatorHighPrior
     : SOLIDUS //ratio in pure CSS
     | STAR
@@ -577,6 +581,12 @@ mathOperatorLowPrior
 expr 
 @init {enterRule(retval, RULE_EXPRESSION);}
     : a=mathExprHighPrior (b+=operator c+=mathExprHighPrior)* -> ^(EXPRESSION $a ($b $c)*)
+    ;
+finally { leaveRule(); }
+
+exprNoComma
+@init {enterRule(retval, RULE_EXPRESSION);}
+    : a=mathExprHighPrior (b+=operatorNoComma c+=mathExprHighPrior)* -> ^(EXPRESSION $a ($b $c)*)
     ;
 finally { leaveRule(); }
     

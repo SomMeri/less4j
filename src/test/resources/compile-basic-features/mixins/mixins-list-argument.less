@@ -1,0 +1,14 @@
+ .mixinOne(@parameter) {
+   content: @parameter;
+ }
+ .mixinTwo(@parameter1, @parameter2) {
+   content1: @parameter1;
+   content2: @parameter2;
+ }
+
+ #usePlace {
+   @variable: 4%;
+   .mixinOne(12 23 33px @variable);
+   .mixinTwo(12 23 33px @variable, @variable identifier "hello");
+ }
+

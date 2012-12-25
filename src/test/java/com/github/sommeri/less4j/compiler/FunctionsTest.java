@@ -7,6 +7,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
+//FIXME: test format function with lists as parameters - focus on comma split
 public class FunctionsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/functions/";
