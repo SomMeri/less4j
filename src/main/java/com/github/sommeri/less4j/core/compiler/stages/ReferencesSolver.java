@@ -76,12 +76,14 @@ public class ReferencesSolver {
     case MIXIN_REFERENCE: {
       MixinReference mixinReference = (MixinReference) node;
       RuleSetsBody replacement = resolveMixinReference(mixinReference, scope.getScope());
+      AstLogic.validateCssBodyCompatibility(mixinReference, replacement.getChilds(), problemsHandler);
       manipulator.replaceInBody(mixinReference, replacement.getChilds());
       break;
     }
     case NAMESPACE_REFERENCE: {
       NamespaceReference namespaceReference = (NamespaceReference) node;
       RuleSetsBody replacement = resolveNamespaceReference(namespaceReference, scope.getScope());
+      AstLogic.validateCssBodyCompatibility(namespaceReference, replacement.getChilds(), problemsHandler);
       manipulator.replaceInBody(namespaceReference, replacement.getChilds());
       break;
     }

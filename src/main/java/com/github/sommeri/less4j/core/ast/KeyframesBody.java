@@ -7,7 +7,6 @@ import java.util.Set;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-//FIXME: !!!! now, what if some mixin add declaration or something similar into this??? The same problem will be there for top level namespace declarations
 public class KeyframesBody extends Body<ASTCssNode> {
   
   private static final Set<ASTCssNodeType> SUPPORTED_MEMBERS = new HashSet<ASTCssNodeType>();

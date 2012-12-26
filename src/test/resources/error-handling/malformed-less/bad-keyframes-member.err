@@ -1,0 +1,3 @@
+Errors produced by compilation of testCase
+ERROR 14:4 The reference brought declaration from 2:3 into @keyframes which started at 13:26. Compilation produced an incorrect CSS.
+ERROR 24:3 The reference brought declaration from 2:3 into @keyframes which started at 23:30. Compilation produced an incorrect CSS.

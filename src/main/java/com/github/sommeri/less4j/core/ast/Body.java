@@ -1,7 +1,10 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -78,6 +81,10 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return body.remove(node);
     }
     
+    public Set<ASTCssNodeType> getSupportedMembers() {
+      return new HashSet<ASTCssNodeType>(Arrays.asList(ASTCssNodeType.values()));  
+    }
+
     @SuppressWarnings("unchecked")
     public Body<T> clone() {
       Body<T> result = (Body<T>) super.clone();

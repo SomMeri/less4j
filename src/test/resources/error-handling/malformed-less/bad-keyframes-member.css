@@ -1,0 +1,9 @@
+@keyframes mixinUsePlace {
+  color: blue;
+}
+#namespace .mixin4 {
+  color: blue;
+}
+@keyframes namespaceUsePlace {
+  color: blue;
+}

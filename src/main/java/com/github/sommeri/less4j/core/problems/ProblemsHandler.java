@@ -17,6 +17,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.utils.LessPrinter;
+import com.github.sommeri.less4j.utils.PrintUtils;
 
 //TODO: this could benefit from some kind of dependency injection framework.
 public class ProblemsHandler {
@@ -24,6 +25,10 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
   
+  public void wrongMemberBroughtIntoBody(ASTCssNode reference, ASTCssNode member, ASTCssNode parent) {
+    collector.addError(new CompilationError(reference, "The reference brought " + PrintUtils.toTypeName(member) + " from " + PrintUtils.toLocation(member) + " into " + PrintUtils.toTypeName(parent) + " which started at " + PrintUtils.toLocation(parent) + ". Compilation produced an incorrect CSS."));
+  }
+
   public void unsupportedKeyframesMember(ASTCssNode errorNode) {
     collector.addError(new CompilationError(errorNode, "This element is not allowed to be @keyframes member."));
   }

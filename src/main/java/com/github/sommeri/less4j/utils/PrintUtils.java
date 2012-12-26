@@ -3,9 +3,11 @@ package com.github.sommeri.less4j.utils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.parser.LessParser;
 
 public class PrintUtils {
+  
   public static String toName(int tokenType) {
     if (tokenType == -1)
       return "EOF";
@@ -39,6 +41,27 @@ public class PrintUtils {
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  public static String toTypeName(ASTCssNode node) {
+    switch (node.getType()) {
+    case DECLARATION:
+      return "declaration";
+
+    case KEYFRAMES_BODY:
+      return "@keyframes";
+
+    case STYLE_SHEET:
+      return "top level style sheet";
+
+    default:
+      //TODO (low priority) replace by something safer
+      return node.getType().name();
+    }
+  }
+
+  public static String toLocation(ASTCssNode node) {
+    return node.getSourceLine() +":"+node.getCharPositionInSourceLine();
   }
 
 }

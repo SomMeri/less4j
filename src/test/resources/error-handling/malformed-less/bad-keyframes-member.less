@@ -1,0 +1,25 @@
+.mixin1() {
+  color: blue;
+}
+
+.mixin2() {
+  .mixin1();
+}
+
+.mixin3() {
+  .mixin2();
+}
+
+@keyframes mixinUsePlace {
+  .mixin3();
+}
+
+#namespace {
+  .mixin4 {
+    .mixin3();
+  }
+}
+
+@keyframes namespaceUsePlace {
+  #namespace .mixin4();
+}
