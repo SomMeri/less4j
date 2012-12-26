@@ -30,6 +30,7 @@ import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.Keyframes;
+import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
@@ -389,8 +390,18 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {
+    List<ASTCssNode> members = handleBodyMembers(token);
+    return new RuleSetsBody(token, members);
+  }
+
+  public KeyframesBody handleKeyframesBody(HiddenTokenAwareTree token) {
+    List<ASTCssNode> members = handleBodyMembers(token);
+    return new KeyframesBody(token, members);
+  }
+
+  private List<ASTCssNode> handleBodyMembers(HiddenTokenAwareTree token) {
     if (token.getChildren() == null)
-      return new RuleSetsBody(token);
+      return new ArrayList<ASTCssNode>();
 
     List<ASTCssNode> members = new ArrayList<ASTCssNode>();
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
@@ -406,8 +417,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     while (iterator.hasNext()) {
       members.add(switchOn(iterator.next()));
     }
-
-    return new RuleSetsBody(token, members);
+    return members;
   }
 
   public Selector handleSelector(HiddenTokenAwareTree token) {
@@ -788,15 +798,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     Keyframes result = new Keyframes(token, children.next().getText());
     result.addNames(handleKeyframesDeclaration(children.next()));
-
-    while (children.hasNext()) {
-      result.addMember(switchOn(children.next()));
-    }
-
+    result.setBody(handleKeyframesBody(children.next()));
+   
     return result;
   }
 
-  //FIXME: comments are ignored here
   private List<KeyframesName> handleKeyframesDeclaration(HiddenTokenAwareTree declaration) {
     List<KeyframesName> result = new ArrayList<KeyframesName>();
     Iterator<HiddenTokenAwareTree> iterator = declaration.getChildren().iterator();

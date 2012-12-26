@@ -203,18 +203,11 @@ media
     ;
 finally { leaveRule(); }
 
-//TODO possible refactoring - put allowed stuff into one rule - do it when adding top level namespaces
 keyframes
 @init {enterRule(retval, RULE_KEYFRAME);}
     : {predicates.isKeyframes(input.LT(1))}?=> (AT_NAME (name+=IDENT (name+=COMMA name+=IDENT )*)?)
-        q1=LBRACE
-            ( element+=variabledeclaration
-            | (mixinReferenceWithSemi)=>element+=mixinReferenceWithSemi
-            | (namespaceReferenceWithSemi)=>element+=namespaceReferenceWithSemi
-            | (reusableStructureName LPAREN)=>element+=reusableStructure
-            | element+=ruleSet )*
-        q2=RBRACE
-    -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $name*) $element* )
+      body+=ruleset_body
+    -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $name*) $body )
     ;
 finally { leaveRule(); }
 

@@ -7,6 +7,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ExtendedStringBuilder;
 import com.github.sommeri.less4j.core.NotACssException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.Comment;
@@ -24,6 +25,7 @@ import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
+import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
@@ -185,6 +187,9 @@ public class CssPrinter {
     case KEYFRAMES_NAME:
       return appendKeyframesName((KeyframesName) node);
 
+    case KEYFRAMES_BODY:
+      return appendBody((KeyframesBody) node);
+
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
@@ -214,12 +219,7 @@ public class CssPrinter {
       append(names.next());
     }
     
-    builder.ensureSeparator().append("{").newLine();
-    appendComments(node.getOrphanComments(), false);
-    builder.increaseIndentationLevel();
-    appendAll(node.getBody());
-    builder.decreaseIndentationLevel();
-    builder.ensureSeparator().append("}").newLine();
+    append(node.getBody());
     return true;
   }
 
@@ -350,13 +350,13 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendBody(RuleSetsBody body) {
+  public boolean appendBody(Body<? extends ASTCssNode> body) {
     if (body.isEmpty())
       return false;
 
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
-    Iterator<ASTCssNode> iterator = body.getChilds().iterator();
+    Iterator<? extends ASTCssNode> iterator = body.getChilds().iterator();
     while (iterator.hasNext()) {
       ASTCssNode declaration = iterator.next();
       append(declaration);

@@ -24,6 +24,10 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
   
+  public void unsupportedKeyframesMember(ASTCssNode errorNode) {
+    collector.addError(new CompilationError(errorNode, "This element is not allowed to be @keyframes member."));
+  }
+
   public void errFormatWrongFirstParameter(Expression param) {
     collector.addError(new CompilationError(param, "First argument of format function must be either string or escaped value."));
   }

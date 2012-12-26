@@ -6,21 +6,25 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-//FIXME: !!!! now, what if some mixin add declaration or something similar into this??? FIX
-public class Keyframes extends Body<ASTCssNode> {
+public class Keyframes extends ASTCssNode {
 
   private String dialect;
   private List<KeyframesName> names = new ArrayList<KeyframesName>();
+  private KeyframesBody body;
 
   public Keyframes(HiddenTokenAwareTree token, String dialect) {
     super(token);
     this.dialect = dialect;
   }
 
-  public List<ASTCssNode> getBody() {
-    return super.getBody();
+  public KeyframesBody getBody() {
+    return body;
   }
-  
+
+  public void setBody(KeyframesBody body) {
+    this.body = body;
+  }
+
   public String getDialect() {
     return dialect;
   }
@@ -35,8 +39,8 @@ public class Keyframes extends Body<ASTCssNode> {
 
   @Override
   public List<ASTCssNode> getChilds() {
-    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(super.getChilds());
-    childs.addAll(names);
+    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(names);
+    childs.add(body);
     return childs;
   }
 
