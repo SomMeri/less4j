@@ -1,0 +1,21 @@
+.mixin1(@color) {
+  color: @color;
+}
+
+.mixin2(@color) {
+  .mixin1(@color);
+}
+
+.mixin3(@color) {
+  .mixin2(@color);
+}
+
+.mixin3(red);
+
+#namespace {
+  .mixin4(@color) {
+    .mixin3(@color);
+  }
+}
+
+#namespace .mixin4(green);

@@ -234,7 +234,9 @@ bodylist
     ;
     
 bodyset
-    : (reusableStructureName LPAREN)=>reusableStructure
+    : (mixinReferenceWithSemi)=>mixinReferenceWithSemi
+    | (namespaceReferenceWithSemi)=>namespaceReferenceWithSemi
+    | (reusableStructureName LPAREN)=>reusableStructure
     | ruleSet
     | media
     | keyframes
