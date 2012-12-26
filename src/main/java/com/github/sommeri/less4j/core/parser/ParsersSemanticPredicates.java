@@ -151,4 +151,12 @@ public class ParsersSemanticPredicates {
     return !directlyFollows(first, second);
   }
 
+  public boolean isKeyframes(Token token) {
+    if (token.getType() != LessParser.AT_NAME || token.getText()==null)
+      return false;
+    
+    String text = token.getText().toLowerCase();
+    return text.startsWith("@") && text.endsWith("keyframes");
+  }
+
 }

@@ -28,6 +28,10 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return body;
     }
 
+    protected List<T> getBody() {
+      return body;
+    }
+
     public boolean isEmpty() {
       return body.isEmpty() && getOrphanComments().isEmpty();
     }

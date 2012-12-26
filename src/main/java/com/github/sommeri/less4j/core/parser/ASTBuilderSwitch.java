@@ -29,6 +29,8 @@ import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
+import com.github.sommeri.less4j.core.ast.Keyframes;
+import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
@@ -779,6 +781,38 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {
     int type = kid.getChild(0).getType();
     return type == LessLexer.MEANINGFULL_WHITESPACE || type == LessLexer.DUMMY_MEANINGFULL_WHITESPACE;
+  }
+
+  @Override
+  public ASTCssNode handleKeyframes(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    Keyframes result = new Keyframes(token, children.next().getText());
+    result.addNames(handleKeyframesDeclaration(children.next()));
+
+    while (children.hasNext()) {
+      result.addMember(switchOn(children.next()));
+    }
+
+    return result;
+  }
+
+  //FIXME: comments are ignored here
+  private List<KeyframesName> handleKeyframesDeclaration(HiddenTokenAwareTree declaration) {
+    List<KeyframesName> result = new ArrayList<KeyframesName>();
+    Iterator<HiddenTokenAwareTree> iterator = declaration.getChildren().iterator();
+    while (iterator.hasNext()) {
+      HiddenTokenAwareTree token = iterator.next();
+      if (token.getType()==LessLexer.COMMA) {
+        token.pushHiddenToSiblings();
+      } else if (token.getType()==LessLexer.IDENT) {
+        result.add(new KeyframesName(token, token.getText()));
+      } else {
+        throw new BugHappened(GRAMMAR_MISMATCH, token);
+      }
+      
+    }
+    
+    return result;
   }
   
 }

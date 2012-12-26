@@ -1,0 +1,24 @@
+.mixi-frames () {
+  from {width: 254px;}
+  to {width: 512px;}
+}
+
+@-webkit-keyframes some-animation {
+  .mixi-frames;
+}
+@-moz-keyframes some-animation {
+  .mixi-frames;
+}
+@-ms-keyframes some-animation {
+  .mixi-frames;
+}
+@-o-keyframes some-animation {
+  .mixi-frames;
+}
+@keyframes some-animation {
+  @variable: 12;
+  something {
+    declaration: @variable;
+  }
+  .mixi-frames;
+}

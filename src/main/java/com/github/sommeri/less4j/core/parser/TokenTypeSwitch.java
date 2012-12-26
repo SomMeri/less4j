@@ -90,10 +90,10 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.ARGUMENT_DECLARATION)
       return handleArgumentDeclaration(token);
 
-    if (type == LessLexer.VARIABLE)
+    if (type == LessLexer.AT_NAME)
       return handleVariable(token);
 
-    if (type == LessLexer.VARIABLE)
+    if (type == LessLexer.INDIRECT_VARIABLE)
       return handleIndirectVariable(token);
 
     if (type == LessLexer.REUSABLE_STRUCTURE)
@@ -123,8 +123,13 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.ESCAPED_SELECTOR)
       return handleEscapedSelector(token);
 
+    if (type == LessLexer.KEYFRAMES)
+      return handleKeyframes(token);
+
     throw new BugHappened("Unexpected token type: " + type +"("+PrintUtils.toName(type)+ ") for " + token.getText(), token);
   }
+
+  public abstract T handleKeyframes(HiddenTokenAwareTree token);
 
   public abstract T handleEscapedSelector(HiddenTokenAwareTree token);
 

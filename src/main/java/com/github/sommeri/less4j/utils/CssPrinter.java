@@ -23,6 +23,8 @@ import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
+import com.github.sommeri.less4j.core.ast.Keyframes;
+import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
@@ -177,6 +179,12 @@ public class CssPrinter {
     case ESCAPED_VALUE:
       return appendEscapedValue((EscapedValue) node);
 
+    case KEYFRAMES:
+      return appendKeyframes((Keyframes) node);
+
+    case KEYFRAMES_NAME:
+      return appendKeyframesName((KeyframesName) node);
+
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
@@ -187,6 +195,32 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getCharPositionInSourceLine());
     }
+  }
+
+  private boolean appendKeyframesName(KeyframesName node) {
+    builder.append(node.getName());
+    return true;
+  }
+
+  private boolean appendKeyframes(Keyframes node) {
+    builder.append(node.getDialect()).ensureSeparator();
+    
+    Iterator<KeyframesName> names = node.getNames().iterator();
+    if (names.hasNext()) {
+      append(names.next());
+    }
+    while (names.hasNext()) {
+      builder.append(",").ensureSeparator();
+      append(names.next());
+    }
+    
+    builder.ensureSeparator().append("{").newLine();
+    appendComments(node.getOrphanComments(), false);
+    builder.increaseIndentationLevel();
+    appendAll(node.getBody());
+    builder.decreaseIndentationLevel();
+    builder.ensureSeparator().append("}").newLine();
+    return true;
   }
 
   private boolean appendFaultyExpression(FaultyExpression node) {
@@ -622,7 +656,11 @@ public class CssPrinter {
 
   private void appendAllChilds(ASTCssNode node) {
     List<? extends ASTCssNode> allChilds = node.getChilds();
-    for (ASTCssNode kid : allChilds) {
+    appendAll(allChilds);
+  }
+
+  private void appendAll(List<? extends ASTCssNode> all) {
+    for (ASTCssNode kid : all) {
       if (append(kid))
         builder.ensureNewLine();
     }

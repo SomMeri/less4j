@@ -67,7 +67,7 @@ public class TermBuilder {
     case LessLexer.TERM_FUNCTION:
       return buildFromNormalFunction(token, offsetChild);
 
-    case LessLexer.VARIABLE:
+    case LessLexer.AT_NAME:
       return buildFromVariable(token, offsetChild);
 
     case LessLexer.INDIRECT_VARIABLE:

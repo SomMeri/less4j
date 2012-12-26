@@ -1,0 +1,43 @@
+@-webkit-keyframes some-animation {
+  from {
+    width: 254px;
+  }
+  to {
+    width: 512px;
+  }
+}
+@-moz-keyframes some-animation {
+  from {
+    width: 254px;
+  }
+  to {
+    width: 512px;
+  }
+}
+@-ms-keyframes some-animation {
+  from {
+    width: 254px;
+  }
+  to {
+    width: 512px;
+  }
+}
+@-o-keyframes some-animation {
+  from {
+    width: 254px;
+  }
+  to {
+    width: 512px;
+  }
+}
+@keyframes some-animation {
+  something {
+    declaration: 12;
+  }
+  from {
+    width: 254px;
+  }
+  to {
+    width: 512px;
+  }
+}

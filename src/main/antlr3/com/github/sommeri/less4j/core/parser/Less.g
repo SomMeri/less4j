@@ -69,6 +69,8 @@ tokens {
   GUARD_CONDITION;
   GUARD;
   DUMMY_MEANINGFULL_WHITESPACE; //ANTLR, please
+  KEYFRAMES_DECLARATION;
+  KEYFRAMES;
 }
 
 @lexer::header {
@@ -201,6 +203,21 @@ media
     ;
 finally { leaveRule(); }
 
+//TODO possible refactoring - put allowed stuff into one rule - do it when adding top level namespaces
+keyframes
+@init {enterRule(retval, RULE_KEYFRAME);}
+    : {predicates.isKeyframes(input.LT(1))}?=> (AT_NAME (name+=IDENT (name+=COMMA name+=IDENT )*)?)
+        q1=LBRACE
+            ( element+=variabledeclaration
+            | (mixinReferenceWithSemi)=>element+=mixinReferenceWithSemi
+            | (namespaceReferenceWithSemi)=>element+=namespaceReferenceWithSemi
+            | (reusableStructureName LPAREN)=>element+=reusableStructure
+            | element+=ruleSet )*
+        q2=RBRACE
+    -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $name*) $element* )
+    ;
+finally { leaveRule(); }
+
 // ---------
 // Medium. The name of a medim that are particulare set of rules applies to.
 //
@@ -227,6 +244,7 @@ bodyset
     : (reusableStructureName LPAREN)=>reusableStructure
     | ruleSet
     | media
+    | keyframes
     | page
     | fontface
     | variabledeclaration
@@ -234,25 +252,25 @@ bodyset
 
 variabledeclaration
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : VARIABLE COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* SEMI)
+    : AT_NAME COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* SEMI)
     ;
 finally { leaveRule(); }
 
 //used in mixinReferenceArgument
 variabledeclarationLimitedNoSemi
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : VARIABLE COLON (a+=exprNoComma) -> ^(VARIABLE_DECLARATION VARIABLE COLON $a* )
+    : AT_NAME COLON (a+=exprNoComma) -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* )
     ;
 finally { leaveRule(); }
 
 //This looks like the declaration, but does not allow a comma.
 reusableStructureParameter
-    : VARIABLE ((b=COLON (a+=mathExprHighPrior)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION VARIABLE $b* $a*)
+    : AT_NAME ((b=COLON (a+=mathExprHighPrior)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION AT_NAME $b* $a*)
     ;
 
 variablereference
 @init {enterRule(retval, RULE_VARIABLE_REFERENCE);}
-    : VARIABLE | INDIRECT_VARIABLE
+    : AT_NAME | INDIRECT_VARIABLE
     ;
 finally { leaveRule(); }
 
@@ -1072,7 +1090,7 @@ MEDIA_SYM : '@' M E D I A ;
 FONT_FACE_SYM : '@' F O N T MINUS F A C E ;
 CHARSET_SYM : '@charset ' ;
 
-VARIABLE : '@' NAME ;
+AT_NAME : '@' NAME ;
 INDIRECT_VARIABLE : '@' '@' NAME ;
 INTERPOLATED_VARIABLE : '@' LBRACE NAME RBRACE;
 
