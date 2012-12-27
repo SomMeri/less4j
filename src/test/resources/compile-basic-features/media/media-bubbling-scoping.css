@@ -1,0 +1,13 @@
+.foo .bar {
+  background: #000;
+}
+@media (max-width: 320px) {
+  .foo .bar {
+    background: url("/img.png");
+  }
+}
+@media (max-width: 320px) and (-webkit-min-device-pixel-ratio: 1.5) {
+  .foo .bar {
+    background: url("/img@2x.png");
+  }
+}

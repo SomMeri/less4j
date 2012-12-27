@@ -1,0 +1,46 @@
+/* Syntax error
+
+// https://github.com/cloudhead/less.js/issues/1028
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'Helvetica Neue';
+    unicode-range: U+FF0C, U+3001, U+3002;
+    src: local('Heiti SC'), local(PMingLiU);
+  }
+}
+*/
+
+//TODO: @media (orientation:portrait) with that and thing
+
+/* This will be fixed in 1.3.2
+
+https://github.com/cloudhead/less.js/issues/999
+.bg() {
+    background: red;
+
+    @media (max-width: 500px) {
+        background: green;
+    }
+}
+
+body {
+    .bg();
+}
+
+@bpMedium: 1000px;
+@media (max-width: @bpMedium) {
+    body {        
+        .bg();
+        background: blue;
+    }
+}
+
+
+*/
+
+/* not implemented in less.js yet, but will be:
+https://github.com/cloudhead/less.js/issues/950
+https://github.com/cloudhead/less.js/issues/654
+*/
+
+

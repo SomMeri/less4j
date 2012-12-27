@@ -1,0 +1,133 @@
+#a {
+  color: blue;
+}
+@media screen {
+  #a set1 {
+    padding: 1 1 1 1;
+  }
+  #a set2 {
+    padding: 2 2 2 2;
+  }
+}
+@media a, b and c {
+  
+}
+@media a and x, b and c and x, a and y, b and c and y {
+  {
+    color: red;
+  }
+}
+@media a {
+  footer {
+    color: white;
+  }
+  header {
+    color: white;
+  }
+}
+@media a and b {
+  header {
+    color: #000000;
+  }
+  footer {
+    color: black;
+  }
+}
+#namespace #foo {
+  color: black;
+}
+@media (orientation: portrait) {
+  #namespace #bar {
+    color: #ffffff;
+  }
+}
+@media all and (orientation: portrait) {
+  color: blue;
+}
+@media print {
+  @page  {
+    margin: 0.5cm;
+  }
+}
+#namespace #foo {
+  color: black;
+}
+@media (orientation: portrait) {
+  #namespace #bar {
+    color: white;
+  }
+}
+@media (orientation: portrait) and x and y {
+  #namespace #bar {
+    padding: 2 2 2 2;
+  }
+  #namespace #bar .innest {
+    margin: 1 1 1 1;
+  }
+}
+@media print {
+  color: blue;
+}
+@media only screen and (min-width: 480px) {
+  color: green;
+}
+@media screen {
+  .sidebar {
+    width: 300px;
+  }
+}
+@media screen and (orientation: landscape) {
+  .sidebar {
+    width: 500px;
+  }
+}
+.selector p {
+  font-size: 12px;
+}
+@media (min-width: 1200px) {
+  .selector p {
+    font-size: 14px;
+  }
+}
+.selector p {
+  font-size: 12px;
+}
+@media (min-width: 1200px) {
+  .selector p {
+    font-size: 14px;
+  }
+}
+.classone {
+  width: 50%;
+}
+@media only screen and (max-width: 767px) {
+  .classone {
+    width: 100%;
+  }
+}
+.classtwo {
+  width: 50%;
+}
+@media screen and max-width (600px) {
+  set {
+    padding: 1 1 1 1;
+  }
+}
+@media screen and max-width (600px) {
+  set {
+    padding: 2 2 2 2;
+  }
+}
+@media screen and max-width(600px) {
+  set {
+    padding: 3 3 3 3;
+  }
+}
+/* partial are not allowed
+@partial: ~"max-width(600px)";
+@media screen and @partial {
+  set {
+    padding: 3 3 3 3;
+  }
+}
+*/

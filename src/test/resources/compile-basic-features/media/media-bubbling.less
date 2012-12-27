@@ -1,0 +1,155 @@
+// https://github.com/cloudhead/less.js/pull/634
+#a {
+  @media screen { 
+    set1 {
+      padding: 1 1 1 1;
+    }
+    set2 {
+      padding: 2 2 2 2;
+    }
+  }
+
+  color: blue;
+}
+
+@media a, b and c {
+  @media x, y { 
+    color: red;
+  }
+}
+
+@media a {
+   footer { color: white; }
+
+  @media b {
+    header { color: black }
+    footer { color: black; }
+  }
+
+  header { color: white; }
+}
+
+// https://github.com/cloudhead/less.js/issues/286
+#namespace {
+  #foo { color:black; }
+  @media (orientation:portrait) {
+    #bar { color:white }
+  }
+}
+
+// https://github.com/cloudhead/less.js/issues/107
+@media all and (orientation:portrait) {
+  color: blue;
+}
+
+@media print {
+  @page { margin: 0.5cm; }
+}
+
+// *** TODO put to separate file, my invention ****
+#namespace {
+  #foo { color:black; }
+  @media (orientation:portrait) {
+    #bar { 
+      color:white;
+      @media x and y {
+        padding: 2 2 2 2;
+          .innest {
+            margin: 1 1 1 1;
+          }
+      }
+    }
+  }
+}
+
+// https://github.com/cloudhead/less.js/issues/528
+
+@media print {
+  color: blue;
+}
+
+@media only screen and (min-width: 480px) {
+  color: green;
+}
+
+// https://github.com/cloudhead/less.js/issues/762
+@media screen {
+  .sidebar {
+    width: 300px;
+    @media (orientation: landscape) {
+      width: 500px;
+    }
+  }
+}
+
+// https://github.com/cloudhead/less.js/issues/152
+// no bubbling
+.selector {
+    p {
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .selector {
+        p {
+            font-size: 14px;
+        }
+   }
+}
+
+// with bubbling
+.selector {
+    p {
+        font-size: 12px;
+        @media (min-width: 1200px) {
+            font-size: 14px;
+        }
+    }
+}
+
+// https://github.com/cloudhead/less.js/issues/544
+.classone {
+    width: 50%;
+}
+
+@media only screen and (max-width: 767px) {
+    .classone {
+        width: 100%;
+    }
+}
+
+.classtwo {
+    .classone;
+}
+
+// https://github.com/cloudhead/less.js/pull/643
+@media screen and max-width(600px) {
+  set {
+    padding: 1 1 1 1;
+  }
+}
+
+@tabletWidth: 600px;
+@media screen and max-width(@tabletWidth) {
+  set {
+    padding: 2 2 2 2;
+  }
+}
+
+@tablet: ~"screen and max-width(600px)";
+@media @tablet {
+  set {
+    padding: 3 3 3 3;
+  }
+}
+
+/* partial are not allowed
+@partial: ~"max-width(600px)";
+@media screen and @partial {
+  set {
+    padding: 3 3 3 3;
+  }
+}
+*/
+

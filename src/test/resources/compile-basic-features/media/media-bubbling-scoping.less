@@ -1,0 +1,18 @@
+// https://github.com/cloudhead/less.js/issues/968
+
+.foo {
+  .bar {
+    background: #000;
+  }
+
+  @media (max-width: 320px) {
+    .bar {
+      background: url("/img.png");
+
+      @media (-webkit-min-device-pixel-ratio: 1.5) {
+        background: url("/img@2x.png");
+      }
+    }
+  }
+}
+
