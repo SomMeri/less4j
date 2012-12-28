@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -19,9 +18,9 @@ public class ReusableStructure extends ASTCssNode {
     super(token);
   }
   
-  public ReusableStructure(HiddenTokenAwareTree token, ElementSubsequent className) {
+  public ReusableStructure(HiddenTokenAwareTree token, List<ElementSubsequent> selectors) {
     this(token);
-    selectors=Arrays.asList(className);
+    this.selectors=selectors;
   }
 
   public List<ElementSubsequent> getSelectors() {

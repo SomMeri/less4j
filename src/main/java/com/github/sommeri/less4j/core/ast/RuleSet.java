@@ -40,15 +40,17 @@ public class RuleSet extends ASTCssNode {
   }
 
   public boolean usableAsReusableStructure() {
-    return hasSingleClassSelector() || hasSingleIdSelector();
-  }
-
-  private boolean hasSingleClassSelector() {
     for (Selector selector : selectors) {
-      if (isSingleClassSelector(selector))
+      if (isReusableSelector(selector))
         return true;
     }
+    return false;
+  }
 
+  private boolean isReusableSelector(Selector selector) {
+    if (isSingleClassSelector(selector) || isSingleIdSelector(selector))
+      return true;
+    
     return false;
   }
 
@@ -58,15 +60,6 @@ public class RuleSet extends ASTCssNode {
       if (head.isSingleClassSelector())
         return true;
     }
-    return false;
-  }
-
-  private boolean hasSingleIdSelector() {
-    for (Selector selector : selectors) {
-      if (isSingleIdSelector(selector))
-        return true;
-    }
-
     return false;
   }
 
@@ -88,9 +81,14 @@ public class RuleSet extends ASTCssNode {
     if (!usableAsReusableStructure()) 
       throw new BugHappened("Caller is supposed to check for this.", this);
     
-    SimpleSelector head = (SimpleSelector) selectors.get(0).getHead();
-    ElementSubsequent className = (ElementSubsequent)head.getSubsequent().get(0);
-    ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), className.clone());
+    List<ElementSubsequent> reusableSelectors = new ArrayList<ElementSubsequent>();
+    for (Selector selector : selectors) if (isReusableSelector(selector)) {
+      SimpleSelector head = (SimpleSelector) selector.getHead();
+      ElementSubsequent className = (ElementSubsequent)head.getSubsequent().get(0);
+      reusableSelectors.add(className.clone());
+    }
+    
+    ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), reusableSelectors);
     reusable.setBody(getBody().clone());
     reusable.configureParentToAllChilds();
     return reusable;

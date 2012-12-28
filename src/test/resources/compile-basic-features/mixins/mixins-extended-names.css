@@ -1,0 +1,31 @@
+.bo,
+.bar {
+  width: 100%;
+}
+.bo {
+  border: 1px;
+}
+.ar.bo.ca {
+  color: black;
+}
+.jo.ki {
+  background: none;
+}
+.jo#ki {
+  color: white;
+}
+#jo#ki {
+  margin: 2;
+}
+.extended {
+  width: 100%;
+  border: 1px;
+  background: none;
+  margin: 2;
+}
+.foo .bar {
+  width: 100%;
+}
+h1 {
+  color: green;
+}
