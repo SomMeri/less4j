@@ -12,7 +12,7 @@ public abstract class ElementSubsequent extends ASTCssNode {
 
   public abstract String getFullName();
 
-  public abstract boolean isSimple();
+  public abstract boolean isInterpolated();
 
   public abstract void extendName(String extension);
 

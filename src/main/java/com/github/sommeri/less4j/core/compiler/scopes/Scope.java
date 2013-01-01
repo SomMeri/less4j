@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -103,7 +104,7 @@ public class Scope {
     return getNearestMixins(reference.getName());
   }
 
-  public List<FullMixinDefinition> getNearestMixins(String name) {
+  public List<FullMixinDefinition> getNearestMixins(ReusableStructureName name) {
     List<FullMixinDefinition> value = mixins.getMixins(name);
     if ((value==null || value.isEmpty()) && hasParent()) 
       return getParent().getNearestMixins(name);
@@ -124,7 +125,7 @@ public class Scope {
   }
 
   private List<Scope> getNearestNamespaces(NamespaceReference reference) {
-    List<String> nameChain = reference.getNameChain();
+    List<String> nameChain = reference.getNameChainAsStrings();
     Scope space = this;
     List<Scope> result = findMatchingChilds(nameChain);
     while (result.isEmpty() && space.hasParent()) {

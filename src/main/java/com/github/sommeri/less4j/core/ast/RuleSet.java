@@ -48,29 +48,11 @@ public class RuleSet extends ASTCssNode {
   }
 
   private boolean isReusableSelector(Selector selector) {
-    if (isSingleClassSelector(selector) || isSingleIdSelector(selector))
-      return true;
-    
-    return false;
-  }
+    if (selector.isCombined())
+      return false;
 
-  private boolean isSingleClassSelector(Selector selector) {
-    if (!selector.isCombined()) {
-      SelectorPart head = selector.getHead();
-      if (head.isSingleClassSelector())
-        return true;
-    }
-    return false;
-  }
-
-  private boolean isSingleIdSelector(Selector selector) {
-    if (!selector.isCombined()) {
-      SelectorPart head = selector.getHead();
-      if (head.isSingleIdSelector())
-        return true;
-    }
-    
-    return false;
+    SelectorPart head = selector.getHead();
+    return head.isClassesAndIdsOnlySelector();
   }
 
   /**
@@ -81,14 +63,13 @@ public class RuleSet extends ASTCssNode {
     if (!usableAsReusableStructure()) 
       throw new BugHappened("Caller is supposed to check for this.", this);
     
-    List<ElementSubsequent> reusableSelectors = new ArrayList<ElementSubsequent>();
+    List<ReusableStructureName> reusableNames = new ArrayList<ReusableStructureName>();
     for (Selector selector : selectors) if (isReusableSelector(selector)) {
       SimpleSelector head = (SimpleSelector) selector.getHead();
-      ElementSubsequent className = (ElementSubsequent)head.getSubsequent().get(0);
-      reusableSelectors.add(className.clone());
+      reusableNames.add(new ReusableStructureName(head.getUnderlyingStructure(), head.getSubsequent()));
     }
     
-    ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), reusableSelectors);
+    ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), reusableNames);
     reusable.setBody(getBody().clone());
     reusable.configureParentToAllChilds();
     return reusable;
@@ -101,7 +82,7 @@ public class RuleSet extends ASTCssNode {
   public List<String> extractReusableStructureNames() {
     List<String> result = new ArrayList<String>();
     for (Selector selector : selectors) {
-      if (isSingleClassSelector(selector) || isSingleIdSelector(selector)) {
+      if (isReusableSelector(selector)) {
         SimpleSelector simpleSelector = (SimpleSelector)selector.getHead();
         result.add(simpleSelector.getSubsequent().get(0).getFullName());
       }

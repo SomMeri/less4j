@@ -7,19 +7,35 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class NamespaceReference extends ASTCssNode {
-  
-  private List<String> nameChain = new ArrayList<String>();
+
+  private List<ReusableStructureName> nameChain = new ArrayList<ReusableStructureName>();
   private MixinReference finalReference;
 
   public NamespaceReference(HiddenTokenAwareTree underlyingStructure) {
     super(underlyingStructure);
   }
 
-  public List<String> getNameChain() {
+  public List<ReusableStructureName> getNameChain() {
     return nameChain;
   }
 
-  public void setNameChain(List<String> nameChain) {
+  public boolean hasInterpolatedName() {
+    for (ReusableStructureName name : nameChain) {
+      if (name.isInterpolated())
+        return true;
+    }
+    return false;
+  }
+
+  public List<String> getNameChainAsStrings() {
+    List<String> result = new ArrayList<String>();
+    for (ReusableStructureName name : nameChain) {
+      result.add(name.asString());
+    }
+    return result;
+  }
+
+  public void setNameChain(List<ReusableStructureName> nameChain) {
     this.nameChain = nameChain;
   }
 
@@ -33,7 +49,9 @@ public class NamespaceReference extends ASTCssNode {
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(finalReference);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode) finalReference);
+    result.addAll(nameChain);
+    return result;
   }
 
   @Override
@@ -44,24 +62,23 @@ public class NamespaceReference extends ASTCssNode {
   @Override
   public NamespaceReference clone() {
     NamespaceReference result = (NamespaceReference) super.clone();
-    result.nameChain = nameChain==null?null:new ArrayList<String>(nameChain);
-    result.finalReference = finalReference==null?null:finalReference.clone();
+    result.nameChain = nameChain == null ? null : new ArrayList<ReusableStructureName>(nameChain);
+    result.finalReference = finalReference == null ? null : finalReference.clone();
     return result;
   }
 
-  public void addName(String text) {
+  public void addName(ReusableStructureName text) {
     nameChain.add(text);
   }
 
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    for (String str : nameChain) {
-      builder.append(str).append(" > ");
+    for (ReusableStructureName str : nameChain) {
+      builder.append(str.asString()).append(" > ");
     }
     builder.append(getFinalReference().toString());
     return builder.toString();
   }
-  
-  
+
 }

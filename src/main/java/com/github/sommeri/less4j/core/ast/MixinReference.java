@@ -11,7 +11,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class MixinReference extends ASTCssNode {
 
-  private ElementSubsequent selector;
+  private ReusableStructureName name;
   private List<Expression> positionalParameters = new ArrayList<Expression>();
   private Map<String, Expression> namedParameters = new HashMap<String, Expression>();
   private boolean important = false;
@@ -20,16 +20,16 @@ public class MixinReference extends ASTCssNode {
     super(token);
   }
 
-  public ElementSubsequent getSelector() {
-    return selector;
+  public ReusableStructureName getName() {
+    return name;
   }
 
-  public String getName() {
-    return getSelector().getFullName();
+  public String getNameAsString() {
+    return getName().asString();
   }
 
-  public void setSelector(ElementSubsequent selector) {
-    this.selector = selector;
+  public void setName(ReusableStructureName name) {
+    this.name = name;
   }
 
   public List<Expression> getPositionalParameters() {
@@ -72,9 +72,13 @@ public class MixinReference extends ASTCssNode {
     this.important = important;
   }
 
+  public boolean hasInterpolatedName() {
+    return name.isInterpolated();
+  }
+
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)selector);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)name);
     result.addAll(positionalParameters);
     result.addAll(namedParameters.values());
     return result;
@@ -93,7 +97,7 @@ public class MixinReference extends ASTCssNode {
   @Override
   public MixinReference clone() {
     MixinReference result = (MixinReference) super.clone();
-    result.selector = selector==null?null:selector.clone();
+    result.name = name==null?null:name.clone();
     result.positionalParameters = ArraysUtils.deeplyClonedList(positionalParameters);
     result.configureParentToAllChilds();
     return result;

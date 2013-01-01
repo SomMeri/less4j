@@ -1,7 +1,10 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -21,21 +24,25 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     this.isStar = isStar;
   }
 
-  public boolean isSingleClassSelector() {
-    return isSimpleOnePurposeSelector(ASTCssNodeType.CSS_CLASS);
+  @Override
+  public boolean isClassesAndIdsOnlySelector() {
+    return isLimitedPurposeSelector(ASTCssNodeType.CSS_CLASS, ASTCssNodeType.ID_SELECTOR);
   }
 
-  public boolean isSingleIdSelector() {
-    return isSimpleOnePurposeSelector(ASTCssNodeType.ID_SELECTOR);
-  }
-
-  private boolean isSimpleOnePurposeSelector(ASTCssNodeType purpose) {
-    if (elementName != null || !isEmptyForm() || subsequent == null || subsequent.size() != 1)
+  private boolean isLimitedPurposeSelector(ASTCssNodeType... purposes) {
+    if (elementName != null || !isEmptyForm() || subsequent == null)
       return false;
-
-    ElementSubsequent es = subsequent.get(0);
     
-    return es.getType() == purpose && es.isSimple();
+    Set<ASTCssNodeType> purposesSet = new HashSet<ASTCssNodeType>(Arrays.asList(purposes));
+    for (ElementSubsequent es : subsequent) {
+      if (!purposesSet.contains(es.getType()))
+        return false;
+      
+      if (es.isInterpolated())
+        return false;
+    }
+   
+    return true;
   }
 
   public InterpolableName getElementName() {

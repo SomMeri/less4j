@@ -26,7 +26,7 @@ public class MixinsReferenceCycleDetector {
   }
 
   public void enteringMixinReference(MixinReference input) {
-    names.add(input.getName());
+    names.add(input.getNameAsString());
     variables.add(input);
   }
 

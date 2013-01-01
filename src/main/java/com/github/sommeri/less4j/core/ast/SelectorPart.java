@@ -13,11 +13,7 @@ public abstract class SelectorPart extends ASTCssNode {
     return (SelectorPart) super.clone();
   }
 
-  public boolean isSingleClassSelector() {
-    return false;
-  }
-
-  public boolean isSingleIdSelector() {
+  public boolean isClassesAndIdsOnlySelector() {
     return false;
   }
 

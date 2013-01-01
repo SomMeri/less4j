@@ -23,8 +23,8 @@ public class CssClass extends ElementSubsequent {
   }
 
   @Override
-  public boolean isSimple() {
-    return name.isSimple();
+  public boolean isInterpolated() {
+    return name.isInterpolated();
   }
 
   @Override

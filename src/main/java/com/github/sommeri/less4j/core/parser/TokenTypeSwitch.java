@@ -125,9 +125,14 @@ public abstract class TokenTypeSwitch<T> {
 
     if (type == LessLexer.KEYFRAMES)
       return handleKeyframes(token);
+    
+    if (type == LessLexer.REUSABLE_STRUCTURE_NAME)
+      return handleReusableStructureName(token);
 
     throw new BugHappened("Unexpected token type: " + type +"("+PrintUtils.toName(type)+ ") for " + token.getText(), token);
   }
+
+  public abstract T handleReusableStructureName(HiddenTokenAwareTree token);
 
   public abstract T handleKeyframes(HiddenTokenAwareTree token);
 

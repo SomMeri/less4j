@@ -1,0 +1,44 @@
+.bo, .bar {
+    width: 100%;
+}
+.bo {
+    border: 1px;
+}
+.ar.bo.ca {
+    color: black;
+}
+.jo.ki {
+    background: none;
+}
+.jo#ki {
+    color: white;
+}
+#jo#ki {
+    margin: 2;
+}
+.extended {
+    .bo;
+    .jo.ki;
+    #jo#ki;
+}
+.foo .bar {
+  .bar;
+}
+
+#extended() {
+  .mixin.extended {
+    color: green;
+  }
+}
+
+#extended.mixin.extended {
+  padding: 2 2 2 2;
+}
+
+h1 {
+  #extended > .mixin.extended;
+}
+
+h2 {
+  #extended > .mixin.extended;
+}

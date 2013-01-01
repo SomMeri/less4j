@@ -28,6 +28,7 @@ import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
@@ -395,7 +396,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public List<FullMixinDefinition> getNearestMixins(String name) {
+  public List<FullMixinDefinition> getNearestMixins(ReusableStructureName name) {
     return Collections.emptyList();
   }
 

@@ -5,19 +5,20 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 
 public class LessPrinter {
   
   public String toString(NamespaceReference reference) {
     StringBuilder result = new StringBuilder();
-    Iterator<String> iterator = reference.getNameChain().iterator();
+    Iterator<ReusableStructureName> iterator = reference.getNameChain().iterator();
     if (iterator.hasNext())
-      result.append(iterator.next());
+      result.append(iterator.next().asString());
 
     while (iterator.hasNext()) {
       result.append(" > ");
-      result.append(iterator.next());
+      result.append(iterator.next().asString());
     }
 
     result.append(" > ");
@@ -27,7 +28,7 @@ public class LessPrinter {
   }
 
   private StringBuilder toString(MixinReference finalReference) {
-    StringBuilder result = new StringBuilder(finalReference.getName());
+    StringBuilder result = new StringBuilder(finalReference.getNameAsString());
     result.append("(...)");
     return result;
   }

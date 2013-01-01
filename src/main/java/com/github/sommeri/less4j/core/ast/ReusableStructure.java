@@ -8,7 +8,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class ReusableStructure extends ASTCssNode {
 
-  private List<ElementSubsequent> selectors;
+  private List<ReusableStructureName> names = new ArrayList<ReusableStructureName>();
   //Allows: variable, argument declaration, pattern
   private List<ASTCssNode> parameters = new ArrayList<ASTCssNode>();
   private List<Guard> guards = new ArrayList<Guard>();
@@ -18,25 +18,29 @@ public class ReusableStructure extends ASTCssNode {
     super(token);
   }
   
-  public ReusableStructure(HiddenTokenAwareTree token, List<ElementSubsequent> selectors) {
+  public ReusableStructure(HiddenTokenAwareTree token, List<ReusableStructureName> names) {
     this(token);
-    this.selectors=selectors;
+    this.names=names;
   }
 
-  public List<ElementSubsequent> getSelectors() {
-   return selectors;
+  public void addName(ReusableStructureName name) {
+    names.add(name);
   }
   
-  public List<String> getNames() {
+  public List<ReusableStructureName> getNames() {
+   return names;
+  }
+  
+  public List<String> getNamesAsStrings() {
     List<String> result = new ArrayList<String>();
-    for (ElementSubsequent selector : getSelectors()) {
-      result.add(selector.getFullName());
+    for (ReusableStructureName name : getNames()) {
+      result.add(name.asString());
     }
     return result;
    }
   
-  public void setSelectors(List<ElementSubsequent> selectors) {
-    this.selectors = selectors;
+  public void setNames(List<ReusableStructureName> names) {
+    this.names = names;
   }
 
   public RuleSetsBody getBody() {
@@ -96,7 +100,7 @@ public class ReusableStructure extends ASTCssNode {
   @Override
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)body);
-    result.addAll(selectors);
+    result.addAll(names);
     result.addAll(parameters);
     return result;
   }
@@ -108,7 +112,7 @@ public class ReusableStructure extends ASTCssNode {
   @Override
   public ReusableStructure clone() {
     ReusableStructure result = (ReusableStructure) super.clone();
-    result.selectors = ArraysUtils.deeplyClonedList(selectors);
+    result.names = ArraysUtils.deeplyClonedList(names);
     result.parameters = ArraysUtils.deeplyClonedList(parameters);
     result.body = body==null?null:body.clone();
     result.configureParentToAllChilds();
@@ -119,9 +123,9 @@ public class ReusableStructure extends ASTCssNode {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("ReusableStructure [");
-    builder.append(selectors);
+    builder.append(names);
     builder.append("]");
     return builder.toString();
   }
-  
+
 }

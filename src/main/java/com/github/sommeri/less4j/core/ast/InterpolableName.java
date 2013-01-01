@@ -14,11 +14,16 @@ public class InterpolableName extends ASTCssNode {
     super(underlyingStructure);
   }
 
-  public boolean isSimple() {
-    if (parts==null || parts.size()!=1)
+  public boolean isInterpolated() {
+    if (parts==null)
       return false;
     
-    return parts.get(0).getType() == ASTCssNodeType.FIXED_NAME_PART;
+    for (InterpolableNamePart part : parts) {
+      if (part.getType() == ASTCssNodeType.VARIABLE_NAME_PART)
+        return true;
+    }
+    
+    return false;
   }
 
   public String getName() {

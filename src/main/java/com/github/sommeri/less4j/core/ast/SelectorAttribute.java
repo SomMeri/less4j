@@ -74,8 +74,8 @@ public class SelectorAttribute extends ElementSubsequent {
   }
 
   @Override
-  public boolean isSimple() {
-    return true;
+  public boolean isInterpolated() {
+    return false;
   }
 
 }

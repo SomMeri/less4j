@@ -98,4 +98,14 @@ public class ASTManipulator {
     }
   }
 
+  public void removeFromClosestBody(ASTCssNode node) {
+    ASTCssNode removeNode = node;
+    while (removeNode!=null && !(removeNode.getParent() instanceof Body)) {
+      removeNode = removeNode.getParent();
+    }
+    
+    if (removeNode!=null)
+      removeFromBody(removeNode);
+  }
+
 }

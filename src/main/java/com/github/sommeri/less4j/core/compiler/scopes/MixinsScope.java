@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
+
 
 public class MixinsScope {
   
@@ -14,27 +16,28 @@ public class MixinsScope {
   }
 
   public void registerMixin(FullMixinDefinition mixin) {
-    List<String> names = mixin.getMixin().getNames();
-    for (String name : names) {
+    List<ReusableStructureName> names = mixin.getMixin().getNames();
+    for (ReusableStructureName name : names) {
       registerMixin(name, mixin);
     }
   }
 
-  private void registerMixin(String name, FullMixinDefinition mixin) {
-    List<FullMixinDefinition> list = storage.get(name);
+  private void registerMixin(ReusableStructureName name, FullMixinDefinition mixin) {
+    String nameAsString = name.asString();
+    List<FullMixinDefinition> list = storage.get(nameAsString);
     if (list == null) {
       list = new ArrayList<FullMixinDefinition>();
-      storage.put(name, list);
+      storage.put(nameAsString, list);
     }
     list.add(mixin);
   }
 
-  public List<FullMixinDefinition> getMixins(String name) {
-    return storage.get(name);
+  public List<FullMixinDefinition> getMixins(ReusableStructureName name) {
+    return storage.get(name.asString());
   }
 
-  public boolean contains(String name) {
-    return storage.containsKey(name);
+  public boolean contains(ReusableStructureName name) {
+    return storage.containsKey(name.asString());
   }
 
   public int size() {

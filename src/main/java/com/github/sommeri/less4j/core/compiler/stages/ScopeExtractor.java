@@ -76,7 +76,7 @@ public class ScopeExtractor {
   private List<String> representedNamedScope(ASTCssNode node) {
     switch (node.getType()) {
     case REUSABLE_STRUCTURE:
-      return ((ReusableStructure) node).getNames();
+      return ((ReusableStructure) node).getNamesAsStrings();
 
     case RULE_SET: {
       RuleSet ruleSet = (RuleSet) node;

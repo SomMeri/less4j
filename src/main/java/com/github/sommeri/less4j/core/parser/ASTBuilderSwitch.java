@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -49,6 +48,7 @@ import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Selector;
@@ -254,13 +254,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public ReusableStructure handleReusableStructureDeclaration(HiddenTokenAwareTree token) {
     ReusableStructure result = new ReusableStructure(token);
 
-    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
-    HiddenTokenAwareTree kid = children.next();
-    result.setSelectors(Arrays.asList(handleElementSubsequent(kid)));
-
-    while (children.hasNext()) {
-      kid = children.next();
-      if (kid.getType() == LessLexer.BODY) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType() == LessLexer.REUSABLE_STRUCTURE_NAME) {
+        result.addName(handleReusableStructureName(kid));
+      } else if (kid.getType() == LessLexer.BODY) {
         result.setBody(handleRuleSetsBody(kid));
       } else if (kid.getType() == LessLexer.GUARD) {
         result.addGuard(handleGuard(kid));
@@ -269,8 +267,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       } else { // anything else is a parameter
         result.addParameter(switchOn(kid));
       }
-
     }
+
     return result;
   }
 
@@ -278,12 +276,21 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return (ElementSubsequent) switchOn(token.getChild(0));
   }
 
+  public ReusableStructureName handleReusableStructureName(HiddenTokenAwareTree token) {
+    ReusableStructureName result = new ReusableStructureName(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      result.addNamePart(handleElementSubsequent(kid));
+    }
+    return result;
+  }
+  
   public MixinReference handleMixinReference(HiddenTokenAwareTree token) {
     MixinReference result = new MixinReference(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() == LessLexer.ELEMENT_SUBSEQUENT) {
-        result.setSelector(handleElementSubsequent(kid));
+      if (kid.getType() == LessLexer.REUSABLE_STRUCTURE_NAME) {
+        result.setName(handleReusableStructureName(kid));
       } else if (kid.getType() == LessLexer.IMPORTANT_SYM) {
         result.setImportant(true);
       } else { // anything else is a parameter
@@ -306,9 +313,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       if (buildKid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
         MixinReference reference = (MixinReference) switchOn(kid);
         result.setFinalReference(reference);
-      } else if (buildKid instanceof ElementSubsequent) {
-        ElementSubsequent name = (ElementSubsequent) switchOn(kid);
-        result.addName(name.getFullName());
+      } else if (buildKid.getType() == ASTCssNodeType.REUSABLE_STRUCTURE_NAME) {
+        result.addName(handleReusableStructureName(kid));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);
       }

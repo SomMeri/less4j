@@ -17,6 +17,7 @@
 // This grammar is free to use providing you retain everything in this header comment
 // section.
 //
+// namespaces with predicates
 grammar Less;
 
 options {
@@ -71,6 +72,7 @@ tokens {
   DUMMY_MEANINGFULL_WHITESPACE; //ANTLR, please
   KEYFRAMES_DECLARATION;
   KEYFRAMES;
+  REUSABLE_STRUCTURE_NAME;
 }
 
 @lexer::header {
@@ -468,14 +470,20 @@ pseudoparameters:
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
 
+referenceSeparator:
+       GREATER
+       | {!predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> -> EMPTY_COMBINATOR;
+ 
 namespaceReference
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
-    : (a+=reusableStructureName GREATER?)* c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
+    : ((reusableStructureName referenceSeparator)=> a+=reusableStructureName referenceSeparator)+
+      c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
 finally { leaveRule(); }
 
 namespaceReferenceWithSemi
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
-    : (a+=reusableStructureName GREATER?)* c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
+    : ((reusableStructureName referenceSeparator)=> a+=reusableStructureName referenceSeparator)+
+      c+=mixinReference SEMI -> ^(NAMESPACE_REFERENCE $a* $c);
 finally { leaveRule(); }
 
 mixinReference
@@ -501,10 +509,10 @@ mixinReferenceArgument
     : exprNoComma | variabledeclarationLimitedNoSemi
     ;
 
-//FIXME: add additional chech - these should NOT trigger interpolation    
+//FIXME: add additional check - these should NOT trigger interpolation    
 reusableStructureName
-    : cssClassOrId;
-
+    : a+=cssClassOrId ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> a+=cssClassOrId)* -> ^(REUSABLE_STRUCTURE_NAME $a*);
+    
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 
 @init {enterRule(retval, RULE_ABSTRACT_MIXIN_OR_NAMESPACE);}
