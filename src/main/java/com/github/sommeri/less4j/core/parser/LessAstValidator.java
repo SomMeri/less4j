@@ -10,18 +10,20 @@ import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
+import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
+import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-public class AstValidator {
+public class LessAstValidator {
 
   private final ProblemsHandler problemsHandler;
   private final ASTManipulator manipulator = new ASTManipulator();
 
-  public AstValidator(ProblemsHandler problemsHandler) {
+  public LessAstValidator(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
   }
 
@@ -29,6 +31,7 @@ public class AstValidator {
     switch (node.getType()) {
     case RULE_SET: {
       checkEmptySelector((RuleSet) node);
+      checkTopLevelNested((RuleSet) node);
       break;
     }
     case MIXIN_REFERENCE: {
@@ -59,6 +62,21 @@ public class AstValidator {
       validate(kid);
     }
 
+  }
+
+  private void checkTopLevelNested(RuleSet node) {
+    if (node.getParent().getType()!=ASTCssNodeType.STYLE_SHEET)
+      return ;
+    
+    for (Selector selector : node.getSelectors()) {
+      NestedSelectorAppender appender = selector.findFirstAppender();
+      if (appender!=null) {
+        problemsHandler.nestedAppenderOnTopLevel(appender);
+        manipulator.removeFromClosestBody(node);
+        return ;
+      }
+    }
+    
   }
 
   private void checkForDisallowedMembers(KeyframesBody keyframes) {

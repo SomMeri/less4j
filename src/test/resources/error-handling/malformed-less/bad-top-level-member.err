@@ -1,3 +1,5 @@
 Errors produced by compilation of testCase
+ERROR 24:1 Appender symbol is not allowed inside top level rulesets.
+ERROR 29:9 Appender symbol is not allowed inside top level rulesets.
 ERROR 13:2 The reference brought declaration from 2:3 into top level style sheet which started at 1:2. Compilation produced an incorrect CSS.
 ERROR 21:1 The reference brought declaration from 2:3 into top level style sheet which started at 1:2. Compilation produced an incorrect CSS.

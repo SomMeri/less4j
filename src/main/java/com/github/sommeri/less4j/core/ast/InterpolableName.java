@@ -66,7 +66,7 @@ public class InterpolableName extends ASTCssNode {
   }
 
   public void extendName(String extension) {
-    //FIXME: this will probably change and extension will be list of name parts
+    //it would be cleaner to extend with a list of name parts (maybe)
     parts.add(new FixedNamePart(getUnderlyingStructure(), extension));
     
   }

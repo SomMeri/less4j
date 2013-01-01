@@ -223,7 +223,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new CharsetDeclaration(token, children.get(0).getText());
   }
 
-  //TODO add validation: top level ruleset can not be nested
   public RuleSet handleRuleSet(HiddenTokenAwareTree token) {
     RuleSet ruleSet = new RuleSet(token);
 

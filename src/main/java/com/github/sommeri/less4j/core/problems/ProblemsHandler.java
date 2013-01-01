@@ -10,6 +10,7 @@ import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
+import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
@@ -25,6 +26,10 @@ public class ProblemsHandler {
 
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
+
+  public void nestedAppenderOnTopLevel(NestedSelectorAppender appender) {
+    collector.addError(new CompilationError(appender, "Appender symbol is not allowed inside top level rulesets."));
+  }
 
   public void interpolatedMixinReferenceSelector(MixinReference reference) {
     collector.addError(new CompilationError(reference, "Interpolation is not allowed inside mixin references."));

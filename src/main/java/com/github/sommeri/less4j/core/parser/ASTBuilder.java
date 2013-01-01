@@ -29,7 +29,7 @@ public class ASTBuilder {
   }
 
  private void checkForWarnings(ASTCssNode result) {
-   AstValidator validator = new AstValidator(problemsHandler);
+   LessAstValidator validator = new LessAstValidator(problemsHandler);
    validator.validate(result);
   }
 
