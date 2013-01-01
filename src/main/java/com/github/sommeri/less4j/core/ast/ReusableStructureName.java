@@ -46,6 +46,10 @@ public class ReusableStructureName extends ASTCssNode {
     nameParts.add(namePart);
   }
 
+  public boolean hasMultipleParts() {
+    return nameParts.size()>1;
+  }
+
   @Override
   public List<? extends ASTCssNode> getChilds() {
     return Collections.emptyList();

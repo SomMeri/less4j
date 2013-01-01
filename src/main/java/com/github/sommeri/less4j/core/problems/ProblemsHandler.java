@@ -30,6 +30,10 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(reference, "Interpolation is not allowed inside mixin references."));
   }
 
+  public void extendedNamespaceReferenceSelector(NamespaceReference reference) {
+    collector.addError(new CompilationError(reference, "Structures with extended names can not be used as namespaces."));
+  }
+
   public void interpolatedNamespaceReferenceSelector(NamespaceReference reference) {
     collector.addError(new CompilationError(reference, "Interpolation is not allowed inside namespace references."));
   }

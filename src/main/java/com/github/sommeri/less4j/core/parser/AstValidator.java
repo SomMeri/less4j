@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -36,6 +37,7 @@ public class AstValidator {
     }
     case NAMESPACE_REFERENCE: {
       checkInterpolatedNamespaceName((NamespaceReference)node);
+      checkExtendedNamespaceName((NamespaceReference)node);
       break;
     }
     case PSEUDO_CLASS: {
@@ -81,7 +83,16 @@ public class AstValidator {
       manipulator.removeFromClosestBody(reference);
     }
   }
-
+  private void checkExtendedNamespaceName(NamespaceReference reference) {
+    for (ReusableStructureName name : reference.getNameChain()) {
+      if (name.hasMultipleParts()) {
+        problemsHandler.extendedNamespaceReferenceSelector(reference);
+        manipulator.removeFromClosestBody(reference);
+        return ;
+      }
+    }
+  }
+  
   private void checkDeprecatedParameterType(PseudoClass pseudo) {
     ASTCssNode parameter = pseudo.getParameter();
     if (parameter!=null && parameter.getType()==ASTCssNodeType.VARIABLE) {
