@@ -19,9 +19,9 @@ import com.github.sommeri.less4j.core.parser.AntlrException;
 
 public class SuperLessParser extends Parser {
 
-  public final String[] tokenErrorNames;
+  public String[] tokenErrorNames;
   //TODO: write about this to error handling post, it would be cool if I could do this declaratively in grammar 
-  private static final Map<String, String> ALTERNATIVE_NAMES_FOR_ERROR_REPORTING = new HashMap<String, String>();
+  public static final Map<String, String> ALTERNATIVE_NAMES_FOR_ERROR_REPORTING = new HashMap<String, String>();
   static {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("CHARSET_SYM", "@charset");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("STRING", "string");
@@ -36,7 +36,7 @@ public class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("LPAREN", "(");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("COLON", ":");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("RPAREN", ")");
-    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("VARIABLE", "@<variable name>");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("AT_NAME", "@<variable name>");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DOT3", "...");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INDIRECT_VARIABLE", "@@<variable name>");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("FONT_FACE_SYM", "@font-face");
@@ -67,6 +67,35 @@ public class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("URL", "empty combinator");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NL", "url");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NEW_LINE", "new line");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("CDO", "<!--");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("CDC", "-->");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("APPENDER_FRAGMENT", "&");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("WS_FRAGMENT", " ");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("ESCAPED_SYMBOL", "\\<escaped symbol>");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("MEANINGFULL_WHITESPACE", "whitespace");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("WS", "whitespace");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("HASH_FRAGMENT", "#<name>");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("VALUE_ESCAPE", "~'<escaped value>'");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("HASH_SYMBOL", "#");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INTERPOLATED_VARIABLE", "@{<variable name>}");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EMS", "em");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EXS", "ex");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("LENGTH", "px, cm, mm, in, ...");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("ANGLE", "deg, rad, grad");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("TIME", "ms, s");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("FREQ", "khz, hz");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("REPEATER", "n");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PERCENTAGE", "%");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PERCENT", "%");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNKNOWN_DIMENSION", "%");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("HEXCHAR", "hex character");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NONASCII", "non-ascii character");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNICODE", "unicode character");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("ESCAPE", "escaped character");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("COMMENT", "/* comment */");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("COMMENT_LITTLE", "// comment");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INVALID", "invalid string like value");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PURE_NUMBER", "number");
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";
@@ -99,17 +128,16 @@ public class SuperLessParser extends Parser {
   public SuperLessParser(TokenStream input, RecognizerSharedState state, List<Problem> errors) {
     super(input, state);
     this.errors = errors;
-    this.tokenErrorNames = generateTokenErrorNames();
+    generateTokenErrorNames();
   }
 
-  private String[] generateTokenErrorNames() {
-    String[] result = getTokenNames().clone();
-    for (int i = 0; i < result.length; i++) {
-      if (ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.containsKey(result[i])) {
-        result[i] = "'" + ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.get(result[i]) + "'";
+  private void generateTokenErrorNames() {
+    tokenErrorNames = getTokenNames().clone();
+    for (int i = 0; i < tokenErrorNames.length; i++) {
+      if (ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.containsKey(tokenErrorNames[i])) {
+        tokenErrorNames[i] = "'" + ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.get(tokenErrorNames[i]) + "'";
       }
     }
-    return result;
   }
 
   public SuperLessParser(TokenStream input, RecognizerSharedState state) {

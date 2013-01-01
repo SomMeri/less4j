@@ -1048,27 +1048,27 @@ fragment INVALID :;
 //This would normally contains all allowed escape symbols. As we are doing compiler into css, we do not
 //care about the exact meaning of escaped symbol, nor we do care whether that make sense.
 //we just want to eat a character that follows escape symbol.
-fragment ESCAPED_SIMBOL : '\\' . ;
-STRING : '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+fragment ESCAPED_SYMBOL : '\\' . ;
+STRING : '\'' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                     (
                           '\''
                         | { $type = INVALID; }
                     )
                     
-                | '"' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
+                | '"' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
                     (
                           '"'
                         | { $type = INVALID; }
                     )
                 ;
                 
-VALUE_ESCAPE : '~' '\'' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+VALUE_ESCAPE : '~' '\'' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                     (
                           '\''
                         | { $type = INVALID; }
                     )
                     
-                | '~' '"' ( ESCAPED_SIMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
+                | '~' '"' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'"') )*
                     (
                           '"'
                         | { $type = INVALID; }
