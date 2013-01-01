@@ -89,7 +89,6 @@ public class TermBuilder {
   }
 
   private Expression buildFromParentheses(HiddenTokenAwareTree first) {
-    // FIXME: test comments!
     first.addBeforeFollowing(first.getLastChild().getFollowing());
     return new ParenthesesExpression(first, parentBuilder.handleExpression(first.getChild(1)));
   }

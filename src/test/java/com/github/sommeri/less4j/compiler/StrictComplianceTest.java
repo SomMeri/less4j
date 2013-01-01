@@ -19,8 +19,7 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, testName);
   }
 
-  //TODO: the alternative annotation is going to be useful right after jUnit 11 comes out. It will contain
-  //nicer test name.
+  //TODO: the alternative annotation is going to be useful right after jUnit 11 comes out. It will contain nicer test name.
   //@Parameters(name="Compile Less: {0}, {2}")
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {

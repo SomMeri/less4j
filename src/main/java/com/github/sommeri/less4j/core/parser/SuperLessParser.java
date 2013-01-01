@@ -20,6 +20,7 @@ import com.github.sommeri.less4j.core.parser.AntlrException;
 public class SuperLessParser extends Parser {
 
   public String[] tokenErrorNames;
+  
   //TODO: write about this to error handling post, it would be cool if I could do this declaratively in grammar 
   public static final Map<String, String> ALTERNATIVE_NAMES_FOR_ERROR_REPORTING = new HashMap<String, String>();
   static {
