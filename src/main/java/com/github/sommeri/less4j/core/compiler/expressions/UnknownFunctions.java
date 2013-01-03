@@ -1,20 +1,12 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
-import com.github.sommeri.less4j.core.ast.NumberExpression;
-import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
-import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class UnknownFunctions implements FunctionsPackage {
 
+  @SuppressWarnings("unused")
   private final ProblemsHandler problemsHandler;
 
   public UnknownFunctions(ProblemsHandler problemsHandler) {
