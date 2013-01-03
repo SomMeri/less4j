@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.utils;
 
 import java.text.DecimalFormat;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ExtendedStringBuilder;
@@ -52,7 +53,7 @@ import com.github.sommeri.less4j.core.ast.StyleSheet;
 
 public class CssPrinter {
 
-  protected final ExtendedStringBuilder builder = new ExtendedStringBuilder("");
+  protected ExtendedStringBuilder builder = new ExtendedStringBuilder();
   private static final DecimalFormat FORMATTER = new DecimalFormat("#.##################");
 
   public CssPrinter() {
@@ -356,17 +357,36 @@ public class CssPrinter {
 
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
-    Iterator<? extends ASTCssNode> iterator = body.getChilds().iterator();
-    while (iterator.hasNext()) {
-      ASTCssNode declaration = iterator.next();
-      append(declaration);
-      builder.ensureNewLine();
+    LinkedHashSet<String> declarationsBuilders = collectUniqueBodyMembersStrings(body);
+    for (String miniBuilder : declarationsBuilders) {
+      builder.appendAsIs(miniBuilder);
     }
+    
     appendComments(body.getOrphanComments(), false);
     builder.decreaseIndentationLevel();
     builder.append("}");
 
     return true;
+  }
+
+  private LinkedHashSet<String> collectUniqueBodyMembersStrings(Body<? extends ASTCssNode> body) {
+    //the same declaration must be printed only once
+    ExtendedStringBuilder storedBuilder = builder;
+    LinkedHashSet<String> declarationsStrings = new LinkedHashSet<String>();
+    for (ASTCssNode declaration : body.getChilds()) {
+      builder = new ExtendedStringBuilder(builder);
+      append(declaration);
+      builder.ensureNewLine();
+      String declarationSnipped = builder.toString();
+      if (declarationsStrings.contains(declarationSnipped)) {
+        declarationsStrings.remove(declarationSnipped);
+      }
+      declarationsStrings.add(declarationSnipped);
+    }
+    
+    storedBuilder.configureFrom(builder);
+    builder = storedBuilder;
+    return declarationsStrings;
   }
 
   public boolean appendDeclaration(Declaration declaration) {

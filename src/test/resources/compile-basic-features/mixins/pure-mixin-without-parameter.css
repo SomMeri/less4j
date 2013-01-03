@@ -1,12 +1,6 @@
 #allAreUsedHere {
   declaration: mixinNoParam;
   last: last;
-  declaration: mixinNoParam;
-  last: last;
-  this-will-survive-too: funny;
-  declaration: nestedMixin;
-  declaration: nestedMixinScoped;
-  declaration: redefined;
   this-will-survive-too: funny;
   declaration: nestedMixin;
   declaration: nestedMixinScoped;

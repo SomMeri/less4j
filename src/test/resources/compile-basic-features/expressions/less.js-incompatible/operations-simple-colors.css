@@ -1,80 +1,80 @@
 #hexColorVsFloat {
-  color: #122334;
-  color: #122334;
-  color: #1e1e1e;
-  color: #4488cc;
-  color: #09111a;
-  color: #224466;
+  color1: #122334;
+  color2: #122334;
+  color3: #1e1e1e;
+  color4: #4488cc;
+  color5: #09111a;
+  color6: #224466;
 }
 #hexColorVsNumber {
-  color: #152637;
-  color: #152637;
-  color: #1e1e1e;
-  color: #4488cc;
-  color: #4488cc;
-  color: #04090d;
+  color1: #152637;
+  color2: #152637;
+  color3: #1e1e1e;
+  color4: #4488cc;
+  color5: #4488cc;
+  color6: #04090d;
 }
 #hexColorVsNumberTooBig {
-  color: #ffffff;
-  color: #ffffff;
-  color: #000000;
-  color: #ffffff;
-  color: #ffffff;
-  color: #000101;
+  color1: #ffffff;
+  color2: #ffffff;
+  color3: #000000;
+  color4: #ffffff;
+  color5: #ffffff;
+  color6: #000101;
 }
 #hexColorVsNegativeNumber {
-  color: #0d1e2f;
-  color: #0d1e2f;
-  color: #262626;
-  color: #000000;
-  color: #4488cc;
-  color: #000000;
+  color1: #0d1e2f;
+  color2: #0d1e2f;
+  color3: #262626;
+  color4: #000000;
+  color5: #4488cc;
+  color6: #000000;
 }
 #hexColorVsNegativeNumberTooBig {
-  color: #fbfaf9;
-  color: #fbfaf9;
-  color: #050607;
-  color: #000000;
-  color: #000000;
-  color: #000000;
+  color1: #fbfaf9;
+  color2: #fbfaf9;
+  color3: #050607;
+  color4: #000000;
+  color5: #000000;
+  color6: #000000;
 }
 #hexColorVsHexColor {
-  color: #233547;
-  color: #233547;
-  color: #122232;
-  color: #114499;
-  color: #114499;
-  color: #111111;
+  color1: #233547;
+  color2: #233547;
+  color3: #122232;
+  color4: #114499;
+  color5: #114499;
+  color6: #111111;
 }
 #hexColorVsHexColorTooBig {
-  color: #ffffff;
-  color: #ffffff;
-  color: #000000;
-  color: #ffffff;
-  color: #ffffff;
-  color: #000000;
+  color1: #ffffff;
+  color2: #ffffff;
+  color3: #000000;
+  color4: #ffffff;
+  color5: #ffffff;
+  color6: #000000;
 }
 #namedColorVsNumber {
-  color: #c1e6ff;
-  color: #c1e6ff;
-  color: #4e361d;
-  color: #69d2ff;
-  color: #69d2ff;
-  color: #020202;
+  color1: #c1e6ff;
+  color2: #c1e6ff;
+  color3: #4e361d;
+  color4: #69d2ff;
+  color5: #69d2ff;
+  color6: #020202;
 }
 #namedColorVsNamedColor {
-  color: #ff8000;
-  color: #1e8fe1;
-  color: #ffffff;
-  color: #010209;
+  color1: #ff8000;
+  color2: #1e8fe1;
+  color3: #ffffff;
+  color4: #010209;
 }
 #hashDecoding {
-  color: #334455;
-  color: #132435;
-  color: #334455;
+  color1: #334455;
+  color2: #132435;
+  color3: #334455;
 }
 #divisionByZero {
-  color: #ffffff;
-  color: #ffffff;
-  color: #ffffff;
+  color1: #ffffff;
+  color2: #ffffff;
+  color3: #ffffff;
 }

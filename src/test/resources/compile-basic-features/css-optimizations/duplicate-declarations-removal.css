@@ -1,0 +1,29 @@
+@media only screen and (max-width: 480px) {
+  h1 {
+    color: red;
+  }
+  h1 {
+    color: red;
+  }
+}
+@font-face {
+  font-family: something;
+  font-family: something;
+}
+.colors {
+  color: red;
+  color: #ff0000;
+  color: /* comment */ red;
+  color: /* comment */ #ff0000;
+  color: /* different comment */ red;
+  color: /* different comment */ #ff0000;
+}
+.id-class {
+  color: red;
+}
+.numbers {
+  padding: 2 2 2 2;
+  padding: 2;
+  padding: 5;
+  padding: 3;
+}

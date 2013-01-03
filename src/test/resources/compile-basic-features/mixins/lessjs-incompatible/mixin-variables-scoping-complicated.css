@@ -3,7 +3,6 @@
   last: last 'the Parameter' 'top used';
   this-will-survive-too: funny 'nested 1' 'inside';
   declaration: nestedMixin 'nested 1' 'inside';
-  declaration: nestedMixinScoped 'inside call' 'inside';
   declaration: redefined 'nested 1' 'inside';
   this-will-survive-too: funny 'nested 2' 'inside';
   declaration: nestedMixin 'nested 2' 'inside';

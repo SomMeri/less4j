@@ -19,8 +19,26 @@ public class ExtendedStringBuilder {
     SEPARATORS.add('(');
   }
 
+  public ExtendedStringBuilder() {
+    this("");
+  }
+  
   public ExtendedStringBuilder(String string) {
     builder = new StringBuilder(string);
+  }
+
+  public ExtendedStringBuilder(ExtendedStringBuilder otherBuilder) {
+    configureFrom(otherBuilder);
+  }
+
+  public void configureFrom(ExtendedStringBuilder otherBuilder) {
+    indentationLevel = otherBuilder.indentationLevel;
+    onNewLine = otherBuilder.onNewLine;
+  }
+
+  public ExtendedStringBuilder appendAsIs(String string) {
+    builder.append(string);
+    return this;
   }
 
   public ExtendedStringBuilder append(boolean arg0) {

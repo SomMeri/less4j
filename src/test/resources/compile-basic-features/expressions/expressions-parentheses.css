@@ -1,20 +1,20 @@
 something {
-  something: 12 -23;
-  something: 12 -23;
-  something: 12 -23;
-  something: 12 -13;
-  something: -11;
-  something: -11;
-  something: 12 -23;
-  something: 12 23 -23;
-  something: 12, 23 -23;
+  something1: 12 -23;
+  something2: 12 -23;
+  something3: 12 -23;
+  something4: 12 -13;
+  something5: -11;
+  something6: -11;
+  something7: 12 -23;
+  something8: 12 23 -23;
+  something9: 12, 23 -23;
   /* operator + */
-  something: -11;
-  something: -11;
-  something: -11;
+  something10: -11;
+  something11: -11;
+  something12: -11;
   /* operator - */
-  something: 35;
-  something: 35;
-  something: 35;
-  something: 12 23;
+  something13: 35;
+  something14: 35;
+  something15: 35;
+  something16: 12 23;
 }

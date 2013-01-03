@@ -1,52 +1,74 @@
-#all-unnamed {
+#all-unnamed1 {
   arguments: defA, defB;
   collector: ;
   all: defA defB;
+}
+#all-unnamed2 {
   arguments: 11, defB;
   collector: ;
   all: 11 defB;
+}
+#all-unnamed3 {
   arguments: 21, 22;
   collector: ;
   all: 21 22;
+}
+#all-unnamed4 {
   arguments: 31, 32;
   collector: 33;
   all: 31 32 33;
+}
+#all-unnamed5 {
   arguments: 41, 42;
   collector: 43 44;
   all: 41 42 43 44;
 }
-#all-named {
+#all-named1 {
   arguments: 11, defB;
   collector: ;
   all: 11 defB;
+}
+#all-named2 {
   arguments: 22, 21;
   collector: ;
   all: 22 21;
 }
-#override-collector {
+#override-collector1 {
   arguments: defA, defB;
   collector: 11;
   all: defA defB 11;
+}
+#override-collector2 {
   arguments: 1, defB;
   collector: 21;
   all: 1 defB 21;
+}
+#override-collector3 {
   arguments: 1, defB;
   collector: 31;
   all: 1 defB 31;
+}
+#override-collector4 {
   arguments: 43, 42;
   collector: 41;
   all: 43 42 41;
+}
+#override-collector5 {
   arguments: 1, 2;
   collector: 51;
   all: 1 2 51;
+}
+#override-collector6 {
   arguments: 1, 2;
   collector: 61;
   all: 1 2 61;
 }
-#combined {
+#combined1 {
   arguments: a, b;
   collector: 11 12 13;
   all: a b 11 12 13;
+}
+#combined2 {
   arguments: a, b;
   collector: 21 22 23;
   all: a b 21 22 23;

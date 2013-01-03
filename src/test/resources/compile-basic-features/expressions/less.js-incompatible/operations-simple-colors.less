@@ -1,92 +1,92 @@
 #hexColorVsFloat {
-  color: #112233 + 0.5;
-  color: 0.5 + #112233;
-  color: #222222 - 4;
-  color: #112233 * 4;
-  color: 0.5 * #112233;
-  color: #112233 / 0.5;
+  color1: #112233 + 0.5;
+  color2: 0.5 + #112233;
+  color3: #222222 - 4;
+  color4: #112233 * 4;
+  color5: 0.5 * #112233;
+  color6: #112233 / 0.5;
 }
 
 #hexColorVsNumber {
-  color: #112233 + 4;
-  color: 4 + #112233;
-  color: #222222 - 4;
+  color1: #112233 + 4;
+  color2: 4 + #112233;
+  color3: #222222 - 4;
   //color: 4 - #11223344; Can't substract or divide a color from a number
-  color: #112233 * 4;
-  color: 4 * #112233;
-  color: #112233 / 4;
+  color4: #112233 * 4;
+  color5: 4 * #112233;
+  color6: #112233 / 4;
   //color: 4 / #11223344; Can't substract or divide a color from a number
 }
 
 #hexColorVsNumberTooBig {
-  color: #fffefd + 4;
-  color: 4 + #fffefd;
-  color: #010203 - 4;
-  color: #99fafb * 4;
-  color: 4 * #99fafb;
-  color: #010203 / 4;
+  color1: #fffefd + 4;
+  color2: 4 + #fffefd;
+  color3: #010203 - 4;
+  color4: #99fafb * 4;
+  color5: 4 * #99fafb;
+  color6: #010203 / 4;
 }
 
 #hexColorVsNegativeNumber {
-  color: #112233 + -4;
-  color: -4 + #112233;
-  color: #222222 - -4;
-  color: #112233 * -4;
-  color: 4 * #112233;
-  color: #112233 / -4;
+  color1: #112233 + -4;
+  color2: -4 + #112233;
+  color3: #222222 - -4;
+  color4: #112233 * -4;
+  color5: 4 * #112233;
+  color6: #112233 / -4;
 }
 
 #hexColorVsNegativeNumberTooBig {
-  color: #fffefd + -4;
-  color: -4 + #fffefd;
-  color: #010203 - -4;
-  color: #99fafb * -4;
-  color: -4 * #99fafb;
-  color: #010203 / -4;
+  color1: #fffefd + -4;
+  color2: -4 + #fffefd;
+  color3: #010203 - -4;
+  color4: #99fafb * -4;
+  color5: -4 * #99fafb;
+  color6: #010203 / -4;
 }
 #hexColorVsHexColor {
-  color: #112233 + #121314;
-  color: #121314 + #112233;
-  color: #223344 - #101112;
-  color: #112233 * #010203;
-  color: #010203 * #112233;
-  color: #112233 / #010203;
+  color1: #112233 + #121314;
+  color2: #121314 + #112233;
+  color3: #223344 - #101112;
+  color4: #112233 * #010203;
+  color5: #010203 * #112233;
+  color6: #112233 / #010203;
 }
 
 #hexColorVsHexColorTooBig {
-  color: #112233 + #fffefd;
-  color: #fffefd + #112233;
-  color: #223344 - #fffefd;
-  color: #112233 * #fffefd;
-  color: #fffefd * #112233;
-  color: #112233 / #fffefd;
+  color1: #112233 + #fffefd;
+  color2: #fffefd + #112233;
+  color3: #223344 - #fffefd;
+  color4: #112233 * #fffefd;
+  color5: #fffefd * #112233;
+  color6: #112233 / #fffefd;
 }
 
 //these two are incompatible with less-1.3.0, it has a bug
 #namedColorVsNumber {
-  color: #112233 + lightsteelblue;
-  color: lightsteelblue + #112233;
-  color: #fefafb - lightsteelblue;
-  color: #010203 * dimgray;
-  color: dimgray * #010203;
-  color: #fefafb / dimgray;
+  color1: #112233 + lightsteelblue;
+  color2: lightsteelblue + #112233;
+  color3: #fefafb - lightsteelblue;
+  color4: #010203 * dimgray;
+  color5: dimgray * #010203;
+  color6: #fefafb / dimgray;
 }
 
 #namedColorVsNamedColor {
-  color: red + green;
-  color: aliceblue - chocolate;
-  color: aliceblue * powderblue;
-  color: aliceblue / chocolate;
+  color1: red + green;
+  color2: aliceblue - chocolate;
+  color3: aliceblue * powderblue;
+  color4: aliceblue / chocolate;
 }
 
 #hashDecoding {
-  color: #112233 + #222; 
-  color: #112233 + #020202; 
-  color: #112233 + #222222; 
+  color1: #112233 + #222; 
+  color2: #112233 + #020202; 
+  color3: #112233 + #222222; 
 }
 
 #divisionByZero {
-  color: #112233 / black; 
-  color: #112233 / #000000; 
-  color: #112233 / 0; 
+  color1: #112233 / black; 
+  color2: #112233 / #000000; 
+  color3: #112233 / 0; 
 }

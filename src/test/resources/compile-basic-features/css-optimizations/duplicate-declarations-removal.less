@@ -1,0 +1,50 @@
+@media only screen and (max-width: 480px){
+  h1 {
+    color: red;
+    color: red;
+  }
+  h1 {
+    color: red;
+    color: red;
+  }
+}
+
+@font-face {
+  font-family: something;
+  font-family: something;
+}
+
+//next ruleset compiles differently then with less.js 
+//it is caused by differences in less.js/less4j colors handling  
+.colors {
+    color: red;
+    color: #ff0000;
+    color: red;
+    color: #ff0000;
+    color: /* comment */ red;
+    color: /* comment */ #ff0000;
+    color: /* comment */ red; //less.js would convert red here into #ff0000 and cut out the line, we keep it
+    color: /* comment */ #ff0000;
+    color: /* different comment */ red;
+    color: /* different comment */ #ff0000;
+    color: /* different comment */ red; //less.js would convert red here into #ff0000 and cut out the line, we keep it
+    color: /* different comment */ #ff0000;
+}
+
+#id-mixin () {
+    color: red;
+}
+
+.id-class {
+    #id-mixin();
+    #id-mixin;
+}
+
+.numbers {
+  padding: 2 2 2 2;
+  padding: 2;
+  padding: 3;
+  padding: 2+3;
+  padding: 5;
+  padding: ~"3"
+}

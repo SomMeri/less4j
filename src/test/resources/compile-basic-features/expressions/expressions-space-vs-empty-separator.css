@@ -1,22 +1,22 @@
 something {
-  margin: -4;
-  margin: -2 -2 -2 -2;
-  margin: 11;
-  margin: 11;
-  margin: -11;
+  margin1: -4;
+  margin2: -2 -2 -2 -2;
+  margin3: 11;
+  margin4: 11;
+  margin5: -11;
   /* Try with different properties: */
-  margin: -5 -2 -4;
-  something: -5 -2 -4;
-  padding: -5 -2 -4;
+  margin6: -5 -2 -4;
+  something7: -5 -2 -4;
+  padding8: -5 -2 -4;
   /* Two operators: */
-  margin: 0;
-  margin: 0;
+  margin9: 0;
+  margin10: 0;
   /* Unary operators: */
-  margin: -3;
+  margin11: -3;
 }
 multiply {
-  margin: 6;
-  margin: 6;
-  margin: 6;
-  margin: 6;
+  margin1: 6;
+  margin2: 6;
+  margin3: 6;
+  margin4: 6;
 }

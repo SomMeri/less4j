@@ -4,30 +4,52 @@
   all: @arguments;
 }
 
-#all-unnamed {
+#all-unnamed1 {
   .mixin();
+}
+#all-unnamed2 {
   .mixin(11);
+}
+#all-unnamed3 {
   .mixin(21, 22);
+}
+#all-unnamed4 {
   .mixin(31, 32, 33);
+}
+#all-unnamed5 {
   .mixin(41, 42, 43, 44);
 }
 
-#all-named {
+#all-named1 {
   .mixin(@a: 11);
+}
+#all-named2 {
   .mixin(@b: 21, @a: 22);
 }
 
-#override-collector {
+#override-collector1 {
   .mixin(@c: 11);
+}
+#override-collector2 {
   .mixin(@c: 21, 1);
+}
+#override-collector3 {
   .mixin(1, @c: 31);
+}
+#override-collector4 {
   .mixin(@c: 41, @b: 42, @a: 43);
+}
+#override-collector5 {
   .mixin(@c: 51, 1, 2, 3);
+}
+#override-collector6 {
   .mixin(1, 2, 3, @c: 61);
 }
 
-#combined {
+#combined1 {
   .mixin(11, 12, 13, @a: a, @b: b);
+}
+#combined2 {
   .mixin(@a: a, @b: b, 21, 22, 23);
 }
 
