@@ -3,3 +3,6 @@
   content1: 12 23 33px 4%;
   content2: 4% identifier "hello";
 }
+#gradientBarUsePlace {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, .25);
+}

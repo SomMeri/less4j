@@ -262,7 +262,7 @@ finally { leaveRule(); }
 
 //This looks like the declaration, but does not allow a comma.
 reusableStructureParameter
-    : AT_NAME ((b=COLON (a+=mathExprHighPrior)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION AT_NAME $b* $a*)
+    : AT_NAME ((b=COLON (a+=exprNoComma)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION AT_NAME $b* $a*)
     ;
 
 variablereference

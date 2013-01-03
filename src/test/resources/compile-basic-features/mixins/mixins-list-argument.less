@@ -12,3 +12,11 @@
    .mixinTwo(12 23 33px @variable, @variable identifier "hello");
  }
 
+//issue #77 https://github.com/SomMeri/less4j/issues/77
+.gradientBar(@shadow: 0 -1px 0 rgba(0,0,0,.25)) {
+  text-shadow: @shadow;
+}
+
+#gradientBarUsePlace {
+  .gradientBar();
+}
