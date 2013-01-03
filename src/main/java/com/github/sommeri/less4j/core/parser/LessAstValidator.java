@@ -9,7 +9,6 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
-import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
@@ -35,12 +34,9 @@ public class LessAstValidator {
       break;
     }
     case MIXIN_REFERENCE: {
+      checkInterpolatedNamespaceName((MixinReference)node);
+      checkExtendedNamespaceName((MixinReference)node);
       checkInterpolatedMixinName((MixinReference)node);
-      break;
-    }
-    case NAMESPACE_REFERENCE: {
-      checkInterpolatedNamespaceName((NamespaceReference)node);
-      checkExtendedNamespaceName((NamespaceReference)node);
       break;
     }
     case PSEUDO_CLASS: {
@@ -89,19 +85,19 @@ public class LessAstValidator {
   }
 
   private void checkInterpolatedMixinName(MixinReference reference) {
-    if (reference.hasInterpolatedName()) {
+    if (reference.hasInterpolatedFinalName()) {
       problemsHandler.interpolatedMixinReferenceSelector(reference);
       manipulator.removeFromClosestBody(reference);
     }
   }
 
-  private void checkInterpolatedNamespaceName(NamespaceReference reference) {
-    if (reference.hasInterpolatedName()) {
+  private void checkInterpolatedNamespaceName(MixinReference reference) {
+    if (reference.hasInterpolatedNameChain()) {
       problemsHandler.interpolatedNamespaceReferenceSelector(reference);
       manipulator.removeFromClosestBody(reference);
     }
   }
-  private void checkExtendedNamespaceName(NamespaceReference reference) {
+  private void checkExtendedNamespaceName(MixinReference reference) {
     for (ReusableStructureName name : reference.getNameChain()) {
       if (name.hasMultipleParts()) {
         problemsHandler.extendedNamespaceReferenceSelector(reference);

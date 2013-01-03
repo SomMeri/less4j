@@ -1,0 +1,10 @@
+#namespace {
+  .mixin(@color) {
+    background-color: @color;
+  }
+}
+
+blaf {
+  @variable: #08c;
+  #namespace > .mixin(unimplementedFunction(@variable));
+}

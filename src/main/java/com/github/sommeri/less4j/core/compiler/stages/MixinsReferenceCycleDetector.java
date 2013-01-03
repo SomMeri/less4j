@@ -17,7 +17,7 @@ public class MixinsReferenceCycleDetector {
   }
 
   public boolean wouldCycle(MixinReference input) {
-    return names.contains(input.getName());
+    return names.contains(input.getFinalName());
   }
   
   public void leftVariableValue() {
@@ -26,7 +26,7 @@ public class MixinsReferenceCycleDetector {
   }
 
   public void enteringMixinReference(MixinReference input) {
-    names.add(input.getNameAsString());
+    names.add(input.getFinalNameAsString());
     variables.add(input);
   }
 
@@ -34,7 +34,7 @@ public class MixinsReferenceCycleDetector {
     if (!wouldCycle(input))
       return Collections.emptyList();
     
-    int position = names.indexOf(input.getName());
+    int position = names.indexOf(input.getFinalName());
     List<MixinReference> result = new ArrayList<MixinReference>(variables.subList(position, variables.size()));
     result.add(input);
     return result;

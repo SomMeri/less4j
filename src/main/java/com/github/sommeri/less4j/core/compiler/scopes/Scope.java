@@ -9,7 +9,6 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
-import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
@@ -100,10 +99,6 @@ public class Scope {
     mixins.registerMixin(new FullMixinDefinition(mixin, mixinsBodyScope));
   }
 
-  public List<FullMixinDefinition> getNearestMixins(MixinReference reference) {
-    return getNearestMixins(reference.getName());
-  }
-
   public List<FullMixinDefinition> getNearestMixins(ReusableStructureName name) {
     List<FullMixinDefinition> value = mixins.getMixins(name);
     if ((value==null || value.isEmpty()) && hasParent()) 
@@ -112,20 +107,23 @@ public class Scope {
     return value==null? new ArrayList<FullMixinDefinition>() : value;
   }
 
-  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference, ProblemsHandler problemsHandler) {
+  public List<FullMixinDefinition> getNearestMixins(MixinReference reference, ProblemsHandler problemsHandler) {
     List<Scope> namespaces = getNearestNamespaces(reference);
     if (namespaces.isEmpty())
       problemsHandler.undefinedNamespace(reference);
     
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (Scope scope : namespaces) {
-      result.addAll(scope.getNearestMixins(reference.getFinalReference()));
+      result.addAll(scope.getNearestMixins(reference.getFinalName()));
     }
     return result;
   }
 
-  private List<Scope> getNearestNamespaces(NamespaceReference reference) {
+  private List<Scope> getNearestNamespaces(MixinReference reference) {
     List<String> nameChain = reference.getNameChainAsStrings();
+    if (nameChain.isEmpty())
+      return Arrays.asList(this);
+    
     Scope space = this;
     List<Scope> result = findMatchingChilds(nameChain);
     while (result.isEmpty() && space.hasParent()) {

@@ -9,7 +9,6 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
-import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
@@ -32,14 +31,14 @@ public class ProblemsHandler {
   }
 
   public void interpolatedMixinReferenceSelector(MixinReference reference) {
-    collector.addError(new CompilationError(reference, "Interpolation is not allowed inside mixin references."));
+    collector.addError(new CompilationError(reference.getFinalName(), "Interpolation is not allowed inside mixin references."));
   }
 
-  public void extendedNamespaceReferenceSelector(NamespaceReference reference) {
+  public void extendedNamespaceReferenceSelector(MixinReference reference) {
     collector.addError(new CompilationError(reference, "Structures with extended names can not be used as namespaces."));
   }
 
-  public void interpolatedNamespaceReferenceSelector(NamespaceReference reference) {
+  public void interpolatedNamespaceReferenceSelector(MixinReference reference) {
     collector.addError(new CompilationError(reference, "Interpolation is not allowed inside namespace references."));
   }
 
@@ -84,7 +83,7 @@ public class ProblemsHandler {
   }
 
   private CompilationError createUndefinedMixinParameterValue(ReusableStructure mixin, ArgumentDeclaration declaration, MixinReference reference) {
-    return new CompilationError(reference, "Undefined parameter " + declaration.getVariable().getName() + " of mixin " + reference.getNameAsString() + " defined on line " + mixin.getSourceLine());
+    return new CompilationError(reference, "Undefined parameter " + declaration.getVariable().getName() + " of mixin " + reference.getFinalNameAsString() + " defined on line " + mixin.getSourceLine());
   }
 
   public void undefinedVariable(Variable variable) {
@@ -109,11 +108,11 @@ public class ProblemsHandler {
   }
 
   private CompilationError createUndefinedMixin(MixinReference reference) {
-    return createUndefinedMixin(reference.getName(), reference);
+    return createUndefinedMixin(reference.getFinalName(), reference);
   }
 
   private CompilationError createUndefinedMixin(ReusableStructureName name, MixinReference reference) {
-    return new CompilationError(reference, "The mixin \"" + name.asString() + "\" was not declared.");
+    return new CompilationError(reference.getFinalName(), "The mixin \"" + name.asString() + "\" was not declared.");
   }
 
   public void unmatchedMixin(MixinReference reference) {
@@ -121,22 +120,22 @@ public class ProblemsHandler {
   }
 
   private CompilationError createUnmatchedMixin(MixinReference reference) {
-    return createUnmatchedMixin(reference.getName(), reference);
+    return createUnmatchedMixin(reference.getFinalName(), reference);
   }
 
   private CompilationError createUnmatchedMixin(ReusableStructureName name, MixinReference reference) {
-    return new CompilationError(reference, "The mixin \"" + name.asString() + "\" was not matched.");
+    return new CompilationError(reference.getFinalName(), "The mixin \"" + name.asString() + "\" was not matched.");
   }
 
-  public void undefinedNamespace(NamespaceReference reference) {
+  public void undefinedNamespace(MixinReference reference) {
     collector.addError(createUndefinedNamespace(reference));
   }
 
-  private CompilationError createUndefinedNamespace(NamespaceReference reference) {
+  private CompilationError createUndefinedNamespace(MixinReference reference) {
     return createUndefinedNamespace(printer.toString(reference), reference);
   }
 
-  private CompilationError createUndefinedNamespace(String name, NamespaceReference reference) {
+  private CompilationError createUndefinedNamespace(String name, MixinReference reference) {
     return new CompilationError(reference, "The namespace \"" + name + "\" was not declared.");
   }
 

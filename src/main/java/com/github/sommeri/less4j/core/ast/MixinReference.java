@@ -11,7 +11,8 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class MixinReference extends ASTCssNode {
 
-  private ReusableStructureName name;
+  private List<ReusableStructureName> nameChain = new ArrayList<ReusableStructureName>();
+  private ReusableStructureName finalName;
   private List<Expression> positionalParameters = new ArrayList<Expression>();
   private Map<String, Expression> namedParameters = new HashMap<String, Expression>();
   private boolean important = false;
@@ -20,16 +21,40 @@ public class MixinReference extends ASTCssNode {
     super(token);
   }
 
-  public ReusableStructureName getName() {
-    return name;
+  public ReusableStructureName getFinalName() {
+    return finalName;
   }
 
-  public String getNameAsString() {
-    return getName().asString();
+  public String getFinalNameAsString() {
+    return getFinalName().asString();
   }
 
-  public void setName(ReusableStructureName name) {
-    this.name = name;
+  public void setFinalName(ReusableStructureName name) {
+    this.finalName = name;
+  }
+
+  public List<ReusableStructureName> getNameChain() {
+    return nameChain;
+  }
+
+  public boolean hasInterpolatedNameChain() {
+    for (ReusableStructureName name : nameChain) {
+      if (name.isInterpolated())
+        return true;
+    }
+    return false;
+  }
+
+  public List<String> getNameChainAsStrings() {
+    List<String> result = new ArrayList<String>();
+    for (ReusableStructureName name : nameChain) {
+      result.add(name.asString());
+    }
+    return result;
+  }
+
+  public void setNameChain(List<ReusableStructureName> nameChain) {
+    this.nameChain = nameChain;
   }
 
   public List<Expression> getPositionalParameters() {
@@ -46,6 +71,14 @@ public class MixinReference extends ASTCssNode {
 
   public Expression getNamedParameter(Variable variable) {
     return namedParameters.get(variable.getName());
+  }
+
+  public void addName(ReusableStructureName text) {
+    nameChain.add(text);
+  }
+
+  public void addNames(List<ReusableStructureName> nameChain) {
+    this.nameChain.addAll(nameChain);
   }
 
   public boolean hasPositionalParameter(int parameterNumber) {
@@ -72,13 +105,14 @@ public class MixinReference extends ASTCssNode {
     this.important = important;
   }
 
-  public boolean hasInterpolatedName() {
-    return name.isInterpolated();
+  public boolean hasInterpolatedFinalName() {
+    return finalName.isInterpolated();
   }
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)name);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)finalName);
+    result.addAll(nameChain);
     result.addAll(positionalParameters);
     result.addAll(namedParameters.values());
     return result;
@@ -91,13 +125,19 @@ public class MixinReference extends ASTCssNode {
 
   @Override
   public String toString() {
-    return "MixinReference[" +getName()+ "]";
+    StringBuilder builder = new StringBuilder("MixinReference[");
+    for (ReusableStructureName str : nameChain) {
+      builder.append(str.asString()).append(" > ");
+    }
+    builder.append(getFinalName()).append("]");
+    return builder.toString();
   }
   
   @Override
   public MixinReference clone() {
     MixinReference result = (MixinReference) super.clone();
-    result.name = name==null?null:name.clone();
+    result.nameChain = nameChain == null ? null : new ArrayList<ReusableStructureName>(nameChain);
+    result.finalName = finalName==null?null:finalName.clone();
     result.positionalParameters = ArraysUtils.deeplyClonedList(positionalParameters);
     result.configureParentToAllChilds();
     return result;

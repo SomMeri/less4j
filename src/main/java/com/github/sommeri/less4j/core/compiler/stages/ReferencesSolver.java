@@ -15,7 +15,6 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.MixinReference;
-import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Variable;
@@ -80,13 +79,6 @@ public class ReferencesSolver {
       manipulator.replaceInBody(mixinReference, replacement.getChilds());
       break;
     }
-    case NAMESPACE_REFERENCE: {
-      NamespaceReference namespaceReference = (NamespaceReference) node;
-      RuleSetsBody replacement = resolveNamespaceReference(namespaceReference, scope.getScope());
-      AstLogic.validateCssBodyCompatibility(namespaceReference, replacement.getChilds(), problemsHandler);
-      manipulator.replaceInBody(namespaceReference, replacement.getChilds());
-      break;
-    }
     case ESCAPED_SELECTOR: {
       EscapedSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator); 
       manipulator.replace(node, replacement);
@@ -107,7 +99,7 @@ public class ReferencesSolver {
     }
     }
 
-    if (node.getType() != ASTCssNodeType.NAMESPACE_REFERENCE && node.getType() != ASTCssNodeType.VARIABLE_NAME_PART) {
+    if (node.getType() != ASTCssNodeType.VARIABLE_NAME_PART) {
       List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       for (ASTCssNode kid : childs) {
         if (AstLogic.hasOwnScope(kid)) {
@@ -138,7 +130,7 @@ public class ReferencesSolver {
   }
 
   private RuleSetsBody resolveMixinReference(MixinReference reference, Scope scope) {
-    List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference);
+    List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference, problemsHandler);
     return resolveReferencedMixins(reference, scope, sameNameMixins);
   }
 
@@ -213,11 +205,6 @@ public class ReferencesSolver {
     return builder.build();
   }
 
-  private RuleSetsBody resolveNamespaceReference(NamespaceReference reference, Scope scope) {
-    List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference, problemsHandler);
-    return resolveReferencedMixins(reference.getFinalReference(), scope, sameNameMixins);
-  }
-  
 }
 
 class ArgumentsBuilder {

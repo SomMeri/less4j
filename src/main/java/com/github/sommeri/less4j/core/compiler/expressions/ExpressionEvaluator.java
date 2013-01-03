@@ -22,9 +22,7 @@ import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
-import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
-import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
@@ -391,17 +389,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public List<FullMixinDefinition> getNearestMixins(MixinReference reference) {
-    return Collections.emptyList();
-  }
-
-  @Override
   public List<FullMixinDefinition> getNearestMixins(ReusableStructureName name) {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<FullMixinDefinition> getNearestMixins(NamespaceReference reference, ProblemsHandler problemsHandler) {
     return Collections.emptyList();
   }
 

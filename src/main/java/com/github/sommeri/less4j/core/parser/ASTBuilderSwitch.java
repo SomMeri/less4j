@@ -39,7 +39,6 @@ import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
-import com.github.sommeri.less4j.core.ast.NamespaceReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
@@ -289,7 +288,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.REUSABLE_STRUCTURE_NAME) {
-        result.setName(handleReusableStructureName(kid));
+        result.setFinalName(handleReusableStructureName(kid));
       } else if (kid.getType() == LessLexer.IMPORTANT_SYM) {
         result.setImportant(true);
       } else { // anything else is a parameter
@@ -304,21 +303,25 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return result;
   }
 
-  public NamespaceReference handleNamespaceReference(HiddenTokenAwareTree token) {
-    NamespaceReference result = new NamespaceReference(token);
+  public MixinReference handleNamespaceReference(HiddenTokenAwareTree token) {
+    MixinReference reference = null;
+    List<ReusableStructureName> nameChain = new ArrayList<ReusableStructureName>();
+    
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
       ASTCssNode buildKid = switchOn(kid);
       if (buildKid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
-        MixinReference reference = (MixinReference) switchOn(kid);
-        result.setFinalReference(reference);
+        reference = (MixinReference) switchOn(kid);
       } else if (buildKid.getType() == ASTCssNodeType.REUSABLE_STRUCTURE_NAME) {
-        result.addName(handleReusableStructureName(kid));
+        nameChain.add(handleReusableStructureName(kid));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);
       }
     }
-    return result;
+    
+    reference.setUnderlyingStructure(token);
+    reference.addNames(nameChain);
+    return reference;
   }
 
   public Expression handleMixinPattern(HiddenTokenAwareTree token) {
