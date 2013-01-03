@@ -1,3 +1,6 @@
-blaf {
+blaf1 {
   background-color: unimplementedFunction(#08c);
+}
+blaf2 {
+  background-color: unimplementedFunction(#fff, 10%);
 }

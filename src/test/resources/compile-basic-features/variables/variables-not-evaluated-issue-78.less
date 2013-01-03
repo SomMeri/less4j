@@ -1,10 +1,19 @@
+// case 1
 #namespace {
   .mixin(@color) {
     background-color: @color;
   }
 }
 
-blaf {
+blaf1 {
   @variable: #08c;
   #namespace > .mixin(unimplementedFunction(@variable));
 }
+
+// case 2
+@white: #fff;
+@btnBackgroundHighlight: unimplementedFunction(@white, 10%);
+
+blaf2 {
+  background-color: @btnBackgroundHighlight;
+} 

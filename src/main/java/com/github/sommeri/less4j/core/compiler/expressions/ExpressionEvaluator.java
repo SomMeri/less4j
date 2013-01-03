@@ -60,6 +60,7 @@ public class ExpressionEvaluator {
     colorsCalculator = new ColorsCalculator(problemsHandler);
     functions.add(new MathFunctions(problemsHandler));
     functions.add(new StringFunctions(problemsHandler));
+    functions.add(new UnknownFunctions(problemsHandler));
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
@@ -159,7 +160,7 @@ public class ExpressionEvaluator {
       return evaluate((SignedExpression) input);
 
     case NAMED_EXPRESSION:
-      return ((NamedExpression) input).getExpression();
+      return evaluate((NamedExpression) input);
       
     case STRING_EXPRESSION:
       return evaluate((CssString) input);
@@ -244,6 +245,10 @@ public class ExpressionEvaluator {
     }
     
     return input;
+  }
+
+  public Expression evaluate(NamedExpression input) { 
+    return new NamedExpression(input.getUnderlyingStructure(), input.getName(), evaluate(input.getExpression()));
   }
 
   public Expression evaluate(SignedExpression input) {
