@@ -1,6 +1,6 @@
-    // variables cycle
-    @first: @second;
-    @second: @first + 1;
-    .ruleset {
-      padding: @second;
-    }
+before1, before2 {
+  declaration: value;
+  &:nested1, & :nested2 {
+    declaration: value;
+  }
+}
