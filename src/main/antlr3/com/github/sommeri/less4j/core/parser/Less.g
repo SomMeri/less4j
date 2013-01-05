@@ -72,6 +72,7 @@ tokens {
   DUMMY_MEANINGFULL_WHITESPACE; //ANTLR, please
   KEYFRAMES_DECLARATION;
   KEYFRAMES;
+  VIEWPORT;
   REUSABLE_STRUCTURE_NAME;
 }
 
@@ -198,8 +199,7 @@ media
     : MEDIA_SYM (m1+=mediaQuery (n+=COMMA m+=mediaQuery)*)
         q1=LBRACE
             ((declaration) => b+=declaration SEMI
-            | b+=variabledeclaration
-            | b+=ruleSet )*
+            | b+=bodyset )*
         q2=RBRACE
     -> ^(MEDIA_SYM ^(MEDIUM_DECLARATION $m1 ($n $m)*) $q1 $b* $q2)
     ;
@@ -207,9 +207,17 @@ finally { leaveRule(); }
 
 keyframes
 @init {enterRule(retval, RULE_KEYFRAME);}
-    : {predicates.isKeyframes(input.LT(1))}?=> (AT_NAME (name+=IDENT (name+=COMMA name+=IDENT )*)?)
+    : {predicates.isKeyframes(input.LT(1))}? (AT_NAME (name+=IDENT (name+=COMMA name+=IDENT )*)?)
       body+=ruleset_body
     -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $name*) $body )
+    ;
+finally { leaveRule(); }
+
+viewport
+@init {enterRule(retval, RULE_KEYFRAME);}
+    : {predicates.isViewport(input.LT(1))}? AT_NAME
+      body+=ruleset_body
+    -> ^(VIEWPORT AT_NAME $body )
     ;
 finally { leaveRule(); }
 
@@ -239,12 +247,13 @@ bodyset
     : (mixinReferenceWithSemi)=>mixinReferenceWithSemi
     | (namespaceReferenceWithSemi)=>namespaceReferenceWithSemi
     | (reusableStructureName LPAREN)=>reusableStructure
+    | (variabledeclaration)=>variabledeclaration
     | ruleSet
     | media
+    | viewport
     | keyframes
     | page
     | fontface
-    | variabledeclaration
     ;
 
 variabledeclaration

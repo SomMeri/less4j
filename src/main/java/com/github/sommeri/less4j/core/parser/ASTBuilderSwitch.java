@@ -59,6 +59,8 @@ import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
+import com.github.sommeri.less4j.core.ast.Viewport;
+import com.github.sommeri.less4j.core.ast.ViewportBody;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -411,9 +413,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (token.getChildren() == null)
       return new ArrayList<ASTCssNode>();
 
+    //FIXME: report comments bug to less.js? it is not too important
     List<ASTCssNode> members = new ArrayList<ASTCssNode>();
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
-    
+    //FIXME: this is wrong
     HiddenTokenAwareTree lbrace = iterator.next();
     token.addPreceding(lbrace.getPreceding());
     if (iterator.hasNext()) {
@@ -802,12 +805,21 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   @Override
-  public ASTCssNode handleKeyframes(HiddenTokenAwareTree token) {
+  public Keyframes handleKeyframes(HiddenTokenAwareTree token) {
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     Keyframes result = new Keyframes(token, children.next().getText());
     result.addNames(handleKeyframesDeclaration(children.next()));
     result.setBody(handleKeyframesBody(children.next()));
    
+    return result;
+  }
+
+  @Override
+  public Viewport handleViewport(HiddenTokenAwareTree token) {
+    Viewport result = new Viewport(token);
+    //HiddenTokenAwareTree atName = token.getChild(0);
+    HiddenTokenAwareTree body = token.getChild(1);
+    result.setBody(new ViewportBody(body, handleBodyMembers(body)));
     return result;
   }
 

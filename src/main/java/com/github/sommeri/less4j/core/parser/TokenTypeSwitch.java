@@ -125,7 +125,10 @@ public abstract class TokenTypeSwitch<T> {
 
     if (type == LessLexer.KEYFRAMES)
       return handleKeyframes(token);
-    
+
+    if (type == LessLexer.VIEWPORT)
+      return handleViewport(token);
+
     if (type == LessLexer.REUSABLE_STRUCTURE_NAME)
       return handleReusableStructureName(token);
 
@@ -135,6 +138,8 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleReusableStructureName(HiddenTokenAwareTree token);
 
   public abstract T handleKeyframes(HiddenTokenAwareTree token);
+
+  public abstract T handleViewport(HiddenTokenAwareTree token);
 
   public abstract T handleEscapedSelector(HiddenTokenAwareTree token);
 

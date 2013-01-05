@@ -13,6 +13,8 @@ import com.github.sommeri.less4j.core.parser.LessParser;
 
 public class ParsersSemanticPredicates {
 
+  private static final String KEYFRAMES = "keyframes";
+  private static final String VIEWPORT = "viewport";
   private static Set<String> NTH_PSEUDOCLASSES = new HashSet<String>();
   static {
     NTH_PSEUDOCLASSES.add("nth-child");
@@ -152,11 +154,19 @@ public class ParsersSemanticPredicates {
   }
 
   public boolean isKeyframes(Token token) {
+    return isConcreteAtName(token, KEYFRAMES);
+  }
+
+  public boolean isViewport(Token token) {
+    return isConcreteAtName(token, VIEWPORT);
+  }
+
+  private boolean isConcreteAtName(Token token, String atName) {
     if (token.getType() != LessParser.AT_NAME || token.getText()==null)
       return false;
     
     String text = token.getText().toLowerCase();
-    return text.startsWith("@") && text.endsWith("keyframes");
+    return text.startsWith("@") && text.endsWith(atName);
   }
 
 }

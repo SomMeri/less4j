@@ -34,6 +34,7 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
+import com.github.sommeri.less4j.core.ast.ViewportBody;
 import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
@@ -50,6 +51,7 @@ import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.Viewport;
 
 public class CssPrinter {
 
@@ -190,6 +192,12 @@ public class CssPrinter {
 
     case KEYFRAMES_BODY:
       return appendBody((KeyframesBody) node);
+      
+    case VIEWPORT:
+      return appendViewport((Viewport) node);
+
+    case VIEWPORT_BODY:
+      return appendBody((ViewportBody) node);
 
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
@@ -223,6 +231,14 @@ public class CssPrinter {
     append(node.getBody());
     return true;
   }
+  
+  private boolean appendViewport(Viewport node) {
+    builder.append("@viewport");
+    append(node.getBody());
+    return true;
+  }
+
+
 
   private boolean appendFaultyExpression(FaultyExpression node) {
     builder.append("!#error#!");
@@ -409,7 +425,7 @@ public class CssPrinter {
     builder.increaseIndentationLevel();
 
     Iterator<ASTCssNode> declarations = node.getDeclarations().iterator();
-    List<ASTCssNode> ruleSets = node.getRuleSets();
+    List<ASTCssNode> ruleSets = node.getNotDeclarations();
     while (declarations.hasNext()) {
       ASTCssNode body = declarations.next();
       append(body);

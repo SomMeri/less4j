@@ -1,0 +1,17 @@
+.mixin(@param) {
+  width: @param;
+}
+
+@viewport {
+  @variable: 397px;
+  .mixin(@variable);
+}
+
+@media screen and (width: 397px) {
+  @variable: 500px;
+  @viewport {
+    .mixin(@variable);
+  }
+}
+
+@variable: 900;

@@ -18,8 +18,8 @@ public class Media extends Body<ASTCssNode> {
     return membersByType(ASTCssNodeType.DECLARATION);
   }
 
-  public List<ASTCssNode> getRuleSets() {
-    return membersByType(ASTCssNodeType.RULE_SET);
+  public List<ASTCssNode> getNotDeclarations() {
+    return membersByNotType(ASTCssNodeType.DECLARATION);
   }
 
   public void addDeclaration(Declaration declaration) {
@@ -31,7 +31,7 @@ public class Media extends Body<ASTCssNode> {
   }
 
   public void addChild(ASTCssNode child) {
-    if (!(child.getType() == ASTCssNodeType.RULE_SET || child.getType() == ASTCssNodeType.VARIABLE_DECLARATION ||child.getType() == ASTCssNodeType.DECLARATION || child.getType() == ASTCssNodeType.MEDIUM || child.getType() == ASTCssNodeType.MEDIA_QUERY))
+    if (!(child.getType() == ASTCssNodeType.RULE_SET || child.getType() == ASTCssNodeType.VARIABLE_DECLARATION ||child.getType() == ASTCssNodeType.DECLARATION || child.getType() == ASTCssNodeType.MEDIUM || child.getType() == ASTCssNodeType.MEDIA_QUERY|| child.getType() == ASTCssNodeType.VIEWPORT))
       throw new IllegalArgumentException("Unexpected media child type: " + child.getType());
 
     if (child.getType() == ASTCssNodeType.MEDIA_QUERY)

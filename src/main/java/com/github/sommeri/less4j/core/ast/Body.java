@@ -13,10 +13,6 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
 
     private List<T> body = new ArrayList<T>();
 
-    public Body() {
-      this(null);
-    }
-
     public Body(HiddenTokenAwareTree underlyingStructure) {
       super(underlyingStructure);
     }
@@ -68,9 +64,20 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
 
     public List<T> membersByType(ASTCssNodeType type) {
       List<T> result = new ArrayList<T>();
-      List<T> body = getChilds();
+      List<T> body = getBody();
       for (T node : body) {
         if (node.getType()==type) {
+          result.add(node);
+        }
+      }
+      return result;
+    }
+
+    public List<T> membersByNotType(ASTCssNodeType type) {
+      List<T> result = new ArrayList<T>();
+      List<T> body = getBody();
+      for (T node : body) {
+        if (node.getType()!=type) {
           result.add(node);
         }
       }

@@ -1,0 +1,17 @@
+@viewport {
+  width: device-width;
+}
+@viewport {
+  width: 980px;
+  min-zoom: 0.25;
+  max-zoom: 5;
+}
+@viewport {
+  zoom: 1.0;
+  width: auto;
+}
+@viewport {
+  width: 480px;
+  zoom: 2.0;
+  user-zoom: zoom;
+}

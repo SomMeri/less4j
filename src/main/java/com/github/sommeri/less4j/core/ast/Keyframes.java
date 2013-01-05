@@ -53,6 +53,7 @@ public class Keyframes extends ASTCssNode {
   public Keyframes clone() {
     Keyframes result = (Keyframes) super.clone();
     result.names = ArraysUtils.deeplyClonedList(names);
+    result.body = body==null? null : body.clone();
     result.configureParentToAllChilds();
     return result;
   }

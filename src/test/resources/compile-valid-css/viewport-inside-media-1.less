@@ -1,0 +1,24 @@
+@viewport {
+  width: 397px;
+}
+
+@media screen and (width: 397px) {
+  font-size: 3em;
+  h1 { color: blue; }
+  @viewport {
+    width: 500px;
+  }
+  div { color: green; }
+  font-size: 5em;
+}
+
+@media screen and (width: 398px) {
+  div { color: green; }
+}
+
+@media screen and (width: 399px) {
+  @viewport {
+    width: 500px;
+  }
+}
+
