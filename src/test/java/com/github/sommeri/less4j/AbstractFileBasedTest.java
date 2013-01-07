@@ -58,7 +58,13 @@ public abstract class AbstractFileBasedTest {
     }
   }
 
-  protected abstract String canonize(String text);
+  protected String canonize(String text) {
+    text = text.replace("\r\n", "\n");
+    //ignore occasional end lines
+    if (text.endsWith("\n"))
+      return text.substring(0, text.length()-1);
+    return text;
+  }
 
   protected LessCompiler getCompiler() {
     return new ThreadUnsafeLessCompiler();

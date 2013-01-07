@@ -8,17 +8,17 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 public class Viewport extends ASTCssNode {
 
   //I have to do this because of a comment in following less: `@viewport /*comment */ { ... }`
-  private ViewportBody body;
+  private GeneralBody body;
 
   public Viewport(HiddenTokenAwareTree token) {
     super(token);
   }
 
-  public ViewportBody getBody() {
+  public GeneralBody getBody() {
     return body;
   }
 
-  public void setBody(ViewportBody body) {
+  public void setBody(GeneralBody body) {
     this.body = body;
   }
 

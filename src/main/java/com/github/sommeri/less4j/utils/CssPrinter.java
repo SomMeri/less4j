@@ -34,13 +34,16 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
-import com.github.sommeri.less4j.core.ast.ViewportBody;
+import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
+import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
+import com.github.sommeri.less4j.core.ast.Page;
+import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
 import com.github.sommeri.less4j.core.ast.RuleSet;
@@ -86,7 +89,7 @@ public class CssPrinter {
       return appendRuleset((RuleSet) node);
 
     case DECLARATIONS_BODY:
-      return appendBody((RuleSetsBody) node);
+      return appendBodyOptimizeDuplicates((RuleSetsBody) node);
 
     case CSS_CLASS:
       return appendCssClass((CssClass) node);
@@ -191,13 +194,22 @@ public class CssPrinter {
       return appendKeyframesName((KeyframesName) node);
 
     case KEYFRAMES_BODY:
-      return appendBody((KeyframesBody) node);
+      return appendBodyOptimizeDuplicates((KeyframesBody) node);
       
     case VIEWPORT:
       return appendViewport((Viewport) node);
 
-    case VIEWPORT_BODY:
-      return appendBody((ViewportBody) node);
+    case GENERAL_BODY:
+      return appendBodyOptimizeDuplicates((GeneralBody) node);
+
+    case PAGE:
+      return appendPage((Page) node);
+
+    case PAGE_MARGIN_BOX:
+      return appendPageMarginBox((PageMarginBox) node);
+
+    case NAME:
+      return appendName((Name) node);
 
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
@@ -211,6 +223,30 @@ public class CssPrinter {
     }
   }
 
+  private boolean appendName(Name node) {
+    builder.append(node.getName());
+    return true;
+  }
+
+  private boolean appendPage(Page node) {
+    builder.append("@page").ensureSeparator();
+    if (node.hasName())
+      append(node.getName());
+
+    if (node.hasPseudopage())
+      append(node.getPseudopage());
+
+    appendBodySortDeclarations(node.getBody());
+    return true;
+  }
+
+  private boolean appendPageMarginBox(PageMarginBox node) {
+    append(node.getName());
+    append(node.getBody());
+    return true;
+  }
+
+  
   private boolean appendKeyframesName(KeyframesName node) {
     builder.append(node.getName());
     return true;
@@ -367,7 +403,7 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendBody(Body<? extends ASTCssNode> body) {
+  public boolean appendBodyOptimizeDuplicates(Body<? extends ASTCssNode> body) {
     if (body.isEmpty())
       return false;
 
@@ -421,6 +457,13 @@ public class CssPrinter {
   public boolean appendMedia(Media node) {
     builder.append("@media");
     appendMediums(node.getMediums());
+    appendBodySortDeclarations(node);
+
+    return true;
+  }
+
+  //TODO: the way this is used ignores comments in front of the body
+  private void appendBodySortDeclarations(Body<ASTCssNode> node) {
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
 
@@ -438,8 +481,6 @@ public class CssPrinter {
     }
     builder.decreaseIndentationLevel();
     builder.append("}");
-
-    return true;
   }
 
   private void appendMediums(List<MediaQuery> mediums) {

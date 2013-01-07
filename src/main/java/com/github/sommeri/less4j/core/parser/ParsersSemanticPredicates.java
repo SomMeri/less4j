@@ -15,6 +15,8 @@ public class ParsersSemanticPredicates {
 
   private static final String KEYFRAMES = "keyframes";
   private static final String VIEWPORT = "viewport";
+  private static final String[] PAGE_MARGIN_BOXES = new String[] {"top-left-corner", "top-left", "top-center", "top-right", "top-right-corner", "bottom-left-corner", "bottom-left", "bottom-center", "bottom-right", "bottom-right-corner", "left-top", "left-middle", "left-bottom", "right-top", "right-middle", "right-bottom"};
+  
   private static Set<String> NTH_PSEUDOCLASSES = new HashSet<String>();
   static {
     NTH_PSEUDOCLASSES.add("nth-child");
@@ -161,11 +163,31 @@ public class ParsersSemanticPredicates {
     return isConcreteAtName(token, VIEWPORT);
   }
 
+  public boolean isPageMarginBox(Token token) {
+    return isAmongAtNames(token, PAGE_MARGIN_BOXES);
+  }
+
+  private boolean isAmongAtNames(Token token, String... atNames) {
+    if (token.getType() != LessParser.AT_NAME || token.getText()==null)
+      return false;
+    
+    String text = token.getText().toLowerCase();
+    for (String atName : atNames) {
+      if (isAtName(text, atName))
+        return true;
+    }
+    return false;
+  }
+  
   private boolean isConcreteAtName(Token token, String atName) {
     if (token.getType() != LessParser.AT_NAME || token.getText()==null)
       return false;
     
     String text = token.getText().toLowerCase();
+    return isAtName(text, atName);
+  }
+
+  private boolean isAtName(String text, String atName) {
     return text.startsWith("@") && text.endsWith(atName);
   }
 

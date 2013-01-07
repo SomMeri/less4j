@@ -74,6 +74,8 @@ tokens {
   KEYFRAMES;
   VIEWPORT;
   REUSABLE_STRUCTURE_NAME;
+  PSEUDO_PAGE;
+  PAGE_MARGIN_BOX;
 }
 
 @lexer::header {
@@ -291,16 +293,28 @@ finally { leaveRule(); }
 
 page
 @init {enterRule(retval, RULE_PAGE);}
-    : PAGE_SYM pseudoPage?
+    : PAGE_SYM a+=IDENT? b+=pseudoPage?
         LBRACE
-            declaration SEMI (declaration SEMI)*
-        RBRACE
+          ((declarationWithSemicolon)=>c+=declarationWithSemicolon
+           | c+=pageMarginBox)*
+        (c+=declaration RBRACE
+        | RBRACE)
+        -> ^(PAGE_SYM $a* $b* ^(BODY LBRACE $c*))
     ;
 finally { leaveRule(); }
-    
+
+pageMarginBox 
+@init {enterRule(retval, RULE_PAGE_MARGIN_BOX);}
+    : {predicates.isPageMarginBox(input.LT(1))}? AT_NAME ruleset_body
+    -> ^(PAGE_MARGIN_BOX AT_NAME ruleset_body)
+    ;
+finally { leaveRule(); }
+   
+
 pseudoPage
 @init {enterRule(retval, RULE_PSEUDO_PAGE);}
     : COLON IDENT
+    -> ^(PSEUDO_PAGE COLON IDENT)
     ;
 finally { leaveRule(); }
     
@@ -1128,7 +1142,7 @@ fragment REPEATER :; // n found in n-th child formulas if I would not do that, t
 fragment PERCENTAGE :; // '%'
 
 // there is no reason to require a dot inside a number
-fragment PURE_NUMBER: '0'..'9' ('.'? '0'..'9'+)?
+fragment PURE_NUMBER: '0'..'9'+ ('.' '0'..'9'+)?
             | '.' '0'..'9'+;
             
 NUMBER

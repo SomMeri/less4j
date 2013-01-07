@@ -1,0 +1,228 @@
+// Examples from specification: http://dev.w3.org/csswg/css3-page/
+// It was named: 
+//
+//               CSS Paged Media Module Level 3
+//               Editor's Draft 28 November 2012 
+
+// The following example creates left and right binding edges using these pseudo-classes: 
+@page :left {
+  margin-left: 3cm;
+  margin-right: 4cm;
+}
+
+@page :right {
+  margin-left: 4cm;
+  margin-right: 3cm;
+}
+
+//Authors can also specify style for the first page of a document with the ‘:first’ pseudo-class. Such style rules are applied only to the first printed page of a document.
+@page { margin: 2cm }
+
+@page :first {
+  margin-top: 10cm
+}
+
+html {page-break-before: always;}
+
+// The following are examples of page selectors  
+@page { margin-left: 3cm; }
+@page :left { margin-left: 3cm; }
+@page :right { margin-left: 3cm; }
+@page LandscapeTable { margin-left: 3cm; }
+@page CompanyLetterHead:first { margin-left: 3cm; } 
+@page:first { margin-left: 3cm; }
+
+//The following are examples of margin boxes where the declaration blocks are ... 
+@page {
+ @top-left { margin-left: 3cm; }
+ @bottom-center { margin-left: 3cm;}
+}
+@page :left { @left-middle { margin-left: 3cm; }}
+@page :right{ @right-middle { margin-left: 3cm; }}
+
+@page :left { @bottom-left-corner { margin-left: 3cm; }}
+@page :right { @bottom-right-corner { margin-left: 3cm; }}
+@page :first { @bottom-left-corner { margin-left: 3cm; }
+             @bottom-right-corner { margin-left: 3cm; } }
+             
+// Some page specificity calculation examples follow
+@page { margin-left: 3cm; } 
+@page :left { margin-left: 3cm; } 
+@page :first { margin-left: 3cm; } 
+@page artsy { margin-left: 3cm; } 
+@page artsy:left { margin-left: 3cm; } 
+@page artsy:first { margin-left: 3cm; } 
+      
+// Consider the following usage example: ... Due to the higher specificity of the pseudo-class selector, the left margin on left pages will be 4cm and all other pages (the right-facing pages) will have a left margin of 3cm. 
+@page {
+  margin-left: 3cm;
+}
+
+@page :left {
+  margin-left: 4cm;
+}    
+
+// In this example, the higher specificity of the green rules wins over the red rule. Therefore the first page will have blue text in the top-left margin box and green text in the top-right margin box, while subsequent pages will have red text in the margin boxes. 
+@page :first {
+  color: green;
+  
+  @top-left {
+    content: "foo";
+    color: blue;
+  }
+  @top-right {
+    content: "bar";
+  }
+}
+
+@page { color: red;
+  @top-center {
+    content: "Page " counter(page);
+  }
+}
+
+// Page contexts cascade, so the following stylesheet would style pages with 25 millimeter margins and 14 point type in the margin boxes: 
+@page { margin: 25mm;}
+@page { font-size: 14pt;}
+
+// The following style sheet establishes a page header containing the title ("Hamlet") on the left side and the page number, preceded by "Page ", on the right side: 
+@page {
+  size: 8.5in 11in;
+  margin: 10%;
+
+  @top-left {
+    content: "Hamlet";
+  }
+  @top-right {
+    content: "Page " counter(page);
+  }
+}
+
+// The following style sheet creates a green box in each corner of the page except the bottom-left corner. 
+@page {
+    @top-left-corner { content: " "; border: solid green; }
+    @top-right-corner { content: url(foo.png); border: solid green; }
+    @bottom-right-corner { content: counter(page); border: solid green; }
+    @bottom-left-corner { content: normal; border: solid green; }
+}
+
+// Here is an example of a page with only a top-left header: 
+@page {
+  @top-left { content: "Header in Left Cell (top-left)" }
+}    
+
+// The following is an example of a page with a centered header: 
+@page {
+  @top-center { content: "Header in Center Cell (top-center)" }
+}            
+
+// The following is an example of a page with a single header in the top-right margin box: 
+@page {
+  @top-right { content: "Header in Right Cell (top-right)" }
+}
+
+// The following is an example of a page with a top-center and a top-left header:
+@page {
+  @top-left { content: "Left Cell (top-left)" }
+  @top-center { content: "Header in Center Cell (top-center)" }
+}
+
+// The following is an example of a page with a top-center and a top-right header:
+@page {
+  @top-center { content: "Header in Center Cell (top-center)" }
+  @top-right { content: "Right Cell (top-right)" }
+} 
+
+// The following is an example of a page with top-left and top-right headers: 
+@page {
+  @top-left { content: "Header in top-left with approx. "
+                   "twice as many words as right cell." }
+  @top-right { content: "Right cell (top-right)" }
+}
+
+// The following rules result in the placement of the current page number in the middle of the outside margin of each page. 
+@page {
+margin: 10%;
+counter-increment: page;
+
+@top-center {
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 2em;
+  content: counter(page);
+}
+}
+
+// This example style sheet could be used to create a centered header with the current chapter name: 
+body {counter-reset: chapter;}
+div.chapter {counter-increment: chapter;}
+@page {
+margin: 10%;
+@top-center { content: "Chapter" counter(chapter) }
+}
+
+// In the following example 
+@page {
+    size: 4in 6in;
+  }
+
+  @media (max-width: 6in) {
+    @page {
+      size: letter;
+    }
+  }
+  
+// ... example sets the width of the page box to be 297mm and the height to be 210mm. The page box in this example should be rendered on a page sheet size of 210 mm by 297 mm.
+@page {
+size: A4 landscape;
+}
+
+// In the following example, the outer edges of the page box will align with the page. The percentage value on the ‘margin’ property is relative to the page size so if the page sheet dimensions are 210mm x 297mm (i.e., A4), the margins are 21mm and 29.7mm. Assuming there are no page borders or padding set in the UA default style sheet, the resulting page area is 189mm by 367.3mm (210mm-21mm by 297mm-29.7mm). 
+@page {
+size: auto;
+margin: 10%;
+}
+
+// ... example sets the width of the page box to be 8.5 inches and the height to be 11 inches. This indicates that the page sheet size should be 8.5"x11" and the orientation ‘portrait’.
+@page {
+  size: 8.5in 11in;
+} 
+
+// example 25
+
+ // style sheet for "A4" printing
+ @media print and (width: 21cm) and (height: 29.7cm) {
+    @page {
+       margin: 3cm;
+    }
+ }
+
+ // style sheet for "letter" printing
+ @media print and (width: 8.5in) and (height: 11in) {
+    @page {
+        margin: 1in;
+    }
+ }
+ 
+// This example will put all tables on a right-hand side landscape page (named "rotated"): 
+@page rotated { size: landscape }
+table { page: rotated; page-break-before: right }
+
+// In this example, the two tables are rendered on landscape pages (indeed, on the same page, if they fit). The page type "narrow" is used for the <p> after the second table, as the page properties for the table element are no longer in effect: 
+@page narrow { size: 9cm 18cm }
+@page rotated { size: landscape }
+div { page: narrow }
+table { page: rotated }
+
+// In Japanese documents, sometimes different parts of a single document will have different kihon hanmen. [JLREQ] The ‘page’ property, together with ‘@page’ rules specifying different page widths, can accomodate this type of layout: 
+html   { writing-mode: vertical-rl;
+             line-height: 1.6; }
+    .main  { page: main;
+             columns: 2; column-gap: 1rem; }
+    .index { page: index;
+             columns: 3; column-gap: 1rem; }
+    @page       { margin: auto;    
+                  width:  40rem; } 
+    @page main  { height: 61rem; } 
+    @page index { height: 62rem; } 
+    

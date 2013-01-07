@@ -46,12 +46,4 @@ public class W3CSelectorsTest extends AbstractFileBasedTest {
     return (new TestFileUtils()).loadTestFiles(standardCases, lessjsIncompatibleNegatedNth, lessjsIncompatibleNegatedVarious);
   }
 
-  protected String canonize(String text) {
-    text = text.replace("\r\n", "\n");
-    //ignore occasional end lines
-    if (text.endsWith("\n"))
-      return text.substring(0, text.length()-1);
-    return text;
-  }
-
 }

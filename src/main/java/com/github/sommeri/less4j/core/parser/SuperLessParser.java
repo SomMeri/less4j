@@ -97,6 +97,8 @@ public class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("COMMENT_LITTLE", "// comment");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INVALID", "invalid string like value");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PURE_NUMBER", "number");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PSEUDO_PAGE", "pseudo page");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PAGE_MARGIN_BOX", "page margin box");
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";
@@ -117,6 +119,8 @@ public class SuperLessParser extends Parser {
   protected static final String RULE_SELECTOR = "selectors";
   protected static final String RULE_MEDIUM = "medium";
   protected static final String RULE_KEYFRAME = "keyframe";
+  protected static final String RULE_PAGE_MARGIN_BOX = "page margin box";
+  
 
   protected List<Problem> errors = new ArrayList<Problem>();
   protected ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();

@@ -132,8 +132,18 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.REUSABLE_STRUCTURE_NAME)
       return handleReusableStructureName(token);
 
+    if (type == LessLexer.PAGE_SYM)
+      return handlePage(token);
+
+    if (type == LessLexer.PAGE_MARGIN_BOX)
+      return handlePageMarginBox(token);
+
     throw new BugHappened("Unexpected token type: " + type +"("+PrintUtils.toName(type)+ ") for " + token.getText(), token);
   }
+
+  public abstract T handlePageMarginBox(HiddenTokenAwareTree token);
+
+  public abstract T handlePage(HiddenTokenAwareTree token);
 
   public abstract T handleReusableStructureName(HiddenTokenAwareTree token);
 

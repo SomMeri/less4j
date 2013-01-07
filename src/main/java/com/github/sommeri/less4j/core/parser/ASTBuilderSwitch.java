@@ -39,10 +39,13 @@ import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
+import com.github.sommeri.less4j.core.ast.Page;
+import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
@@ -60,7 +63,7 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.ast.Viewport;
-import com.github.sommeri.less4j.core.ast.ViewportBody;
+import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -819,7 +822,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Viewport result = new Viewport(token);
     //HiddenTokenAwareTree atName = token.getChild(0);
     HiddenTokenAwareTree body = token.getChild(1);
-    result.setBody(new ViewportBody(body, handleBodyMembers(body)));
+    result.setBody(new GeneralBody(body, handleBodyMembers(body)));
     return result;
   }
 
@@ -841,4 +844,36 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return result;
   }
   
+  public Page handlePage(HiddenTokenAwareTree token) {
+    Page result = new Page(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType()==LessLexer.IDENT) {
+        result.setName(new Name(kid, kid.getText()));
+      } else if (kid.getType()==LessLexer.PSEUDO_PAGE) {
+        result.setPseudopage(new Name(kid, ":" + kid.getChild(1).getText()));
+      } else if (kid.getType()==LessLexer.BODY) {
+        result.setBody(new GeneralBody(kid, handleBodyMembers(kid)));
+      } else {
+        throw new BugHappened(GRAMMAR_MISMATCH, kid);
+      }
+    }
+    return result;
+  }
+
+  public PageMarginBox handlePageMarginBox(HiddenTokenAwareTree token) {
+    PageMarginBox result = new PageMarginBox(token);
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType()==LessLexer.AT_NAME) {
+        result.setName(new Name(kid, kid.getText()));
+      } else if (kid.getType()==LessLexer.BODY) {
+        result.setBody(new GeneralBody(kid, handleBodyMembers(kid)));
+      } else {
+        throw new BugHappened(GRAMMAR_MISMATCH, kid);
+      }
+    }
+    return result;
+  }
+
 }

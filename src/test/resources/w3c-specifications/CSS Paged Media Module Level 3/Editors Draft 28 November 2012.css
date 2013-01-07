@@ -1,0 +1,272 @@
+@page :left {
+  margin-left: 3cm;
+  margin-right: 4cm;
+}
+@page :right {
+  margin-left: 4cm;
+  margin-right: 3cm;
+}
+@page {
+  margin: 2cm;
+}
+@page :first {
+  margin-top: 10cm;
+}
+html {
+  page-break-before: always;
+}
+@page {
+  margin-left: 3cm;
+}
+@page :left {
+  margin-left: 3cm;
+}
+@page :right {
+  margin-left: 3cm;
+}
+@page LandscapeTable {
+  margin-left: 3cm;
+}
+@page CompanyLetterHead:first {
+  margin-left: 3cm;
+}
+@page :first {
+  margin-left: 3cm;
+}
+@page {
+  @top-left {
+    margin-left: 3cm;
+  }
+  @bottom-center {
+    margin-left: 3cm;
+  }
+}
+@page :left {
+  @left-middle {
+    margin-left: 3cm;
+  }
+}
+@page :right {
+  @right-middle {
+    margin-left: 3cm;
+  }
+}
+@page :left {
+  @bottom-left-corner {
+    margin-left: 3cm;
+  }
+}
+@page :right {
+  @bottom-right-corner {
+    margin-left: 3cm;
+  }
+}
+@page :first {
+  @bottom-left-corner {
+    margin-left: 3cm;
+  }
+  @bottom-right-corner {
+    margin-left: 3cm;
+  }
+}
+@page {
+  margin-left: 3cm;
+}
+@page :left {
+  margin-left: 3cm;
+}
+@page :first {
+  margin-left: 3cm;
+}
+@page artsy {
+  margin-left: 3cm;
+}
+@page artsy:left {
+  margin-left: 3cm;
+}
+@page artsy:first {
+  margin-left: 3cm;
+}
+@page {
+  margin-left: 3cm;
+}
+@page :left {
+  margin-left: 4cm;
+}
+@page :first {
+  color: green;@top-left {
+    content: "foo";
+    color: blue;
+  }
+  @top-right {
+    content: "bar";
+  }
+}
+@page {
+  color: red;@top-center {
+    content: "Page " counter(page);
+  }
+}
+@page {
+  margin: 25mm;
+}
+@page {
+  font-size: 14pt;
+}
+@page {
+  size: 8.5in 11in;
+  margin: 10%;@top-left {
+    content: "Hamlet";
+  }
+  @top-right {
+    content: "Page " counter(page);
+  }
+}
+@page {
+  @top-left-corner {
+    content: " ";
+    border: solid green;
+  }
+  @top-right-corner {
+    content: url(foo.png);
+    border: solid green;
+  }
+  @bottom-right-corner {
+    content: counter(page);
+    border: solid green;
+  }
+  @bottom-left-corner {
+    content: normal;
+    border: solid green;
+  }
+}
+@page {
+  @top-left {
+    content: "Header in Left Cell (top-left)";
+  }
+}
+@page {
+  @top-center {
+    content: "Header in Center Cell (top-center)";
+  }
+}
+@page {
+  @top-right {
+    content: "Header in Right Cell (top-right)";
+  }
+}
+@page {
+  @top-left {
+    content: "Left Cell (top-left)";
+  }
+  @top-center {
+    content: "Header in Center Cell (top-center)";
+  }
+}
+@page {
+  @top-center {
+    content: "Header in Center Cell (top-center)";
+  }
+  @top-right {
+    content: "Right Cell (top-right)";
+  }
+}
+@page {
+  @top-left {
+    content: "Header in top-left with approx. " "twice as many words as right cell.";
+  }
+  @top-right {
+    content: "Right cell (top-right)";
+  }
+}
+@page {
+  margin: 10%;
+  counter-increment: page;@top-center {
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 2em;
+    content: counter(page);
+  }
+}
+body {
+  counter-reset: chapter;
+}
+div.chapter {
+  counter-increment: chapter;
+}
+@page {
+  margin: 10%;@top-center {
+    content: "Chapter" counter(chapter);
+  }
+}
+@page {
+  size: 4in 6in;
+}
+@media (max-width: 6in) {
+  @page {
+    size: letter;
+  }
+}
+@page {
+  size: A4 landscape;
+}
+@page {
+  size: auto;
+  margin: 10%;
+}
+@page {
+  size: 8.5in 11in;
+}
+@media print and (width: 21cm) and (height: 29.7cm) {
+  @page {
+    margin: 3cm;
+  }
+}
+@media print and (width: 8.5in) and (height: 11in) {
+  @page {
+    margin: 1in;
+  }
+}
+@page rotated {
+  size: landscape;
+}
+table {
+  page: rotated;
+  page-break-before: right;
+}
+@page narrow {
+  size: 9cm 18cm;
+}
+@page rotated {
+  size: landscape;
+}
+div {
+  page: narrow;
+}
+table {
+  page: rotated;
+}
+html {
+  writing-mode: vertical-rl;
+  line-height: 1.6;
+}
+.main {
+  page: main;
+  columns: 2;
+  column-gap: 1rem;
+}
+.index {
+  page: index;
+  columns: 3;
+  column-gap: 1rem;
+}
+@page {
+  margin: auto;
+  width: 40rem;
+}
+@page main {
+  height: 61rem;
+}
+@page index {
+  height: 62rem;
+}

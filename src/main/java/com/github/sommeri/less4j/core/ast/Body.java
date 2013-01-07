@@ -100,4 +100,12 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return result;
     }
 
+    public List<T> getDeclarations() {
+      return membersByType(ASTCssNodeType.DECLARATION);
+    }
+
+    public List<T> getNotDeclarations() {
+      return membersByNotType(ASTCssNodeType.DECLARATION);
+    }
+
 }
