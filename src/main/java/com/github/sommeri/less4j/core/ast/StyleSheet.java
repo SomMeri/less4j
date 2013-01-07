@@ -17,6 +17,7 @@ public class StyleSheet extends Body<ASTCssNode> {
     HashSet<ASTCssNodeType> result = new HashSet<ASTCssNodeType>(Arrays.asList(ASTCssNodeType.values()));
     // removed only the elements that are likely to end there, this method could be done in more precise way  
     result.remove(ASTCssNodeType.DECLARATION);
+    result.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
     return result;  
   }
   
