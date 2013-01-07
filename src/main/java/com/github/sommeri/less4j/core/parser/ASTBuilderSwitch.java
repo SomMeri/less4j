@@ -851,7 +851,12 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       if (kid.getType()==LessLexer.IDENT) {
         result.setName(new Name(kid, kid.getText()));
       } else if (kid.getType()==LessLexer.PSEUDO_PAGE) {
-        result.setPseudopage(new Name(kid, ":" + kid.getChild(1).getText()));
+        int pseudoPageIndex = 1;
+        if (kid.getChild(0).getType()==LessLexer.MEANINGFULL_WHITESPACE) {
+          pseudoPageIndex = 2;
+          result.setDockedPseudopage(false);
+        }
+        result.setPseudopage(new Name(kid, ":" + kid.getChild(pseudoPageIndex).getText()));
       } else if (kid.getType()==LessLexer.BODY) {
         result.setBody(new GeneralBody(kid, handleBodyMembers(kid)));
       } else {

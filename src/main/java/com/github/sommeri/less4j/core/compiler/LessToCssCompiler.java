@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
+import com.github.sommeri.less4j.core.ast.Page;
+import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
@@ -49,15 +50,29 @@ public class LessToCssCompiler {
     
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
     for (ASTCssNode kid : childs) {
-      if (kid.getType() == ASTCssNodeType.RULE_SET) {
+      switch (kid.getType()) {
+      case RULE_SET: {
         List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
         body.addMembersAfter(nestedRulesets, kid);
         for (RuleSet ruleSet : nestedRulesets) {
           ruleSet.setParent(body);
         }
+        break;
       }
-      if (kid.getType() == ASTCssNodeType.MEDIA) {
+      case MEDIA: {
         freeNestedRuleSets((Media) kid);
+        break;
+      }
+      case PAGE: {
+        Page page = (Page) kid;
+        freeNestedRuleSets(page.getBody());
+        break;
+      }
+      case PAGE_MARGIN_BOX: {
+        PageMarginBox marginBox = (PageMarginBox) kid;
+        freeNestedRuleSets(marginBox.getBody());
+        break;
+      }
       }
     }
   }

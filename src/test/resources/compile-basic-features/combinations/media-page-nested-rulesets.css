@@ -1,0 +1,16 @@
+@page {
+  @bottom-center {
+    margin-left: 3cm;h1 {
+      bla: bla;
+    }
+    h1 :hover {
+      padding: 2;
+    }
+  }
+  h2 {
+    color: red;
+  }
+  h2 :visit {
+    margin: 2;
+  }
+}

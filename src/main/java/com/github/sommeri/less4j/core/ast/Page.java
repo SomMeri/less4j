@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 public class Page extends ASTCssNode {
 
   private Name name;
+  private boolean dockedPseudopage = true;
   private Name pseudopage;
   private GeneralBody body;
 
@@ -19,6 +20,14 @@ public class Page extends ASTCssNode {
     super(token);
     this.name = name;
     this.pseudopage = pseudopage;
+  }
+
+  public boolean hasDockedPseudopage() {
+    return dockedPseudopage;
+  }
+
+  public void setDockedPseudopage(boolean dockedPseudopage) {
+    this.dockedPseudopage = dockedPseudopage;
   }
 
   public Name getName() {

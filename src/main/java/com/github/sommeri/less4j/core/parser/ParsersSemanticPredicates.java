@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,16 +8,12 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 
-
-import com.github.sommeri.less4j.core.parser.LessLexer;
-import com.github.sommeri.less4j.core.parser.LessParser;
-
 public class ParsersSemanticPredicates {
 
   private static final String KEYFRAMES = "keyframes";
   private static final String VIEWPORT = "viewport";
-  private static final String[] PAGE_MARGIN_BOXES = new String[] {"top-left-corner", "top-left", "top-center", "top-right", "top-right-corner", "bottom-left-corner", "bottom-left", "bottom-center", "bottom-right", "bottom-right-corner", "left-top", "left-middle", "left-bottom", "right-top", "right-middle", "right-bottom"};
-  
+  private static final Set<String> PAGE_MARGIN_BOXES = new HashSet<String>(Arrays.asList(new String[] { "@top-left-corner", "@top-left", "@top-center", "@top-right", "@top-right-corner", "@bottom-left-corner", "@bottom-left", "@bottom-center", "@bottom-right", "@bottom-right-corner", "@left-top", "@left-middle", "@left-bottom", "@right-top", "@right-middle", "@right-bottom" }));
+
   private static Set<String> NTH_PSEUDOCLASSES = new HashSet<String>();
   static {
     NTH_PSEUDOCLASSES.add("nth-child");
@@ -24,11 +21,11 @@ public class ParsersSemanticPredicates {
     NTH_PSEUDOCLASSES.add("nth-of-type");
     NTH_PSEUDOCLASSES.add("nth-last-of-type");
   }
-                 
+
   public boolean insideNth(TokenStream input) {
     return isNthPseudoClass(input.LT(-1));
   }
-  
+
   private boolean isNthPseudoClass(Token a) {
     if (a == null)
       return false;
@@ -56,7 +53,7 @@ public class ParsersSemanticPredicates {
   public boolean onFunctionStart(TokenStream input) {
     return isFunctionStart(input.LT(1), input.LT(2));
   }
-  
+
   private boolean isFunctionStart(Token first, Token second) {
     if (first == null || second == null)
       return false;
@@ -80,7 +77,7 @@ public class ParsersSemanticPredicates {
   public boolean onEmptySeparator(TokenStream input) {
     return isEmptySeparator(input.LT(-1), input.LT(1), input.LT(2));
   }
-  
+
   private boolean isEmptySeparator(Token previousT, Token firstT, Token secondT) {
     //expression can not start with an empty separator
     if (previousT == null)
@@ -150,44 +147,37 @@ public class ParsersSemanticPredicates {
   public boolean onEmptyCombinator(TokenStream input) {
     return isEmptyCombinator(input.LT(-1), input.LT(1));
   }
-  
+
   private boolean isEmptyCombinator(Token first, Token second) {
     return !directlyFollows(first, second);
   }
 
   public boolean isKeyframes(Token token) {
-    return isConcreteAtName(token, KEYFRAMES);
+    return isVendorPrefixedAtName(token, KEYFRAMES);
   }
 
   public boolean isViewport(Token token) {
-    return isConcreteAtName(token, VIEWPORT);
+    return isVendorPrefixedAtName(token, VIEWPORT);
   }
 
   public boolean isPageMarginBox(Token token) {
     return isAmongAtNames(token, PAGE_MARGIN_BOXES);
   }
 
-  private boolean isAmongAtNames(Token token, String... atNames) {
-    if (token.getType() != LessParser.AT_NAME || token.getText()==null)
+  private boolean isAmongAtNames(Token token, Set<String> atNames) {
+    if (token.getType() != LessParser.AT_NAME || token.getText() == null)
       return false;
-    
+
     String text = token.getText().toLowerCase();
-    for (String atName : atNames) {
-      if (isAtName(text, atName))
-        return true;
-    }
-    return false;
-  }
-  
-  private boolean isConcreteAtName(Token token, String atName) {
-    if (token.getType() != LessParser.AT_NAME || token.getText()==null)
-      return false;
-    
-    String text = token.getText().toLowerCase();
-    return isAtName(text, atName);
+    return atNames.contains(text);
   }
 
-  private boolean isAtName(String text, String atName) {
+  private boolean isVendorPrefixedAtName(Token token, String atName) {
+    if (token.getType() != LessParser.AT_NAME || token.getText() == null)
+      return false;
+
+    String text = token.getText().toLowerCase();
+    //anything in between is assumed to be vendor prefix
     return text.startsWith("@") && text.endsWith(atName);
   }
 

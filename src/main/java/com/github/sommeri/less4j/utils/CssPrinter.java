@@ -230,11 +230,16 @@ public class CssPrinter {
 
   private boolean appendPage(Page node) {
     builder.append("@page").ensureSeparator();
-    if (node.hasName())
+    if (node.hasName()) {
       append(node.getName());
+      if (!node.hasDockedPseudopage())
+        builder.ensureSeparator();
+    }
 
-    if (node.hasPseudopage())
+    if (node.hasPseudopage()) {
       append(node.getPseudopage());
+      builder.ensureSeparator();
+    }
 
     appendBodySortDeclarations(node.getBody());
     return true;
@@ -242,7 +247,7 @@ public class CssPrinter {
 
   private boolean appendPageMarginBox(PageMarginBox node) {
     append(node.getName());
-    append(node.getBody());
+    appendBodySortDeclarations(node.getBody());
     return true;
   }
 
@@ -468,16 +473,17 @@ public class CssPrinter {
     builder.increaseIndentationLevel();
 
     Iterator<ASTCssNode> declarations = node.getDeclarations().iterator();
-    List<ASTCssNode> ruleSets = node.getNotDeclarations();
+    List<ASTCssNode> notDeclarations = node.getNotDeclarations();
     while (declarations.hasNext()) {
-      ASTCssNode body = declarations.next();
-      append(body);
-      if (declarations.hasNext() || ruleSets.isEmpty())
+      ASTCssNode declaration = declarations.next();
+      append(declaration);
+      if (declarations.hasNext() || notDeclarations.isEmpty())
         builder.ensureNewLine();
     }
-    for (ASTCssNode body : ruleSets) {
-      append(body);
-      builder.ensureNewLine();
+    for (ASTCssNode body : notDeclarations) {
+      boolean changedAnything = append(body);
+      if (changedAnything)
+        builder.ensureNewLine();
     }
     builder.decreaseIndentationLevel();
     builder.append("}");

@@ -210,7 +210,7 @@ finally { leaveRule(); }
 keyframes
 @init {enterRule(retval, RULE_KEYFRAME);}
     : {predicates.isKeyframes(input.LT(1))}? (AT_NAME (name+=IDENT (name+=COMMA name+=IDENT )*)?)
-      body+=ruleset_body
+      body+=general_body
     -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $name*) $body )
     ;
 finally { leaveRule(); }
@@ -218,7 +218,7 @@ finally { leaveRule(); }
 viewport
 @init {enterRule(retval, RULE_KEYFRAME);}
     : {predicates.isViewport(input.LT(1))}? AT_NAME
-      body+=ruleset_body
+      body+=general_body
     -> ^(VIEWPORT AT_NAME $body )
     ;
 finally { leaveRule(); }
@@ -293,28 +293,23 @@ finally { leaveRule(); }
 
 page
 @init {enterRule(retval, RULE_PAGE);}
-    : PAGE_SYM a+=IDENT? b+=pseudoPage?
-        LBRACE
-          ((declarationWithSemicolon)=>c+=declarationWithSemicolon
-           | c+=pageMarginBox)*
-        (c+=declaration RBRACE
-        | RBRACE)
-        -> ^(PAGE_SYM $a* $b* ^(BODY LBRACE $c*))
+    : PAGE_SYM a+=IDENT? b+=pseudoPage? c+=general_body
+      -> ^(PAGE_SYM $a* $b* $c*)
     ;
 finally { leaveRule(); }
 
 pageMarginBox 
 @init {enterRule(retval, RULE_PAGE_MARGIN_BOX);}
-    : {predicates.isPageMarginBox(input.LT(1))}? AT_NAME ruleset_body
-    -> ^(PAGE_MARGIN_BOX AT_NAME ruleset_body)
+    : {predicates.isPageMarginBox(input.LT(1))}? AT_NAME general_body
+    -> ^(PAGE_MARGIN_BOX AT_NAME general_body)
     ;
 finally { leaveRule(); }
    
 
 pseudoPage
 @init {enterRule(retval, RULE_PSEUDO_PAGE);}
-    : COLON IDENT
-    -> ^(PSEUDO_PAGE COLON IDENT)
+    : {predicates.directlyFollows(input.LT(-1), input.LT(1))}? COLON IDENT -> ^(PSEUDO_PAGE COLON IDENT)
+      | COLON IDENT -> ^(PSEUDO_PAGE MEANINGFULL_WHITESPACE COLON IDENT)
     ;
 finally { leaveRule(); }
     
@@ -352,7 +347,7 @@ property
 ruleSet
 @init {enterRule(retval, RULE_RULESET);}
     : (a+=selector ( a+=selectorSeparator a+=selector)*)?
-       b=ruleset_body
+       b=general_body
      -> ^(RULESET $a* $b)
     ;
 finally { leaveRule(); }
@@ -373,13 +368,14 @@ nestedAppender // this must be here because of special case & & <- the space bel
     ;
 
 //css does not require ; in last declaration
-ruleset_body
+general_body
     : LBRACE
             (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
                | (ruleSet)=> a+=ruleSet
                | (mixinReferenceWithSemi)=>a+=mixinReferenceWithSemi
                | (namespaceReferenceWithSemi)=>a+=namespaceReferenceWithSemi
-               | (reusableStructure)=>a+=reusableStructure 
+               | (reusableStructure)=>a+=reusableStructure
+               | a+=pageMarginBox 
                | a+=variabledeclaration
              )*
              (  
@@ -539,7 +535,7 @@ reusableStructureName
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 
 @init {enterRule(retval, RULE_ABSTRACT_MIXIN_OR_NAMESPACE);}
-    : a=reusableStructureName LPAREN c=reusableStructureArguments? RPAREN e=reusableStructureGuards? f=ruleset_body
+    : a=reusableStructureName LPAREN c=reusableStructureArguments? RPAREN e=reusableStructureGuards? f=general_body
     -> ^(REUSABLE_STRUCTURE $a $c* $e* $f)
     ;
 finally { leaveRule(); }

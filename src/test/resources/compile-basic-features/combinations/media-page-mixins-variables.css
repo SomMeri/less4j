@@ -1,0 +1,13 @@
+@page {
+  width: 397px;
+}
+@page name :first {
+  color: red;
+  content: 'some content';@top-left-corner {
+    width: 500px;
+    color: red;
+    content: 'some content';
+    border-style: solid;
+    border-color: blue;
+  }
+}

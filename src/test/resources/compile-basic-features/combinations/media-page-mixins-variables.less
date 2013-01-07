@@ -1,0 +1,35 @@
+.topLevelMixin(@param) {
+  width: @param;
+}
+
+@page {
+  @variable: 397px;
+  .topLevelMixin(@variable);
+}
+
+@page name :first {
+  @variable: 500px;
+  #pageNamespace {
+    .pageMixin() {
+      color: red;
+    }
+  }
+  .pageMixin() {
+    content: 'some content';
+  }
+  @top-left-corner {
+    .marginBoxMixin() {
+      border-style:solid;
+      border-color:blue;
+    }
+    .topLevelMixin(@variable);
+    #pageNamespace .pageMixin;
+    .pageMixin;
+    .marginBoxMixin();
+  }
+  #pageNamespace .pageMixin;
+  .pageMixin;
+}
+
+@variable: 900;
+
