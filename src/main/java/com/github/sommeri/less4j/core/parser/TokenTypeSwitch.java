@@ -138,8 +138,13 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.PAGE_MARGIN_BOX)
       return handlePageMarginBox(token);
 
+    if (type == LessLexer.IMPORT_SYM | type == LessLexer.IMPORT_ONCE_SYM |type == LessLexer.IMPORT_MULTIPLE_SYM)
+      return handleImport(token);
+
     throw new BugHappened("Unexpected token type: " + type +"("+PrintUtils.toName(type)+ ") for " + token.getText(), token);
   }
+
+  public abstract T handleImport(HiddenTokenAwareTree token);
 
   public abstract T handlePageMarginBox(HiddenTokenAwareTree token);
 

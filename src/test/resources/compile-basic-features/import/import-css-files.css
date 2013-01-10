@@ -1,0 +1,27 @@
+@import "import\some-file-1.css" screen and (max-width: 400px);
+@import 'import\some-file-2.css' handheld;
+@import url("import\some-file-3.css?id=123");
+@import url('import\some-file-4.css');
+@import url(import\some-file-5.css);
+@import "import\some-file-once-1.css" screen and (max-width: 400px);
+@import 'import\some-file-once-2.css' handheld;
+@import url("import\some-file-once-3.css?id=123");
+@import url('import\some-file-once-4.css');
+@import url(import\some-file-once-5.css);
+@import "import\some-file-multiple-1.css" screen and (max-width: 400px);
+@import 'import\some-file-multiple-2.css' handheld;
+@import url("import\some-file-multiple-3.css?id=123");
+@import url('import\some-file-multiple-4.css');
+@import url(import\some-file-multiple-5.css);
+h1 {
+  color: red;
+}
+#namespace {
+  @import "import\some-file-6.css";
+}
+#namespace {
+  @import "import\some-file-once-6.css";
+}
+#namespace {
+  @import "import\some-file-multiple-6.css";
+}

@@ -99,6 +99,8 @@ public class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PURE_NUMBER", "number");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PSEUDO_PAGE", "pseudo page");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PAGE_MARGIN_BOX", "page margin box");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IMPORT_ONCE_SYM", "@import-once");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IMPORT_MULTIPLE_SYM", "@import-multiple");
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";

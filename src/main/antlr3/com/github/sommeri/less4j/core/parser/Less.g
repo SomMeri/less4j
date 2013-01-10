@@ -165,7 +165,6 @@ tokens {
 styleSheet
 @init {enterRule(retval, RULE_STYLESHEET);}
     : ( a+=charSet* //the original ? was replaced by *, because it is possible (even if it makes no sense) and less.js is able to handle such situation
-        a+=imports*
         a+=bodylist
         EOF ) -> ^(STYLE_SHEET ($a)*)
     ;
@@ -186,7 +185,7 @@ finally { leaveRule(); }
 //
 imports
 @init {enterRule(retval, RULE_IMPORTS);}
-    : IMPORT_SYM (STRING|URI) (mediaQuery (COMMA mediaQuery)*)? SEMI
+    : (IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM)^ (term) (mediaQuery (COMMA mediaQuery)*)? SEMI!
     ;
 finally { leaveRule(); }
 
@@ -256,6 +255,7 @@ bodyset
     | keyframes
     | page
     | fontface
+    | imports
     ;
 
 variabledeclaration
@@ -377,6 +377,7 @@ general_body
                | (reusableStructure)=>a+=reusableStructure
                | a+=pageMarginBox 
                | a+=variabledeclaration
+               | a+=imports
              )*
              (  
                 ( (declaration)=>a+=declaration RBRACE)
@@ -1106,7 +1107,9 @@ IDENT : '-'? NMSTART NMCHAR* ;
 fragment HASH_FRAGMENT : '#' NAME ;
 HASH : HASH_FRAGMENT ;
 
-IMPORT_SYM : '@' I M P O R T ;
+IMPORT_SYM : '@' I M P O R T;
+IMPORT_ONCE_SYM : '@' I M P O R T MINUS O N C E;
+IMPORT_MULTIPLE_SYM : '@' I M P O R T  MINUS M U L T I P L E;
 PAGE_SYM : '@' P A G E ;
 MEDIA_SYM : '@' M E D I A ;
 FONT_FACE_SYM : '@' F O N T MINUS F A C E ;
@@ -1195,10 +1198,10 @@ NUMBER
 // url and uri.
 URI : (U R L
         '('
-            ((WS)=>WS)? (URL|STRING) WS?
+            ((WS)=>WS)? (URL) WS?
         ')') => (U R L
         '('
-            ((WS)=>WS)? (URL|STRING) WS?
+            ((WS)=>WS)? (URL) WS?
         ')')
         | U R L { $type=IDENT; }
     ;

@@ -1,9 +1,12 @@
 package com.github.sommeri.less4j.core.compiler;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -34,20 +37,40 @@ public class LessToCssCompiler {
   public ASTCssNode compileToCss(StyleSheet less) {
     ScopeExtractor scopeBuilder = new ScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
-    
+
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);
-    
+
     //just a safety measure
     evaluateExpressions(less);
     freeNestedRuleSets(less);
+    sortTopLevelElements(less);
 
     return less;
   }
 
+  private void sortTopLevelElements(StyleSheet less) {
+    Collections.sort(less.getChilds(), new Comparator<ASTCssNode>() {
+
+      @Override
+      public int compare(ASTCssNode first, ASTCssNode second) {
+        return code(first) - code(second);
+      }
+
+      private int code(ASTCssNode node) {
+        if (node.getType() == ASTCssNodeType.CHARSET_DECLARATION)
+          return 0;
+        if (node.getType() == ASTCssNodeType.IMPORT)
+          return 1;
+        
+        return 2;
+      }
+    });
+  }
+
   private void freeNestedRuleSets(Body<ASTCssNode> body) {
     NestedRulesCollector nestedRulesCollector = new NestedRulesCollector();
-    
+
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
     for (ASTCssNode kid : childs) {
       switch (kid.getType()) {

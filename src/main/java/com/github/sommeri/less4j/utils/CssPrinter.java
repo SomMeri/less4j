@@ -25,6 +25,7 @@ import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
+import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
@@ -211,6 +212,9 @@ public class CssPrinter {
     case NAME:
       return appendName((Name) node);
 
+    case IMPORT:
+      return appendImport((Import) node);
+
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
@@ -221,6 +225,15 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getCharPositionInSourceLine());
     }
+  }
+
+  private boolean appendImport(Import node) {
+    builder.append("@import").ensureSeparator();
+    append(node.getUrlExpression());
+    appendMediums(node.getMediums());
+    builder.append(";");
+    
+    return true;
   }
 
   private boolean appendName(Name node) {

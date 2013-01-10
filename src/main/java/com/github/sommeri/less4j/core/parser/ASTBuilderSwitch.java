@@ -26,6 +26,7 @@ import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
+import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.Keyframes;
@@ -180,9 +181,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public Declaration handleDeclaration(HiddenTokenAwareTree token) {
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
     HiddenTokenAwareTree nameToken = iterator.next();
-    
+
     String name = nameToken.getText();
-    if (nameToken.getType()==LessLexer.STAR) {
+    if (nameToken.getType() == LessLexer.STAR) {
       // handling star prefix browser hack
       nameToken = iterator.next();
       name += nameToken.getText();
@@ -287,7 +288,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
     return result;
   }
-  
+
   public MixinReference handleMixinReference(HiddenTokenAwareTree token) {
     MixinReference result = new MixinReference(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
@@ -311,7 +312,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public MixinReference handleNamespaceReference(HiddenTokenAwareTree token) {
     MixinReference reference = null;
     List<ReusableStructureName> nameChain = new ArrayList<ReusableStructureName>();
-    
+
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
       ASTCssNode buildKid = switchOn(kid);
@@ -323,7 +324,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         throw new BugHappened(GRAMMAR_MISMATCH, token);
       }
     }
-    
+
     reference.setUnderlyingStructure(token);
     reference.addNames(nameChain);
     return reference;
@@ -427,7 +428,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     } else {
       token.addOrphans(lbrace.getFollowing());
     }
-    
+
     while (iterator.hasNext()) {
       members.add(switchOn(iterator.next()));
     }
@@ -442,15 +443,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public CssClass handleCssClass(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     return new CssClass(token, toInterpolableName(token, children));
-//    HiddenTokenAwareTree nameToken = children.get(0);
-//
-//    String name = nameToken.getText();
-//    if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
-//      name = name.substring(1, name.length());
-//    }
-//
-//    CssClass result = new CssClass(token, name);
-//    return result;
+    //    HiddenTokenAwareTree nameToken = children.get(0);
+    //
+    //    String name = nameToken.getText();
+    //    if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
+    //      name = name.substring(1, name.length());
+    //    }
+    //
+    //    CssClass result = new CssClass(token, name);
+    //    return result;
   }
 
   public SelectorAttribute handleSelectorAttribute(HiddenTokenAwareTree token) {
@@ -583,10 +584,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       String text = kid.getText();
       if (text == null || text.length() < 1)
         throw new BugHappened(GRAMMAR_MISMATCH, kid);
-      
-      if (kid.getType()==LessLexer.INTERPOLATED_VARIABLE) {
-        result.add(new VariableNamePart(kid, new Variable(kid, "@"+ text.substring(2, text.length()-1))));
-      } else if (kid.getType()==LessLexer.HASH_SYMBOL) {
+
+      if (kid.getType() == LessLexer.INTERPOLATED_VARIABLE) {
+        result.add(new VariableNamePart(kid, new Variable(kid, "@" + text.substring(2, text.length() - 1))));
+      } else if (kid.getType() == LessLexer.HASH_SYMBOL) {
         //do nothing
       } else {
         result.add(new FixedNamePart(kid, toFixedName(kid.getType(), text)));
@@ -596,9 +597,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   private String toFixedName(int typeCode, String text) {
-    if (typeCode==LessLexer.HASH)
+    if (typeCode == LessLexer.HASH)
       return text.substring(1);
-    
+
     return text;
   }
 
@@ -770,14 +771,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       result = new SimpleSelector(kid, interpolableName, isStarElementName(elementNameParts));
       if (iterator.hasNext())
         kid = iterator.next();
-      else return result;
+      else
+        return result;
     } else {
       result = new SimpleSelector(kid, null, true);
       result.setEmptyForm(true);
     }
 
     do {
-      result.addSubsequent((ElementSubsequent)switchOn(kid));
+      result.addSubsequent((ElementSubsequent) switchOn(kid));
 
       if (iterator.hasNext())
         kid = iterator.next();
@@ -789,17 +791,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   private boolean isStarElementName(List<HiddenTokenAwareTree> elementNameParts) {
-    if (elementNameParts.size()!=1)
+    if (elementNameParts.size() != 1)
       return false;
-    
-    return elementNameParts.get(0).getType()==LessLexer.STAR;
+
+    return elementNameParts.get(0).getType() == LessLexer.STAR;
   }
 
   public EscapedSelector handleEscapedSelector(HiddenTokenAwareTree token) {
     token.pushHiddenToKids();
     HiddenTokenAwareTree valueToken = token.getChild(0);
     String quotedText = valueToken.getText();
-    return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), ""+quotedText.charAt(1));
+    return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), "" + quotedText.charAt(1));
   }
 
   private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {
@@ -813,7 +815,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Keyframes result = new Keyframes(token, children.next().getText());
     result.addNames(handleKeyframesDeclaration(children.next()));
     result.setBody(handleKeyframesBody(children.next()));
-   
+
     return result;
   }
 
@@ -831,33 +833,33 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Iterator<HiddenTokenAwareTree> iterator = declaration.getChildren().iterator();
     while (iterator.hasNext()) {
       HiddenTokenAwareTree token = iterator.next();
-      if (token.getType()==LessLexer.COMMA) {
+      if (token.getType() == LessLexer.COMMA) {
         token.pushHiddenToSiblings();
-      } else if (token.getType()==LessLexer.IDENT) {
+      } else if (token.getType() == LessLexer.IDENT) {
         result.add(new KeyframesName(token, token.getText()));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);
       }
-      
+
     }
-    
+
     return result;
   }
-  
+
   public Page handlePage(HiddenTokenAwareTree token) {
     Page result = new Page(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType()==LessLexer.IDENT) {
+      if (kid.getType() == LessLexer.IDENT) {
         result.setName(new Name(kid, kid.getText()));
-      } else if (kid.getType()==LessLexer.PSEUDO_PAGE) {
+      } else if (kid.getType() == LessLexer.PSEUDO_PAGE) {
         int pseudoPageIndex = 1;
-        if (kid.getChild(0).getType()==LessLexer.MEANINGFULL_WHITESPACE) {
+        if (kid.getChild(0).getType() == LessLexer.MEANINGFULL_WHITESPACE) {
           pseudoPageIndex = 2;
           result.setDockedPseudopage(false);
         }
         result.setPseudopage(new Name(kid, ":" + kid.getChild(pseudoPageIndex).getText()));
-      } else if (kid.getType()==LessLexer.BODY) {
+      } else if (kid.getType() == LessLexer.BODY) {
         result.setBody(new GeneralBody(kid, handleBodyMembers(kid)));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, kid);
@@ -870,14 +872,46 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     PageMarginBox result = new PageMarginBox(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType()==LessLexer.AT_NAME) {
+      if (kid.getType() == LessLexer.AT_NAME) {
         result.setName(new Name(kid, kid.getText()));
-      } else if (kid.getType()==LessLexer.BODY) {
+      } else if (kid.getType() == LessLexer.BODY) {
         result.setBody(new GeneralBody(kid, handleBodyMembers(kid)));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, kid);
       }
     }
+    return result;
+  }
+
+  public Import handleImport(HiddenTokenAwareTree token) {
+    Import result = new Import(token);
+    switch (token.getType()) {
+    case LessLexer.IMPORT_SYM:
+      result.setKind(Import.ImportKind.IMPORT);
+      break;
+    case LessLexer.IMPORT_ONCE_SYM:
+      result.setKind(Import.ImportKind.IMPORT_ONCE);
+      break;
+    case LessLexer.IMPORT_MULTIPLE_SYM:
+      result.setKind(Import.ImportKind.IMPORT_MULTIPLE);
+      break;
+    default:
+      throw new BugHappened(GRAMMAR_MISMATCH, token);
+    }
+
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    result.setUrlExpression(handleTerm(children.next()));
+    while (children.hasNext()) {
+      HiddenTokenAwareTree kid = children.next();
+      if (kid.getType()==LessLexer.COMMA) {
+        kid.pushHiddenToSiblings();
+      } else if (kid.getType()==LessLexer.MEDIA_QUERY) {
+        result.add(handleMediaQuery(kid));
+      } else {
+        throw new BugHappened(GRAMMAR_MISMATCH, token);
+      }
+    }
+    
     return result;
   }
 
