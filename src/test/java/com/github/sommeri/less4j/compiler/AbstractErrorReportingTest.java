@@ -28,7 +28,6 @@ public abstract class AbstractErrorReportingTest {
   private final File cssOutput;
   private final File errorList;
   private final String testName;
-  protected boolean print = false;
 
   public AbstractErrorReportingTest(File lessFile, File cssOutput, File errorList, String testName) {
     this.lessFile = lessFile;
@@ -59,22 +58,11 @@ public abstract class AbstractErrorReportingTest {
   }
 
   private void assertCorrectErrors(Less4jException error) {
-    String expectedCss = canonize(expectedCss());
-    String actualCss = canonize(error.getPartialResult().getCss());
-    String completeErrorReport = generateErrorReport(error);
-    String actualErrors = canonize(completeErrorReport);
-    if (print) {
-    System.out.println("******** expected css **********");
-    System.out.println(expectedCss);
-    System.out.println("******** actual css **********");
-    System.out.println(actualCss);
-    System.out.println("******** errors **********");
-    System.out.println(actualErrors);
-    }
     //validate css
-    assertEquals(lessFile.toString(), expectedCss, actualCss);
+    assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
     //validate errors and warnings
-    assertEquals(lessFile.toString(), canonize(expectedErrors()), actualErrors);
+    String completeErrorReport = generateErrorReport(error);
+    assertEquals(lessFile.toString(), canonize(expectedErrors()), canonize(completeErrorReport));
   }
 
   private void assertCorrectWarnings(CompilationResult actual) {
