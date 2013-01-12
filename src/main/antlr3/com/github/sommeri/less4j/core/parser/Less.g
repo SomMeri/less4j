@@ -103,8 +103,9 @@ tokens {
     }
     
     public LessLexer(File inputFile, CharStream input, RecognizerSharedState state, List<Problem> errors) {
-      super(inputFile, input,state);
+      super(input,state);
       this.errors = errors;
+      this.inputFile = inputFile;
     }
 
   //This trick allow Lexer to emit multiple tokens per one rule.
@@ -128,7 +129,7 @@ tokens {
   }
   //add new field
   private List<Problem> errors = new ArrayList<Problem>();
-  private final File inputFile;
+  private File inputFile;
   
   //add new method
   public List<Problem> getAllErrors() {
@@ -142,7 +143,7 @@ tokens {
   
   //override method
   public void reportError(RecognitionException e) {
-    errors.add(new AntlrException(e, getErrorMessage(e, getTokenNames())));
+    errors.add(new AntlrException(inputFile, e, getErrorMessage(e, getTokenNames())));
   }
   
 }
