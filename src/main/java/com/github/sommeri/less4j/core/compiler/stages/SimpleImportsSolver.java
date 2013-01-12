@@ -16,6 +16,7 @@ import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Import.ImportKind;
+import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ConversionUtils;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
@@ -44,7 +45,6 @@ public class SimpleImportsSolver {
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.IMPORT) {
-        //FIXME: add test case on what happen in less.js in case of two imports if the first one is rewriting variable containing url for the second one 
         importEncountered((Import) kid, baseDirectory);
       }
     }
@@ -77,19 +77,32 @@ public class SimpleImportsSolver {
     // add .less suffix if needed
     filename = normalizeFileName(filename, urlParams);
     File importedFile = new File(baseDirectory, filename);
+
+    // import once should not import a file that was already imported  
     if (isImportOnce(node) && alreadyVisited(importedFile)) {
       astManipulator.removeFromBody(node);
       return ;
     }
+    importedFiles.add(importedFile.getAbsoluteFile());
     
     String importedContent = loadFile(node, importedFile, filename);
     if (importedContent == null)
       return;
 
-    importedFiles.add(importedFile.getAbsoluteFile());
+    // parse imported file
     StyleSheet importedAst = parseContent(node, importedContent, importedFile);
     solveImports(importedAst, importedFile.getParentFile());
-    astManipulator.replaceInBody(node, importedAst.getChilds());
+    
+    // add media queries if needed 
+    if (node.hasMediums()) {
+      Media media = new Media(node.getUnderlyingStructure());
+      media.setMediums(node.getMediums());
+      media.addMembers(importedAst.getMembers());
+      media.configureParentToAllChilds();
+      astManipulator.replaceInBody(node, media);
+    } else {
+      astManipulator.replaceInBody(node, importedAst.getChilds());
+    }
   }
 
   private boolean isImportOnce(Import node) {

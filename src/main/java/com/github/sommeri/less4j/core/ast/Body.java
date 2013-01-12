@@ -27,6 +27,10 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return body;
     }
 
+    public List<T> getMembers() {
+      return body;
+    }
+
     protected List<T> getBody() {
       return body;
     }
@@ -60,6 +64,13 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       body.remove(oldMember);
       oldMember.setParent(null);
       configureParentToAllChilds();
+    }
+
+    public void replaceMember(T oldMember, T newMember) {
+      body.add(body.indexOf(oldMember), newMember);
+      body.remove(oldMember);
+      oldMember.setParent(null);
+      newMember.setParent(this);
     }
 
     public List<T> membersByType(ASTCssNodeType type) {

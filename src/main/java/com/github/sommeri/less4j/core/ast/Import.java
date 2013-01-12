@@ -44,6 +44,10 @@ public class Import extends ASTCssNode {
     mediums.add(medium);
   }
 
+  public boolean hasMediums() {
+    return !mediums.isEmpty();
+  }
+
   @Override
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)urlExpression);
@@ -59,10 +63,6 @@ public class Import extends ASTCssNode {
     result.configureParentToAllChilds();
     return result;
   }
-
-//@Override
-//public String toString() {
-//}
 
   @Override
   public ASTCssNodeType getType() {

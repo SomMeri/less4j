@@ -1,0 +1,13 @@
+@media screen and (max-width: 400px) {
+  chained-import-1 {
+    content: chained-import-1;
+  }
+  chained-import-2 {
+    content: chained-import-2;
+  }
+}
+@media handheld {
+  chained-import-1 {
+    content: chained-import-1;
+  }
+}
