@@ -28,6 +28,7 @@ public abstract class AbstractErrorReportingTest {
   private final File cssOutput;
   private final File errorList;
   private final String testName;
+  protected boolean print = false;
 
   public AbstractErrorReportingTest(File lessFile, File cssOutput, File errorList, String testName) {
     this.lessFile = lessFile;
@@ -67,7 +68,15 @@ public abstract class AbstractErrorReportingTest {
 
   private void assertCorrectWarnings(CompilationResult actual) {
     //validate css
-    assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(actual.getCss()));
+    String expectedCss = canonize(expectedCss());
+    String actualCss = canonize(actual.getCss());
+    if (print) {
+    System.out.println("******** expected css **********");
+    System.out.println(expectedCss);
+    System.out.println("******** actual css **********");
+    System.out.println(actualCss);
+    }
+    assertEquals(lessFile.toString(), expectedCss, actualCss);
     //validate warnings
     String completeErrorReport = generateWarningsReport(actual);
     assertEquals(lessFile.toString(), canonize(expectedErrors()), canonize(completeErrorReport));

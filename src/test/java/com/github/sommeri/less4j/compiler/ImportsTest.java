@@ -16,6 +16,7 @@ public class ImportsTest extends AbstractErrorReportingTest {
 
   public ImportsTest(File lessFile, File cssOutput, File errorList, String testName) {
     super(lessFile, cssOutput, errorList, testName);
+    print = true;
   }
 
   @Parameters()
