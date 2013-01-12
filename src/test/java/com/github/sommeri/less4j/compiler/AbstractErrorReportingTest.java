@@ -59,23 +59,28 @@ public abstract class AbstractErrorReportingTest {
   }
 
   private void assertCorrectErrors(Less4jException error) {
-    //validate css
-    assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
-    //validate errors and warnings
+    String expectedCss = canonize(expectedCss());
+    String actualCss = canonize(error.getPartialResult().getCss());
     String completeErrorReport = generateErrorReport(error);
-    assertEquals(lessFile.toString(), canonize(expectedErrors()), canonize(completeErrorReport));
+    String actualErrors = canonize(completeErrorReport);
+    if (print) {
+    System.out.println("******** expected css **********");
+    System.out.println(expectedCss);
+    System.out.println("******** actual css **********");
+    System.out.println(actualCss);
+    System.out.println("******** errors **********");
+    System.out.println(actualErrors);
+    }
+    //validate css
+    assertEquals(lessFile.toString(), expectedCss, actualCss);
+    //validate errors and warnings
+    assertEquals(lessFile.toString(), canonize(expectedErrors()), actualErrors);
   }
 
   private void assertCorrectWarnings(CompilationResult actual) {
     //validate css
     String expectedCss = canonize(expectedCss());
     String actualCss = canonize(actual.getCss());
-    if (print) {
-    System.out.println("******** expected css **********");
-    System.out.println(expectedCss);
-    System.out.println("******** actual css **********");
-    System.out.println(actualCss);
-    }
     assertEquals(lessFile.toString(), expectedCss, actualCss);
     //validate warnings
     String completeErrorReport = generateWarningsReport(actual);
