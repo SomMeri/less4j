@@ -39,9 +39,8 @@ public abstract class AbstractFileBasedTest {
   @Test
   public final void compileAndCompare() throws Throwable {
     try {
-      String less = IOUtils.toString(new FileReader(lessFile));
       LessCompiler compiler = getCompiler();
-      CompilationResult actual = compiler.compile(less);
+      CompilationResult actual = compiler.compile(lessFile);
       
       String expected = IOUtils.toString(new FileReader(cssFile));
       assertEquals(lessFile.toString(), canonize(expected), canonize(actual.getCss()));
@@ -75,8 +74,8 @@ public abstract class AbstractFileBasedTest {
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
     CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
-    printer.printToSysout(error.getPartialResult(), testName);
-    printer.reportErrorsAndWarnings(error, testName);
+    printer.printToSysout(error.getPartialResult(), testName, lessFile);
+    printer.reportErrorsAndWarnings(error, testName, lessFile);
     
     String completeErrorReport = outContent.toString() + errContent.toString();
     return completeErrorReport;

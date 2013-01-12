@@ -9,11 +9,13 @@ import java.io.PrintStream;
 import org.junit.After;
 import org.junit.Before;
 
+import com.github.sommeri.less4j.utils.DebugAndTestPrint;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
 public abstract class CommandLineTest {
 
-  protected static final String FILE_DOES_NOT_EXISTS = "The file src/test/resources/command-line/doesNotExists.less does not exists.\nCould not compile the file src/test/resources/command-line/doesNotExists.less\n";
+  protected static final String FILE_DOES_NOT_EXISTS = "Errors produced by compilation of src/test/resources/command-line/doesNotExists.less\nERROR The file " + DebugAndTestPrint.slashToplatformFileSeparator("src/test/resources/command-line/doesNotExists.less")+" does not exists.\nCould not compile the file src/test/resources/command-line/doesNotExists.less\n";
+
   protected static final String inputDir = "src/test/resources/command-line/";
   protected static final String customOutputDir = "src/test/resources/command-line/output";
   private static final String EXPECTED_CSS = ".test h4 {\n  declaration: ##ID;\n}\n";

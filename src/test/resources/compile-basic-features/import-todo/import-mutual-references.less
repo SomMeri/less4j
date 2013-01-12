@@ -1,0 +1,10 @@
+@variable: 2; // imported file contains variable with the same name
+.mainMixin() {
+  padding: @variable @variable @variable @variable;
+}
+mainSelector {
+  .mainMixin();
+  .importedMixin(); // mixin is defined in imported file 
+}
+@import url(import/needs-mutual-references.less);
+@definitelyLast: 99;

@@ -94,7 +94,7 @@ public class ExpressionEvaluator {
     String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
     return new EscapedValue(input.getUnderlyingStructure(), value);
   }
-  
+
   public Expression evaluate(Variable input) {
     if (cycleDetector.wouldCycle(input)) {
       problemsHandler.variablesCycle(cycleDetector.getCycleFor(input));
@@ -168,7 +168,7 @@ public class ExpressionEvaluator {
     case ESCAPED_VALUE:
       return evaluate((EscapedValue) input);
 
-      //the value is already there, nothing to evaluate
+    //the value is already there, nothing to evaluate
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:

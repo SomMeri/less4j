@@ -7,10 +7,12 @@ import org.antlr.runtime.Token;
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
-public class DebugPrint {
+public class DebugAndTestPrint {
 
+  public static final String FILE_SEPARATOR = "#FILE_SEPARATOR#";
   private static boolean printIndexes = true;
   private static boolean printComments = false;
 
@@ -84,4 +86,19 @@ public class DebugPrint {
     return result;
   }
 
+  public static String slashToplatformFileSeparator(String path) {
+    if (path==null)
+      return path;
+    
+    return platformFileSeparator(path.replace("/", FILE_SEPARATOR));
+  }
+
+  public static String platformFileSeparator(String path) {
+    if (path==null)
+      return path;
+    
+    return path.replace(FILE_SEPARATOR, Constants.FILE_SEPARATOR);
+  }
+
+  
 }

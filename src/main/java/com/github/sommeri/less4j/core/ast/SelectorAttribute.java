@@ -12,7 +12,7 @@ public class SelectorAttribute extends ElementSubsequent {
   private String value;
 
   public SelectorAttribute(HiddenTokenAwareTree token, String name) {
-    this(token, name, new SelectorOperator(new HiddenTokenAwareTree(), SelectorOperator.Operator.NONE), null);
+    this(token, name, new SelectorOperator(new HiddenTokenAwareTree(token.getInputFile()), SelectorOperator.Operator.NONE), null);
   }
   
   public SelectorAttribute(HiddenTokenAwareTree token, String name, SelectorOperator operator, String value) {

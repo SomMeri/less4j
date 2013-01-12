@@ -12,12 +12,13 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.TreeAdaptor;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
 import com.github.sommeri.less4j.core.parser.AntlrException;
 
-public class SuperLessParser extends Parser {
+public abstract class SuperLessParser extends Parser {
 
   public String[] tokenErrorNames;
   
@@ -138,6 +139,8 @@ public class SuperLessParser extends Parser {
     generateTokenErrorNames();
   }
 
+  public abstract TreeAdaptor getTreeAdaptor();
+  
   private void generateTokenErrorNames() {
     tokenErrorNames = getTokenNames().clone();
     for (int i = 0; i < tokenErrorNames.length; i++) {
@@ -160,7 +163,8 @@ public class SuperLessParser extends Parser {
   }
 
   public void reportError(RecognitionException e) {
-    errors.add(new AntlrException(e, getErrorMessage(e, tokenErrorNames)));
+    HiddenTokenAwareTreeAdaptor treeAdaptor = (HiddenTokenAwareTreeAdaptor)getTreeAdaptor();
+    errors.add(new AntlrException(treeAdaptor.getInputFile(), e, getErrorMessage(e, tokenErrorNames)));
   }
 
   public String getErrorHeader(RecognitionException e) {

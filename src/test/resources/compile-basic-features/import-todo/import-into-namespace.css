@@ -1,0 +1,4 @@
+h1 {
+  content: @variable value is "namespace";
+  content: mixin in space;
+}

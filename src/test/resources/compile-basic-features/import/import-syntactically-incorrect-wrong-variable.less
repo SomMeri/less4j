@@ -1,0 +1,5 @@
+@import-once url(import\syntactically-incorrect-wrong-variable.less);
+@variable: value;
+h1 {
+  content: ~"@{variable}";
+}

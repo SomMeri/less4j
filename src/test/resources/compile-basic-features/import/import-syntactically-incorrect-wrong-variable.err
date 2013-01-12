@@ -1,0 +1,2 @@
+Errors produced by compilation of testCase
+ERROR import#FILE_SEPARATOR#syntactically-incorrect-wrong-variable.less 3:10 The variable "@undefinedVariable" was not declared.

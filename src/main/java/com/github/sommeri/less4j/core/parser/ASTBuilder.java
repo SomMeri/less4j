@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,23 +53,24 @@ public class ASTBuilder {
     if (underlyingStructure==null)
       return ;
     
-    List<Comment> preceding = convertToComments(underlyingStructure.getPreceding());
+    File inputFile = underlyingStructure.getInputFile();
+    List<Comment> preceding = convertToComments(underlyingStructure.getPreceding(), inputFile);
     node.setOpeningComments(preceding);
 
-    List<Comment> following = convertToComments(underlyingStructure.getFollowing());
+    List<Comment> following = convertToComments(underlyingStructure.getFollowing(), inputFile);
     node.setTrailingComments(following);
 
-    List<Comment> orphans = convertToComments(underlyingStructure.getOrphans());
+    List<Comment> orphans = convertToComments(underlyingStructure.getOrphans(), inputFile);
     node.setOrphanComments(orphans);
   }
   
-  private List<Comment> convertToComments(List<Token> preceding) {
+  private List<Comment> convertToComments(List<Token> preceding, File inputFile) {
     List<Comment> result = new ArrayList<Comment>();
 
     Comment comment = null;
     for (Token token : preceding) {
       if (token.getType() == LessLexer.COMMENT) {
-        comment = new Comment(new HiddenTokenAwareTree(token));
+        comment = new Comment(new HiddenTokenAwareTree(token, inputFile));
         result.add(comment);
       }
       if (token.getType() == LessLexer.NEW_LINE) {

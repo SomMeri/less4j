@@ -16,12 +16,3 @@
 h1 {
   color: red;
 }
-#namespace {
-  @import "import\some-file-6.css";
-}
-#namespace {
-  @import "import\some-file-once-6.css";
-}
-#namespace {
-  @import "import\some-file-multiple-6.css";
-}

@@ -21,6 +21,7 @@ import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
+import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdSelector;
@@ -182,6 +183,9 @@ public class CssPrinter {
     case FAULTY_EXPRESSION:
       return appendFaultyExpression((FaultyExpression) node);
 
+    case FAULTY_NODE:
+      return appendFaultyNode((FaultyNode) node);
+
     case ESCAPED_SELECTOR:
       return appendEscapedSelector((EscapedSelector) node);
 
@@ -293,6 +297,11 @@ public class CssPrinter {
   }
 
 
+
+  private boolean appendFaultyNode(FaultyNode node) {
+    builder.append("!#error#!");
+    return true;
+  }
 
   private boolean appendFaultyExpression(FaultyExpression node) {
     builder.append("!#error#!");

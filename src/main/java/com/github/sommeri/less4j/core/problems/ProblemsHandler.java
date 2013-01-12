@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
@@ -25,6 +26,23 @@ public class ProblemsHandler {
 
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
+
+  
+  public void warnLessImportNoBaseDirectory(Expression urlExpression) {
+    collector.addWarning(new CompilationWarning(urlExpression, "Attempt to import less file with an unknown compiled file location. Import statement left unchanged."));
+  }
+
+  public void errorImportedFileCanNotBeRead(Import node, String filename) {
+    collector.addError(new CompilationError(node, "The file " + filename + " can not be read."));
+  }
+
+  public void errorImportedFileNotFound(Import node, String filename) {
+    collector.addError(new CompilationError(node, "The file " + filename + " does not exist."));
+  }
+
+  public void errorWrongImport(Expression urlExpression) {
+    collector.addError(new CompilationError(urlExpression, "Unsupported @import url kind. File link expression in @import can handle only strings and urls."));
+  }
 
   public void nestedAppenderOnTopLevel(NestedSelectorAppender appender) {
     collector.addError(new CompilationError(appender, "Appender symbol is not allowed inside top level rulesets."));
@@ -194,6 +212,10 @@ public class ProblemsHandler {
 
   public List<Problem> getErrors() {
     return collector.getErrors();
+  }
+
+  public void addErrors(List<Problem> errors) {
+    collector.addErrors(errors);
   }
 
 }

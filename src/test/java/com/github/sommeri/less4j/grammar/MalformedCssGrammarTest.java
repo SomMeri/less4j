@@ -18,7 +18,7 @@ public class MalformedCssGrammarTest {
   public void simpleIncorrectSelector() throws RecognitionException {
     String crashingSelector = "p:not*()";
     ANTLRParser compiler = new ANTLRParser();
-    ParseResult result = compiler.parseSelector(crashingSelector);
+    ParseResult result = compiler.parseSelector(crashingSelector, null);
     
     assertNoTokenMissing(crashingSelector, result.getTree(), 0);
   }
@@ -27,7 +27,7 @@ public class MalformedCssGrammarTest {
   public void combinedIncorrectSelector() throws RecognitionException {
     String crashingSelector = "p:not*()  p:not() { }";
     ANTLRParser compiler = new ANTLRParser();
-    ParseResult result = compiler.parseRuleset(crashingSelector);
+    ParseResult result = compiler.parseRuleset(crashingSelector, null);
 
     assertNoTokenMissing(crashingSelector, result.getTree(), -1);
   }
@@ -36,7 +36,7 @@ public class MalformedCssGrammarTest {
   public void stylesheet() throws RecognitionException {
     String crashingSelector =   "p:not([class**=\"lead\"]) {\n  color: black;\n}";
     ANTLRParser compiler = new ANTLRParser();
-    ParseResult result = compiler.parseStyleSheet(crashingSelector);
+    ParseResult result = compiler.parseStyleSheet(crashingSelector, null);
 
     //the -3 is correct, even if it seems like huge hack. It sort of is.
     //RBRACE }; LBRACE {; RBRACKET ] and LBRACKET [ are (correctly thrown away)

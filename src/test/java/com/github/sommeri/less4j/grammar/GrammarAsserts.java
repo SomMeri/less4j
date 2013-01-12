@@ -108,7 +108,7 @@ class CountNodesAction implements TreeVisitorAction {
     } else {
       if (!isDummy(((CommonTree)t).getToken())) {
         count++;
-//        String string = DebugPrint.toString(count, ((CommonTree)t).getToken());
+//        String string = DebugAndTestPrint.toString(count, ((CommonTree)t).getToken());
 //        System.out.println(string);
       }
     }

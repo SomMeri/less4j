@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,7 +19,7 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
-import com.github.sommeri.less4j.utils.DebugPrint;
+import com.github.sommeri.less4j.utils.DebugAndTestPrint;
 
 /**
  * 
@@ -29,61 +30,61 @@ public class ANTLRParser {
   private final boolean isDebug = false;
   private static final List<Integer> KEEP_HIDDEN_TOKENS = Arrays.asList(LessLexer.COMMENT, LessLexer.NEW_LINE);
 
-  public ParseResult parseStyleSheet(String styleSheet) {
-    return parse(styleSheet, InputType.STYLE_SHEET);
+  public ParseResult parseStyleSheet(String styleSheet, File inputFile) {
+    return parse(styleSheet, inputFile, InputType.STYLE_SHEET);
   }
 
-  public ParseResult parseDeclaration(String declaration) {
-    return parse(declaration, InputType.DECLARATION);
+  public ParseResult parseDeclaration(String declaration, File inputFile) {
+    return parse(declaration, inputFile, InputType.DECLARATION);
   }
 
-  public ParseResult parseExpression(String expression) {
-    return parse(expression, InputType.EXPRESSION);
+  public ParseResult parseExpression(String expression, File inputFile) {
+    return parse(expression, inputFile, InputType.EXPRESSION);
   }
 
-  public ParseResult parseTerm(String term) {
-    return parse(term, InputType.TERM);
+  public ParseResult parseTerm(String term, File inputFile) {
+    return parse(term, inputFile, InputType.TERM);
   }
 
-  public ParseResult parseSelector(String selector) {
-    return parse(selector, InputType.SELECTOR);
+  public ParseResult parseSelector(String selector, File inputFile) {
+    return parse(selector, inputFile, InputType.SELECTOR);
   }
 
-  public ParseResult parseRuleset(String ruleset) {
-    return parse(ruleset, InputType.RULESET);
+  public ParseResult parseRuleset(String ruleset, File inputFile) {
+    return parse(ruleset, inputFile, InputType.RULESET);
   }
   
-  private ParseResult parse(String input, InputType inputType) {
+  private ParseResult parse(String input, File inputFile, InputType inputType) {
     try {
       if (isDebug)
-        DebugPrint.printTokenStream(input);
+        DebugAndTestPrint.printTokenStream(input);
       List<Problem> errors = new ArrayList<Problem>();
-      LessLexer lexer = createLexer(input, errors);
+      LessLexer lexer = createLexer(input, inputFile, errors);
 
       CollectorTokenSource tokenSource = new CollectorTokenSource(lexer, KEEP_HIDDEN_TOKENS);
-      LessParser parser = createParser(tokenSource, errors);
+      LessParser parser = createParser(tokenSource, inputFile, errors);
       ParserRuleReturnScope returnScope = inputType.parseTree(parser);
       
       HiddenTokenAwareTree ast = (HiddenTokenAwareTree) returnScope.getTree();
       merge(ast, tokenSource.getCollectedTokens());
       if (isDebug)
-        DebugPrint.print(ast);
+        DebugAndTestPrint.print(ast);
       return new ParseResultImpl(ast, new ArrayList<Problem>(errors));
     } catch (RecognitionException e) {
       throw new IllegalStateException("Recognition exception is never thrown, only declared.");
     }
   }
 
-  private LessParser createParser(TokenSource tokenSource, List<Problem> errors) {
+  private LessParser createParser(TokenSource tokenSource, File inputFile, List<Problem> errors) {
     CommonTokenStream tokens = new CommonTokenStream(tokenSource);
     LessParser parser = new LessParser(tokens, errors);
-    parser.setTreeAdaptor(new HiddenTokenAwareTreeAdaptor());
+    parser.setTreeAdaptor(new HiddenTokenAwareTreeAdaptor(inputFile));
     return parser;
   }
 
-  private LessLexer createLexer(String expression, List<Problem> errors) {
+  private LessLexer createLexer(String expression, File inputFile, List<Problem> errors) {
     ANTLRStringStream input = new ANTLRStringStream(expression);
-    LessLexer lexer = new LessLexer(input, errors);
+    LessLexer lexer = new LessLexer(inputFile, input, errors);
     return lexer;
   }
 
@@ -215,14 +216,25 @@ class CollectorTokenSource implements TokenSource {
 
 class HiddenTokenAwareTreeAdaptor extends CommonTreeAdaptor {
 
+  private final File inputFile;
+
+  public HiddenTokenAwareTreeAdaptor(File inputFile) {
+    super();
+    this.inputFile = inputFile;
+  }
+
   @Override
   public Object create(Token payload) {
-    return new HiddenTokenAwareTree(payload);
+    return new HiddenTokenAwareTree(payload, inputFile);
   }
 
   @Override
   public Object errorNode(TokenStream input, Token start, Token stop, RecognitionException e) {
-    return new HiddenTokenAwareErrorTree(input, start, stop, e);
+    return new HiddenTokenAwareErrorTree(input, start, stop, e, inputFile);
+  }
+
+  public File getInputFile() {
+    return inputFile;
   }
 
 }

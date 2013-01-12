@@ -1,0 +1,9 @@
+chained-import-1 {
+  content: chained-import-1;
+}
+chained-import-2 {
+  content: chained-import-2;
+}
+h1 {
+  color: green;
+}

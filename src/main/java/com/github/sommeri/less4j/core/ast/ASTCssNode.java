@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.ast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +86,10 @@ public abstract class ASTCssNode implements Cloneable {
   
   public boolean isFaulty() {
     return false;
+  }
+
+  public File getSourceFile() {
+    return getUnderlyingStructure()==null? null : getUnderlyingStructure().getInputFile();
   }
 
   public int getSourceLine() {

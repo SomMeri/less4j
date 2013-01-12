@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.compiler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +24,7 @@ import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
+import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class LessToCssCompiler {
@@ -34,10 +36,13 @@ public class LessToCssCompiler {
     this.problemsHandler = problemsHandler;
   }
 
-  public ASTCssNode compileToCss(StyleSheet less) {
+  public ASTCssNode compileToCss(StyleSheet less, File baseDirectory) {
+    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
+    importsSolver.solveImports(less, baseDirectory);
+
     ScopeExtractor scopeBuilder = new ScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
-
+    
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);
 

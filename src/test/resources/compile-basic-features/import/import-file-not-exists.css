@@ -1,0 +1,4 @@
+@import url(somewhere/this-file-does-not-exists.less);
+.class {
+  padding: 2 2 2 2;
+}

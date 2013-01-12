@@ -29,28 +29,28 @@ public class SelectorsGrammarTest {
   @Test
   public void emptyCombinator() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("h1 h2 {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("h1 h2 {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void spacelessCombinator() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("h1>h2 {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("h1>h2 {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void spacedCombinator() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("h1 + h2 {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("h1 + h2 {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void afterCSS2() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:after {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:after {", null);
     assertValidSelector(result);
     assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.SIMPLE_SELECTOR);
   }
@@ -59,7 +59,7 @@ public class SelectorsGrammarTest {
   public void afterCSS3() {
     ANTLRParser compiler = new ANTLRParser();
     String selector = "li::after {";
-    ANTLRParser.ParseResult result = compiler.parseSelector(selector);
+    ANTLRParser.ParseResult result = compiler.parseSelector(selector, null);
     assertValidSelector(result);
     assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.SIMPLE_SELECTOR);
   }
@@ -68,21 +68,21 @@ public class SelectorsGrammarTest {
   public void notPseudo() {
     ANTLRParser compiler = new ANTLRParser();
     String selector = "li:not(:only-child) { ";
-    ANTLRParser.ParseResult result = compiler.parseSelector(selector);
+    ANTLRParser.ParseResult result = compiler.parseSelector(selector, null);
     assertValidSelector(result);
     }
 
   @Test
   public void notNumber() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("class#id[attr=32]:not(1) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("class#id[attr=32]:not(1) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void notAttribute() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("p:not([class*=\"lead\"]) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("p:not([class*=\"lead\"]) {", null);
     assertValidSelector(result);
   }
   
@@ -95,42 +95,42 @@ public class SelectorsGrammarTest {
         "}";
     
     ANTLRParser compiler = new ANTLRParser();
-    ParseResult result = compiler.parseStyleSheet(combined_stylesheet);
+    ParseResult result = compiler.parseStyleSheet(combined_stylesheet, null);
     assertValid(result);
   }
 
   @Test
   public void formulaAnb() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(4n+1) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(4n+1) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaAnMinusb() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(4n-1) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(4n-1) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaAn() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(4n) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(4n) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaMinusAn() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(-4n) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(-4n) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaMinusN() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(-n) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(-n) {", null);
     assertValidSelector(result);
   }
 
@@ -138,35 +138,35 @@ public class SelectorsGrammarTest {
   public void formulaMinusNMinus() {
     ANTLRParser compiler = new ANTLRParser();
     String selector = "li:nth-child(-n+2) {";
-    ANTLRParser.ParseResult result = compiler.parseSelector(selector);
+    ANTLRParser.ParseResult result = compiler.parseSelector(selector, null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaEven() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(even) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(even) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaEvenUppercase() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:NTH-CHILD(EVEN) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:NTH-CHILD(EVEN) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaOdd() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(odd) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:nth-child(odd) {", null);
     assertValidSelector(result);
   }
 
   @Test
   public void formulaOddUppercase() {
     ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:NTH-CHILD(ODD) {");
+    ANTLRParser.ParseResult result = compiler.parseSelector("li:NTH-CHILD(ODD) {", null);
     assertValidSelector(result);
   }
 

@@ -1,13 +1,10 @@
 package com.github.sommeri.less4j.commandline;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
-
-import org.apache.commons.io.IOUtils;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -75,28 +72,29 @@ public class CommandLine {
       return;
     }
 
-    String inputfile = files.get(0);
+    String inputFileName = files.get(0);
+    File inputFile = new File(inputFileName);
     try {
-      CompilationResult content = compile(inputfile);
-      singleModePrint(files, inputfile, content);
+      CompilationResult content = compile(inputFile);
+      singleModePrint(files, inputFileName, inputFile, content);
     } catch (Less4jException ex) {
       CompilationResult partialResult = ex.getPartialResult();
       if (printPartial) {
-        singleModePrint(files, inputfile, partialResult);
-        print.reportErrors(ex, inputfile);
+        singleModePrint(files, inputFileName, inputFile, partialResult);
+        print.reportErrors(ex, inputFileName, inputFile);
       } else {
-        print.reportErrorsAndWarnings(ex, inputfile);
+        print.reportErrorsAndWarnings(ex, inputFileName, inputFile);
       }
-      print.reportCouldNotCompileTheFile(inputfile);
+      print.reportCouldNotCompileTheFile(inputFileName);
     }
 
   }
 
-  private void singleModePrint(List<String> files, String inputfile, CompilationResult content) {
+  private void singleModePrint(List<String> files, String inputfileName, File inputFile, CompilationResult content) {
     if (files.size() == 1) {
-      print.printToSysout(content, inputfile);
+      print.printToSysout(content, inputfileName, inputFile);
     } else {
-      print.printToFile(content, files.get(1), inputfile);
+      print.printToFile(content, files.get(1), inputfileName, inputFile);
     }
   }
 
@@ -105,16 +103,17 @@ public class CommandLine {
       return;
 
     for (String filename : files) {
+      File inputFile = new File(filename);
       try {
-        CompilationResult content = compile(filename);
-        print.printToFile(content, toOutputFilename(outputDirectory, filename), filename);
+        CompilationResult content = compile(inputFile);
+        print.printToFile(content, toOutputFilename(outputDirectory, filename), filename, inputFile);
       } catch (Less4jException ex) {
         CompilationResult partialResult = ex.getPartialResult();
         if (printPartial) {
-          print.printToFile(partialResult, toOutputFilename(outputDirectory, filename), filename);
-          print.reportErrors(ex, filename);
+          print.printToFile(partialResult, toOutputFilename(outputDirectory, filename), filename, inputFile);
+          print.reportErrors(ex, filename, inputFile);
         } else {
-          print.reportErrorsAndWarnings(ex, filename);
+          print.reportErrorsAndWarnings(ex, filename, inputFile);
         }
         print.reportCouldNotCompileTheFile(filename);
       }
@@ -163,27 +162,9 @@ public class CommandLine {
     return filename.substring(0, lastIndexOf) + ".css";
   }
 
-  private CompilationResult compile(String filename) throws Less4jException {
-    File inputFile = new File(filename);
-    if (!inputFile.exists()) {
-      print.reportError("The file " + filename + " does not exists.");
-      return null;
-    }
-    if (!inputFile.canRead()) {
-      print.reportError("Cannot read the file " + filename + ".");
-      return null;
-    }
-    String content;
-    try {
-      FileReader input = new FileReader(inputFile);
-      content = IOUtils.toString(input).replace("\r\n", "\n");
-      input.close();
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
-    }
-
+  private CompilationResult compile(File inputFile) throws Less4jException {
     DefaultLessCompiler compiler = new DefaultLessCompiler();
-    return compiler.compile(content);
+    return compiler.compile(inputFile);
   }
 
   private void printVersion(JCommander jCommander) {

@@ -1,0 +1,28 @@
+#pureNamespace() {
+  @fromImporter: "pureNamespace";
+  TODO document this is not legal
+  @import-multiple "import\namespaces-and-mixins.less";
+}
+
+h2 {
+  #pureNamespace .mixin;
+  #pureNamespace #space .mixin;
+}
+
+/* Will I bother them again with a non-bug or is it a bug? */
+h1 {
+  #ruleset(); //this works
+  #ruleset() > .imported(); //this causes error
+}
+#ruleset() {
+  @import-once "import\abused-import-1.less";
+  .imported(); //this works
+}
+
+// import\abused-import-1.less contains this:
+declaration: value;
+
+.imported() {
+  color: blue;
+}
+// end of import\abused-import-1.less

@@ -1,0 +1,11 @@
+@fromImporter: "top level";
+
+#namespace {
+  @fromImporter: "namespace";
+  @import-multiple "import\namespaces-and-mixins.less";
+}
+
+h1 {
+  #namespace .mixin;
+  #namespace #space .mixin;
+}

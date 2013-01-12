@@ -1,11 +1,14 @@
 package com.github.sommeri.less4j;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
 public interface LessCompiler {
 
   public CompilationResult compile(String lessContent) throws Less4jException;
+
+  public CompilationResult compile(File inputFile) throws Less4jException;
 
   public class CompilationResult {
 
@@ -40,6 +43,8 @@ public interface LessCompiler {
 
     public Type getType();
 
+    public File getFile();
+
     public int getLine();
 
     public int getCharacter();
@@ -49,6 +54,7 @@ public interface LessCompiler {
     public enum Type {
       WARNING, ERROR
     }
+
   }
 
 }

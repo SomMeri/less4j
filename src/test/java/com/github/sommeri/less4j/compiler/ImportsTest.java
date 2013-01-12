@@ -7,17 +7,20 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
-public class ImportsTest extends BasicFeaturesTest {
+//TODO: create issue: import-types-combinations.less must be revisited under 1.4.0
+//TODO: document import-once - does not import if it was imported at all
+//TODO: document import acts as import-once - does not import if it was imported at all
+public class ImportsTest extends AbstractErrorReportingTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/import/";
 
-  public ImportsTest(File inputFile, File outputFile, String testName) {
-    super(inputFile, outputFile, testName);
+  public ImportsTest(File lessFile, File cssOutput, File errorList, String testName) {
+    super(lessFile, cssOutput, errorList, testName);
   }
 
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    return (new TestFileUtils()).loadTestFiles(standardCases);
+    return (new TestFileUtils(".err")).loadTestFiles(standardCases);
   }
 
 }

@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.problems;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
@@ -10,6 +11,10 @@ public class ProblemsCollector {
   private List<Problem> warnings = new ArrayList<Problem>();
   private List<Problem> errors = new ArrayList<Problem>();
   
+  public void addErrors(Collection<Problem> errors) {
+    this.errors.addAll(errors);
+  }
+
   public void addError(CompilationError error) {
     errors.add(error);
   }

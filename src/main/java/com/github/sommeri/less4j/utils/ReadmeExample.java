@@ -6,6 +6,7 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
+//FIXME: !!! modify readme and describe API !!!
 public class ReadmeExample {
   public static void main(String[] args) throws Less4jException {
     LessCompiler compiler = new ThreadUnsafeLessCompiler();

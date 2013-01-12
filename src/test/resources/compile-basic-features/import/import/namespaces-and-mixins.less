@@ -1,0 +1,11 @@
+@variable: @fromImporter;
+
+.mixin() {
+  content: ~"@variable value is" @variable;
+}
+
+#space {
+  .mixin() {
+    content: ~"mixin in space";
+  }
+}

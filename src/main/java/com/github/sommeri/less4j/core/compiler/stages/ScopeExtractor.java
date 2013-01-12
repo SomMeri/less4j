@@ -54,7 +54,6 @@ public class ScopeExtractor {
         ReusableStructure mixin = (ReusableStructure) kid;
         Scope bodyScope = currentScope.getChildOwnerOf(mixin.getBody());
         currentScope.registerMixin(mixin, bodyScope);
-        
         bodyScope.removedFromTree();
         manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.RULE_SET) {

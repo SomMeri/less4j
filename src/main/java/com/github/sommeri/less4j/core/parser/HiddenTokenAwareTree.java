@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,20 +10,28 @@ import org.antlr.runtime.tree.CommonTree;
 
 public class HiddenTokenAwareTree extends CommonTree {
 
+  private final File inputFile;
   private List<Token> preceding = new LinkedList<Token>();
   private List<Token> orphans = new LinkedList<Token>();
   private List<Token> following = new LinkedList<Token>();
 
-  public HiddenTokenAwareTree(Token payload) {
+  public HiddenTokenAwareTree(Token payload, File inputFile) {
     super(payload);
+    this.inputFile = inputFile;
   }
 
-  public HiddenTokenAwareTree() {
+  public HiddenTokenAwareTree(File inputFile) {
     super();
+    this.inputFile = inputFile;
   }
 
-  public HiddenTokenAwareTree(CommonTree node) {
+  public HiddenTokenAwareTree(CommonTree node, File inputFile) {
     super(node);
+    this.inputFile = inputFile;
+  }
+
+  public File getInputFile() {
+    return inputFile;
   }
 
   @Override
