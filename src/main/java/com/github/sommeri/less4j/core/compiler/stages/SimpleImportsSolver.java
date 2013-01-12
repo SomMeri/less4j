@@ -22,6 +22,7 @@ import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.platform.Constants;
 
 public class SimpleImportsSolver {
 
@@ -130,7 +131,7 @@ public class SimpleImportsSolver {
     Expression urlExpression = expressionEvaluator.evaluate(urlInput);
 
     if (urlExpression.getType() != ASTCssNodeType.FUNCTION)
-      return conversionUtils.toStringContent(urlExpression);
+      return toJavaFileSeparator(conversionUtils.toStringContent(urlExpression));
 
     //this is the only place in the compiler that can interpret the url function
     //TODO: ! may there should be a special AST construct for uri. I will see when I will start to play with variables as URI parameters.
@@ -138,7 +139,15 @@ public class SimpleImportsSolver {
     if (!"url".equals(function.getName().toLowerCase()))
       return null;
 
-    return conversionUtils.toStringContent(expressionEvaluator.evaluate(function.getParameter()));
+    return toJavaFileSeparator(conversionUtils.toStringContent(expressionEvaluator.evaluate(function.getParameter())));
+  }
+
+  private String toJavaFileSeparator(String path) {
+    if (Constants.FILE_SEPARATOR.equals("/")) {
+      return path;
+    }
+    
+    return path.replace(Constants.FILE_SEPARATOR, "/");
   }
 
   private String loadFile(Import node, File inputFile, String filename) {
