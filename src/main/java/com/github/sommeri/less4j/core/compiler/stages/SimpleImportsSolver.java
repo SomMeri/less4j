@@ -53,7 +53,7 @@ public class SimpleImportsSolver {
 
   private void importEncountered(Import node, File baseDirectory) {
     String filename = evaluateFilename(node.getUrlExpression());
-    if (filename == null) { //FIXME: document limitations
+    if (filename == null) { 
       problemsHandler.errorWrongImport(node.getUrlExpression());
       return;
     }

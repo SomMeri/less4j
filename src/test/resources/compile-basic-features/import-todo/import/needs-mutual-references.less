@@ -1,9 +1,0 @@
-importedSelector {
-  .mainMixin(); // mixin is defined in main file
-  .importedMixin();
-}
-.importedMixin() {
-  content: "imported mixin" @definitelyLast;
-}
-@variable: 3; // main file contains variable with the same name
-@definitelyLast: 1; // main file contains variable with the same name

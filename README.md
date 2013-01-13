@@ -22,7 +22,7 @@ The documentation is kept on Github wiki:
 * [wiki home page](https://github.com/SomMeri/less4j/wiki),
 * [all written wiki pages](https://github.com/SomMeri/less4j/wiki/_pages). 
 
-For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation be a bit different.
+For those interested about project internals, architecture and comments handling are described in a [blog post] (http://meri-stuff.blogspot.sk/2012/09/tackling-comments-in-antlr-compiler.html). The blog post captures our ideas at the time of its writing, so current implementation may be a bit different.
 
 ## Command Line
 Less4j can run from [command line](https://github.com/SomMeri/less4j/wiki/Command-Line-Options). Latest versions are shared via [less4j dropbox account](https://www.dropbox.com/sh/zcb8p27db9ou4x1/keQWIZziH8). Shared folder always contains at least two latest versions, but we may remove older ones. 
@@ -46,7 +46,7 @@ The easiest way to integrate less4j into Java project is to use [wro4j](http://a
 ## API:
 Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
 
-Access the compiler through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. Thread safe implementation of the interface is `com.github.less4j.core.DefaultLessCompiler`. Return object `CompilationResult` has two methods: 
+Access the compiler either through `CompilationResult compile(File inputFile)` method or through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. Thread safe implementation of the interface is `com.github.less4j.core.DefaultLessCompiler`. Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list of compilation warnings or an empty list. 
 
