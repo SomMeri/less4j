@@ -129,7 +129,7 @@ public class SimpleImportsSolver {
   }
 
   private String normalizeFileName(String filename, String urlParams) {
-    if (filename.toLowerCase().endsWith(".less"))
+    if (filename.toLowerCase().contains("."))
       return filename;
 
     return filename + ".less" + urlParams;
@@ -147,7 +147,6 @@ public class SimpleImportsSolver {
       return toJavaFileSeparator(conversionUtils.toStringContent(urlExpression));
 
     //this is the only place in the compiler that can interpret the url function
-    //TODO: ! may there should be a special AST construct for uri. I will see when I will start to play with variables as URI parameters.
     FunctionExpression function = (FunctionExpression) urlExpression;
     if (!"url".equals(function.getName().toLowerCase()))
       return null;

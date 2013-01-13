@@ -420,7 +420,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     //FIXME: report comments bug to less.js? it is not too important
     List<ASTCssNode> members = new ArrayList<ASTCssNode>();
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
-    //FIXME: this is wrong
     HiddenTokenAwareTree lbrace = iterator.next();
     token.addPreceding(lbrace.getPreceding());
     if (iterator.hasNext()) {
