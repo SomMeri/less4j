@@ -46,7 +46,11 @@ The easiest way to integrate less4j into Java project is to use [wro4j](http://a
 ## API:
 Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
 
-Access the compiler either through `CompilationResult compile(File inputFile)` method or through `CompilationResult compile(String lessContent)` method of the `com.github.less4j.LessCompiler` interface. Thread safe implementation of the interface is `com.github.less4j.core.DefaultLessCompiler`. Return object `CompilationResult` has two methods: 
+Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes two methods:
+*  `CompilationResult compile(File inputFile)` - compiles a file, 
+*  `CompilationResult compile(String lessContent)` - compiles a string.
+
+Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list of compilation warnings or an empty list. 
 
