@@ -50,7 +50,7 @@ Access the compiler either through the `com.github.less4j.LessCompiler` interfac
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(String lessContent)` - compiles a string.
 
-The first and second method differ in one important thing: the second method is unable to handle "@import" statements located in compiled string. Files referenced by the import statement are relative to current file. Compiler invoked via string based compile method is unable to find imported less files and leaves the import statement as it is.     
+The first and second method differ in one important point: the second method is unable to handle "@import" statements located in compiled string. Files referenced by the import statement are relative to current file. Compiler invoked through string based compile method is unable to find imported less files and therefore leaves the import statement as it is. Use it with caution.
 
 Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
@@ -58,8 +58,11 @@ Return object `CompilationResult` has two methods:
 
 Each warning is described by an error message and knows both line and character number of the place that caused it.  
 
-<pre><code>LessCompiler compiler = new ThreadUnsafeLessCompiler();
-CompilationResult compilationResult = compiler.compile("* { margin: 1 1 1 1; }");
+<pre><code>
+File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
+
+LessCompiler compiler = new ThreadUnsafeLessCompiler();
+CompilationResult compilationResult = compiler.compile(inputLessFile);
 
 System.out.println(compilationResult.getCss());
 for (Problem warning : compilationResult.getWarnings()) {
