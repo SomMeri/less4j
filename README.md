@@ -58,12 +58,14 @@ Return object `CompilationResult` has two methods:
 
 Each warning is described by an error message and knows both line and character number of the place that caused it.  
 
-<pre><code>
+<pre><code>// create input file
 File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
 
+// compile it
 LessCompiler compiler = new ThreadUnsafeLessCompiler();
 CompilationResult compilationResult = compiler.compile(inputLessFile);
 
+// print results to console
 System.out.println(compilationResult.getCss());
 for (Problem warning : compilationResult.getWarnings()) {
   System.err.println(format(warning));
