@@ -23,6 +23,15 @@ public class ReadmeExample {
       System.err.println(format(warning));
     }
     
+    deleteFile(inputLessFile);
+  }
+
+  private static void deleteFile(File inputLessFile) {
+    try {
+      FileUtils.forceDelete(inputLessFile);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private static File createFile(String filename, String content) {

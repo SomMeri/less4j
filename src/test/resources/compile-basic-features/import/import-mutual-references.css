@@ -1,0 +1,8 @@
+mainSelector {
+  padding: 3 3 3 3;
+  content: "imported mixin" 99;
+}
+importedSelector {
+  padding: 3 3 3 3;
+  content: "imported mixin" 99;
+}
