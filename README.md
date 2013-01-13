@@ -50,7 +50,7 @@ Access the compiler either through the `com.github.less4j.LessCompiler` interfac
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(String lessContent)` - compiles a string.
 
-The first and second method differ in one important thing: the second method is unable to handle `@import` statements located in compiled string. 
+The first and second method differ in one important thing: the second method is unable to handle "@import" statements located in compiled string. Files referenced by the import statement are relative to current file. Compiler invoked via string based compile method is unable to find imported less files and leaves the import statement as it is.     
 
 Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
