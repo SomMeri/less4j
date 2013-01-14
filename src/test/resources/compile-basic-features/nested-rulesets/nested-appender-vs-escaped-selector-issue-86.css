@@ -1,0 +1,18 @@
+escaped.black {
+  color: black;
+}
+.green > .escaped {
+  color: black;
+}
+.greenescaped {
+  color: black;
+}
+.green #escaped {
+  color: black;
+}
+#escaped.escaped {
+  color: black;
+}
+#escaped .escaped {
+  color: black;
+}

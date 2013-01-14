@@ -14,9 +14,11 @@ import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
+import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSetsBody;
+import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
@@ -80,7 +82,7 @@ public class ReferencesSolver {
       break;
     }
     case ESCAPED_SELECTOR: {
-      EscapedSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator); 
+      SimpleSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator); 
       manipulator.replace(node, replacement);
       break;
     }
@@ -119,9 +121,11 @@ public class ReferencesSolver {
     return fixedName;
   }
 
-  private EscapedSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
+  private SimpleSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
+    HiddenTokenAwareTree underlying = input.getUnderlyingStructure();
     String value = stringInterpolator.replaceIn(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
-    return new EscapedSelector(input.getUnderlyingStructure(), value, input.getQuoteType());
+    InterpolableName interpolableName = new InterpolableName(underlying, new FixedNamePart(underlying, value));
+    return new SimpleSelector(input.getUnderlyingStructure(), interpolableName, false);
   }
 
   private FixedNamePart interpolateFixedNamePart(FixedNamePart input, ExpressionEvaluator expressionEvaluator) {

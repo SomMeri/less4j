@@ -25,15 +25,17 @@ public class SelectorBuilder {
       SelectorCombinator combinator = null;
       SelectorPart head = null;
       HiddenTokenAwareTree kid = iterator.next();
-      if (kid.getType() == LessLexer.NESTED_APPENDER || kid.getType() == LessLexer.SIMPLE_SELECTOR) {
-        head = (SelectorPart) parent.switchOn(kid);
-      } else {
+
+      if (ConversionUtils.isSelectorCombinator(kid)) {
         combinator = ConversionUtils.createSelectorCombinator(kid);
         kid = iterator.next();
         head = (SelectorPart) parent.switchOn(kid);
         // Ignore descendant combinator before appender. This info is already hidden in appender.isDirectlyBefore. 
         if (isDescendant(combinator) && kid.getType() == LessLexer.NESTED_APPENDER)
           combinator = null;
+      } else {
+        //if it is not a combinator, then it is either nested appender, simple selector or escaped selector   
+        head = (SelectorPart) parent.switchOn(kid);
       }
 
       Selector part = new Selector(token, combinator, head);
@@ -49,6 +51,6 @@ public class SelectorBuilder {
   }
 
   private boolean isDescendant(SelectorCombinator combinator) {
-    return combinator!=null && combinator.getCombinator()==Combinator.DESCENDANT;
+    return combinator != null && combinator.getCombinator() == Combinator.DESCENDANT;
   }
 }

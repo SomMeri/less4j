@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -12,6 +13,11 @@ public class InterpolableName extends ASTCssNode {
   
   public InterpolableName(HiddenTokenAwareTree underlyingStructure) {
     super(underlyingStructure);
+  }
+
+  public InterpolableName(HiddenTokenAwareTree underlyingStructure, InterpolableNamePart... fixedNameParts) {
+    super(underlyingStructure);
+    add(fixedNameParts);
   }
 
   public boolean isInterpolated() {
@@ -36,6 +42,11 @@ public class InterpolableName extends ASTCssNode {
 
   public void add(InterpolableNamePart part) {
     parts.add(part);
+  }
+
+  public void add(InterpolableNamePart... parts) {
+    this.parts.addAll(Arrays.asList(parts));
+    configureParentToAllChilds();
   }
 
   public List<InterpolableNamePart> getParts() {

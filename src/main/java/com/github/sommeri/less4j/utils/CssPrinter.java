@@ -17,13 +17,13 @@ import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
-import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
@@ -36,7 +36,6 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
-import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.Name;
@@ -186,9 +185,6 @@ public class CssPrinter {
     case FAULTY_NODE:
       return appendFaultyNode((FaultyNode) node);
 
-    case ESCAPED_SELECTOR:
-      return appendEscapedSelector((EscapedSelector) node);
-
     case ESCAPED_VALUE:
       return appendEscapedValue((EscapedValue) node);
 
@@ -219,6 +215,7 @@ public class CssPrinter {
     case IMPORT:
       return appendImport((Import) node);
 
+    case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
@@ -632,12 +629,6 @@ public class CssPrinter {
   public boolean appendCssString(CssString expression) {
     String quoteType = expression.getQuoteType();
     builder.append(quoteType).append(expression.getValue()).append(quoteType);
-
-    return true;
-  }
-
-  public boolean appendEscapedSelector(EscapedSelector escaped) {
-    builder.append(escaped.getValue());
 
     return true;
   }

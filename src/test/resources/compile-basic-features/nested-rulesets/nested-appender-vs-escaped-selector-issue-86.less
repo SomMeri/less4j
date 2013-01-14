@@ -1,0 +1,38 @@
+(~"escaped") {
+  &.black {
+    color:black;
+  }
+}
+
+//another manifestation
+.green {
+  > (~".escaped") {
+    color:black;
+  }
+}
+
+//yet another problem
+.green {
+  &(~"escaped") {
+    color:black;
+  }
+}
+
+.green {
+  & (~"#escaped") {
+    color:black;
+  }
+}
+
+//this should work too
+(~"#escaped") {
+  &(~".escaped") {
+    color:black;
+  }
+}
+
+(~"#escaped") {
+  & (~".escaped") {
+    color:black;
+  }
+}
