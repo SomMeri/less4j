@@ -74,7 +74,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private File toBaseDirectory(File inputFile) {
-    return inputFile==null? null : inputFile.getParentFile();
+    return inputFile==null? null : inputFile.getAbsoluteFile().getParentFile();
   }
 
 }

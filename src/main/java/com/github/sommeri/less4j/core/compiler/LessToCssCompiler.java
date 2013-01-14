@@ -21,6 +21,7 @@ import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
+import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
 import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
@@ -48,10 +49,16 @@ public class LessToCssCompiler {
 
     //just a safety measure
     evaluateExpressions(less);
+    bubbleAndMergeMedia(less);
     freeNestedRuleSets(less);
     sortTopLevelElements(less);
 
     return less;
+  }
+
+  private void bubbleAndMergeMedia(StyleSheet less) {
+    MediaBubblerAndMerger bubblerAndMerger = new MediaBubblerAndMerger();
+    bubblerAndMerger.bubbleAndMergeMedia(less);
   }
 
   private void sortTopLevelElements(StyleSheet less) {
