@@ -8,18 +8,71 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
 
 import com.github.sommeri.less4j.utils.URLUtils;
 
 public abstract class LessSource {
-
+	
 	public abstract LessSource relativeSource(String filename) throws MalformedURLException, StringSourceException;
 
 	public abstract String getContent() throws IOException;
+	
+	public abstract static class AbstractHierarchicalSource extends LessSource {
+		
+		protected AbstractHierarchicalSource parent;
+		
+		protected long lastModified;
+		
+		protected long latestModified;
+		
+		protected Collection<LessSource> importedSources;
 
-	public static class URLSource extends LessSource {
+		public AbstractHierarchicalSource() {
+			super();
+			
+			importedSources = new ArrayList<LessSource>();
+		}
+
+		public AbstractHierarchicalSource(AbstractHierarchicalSource parent) {
+			super();
+			this.parent = parent;
+		}
+		
+		protected void setLastModified(long lastModified) {
+			this.lastModified = lastModified;
+			this.latestModified = lastModified;
+			if (parent != null && lastModified > parent.latestModified) {
+				parent.latestModified = lastModified;
+			}
+		}
+		
+		protected void addImportedSource(LessSource source) {
+			if (parent != null) {
+				parent.addImportedSource(source);
+			} else {
+				importedSources.add(source);
+			}
+		}
+
+		public Collection<LessSource> getImportedSources() {
+			return importedSources;
+		}
+
+		public long getLastModified() {
+			return lastModified;
+		}
+
+		public long getLatestModified() {
+			return latestModified;
+		}
+		
+	}
+
+	public static class URLSource extends AbstractHierarchicalSource {
 		
 		private URL inputURL;
 		
@@ -28,16 +81,25 @@ public abstract class LessSource {
 			this.inputURL = inputURL;
 		}
 		
+		public URLSource(URLSource parent, String filename) throws MalformedURLException {
+			super(parent);
+			this.inputURL = new URL(URLUtils.toParentURL(parent.inputURL), filename);
+			parent.addImportedSource(this);
+		}
+		
+		@Override
 		public String getContent() throws IOException {
  			URLConnection connection = getInputURL().openConnection();
 			Reader input = new InputStreamReader(connection.getInputStream());
 			String content = IOUtils.toString(input).replace("\r\n", "\n");
+			setLastModified(connection.getLastModified());
 			input.close();
 			return content;
 		}
 		
+		@Override
 		public LessSource relativeSource(String filename) throws MalformedURLException {
-			return new URLSource(new URL(URLUtils.toParentURL(this.inputURL), filename));
+			return new URLSource(this, filename);
 		}
 		
 		public URL getInputURL() {
@@ -75,7 +137,7 @@ public abstract class LessSource {
 		
 	}
 	
-	public static class FileSource extends LessSource {
+	public static class FileSource extends AbstractHierarchicalSource {
 		
 		private File inputFile;
 		
@@ -83,15 +145,24 @@ public abstract class LessSource {
 			this.inputFile = inputFile;
 		}
 		
+		public FileSource(FileSource parent, String filename) {
+			super(parent);
+			this.inputFile = new File(parent.inputFile.getParentFile(), filename);
+			parent.addImportedSource(this);
+		}
+
+		@Override
 		public String getContent() throws IOException {
 			FileReader input = new FileReader(inputFile);
 			String content = IOUtils.toString(input).replace("\r\n", "\n");
+			setLastModified(inputFile.lastModified());
 			input.close();
 			return content;
 		}
 		
+		@Override
 		public LessSource relativeSource(String filename) {
-			return new FileSource(new File(this.inputFile.getParentFile(), filename));
+			return new FileSource(this, filename);
 		}
 		
 		public File getInputFile() {
@@ -137,6 +208,7 @@ public abstract class LessSource {
 			this.content = content;
 		}
 		
+		@Override
 		public String getContent() {
 			return content;
 		}

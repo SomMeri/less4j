@@ -14,6 +14,8 @@ public interface LessCompiler {
 
   public CompilationResult compile(URL inputFile) throws Less4jException;
 
+  public CompilationResult compile(LessSource source) throws Less4jException;
+
   public class CompilationResult {
 
     private final String css;

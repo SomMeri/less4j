@@ -27,4 +27,9 @@ public class DefaultLessCompiler implements LessCompiler {
     return compiler.compile(inputURL);
   }
 
+  public CompilationResult compile(LessSource source) throws Less4jException {
+	ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
+	return compiler.compile(source);
+  }
+
 }

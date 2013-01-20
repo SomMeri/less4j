@@ -39,6 +39,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 	return compile(new LessSource.URLSource(inputURL));
   }
 
+  @Override
   public CompilationResult compile(LessSource source) throws Less4jException {
     problemsHandler = new ProblemsHandler();
     astBuilder = new ASTBuilder(problemsHandler);
