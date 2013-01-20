@@ -1,18 +1,15 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-
-import com.github.sommeri.less4j.core.URLUtils;
+import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.LessSource.StringSourceException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -35,27 +32,27 @@ public class SimpleImportsSolver {
   private ConversionUtils conversionUtils = new ConversionUtils();
   private ASTManipulator astManipulator = new ASTManipulator();
   
-  private Set<URL> importedFiles = new HashSet<URL>();
+  private Set<LessSource> importedSources = new HashSet<LessSource>();
 
   public SimpleImportsSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
   }
 
-  public void solveImports(StyleSheet node, URL baseDirectory) {
-    doSolveImports(node, baseDirectory);
+  public void solveImports(StyleSheet node, LessSource source) {
+    doSolveImports(node, source);
   }
 
-  private void doSolveImports(StyleSheet node, URL baseDirectory) {
+  private void doSolveImports(StyleSheet node, LessSource source) {
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {
       if (kid.getType() == ASTCssNodeType.IMPORT) {
-        importEncountered((Import) kid, baseDirectory);
+        importEncountered((Import) kid, source);
       }
     }
 
   }
 
-  private void importEncountered(Import node, URL baseDirectory) {
+  private void importEncountered(Import node, LessSource source) {
     String filename = evaluateFilename(node.getUrlExpression());
     if (filename == null) { 
       problemsHandler.errorWrongImport(node.getUrlExpression());
@@ -72,35 +69,41 @@ public class SimpleImportsSolver {
       // css file imports should be left as they are
       return;
 
-    if (baseDirectory==null) {
-      // imports are relative to current file and we do not know its location   
-      problemsHandler.warnLessImportNoBaseDirectory(node.getUrlExpression());
-      return ;
-    }
-    
     // add .less suffix if needed
     filename = normalizeFileName(filename, urlParams);
-    URL importedFile;
-	try {
-		importedFile = new URL(baseDirectory, filename);
-	} catch (MalformedURLException e) {
-		throw new RuntimeException(e);
-	}
-
+    LessSource importedSource;
+    try {
+    	importedSource = source.relativeSource(filename);
+    } catch (MalformedURLException ex) {
+    	problemsHandler.errorImportedFileNotFound(node, filename);
+		return;
+    } catch (StringSourceException ex) {
+    	// imports are relative to current file and we do not know its location   
+        problemsHandler.warnLessImportNoBaseDirectory(node.getUrlExpression());
+        return ;
+    }
+    
     // import once should not import a file that was already imported  
-    if (isImportOnce(node) && alreadyVisited(importedFile)) {
+    if (isImportOnce(node) && alreadyVisited(importedSource)) {
       astManipulator.removeFromBody(node);
       return ;
     }
-    importedFiles.add(importedFile);
-    
-    String importedContent = loadFile(node, importedFile, filename);
-    if (importedContent == null)
-      return;
+    importedSources.add(importedSource);
+
+    String importedContent;
+	try {
+		importedContent = importedSource.getContent();
+	} catch (FileNotFoundException e) {
+		problemsHandler.errorImportedFileNotFound(node, filename);
+		return;
+	} catch (IOException e) {
+		problemsHandler.errorImportedFileCanNotBeRead(node, filename);
+		return;
+	}
 
     // parse imported file
-    StyleSheet importedAst = parseContent(node, importedContent, importedFile);
-    solveImports(importedAst, URLUtils.toParentURL(importedFile));
+    StyleSheet importedAst = parseContent(node, importedContent, importedSource);
+    solveImports(importedAst, importedSource);
     
     // add media queries if needed 
     if (node.hasMediums()) {
@@ -118,13 +121,13 @@ public class SimpleImportsSolver {
     return node.getKind()==ImportKind.IMPORT_ONCE;
   }
 
-  private boolean alreadyVisited(URL importedFile) {
-    return importedFiles.contains(importedFile);
+  private boolean alreadyVisited(LessSource importedSource) {
+    return importedSources.contains(importedSource);
   }
 
-  private StyleSheet parseContent(Import importNode, String importedContent, URL importedFile) {
+  private StyleSheet parseContent(Import importNode, String importedContent, LessSource source) {
     ANTLRParser parser = new ANTLRParser();
-    ANTLRParser.ParseResult parsedSheet = parser.parseStyleSheet(importedContent, importedFile);
+    ANTLRParser.ParseResult parsedSheet = parser.parseStyleSheet(importedContent, source);
     if (parsedSheet.hasErrors()) {
       StyleSheet result = new StyleSheet(importNode.getUnderlyingStructure());
       result.addMember(new FaultyNode(importNode));
@@ -169,27 +172,6 @@ public class SimpleImportsSolver {
     }
     
     return path.replace(Constants.FILE_SEPARATOR, "/");
-  }
-
-  private String loadFile(Import node, URL inputFile, String filename) {
-//    if (!inputFile.exists()) {
-//      problemsHandler.errorImportedFileNotFound(node, filename);
-//      return null;
-//    }
-//    if (!inputFile.canRead()) {
-//      problemsHandler.errorImportedFileCanNotBeRead(node, filename);
-//      return null;
-//    }
-    String content;
-    try {
-    	Reader input = new InputStreamReader(inputFile.openStream());
-      content = IOUtils.toString(input).replace("\r\n", "\n");
-      input.close();
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
-    }
-
-    return content;
   }
 
 }

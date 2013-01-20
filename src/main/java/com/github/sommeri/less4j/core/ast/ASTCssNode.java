@@ -1,10 +1,9 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public abstract class ASTCssNode implements Cloneable {
@@ -89,8 +88,8 @@ public abstract class ASTCssNode implements Cloneable {
     return false;
   }
 
-  public URL getSourceFile() {
-    return getUnderlyingStructure()==null? null : getUnderlyingStructure().getInputFile();
+  public LessSource getSource() {
+    return getUnderlyingStructure()==null? null : getUnderlyingStructure().getSource();
   }
 
   public int getSourceLine() {

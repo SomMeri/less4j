@@ -1,10 +1,9 @@
 package com.github.sommeri.less4j.core.problems;
 
-import java.net.URL;
+import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.core.AbstractProblem;
 
-import com.github.sommeri.less4j.LessCompiler.Problem;
-
-public class GeneralProblem implements Problem {
+public class GeneralProblem extends AbstractProblem {
 
   private final String message;
 
@@ -34,8 +33,8 @@ public class GeneralProblem implements Problem {
   }
 
   @Override
-  public URL getFile() {
-    return null;
+  public LessSource getSource() {
+	return null;
   }
 
 }

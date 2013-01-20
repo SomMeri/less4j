@@ -1,12 +1,11 @@
 package com.github.sommeri.less4j.core.parser;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.Token;
 
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
@@ -54,24 +53,24 @@ public class ASTBuilder {
     if (underlyingStructure==null)
       return ;
     
-    URL inputFile = underlyingStructure.getInputFile();
-    List<Comment> preceding = convertToComments(underlyingStructure.getPreceding(), inputFile);
+    LessSource source = underlyingStructure.getSource();
+    List<Comment> preceding = convertToComments(underlyingStructure.getPreceding(), source);
     node.setOpeningComments(preceding);
 
-    List<Comment> following = convertToComments(underlyingStructure.getFollowing(), inputFile);
+    List<Comment> following = convertToComments(underlyingStructure.getFollowing(), source);
     node.setTrailingComments(following);
 
-    List<Comment> orphans = convertToComments(underlyingStructure.getOrphans(), inputFile);
+    List<Comment> orphans = convertToComments(underlyingStructure.getOrphans(), source);
     node.setOrphanComments(orphans);
   }
   
-  private List<Comment> convertToComments(List<Token> preceding, URL inputFile) {
+  private List<Comment> convertToComments(List<Token> preceding, LessSource source) {
     List<Comment> result = new ArrayList<Comment>();
 
     Comment comment = null;
     for (Token token : preceding) {
       if (token.getType() == LessLexer.COMMENT) {
-        comment = new Comment(new HiddenTokenAwareTree(token, inputFile));
+        comment = new Comment(new HiddenTokenAwareTree(token, source));
         result.add(comment);
       }
       if (token.getType() == LessLexer.NEW_LINE) {
