@@ -82,7 +82,7 @@ tokens {
   package com.github.sommeri.less4j.core.parser;
   import com.github.sommeri.less4j.core.parser.AntlrException;
   import com.github.sommeri.less4j.LessCompiler.Problem;
-  import java.io.File;
+  import java.net.URL;
 }
  
 @parser::header {
@@ -93,16 +93,16 @@ tokens {
 
 //override some methods and add new members to generated lexer
 @lexer::members {
-    public LessLexer(File inputFile, List<Problem> errors) {
+    public LessLexer(URL inputFile, List<Problem> errors) {
       this.errors = errors;
       this.inputFile = inputFile;
     }
 
-    public LessLexer(File inputFile, CharStream input, List<Problem> errors) {
+    public LessLexer(URL inputFile, CharStream input, List<Problem> errors) {
       this(inputFile, input, new RecognizerSharedState(), errors);
     }
     
-    public LessLexer(File inputFile, CharStream input, RecognizerSharedState state, List<Problem> errors) {
+    public LessLexer(URL inputFile, CharStream input, RecognizerSharedState state, List<Problem> errors) {
       super(input,state);
       this.errors = errors;
       this.inputFile = inputFile;
@@ -129,7 +129,7 @@ tokens {
   }
   //add new field
   private List<Problem> errors = new ArrayList<Problem>();
-  private File inputFile;
+  private URL inputFile;
   
   //add new method
   public List<Problem> getAllErrors() {

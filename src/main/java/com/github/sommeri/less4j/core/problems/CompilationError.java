@@ -1,18 +1,18 @@
 package com.github.sommeri.less4j.core.problems;
 
-import java.io.File;
+import java.net.URL;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 
 public class CompilationError implements Problem {
   
-  private final File file;
+  private final URL file;
   private final int line;
   private final int character;
   private final String message;
 
-  public CompilationError(File file, int line, int character, String message) {
+  public CompilationError(URL file, int line, int character, String message) {
     super();
     this.file = file;
     this.line = line;
@@ -33,7 +33,7 @@ public class CompilationError implements Problem {
     return Type.ERROR;
   }
 
-  public File getFile() {
+  public URL getFile() {
     return file;
   }
 

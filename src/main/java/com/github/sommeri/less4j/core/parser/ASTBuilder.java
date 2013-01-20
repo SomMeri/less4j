@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.parser;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class ASTBuilder {
     if (underlyingStructure==null)
       return ;
     
-    File inputFile = underlyingStructure.getInputFile();
+    URL inputFile = underlyingStructure.getInputFile();
     List<Comment> preceding = convertToComments(underlyingStructure.getPreceding(), inputFile);
     node.setOpeningComments(preceding);
 
@@ -64,7 +65,7 @@ public class ASTBuilder {
     node.setOrphanComments(orphans);
   }
   
-  private List<Comment> convertToComments(List<Token> preceding, File inputFile) {
+  private List<Comment> convertToComments(List<Token> preceding, URL inputFile) {
     List<Comment> result = new ArrayList<Comment>();
 
     Comment comment = null;

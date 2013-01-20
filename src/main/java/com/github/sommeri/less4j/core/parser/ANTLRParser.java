@@ -1,6 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
-import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,31 +30,31 @@ public class ANTLRParser {
   private final boolean isDebug = false;
   private static final List<Integer> KEEP_HIDDEN_TOKENS = Arrays.asList(LessLexer.COMMENT, LessLexer.NEW_LINE);
 
-  public ParseResult parseStyleSheet(String styleSheet, File inputFile) {
+  public ParseResult parseStyleSheet(String styleSheet, URL inputFile) {
     return parse(styleSheet, inputFile, InputType.STYLE_SHEET);
   }
 
-  public ParseResult parseDeclaration(String declaration, File inputFile) {
+  public ParseResult parseDeclaration(String declaration, URL inputFile) {
     return parse(declaration, inputFile, InputType.DECLARATION);
   }
 
-  public ParseResult parseExpression(String expression, File inputFile) {
+  public ParseResult parseExpression(String expression, URL inputFile) {
     return parse(expression, inputFile, InputType.EXPRESSION);
   }
 
-  public ParseResult parseTerm(String term, File inputFile) {
+  public ParseResult parseTerm(String term, URL inputFile) {
     return parse(term, inputFile, InputType.TERM);
   }
 
-  public ParseResult parseSelector(String selector, File inputFile) {
+  public ParseResult parseSelector(String selector, URL inputFile) {
     return parse(selector, inputFile, InputType.SELECTOR);
   }
 
-  public ParseResult parseRuleset(String ruleset, File inputFile) {
+  public ParseResult parseRuleset(String ruleset, URL inputFile) {
     return parse(ruleset, inputFile, InputType.RULESET);
   }
   
-  private ParseResult parse(String input, File inputFile, InputType inputType) {
+  private ParseResult parse(String input, URL inputFile, InputType inputType) {
     try {
       if (isDebug)
         DebugAndTestPrint.printTokenStream(input);
@@ -75,14 +75,14 @@ public class ANTLRParser {
     }
   }
 
-  private LessParser createParser(TokenSource tokenSource, File inputFile, List<Problem> errors) {
+  private LessParser createParser(TokenSource tokenSource, URL inputFile, List<Problem> errors) {
     CommonTokenStream tokens = new CommonTokenStream(tokenSource);
     LessParser parser = new LessParser(tokens, errors);
     parser.setTreeAdaptor(new HiddenTokenAwareTreeAdaptor(inputFile));
     return parser;
   }
 
-  private LessLexer createLexer(String expression, File inputFile, List<Problem> errors) {
+  private LessLexer createLexer(String expression, URL inputFile, List<Problem> errors) {
     ANTLRStringStream input = new ANTLRStringStream(expression);
     LessLexer lexer = new LessLexer(inputFile, input, errors);
     return lexer;
@@ -216,9 +216,9 @@ class CollectorTokenSource implements TokenSource {
 
 class HiddenTokenAwareTreeAdaptor extends CommonTreeAdaptor {
 
-  private final File inputFile;
+  private final URL inputFile;
 
-  public HiddenTokenAwareTreeAdaptor(File inputFile) {
+  public HiddenTokenAwareTreeAdaptor(URL inputFile) {
     super();
     this.inputFile = inputFile;
   }
@@ -233,7 +233,7 @@ class HiddenTokenAwareTreeAdaptor extends CommonTreeAdaptor {
     return new HiddenTokenAwareErrorTree(input, start, stop, e, inputFile);
   }
 
-  public File getInputFile() {
+  public URL getInputFile() {
     return inputFile;
   }
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -88,7 +89,7 @@ public class CommandLinePrint {
     return problem.getLine() + ":" + problem.getCharacter();
   }
   
-  private String toFilenameReport(File rootInputFile, File file) {
+  private String toFilenameReport(File rootInputFile, URL file) {
     if (file==null)
       return "";
 
@@ -96,7 +97,7 @@ public class CommandLinePrint {
       return file.getPath();
     }
 
-    String fileAbsoluteName = file.getAbsoluteFile().getAbsolutePath();
+    String fileAbsoluteName = file.toExternalForm();
     String rootInputFileAbsoluteName = rootInputFile.getAbsoluteFile().getAbsolutePath();
     if (fileAbsoluteName.equals(rootInputFileAbsoluteName))
       return "";

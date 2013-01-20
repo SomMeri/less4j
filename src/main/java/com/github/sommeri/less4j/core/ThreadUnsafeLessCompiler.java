@@ -2,11 +2,16 @@ package com.github.sommeri.less4j.core;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
@@ -29,16 +34,25 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   @Override
-  public CompilationResult compile(File inputFile) throws Less4jException {
-    if (!inputFile.exists()) {
-      throw new Less4jException(new GeneralProblem("The file " + inputFile.getPath() + " does not exists."), new CompilationResult(null));
-    }
-    if (!inputFile.canRead()) {
-      throw new Less4jException(new GeneralProblem("Cannot read the file " + inputFile.getPath() + "."), new CompilationResult(null));
-    }
+public CompilationResult compile(File inputFile) throws Less4jException {
+	try {
+		return compile(inputFile.toURI().toURL());
+	} catch (MalformedURLException e) {
+		throw new RuntimeException(e);
+	}
+}
+
+@Override
+  public CompilationResult compile(URL inputFile) throws Less4jException {
+//    if (!inputFile.exists()) {
+//      throw new Less4jException(new GeneralProblem("The file " + inputFile.getPath() + " does not exists."), new CompilationResult(null));
+//    }
+//    if (!inputFile.canRead()) {
+//      throw new Less4jException(new GeneralProblem("Cannot read the file " + inputFile.getPath() + "."), new CompilationResult(null));
+//    }
     String content;
     try {
-      FileReader input = new FileReader(inputFile);
+      Reader input = new InputStreamReader(inputFile.openStream());
       content = IOUtils.toString(input).replace("\r\n", "\n");
       input.close();
     } catch (Exception ex) {
@@ -47,7 +61,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return compile(content, inputFile);
   }
 
-  private CompilationResult compile(String lessContent, File baseDirectory) throws Less4jException {
+  private CompilationResult compile(String lessContent, URL baseDirectory) throws Less4jException {
     problemsHandler = new ProblemsHandler();
     astBuilder = new ASTBuilder(problemsHandler);
     compiler = new LessToCssCompiler(problemsHandler);
@@ -59,7 +73,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return compilationResult;
   }
 
-  private String doCompile(String lessContent, File inputFile) throws Less4jException {
+  private String doCompile(String lessContent, URL inputFile) throws Less4jException {
     ANTLRParser.ParseResult result = parser.parseStyleSheet(lessContent, inputFile);
     if (result.hasErrors()) {
       CompilationResult compilationResult = new CompilationResult("Errors during parsing phase, partial result is not available.");
@@ -73,8 +87,11 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return builder.toString();
   }
 
-  private File toBaseDirectory(File inputFile) {
-    return inputFile==null? null : inputFile.getAbsoluteFile().getParentFile();
+  private URL toBaseDirectory(URL inputFile) {
+	  if (inputFile == null)
+		  return null;
+	  
+	  return URLUtils.toParentURL(inputFile);
   }
 
 }

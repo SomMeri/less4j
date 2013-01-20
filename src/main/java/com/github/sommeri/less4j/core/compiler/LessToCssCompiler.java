@@ -1,6 +1,6 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,7 +37,7 @@ public class LessToCssCompiler {
     this.problemsHandler = problemsHandler;
   }
 
-  public ASTCssNode compileToCss(StyleSheet less, File baseDirectory) {
+  public ASTCssNode compileToCss(StyleSheet less, URL baseDirectory) {
     SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
     importsSolver.solveImports(less, baseDirectory);
 
