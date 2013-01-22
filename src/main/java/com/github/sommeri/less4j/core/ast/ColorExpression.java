@@ -53,6 +53,10 @@ public class ColorExpression extends Expression {
     return blue;
   }
   
+  public float getAlpha() {
+    return 1.0f;
+  }
+  
   private int decode(String color, int i) {
     if (color.length()<7) {
       String substring = color.substring(i+1, i+2);
@@ -120,6 +124,7 @@ public class ColorExpression extends Expression {
       this(token, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() / 255.0f);
     }
     
+    @Override
     public float getAlpha() {
       return alpha;
     }
