@@ -21,7 +21,7 @@ abstract class AbstractMultiParameterFunction implements Function {
       splitParameters = ((ComposedExpression) parameters).splitByComma();
     } else {
       problemsHandler.wrongNumberOfArgumentsToFunction(parameters, getMinParameters());
-      return parameters;
+      return null;
     }
 
     if (splitParameters.size() >= getMinParameters() && splitParameters.size() <= getMaxParameters()) {
@@ -36,11 +36,11 @@ abstract class AbstractMultiParameterFunction implements Function {
       if (valid) {
         return evaluate(splitParameters, problemsHandler, parameters.getUnderlyingStructure());
       } else {
-        return parameters;
+        return null;
       }
     } else {
       problemsHandler.wrongNumberOfArgumentsToFunction(parameters, getMinParameters());
-      return parameters;
+      return null;
     }
   }
 
