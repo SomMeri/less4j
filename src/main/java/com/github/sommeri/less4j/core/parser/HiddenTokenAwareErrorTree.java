@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.parser;
 
-import java.io.File;
 import java.util.List;
 
 import org.antlr.runtime.RecognitionException;
@@ -9,12 +8,14 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonErrorNode;
 import org.antlr.runtime.tree.Tree;
 
+import com.github.sommeri.less4j.LessSource;
+
 public class HiddenTokenAwareErrorTree extends HiddenTokenAwareTree {
 
   private final CommonErrorNode errorNode;
 
-  public HiddenTokenAwareErrorTree(TokenStream input, Token start, Token stop, RecognitionException e, File inputFile) {
-    super(inputFile);
+  public HiddenTokenAwareErrorTree(TokenStream input, Token start, Token stop, RecognitionException e, LessSource source) {
+    super(source);
     this.errorNode = new CommonErrorNode(input, start, stop, e);
   }
 

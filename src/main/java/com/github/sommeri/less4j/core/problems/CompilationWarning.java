@@ -1,20 +1,19 @@
 package com.github.sommeri.less4j.core.problems;
 
-import java.io.File;
-
-import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.core.AbstractProblem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 
-public class CompilationWarning implements Problem {
+public class CompilationWarning extends AbstractProblem {
   
-  private final File file;
+  private final LessSource source;
   private final int line;
   private final int character;
   private final String message;
 
-  public CompilationWarning(File file, int line, int character, String message) {
+  public CompilationWarning(LessSource source, int line, int character, String message) {
     super();
-    this.file = file;
+    this.source = source;
     this.line = line;
     this.character = character;
     this.message = message;
@@ -22,7 +21,7 @@ public class CompilationWarning implements Problem {
 
   public CompilationWarning(ASTCssNode offendingNode, String message) {
     super();
-    this.file = offendingNode.getSourceFile();
+    this.source = offendingNode.getSource();
     this.line = offendingNode.getSourceLine();
     this.character = offendingNode.getCharPositionInSourceLine();
     this.message = message;
@@ -33,8 +32,9 @@ public class CompilationWarning implements Problem {
     return Type.WARNING;
   }
 
-  public File getFile() {
-    return file;
+  @Override
+  public LessSource getSource() {
+	return source;
   }
 
   @Override

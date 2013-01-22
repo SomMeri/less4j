@@ -1,11 +1,11 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
@@ -37,9 +37,9 @@ public class LessToCssCompiler {
     this.problemsHandler = problemsHandler;
   }
 
-  public ASTCssNode compileToCss(StyleSheet less, File baseDirectory) {
+  public ASTCssNode compileToCss(StyleSheet less, LessSource source) {
     SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
-    importsSolver.solveImports(less, baseDirectory);
+    importsSolver.solveImports(less, source);
 
     ScopeExtractor scopeBuilder = new ScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);

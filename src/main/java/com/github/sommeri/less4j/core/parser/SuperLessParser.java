@@ -164,7 +164,7 @@ public abstract class SuperLessParser extends Parser {
 
   public void reportError(RecognitionException e) {
     HiddenTokenAwareTreeAdaptor treeAdaptor = (HiddenTokenAwareTreeAdaptor)getTreeAdaptor();
-    errors.add(new AntlrException(treeAdaptor.getInputFile(), e, getErrorMessage(e, tokenErrorNames)));
+    errors.add(new AntlrException(treeAdaptor.getSource(), e, getErrorMessage(e, tokenErrorNames)));
   }
 
   public String getErrorHeader(RecognitionException e) {

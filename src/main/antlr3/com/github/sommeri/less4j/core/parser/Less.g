@@ -82,7 +82,7 @@ tokens {
   package com.github.sommeri.less4j.core.parser;
   import com.github.sommeri.less4j.core.parser.AntlrException;
   import com.github.sommeri.less4j.LessCompiler.Problem;
-  import java.io.File;
+  import com.github.sommeri.less4j.LessSource;
 }
  
 @parser::header {
@@ -93,19 +93,19 @@ tokens {
 
 //override some methods and add new members to generated lexer
 @lexer::members {
-    public LessLexer(File inputFile, List<Problem> errors) {
+    public LessLexer(LessSource source, List<Problem> errors) {
       this.errors = errors;
-      this.inputFile = inputFile;
+      this.source = source;
     }
 
-    public LessLexer(File inputFile, CharStream input, List<Problem> errors) {
-      this(inputFile, input, new RecognizerSharedState(), errors);
+    public LessLexer(LessSource source, CharStream input, List<Problem> errors) {
+      this(source, input, new RecognizerSharedState(), errors);
     }
     
-    public LessLexer(File inputFile, CharStream input, RecognizerSharedState state, List<Problem> errors) {
+    public LessLexer(LessSource source, CharStream input, RecognizerSharedState state, List<Problem> errors) {
       super(input,state);
       this.errors = errors;
-      this.inputFile = inputFile;
+      this.source = source;
     }
 
   //This trick allow Lexer to emit multiple tokens per one rule.
@@ -129,7 +129,7 @@ tokens {
   }
   //add new field
   private List<Problem> errors = new ArrayList<Problem>();
-  private File inputFile;
+  private LessSource source;
   
   //add new method
   public List<Problem> getAllErrors() {
@@ -143,7 +143,7 @@ tokens {
   
   //override method
   public void reportError(RecognitionException e) {
-    errors.add(new AntlrException(inputFile, e, getErrorMessage(e, getTokenNames())));
+    errors.add(new AntlrException(source, e, getErrorMessage(e, getTokenNames())));
   }
   
 }
