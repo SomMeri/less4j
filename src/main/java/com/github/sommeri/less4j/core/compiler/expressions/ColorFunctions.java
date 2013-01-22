@@ -35,7 +35,7 @@ public class ColorFunctions implements FunctionsPackage {
   protected static final String GREEN = "green";
   protected static final String BLUE = "blue";
   protected static final String ALPHA = "alpha";
-  protected static final String LUME = "luma";
+  protected static final String LUMA = "luma";
 
   protected static final String SATURATE = "saturate";
   protected static final String DESATURATE = "desaturate";
@@ -61,13 +61,29 @@ public class ColorFunctions implements FunctionsPackage {
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
+    FUNCTIONS.put(RGB, new RGB());
+    FUNCTIONS.put(RGBA, new RGBA());
+    FUNCTIONS.put(ARGB, new ARGB());
+    FUNCTIONS.put(HSL, new HSL());
+    FUNCTIONS.put(HSLA, new HSLA());
+    
+    FUNCTIONS.put(HUE, new Hue());
+//    FUNCTIONS.put(SATURATION, new Saturation());
+//    FUNCTIONS.put(LIGHTNESS, new Lightness());
+//    FUNCTIONS.put(RED, new Red());
+//    FUNCTIONS.put(GREEN, new Green());
+//    FUNCTIONS.put(BLUE, new Blue());
+//    FUNCTIONS.put(ALPHA, new Alpha());
+//    FUNCTIONS.put(LUMA, new Luma());
+
+    FUNCTIONS.put(SATURATE, new Saturate());
+    FUNCTIONS.put(DESATURATE, new Desaturate());
     FUNCTIONS.put(LIGHTEN, new Lighten());
     FUNCTIONS.put(DARKEN, new Darken());
-    FUNCTIONS.put(HSLA, new HSLA());
-    FUNCTIONS.put(HSL, new HSL());
-    FUNCTIONS.put(RGBA, new RGBA());
-    FUNCTIONS.put(RGB, new RGB());
-    FUNCTIONS.put(ARGB, new ARGB());
+    FUNCTIONS.put(FADEIN, new FadeIn());
+    FUNCTIONS.put(FADEOUT, new FadeOut());
+    FUNCTIONS.put(FADE, new Fade());
+    FUNCTIONS.put(SPIN, new Spin());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -103,31 +119,6 @@ public class ColorFunctions implements FunctionsPackage {
 
     Function function = FUNCTIONS.get(input.getName());
     return function.evaluate(parameters, problemsHandler);
-  }
-
-}
-
-class Lighten extends AbstractColorAmountFunction {
-
-  @Override
-  protected Expression evaluate(ColorExpression colorExpression, NumberExpression amount, HiddenTokenAwareTree token) {
-    Color color = colorExpression.toColor();
-    float[] hsl = HSLColor.fromRGB(color);
-    hsl[2] += amount.getValueAsDouble();
-    hsl[2] = clamp(hsl[2]);
-    return hsla(hsl, color.getAlpha() / 255.0f, token);
-  }
-
-}
-
-class Darken extends AbstractColorAmountFunction {
-
-  protected Expression evaluate(ColorExpression colorExpression, NumberExpression amount, HiddenTokenAwareTree token) {
-    Color color = colorExpression.toColor();
-    float[] hsl = HSLColor.fromRGB(color);
-    hsl[2] -= amount.getValueAsDouble();
-    hsl[2] = clamp(hsl[2]);
-    return hsla(hsl, color.getAlpha() / 255.0f, token);
   }
 
 }
@@ -275,6 +266,122 @@ class ARGB extends AbstractColorFunction {
 
 }
 
+class Hue extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    float[] hsl = HSLColor.fromRGB(color.toColor());
+    return new NumberExpression(token, Double.valueOf(hsl[0]), "", "" + hsl[0], Dimension.NUMBER);
+  }
+
+}
+
+abstract class AbstractColorOperationFunction extends AbstractColorFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return evaluate((ColorExpression)splitParameters.get(0), problemsHandler, token);
+  }
+
+  protected abstract Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token);
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 1;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+  }
+  
+}
+
+class Saturate extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    hsla[1] += amount.getValueAsDouble() / 100.0f;
+    hsla[1] = clamp(hsla[1]);
+  }
+  
+}
+
+class Desaturate extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    hsla[1] -= amount.getValueAsDouble() / 100.0f;
+    hsla[1] = clamp(hsla[1]);
+  }
+  
+}
+
+class Lighten extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    hsla[2] += amount.getValueAsDouble() / 100.0f;
+    hsla[2] = clamp(hsla[2]);
+  }
+
+}
+
+class Darken extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    hsla[2] -= amount.getValueAsDouble() / 100.0f;
+    hsla[2] = clamp(hsla[2]);
+  }
+
+}
+
+class FadeIn extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    hsla[3] += amount.getValueAsDouble() / 100.0f;
+    hsla[3] = clamp(hsla[3]);
+  }
+
+}
+
+class FadeOut extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    hsla[3] -= amount.getValueAsDouble() / 100.0f;
+    hsla[3] = clamp(hsla[3]);
+  }
+
+}
+
+class Fade extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    hsla[3] = (float) (amount.getValueAsDouble() / 100.0f);
+    hsla[3] = clamp(hsla[3]);
+  }
+
+}
+
+class Spin extends AbstractColorHSLAmountFunction {
+
+  @Override
+  protected void apply(NumberExpression amount, float[] hsla) {
+    float hue = (float) ((hsla[0] + amount.getValueAsDouble()) % 360);
+    hsla[0] = hue < 0 ? 360 + hue : hue;
+  }
+
+}
+
 abstract class AbstractMultiParameterFunction implements Function {
 
   @Override
@@ -332,7 +439,7 @@ abstract class AbstractMultiParameterFunction implements Function {
 abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
 
   static float clamp(float val) {
-    return Math.min(100, Math.max(0, val));
+    return Math.min(1, Math.max(0, val));
   }
 
   static ColorExpression hsl(float[] hsl, HiddenTokenAwareTree token) {
@@ -395,4 +502,35 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
     return false;
   }
 
+}
+
+abstract class AbstractColorHSLAmountFunction extends AbstractColorAmountFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token) {
+    Color c = color.toColor();
+    float[] hsl = HSLColor.fromRGB(c);
+    float[] hsla = new float[4];
+    
+    hsla[0] = hsl[0];
+    hsla[1] = hsl[1] / 100.0f;
+    hsla[2] = hsl[2] / 100.0f;
+    hsla[3] = c.getAlpha() / 255.0f;
+    
+    apply(amount, hsla);
+    
+    hsl[0] = hsla[0];
+    hsl[1] = hsla[1] * 100.0f;
+    hsl[2] = hsla[2] * 100.0f;
+    
+    return hsla(hsl, hsla[3], token);
+  }
+
+  /**
+   * Apply the amount to the given hsla array.
+   * @param amount
+   * @param hsla
+   */
+  protected abstract void apply(NumberExpression amount, float[] hsla);
+  
 }
