@@ -77,8 +77,8 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(param, "Wrong number of arguments to function, should be " + expectedArguments + "."));
   }
   
-  public void wrongArgumentTypeToFunction(Expression param, ASTCssNodeType expected) {
-    collector.addError(new CompilationError(param, "Wrong argument type to function, should be " + expected + "."));
+  public void wrongArgumentTypeToFunction(Expression param, ASTCssNodeType expected, ASTCssNodeType received) {
+    collector.addError(new CompilationError(param, "Wrong argument type to function, expected " + expected + " saw " + received + "."));
   }
 
   public void variablesCycle(List<Variable> cycle) {

@@ -97,6 +97,27 @@ public class NumberExpression extends Expression implements Cloneable {
 
   public enum Dimension {
     NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQ, REPEATER, UNKNOWN;
+    
+    public static Dimension forSuffix(String suffix) {
+      if (suffix.equals("%")) {
+	return PERCENTAGE;
+      } else if (suffix.equals("px") || suffix.equals("cm") || suffix.equals("mm") || suffix.equals("in") ||
+	  suffix.equals("pt") || suffix.equals("pc")) {
+	return LENGTH;
+      } else if (suffix.equals("em")) {
+	return EMS;
+      } else if (suffix.equals("ex")) {
+	return EXS;
+      } else if (suffix.equals("deg") || suffix.equals("rad") || suffix.equals("grad")) {
+	return ANGLE;
+      } else if (suffix.equals("ms") || suffix.equals("s")) {
+	return TIME;
+      } else if (suffix.equals("khz") || suffix.equals("hz")) {
+	return FREQ;
+      } else {
+	return UNKNOWN;
+      }
+    }
   }
 
   @Override

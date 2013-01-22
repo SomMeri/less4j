@@ -38,6 +38,9 @@
   roundedpx: 3px;
   percentage: 20%;
   color: #ff0011;
+  color2: #aaa;
+  unit: 5px;
+  unit2: 15;
 }
 #built-in .is-a {
   color: true;
