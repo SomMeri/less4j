@@ -26,6 +26,18 @@
   hue: hue(hsl(98, 12%, 95%));
   saturation: saturation(hsl(98, 12%, 95%));
   lightness: lightness(hsl(98, 12%, 95%));
+  red: red(#112233);
+  green: green(#112233);
+  blue: blue(#112233);
+  alpha: alpha(rgba(10, 20, 30, 0.5));
+  luma: luma(rgb(100, 200, 30));
+  mix: mix(#ff0000, #0000ff, 50%);
+  mix2: mix(rgba(100,0,0,1.0), rgba(0,100,0,0.5), 50%);
+  contrast: contrast(#aaaaaa);
+  contrast2: contrast(#222222, #101010);
+  contrast3: contrast(#222222, #101010, #dddddd);
+  contrast4: contrast(hsl(90, 100%, 50%),#000000,#ffffff,40%);
+  contrast5: contrast(hsl(90, 100%, 50%),#000000,#ffffff,60%);
   rounded: round(@r/3);
   roundedpx: round(10px / 3);
   percentage: percentage(10px / 50);

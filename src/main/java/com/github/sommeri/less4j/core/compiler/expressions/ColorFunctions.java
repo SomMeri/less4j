@@ -64,15 +64,17 @@ public class ColorFunctions implements FunctionsPackage {
     FUNCTIONS.put(ARGB, new ARGB());
     FUNCTIONS.put(HSL, new HSL());
     FUNCTIONS.put(HSLA, new HSLA());
-    
+    // FUNCTIONS.put(HSV, new HSV());
+    // FUNCTIONS.put(HSVA, new HSVA());
+
     FUNCTIONS.put(HUE, new Hue());
-//    FUNCTIONS.put(SATURATION, new Saturation());
-//    FUNCTIONS.put(LIGHTNESS, new Lightness());
-//    FUNCTIONS.put(RED, new Red());
-//    FUNCTIONS.put(GREEN, new Green());
-//    FUNCTIONS.put(BLUE, new Blue());
-//    FUNCTIONS.put(ALPHA, new Alpha());
-//    FUNCTIONS.put(LUMA, new Luma());
+    FUNCTIONS.put(SATURATION, new Saturation());
+    FUNCTIONS.put(LIGHTNESS, new Lightness());
+    FUNCTIONS.put(RED, new Red());
+    FUNCTIONS.put(GREEN, new Green());
+    FUNCTIONS.put(BLUE, new Blue());
+    FUNCTIONS.put(ALPHA, new Alpha());
+    FUNCTIONS.put(LUMA, new Luma());
 
     FUNCTIONS.put(SATURATE, new Saturate());
     FUNCTIONS.put(DESATURATE, new Desaturate());
@@ -82,6 +84,19 @@ public class ColorFunctions implements FunctionsPackage {
     FUNCTIONS.put(FADEOUT, new FadeOut());
     FUNCTIONS.put(FADE, new Fade());
     FUNCTIONS.put(SPIN, new Spin());
+    FUNCTIONS.put(MIX, new Mix());
+    FUNCTIONS.put(GREYSCALE, new Greyscale());
+//    FUNCTIONS.put(CONTRAST, new Contrast());
+
+//    FUNCTIONS.put(MULTIPLY, new Multiply());
+//    FUNCTIONS.put(SCREEN, new Screen());
+//    FUNCTIONS.put(OVERLAY, new Overlay());
+//    FUNCTIONS.put(SOFTLIGHT, new Softlight());
+//    FUNCTIONS.put(HARDLIGHT, new Hardlight());
+//    FUNCTIONS.put(DIFFERENCE, new Difference());
+//    FUNCTIONS.put(EXCLUSION, new Exclusion());
+//    FUNCTIONS.put(AVERAGE, new Average());
+//    FUNCTIONS.put(NEGATION, new Negation());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -187,7 +202,7 @@ class HSL extends AbstractColorFunction {
   }
 
   private Expression evaluate(NumberExpression h, NumberExpression s, NumberExpression l, HiddenTokenAwareTree token) {
-    return hsla(new HSLAValue((float)number(h), (float)number(s), (float)number(l)), token);
+    return hsla(new HSLAValue((float) number(h), (float) number(s), (float) number(l)), token);
   }
 
   @Override
@@ -216,7 +231,7 @@ class HSLA extends AbstractColorFunction {
   }
 
   private Expression evaluate(NumberExpression h, NumberExpression s, NumberExpression l, NumberExpression a, HiddenTokenAwareTree token) {
-    return hsla(new HSLAValue((float)number(h), (float)number(s), (float)number(l), (float)number(a)), token);
+    return hsla(new HSLAValue((float) number(h), (float) number(s), (float) number(l), (float) number(a)), token);
   }
 
   @Override
@@ -240,7 +255,7 @@ class ARGB extends AbstractColorFunction {
 
   @Override
   protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemHandler, HiddenTokenAwareTree token) {
-    return new AnonymousExpression(token, ((ColorExpression)parameters.get(0)).toARGB());
+    return new AnonymousExpression(token, ((ColorExpression) parameters.get(0)).toARGB());
   }
 
   @Override
@@ -265,7 +280,76 @@ class Hue extends AbstractColorOperationFunction {
   @Override
   protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     HSLAValue hsla = toHSLA(color);
-    return new NumberExpression(token, Double.valueOf(hsla.h), "", "" + hsla.h, Dimension.NUMBER);
+    return new NumberExpression(token, Double.valueOf(hsla.h), "", "" + (float) hsla.h, Dimension.NUMBER);
+  }
+
+}
+
+class Saturation extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    HSLAValue hsla = toHSLA(color);
+    return new NumberExpression(token, Double.valueOf(hsla.s * 100), "%", "" + ((float) hsla.s * 100) + "%", Dimension.PERCENTAGE);
+  }
+
+}
+
+class Lightness extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    HSLAValue hsla = toHSLA(color);
+    return new NumberExpression(token, Double.valueOf(hsla.l * 100), "%", "" + ((float) hsla.l * 100) + "%", Dimension.PERCENTAGE);
+  }
+
+}
+
+class Red extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return new NumberExpression(token, Double.valueOf(color.getRed()), "", "" + color.getRed(), Dimension.NUMBER);
+  }
+
+}
+
+class Green extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return new NumberExpression(token, Double.valueOf(color.getGreen()), "", "" + color.getGreen(), Dimension.NUMBER);
+  }
+
+}
+
+class Blue extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return new NumberExpression(token, Double.valueOf(color.getBlue()), "", "" + color.getBlue(), Dimension.NUMBER);
+  }
+
+}
+
+class Alpha extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return new NumberExpression(token, Double.valueOf(color.getAlpha()), "", "" + color.getAlpha(), Dimension.NUMBER);
+  }
+
+}
+
+class Luma extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    double luma = (Math
+        .round((0.2126 * (color.getRed() / 255.0) + 0.7152 * (color.getGreen() / 255.0) + 0.0722 * (color.getBlue() / 255.0))
+            * color.getAlpha() * 100));
+
+    return new NumberExpression(token, Double.valueOf(luma), "%", "" + (float) luma + "%", Dimension.PERCENTAGE);
   }
 
 }
@@ -274,7 +358,7 @@ abstract class AbstractColorOperationFunction extends AbstractColorFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
-    return evaluate((ColorExpression)splitParameters.get(0), problemsHandler, token);
+    return evaluate((ColorExpression) splitParameters.get(0), problemsHandler, token);
   }
 
   protected abstract Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token);
@@ -293,7 +377,7 @@ abstract class AbstractColorOperationFunction extends AbstractColorFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
   }
-  
+
 }
 
 class Saturate extends AbstractColorHSLAmountFunction {
@@ -303,7 +387,7 @@ class Saturate extends AbstractColorHSLAmountFunction {
     hsla.s += amount.getValueAsDouble() / 100.0f;
     hsla.s = clamp(hsla.s);
   }
-  
+
 }
 
 class Desaturate extends AbstractColorHSLAmountFunction {
@@ -313,7 +397,7 @@ class Desaturate extends AbstractColorHSLAmountFunction {
     hsla.s -= amount.getValueAsDouble() / 100.0f;
     hsla.s = clamp(hsla.s);
   }
-  
+
 }
 
 class Lighten extends AbstractColorHSLAmountFunction {
@@ -376,6 +460,70 @@ class Spin extends AbstractColorHSLAmountFunction {
 
 }
 
+//
+// Copyright (c) 2006-2009 Hampton Catlin, Nathan Weizenbaum, and Chris Eppstein
+// http://sass-lang.com
+//
+class Mix extends AbstractColorFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    ColorExpression color1 = (ColorExpression) splitParameters.get(0);
+    ColorExpression color2 = (ColorExpression) splitParameters.get(1);
+    NumberExpression weight = splitParameters.size() > 2 ? (NumberExpression) splitParameters.get(2) : null;
+    
+    if (weight == null) {
+      weight = new NumberExpression(token, Double.valueOf(50), "%", "50%", Dimension.PERCENTAGE);
+    }
+    
+    double p = weight.getValueAsDouble() / 100.0;
+    double w = p * 2 - 1;
+    double a = color1.getAlpha() - color2.getAlpha();
+  
+    double w1 = (((w * a == -1) ? w : (w + a) / (1 + w * a)) + 1) / 2.0;
+    double w2 = 1 - w1;
+  
+    return new ColorExpression.ColorWithAlphaExpression(token, (int)Math.round(color1.getRed() * w1 + color2.getRed() * w2), 
+        (int)Math.round(color1.getGreen() * w1 + color2.getGreen() * w2), 
+        (int)Math.round(color1.getBlue() * w1 + color2.getBlue() * w2),
+        (float) (color1.getAlpha() * p + color2.getAlpha() * (1 - p)));
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 2;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 3;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    switch (position) {
+    case 0:
+    case 1:
+      return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+    case 2:
+      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    }
+    return false;
+  }
+
+}
+
+class Greyscale extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    HSLAValue hsla = toHSLA(color);
+    hsla.s = 0;
+    return hsla(hsla, token);
+  }
+  
+}
+
 abstract class AbstractMultiParameterFunction implements Function {
 
   @Override
@@ -432,7 +580,7 @@ abstract class AbstractMultiParameterFunction implements Function {
 
 abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
 
-  static float clamp(float val) {
+  static double clamp(double val) {
     return Math.min(1, Math.max(0, val));
   }
 
@@ -442,18 +590,20 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
     double m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
     double m1 = l * 2 - m2;
 
-    return new ColorExpression.ColorWithAlphaExpression(token, (int)Math.round(hue(h + 1.0/3.0, m1, m2) * 255),
-                     (int)Math.round(hue(h, m1, m2)       * 255),
-                     (int)Math.round(hue(h - 1.0/3.0, m1, m2) * 255),
-                     (float) a);
+    return new ColorExpression.ColorWithAlphaExpression(token, (int) Math.round(hue(h + 1.0 / 3.0, m1, m2) * 255), (int) Math.round(hue(h,
+        m1, m2) * 255), (int) Math.round(hue(h - 1.0 / 3.0, m1, m2) * 255), (float) a);
   }
-  
+
   static double hue(double h, double m1, double m2) {
     h = h < 0 ? h + 1 : (h > 1 ? h - 1 : h);
-    if      (h * 6 < 1) return m1 + (m2 - m1) * h * 6;
-    else if (h * 2 < 1) return m2;
-    else if (h * 3 < 2) return m1 + (m2 - m1) * (2.0/3.0 - h) * 6;
-    else                return m1;
+    if (h * 6 < 1)
+      return m1 + (m2 - m1) * h * 6;
+    else if (h * 2 < 1)
+      return m2;
+    else if (h * 3 < 2)
+      return m1 + (m2 - m1) * (2.0 / 3.0 - h) * 6;
+    else
+      return m1;
   }
 
   static double scaled(NumberExpression n, int size) {
@@ -471,17 +621,13 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
       return n.getValueAsDouble();
     }
   }
-  
+
   static HSLAValue toHSLA(ColorExpression color) {
-    double r = color.getRed() / 255.0f,
-        g = color.getGreen() / 255.0f,
-        b = color.getBlue() / 255.0f,
-        a = color.getAlpha();
-    
-    double max = Math.max(r, Math.max(g, b)),
-        min = Math.min(r, Math.min(g, b));
+    double r = color.getRed() / 255.0, g = color.getGreen() / 255.0, b = color.getBlue() / 255.0, a = color.getAlpha();
+
+    double max = Math.max(r, Math.max(g, b)), min = Math.min(r, Math.min(g, b));
     double h, s, l = (max + min) / 2, d = max - min;
-    
+
     if (max == min) {
       h = s = 0;
     } else {
@@ -494,23 +640,23 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
       } else {
         h = (r - g) / d + 4;
       }
-      
+
       h /= 6;
     }
-    
-    return new HSLAValue((float) (h * 360), (float)s, (float)l, (float)a);
+
+    return new HSLAValue((h * 360), s, l, a);
   }
 
 }
 
 class HSLAValue {
-  public float h, s, l, a;
+  public double h, s, l, a;
 
   public HSLAValue() {
     super();
   }
 
-  public HSLAValue(float h, float s, float l, float a) {
+  public HSLAValue(double h, double s, double l, double a) {
     super();
     this.h = h;
     this.s = s;
@@ -518,7 +664,7 @@ class HSLAValue {
     this.a = a;
   }
 
-  public HSLAValue(float h, float s, float l) {
+  public HSLAValue(double h, double s, double l) {
     super();
     this.h = h;
     this.s = s;
@@ -567,17 +713,18 @@ abstract class AbstractColorHSLAmountFunction extends AbstractColorAmountFunctio
   @Override
   protected Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token) {
     HSLAValue hsla = toHSLA(color);
-    
+
     apply(amount, hsla);
-    
+
     return hsla(hsla, token);
   }
 
   /**
    * Apply the amount to the given hsla array.
+   * 
    * @param amount
    * @param hsla
    */
   protected abstract void apply(NumberExpression amount, HSLAValue hsla);
-  
+
 }

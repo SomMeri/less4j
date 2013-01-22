@@ -22,6 +22,18 @@
   hue: 98;
   saturation: 12%;
   lightness: 95%;
+  red: 17;
+  green: 34;
+  blue: 51;
+  alpha: 0.5;
+  luma: 65%;
+  mix: #800080;
+  mix2: rgba(75, 25, 0, 0.75);
+  contrast: #000000;
+  contrast2: #ffffff;
+  contrast3: #dddddd;
+  contrast4: #000000;
+  contrast5: #ffffff;
   rounded: 11;
   roundedpx: 3px;
   percentage: 20%;
