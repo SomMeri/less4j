@@ -9,16 +9,16 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 public class ColorExpression extends Expression {
 
   protected String value;
-  protected int red;
-  protected int green;
-  protected int blue;
+  protected double red;
+  protected double green;
+  protected double blue;
 
   public ColorExpression(HiddenTokenAwareTree token, String value) {
     super(token);
     setValue(value);
   }
 
-  public ColorExpression(HiddenTokenAwareTree token, int red, int green, int blue) {
+  public ColorExpression(HiddenTokenAwareTree token, double red, double green, double blue) {
     super(token);
     this.red = red;
     this.green = green;
@@ -41,19 +41,19 @@ public class ColorExpression extends Expression {
     blue=decode(value, 2);
   }
 
-  public int getRed() {
+  public double getRed() {
     return red;
   }
 
-  public int getGreen() {
+  public double getGreen() {
     return green;
   }
 
-  public int getBlue() {
+  public double getBlue() {
     return blue;
   }
   
-  public float getAlpha() {
+  public double getAlpha() {
     return 1.0f;
   }
   
@@ -66,15 +66,15 @@ public class ColorExpression extends Expression {
     return Integer.parseInt(color.substring(i*2+1, i*2+3), 16);
   }
 
-  private String encode(int red, int green, int blue) {
+  private String encode(double red, double green, double blue) {
     return "#" + toHex(red) + toHex(green) + toHex(blue); 
   }
 
-  protected String toHex(int color) {
+  protected String toHex(double color) {
     String prefix = "";
     if (color<16)
       prefix = "0";
-    return prefix + Integer.toHexString(color);
+    return prefix + Integer.toHexString((int) Math.round(color));
   }
 
   @Override
@@ -102,7 +102,7 @@ public class ColorExpression extends Expression {
   }
   
   public Color toColor() {
-    return new Color(this.red, this.green, this.blue);
+    return new Color((int)Math.round(this.red), (int)Math.round(this.green), (int)Math.round(this.blue));
   }
   
   public static class ColorWithAlphaExpression extends ColorExpression {
@@ -110,9 +110,9 @@ public class ColorExpression extends Expression {
     /**
      * Alpha in the range 0-1.
      */
-    private float alpha;
+    private double alpha;
     
-    public ColorWithAlphaExpression(HiddenTokenAwareTree token, int red, int green, int blue, float alpha) {
+    public ColorWithAlphaExpression(HiddenTokenAwareTree token, double red, double green, double blue, double alpha) {
       super(token, red, green, blue);
       this.alpha = alpha;
       if (alpha != 1.0) {
@@ -125,12 +125,12 @@ public class ColorExpression extends Expression {
     }
     
     @Override
-    public float getAlpha() {
+    public double getAlpha() {
       return alpha;
     }
 
-    protected String encode(int red, int green, int blue, float alpha) {
-      return "rgba(" + red + ", " + green + ", " + blue + ", " + alpha + ")";
+    protected String encode(double red, double green, double blue, double alpha) {
+      return "rgba(" + Math.round(red) + ", " + Math.round(green) + ", " + Math.round(blue) + ", " + alpha + ")";
     }
     
     @Override
@@ -140,7 +140,7 @@ public class ColorExpression extends Expression {
 
     @Override
     public Color toColor() {
-      return new Color(this.red, this.green, this.blue, Math.round(this.alpha * 255));
+      return new Color((int)Math.round(this.red), (int)Math.round(this.green), (int)Math.round(this.blue), Math.round(this.alpha * 255));
     }
     
   }

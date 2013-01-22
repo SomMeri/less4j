@@ -96,7 +96,7 @@ class Unit extends AbstractMultiParameterFunction {
       newDimension = Dimension.NUMBER;
     }
 
-    return new NumberExpression(token, dimension.getValueAsDouble(), "", "" + dimension.getValueAsDouble() + newSuffix, newDimension);
+    return new NumberExpression(token, dimension.getValueAsDouble(), newSuffix, null, newDimension);
   }
 
   @Override
