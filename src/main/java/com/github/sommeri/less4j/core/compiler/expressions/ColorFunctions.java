@@ -16,10 +16,45 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.HSLColor;
 
 public class ColorFunctions implements FunctionsPackage {
-  
+
+  protected static final String RGB = "rgb";
+  protected static final String RGBA = "rgba";
+  protected static final String ARGB = "argb";
+  protected static final String HSL = "hsl";
+  protected static final String HSLA = "hsla";
+  protected static final String HSV = "hsv";
+  protected static final String HSVA = "hsva";
+
+  protected static final String HUE = "hue";
+  protected static final String SATURATION = "saturation";
+  protected static final String LIGHTNESS = "lightness";
+  protected static final String RED = "red";
+  protected static final String GREEN = "green";
+  protected static final String BLUE = "blue";
+  protected static final String ALPHA = "alpha";
+  protected static final String LUME = "luma";
+
+  protected static final String SATURATE = "saturate";
+  protected static final String DESATURATE = "desaturate";
   protected static final String LIGHTEN = "lighten";
   protected static final String DARKEN = "darken";
-  protected static final String HSLA = "hsla";
+  protected static final String FADEIN = "fadein";
+  protected static final String FADEOUT = "fadeout";
+  protected static final String FADE = "fade";
+  protected static final String SPIN = "spin";
+  protected static final String MIX = "mix";
+  protected static final String GREYSCALE = "greyscale";
+  protected static final String CONTRAST = "contrast";
+
+  protected static final String MULTIPLY = "multiply";
+  protected static final String SCREEN = "screen";
+  protected static final String OVERLAY = "overlay";
+  protected static final String SOFTLIGHT = "softlight";
+  protected static final String HARDLIGHT = "hardlight";
+  protected static final String DIFFERENCE = "difference";
+  protected static final String EXCLUSION = "exclusion";
+  protected static final String AVERAGE = "average";
+  protected static final String NEGATION = "negation";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
