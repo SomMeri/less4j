@@ -60,6 +60,7 @@ public class ExpressionEvaluator {
     colorsCalculator = new ColorsCalculator(problemsHandler);
     functions.add(new MathFunctions(problemsHandler));
     functions.add(new StringFunctions(problemsHandler));
+    functions.add(new ColorFunctions(problemsHandler));
     functions.add(new UnknownFunctions(problemsHandler));
   }
 

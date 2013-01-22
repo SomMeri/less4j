@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
@@ -70,6 +71,14 @@ public class ProblemsHandler {
 
   public void errFormatWrongFirstParameter(Expression param) {
     collector.addError(new CompilationError(param, "First argument of format function must be either string or escaped value."));
+  }
+  
+  public void wrongNumberOfArgumentsToFunction(Expression param, int expectedArguments) {
+    collector.addError(new CompilationError(param, "Wrong number of arguments to function, should be " + expectedArguments + "."));
+  }
+  
+  public void wrongArgumentTypeToFunction(Expression param, ASTCssNodeType expected) {
+    collector.addError(new CompilationError(param, "Wrong argument type to function, should be " + expected + "."));
   }
 
   public void variablesCycle(List<Variable> cycle) {

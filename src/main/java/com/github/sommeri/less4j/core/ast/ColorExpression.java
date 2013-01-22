@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.ast;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,10 +8,10 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class ColorExpression extends Expression {
 
-  private String value;
-  private int red;
-  private int green;
-  private int blue;
+  protected String value;
+  protected int red;
+  protected int green;
+  protected int blue;
 
   public ColorExpression(HiddenTokenAwareTree token, String value) {
     super(token);
@@ -23,6 +24,10 @@ public class ColorExpression extends Expression {
     this.green = green;
     this.blue = blue;
     this.value = encode(red, green, blue);
+  }
+  
+  public ColorExpression(HiddenTokenAwareTree token, Color color) {
+    this(token, color.getRed(), color.getGreen(), color.getBlue());
   }
 
   public String getValue() {
@@ -86,5 +91,43 @@ public class ColorExpression extends Expression {
   @Override
   public ColorExpression clone() {
     return (ColorExpression) super.clone();
+  }
+  
+  public Color toColor() {
+    return new Color(this.red, this.green, this.blue);
+  }
+  
+  public static class ColorWithAlphaExpression extends ColorExpression {
+    
+    /**
+     * Alpha in the range 0-255.
+     */
+    private int alpha;
+    
+    public ColorWithAlphaExpression(HiddenTokenAwareTree token, int red, int green, int blue, int alpha) {
+      super(token, red, green, blue);
+      this.alpha = alpha;
+      if (alpha != 255) {
+	this.value = encode(red, green, blue, alpha);
+      }
+    }
+
+    public ColorWithAlphaExpression(HiddenTokenAwareTree token, Color color) {
+      this(token, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+    }
+    
+    public int getAlpha() {
+      return alpha;
+    }
+
+    protected String encode(int red, int green, int blue, int alpha) {
+      return "rgba(" + red + ", " + green + ", " + blue + ", " + (alpha/255.0) + ")";
+    }
+
+    @Override
+    public Color toColor() {
+      return new Color(this.red, this.green, this.blue, this.alpha);
+    }
+    
   }
 }
