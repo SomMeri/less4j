@@ -84,7 +84,7 @@ public class ColorFunctions implements FunctionsPackage {
     FUNCTIONS.put(SPIN, new Spin());
     FUNCTIONS.put(MIX, new Mix());
     FUNCTIONS.put(GREYSCALE, new Greyscale());
-//    FUNCTIONS.put(CONTRAST, new Contrast());
+    FUNCTIONS.put(CONTRAST, new Contrast());
 
 //    FUNCTIONS.put(MULTIPLY, new Multiply());
 //    FUNCTIONS.put(SCREEN, new Screen());
@@ -519,6 +519,49 @@ class Greyscale extends AbstractColorOperationFunction {
     hsla.s = 0;
     return hsla(hsla, token);
   }
+  
+}
+
+class Contrast extends AbstractMultiParameterFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    ColorExpression color = (ColorExpression) splitParameters.get(0);
+    ColorExpression dark = (ColorExpression) (splitParameters.size() > 1 ? splitParameters.get(1) : new ColorExpression(token, 0, 0, 0));
+    ColorExpression light = (ColorExpression) (splitParameters.size() > 2 ? splitParameters.get(2) : new ColorExpression(token, 255, 255, 255));
+    NumberExpression threshold = (NumberExpression) (splitParameters.size() > 3 ? splitParameters.get(3) : new NumberExpression(token, 43.0, "%", null, Dimension.PERCENTAGE));
+    double thresholdValue = AbstractColorFunction.number(threshold);
+    
+    if (((0.2126 * (color.getRed()/255) + 0.7152 * (color.getGreen()/255) + 0.0722 * (color.getBlue()/255)) * color.getAlpha()) < thresholdValue) {
+      return light;
+    } else {
+      return dark;
+    }
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 4;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    switch (position) {
+    case 0:
+    case 1:
+    case 2:
+      return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+    case 3:
+      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    }
+    return false;
+  }
+
   
 }
 
