@@ -66,7 +66,7 @@ public class ColorExpression extends Expression {
     return "#" + toHex(red) + toHex(green) + toHex(blue); 
   }
 
-  private String toHex(int color) {
+  protected String toHex(int color) {
     String prefix = "";
     if (color<16)
       prefix = "0";
@@ -93,6 +93,10 @@ public class ColorExpression extends Expression {
     return (ColorExpression) super.clone();
   }
   
+  public String toARGB() {
+    return "#FF" + toHex(red) + toHex(green) + toHex(blue); 
+  }
+  
   public Color toColor() {
     return new Color(this.red, this.green, this.blue);
   }
@@ -100,33 +104,38 @@ public class ColorExpression extends Expression {
   public static class ColorWithAlphaExpression extends ColorExpression {
     
     /**
-     * Alpha in the range 0-255.
+     * Alpha in the range 0-1.
      */
-    private int alpha;
+    private float alpha;
     
-    public ColorWithAlphaExpression(HiddenTokenAwareTree token, int red, int green, int blue, int alpha) {
+    public ColorWithAlphaExpression(HiddenTokenAwareTree token, int red, int green, int blue, float alpha) {
       super(token, red, green, blue);
       this.alpha = alpha;
-      if (alpha != 255) {
+      if (alpha != 1.0) {
 	this.value = encode(red, green, blue, alpha);
       }
     }
 
     public ColorWithAlphaExpression(HiddenTokenAwareTree token, Color color) {
-      this(token, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+      this(token, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() / 255.0f);
     }
     
-    public int getAlpha() {
+    public float getAlpha() {
       return alpha;
     }
 
-    protected String encode(int red, int green, int blue, int alpha) {
-      return "rgba(" + red + ", " + green + ", " + blue + ", " + (alpha/255.0) + ")";
+    protected String encode(int red, int green, int blue, float alpha) {
+      return "rgba(" + red + ", " + green + ", " + blue + ", " + alpha + ")";
+    }
+    
+    @Override
+    public String toARGB() {
+      return "#" + toHex(Math.round(alpha * 255)) + toHex(red) + toHex(green) + toHex(blue); 
     }
 
     @Override
     public Color toColor() {
-      return new Color(this.red, this.green, this.blue, this.alpha);
+      return new Color(this.red, this.green, this.blue, Math.round(this.alpha * 255));
     }
     
   }
