@@ -553,6 +553,7 @@ class Contrast extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
+      return (parameter.getType() == ASTCssNodeType.COLOR_EXPRESSION);
     case 1:
     case 2:
       return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
