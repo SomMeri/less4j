@@ -32,7 +32,6 @@ public class CompilationError extends AbstractProblem {
     return Type.ERROR;
   }
 
-
   @Override
   public LessSource getSource() {
 	return source;

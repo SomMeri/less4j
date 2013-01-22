@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.PrintUtils;
 

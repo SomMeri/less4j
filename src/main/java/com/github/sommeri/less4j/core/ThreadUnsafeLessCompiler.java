@@ -31,12 +31,12 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(File inputFile) throws Less4jException {
-	return compile(new LessSource.FileSource(inputFile));
-}
+    return compile(new LessSource.FileSource(inputFile));
+  }
 
   @Override
   public CompilationResult compile(URL inputURL) throws Less4jException {
-	return compile(new LessSource.URLSource(inputURL));
+    return compile(new LessSource.URLSource(inputURL));
   }
 
   @Override
@@ -52,16 +52,16 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return compilationResult;
   }
 
-private String doCompile(LessSource source) throws Less4jException {
+  private String doCompile(LessSource source) throws Less4jException {
     ANTLRParser.ParseResult result;
-	try {
-		result = parser.parseStyleSheet(source.getContent(), source);
-	} catch (FileNotFoundException ex) {
-		throw new Less4jException(new GeneralProblem("The file " + source + " does not exists."), new CompilationResult(null));
-	} catch (IOException ex) {
-		throw new Less4jException(new GeneralProblem("Cannot read the file " + source + "."), new CompilationResult(null));
-	}
-	
+    try {
+      result = parser.parseStyleSheet(source.getContent(), source);
+    } catch (FileNotFoundException ex) {
+      throw new Less4jException(new GeneralProblem("The file " + source + " does not exists."), new CompilationResult(null));
+    } catch (IOException ex) {
+      throw new Less4jException(new GeneralProblem("Cannot read the file " + source + "."), new CompilationResult(null));
+    }
+
     if (result.hasErrors()) {
       CompilationResult compilationResult = new CompilationResult("Errors during parsing phase, partial result is not available.");
       throw new Less4jException(result.getErrors(), compilationResult);

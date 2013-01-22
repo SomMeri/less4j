@@ -15,6 +15,8 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
+import com.github.sommeri.less4j.core.parser.AntlrException;
 
 public abstract class SuperLessParser extends Parser {
 

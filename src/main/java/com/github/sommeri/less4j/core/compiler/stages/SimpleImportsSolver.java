@@ -31,7 +31,7 @@ public class SimpleImportsSolver {
   private final ProblemsHandler problemsHandler;
   private ConversionUtils conversionUtils = new ConversionUtils();
   private ASTManipulator astManipulator = new ASTManipulator();
-  
+
   private Set<LessSource> importedSources = new HashSet<LessSource>();
 
   public SimpleImportsSolver(ProblemsHandler problemsHandler) {
@@ -49,12 +49,11 @@ public class SimpleImportsSolver {
         importEncountered((Import) kid, source);
       }
     }
-
   }
 
   private void importEncountered(Import node, LessSource source) {
     String filename = evaluateFilename(node.getUrlExpression());
-    if (filename == null) { 
+    if (filename == null) {
       problemsHandler.errorWrongImport(node.getUrlExpression());
       return;
     }
@@ -73,39 +72,39 @@ public class SimpleImportsSolver {
     filename = normalizeFileName(filename, urlParams);
     LessSource importedSource;
     try {
-    	importedSource = source.relativeSource(filename);
+      importedSource = source.relativeSource(filename);
     } catch (MalformedURLException ex) {
-    	problemsHandler.errorImportedFileNotFound(node, filename);
-		return;
+      problemsHandler.errorImportedFileNotFound(node, filename);
+      return;
     } catch (StringSourceException ex) {
-    	// imports are relative to current file and we do not know its location   
-        problemsHandler.warnLessImportNoBaseDirectory(node.getUrlExpression());
-        return ;
+      // imports are relative to current file and we do not know its location
+      problemsHandler.warnLessImportNoBaseDirectory(node.getUrlExpression());
+      return;
     }
-    
-    // import once should not import a file that was already imported  
+
+    // import once should not import a file that was already imported
     if (isImportOnce(node) && alreadyVisited(importedSource)) {
       astManipulator.removeFromBody(node);
-      return ;
+      return;
     }
     importedSources.add(importedSource);
 
     String importedContent;
-	try {
-		importedContent = importedSource.getContent();
-	} catch (FileNotFoundException e) {
-		problemsHandler.errorImportedFileNotFound(node, filename);
-		return;
-	} catch (IOException e) {
-		problemsHandler.errorImportedFileCanNotBeRead(node, filename);
-		return;
-	}
+    try {
+      importedContent = importedSource.getContent();
+    } catch (FileNotFoundException e) {
+      problemsHandler.errorImportedFileNotFound(node, filename);
+      return;
+    } catch (IOException e) {
+      problemsHandler.errorImportedFileCanNotBeRead(node, filename);
+      return;
+    }
 
     // parse imported file
     StyleSheet importedAst = parseContent(node, importedContent, importedSource);
     solveImports(importedAst, importedSource);
-    
-    // add media queries if needed 
+
+    // add media queries if needed
     if (node.hasMediums()) {
       Media media = new Media(node.getUnderlyingStructure());
       media.setMediums(node.getMediums());
@@ -118,7 +117,7 @@ public class SimpleImportsSolver {
   }
 
   private boolean isImportOnce(Import node) {
-    return node.getKind()==ImportKind.IMPORT_ONCE;
+    return node.getKind() == ImportKind.IMPORT_ONCE;
   }
 
   private boolean alreadyVisited(LessSource importedSource) {
@@ -170,7 +169,7 @@ public class SimpleImportsSolver {
     if (Constants.FILE_SEPARATOR.equals("/")) {
       return path;
     }
-    
+
     return path.replace(Constants.FILE_SEPARATOR, "/");
   }
 
