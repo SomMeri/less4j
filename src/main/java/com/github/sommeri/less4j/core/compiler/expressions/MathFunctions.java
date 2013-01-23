@@ -370,7 +370,22 @@ class Acos extends AbstractSingleValueMathFunction {
   
 }
 
-class Mod extends AbstractMultiParameterFunction {
+abstract class AbtractMultiParameterMathFunction extends AbstractMultiParameterFunction {
+
+  @Override
+  protected boolean validateParameter(Expression parameter, ASTCssNodeType expected, ProblemsHandler problemsHandler) {
+    if (expected == ASTCssNodeType.NUMBER && parameter.getType() != expected) {
+      /* There is a special problemsHandler method for reporting math functions not getting numbers. */
+      problemsHandler.mathFunctionParameterNotANumber(getName(), parameter);
+      return false;
+    } else {
+      return super.validateParameter(parameter, expected, problemsHandler);
+    }
+  }
+  
+}
+
+class Mod extends AbtractMultiParameterMathFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
@@ -393,6 +408,11 @@ class Mod extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
   }
+
+  @Override
+  protected String getName() {
+    return MathFunctions.MOD;
+  }
   
 }
 
@@ -402,10 +422,15 @@ class Pow extends AbstractTwoValueMathFunction {
   protected Expression evaluate(NumberExpression a, NumberExpression b, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     return new NumberExpression(token, Math.pow(a.getValueAsDouble(), b.getValueAsDouble()), a.getSuffix(), null, a.getDimension());
   }
+
+  @Override
+  protected String getName() {
+    return MathFunctions.POW;
+  }
   
 }
 
-abstract class AbstractTwoValueMathFunction extends AbstractMultiParameterFunction {
+abstract class AbstractTwoValueMathFunction extends AbtractMultiParameterMathFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
@@ -431,7 +456,7 @@ abstract class AbstractTwoValueMathFunction extends AbstractMultiParameterFuncti
   
 }
 
-class Round extends AbstractMultiParameterFunction {
+class Round extends AbtractMultiParameterMathFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree parentToken) {
@@ -466,6 +491,11 @@ class Round extends AbstractMultiParameterFunction {
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+  }
+
+  @Override
+  protected String getName() {
+    return MathFunctions.ROUND;
   }
 
 }

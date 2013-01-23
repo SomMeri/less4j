@@ -6,6 +6,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -20,8 +21,8 @@ abstract class AbstractMultiParameterFunction extends AbstractFunction {
     } else if (parameters.getType() == ASTCssNodeType.COMPOSED_EXPRESSION) {
       splitParameters = ((ComposedExpression) parameters).splitByComma();
     } else {
-      problemsHandler.wrongNumberOfArgumentsToFunction(parameters, getMinParameters());
-      return null;
+      problemsHandler.wrongNumberOfArgumentsToFunction(parameters, getName(), getMinParameters());
+      return new FaultyExpression(parameters);
     }
 
     if (splitParameters.size() >= getMinParameters() && splitParameters.size() <= getMaxParameters()) {
@@ -36,11 +37,11 @@ abstract class AbstractMultiParameterFunction extends AbstractFunction {
       if (valid) {
         return evaluate(splitParameters, problemsHandler, parameters.getUnderlyingStructure());
       } else {
-        return null;
+        return new FaultyExpression(parameters);
       }
     } else {
-      problemsHandler.wrongNumberOfArgumentsToFunction(parameters, getMinParameters());
-      return null;
+      problemsHandler.wrongNumberOfArgumentsToFunction(parameters, getName(), getMinParameters());
+      return new FaultyExpression(parameters);
     }
   }
 
@@ -54,11 +55,13 @@ abstract class AbstractMultiParameterFunction extends AbstractFunction {
 
   protected boolean validateParameter(Expression parameter, ASTCssNodeType expected, ProblemsHandler problemsHandler) {
     if (parameter.getType() != expected) {
-      problemsHandler.wrongArgumentTypeToFunction(parameter, expected, parameter.getType());
+      problemsHandler.wrongArgumentTypeToFunction(parameter, getName(), expected, parameter.getType());
       return false;
     } else {
       return true;
     }
   }
+  
+  protected abstract String getName();
 
 }

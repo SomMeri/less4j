@@ -73,12 +73,12 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(param, "First argument of format function must be either string or escaped value."));
   }
   
-  public void wrongNumberOfArgumentsToFunction(Expression param, int expectedArguments) {
-    collector.addError(new CompilationError(param, "Wrong number of arguments to function, should be " + expectedArguments + "."));
+  public void wrongNumberOfArgumentsToFunction(Expression param, String function, int expectedArguments) {
+    collector.addError(new CompilationError(param, "Wrong number of arguments to function '" + function + "', should be " + expectedArguments + "."));
   }
   
-  public void wrongArgumentTypeToFunction(Expression param, ASTCssNodeType expected, ASTCssNodeType received) {
-    collector.addError(new CompilationError(param, "Wrong argument type to function, expected " + expected + " saw " + received + "."));
+  public void wrongArgumentTypeToFunction(Expression param, String function, ASTCssNodeType expected, ASTCssNodeType received) {
+    collector.addError(new CompilationError(param, "Wrong argument type to function '" + function + "', expected " + expected + " saw " + received + "."));
   }
 
   public void variablesCycle(List<Variable> cycle) {

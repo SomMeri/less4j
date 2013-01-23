@@ -92,6 +92,11 @@ class Color extends AbstractMultiParameterFunction {
     return validateParameter(parameter, ASTCssNodeType.STRING_EXPRESSION, problemsHandler);
   }
 
+  @Override
+  protected String getName() {
+    return MiscFunctions.COLOR;
+  }
+
 }
 
 class Unit extends AbstractMultiParameterFunction {
@@ -135,6 +140,11 @@ class Unit extends AbstractMultiParameterFunction {
     return false;
   }
 
+  @Override
+  protected String getName() {
+    return MiscFunctions.UNIT;
+  }
+
 }
 
 class Convert extends AbstractMultiParameterFunction {
@@ -165,6 +175,11 @@ class Convert extends AbstractMultiParameterFunction {
       return validateParameter(parameter, ASTCssNodeType.IDENTIFIER_EXPRESSION, problemsHandler);
     }
     return false;
+  }
+
+  @Override
+  protected String getName() {
+    return MiscFunctions.CONVERT;
   }
 
 }
@@ -215,6 +230,11 @@ class Extract extends AbstractMultiParameterFunction {
       return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
     }
     return false;
+  }
+
+  @Override
+  protected String getName() {
+    return MiscFunctions.EXTRACT;
   }
   
 }
