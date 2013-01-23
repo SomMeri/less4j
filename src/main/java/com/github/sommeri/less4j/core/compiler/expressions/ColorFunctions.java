@@ -54,6 +54,9 @@ public class ColorFunctions implements FunctionsPackage {
   protected static final String EXCLUSION = "exclusion";
   protected static final String AVERAGE = "average";
   protected static final String NEGATION = "negation";
+  
+  protected static final String TINT = "tint";
+  protected static final String SHADE = "shade";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -95,6 +98,9 @@ public class ColorFunctions implements FunctionsPackage {
     FUNCTIONS.put(EXCLUSION, new Exclusion());
     FUNCTIONS.put(AVERAGE, new Average());
     FUNCTIONS.put(NEGATION, new Negation());
+
+    FUNCTIONS.put(TINT, new Tint());
+    FUNCTIONS.put(SHADE, new Shade());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -530,17 +536,7 @@ class Mix extends AbstractColorFunction {
       weight = new NumberExpression(token, Double.valueOf(50), "%", null, Dimension.PERCENTAGE);
     }
     
-    double p = weight.getValueAsDouble() / 100.0;
-    double w = p * 2 - 1;
-    double a = color1.getAlpha() - color2.getAlpha();
-  
-    double w1 = (((w * a == -1) ? w : (w + a) / (1 + w * a)) + 1) / 2.0;
-    double w2 = 1 - w1;
-  
-    return rgba(color1.getRed() * w1 + color2.getRed() * w2, 
-        color1.getGreen() * w1 + color2.getGreen() * w2, 
-        color1.getBlue() * w1 + color2.getBlue() * w2,
-        color1.getAlpha() * p + color2.getAlpha() * (1 - p), token);
+    return mix(color1, color2, weight, token);
   }
 
   @Override
@@ -703,6 +699,24 @@ class Negation extends AbstractSimpleColorBlendFunction {
 
 }
 
+class Tint extends AbstractColorAmountFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token) {
+    return mix(rgb(255, 255, 255, token), color, amount, token);
+  }
+  
+}
+
+class Shade extends AbstractColorAmountFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token) {
+    return mix(rgb(0, 0, 0, token), color, amount, token);
+  }
+  
+}
+
 abstract class AbstractSimpleColorBlendFunction extends AbstractColorBlendFunction {
  
   @Override
@@ -816,6 +830,27 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
     } else {
       return n.getValueAsDouble();
     }
+  }
+  
+  /**
+   * Mix
+   * @param color1
+   * @param color2
+   * @param weight number 0-100.
+   * @return
+   */
+  protected static Expression mix(ColorExpression color1, ColorExpression color2, NumberExpression weight, HiddenTokenAwareTree token) {
+    double p = weight.getValueAsDouble() / 100.0;
+    double w = p * 2 - 1;
+    double a = color1.getAlpha() - color2.getAlpha();
+  
+    double w1 = (((w * a == -1) ? w : (w + a) / (1 + w * a)) + 1) / 2.0;
+    double w2 = 1 - w1;
+  
+    return rgba(color1.getRed() * w1 + color2.getRed() * w2, 
+        color1.getGreen() * w1 + color2.getGreen() * w2, 
+        color1.getBlue() * w1 + color2.getBlue() * w2,
+        color1.getAlpha() * p + color2.getAlpha() * (1 - p), token);
   }
 
   static HSLAValue toHSLA(ColorExpression color) {
