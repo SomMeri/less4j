@@ -19,11 +19,13 @@ public class MiscFunctions implements FunctionsPackage {
 
   protected static final String COLOR = "color";
   protected static final String UNIT = "unit";
+  protected static final String CONVERT = "convert";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
     FUNCTIONS.put(COLOR, new Color());
     FUNCTIONS.put(UNIT, new Unit());
+    FUNCTIONS.put(CONVERT, new Convert());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -32,16 +34,25 @@ public class MiscFunctions implements FunctionsPackage {
     this.problemsHandler = problemsHandler;
   }
 
-  /* (non-Javadoc)
-   * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#canEvaluate(com.github.sommeri.less4j.core.ast.FunctionExpression, com.github.sommeri.less4j.core.ast.Expression)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#
+   * canEvaluate(com.github.sommeri.less4j.core.ast.FunctionExpression,
+   * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
   public boolean canEvaluate(FunctionExpression input, Expression parameters) {
     return FUNCTIONS.containsKey(input.getName());
   }
-  
-  /* (non-Javadoc)
-   * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#evaluate(com.github.sommeri.less4j.core.ast.FunctionExpression, com.github.sommeri.less4j.core.ast.Expression)
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#evaluate
+   * (com.github.sommeri.less4j.core.ast.FunctionExpression,
+   * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
   public Expression evaluate(FunctionExpression input, Expression parameters) {
@@ -76,7 +87,7 @@ class Color extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     return validateParameter(parameter, ASTCssNodeType.STRING_EXPRESSION, problemsHandler);
   }
-  
+
 }
 
 class Unit extends AbstractMultiParameterFunction {
@@ -119,5 +130,37 @@ class Unit extends AbstractMultiParameterFunction {
     }
     return false;
   }
-  
+
+}
+
+class Convert extends AbstractMultiParameterFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    NumberExpression value = (NumberExpression) splitParameters.get(0);
+    IdentifierExpression unit = (IdentifierExpression) splitParameters.get(1);
+    return value.convertTo(unit.getValue());
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 2;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    switch (position) {
+    case 0:
+      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    case 1:
+      return validateParameter(parameter, ASTCssNodeType.IDENTIFIER_EXPRESSION, problemsHandler);
+    }
+    return false;
+  }
+
 }
