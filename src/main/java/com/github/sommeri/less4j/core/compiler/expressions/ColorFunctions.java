@@ -62,8 +62,8 @@ public class ColorFunctions implements FunctionsPackage {
     FUNCTIONS.put(ARGB, new ARGB());
     FUNCTIONS.put(HSL, new HSL());
     FUNCTIONS.put(HSLA, new HSLA());
-    // FUNCTIONS.put(HSV, new HSV());
-    // FUNCTIONS.put(HSVA, new HSVA());
+     FUNCTIONS.put(HSV, new HSV());
+     FUNCTIONS.put(HSVA, new HSVA());
 
     FUNCTIONS.put(HUE, new Hue());
     FUNCTIONS.put(SATURATION, new Saturation());
@@ -230,6 +230,63 @@ class HSLA extends AbstractColorFunction {
 
   private Expression evaluate(NumberExpression h, NumberExpression s, NumberExpression l, NumberExpression a, HiddenTokenAwareTree token) {
     return hsla(new HSLAValue(number(h), number(s), number(l), number(a)), token);
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 4;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 4;
+  }
+
+}
+
+class HSV extends AbstractColorFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2), token);
+  }
+
+  private Expression evaluate(NumberExpression h, NumberExpression s, NumberExpression v, HiddenTokenAwareTree token) {
+    return hsva(number(h), number(s), number(v), 1.0, token);
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 3;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 3;
+  }
+
+}
+
+class HSVA extends AbstractColorFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2), 
+	(NumberExpression) parameters.get(3), token);
+  }
+
+  private Expression evaluate(NumberExpression h, NumberExpression s, NumberExpression v, NumberExpression a, HiddenTokenAwareTree token) {
+    return hsva(number(h), number(s), number(v), number(a), token);
   }
 
   @Override
@@ -580,6 +637,33 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
 
     return new ColorExpression.ColorWithAlphaExpression(token, hue(h + 1.0 / 3.0, m1, m2) * 255, hue(h,
         m1, m2) * 255, hue(h - 1.0 / 3.0, m1, m2) * 255, a);
+  }
+  
+  static final int[][] hsvaPerm = new int[][] {
+    new int[] { 0, 3, 1 },
+    new int[] { 2, 0, 1 },
+    new int[] { 1, 0, 3 },
+    new int[] { 1, 2, 0 },
+    new int[] { 3, 1, 0 },
+    new int[] { 0, 1, 2 }
+  };
+  
+  static ColorExpression hsva(double h, double s, double v, double a, HiddenTokenAwareTree token) {
+    h = ((h % 360) / 360) * 360;
+
+    int i = (int) Math.floor((h / 60) % 6);
+    double f = (h / 60) - i;
+
+    double[] vs = new double[] { v,
+              v * (1 - s),
+              v * (1 - f * s),
+              v * (1 - (1 - f) * s)
+    };
+
+    return new ColorExpression.ColorWithAlphaExpression(token, vs[hsvaPerm[i][0]] * 255,
+                     vs[hsvaPerm[i][1]] * 255,
+                     vs[hsvaPerm[i][2]] * 255,
+                     a);
   }
 
   static double hue(double h, double m1, double m2) {
