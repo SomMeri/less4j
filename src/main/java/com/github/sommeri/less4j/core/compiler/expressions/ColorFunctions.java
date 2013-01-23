@@ -815,22 +815,6 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
 
     return rgba(vs[hsvaPerm[i][0]] * 255, vs[hsvaPerm[i][1]] * 255, vs[hsvaPerm[i][2]] * 255, a, token);
   }
-
-  static double scaled(NumberExpression n, int size) {
-    if (n.getDimension() == Dimension.PERCENTAGE) {
-      return n.getValueAsDouble() * size / 100;
-    } else {
-      return number(n);
-    }
-  }
-
-  static double number(NumberExpression n) {
-    if (n.getDimension() == Dimension.PERCENTAGE) {
-      return n.getValueAsDouble() / 100;
-    } else {
-      return n.getValueAsDouble();
-    }
-  }
   
   /**
    * Mix

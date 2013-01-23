@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-abstract class AbstractMultiParameterFunction implements Function {
+abstract class AbstractMultiParameterFunction extends AbstractFunction {
 
   @Override
   public Expression evaluate(Expression parameters, ProblemsHandler problemsHandler) {
