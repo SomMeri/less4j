@@ -63,6 +63,10 @@ public class Declaration extends ASTCssNode {
   public boolean isFontDeclaration() {
     return getName()!=null? getName().toLowerCase().equals("font") : false;
   }
+
+  public boolean isFilterDeclaration() {
+    return getName()!=null? getName().toLowerCase().equals("filter") : false;
+  }
   
   @Override
   public String toString() {

@@ -142,7 +142,7 @@ public class LessToCssCompiler {
   }
 
   private void evaluateInDeclaration(Declaration node) {
-    if (!node.isFontDeclaration()) {
+    if (!node.isFontDeclaration() && !node.isFilterDeclaration()) {
       evaluateExpressions(node);
       return;
     }
