@@ -340,7 +340,7 @@ class Hue extends AbstractColorOperationFunction {
   @Override
   protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     HSLAValue hsla = toHSLA(color);
-    return new NumberExpression(token, Double.valueOf(hsla.h), "", null, Dimension.NUMBER);
+    return new NumberExpression(token, Double.valueOf(Math.round(hsla.h)), "", null, Dimension.NUMBER);
   }
 
 }
@@ -350,7 +350,7 @@ class Saturation extends AbstractColorOperationFunction {
   @Override
   protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     HSLAValue hsla = toHSLA(color);
-    return new NumberExpression(token, Double.valueOf(hsla.s * 100), "%", null, Dimension.PERCENTAGE);
+    return new NumberExpression(token, Double.valueOf(Math.round(hsla.s * 100)), "%", null, Dimension.PERCENTAGE);
   }
 
 }
@@ -360,7 +360,7 @@ class Lightness extends AbstractColorOperationFunction {
   @Override
   protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     HSLAValue hsla = toHSLA(color);
-    return new NumberExpression(token, Double.valueOf(hsla.l * 100), "%", null, Dimension.PERCENTAGE);
+    return new NumberExpression(token, Double.valueOf(Math.round(hsla.l * 100)), "%", null, Dimension.PERCENTAGE);
   }
 
 }
@@ -771,13 +771,25 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
   }
 
   static ColorExpression hsla(HSLAValue hsla, HiddenTokenAwareTree token) {
-    double h = (hsla.h % 360) / 360, s = hsla.s, l = hsla.l, a = hsla.a;
+    double h = (hsla.h % 360.0) / 360.0, s = hsla.s, l = hsla.l, a = hsla.a;
 
     double m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
     double m1 = l * 2 - m2;
 
     return rgba(hue(h + 1.0 / 3.0, m1, m2) * 255, hue(h,
         m1, m2) * 255, hue(h - 1.0 / 3.0, m1, m2) * 255, a, token);
+  }
+
+  private static double hue(double h, double m1, double m2) {
+    h = h < 0 ? h + 1 : (h > 1 ? h - 1 : h);
+    if (h * 6 < 1)
+      return m1 + (m2 - m1) * h * 6;
+    else if (h * 2 < 1)
+      return m2;
+    else if (h * 3 < 2)
+      return m1 + (m2 - m1) * (2.0 / 3.0 - h) * 6;
+    else
+      return m1;
   }
   
   static final int[][] hsvaPerm = new int[][] {
@@ -802,18 +814,6 @@ abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
     };
 
     return rgba(vs[hsvaPerm[i][0]] * 255, vs[hsvaPerm[i][1]] * 255, vs[hsvaPerm[i][2]] * 255, a, token);
-  }
-
-  static double hue(double h, double m1, double m2) {
-    h = h < 0 ? h + 1 : (h > 1 ? h - 1 : h);
-    if (h * 6 < 1)
-      return m1 + (m2 - m1) * h * 6;
-    else if (h * 2 < 1)
-      return m2;
-    else if (h * 3 < 2)
-      return m1 + (m2 - m1) * (2.0 / 3.0 - h) * 6;
-    else
-      return m1;
   }
 
   static double scaled(NumberExpression n, int size) {
