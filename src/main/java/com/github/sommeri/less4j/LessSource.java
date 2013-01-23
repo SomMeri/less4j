@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,9 +18,9 @@ import com.github.sommeri.less4j.utils.URLUtils;
 
 public abstract class LessSource {
 
-  public abstract LessSource relativeSource(String filename) throws MalformedURLException, StringSourceException;
+  public abstract LessSource relativeSource(String filename) throws FileNotFound, CannotReadFile, StringSourceException;
 
-  public abstract String getContent() throws IOException;
+  public abstract String getContent() throws FileNotFound, CannotReadFile;
 
   public abstract static class AbstractHierarchicalSource extends LessSource {
 
@@ -81,24 +82,35 @@ public abstract class LessSource {
       this.inputURL = inputURL;
     }
 
-    public URLSource(URLSource parent, String filename) throws MalformedURLException {
+    public URLSource(URLSource parent, String filename) throws FileNotFound, CannotReadFile {
       super(parent);
-      this.inputURL = new URL(URLUtils.toParentURL(parent.inputURL), filename);
+      try {
+        this.inputURL = new URL(URLUtils.toParentURL(parent.inputURL), filename);
+      } catch (MalformedURLException e) {
+        throw new FileNotFound();
+      }
       parent.addImportedSource(this);
     }
 
     @Override
-    public String getContent() throws IOException {
-      URLConnection connection = getInputURL().openConnection();
-      Reader input = new InputStreamReader(connection.getInputStream());
-      String content = IOUtils.toString(input).replace("\r\n", "\n");
-      setLastModified(connection.getLastModified());
-      input.close();
-      return content;
+    public String getContent() throws FileNotFound, CannotReadFile {
+      try {
+        URLConnection connection = getInputURL().openConnection();
+        Reader input = new InputStreamReader(connection.getInputStream());
+        String content = IOUtils.toString(input).replace("\r\n", "\n");
+        setLastModified(connection.getLastModified());
+        input.close();
+        return content;
+      } catch (FileNotFoundException ex) {
+        throw new FileNotFound();
+      } catch (IOException ex) {
+        throw new CannotReadFile();
+      }
+
     }
 
     @Override
-    public LessSource relativeSource(String filename) throws MalformedURLException {
+    public LessSource relativeSource(String filename) throws FileNotFound, CannotReadFile {
       return new URLSource(this, filename);
     }
 
@@ -152,12 +164,18 @@ public abstract class LessSource {
     }
 
     @Override
-    public String getContent() throws IOException {
-      FileReader input = new FileReader(inputFile);
-      String content = IOUtils.toString(input).replace("\r\n", "\n");
-      setLastModified(inputFile.lastModified());
-      input.close();
-      return content;
+    public String getContent() throws FileNotFound, CannotReadFile {
+      try {
+        FileReader input = new FileReader(inputFile);
+        String content = IOUtils.toString(input).replace("\r\n", "\n");
+        setLastModified(inputFile.lastModified());
+        input.close();
+        return content;
+      } catch (FileNotFoundException ex) {
+        throw new FileNotFound();
+      } catch (IOException ex) {
+        throw new CannotReadFile();
+      }
     }
 
     @Override
@@ -245,7 +263,18 @@ public abstract class LessSource {
 
   }
 
+  @SuppressWarnings("serial")
   public static class StringSourceException extends Exception {
+
+  }
+
+  @SuppressWarnings("serial")
+  public static class FileNotFound extends Exception {
+
+  }
+
+  @SuppressWarnings("serial")
+  public static class CannotReadFile extends Exception {
 
   }
 

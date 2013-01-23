@@ -1,13 +1,13 @@
 package com.github.sommeri.less4j.core;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URL;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.LessSource.CannotReadFile;
+import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
@@ -56,9 +56,9 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     ANTLRParser.ParseResult result;
     try {
       result = parser.parseStyleSheet(source.getContent(), source);
-    } catch (FileNotFoundException ex) {
+    } catch (FileNotFound ex) {
       throw new Less4jException(new GeneralProblem("The file " + source + " does not exists."), new CompilationResult(null));
-    } catch (IOException ex) {
+    } catch (CannotReadFile ex) {
       throw new Less4jException(new GeneralProblem("Cannot read the file " + source + "."), new CompilationResult(null));
     }
 

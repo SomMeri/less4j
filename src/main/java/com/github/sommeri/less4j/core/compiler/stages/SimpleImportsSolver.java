@@ -1,14 +1,13 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.LessSource.CannotReadFile;
+import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.LessSource.StringSourceException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -73,8 +72,11 @@ public class SimpleImportsSolver {
     LessSource importedSource;
     try {
       importedSource = source.relativeSource(filename);
-    } catch (MalformedURLException ex) {
+    } catch (FileNotFound ex) {
       problemsHandler.errorImportedFileNotFound(node, filename);
+      return;
+    } catch (CannotReadFile e) {
+      problemsHandler.errorImportedFileCanNotBeRead(node, filename);
       return;
     } catch (StringSourceException ex) {
       // imports are relative to current file and we do not know its location
@@ -92,10 +94,10 @@ public class SimpleImportsSolver {
     String importedContent;
     try {
       importedContent = importedSource.getContent();
-    } catch (FileNotFoundException e) {
+    } catch (FileNotFound e) {
       problemsHandler.errorImportedFileNotFound(node, filename);
       return;
-    } catch (IOException e) {
+    } catch (CannotReadFile e) {
       problemsHandler.errorImportedFileCanNotBeRead(node, filename);
       return;
     }
