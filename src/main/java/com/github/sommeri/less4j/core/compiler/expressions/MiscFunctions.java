@@ -1,11 +1,13 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
+import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
@@ -20,12 +22,14 @@ public class MiscFunctions implements FunctionsPackage {
   protected static final String COLOR = "color";
   protected static final String UNIT = "unit";
   protected static final String CONVERT = "convert";
+  protected static final String EXTRACT = "extract";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
     FUNCTIONS.put(COLOR, new Color());
     FUNCTIONS.put(UNIT, new Unit());
     FUNCTIONS.put(CONVERT, new Convert());
+    FUNCTIONS.put(EXTRACT, new Extract());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -163,4 +167,54 @@ class Convert extends AbstractMultiParameterFunction {
     return false;
   }
 
+}
+
+class Extract extends AbstractMultiParameterFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    List<Expression> values = collect((ComposedExpression) splitParameters.get(0));
+    NumberExpression index = (NumberExpression) splitParameters.get(1);
+    return values.get(index.getValueAsDouble().intValue() - 1);
+  }
+  
+  private List<Expression> collect(ComposedExpression values) {
+    List<Expression> result = new ArrayList<Expression>();
+    Expression left = values.getLeft();
+    Expression right = values.getRight();
+    
+    if (left.getType() == ASTCssNodeType.COMPOSED_EXPRESSION) {
+      result.addAll(collect((ComposedExpression) left));
+    } else {
+      result.add(left);
+    }
+    if (right.getType() == ASTCssNodeType.COMPOSED_EXPRESSION) {
+      result.addAll(collect((ComposedExpression) right));
+    } else {
+      result.add(right);
+    }
+    return result;
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 2;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    switch (position) {
+    case 0:
+      return validateParameter(parameter, ASTCssNodeType.COMPOSED_EXPRESSION, problemsHandler);
+    case 1:
+      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    }
+    return false;
+  }
+  
 }
