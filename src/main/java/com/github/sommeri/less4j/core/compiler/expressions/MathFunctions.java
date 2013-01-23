@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -94,7 +95,7 @@ class Percentage implements Function {
 
 }
 
-abstract class RoundingFunction implements Function {
+abstract class AbstractSingleValueMathFunction implements Function {
   
   @Override
   public final Expression evaluate(Expression iParameter, ProblemsHandler problemsHandler) {
@@ -120,7 +121,7 @@ abstract class RoundingFunction implements Function {
 
 }
 
-class Floor extends RoundingFunction {
+class Floor extends AbstractSingleValueMathFunction {
 
   @Override
   protected Expression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension) {
@@ -133,7 +134,7 @@ class Floor extends RoundingFunction {
   }
 }
 
-class Ceil extends RoundingFunction {
+class Ceil extends AbstractSingleValueMathFunction {
 
   @Override
   protected NumberExpression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension) {
@@ -146,16 +147,42 @@ class Ceil extends RoundingFunction {
   }
 }
 
-class Round extends RoundingFunction {
+class Round extends AbstractMultiParameterFunction {
 
   @Override
-  protected Expression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension) {
-    return new NumberExpression(parentToken, (double)Math.round(oValue), suffix, null, dimension);
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree parentToken) {
+    NumberExpression parameter = (NumberExpression) splitParameters.get(0);
+    Double oValue = parameter.getValueAsDouble();
+    String suffix = parameter.getSuffix();
+    Dimension dimension = parameter.getDimension();
+    
+    if (oValue.isInfinite() || oValue.isNaN())
+      return new NumberExpression(parentToken, oValue, suffix, null, dimension);
+
+    NumberExpression fraction = (NumberExpression) (splitParameters.size() > 1 ? splitParameters.get(1) : null);
+    if (fraction != null) {
+      double pow = Math.pow(10, fraction.getValueAsDouble());
+      oValue = Math.round(oValue * pow) / pow;
+    } else {
+      oValue = (double) Math.round(oValue);
+    }
+    return new NumberExpression(parentToken, oValue, suffix, null, dimension);
   }
 
   @Override
-  protected String getName() {
-    return MathFunctions.ROUND;
+  protected int getMinParameters() {
+    return 1;
   }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+  }
+
 }
 
