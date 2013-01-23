@@ -30,8 +30,6 @@ public class MathFunctions implements FunctionsPackage {
   protected static final String ATAN = "atan";
   protected static final String ASIN = "asin";
   protected static final String ACOS = "acos";
-  protected static final String INCREMENT = "increment";
-  protected static final String ADD = "add";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -49,8 +47,6 @@ public class MathFunctions implements FunctionsPackage {
     FUNCTIONS.put(ATAN, new Atan());
     FUNCTIONS.put(ASIN, new Asin());
     FUNCTIONS.put(ACOS, new Acos());
-    FUNCTIONS.put(INCREMENT, new Increment());
-    FUNCTIONS.put(ADD, new Add());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -372,20 +368,6 @@ class Acos extends AbstractSingleValueMathFunction {
   
 }
 
-class Increment extends AbstractSingleValueMathFunction {
-
-  @Override
-  protected String getName() {
-    return MathFunctions.INCREMENT;
-  }
-
-  @Override
-  protected double calc(double d, String suffix, Dimension dimension) {
-    return d + 1;
-  }
-  
-}
-
 class Mod extends AbstractMultiParameterFunction {
 
   @Override
@@ -419,15 +401,6 @@ class Pow extends AbstractTwoValueMathFunction {
     return new NumberExpression(token, Math.pow(a.getValueAsDouble(), b.getValueAsDouble()), a.getSuffix(), null, a.getDimension());
   }
   
-}
-
-class Add extends AbstractTwoValueMathFunction {
-
-  @Override
-  protected Expression evaluate(NumberExpression a, NumberExpression b, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
-    return new NumberExpression(token, number(a) + number(b), a.getSuffix(), null, a.getDimension());
-  }
-
 }
 
 abstract class AbstractTwoValueMathFunction extends AbstractMultiParameterFunction {

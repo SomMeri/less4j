@@ -1,9 +1,5 @@
 #functions {
-  color: #660000;
-  width: 16;
   height: undefined("self");
-  border-width: 5;
-  variable: 11;
   background: linear-gradient(#000000, #ffffff);
 }
 #built-in {
