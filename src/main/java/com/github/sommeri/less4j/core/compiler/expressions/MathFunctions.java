@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -19,6 +20,17 @@ public class MathFunctions implements FunctionsPackage {
   protected static final String ROUND = "round";
   protected static final String FLOOR = "floor";
   protected static final String CEIL = "ceil";
+  protected static final String SQRT = "sqrt";
+  protected static final String ABS = "abs";
+  protected static final String TAN = "tan";
+  protected static final String SIN = "sin";
+  protected static final String COS = "cos";
+  protected static final String MOD = "mod";
+  protected static final String POW = "pow";
+  protected static final String ATAN = "atan";
+  protected static final String ASIN = "asin";
+  protected static final String ACOS = "acos";
+  protected static final String PI = "pi";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -26,6 +38,17 @@ public class MathFunctions implements FunctionsPackage {
     FUNCTIONS.put(FLOOR, new Floor());
     FUNCTIONS.put(CEIL, new Ceil());
     FUNCTIONS.put(ROUND, new Round());
+    FUNCTIONS.put(SQRT, new Sqrt());
+    FUNCTIONS.put(ABS, new Abs());
+    FUNCTIONS.put(TAN, new Tan());
+    FUNCTIONS.put(SIN, new Sin());
+    FUNCTIONS.put(COS, new Cos());
+    FUNCTIONS.put(MOD, new Mod());
+    FUNCTIONS.put(POW, new Pow());
+    FUNCTIONS.put(ATAN, new Atan());
+    FUNCTIONS.put(ASIN, new Asin());
+    FUNCTIONS.put(ACOS, new Acos());
+    FUNCTIONS.put(PI, new Pi());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -94,7 +117,7 @@ class Percentage implements Function {
 
 }
 
-abstract class RoundingFunction implements Function {
+abstract class AbstractSingleValueMathFunction implements Function {
   
   @Override
   public final Expression evaluate(Expression iParameter, ProblemsHandler problemsHandler) {
@@ -114,17 +137,31 @@ abstract class RoundingFunction implements Function {
 
     return calc(parentToken, oValue, suffix, dimension);
   }
+  
+  protected Expression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension) {
+    return new NumberExpression(parentToken, calc(oValue, suffix, dimension), resultSuffix(suffix, dimension),
+	null, resultDimension(suffix, dimension));
+  }
+  
+  protected String resultSuffix(String suffix, Dimension dimension) {
+    return suffix;
+  }
+  
+  protected Dimension resultDimension(String suffix, Dimension dimension) {
+    return dimension;
+  }
 
   protected abstract String getName();
-  protected abstract Expression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension);
+  
+  protected abstract double calc(double d, String suffix, Dimension dimension);
 
 }
 
-class Floor extends RoundingFunction {
+class Floor extends AbstractSingleValueMathFunction {
 
   @Override
-  protected Expression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension) {
-    return new NumberExpression(parentToken, Math.floor(oValue), suffix, null, dimension);
+  protected double calc(double d, String suffix, Dimension dimension) {
+    return Math.floor(d);
   }
 
   @Override
@@ -133,11 +170,11 @@ class Floor extends RoundingFunction {
   }
 }
 
-class Ceil extends RoundingFunction {
+class Ceil extends AbstractSingleValueMathFunction {
 
   @Override
-  protected NumberExpression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension) {
-    return new NumberExpression(parentToken, Math.ceil(oValue), suffix, null, dimension);
+  protected double calc(double d, String suffix, Dimension dimension) {
+    return Math.ceil(d);
   }
 
   @Override
@@ -146,16 +183,328 @@ class Ceil extends RoundingFunction {
   }
 }
 
-class Round extends RoundingFunction {
+class Sqrt extends AbstractSingleValueMathFunction {
 
   @Override
-  protected Expression calc(HiddenTokenAwareTree parentToken, Double oValue, String suffix, Dimension dimension) {
-    return new NumberExpression(parentToken, (double)Math.round(oValue), suffix, null, dimension);
+  protected String getName() {
+    return MathFunctions.SQRT;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    return Math.sqrt(d);
+  }
+  
+}
+
+class Abs extends AbstractSingleValueMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.ABS;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    return Math.abs(d);
+  }
+  
+}
+
+class Tan extends AbstractSingleValueMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.TAN;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    if (suffix.equalsIgnoreCase("deg")) {
+      d = Math.toRadians(d);
+    } else if (suffix.equalsIgnoreCase("grad")) {
+      d *= Math.PI / 200;
+    }
+    return Math.tan(d);
+  }
+
+  @Override
+  protected String resultSuffix(String suffix, Dimension dimension) {
+    return "";
+  }
+
+  @Override
+  protected Dimension resultDimension(String suffix, Dimension dimension) {
+    return Dimension.NUMBER;
+  }
+  
+}
+
+class Atan extends AbstractSingleValueMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.ATAN;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    return Math.atan(d);
+  }
+
+  @Override
+  protected String resultSuffix(String suffix, Dimension dimension) {
+    return "rad";
+  }
+
+  @Override
+  protected Dimension resultDimension(String suffix, Dimension dimension) {
+    return Dimension.ANGLE;
+  }
+  
+}
+
+class Sin extends AbstractSingleValueMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.SIN;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    if (suffix.equalsIgnoreCase("deg")) {
+      d = Math.toRadians(d);
+    } else if (suffix.equalsIgnoreCase("grad")) {
+      d *= Math.PI / 200;
+    }
+    return Math.sin(d);
+  }
+
+  @Override
+  protected String resultSuffix(String suffix, Dimension dimension) {
+    return "";
+  }
+
+  @Override
+  protected Dimension resultDimension(String suffix, Dimension dimension) {
+    return Dimension.NUMBER;
+  }
+  
+}
+
+class Asin extends AbstractSingleValueMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.ASIN;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    return Math.asin(d);
+  }
+
+  @Override
+  protected String resultSuffix(String suffix, Dimension dimension) {
+    return "rad";
+  }
+
+  @Override
+  protected Dimension resultDimension(String suffix, Dimension dimension) {
+    return Dimension.ANGLE;
+  }
+  
+}
+
+class Cos extends AbstractSingleValueMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.COS;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    if (suffix.equalsIgnoreCase("deg")) {
+      d = Math.toRadians(d);
+    } else if (suffix.equalsIgnoreCase("grad")) {
+      d *= Math.PI / 200;
+    }
+    return Math.cos(d);
+  }
+
+  @Override
+  protected String resultSuffix(String suffix, Dimension dimension) {
+    return "";
+  }
+
+  @Override
+  protected Dimension resultDimension(String suffix, Dimension dimension) {
+    return Dimension.NUMBER;
+  }
+  
+}
+
+class Acos extends AbstractSingleValueMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.ACOS;
+  }
+  
+  @Override
+  protected double calc(double d, String suffix, Dimension dimension) {
+    return Math.acos(d);
+  }
+
+  @Override
+  protected String resultSuffix(String suffix, Dimension dimension) {
+    return "rad";
+  }
+
+  @Override
+  protected Dimension resultDimension(String suffix, Dimension dimension) {
+    return Dimension.ANGLE;
+  }
+  
+}
+
+abstract class AbtractMultiParameterMathFunction extends AbstractMultiParameterFunction {
+
+  @Override
+  protected boolean validateParameter(Expression parameter, ASTCssNodeType expected, ProblemsHandler problemsHandler) {
+    if (expected == ASTCssNodeType.NUMBER && parameter.getType() != expected) {
+      /* There is a special problemsHandler method for reporting math functions not getting numbers. */
+      problemsHandler.mathFunctionParameterNotANumber(getName(), parameter);
+      return false;
+    } else {
+      return super.validateParameter(parameter, expected, problemsHandler);
+    }
+  }
+  
+}
+
+class Mod extends AbtractMultiParameterMathFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    NumberExpression a = (NumberExpression) splitParameters.get(0);
+    NumberExpression b = (NumberExpression) splitParameters.get(1);
+    return new NumberExpression(token, a.getValueAsDouble() % b.getValueAsDouble(), a.getSuffix(), null, a.getDimension());
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 2;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+  }
+
+  @Override
+  protected String getName() {
+    return MathFunctions.MOD;
+  }
+  
+}
+
+class Pow extends AbstractTwoValueMathFunction {
+
+  @Override
+  protected Expression evaluate(NumberExpression a, NumberExpression b, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return new NumberExpression(token, Math.pow(a.getValueAsDouble(), b.getValueAsDouble()), a.getSuffix(), null, a.getDimension());
+  }
+
+  @Override
+  protected String getName() {
+    return MathFunctions.POW;
+  }
+  
+}
+
+abstract class AbstractTwoValueMathFunction extends AbtractMultiParameterMathFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    return evaluate((NumberExpression)splitParameters.get(0), (NumberExpression)splitParameters.get(1), problemsHandler, token);
+  }
+
+  protected abstract Expression evaluate(NumberExpression a, NumberExpression b, ProblemsHandler problemsHandler, HiddenTokenAwareTree token);
+
+  @Override
+  protected int getMinParameters() {
+    return 2;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+  }
+  
+}
+
+class Round extends AbtractMultiParameterMathFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree parentToken) {
+    NumberExpression parameter = (NumberExpression) splitParameters.get(0);
+    Double oValue = parameter.getValueAsDouble();
+    String suffix = parameter.getSuffix();
+    Dimension dimension = parameter.getDimension();
+    
+    if (oValue.isInfinite() || oValue.isNaN())
+      return new NumberExpression(parentToken, oValue, suffix, null, dimension);
+
+    NumberExpression fraction = (NumberExpression) (splitParameters.size() > 1 ? splitParameters.get(1) : null);
+    if (fraction != null) {
+      double pow = Math.pow(10, fraction.getValueAsDouble());
+      oValue = Math.round(oValue * pow) / pow;
+    } else {
+      oValue = (double) Math.round(oValue);
+    }
+    return new NumberExpression(parentToken, oValue, suffix, null, dimension);
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
   }
 
   @Override
   protected String getName() {
     return MathFunctions.ROUND;
   }
+
 }
 
+class Pi extends AbstractFunction {
+
+  @Override
+  public Expression evaluate(Expression parameters, ProblemsHandler problemsHandler) {
+    return new NumberExpression(parameters.getUnderlyingStructure(), Math.PI, "", null, Dimension.NUMBER);
+  }
+  
+}

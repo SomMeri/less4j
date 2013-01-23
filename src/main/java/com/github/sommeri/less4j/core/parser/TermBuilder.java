@@ -6,6 +6,7 @@ import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
@@ -216,6 +217,12 @@ public class TermBuilder {
   private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {
     List<HiddenTokenAwareTree> children = actual.getChildren();
     String name = children.get(0).getText();
+    
+    if (children.size() == 1) {
+      /* No arguments to the function */
+      return new FunctionExpression(token, name, new EmptyExpression(token));
+    }
+    
     HiddenTokenAwareTree parameterNode = children.get(1);
 
     if (parameterNode.getType() != LessLexer.OPEQ) {

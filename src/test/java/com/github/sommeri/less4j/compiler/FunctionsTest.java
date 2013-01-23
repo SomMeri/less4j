@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.utils.TestFileUtils;
 
 public class FunctionsTest extends BasicFeaturesTest {
 
-  private static final String standardCases = "src/test/resources/compile-basic-features/css-optimizations/";
+  private static final String standardCases = "src/test/resources/compile-basic-features/functions/";
 
   public FunctionsTest(File inputFile, File outputFile, String testName) {
     super(inputFile, outputFile, testName);

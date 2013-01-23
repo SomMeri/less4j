@@ -8,6 +8,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ExtendedStringBuilder;
 import com.github.sommeri.less4j.core.NotACssException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.AnonymousExpression;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
@@ -214,6 +215,9 @@ public class CssPrinter {
 
     case IMPORT:
       return appendImport((Import) node);
+      
+    case ANONYMOUS:
+      return appendAnonymous((AnonymousExpression) node);
 
     case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
@@ -226,6 +230,11 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getCharPositionInSourceLine());
     }
+  }
+  
+  private boolean appendAnonymous(AnonymousExpression node) {
+    builder.append(node.getValue());
+    return true;
   }
 
   private boolean appendImport(Import node) {
