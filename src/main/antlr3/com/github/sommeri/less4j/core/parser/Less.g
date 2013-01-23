@@ -692,7 +692,7 @@ hexColor
     ;
 
 function
-    : (a=IDENT | a=PERCENT) LPAREN b=functionParameter RPAREN -> ^(TERM_FUNCTION $a $b*)
+    : (a=IDENT | a=PERCENT) LPAREN b=functionParameter? RPAREN -> ^(TERM_FUNCTION $a $b*)
     ;
     
 functionParameter

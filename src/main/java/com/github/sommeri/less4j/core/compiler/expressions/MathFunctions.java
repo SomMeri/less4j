@@ -30,6 +30,7 @@ public class MathFunctions implements FunctionsPackage {
   protected static final String ATAN = "atan";
   protected static final String ASIN = "asin";
   protected static final String ACOS = "acos";
+  protected static final String PI = "pi";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -47,6 +48,7 @@ public class MathFunctions implements FunctionsPackage {
     FUNCTIONS.put(ATAN, new Atan());
     FUNCTIONS.put(ASIN, new Asin());
     FUNCTIONS.put(ACOS, new Acos());
+    FUNCTIONS.put(PI, new Pi());
   }
 
   private final ProblemsHandler problemsHandler;
@@ -466,4 +468,13 @@ class Round extends AbstractMultiParameterFunction {
     return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
   }
 
+}
+
+class Pi extends AbstractFunction {
+
+  @Override
+  public Expression evaluate(Expression parameters, ProblemsHandler problemsHandler) {
+    return new NumberExpression(parameters.getUnderlyingStructure(), Math.PI, "", null, Dimension.NUMBER);
+  }
+  
 }

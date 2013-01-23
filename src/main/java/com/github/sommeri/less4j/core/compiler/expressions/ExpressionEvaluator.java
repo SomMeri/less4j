@@ -176,6 +176,7 @@ public class ExpressionEvaluator {
     case COLOR_EXPRESSION:
     case NUMBER:
     case FAULTY_EXPRESSION:
+    case EMPTY_EXPRESSION:
       return input;
 
     default:
