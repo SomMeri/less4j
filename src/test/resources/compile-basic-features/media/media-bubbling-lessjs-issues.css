@@ -9,32 +9,29 @@
     padding: 2 2 2 2;
   }
 }
-@media a, b and c {
-  
+@media screen, (min-width: 117px) and (min-width: 117px) {
 }
-@media a and x, b and c and x, a and y, b and c and y {
-  {
-    color: red;
-  }
+@media screen and (max-device-aspect-ratio: 1367/768), (min-width: 117px) and (min-width: 117px) and (max-device-aspect-ratio: 1367/768), screen and (max-device-aspect-ratio: 2000/768), (min-width: 117px) and (min-width: 117px) and (max-device-aspect-ratio: 2000/768) {
+  color: red;
 }
-@media a {
+@media print {
   footer {
-    color: white;
+    color: #ffffff;
   }
   header {
-    color: white;
+    color: #ffffff;
   }
 }
-@media a and b {
+@media print and (min-width: 117px) {
   header {
     color: #000000;
   }
   footer {
-    color: black;
+    color: #000000;
   }
 }
 #namespace #foo {
-  color: black;
+  color: #000000;
 }
 @media (orientation: portrait) {
   #namespace #bar {
@@ -45,7 +42,7 @@
   color: blue;
 }
 @media print {
-  @page  {
+  @page {
     margin: 0.5cm;
   }
 }
@@ -57,7 +54,7 @@
     color: white;
   }
 }
-@media (orientation: portrait) and x and y {
+@media (orientation: portrait) and (min-width: 22) and (max-width: 220) {
   #namespace #bar {
     padding: 2 2 2 2;
   }
@@ -108,26 +105,32 @@
 .classtwo {
   width: 50%;
 }
-@media screen and max-width (600px) {
-  set {
-    padding: 1 1 1 1;
+@media screen and (max-width: 600px) {
+  h1 {
+    declaration: value;
   }
 }
-@media screen and max-width (600px) {
-  set {
-    padding: 2 2 2 2;
+@media screen and (max-width: 300) {
+  h2 {
+    declaration: value;
   }
 }
-@media screen and max-width(600px) {
-  set {
-    padding: 3 3 3 3;
+body {
+  background: red;
+}
+@media (max-width: 500px) {
+  body {
+    background: green;
   }
 }
-/* partial are not allowed
-@partial: ~"max-width(600px)";
-@media screen and @partial {
-  set {
-    padding: 3 3 3 3;
+@media (max-width: 1000px) {
+  body {
+    background: red;
+    background: blue;
   }
 }
-*/
+@media (max-width: 1000px) and (max-width: 500px) {
+  body {
+    background: green;
+  }
+}

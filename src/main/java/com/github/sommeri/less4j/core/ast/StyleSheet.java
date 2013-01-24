@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-public class StyleSheet extends Body<ASTCssNode> {
+public class StyleSheet extends Body {
   
   public StyleSheet(HiddenTokenAwareTree underlyingStructure) {
     super(underlyingStructure);

@@ -58,7 +58,7 @@ public abstract class TokenTypeSwitch<T> {
     }
 
     if (type == LessLexer.BODY) {
-      return handleRuleSetsBody(token);
+      return handleGeneralBody(token);
     }
 
     if (type == LessLexer.EXPRESSION) {
@@ -190,7 +190,7 @@ public abstract class TokenTypeSwitch<T> {
 
   public abstract T handleNth(HiddenTokenAwareTree token);
 
-  public abstract T handleRuleSetsBody(HiddenTokenAwareTree token);
+  public abstract T handleGeneralBody(HiddenTokenAwareTree token);
 
   public abstract T handleMediaQuery(HiddenTokenAwareTree token);
 

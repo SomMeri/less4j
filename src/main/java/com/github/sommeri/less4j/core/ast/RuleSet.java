@@ -7,16 +7,16 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class RuleSet extends ASTCssNode {
+public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   private List<Selector> selectors = new ArrayList<Selector>();
-  private RuleSetsBody body;
+  private GeneralBody body;
 
   public RuleSet(HiddenTokenAwareTree token) {
     super(token);
   }
 
-  public RuleSet(HiddenTokenAwareTree token, RuleSetsBody body, List<Selector> selectors) {
+  public RuleSet(HiddenTokenAwareTree token, GeneralBody body, List<Selector> selectors) {
     super(token);
     this.body = body;
     addSelectors(selectors);
@@ -27,7 +27,7 @@ public class RuleSet extends ASTCssNode {
    return selectors;
   }
   
-  public RuleSetsBody getBody() {
+  public GeneralBody getBody() {
     return body;
   }
 
@@ -35,7 +35,7 @@ public class RuleSet extends ASTCssNode {
     return body==null? true : body.isEmpty();
   }
 
-  public void setBody(RuleSetsBody body) {
+  public void setBody(GeneralBody body) {
     this.body = body;
   }
 

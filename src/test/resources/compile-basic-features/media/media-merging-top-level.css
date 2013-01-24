@@ -1,0 +1,40 @@
+@media screen, print {
+}
+@media screen and (max-device-aspect-ratio: 1367/768), print and (max-device-aspect-ratio: 1367/768) {
+  color: white;
+}
+@media screen and (min-width: 117px) {
+  padding: 1 1 1 1;
+  color: #008000;
+  background-color: white;
+}
+@media screen and (min-width: 117px) and (max-device-aspect-ratio: 1367/768) {
+  color: white;
+  background-color: #008000;
+}
+@media screen and (min-width: 117px), print {
+}
+@media screen and (min-width: 117px) and (max-device-aspect-ratio: 1367/768) and (max-width: 700px), print and (max-device-aspect-ratio: 1367/768) and (max-width: 700px), screen and (min-width: 117px) and (min-device-aspect-ratio: 10/10), print and (min-device-aspect-ratio: 10/10) {
+  pre {
+    color: white;
+    padding: 2 2 2 2;
+  }
+  pre #45 {
+    padding: 3 3 3 3;
+  }
+}
+@media screen, print {
+  pre {
+    content: "one level down";
+  }
+}
+@media screen and (max-device-aspect-ratio: 1367/768), print and (max-device-aspect-ratio: 1367/768) {
+  pre {
+    content: "two levels down";
+  }
+}
+@media screen and (max-device-aspect-ratio: 1367/768) and (max-width: 34), print and (max-device-aspect-ratio: 1367/768) and (max-width: 34) {
+  pre {
+    content: "three levels down";
+  }
+}

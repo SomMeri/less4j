@@ -12,28 +12,28 @@
   color: blue;
 }
 
-@media a, b and c {
-  @media x, y { 
+@media screen, (min-width: 117px) and (min-width: 117px) {
+  @media (max-device-aspect-ratio: 1367/768), (max-device-aspect-ratio: 2000/768) { 
     color: red;
   }
 }
 
-@media a {
-   footer { color: white; }
+@media print {
+   footer { color: #ffffff; }
 
-  @media b {
-    header { color: black }
-    footer { color: black; }
+  @media (min-width: 117px) {
+    header { color: #000000 }
+    footer { color: #000000; }
   }
 
-  header { color: white; }
+  header { color: #ffffff; }
 }
 
 // https://github.com/cloudhead/less.js/issues/286
 #namespace {
-  #foo { color:black; }
+  #foo { color:#000000; }
   @media (orientation:portrait) {
-    #bar { color:white }
+    #bar { color:#ffffff }
   }
 }
 
@@ -46,13 +46,13 @@
   @page { margin: 0.5cm; }
 }
 
-// *** TODO put to separate file, my invention ****
+// my invention ****
 #namespace {
   #foo { color:black; }
   @media (orientation:portrait) {
     #bar { 
       color:white;
-      @media x and y {
+      @media (min-width: 22) and (max-width: 220) {
         padding: 2 2 2 2;
           .innest {
             margin: 1 1 1 1;
@@ -63,7 +63,6 @@
 }
 
 // https://github.com/cloudhead/less.js/issues/528
-
 @media print {
   color: blue;
 }
@@ -124,32 +123,37 @@
 }
 
 // https://github.com/cloudhead/less.js/pull/643
-@media screen and max-width(600px) {
-  set {
-    padding: 1 1 1 1;
+@media screen and (max-width: 600px) {
+  h1 {
+    declaration: value;
   }
 }
 
-@tabletWidth: 600px;
-@media screen and max-width(@tabletWidth) {
-  set {
-    padding: 2 2 2 2;
+@tabletWidth: 300;
+@media screen and (max-width: @tabletWidth) {
+  h2 {
+    declaration: value;
   }
 }
 
-@tablet: ~"screen and max-width(600px)";
-@media @tablet {
-  set {
-    padding: 3 3 3 3;
-  }
+//https://github.com/cloudhead/less.js/issues/999
+.bg() {
+    background: red;
+
+    @media (max-width: 500px) {
+        background: green;
+    }
 }
 
-/* partial are not allowed
-@partial: ~"max-width(600px)";
-@media screen and @partial {
-  set {
-    padding: 3 3 3 3;
-  }
+body {
+    .bg();
 }
-*/
+
+@bpMedium: 1000px;
+@media (max-width: @bpMedium) {
+    body {        
+        .bg();
+        background: blue;
+    }
+}
 

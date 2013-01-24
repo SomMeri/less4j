@@ -1,0 +1,6 @@
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  @font-face {
+    font-family: 'Helvetica Neue';
+    src: local('Heiti SC'), local(PMingLiU);
+  }
+}

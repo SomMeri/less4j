@@ -49,7 +49,6 @@ import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
 import com.github.sommeri.less4j.core.ast.RuleSet;
-import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
@@ -89,9 +88,6 @@ public class CssPrinter {
     switch (node.getType()) {
     case RULE_SET:
       return appendRuleset((RuleSet) node);
-
-    case DECLARATIONS_BODY:
-      return appendBodyOptimizeDuplicates((RuleSetsBody) node);
 
     case CSS_CLASS:
       return appendCssClass((CssClass) node);
@@ -352,11 +348,8 @@ public class CssPrinter {
   }
 
   public boolean appendFontFace(FontFace node) {
-    builder.append("@font-face {").newLine();
-    builder.increaseIndentationLevel();
+    builder.append("@font-face").ensureSeparator();
     appendAllChilds(node);
-    builder.decreaseIndentationLevel();
-    builder.append("}");
 
     return true;
   }
@@ -436,7 +429,7 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendBodyOptimizeDuplicates(Body<? extends ASTCssNode> body) {
+  private boolean appendBodyOptimizeDuplicates(Body body) {
     if (body.isEmpty())
       return false;
 
@@ -454,7 +447,7 @@ public class CssPrinter {
     return true;
   }
 
-  private LinkedHashSet<String> collectUniqueBodyMembersStrings(Body<? extends ASTCssNode> body) {
+  private LinkedHashSet<String> collectUniqueBodyMembersStrings(Body body) {
     //the same declaration must be printed only once
     ExtendedStringBuilder storedBuilder = builder;
     LinkedHashSet<String> declarationsStrings = new LinkedHashSet<String>();
@@ -487,16 +480,17 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendMedia(Media node) {
+  private boolean appendMedia(Media node) {
     builder.append("@media");
     appendMediums(node.getMediums());
-    appendBodySortDeclarations(node);
+    appendBodySortDeclarations(node.getBody());
 
     return true;
   }
 
-  //TODO: the way this is used ignores comments in front of the body
-  private void appendBodySortDeclarations(Body<ASTCssNode> node) {
+  private void appendBodySortDeclarations(Body node) {
+    //this is sort of hack, bypass the usual append method
+    appendComments(node.getOpeningComments(), true);
     builder.ensureSeparator().append("{").newLine();
     builder.increaseIndentationLevel();
 
@@ -515,6 +509,8 @@ public class CssPrinter {
     }
     builder.decreaseIndentationLevel();
     builder.append("}");
+    //this is sort of hack, bypass the usual append method
+    appendComments(node.getTrailingComments(), false);
   }
 
   private void appendMediums(List<MediaQuery> mediums) {

@@ -6,13 +6,13 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class ReusableStructure extends ASTCssNode {
+public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   private List<ReusableStructureName> names = new ArrayList<ReusableStructureName>();
   //Allows: variable, argument declaration, pattern
   private List<ASTCssNode> parameters = new ArrayList<ASTCssNode>();
   private List<Guard> guards = new ArrayList<Guard>();
-  private RuleSetsBody body;
+  private GeneralBody body;
 
   public ReusableStructure(HiddenTokenAwareTree token) {
     super(token);
@@ -43,7 +43,7 @@ public class ReusableStructure extends ASTCssNode {
     this.names = names;
   }
 
-  public RuleSetsBody getBody() {
+  public GeneralBody getBody() {
     return body;
   }
 
@@ -51,7 +51,7 @@ public class ReusableStructure extends ASTCssNode {
     return body==null? true : body.isEmpty();
   }
 
-  public void setBody(RuleSetsBody body) {
+  public void setBody(GeneralBody body) {
     this.body = body;
   }
 

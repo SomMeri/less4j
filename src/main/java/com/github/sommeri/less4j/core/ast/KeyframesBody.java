@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-public class KeyframesBody extends Body<ASTCssNode> {
+public class KeyframesBody extends Body {
   
   private static final Set<ASTCssNodeType> SUPPORTED_MEMBERS = new HashSet<ASTCssNodeType>();
   

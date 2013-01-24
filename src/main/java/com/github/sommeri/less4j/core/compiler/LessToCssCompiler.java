@@ -31,6 +31,7 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 public class LessToCssCompiler {
 
   private ProblemsHandler problemsHandler;
+  ASTManipulator astManipulator = new ASTManipulator();
 
   public LessToCssCompiler(ProblemsHandler problemsHandler) {
     super();
@@ -43,7 +44,7 @@ public class LessToCssCompiler {
 
     ScopeExtractor scopeBuilder = new ScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
-    
+
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);
 
@@ -57,7 +58,7 @@ public class LessToCssCompiler {
   }
 
   private void bubbleAndMergeMedia(StyleSheet less) {
-    MediaBubblerAndMerger bubblerAndMerger = new MediaBubblerAndMerger();
+    MediaBubblerAndMerger bubblerAndMerger = new MediaBubblerAndMerger(problemsHandler);
     bubblerAndMerger.bubbleAndMergeMedia(less);
   }
 
@@ -80,7 +81,7 @@ public class LessToCssCompiler {
     });
   }
 
-  private void freeNestedRuleSets(Body<ASTCssNode> body) {
+  private void freeNestedRuleSets(Body body) {
     NestedRulesCollector nestedRulesCollector = new NestedRulesCollector();
 
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
@@ -88,14 +89,11 @@ public class LessToCssCompiler {
       switch (kid.getType()) {
       case RULE_SET: {
         List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
-        body.addMembersAfter(nestedRulesets, kid);
-        for (RuleSet ruleSet : nestedRulesets) {
-          ruleSet.setParent(body);
-        }
+        astManipulator.addIntoBody(nestedRulesets, kid);
         break;
       }
       case MEDIA: {
-        freeNestedRuleSets((Media) kid);
+        freeNestedRuleSets(((Media) kid).getBody());
         break;
       }
       case PAGE: {

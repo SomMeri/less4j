@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Import.ImportKind;
 import com.github.sommeri.less4j.core.ast.Media;
@@ -22,6 +23,7 @@ import com.github.sommeri.less4j.core.compiler.expressions.ConversionUtils;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
 
@@ -108,9 +110,10 @@ public class SimpleImportsSolver {
 
     // add media queries if needed
     if (node.hasMediums()) {
-      Media media = new Media(node.getUnderlyingStructure());
+      HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
+      Media media = new Media(underlyingStructure);
       media.setMediums(node.getMediums());
-      media.addMembers(importedAst.getMembers());
+      media.setBody(new GeneralBody(underlyingStructure, importedAst.getMembers()));
       media.configureParentToAllChilds();
       astManipulator.replaceInBody(node, media);
     } else {

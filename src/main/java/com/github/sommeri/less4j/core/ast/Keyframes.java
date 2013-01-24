@@ -6,7 +6,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class Keyframes extends ASTCssNode {
+public class Keyframes extends ASTCssNode implements BodyOwner<KeyframesBody> {
 
   private String dialect;
   private List<KeyframesName> names = new ArrayList<KeyframesName>();

@@ -22,6 +22,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.FontFace;
+import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
@@ -53,7 +54,6 @@ import com.github.sommeri.less4j.core.ast.PseudoElement;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
-import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
@@ -64,7 +64,6 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.ast.Viewport;
-import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -210,13 +209,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     FontFace result = new FontFace(token);
 
     List<HiddenTokenAwareTree> children = token.getChildren();
-    List<Declaration> declarations = new ArrayList<Declaration>();
-    for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() == LessLexer.DECLARATION)
-        declarations.add(handleDeclaration(kid));
-    }
-
-    result.addMembers(declarations);
+    result.setBody(handleGeneralBody(children.get(0)));
     return result;
   }
 
@@ -242,7 +235,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
           selectors.add(selector);
         previousKid = selector;
       } else if (kid.getType() == LessLexer.BODY) {
-        RuleSetsBody body = handleRuleSetsBody(kid);
+        GeneralBody body = handleGeneralBody(kid);
         ruleSet.setBody(body);
         previousKid = body;
       } else if (kid.getType() == LessLexer.COMMA) {
@@ -263,7 +256,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       if (kid.getType() == LessLexer.REUSABLE_STRUCTURE_NAME) {
         result.addName(handleReusableStructureName(kid));
       } else if (kid.getType() == LessLexer.BODY) {
-        result.setBody(handleRuleSetsBody(kid));
+        result.setBody(handleGeneralBody(kid));
       } else if (kid.getType() == LessLexer.GUARD) {
         result.addGuard(handleGuard(kid));
       } else if (kid.getType() == LessLexer.DOT3) {
@@ -403,9 +396,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       throw new BugHappened(GRAMMAR_MISMATCH, token);
   }
 
-  public RuleSetsBody handleRuleSetsBody(HiddenTokenAwareTree token) {
+  public GeneralBody handleGeneralBody(HiddenTokenAwareTree token) {
     List<ASTCssNode> members = handleBodyMembers(token);
-    return new RuleSetsBody(token, members);
+    return new GeneralBody(token, members);
   }
 
   public KeyframesBody handleKeyframesBody(HiddenTokenAwareTree token) {
@@ -603,39 +596,26 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Media handleMedia(HiddenTokenAwareTree token) {
-    List<HiddenTokenAwareTree> originalChildren = token.getChildren();
-    List<HiddenTokenAwareTree> children = new ArrayList<HiddenTokenAwareTree>(originalChildren);
-    HiddenTokenAwareTree lbrace = children.remove(1);
-    children.get(0).addFollowing(lbrace.getPreceding());
-    children.get(1).addBeforePreceding(lbrace.getFollowing());
-
-    HiddenTokenAwareTree rbrace = children.remove(children.size() - 1);
-    children.get(children.size() - 1).addFollowing(rbrace.getPreceding());
-    rbrace.getParent().addBeforeFollowing(rbrace.getFollowing());
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
 
     Media result = new Media(token);
-    for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() == LessLexer.MEDIUM_DECLARATION) {
-        kid.pushHiddenToKids();
-        handleMediaDeclaration(result, kid);
-      } else {
-        result.addChild(switchOn(kid));
-      }
-
-    }
+    handleMediaDeclaration(result, children.next());
+    result.setBody(handleGeneralBody(children.next()));
+    
     return result;
   }
 
   private void handleMediaDeclaration(Media result, HiddenTokenAwareTree declaration) {
+    declaration.pushHiddenToKids();
     List<HiddenTokenAwareTree> children = declaration.getChildren();
 
-    ASTCssNode previousKid = null;
+    MediaQuery previousKid = null;
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() == LessLexer.COMMA) {
         previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
       } else {
-        previousKid = switchOn(kid);
-        result.addChild(previousKid);
+        previousKid = handleMediaQuery(kid);
+        result.addMediaQuery(previousKid);
       }
     }
   }

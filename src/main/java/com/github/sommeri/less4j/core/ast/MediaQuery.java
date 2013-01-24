@@ -44,6 +44,13 @@ public class MediaQuery extends ASTCssNode {
     this.expressions.add(expression);
   }
 
+  public void addExpressions(List<MediaExpression> expressions) {
+    if (expressions == null)
+      expressions = new ArrayList<MediaExpression>();
+
+    this.expressions.addAll(expressions);
+  }
+  
   /**
    * May throw class cast exception if the member in parameter is 
    * does not have the right type. 
@@ -73,6 +80,8 @@ public class MediaQuery extends ASTCssNode {
     MediaQuery result = (MediaQuery) super.clone();
     result.medium = medium==null?null:medium.clone();
     result.expressions = ArraysUtils.deeplyClonedList(expressions);
+    result.configureParentToAllChilds();
     return result;
   }
+
 }

@@ -6,30 +6,13 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class Media extends Body<ASTCssNode> {
+public class Media extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   private List<MediaQuery> mediums;
+  private GeneralBody body;
 
   public Media(HiddenTokenAwareTree token) {
     super(token);
-  }
-
-  public void addDeclaration(Declaration declaration) {
-    addMember(declaration);
-  }
-
-  public void addRuleSet(RuleSet ruleSet) {
-    addMember(ruleSet);
-  }
-
-  public void addChild(ASTCssNode child) {
-    if (!(child.getType() == ASTCssNodeType.RULE_SET || child.getType() == ASTCssNodeType.VARIABLE_DECLARATION ||child.getType() == ASTCssNodeType.DECLARATION || child.getType() == ASTCssNodeType.MEDIUM || child.getType() == ASTCssNodeType.MEDIA_QUERY|| child.getType() == ASTCssNodeType.VIEWPORT|| child.getType() == ASTCssNodeType.PAGE))
-      throw new IllegalArgumentException("Unexpected media child type: " + child.getType());
-
-    if (child.getType() == ASTCssNodeType.MEDIA_QUERY)
-      addMediaQuery((MediaQuery) child);
-    else
-      addMember(child);
   }
 
   public void addMediaQuery(MediaQuery medium) {
@@ -47,10 +30,19 @@ public class Media extends Body<ASTCssNode> {
     this.mediums = mediums;
   }
 
+  public void replaceMediaQueries(List<MediaQuery> result) {
+    for (MediaQuery oldMediums : mediums) {
+      oldMediums.setParent(null);
+    }
+    mediums = new ArrayList<MediaQuery>();
+    mediums.addAll(result);
+  }
+
   @Override
   public List<ASTCssNode> getChilds() {
-    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(super.getChilds());
+    List<ASTCssNode> childs = new ArrayList<ASTCssNode>();
     childs.addAll(mediums);
+    childs.add(body);
     return childs;
   }
 
@@ -63,7 +55,19 @@ public class Media extends Body<ASTCssNode> {
   public Media clone() {
     Media result = (Media) super.clone();
     result.mediums = ArraysUtils.deeplyClonedList(mediums);
+    result.body = body==null?null:body.clone();
     result.configureParentToAllChilds();
     return result;
   }
+
+  @Override
+  public void setBody(GeneralBody body) {
+    this.body = body;
+  }
+
+  @Override
+  public GeneralBody getBody() {
+    return body;
+  }
+
 }

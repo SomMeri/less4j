@@ -5,7 +5,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class Viewport extends ASTCssNode {
+public class Viewport extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   //I have to do this because of a comment in following less: `@viewport /*comment */ { ... }`
   private GeneralBody body;

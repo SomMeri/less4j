@@ -10,6 +10,7 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
@@ -29,6 +30,10 @@ public class ProblemsHandler {
   private LessPrinter printer = new LessPrinter();
 
   
+  public void warnMerginMediaQueryWithMedium(MediaQuery mediaQuery) {
+    collector.addWarning(new CompilationWarning(mediaQuery, "Attempt to merge media query with a medium. Merge removed medium from inner media query, because the result CSS would be invalid otherwise."));
+  }
+
   public void warnLessImportNoBaseDirectory(Expression urlExpression) {
     collector.addWarning(new CompilationWarning(urlExpression, "Attempt to import less file with an unknown compiled file location. Import statement left unchanged."));
   }

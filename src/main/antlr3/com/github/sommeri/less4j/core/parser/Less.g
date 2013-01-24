@@ -170,7 +170,7 @@ tokens {
 styleSheet
 @init {enterRule(retval, RULE_STYLESHEET);}
     : ( a+=charSet* //the original ? was replaced by *, because it is possible (even if it makes no sense) and less.js is able to handle such situation
-        a+=bodylist
+        (a+=top_level_element)*
         EOF ) -> ^(STYLE_SHEET ($a)*)
     ;
 finally { leaveRule(); }
@@ -200,14 +200,22 @@ finally { leaveRule(); }
 // Media can also have a ruleset in them.
 //
 //TODO media part of the grammar is throwing away tokens, so comments will not work correctly. fix that
-media
+media_queries_declaration:
+    m1+=mediaQuery (n+=COMMA m+=mediaQuery)*
+    -> ^(MEDIUM_DECLARATION $m1 ($n $m)*)
+; 
+
+media_top_level
 @init {enterRule(retval, RULE_MEDIA);}
-    : MEDIA_SYM (m1+=mediaQuery (n+=COMMA m+=mediaQuery)*)
-        q1=LBRACE
-            ((declaration) => b+=declaration SEMI
-            | b+=bodyset )*
-        q2=RBRACE
-    -> ^(MEDIA_SYM ^(MEDIUM_DECLARATION $m1 ($n $m)*) $q1 $b* $q2)
+    : MEDIA_SYM m1+=media_queries_declaration b+=top_level_body_with_declaration
+    -> ^(MEDIA_SYM $m1* $b*)
+    ;
+finally { leaveRule(); }
+
+media_in_general_body
+@init {enterRule(retval, RULE_MEDIA);}
+    : MEDIA_SYM m1+=media_queries_declaration b+=general_body
+    -> ^(MEDIA_SYM $m1* $b*)
     ;
 finally { leaveRule(); }
 
@@ -245,17 +253,13 @@ mediaFeature
     : IDENT
     ;
 
-bodylist
-    : bodyset*
-    ;
-    
-bodyset
+top_level_element
     : (mixinReferenceWithSemi)=>mixinReferenceWithSemi
     | (namespaceReferenceWithSemi)=>namespaceReferenceWithSemi
     | (reusableStructureName LPAREN)=>reusableStructure
     | (variabledeclaration)=>variabledeclaration
     | ruleSet
-    | media
+    | media_top_level
     | viewport
     | keyframes
     | page
@@ -289,10 +293,7 @@ finally { leaveRule(); }
 
 fontface
 @init {enterRule(retval, RULE_FONT_FACE);}
-    : FONT_FACE_SYM^
-        LBRACE!
-            declaration SEMI! (declaration SEMI!)*
-        RBRACE!
+    : FONT_FACE_SYM^ general_body
     ;
 finally { leaveRule(); }
 
@@ -373,6 +374,22 @@ nestedAppender // this must be here because of special case & & <- the space bel
     ;
 
 //css does not require ; in last declaration
+
+top_level_body
+    : LBRACE
+            (a+=top_level_element)*
+      RBRACE
+     //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
+     -> ^(BODY LBRACE $a*); 
+
+top_level_body_with_declaration
+    : LBRACE
+            ((declarationWithSemicolon)=> a+=declarationWithSemicolon
+            | a+=top_level_element)*
+      RBRACE
+     //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
+     -> ^(BODY LBRACE $a*); 
+
 general_body
     : LBRACE
             (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
@@ -382,6 +399,7 @@ general_body
                | (reusableStructure)=>a+=reusableStructure
                | a+=pageMarginBox 
                | a+=variabledeclaration
+               | a+=media_in_general_body
                //| a+=imports
              )*
              (  

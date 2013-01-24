@@ -1,0 +1,30 @@
+h2 {
+  h1 {
+    @media screen, print {
+      @media (max-device-aspect-ratio: 1367/768) {
+        color: white;
+      }
+    } 
+  }
+} 
+ 
+#namespace {  
+  .mixin() {
+      content: "string";
+      @media (max-device-aspect-ratio: 30/2) {
+        h2 {
+          color: white;
+        }
+      }
+  }
+} 
+
+pre {
+  td {
+    @media screen, print {
+      body { #nested {
+        #namespace .mixin();
+      } }
+    } 
+  }
+}  

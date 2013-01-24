@@ -21,7 +21,6 @@ public class AstLogic {
       throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
     
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     Set<ASTCssNodeType> supportedMembers = ((Body) parent).getSupportedMembers();
     for (ASTCssNode member : members) {
       if (!supportedMembers.contains(member.getType())) {

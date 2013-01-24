@@ -9,29 +9,29 @@ import java.util.Set;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
+public abstract class Body extends ASTCssNode {
 
-    private List<T> body = new ArrayList<T>();
+    private List<ASTCssNode> body = new ArrayList<ASTCssNode>();
 
     public Body(HiddenTokenAwareTree underlyingStructure) {
       super(underlyingStructure);
     }
 
-    public Body(HiddenTokenAwareTree underlyingStructure, List<T> declarations) {
+    public Body(HiddenTokenAwareTree underlyingStructure, List<ASTCssNode> declarations) {
       this(underlyingStructure);
       body.addAll(declarations);
     }
 
     @Override
-    public List<T> getChilds() {
+    public List<ASTCssNode> getChilds() {
       return body;
     }
 
-    public List<T> getMembers() {
+    public List<ASTCssNode> getMembers() {
       return body;
     }
 
-    protected List<T> getBody() {
+    protected List<ASTCssNode> getBody() {
       return body;
     }
 
@@ -39,44 +39,57 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return body.isEmpty() && getOrphanComments().isEmpty();
     }
 
-    public void addMembers(List<? extends T> members) {
+    public void removeAllMembers() {
+      body = new ArrayList<ASTCssNode>();
+    }
+
+    public void addMembers(List<ASTCssNode> members) {
       body.addAll(members);
     }
 
-    public void addMembersAfter(List<? extends T> nestedRulesets, ASTCssNode kid) {
+    public void addMembersAfter(List<? extends ASTCssNode> newMembers, ASTCssNode kid) {
       int index = body.indexOf(kid);
       if (index==-1)
         index = body.size();
       else 
         index++;
       
-      body.addAll(index, nestedRulesets);
+      body.addAll(index, newMembers);
+    }
+
+    public void addMemberAfter(ASTCssNode newMember, ASTCssNode kid) {
+      int index = body.indexOf(kid);
+      if (index==-1)
+        index = body.size();
+      else 
+        index++;
+      
+      body.add(index, newMember);
 
       
     }
-
-    public void addMember(T member) {
+    public void addMember(ASTCssNode member) {
       body.add(member);
     }
 
-    public void replaceMember(T oldMember, List<T> newMembers) {
+    public void replaceMember(ASTCssNode oldMember, List<ASTCssNode> newMembers) {
       body.addAll(body.indexOf(oldMember), newMembers);
       body.remove(oldMember);
       oldMember.setParent(null);
       configureParentToAllChilds();
     }
 
-    public void replaceMember(T oldMember, T newMember) {
+    public void replaceMember(ASTCssNode oldMember, ASTCssNode newMember) {
       body.add(body.indexOf(oldMember), newMember);
       body.remove(oldMember);
       oldMember.setParent(null);
       newMember.setParent(this);
     }
 
-    public List<T> membersByType(ASTCssNodeType type) {
-      List<T> result = new ArrayList<T>();
-      List<T> body = getBody();
-      for (T node : body) {
+    public List<ASTCssNode> membersByType(ASTCssNodeType type) {
+      List<ASTCssNode> result = new ArrayList<ASTCssNode>();
+      List<ASTCssNode> body = getBody();
+      for (ASTCssNode node : body) {
         if (node.getType()==type) {
           result.add(node);
         }
@@ -84,10 +97,10 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return result;
     }
 
-    public List<T> membersByNotType(ASTCssNodeType type) {
-      List<T> result = new ArrayList<T>();
-      List<T> body = getBody();
-      for (T node : body) {
+    public List<ASTCssNode> membersByNotType(ASTCssNodeType type) {
+      List<ASTCssNode> result = new ArrayList<ASTCssNode>();
+      List<ASTCssNode> body = getBody();
+      for (ASTCssNode node : body) {
         if (node.getType()!=type) {
           result.add(node);
         }
@@ -95,7 +108,7 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return result;
     }
 
-    public boolean removeMember(T node) {
+    public boolean removeMember(ASTCssNode node) {
       return body.remove(node);
     }
     
@@ -103,20 +116,34 @@ public abstract class Body <T extends ASTCssNode> extends ASTCssNode {
       return new HashSet<ASTCssNodeType>(Arrays.asList(ASTCssNodeType.values()));  
     }
 
-    @SuppressWarnings("unchecked")
-    public Body<T> clone() {
-      Body<T> result = (Body<T>) super.clone();
+    public Body clone() {
+      Body result = (Body) super.clone();
       result.body = ArraysUtils.deeplyClonedList(body);
       result.configureParentToAllChilds();
       return result;
     }
 
-    public List<T> getDeclarations() {
+    public Body emptyClone() {
+      Body result = (Body) super.clone();
+      result.body = new ArrayList<ASTCssNode>();
+      return result;
+    }
+
+    public List<ASTCssNode> getDeclarations() {
       return membersByType(ASTCssNodeType.DECLARATION);
     }
 
-    public List<T> getNotDeclarations() {
+    public List<ASTCssNode> getNotDeclarations() {
       return membersByNotType(ASTCssNodeType.DECLARATION);
     }
+    
+    @Override
+    public void setParent(ASTCssNode parent) {
+      if (parent!=null && !(parent instanceof BodyOwner))
+        throw new IllegalArgumentException("Body parent must be a BodyOwner: " + parent.getType());
+      
+      super.setParent(parent);
+    }
+
 
 }

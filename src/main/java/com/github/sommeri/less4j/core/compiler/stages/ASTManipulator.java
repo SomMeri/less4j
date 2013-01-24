@@ -33,7 +33,6 @@ public class ASTManipulator {
     }
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void removeFromBody(ASTCssNode node) {
     ASTCssNode parent = node.getParent();
     if (!(parent instanceof Body)) {
@@ -45,7 +44,6 @@ public class ASTManipulator {
     node.setParent(null);
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void replaceInBody(ASTCssNode oldNode, ASTCssNode newNode) {
     ASTCssNode parent = oldNode.getParent();
     if (!(parent instanceof Body)) {
@@ -56,7 +54,6 @@ public class ASTManipulator {
     pBody.replaceMember(oldNode, newNode);
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void replaceInBody(ASTCssNode oldNode, List<ASTCssNode> newNodes) {
     ASTCssNode parent = oldNode.getParent();
     if (!(parent instanceof Body)) {
@@ -65,6 +62,30 @@ public class ASTManipulator {
     
     Body pBody = (Body) parent;
     pBody.replaceMember(oldNode, newNodes);
+  }
+
+  public void addIntoBody(ASTCssNode newNode, ASTCssNode afterNode) {
+    ASTCssNode parent = afterNode.getParent();
+    if (!(parent instanceof Body)) {
+      throw new BugHappened("Parent is not a body instance. " + parent, parent);
+    }
+    
+    Body pBody = (Body) parent;
+    pBody.addMemberAfter(newNode, afterNode);
+    newNode.setParent(parent);
+  }
+
+  public void addIntoBody(List<? extends ASTCssNode> newNodes, ASTCssNode afterNode) {
+    ASTCssNode parent = afterNode.getParent();
+    if (!(parent instanceof Body)) {
+      throw new BugHappened("Parent is not a body instance. " + parent, parent);
+    }
+    
+    Body pBody = (Body) parent;
+    pBody.addMembersAfter(newNodes, afterNode);
+    for (ASTCssNode newNode : newNodes) {
+      newNode.setParent(pBody);
+    }
   }
 
   private void setPropertyValue(ASTCssNode parent, ASTCssNode value, String name) {
@@ -92,7 +113,7 @@ public class ASTManipulator {
 
   }
 
-  public Object getPropertyValue(ASTCssNode object, PropertyDescriptor descriptor) {
+  private Object getPropertyValue(ASTCssNode object, PropertyDescriptor descriptor) {
     try {
       Object result = PropertyUtils.getProperty(object, descriptor.getName());
       return result;
@@ -113,6 +134,12 @@ public class ASTManipulator {
     
     if (removeNode!=null)
       removeFromBody(removeNode);
+  }
+
+  public void moveChildsBetweenBodies(Body from, Body to) {
+    to.addMembers(from.getChilds());
+    to.configureParentToAllChilds();
+    from.removeAllMembers();
   }
 
 }

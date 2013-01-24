@@ -3,15 +3,27 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class FontFace extends Body<Declaration> {
+public class FontFace extends ASTCssNode implements BodyOwner<GeneralBody> {
+
+  private GeneralBody body;
 
   public FontFace(HiddenTokenAwareTree underlyingStructure) {
     super(underlyingStructure);
   }
 
-  public FontFace(HiddenTokenAwareTree underlyingStructure, List<Declaration> declarations) {
-    super(underlyingStructure, declarations);
+  public GeneralBody getBody() {
+    return body;
+  }
+
+  public void setBody(GeneralBody body) {
+    this.body = body;
+  }
+
+  @Override
+  public List<ASTCssNode> getChilds() {
+    return ArraysUtils.asNonNullList((ASTCssNode)body);
   }
 
   @Override

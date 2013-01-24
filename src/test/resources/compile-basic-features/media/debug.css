@@ -1,0 +1,10 @@
+@media (max-width: 500px) {
+  h1 {
+    background: green;
+  }
+}
+@media (max-width: 500px) {
+  h2 {
+    background: green;
+  }
+}

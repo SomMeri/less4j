@@ -5,7 +5,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class Page extends ASTCssNode {
+public class Page extends ASTCssNode implements BodyOwner<GeneralBody>{
 
   private Name name;
   private boolean dockedPseudopage = true;

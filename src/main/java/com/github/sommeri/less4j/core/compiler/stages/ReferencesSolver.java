@@ -13,11 +13,11 @@ import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
+import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.ast.RuleSetsBody;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
@@ -52,7 +52,6 @@ public class ReferencesSolver {
 
   private void doSolveReferences(ASTCssNode node, IteratedScope scope) {
     ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope.getScope(), problemsHandler);
-
     switch (node.getType()) {
     case VARIABLE: {
       Expression replacement = expressionEvaluator.evaluate((Variable) node);
@@ -76,7 +75,7 @@ public class ReferencesSolver {
     }
     case MIXIN_REFERENCE: {
       MixinReference mixinReference = (MixinReference) node;
-      RuleSetsBody replacement = resolveMixinReference(mixinReference, scope.getScope());
+      GeneralBody replacement = resolveMixinReference(mixinReference, scope.getScope());
       AstLogic.validateCssBodyCompatibility(mixinReference, replacement.getChilds(), problemsHandler);
       manipulator.replaceInBody(mixinReference, replacement.getChilds());
       break;
@@ -111,6 +110,7 @@ public class ReferencesSolver {
         }
       }
     }
+    
   }
 
   private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent) {
@@ -133,12 +133,12 @@ public class ReferencesSolver {
     return new FixedNamePart(input.getUnderlyingStructure(), value);
   }
 
-  private RuleSetsBody resolveMixinReference(MixinReference reference, Scope scope) {
+  private GeneralBody resolveMixinReference(MixinReference reference, Scope scope) {
     List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(reference, problemsHandler);
     return resolveReferencedMixins(reference, scope, sameNameMixins);
   }
 
-  private RuleSetsBody resolveReferencedMixins(MixinReference reference, Scope referenceScope, List<FullMixinDefinition> sameNameMixins) {
+  private GeneralBody resolveReferencedMixins(MixinReference reference, Scope referenceScope, List<FullMixinDefinition> sameNameMixins) {
     if (sameNameMixins.isEmpty())
       problemsHandler.undefinedMixin(reference);
 
@@ -146,14 +146,14 @@ public class ReferencesSolver {
     if (mixins.isEmpty())
       problemsHandler.unmatchedMixin(reference);
 
-    RuleSetsBody result = new RuleSetsBody(reference.getUnderlyingStructure());
+    GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     for (FullMixinDefinition fullMixin : mixins) {
       Scope combinedScope = calculateMixinsOwnVariables(reference, referenceScope, fullMixin);
       ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(combinedScope, problemsHandler);
 
       ReusableStructure mixin = fullMixin.getMixin();
       if (expressionEvaluator.evaluate(mixin.getGuards())) {
-        RuleSetsBody body = mixin.getBody().clone();
+        GeneralBody body = mixin.getBody().clone();
         doSolveReferences(body, combinedScope);
         result.addMembers(body.getChilds());
       }
@@ -165,7 +165,7 @@ public class ReferencesSolver {
     return result;
   }
 
-  private void shiftComments(MixinReference reference, RuleSetsBody result) {
+  private void shiftComments(MixinReference reference, GeneralBody result) {
     List<ASTCssNode> childs = result.getChilds();
     if (!childs.isEmpty()) {
       childs.get(0).addOpeningComments(reference.getOpeningComments());
@@ -173,13 +173,13 @@ public class ReferencesSolver {
     }
   }
 
-  private void resolveImportance(MixinReference reference, RuleSetsBody result) {
+  private void resolveImportance(MixinReference reference, GeneralBody result) {
     if (reference.isImportant()) {
       declarationsAreImportant(result);
     }
   }
 
-  private void declarationsAreImportant(RuleSetsBody result) {
+  private void declarationsAreImportant(GeneralBody result) {
     for (ASTCssNode kid : result.getChilds()) {
       if (kid instanceof Declaration) {
         Declaration declaration = (Declaration) kid;
