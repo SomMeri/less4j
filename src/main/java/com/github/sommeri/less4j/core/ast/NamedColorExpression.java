@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.sommeri.less4j.core.parser.ConversionUtils;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 /**
@@ -169,7 +170,7 @@ public class NamedColorExpression extends ColorExpression {
   private String colorName;
 
   public NamedColorExpression(HiddenTokenAwareTree token, String colorName) {
-    super(token, ALL_NAMES.get(colorName.toLowerCase()));
+    super(token, ConversionUtils.parseColor(token, ALL_NAMES.get(colorName.toLowerCase())));
     this.colorName = colorName;
   }
 

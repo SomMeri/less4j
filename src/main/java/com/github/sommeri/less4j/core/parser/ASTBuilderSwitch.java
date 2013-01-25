@@ -74,7 +74,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
   @SuppressWarnings("unused")
   private final ProblemsHandler problemsHandler;
-  private final TermBuilder termBuilder = new TermBuilder(this);
+  private final TermBuilder termBuilder;
   // as stated here: http://www.w3.org/TR/css3-selectors/#pseudo-elements
   private static Set<String> COLONLESS_PSEUDOELEMENTS = new HashSet<String>();
   static {
@@ -87,6 +87,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
+    termBuilder = new TermBuilder(this, problemsHandler);
   }
 
   public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {

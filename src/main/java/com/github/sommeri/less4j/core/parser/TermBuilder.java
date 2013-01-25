@@ -4,11 +4,13 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.problems.BugHappened;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
@@ -25,9 +27,11 @@ import com.github.sommeri.less4j.utils.PrintUtils;
 public class TermBuilder {
 
   private final ASTBuilderSwitch parentBuilder;
+  private ProblemsHandler problemsHandler = new ProblemsHandler();
 
-  public TermBuilder(ASTBuilderSwitch astBuilderSwitch) {
+  public TermBuilder(ASTBuilderSwitch astBuilderSwitch, ProblemsHandler problemsHandler) {
     this.parentBuilder = astBuilderSwitch;
+    this.problemsHandler = problemsHandler;
   }
 
   public Expression buildFromTerm(HiddenTokenAwareTree token) {
@@ -95,7 +99,14 @@ public class TermBuilder {
   }
 
   private Expression buildFromColorHash(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
-    return new ColorExpression(token, first.getText());
+    String text = first.getText();
+    ColorExpression parsedColor = ConversionUtils.parseColor(token, text);
+    if (parsedColor==null) {
+      FaultyExpression faultyExpression = new FaultyExpression(token);
+      problemsHandler.notAColor(faultyExpression, text);
+    }
+    
+    return parsedColor;
   }
 
   private Expression negate(Expression value, HiddenTokenAwareTree sign) {

@@ -10,10 +10,12 @@ import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
+import com.github.sommeri.less4j.core.parser.ConversionUtils;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -74,7 +76,16 @@ class Color extends AbstractMultiParameterFunction {
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     CssString string = (CssString) splitParameters.get(0);
-    return new ColorExpression(token, string.getValue());
+    String text = string.getValue();
+    
+    //this does a bit more then less.js: it is able to parse named colors
+    ColorExpression parsedColor = ConversionUtils.parseColor(token, text);
+    if (parsedColor==null) {
+      FaultyExpression faultyExpression = new FaultyExpression(token);
+      problemsHandler.notAColor(faultyExpression, text);
+    }
+    
+    return parsedColor;
   }
 
   @Override

@@ -30,6 +30,10 @@ public class ProblemsHandler {
   private LessPrinter printer = new LessPrinter();
 
   
+  public void notAColor(ASTCssNode node, String text) {
+    collector.addError(new CompilationError(node, "The string \"" + text + "\" is not a valid color."));
+  }
+
   public void warnMerginMediaQueryWithMedium(MediaQuery mediaQuery) {
     collector.addWarning(new CompilationWarning(mediaQuery, "Attempt to merge media query with a medium. Merge removed medium from inner media query, because the result CSS would be invalid otherwise."));
   }
