@@ -104,6 +104,7 @@ public class TermBuilder {
     if (parsedColor==null) {
       FaultyExpression faultyExpression = new FaultyExpression(token);
       problemsHandler.notAColor(faultyExpression, text);
+      return faultyExpression;
     }
     
     return parsedColor;
