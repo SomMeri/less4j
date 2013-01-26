@@ -87,7 +87,7 @@ public class ProblemsHandler {
   }
   
   public void wrongArgumentTypeToFunction(Expression param, String function, ASTCssNodeType expected, ASTCssNodeType received) {
-    collector.addError(new CompilationError(param, "Wrong argument type to function '" + function + "', expected " + expected + " saw " + received + "."));
+    collector.addError(new CompilationError(param, "Wrong argument type to function '" + function + "', expected " + PrintUtils.toTypeName(expected) + " saw " + PrintUtils.toTypeName(received) + "."));
   }
 
   public void variablesCycle(List<Variable> cycle) {

@@ -4,10 +4,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.parser.LessParser;
 
 public class PrintUtils {
-  
+
   public static String toName(int tokenType) {
     if (tokenType == -1)
       return "EOF";
@@ -44,7 +45,11 @@ public class PrintUtils {
   }
 
   public static String toTypeName(ASTCssNode node) {
-    switch (node.getType()) {
+    return toTypeName(node.getType());
+  }
+
+  public static String toTypeName(ASTCssNodeType type) {
+    switch (type) {
     case DECLARATION:
       return "declaration";
 
@@ -54,14 +59,47 @@ public class PrintUtils {
     case STYLE_SHEET:
       return "top level style sheet";
 
+    case INDIRECT_VARIABLE:
+      return "indirect variable";
+
+    case VARIABLE:
+      return "variable";
+
+    case NUMBER:
+      return "number";
+
+    case NAMED_EXPRESSION:
+      return "identifier";
+
+    case IDENTIFIER_EXPRESSION:
+      return "identifier";
+
+    case FUNCTION:
+      return "function";
+
+    case FAULTY_EXPRESSION:
+      return "faulty expression";
+
+    case ESCAPED_VALUE:
+      return "escaped value";
+
+    case EMPTY_EXPRESSION:
+      return "empty expression";
+
+    case COLOR_EXPRESSION:
+      return "color";
+      
+    case STRING_EXPRESSION:
+      return "string";
+
     default:
       //TODO (low priority) replace by something safer
-      return node.getType().name();
+      return type.name();
     }
   }
 
   public static String toLocation(ASTCssNode node) {
-    return node.getSourceLine() +":"+node.getCharPositionInSourceLine();
+    return node.getSourceLine() + ":" + node.getCharPositionInSourceLine();
   }
 
 }
