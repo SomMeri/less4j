@@ -36,7 +36,7 @@ Pom.xml dependency:
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;com.github.sommeri&lt;/groupId&gt;
   &lt;artifactId&gt;less4j&lt;/artifactId&gt;
-  &lt;version&gt;0.0.11&lt;/version&gt;
+  &lt;version&gt;0.0.12&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
@@ -48,7 +48,9 @@ Warning: Project is still in alpha and current API is very temporary. It will ch
 
 Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes two methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
-*  `CompilationResult compile(String lessContent)` - compiles a string.
+*  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url, 
+*  `CompilationResult compile(String lessContent)` - compiles a string,
+*  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type. 
 
 The first and second method differ in one important point: the second method is unable to handle "@import" statements located in compiled string. Files referenced by the import statement are relative to current file. Compiler invoked through string based compile method is unable to find imported less files and therefore leaves the import statement as it is. Use it with caution.
 
