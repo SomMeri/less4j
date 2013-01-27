@@ -1,0 +1,17 @@
+.mixin(@param) {
+  width: @param;
+}
+
+@font-face {
+  @variable: 397px;
+  .mixin(@variable);
+}
+
+@media screen and (width: 397px) {
+  @variable: 500px;
+  @font-face {
+    .mixin(@variable);
+  }
+}
+
+@variable: 900;
