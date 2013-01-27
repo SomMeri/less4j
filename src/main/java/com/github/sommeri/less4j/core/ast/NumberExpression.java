@@ -96,18 +96,18 @@ public class NumberExpression extends Expression implements Cloneable {
   public ASTCssNodeType getType() {
     return ASTCssNodeType.NUMBER;
   }
-  
+
   public NumberExpression convertTo(String targetUnit) {
     Map<Dimension, String> conversions = new HashMap<Dimension, String>();
     for (Dimension dim : Dimension.values()) {
       if (dim.getConversions().containsKey(targetUnit)) {
-	conversions.put(dim, targetUnit);
+        conversions.put(dim, targetUnit);
       }
     }
-    
+
     return convertTo(conversions);
   }
-  
+
   public NumberExpression convertTo(Map<Dimension, String> conversions) {
     double value = getValueAsDouble();
     String unit = getSuffix();
@@ -191,7 +191,7 @@ public class NumberExpression extends Expression implements Cloneable {
       return result;
     }
   }
-  
+
   @Override
   public String toString() {
     if (originalString != null)

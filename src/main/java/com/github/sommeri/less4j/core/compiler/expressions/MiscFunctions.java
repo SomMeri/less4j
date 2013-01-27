@@ -12,7 +12,6 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
-import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.parser.ConversionUtils;
@@ -100,7 +99,7 @@ class Color extends AbstractMultiParameterFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.STRING_EXPRESSION, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.STRING_EXPRESSION);
   }
 
   @Override
@@ -112,15 +111,17 @@ class Color extends AbstractMultiParameterFunction {
 
 class Unit extends AbstractMultiParameterFunction {
 
+  private TypesConversionUtils conversionUtils = new TypesConversionUtils();
+
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     NumberExpression dimension = (NumberExpression) splitParameters.get(0);
-    IdentifierExpression unit = splitParameters.size() > 1 ? (IdentifierExpression) splitParameters.get(1) : null;
+    String unit = splitParameters.size() > 1 ? conversionUtils.contentToString(splitParameters.get(1)) : null;
 
     String newSuffix;
     Dimension newDimension;
     if (unit != null) {
-      newSuffix = unit.getValue();
+      newSuffix = unit;
       newDimension = Dimension.forSuffix(newSuffix);
     } else {
       newSuffix = "";
@@ -144,9 +145,9 @@ class Unit extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     case 1:
-      return validateParameter(parameter, ASTCssNodeType.IDENTIFIER_EXPRESSION, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.IDENTIFIER_EXPRESSION, ASTCssNodeType.STRING_EXPRESSION, ASTCssNodeType.ESCAPED_VALUE);
     }
     return false;
   }
@@ -159,12 +160,13 @@ class Unit extends AbstractMultiParameterFunction {
 }
 
 class Convert extends AbstractMultiParameterFunction {
+  
+  private TypesConversionUtils conversionUtils = new TypesConversionUtils();
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
     NumberExpression value = (NumberExpression) splitParameters.get(0);
-    IdentifierExpression unit = (IdentifierExpression) splitParameters.get(1);
-    return value.convertTo(unit.getValue());
+    return value.convertTo(conversionUtils.contentToString(splitParameters.get(1)));
   }
 
   @Override
@@ -181,9 +183,9 @@ class Convert extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     case 1:
-      return validateParameter(parameter, ASTCssNodeType.IDENTIFIER_EXPRESSION, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.IDENTIFIER_EXPRESSION, ASTCssNodeType.STRING_EXPRESSION, ASTCssNodeType.ESCAPED_VALUE);
     }
     return false;
   }
@@ -236,9 +238,9 @@ class Extract extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, ASTCssNodeType.COMPOSED_EXPRESSION, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COMPOSED_EXPRESSION);
     case 1:
-      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }

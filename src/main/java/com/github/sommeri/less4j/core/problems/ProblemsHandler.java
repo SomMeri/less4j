@@ -86,8 +86,8 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(param, "Wrong number of arguments to function '" + function + "', should be " + expectedArguments + "."));
   }
   
-  public void wrongArgumentTypeToFunction(Expression param, String function, ASTCssNodeType expected, ASTCssNodeType received) {
-    collector.addError(new CompilationError(param, "Wrong argument type to function '" + function + "', expected " + PrintUtils.toTypeName(expected) + " saw " + PrintUtils.toTypeName(received) + "."));
+  public void wrongArgumentTypeToFunction(Expression param, String function, ASTCssNodeType received, ASTCssNodeType... expected) {
+    collector.addError(new CompilationError(param, "Wrong argument type to function '" + function + "', expected " + PrintUtils.toTypeNames(expected) + " saw " + PrintUtils.toTypeName(received) + "."));
   }
 
   public void variablesCycle(List<Variable> cycle) {
@@ -189,10 +189,6 @@ public class ProblemsHandler {
 
   public void subtractOrDiveColorFromNumber(Expression errorNode) {
     collector.addError(new CompilationError(errorNode, "Can't subtract or divide a color from a number"));
-  }
-
-  public void mathFunctionParameterNotANumber(String functionName, Expression errorNode) {
-    collector.addError(new CompilationError(errorNode, "function '" + functionName + "' requires number as a parameter."));
   }
 
   public void mathFunctionParameterNotANumberWarn(String functionName, Expression errorNode) {

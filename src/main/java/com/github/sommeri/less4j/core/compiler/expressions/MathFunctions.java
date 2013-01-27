@@ -81,7 +81,7 @@ public class MathFunctions implements FunctionsPackage {
 
 class Percentage implements Function {
 
-  private final ConversionUtils utils = new ConversionUtils();
+  private final TypesConversionUtils utils = new TypesConversionUtils();
 
   @Override
   public Expression evaluate(Expression parameter, ProblemsHandler problemsHandler) {
@@ -122,7 +122,7 @@ abstract class AbstractSingleValueMathFunction implements Function {
   @Override
   public final Expression evaluate(Expression iParameter, ProblemsHandler problemsHandler) {
     if (iParameter.getType() != ASTCssNodeType.NUMBER) {
-      problemsHandler.mathFunctionParameterNotANumber(getName(), iParameter);
+      problemsHandler.wrongArgumentTypeToFunction(iParameter, getName(), iParameter.getType(), ASTCssNodeType.NUMBER);
       return new FaultyExpression(iParameter);
     }
 
@@ -373,14 +373,8 @@ class Acos extends AbstractSingleValueMathFunction {
 abstract class AbtractMultiParameterMathFunction extends AbstractMultiParameterFunction {
 
   @Override
-  protected boolean validateParameter(Expression parameter, ASTCssNodeType expected, ProblemsHandler problemsHandler) {
-    if (expected == ASTCssNodeType.NUMBER && parameter.getType() != expected) {
-      /* There is a special problemsHandler method for reporting math functions not getting numbers. */
-      problemsHandler.mathFunctionParameterNotANumber(getName(), parameter);
-      return false;
-    } else {
-      return super.validateParameter(parameter, expected, problemsHandler);
-    }
+  protected boolean validateParameter(Expression parameter, ProblemsHandler problemsHandler, ASTCssNodeType... expected) {
+      return super.validateParameter(parameter, problemsHandler, expected);
   }
   
 }
@@ -406,7 +400,7 @@ class Mod extends AbtractMultiParameterMathFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -451,7 +445,7 @@ abstract class AbstractTwoValueMathFunction extends AbtractMultiParameterMathFun
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
   
 }
@@ -490,7 +484,7 @@ class Round extends AbtractMultiParameterMathFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override

@@ -19,7 +19,7 @@ import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Import.ImportKind;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
-import com.github.sommeri.less4j.core.compiler.expressions.ConversionUtils;
+import com.github.sommeri.less4j.core.compiler.expressions.TypesConversionUtils;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
@@ -30,7 +30,7 @@ import com.github.sommeri.less4j.platform.Constants;
 public class SimpleImportsSolver {
 
   private final ProblemsHandler problemsHandler;
-  private ConversionUtils conversionUtils = new ConversionUtils();
+  private TypesConversionUtils conversionUtils = new TypesConversionUtils();
   private ASTManipulator astManipulator = new ASTManipulator();
 
   private Set<LessSource> importedSources = new HashSet<LessSource>();
@@ -160,14 +160,14 @@ public class SimpleImportsSolver {
     Expression urlExpression = expressionEvaluator.evaluate(urlInput);
 
     if (urlExpression.getType() != ASTCssNodeType.FUNCTION)
-      return toJavaFileSeparator(conversionUtils.toStringContent(urlExpression));
+      return toJavaFileSeparator(conversionUtils.contentToString(urlExpression));
 
     //this is the only place in the compiler that can interpret the url function
     FunctionExpression function = (FunctionExpression) urlExpression;
     if (!"url".equals(function.getName().toLowerCase()))
       return null;
 
-    return toJavaFileSeparator(conversionUtils.toStringContent(expressionEvaluator.evaluate(function.getParameter())));
+    return toJavaFileSeparator(conversionUtils.contentToString(expressionEvaluator.evaluate(function.getParameter())));
   }
 
   private String toJavaFileSeparator(String path) {

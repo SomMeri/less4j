@@ -48,6 +48,18 @@ public class PrintUtils {
     return toTypeName(node.getType());
   }
 
+  public static String toTypeNames(ASTCssNodeType... types) {
+    String result = "";
+    for (ASTCssNodeType type : types) {
+      if (!result.isEmpty())
+        result +=" or ";
+      
+      result +=toTypeName(type);
+    }
+    
+    return result;
+  }
+  
   public static String toTypeName(ASTCssNodeType type) {
     switch (type) {
     case DECLARATION:

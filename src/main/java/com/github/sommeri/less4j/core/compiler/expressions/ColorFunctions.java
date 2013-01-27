@@ -153,7 +153,7 @@ class RGB extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -187,7 +187,7 @@ class RGBA extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -220,7 +220,7 @@ class HSL extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -254,7 +254,7 @@ class HSLA extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -287,7 +287,7 @@ class HSV extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -321,7 +321,7 @@ class HSVA extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -360,7 +360,7 @@ class ARGB extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
   }
 
   @Override
@@ -510,7 +510,7 @@ abstract class AbstractColorOperationFunction extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
   }
 
 }
@@ -669,9 +669,9 @@ class Mix extends AbstractColorFunction {
     switch (position) {
     case 0:
     case 1:
-      return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 2:
-      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }
@@ -744,9 +744,9 @@ class Contrast extends AbstractMultiParameterFunction {
       return true;
     case 1:
     case 2:
-      return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 3:
-      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }
@@ -947,7 +947,7 @@ abstract class AbstractColorBlendFunction extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+    return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
   }
   
 }
@@ -1110,9 +1110,9 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, ASTCssNodeType.COLOR_EXPRESSION, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 1:
-      return validateParameter(parameter, ASTCssNodeType.NUMBER, problemsHandler);
+      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }

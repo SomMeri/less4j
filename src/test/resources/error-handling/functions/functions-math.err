@@ -2,9 +2,9 @@ Warnings produced by compilation of testCase
 WARNING 2:24 function 'percentage' requires number as a parameter.
 WARNING 3:24 function 'percentage' requires number as a parameter.
 Errors produced by compilation of testCase
-ERROR 6:19 function 'floor' requires number as a parameter.
-ERROR 7:19 function 'floor' requires number as a parameter.
-ERROR 10:18 function 'ceil' requires number as a parameter.
-ERROR 11:18 function 'ceil' requires number as a parameter.
-ERROR 14:19 function 'round' requires number as a parameter.
-ERROR 15:19 function 'round' requires number as a parameter.
+ERROR 6:19 Wrong argument type to function 'floor', expected number saw identifier.
+ERROR 7:19 Wrong argument type to function 'floor', expected number saw string.
+ERROR 10:18 Wrong argument type to function 'ceil', expected number saw identifier.
+ERROR 11:18 Wrong argument type to function 'ceil', expected number saw string.
+ERROR 14:19 Wrong argument type to function 'round', expected number saw identifier.
+ERROR 15:19 Wrong argument type to function 'round', expected number saw string.
