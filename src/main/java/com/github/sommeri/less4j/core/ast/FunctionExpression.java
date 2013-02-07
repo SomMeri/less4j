@@ -32,6 +32,30 @@ public class FunctionExpression extends Expression {
     this.parameter = parameter;
   }
 
+  public boolean isCssOnlyFunction() {
+    if (isMsFilter() || hasNamedParameter())
+      return true;
+    
+    return false;
+  }
+
+  private boolean hasNamedParameter() {
+    if (getParameter()==null)
+      return false;
+    
+    List<Expression> parameters = getParameter().splitByComma();
+    for (Expression param : parameters) {
+      if (param.getType()==ASTCssNodeType.NAMED_EXPRESSION)
+        return true;
+    }
+
+    return false;
+  }
+
+  private boolean isMsFilter() {
+    return getName().contains(":") || getName().contains(".");
+  }
+
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.FUNCTION;
@@ -41,12 +65,13 @@ public class FunctionExpression extends Expression {
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(parameter);
   }
-  
+
   @Override
   public FunctionExpression clone() {
     FunctionExpression result = (FunctionExpression) super.clone();
-    result.parameter = parameter==null?null:parameter.clone();
+    result.parameter = parameter == null ? null : parameter.clone();
     result.configureParentToAllChilds();
     return result;
   }
+
 }

@@ -50,6 +50,7 @@ public class ComposedExpression extends Expression {
     this.right = right;
   }
 
+  @Override
   public List<Expression> splitByComma() {
     List<Expression> result = new ArrayList<Expression>();
     if (operator.getOperator()!=Operator.COMMA && operator.getOperator()!=Operator.EMPTY_OPERATOR) {

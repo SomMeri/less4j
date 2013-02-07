@@ -42,6 +42,7 @@ import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.Name;
+import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
@@ -893,6 +894,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
     
     return result;
+  }
+
+  public NamedExpression handleNamedExpression(HiddenTokenAwareTree token) {
+    HiddenTokenAwareTree nameToken = token.getChild(0);
+    HiddenTokenAwareTree valueToken = token.getChild(1);
+    Expression value = (Expression) switchOn(valueToken);
+
+    return new NamedExpression(token, nameToken.getText(), value);
+
   }
 
 }

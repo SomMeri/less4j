@@ -117,7 +117,7 @@ public class ColorFunctions implements FunctionsPackage {
    * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public boolean canEvaluate(FunctionExpression input, Expression parameters) {
+  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
     return FUNCTIONS.containsKey(input.getName());
   }
 
@@ -130,12 +130,12 @@ public class ColorFunctions implements FunctionsPackage {
    * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public Expression evaluate(FunctionExpression input, Expression parameters) {
+  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter) {
     if (!canEvaluate(input, parameters))
       return input;
 
     Function function = FUNCTIONS.get(input.getName());
-    return function.evaluate(parameters, problemsHandler);
+    return function.evaluate(parameters, problemsHandler, input, evaluatedParameter);
   }
 
 }
@@ -153,7 +153,7 @@ class RGB extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -187,7 +187,7 @@ class RGBA extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -220,7 +220,7 @@ class HSL extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -254,7 +254,7 @@ class HSLA extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -287,7 +287,7 @@ class HSV extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -321,7 +321,7 @@ class HSVA extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -360,7 +360,7 @@ class ARGB extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
   }
 
   @Override
@@ -457,11 +457,27 @@ class Blue extends AbstractColorOperationFunction {
 
 }
 
-class Alpha extends AbstractColorOperationFunction {
+class Alpha extends CssNameClashMultiParameterFunction {
 
   @Override
-  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
-    return new NumberExpression(token, Double.valueOf(color.getAlpha()), "", null, Dimension.NUMBER);
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    ColorExpression color = (ColorExpression) parameters.get(0);
+    return new NumberExpression(call.getUnderlyingStructure(), Double.valueOf(color.getAlpha()), "", null, Dimension.NUMBER);
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 1;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
   }
 
   @Override
@@ -510,17 +526,53 @@ abstract class AbstractColorOperationFunction extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
   }
 
 }
 
-class Saturate extends AbstractColorHSLAmountFunction {
+class Saturate extends CssNameClashMultiParameterFunction {
 
   @Override
+  public Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    Expression firstParam = splitParameters.get(0);
+    if (firstParam.getType()!=ASTCssNodeType.COLOR_EXPRESSION) {
+      UnknownFunction unknownFunction = new UnknownFunction();
+      return unknownFunction.evaluate(splitParameters, problemsHandler, call, evaluatedParameter);
+    }
+    
+    ColorExpression color = (ColorExpression) firstParam;
+    NumberExpression amount = (NumberExpression) splitParameters.get(1);
+
+    HSLAValue hsla = AbstractColorFunction.toHSLA(color);
+    apply(amount, hsla);
+    return AbstractColorFunction.hsla(hsla, call.getUnderlyingStructure());
+  }
+
   protected void apply(NumberExpression amount, HSLAValue hsla) {
     hsla.s += amount.getValueAsDouble() / 100.0f;
-    hsla.s = clamp(hsla.s);
+    hsla.s = AbstractColorFunction.clamp(hsla.s);
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 2;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    switch (position) {
+    case 0:
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
+    case 1:
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    }
+    return false;
   }
 
   @Override
@@ -669,9 +721,9 @@ class Mix extends AbstractColorFunction {
     switch (position) {
     case 0:
     case 1:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 2:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }
@@ -699,17 +751,21 @@ class Greyscale extends AbstractColorOperationFunction {
   
 }
 
-class Contrast extends AbstractMultiParameterFunction {
+class Contrast extends CssNameClashMultiParameterFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  public Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
     /* Contrast needs to support an invalid first parameter to succeed in less.js test cases.
      * I think this is in order to support filter: rules so may not be a good idea.
      * We return null to ColorFunctions which will in turn return the input, so in effect we change
      * nothing.
      */
-    if (splitParameters.get(0).getType() != ASTCssNodeType.COLOR_EXPRESSION)
-      return null;
+    if (splitParameters.get(0).getType() != ASTCssNodeType.COLOR_EXPRESSION) {
+      UnknownFunction unknownFunction = new UnknownFunction();
+      return unknownFunction.evaluate(splitParameters, problemsHandler, call, evaluatedParameter);
+  }
+    
+    HiddenTokenAwareTree token = call.getUnderlyingStructure();
     
     ColorExpression color = (ColorExpression) splitParameters.get(0);
     ColorExpression dark = (ColorExpression) (splitParameters.size() > 1 ? splitParameters.get(1) : new ColorExpression(token, 0, 0, 0));
@@ -744,9 +800,9 @@ class Contrast extends AbstractMultiParameterFunction {
       return true;
     case 1:
     case 2:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 3:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }
@@ -947,12 +1003,12 @@ abstract class AbstractColorBlendFunction extends AbstractColorFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
   }
   
 }
 
-abstract class AbstractColorFunction extends AbstractMultiParameterFunction {
+abstract class AbstractColorFunction extends CatchAllMultiParameterFunction {
 
   static double clamp(double val) {
     return Math.min(1, Math.max(0, val));
@@ -1110,9 +1166,9 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 1:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }

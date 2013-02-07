@@ -58,8 +58,12 @@ public class ParsersSemanticPredicates {
     if (first == null || second == null)
       return false;
 
-    //identifier contains function name and is followed by a parenthesis
-    if (!(first.getType() == LessParser.IDENT || first.getType() == LessParser.PERCENT) || second.getType() != LessParser.LPAREN)
+    //identifier contains either:
+    // * simple function name and is followed by a parenthesis (e.g. "name()")
+    // * composed function name (e.g. "name:something ... ")
+    int ft = first.getType();
+    int st = second.getType();
+    if (!(ft == LessParser.IDENT || ft == LessParser.PERCENT) || !(st == LessParser.LPAREN || st == LessParser.COLON || st == LessParser.DOT))
       return false;
 
     //there must be no space between function name and parenthesis with arguments

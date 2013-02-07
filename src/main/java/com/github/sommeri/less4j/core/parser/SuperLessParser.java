@@ -102,6 +102,7 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("PAGE_MARGIN_BOX", "page margin box");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IMPORT_ONCE_SYM", "@import-once");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IMPORT_MULTIPLE_SYM", "@import-multiple");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NAMED_EXPRESSION", "named expression");
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";

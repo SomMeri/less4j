@@ -61,7 +61,7 @@ public class MathFunctions implements FunctionsPackage {
    * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#canEvaluate(com.github.sommeri.less4j.core.ast.FunctionExpression, com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public boolean canEvaluate(FunctionExpression input, Expression parameters) {
+  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
     return FUNCTIONS.containsKey(input.getName());
   }
   
@@ -69,22 +69,26 @@ public class MathFunctions implements FunctionsPackage {
    * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#evaluate(com.github.sommeri.less4j.core.ast.FunctionExpression, com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public Expression evaluate(FunctionExpression input, Expression parameters) {
+  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter) {
     if (!canEvaluate(input, parameters))
       return input;
 
     Function function = FUNCTIONS.get(input.getName());
-    return function.evaluate(parameters, problemsHandler);
+    return function.evaluate(parameters, problemsHandler, input, evaluatedParameter);
   }
 
 }
 
-class Percentage implements Function {
+class Percentage extends AbstractFunction {
 
   private final TypesConversionUtils utils = new TypesConversionUtils();
 
   @Override
-  public Expression evaluate(Expression parameter, ProblemsHandler problemsHandler) {
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    if (parameters.size()>1)
+      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
+
+    Expression parameter = parameters.get(0);
     if (parameter.getType() == ASTCssNodeType.NUMBER) {
       return evaluate((NumberExpression) parameter);
     }
@@ -118,9 +122,17 @@ class Percentage implements Function {
 }
 
 abstract class AbstractSingleValueMathFunction implements Function {
-  
+
+  public boolean acceptsParameters(List<Expression> parameters) {
+    return true;
+  }
+
   @Override
-  public final Expression evaluate(Expression iParameter, ProblemsHandler problemsHandler) {
+  public final Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    if (parameters.size()>1)
+      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
+
+    Expression iParameter = parameters.get(0);
     if (iParameter.getType() != ASTCssNodeType.NUMBER) {
       problemsHandler.wrongArgumentTypeToFunction(iParameter, getName(), iParameter.getType(), ASTCssNodeType.NUMBER);
       return new FaultyExpression(iParameter);
@@ -370,11 +382,11 @@ class Acos extends AbstractSingleValueMathFunction {
   
 }
 
-abstract class AbtractMultiParameterMathFunction extends AbstractMultiParameterFunction {
+abstract class AbtractMultiParameterMathFunction extends CatchAllMultiParameterFunction {
 
   @Override
-  protected boolean validateParameter(Expression parameter, ProblemsHandler problemsHandler, ASTCssNodeType... expected) {
-      return super.validateParameter(parameter, problemsHandler, expected);
+  protected boolean validateParameterTypeReportError(Expression parameter, ProblemsHandler problemsHandler, ASTCssNodeType... expected) {
+      return super.validateParameterTypeReportError(parameter, problemsHandler, expected);
   }
   
 }
@@ -400,7 +412,7 @@ class Mod extends AbtractMultiParameterMathFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -445,7 +457,7 @@ abstract class AbstractTwoValueMathFunction extends AbtractMultiParameterMathFun
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
   
 }
@@ -484,7 +496,7 @@ class Round extends AbtractMultiParameterMathFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
   }
 
   @Override
@@ -497,8 +509,8 @@ class Round extends AbtractMultiParameterMathFunction {
 class Pi extends AbstractFunction {
 
   @Override
-  public Expression evaluate(Expression parameters, ProblemsHandler problemsHandler) {
-    return new NumberExpression(parameters.getUnderlyingStructure(), Math.PI, "", null, Dimension.NUMBER);
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    return new NumberExpression(call.getUnderlyingStructure(), Math.PI, "", null, Dimension.NUMBER);
   }
   
 }

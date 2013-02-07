@@ -47,7 +47,7 @@ public class MiscFunctions implements FunctionsPackage {
    * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public boolean canEvaluate(FunctionExpression input, Expression parameters) {
+  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
     return FUNCTIONS.containsKey(input.getName());
   }
 
@@ -60,17 +60,17 @@ public class MiscFunctions implements FunctionsPackage {
    * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public Expression evaluate(FunctionExpression input, Expression parameters) {
+  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter) {
     if (!canEvaluate(input, parameters))
       return input;
 
     Function function = FUNCTIONS.get(input.getName());
-    return function.evaluate(parameters, problemsHandler);
+    return function.evaluate(parameters, problemsHandler, input, evaluatedParameter);
   }
 
 }
 
-class Color extends AbstractMultiParameterFunction {
+class Color extends CatchAllMultiParameterFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
@@ -99,7 +99,7 @@ class Color extends AbstractMultiParameterFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    return validateParameter(parameter, problemsHandler, ASTCssNodeType.STRING_EXPRESSION);
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.STRING_EXPRESSION);
   }
 
   @Override
@@ -109,7 +109,7 @@ class Color extends AbstractMultiParameterFunction {
 
 }
 
-class Unit extends AbstractMultiParameterFunction {
+class Unit extends CatchAllMultiParameterFunction {
 
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
 
@@ -145,9 +145,9 @@ class Unit extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     case 1:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.IDENTIFIER_EXPRESSION, ASTCssNodeType.STRING_EXPRESSION, ASTCssNodeType.ESCAPED_VALUE);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.IDENTIFIER_EXPRESSION, ASTCssNodeType.STRING_EXPRESSION, ASTCssNodeType.ESCAPED_VALUE);
     }
     return false;
   }
@@ -159,7 +159,7 @@ class Unit extends AbstractMultiParameterFunction {
 
 }
 
-class Convert extends AbstractMultiParameterFunction {
+class Convert extends CatchAllMultiParameterFunction {
   
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
 
@@ -183,9 +183,9 @@ class Convert extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     case 1:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.IDENTIFIER_EXPRESSION, ASTCssNodeType.STRING_EXPRESSION, ASTCssNodeType.ESCAPED_VALUE);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.IDENTIFIER_EXPRESSION, ASTCssNodeType.STRING_EXPRESSION, ASTCssNodeType.ESCAPED_VALUE);
     }
     return false;
   }
@@ -197,7 +197,7 @@ class Convert extends AbstractMultiParameterFunction {
 
 }
 
-class Extract extends AbstractMultiParameterFunction {
+class Extract extends CatchAllMultiParameterFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
@@ -238,9 +238,9 @@ class Extract extends AbstractMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.COMPOSED_EXPRESSION);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COMPOSED_EXPRESSION);
     case 1:
-      return validateParameter(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
     return false;
   }

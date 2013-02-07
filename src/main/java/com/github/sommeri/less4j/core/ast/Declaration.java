@@ -65,7 +65,7 @@ public class Declaration extends ASTCssNode {
   }
 
   public boolean isFilterDeclaration() {
-    return getName()!=null? getName().toLowerCase().equals("filter") : false;
+    return getName()!=null? getName().toLowerCase().endsWith("filter") : false;
   }
   
   @Override

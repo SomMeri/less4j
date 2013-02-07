@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -45,7 +46,7 @@ public class TypeFunctions implements FunctionsPackage {
    * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public boolean canEvaluate(FunctionExpression input, Expression parameters) {
+  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
     return FUNCTIONS.containsKey(input.getName());
   }
 
@@ -58,12 +59,12 @@ public class TypeFunctions implements FunctionsPackage {
    * com.github.sommeri.less4j.core.ast.Expression)
    */
   @Override
-  public Expression evaluate(FunctionExpression input, Expression parameters) {
+  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter) {
     if (!canEvaluate(input, parameters))
       return input;
 
     Function function = FUNCTIONS.get(input.getName());
-    return function.evaluate(parameters, problemsHandler);
+    return function.evaluate(parameters, problemsHandler, input, evaluatedParameter);
   }
 
 }
@@ -74,7 +75,7 @@ class IsColor extends AbstractTypeFunction {
   protected boolean checkType(Expression parameter) {
     return parameter.getType() == ASTCssNodeType.COLOR_EXPRESSION;
   }
-  
+
 }
 
 class IsKeyword extends AbstractTypeFunction {
@@ -135,7 +136,11 @@ class IsEm extends AbstractTypeFunction {
 abstract class AbstractTypeFunction extends AbstractFunction {
 
   @Override
-  public Expression evaluate(Expression parameter, ProblemsHandler problemsHandler) {
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    if (parameters.size()>1)
+      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
+
+    Expression parameter = parameters.get(0);
     if (checkType(parameter)) {
       return new NumberExpression(parameter.getUnderlyingStructure(), 1.0, "", "true", Dimension.UNKNOWN);
     } else {

@@ -63,7 +63,6 @@ public class ExpressionEvaluator {
     functions.add(new ColorFunctions(problemsHandler));
     functions.add(new MiscFunctions(problemsHandler));
     functions.add(new TypeFunctions(problemsHandler));
-    functions.add(new UnknownFunctions(problemsHandler));
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
@@ -241,14 +240,18 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(FunctionExpression input) {
-    Expression parameter = evaluate(input.getParameter());
+    Expression evaluatedParameter = evaluate(input.getParameter());
+    List<Expression> splitParameters = evaluatedParameter.splitByComma();
     
-    for (FunctionsPackage pack : functions) {
-      if (pack.canEvaluate(input, parameter))
-        return pack.evaluate(input, parameter);
+    if (!input.isCssOnlyFunction()) { 
+      for (FunctionsPackage pack : functions) {
+        if (pack.canEvaluate(input, splitParameters))
+          return pack.evaluate(input, splitParameters, evaluatedParameter);
+      }
     }
     
-    return input;
+    UnknownFunction unknownFunction = new UnknownFunction();
+    return unknownFunction.evaluate(splitParameters, problemsHandler, input, evaluatedParameter);
   }
 
   public Expression evaluate(NamedExpression input) { 

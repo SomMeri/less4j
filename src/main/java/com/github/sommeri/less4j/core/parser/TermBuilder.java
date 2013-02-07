@@ -2,9 +2,6 @@ package com.github.sommeri.less4j.core.parser;
 
 import java.util.List;
 
-import com.github.sommeri.less4j.core.parser.LessLexer;
-import com.github.sommeri.less4j.core.problems.BugHappened;
-import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EmptyExpression;
@@ -15,12 +12,13 @@ import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
-import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
+import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
+import com.github.sommeri.less4j.core.problems.BugHappened;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
@@ -228,7 +226,7 @@ public class TermBuilder {
 
   private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {
     List<HiddenTokenAwareTree> children = actual.getChildren();
-    String name = children.get(0).getText();
+    String name = buildFunctionName(children.get(0));
     
     if (children.size() == 1) {
       /* No arguments to the function */
@@ -237,17 +235,17 @@ public class TermBuilder {
     
     HiddenTokenAwareTree parameterNode = children.get(1);
 
-    if (parameterNode.getType() != LessLexer.OPEQ) {
-      Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
-      return new FunctionExpression(token, name, parameter);
+    Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
+    return new FunctionExpression(token, name, parameter);
+  }
+
+  private String buildFunctionName(HiddenTokenAwareTree token) {
+    String result = "";
+    for (HiddenTokenAwareTree kid : token.getChildren()) {
+      result += kid.getText();
     }
-
-    //first child is a name
-    HiddenTokenAwareTree parameterName = parameterNode.getChild(0);
-    HiddenTokenAwareTree parameterValue = parameterNode.getChild(1);
-    Expression parameter = (Expression) parentBuilder.switchOn(parameterValue);
-
-    return new FunctionExpression(token, name, new NamedExpression(parameterNode, parameterName.getText(), parameter));
+    
+    return result;
   }
 
   public Variable buildFromVariable(HiddenTokenAwareTree variableToken) {

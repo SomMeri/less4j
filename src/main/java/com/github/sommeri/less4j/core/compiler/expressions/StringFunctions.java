@@ -1,14 +1,11 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -40,36 +37,40 @@ public class StringFunctions implements FunctionsPackage {
     this.problemsHandler = problemsHandler;
   }
 
-  public boolean canEvaluate(FunctionExpression input, Expression parameters) {
+  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
     return FUNCTIONS.containsKey(input.getName());
   }
   
-  public Expression evaluate(FunctionExpression input, Expression parameters) {
+  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter) {
     if (!canEvaluate(input, parameters))
       return input;
 
     Function function = FUNCTIONS.get(input.getName());
-    return function.evaluate(parameters, problemsHandler);
+    return function.evaluate(parameters, problemsHandler, input, evaluatedParameter);
   }
 
 }
 
-class E implements Function {
+class E extends AbstractFunction {
 
   @Override
-  public Expression evaluate(Expression parameters, ProblemsHandler problemsHandler) {
-    if (parameters.getType()==ASTCssNodeType.STRING_EXPRESSION) 
-      return evaluate((CssString) parameters);
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    if (parameters.size()>1)
+      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
 
-    if (parameters.getType()==ASTCssNodeType.ESCAPED_VALUE) 
-      return evaluate((EscapedValue) parameters);
+    Expression parameter = parameters.get(0);
+    if (parameter.getType()==ASTCssNodeType.STRING_EXPRESSION) 
+      return evaluate((CssString) parameter);
 
-    if (parameters.getType()==ASTCssNodeType.NUMBER) 
-      return evaluate((NumberExpression) parameters);
+    if (parameter.getType()==ASTCssNodeType.ESCAPED_VALUE) 
+      return evaluate((EscapedValue) parameter);
 
-    problemsHandler.warnEFunctionArgument(parameters);
+    if (parameter.getType()==ASTCssNodeType.NUMBER) 
+      return evaluate((NumberExpression) parameter);
 
-    return new FaultyExpression(parameters);
+    problemsHandler.warnEFunctionArgument(parameter);
+
+    return new FaultyExpression(call.getParameter());
   }
 
   private Expression evaluate(NumberExpression parameters) {
@@ -88,22 +89,26 @@ class E implements Function {
 
 }
 
-class Escape implements Function {
+class Escape extends AbstractFunction {
 
   @Override
-  public Expression evaluate(Expression parameters, ProblemsHandler problemsHandler) {
-    if (parameters.getType()==ASTCssNodeType.STRING_EXPRESSION) 
-      return evaluate((CssString) parameters);
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    if (parameters.size()>1)
+      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
 
-    if (parameters.getType()==ASTCssNodeType.ESCAPED_VALUE) 
-      return evaluate((EscapedValue) parameters);
+    Expression parameter = parameters.get(0);
+    if (parameter.getType()==ASTCssNodeType.STRING_EXPRESSION) 
+      return evaluate((CssString) parameter);
 
-    problemsHandler.warnEscapeFunctionArgument(parameters);
+    if (parameter.getType()==ASTCssNodeType.ESCAPED_VALUE) 
+      return evaluate((EscapedValue) parameter);
 
-    if (parameters.getType()==ASTCssNodeType.COLOR_EXPRESSION) 
-      return evaluate((ColorExpression) parameters);
+    problemsHandler.warnEscapeFunctionArgument(call.getParameter());
 
-    return parameters;
+    if (parameter.getType()==ASTCssNodeType.COLOR_EXPRESSION) 
+      return evaluate((ColorExpression) parameter);
+
+    return call.getParameter();
   }
 
   private Expression evaluate(ColorExpression parameters) {
@@ -122,26 +127,24 @@ class Escape implements Function {
 
 }
 
-class Format implements Function {
+class Format extends AbstractFunction {
 
   @Override
-  public Expression evaluate(Expression param, ProblemsHandler problemsHandler) {
-    
-    List<Expression> parameters = splitToParams(param);
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
     if (parameters.isEmpty()) 
-      problemsHandler.errFormatWrongFirstParameter(param);
+      problemsHandler.errFormatWrongFirstParameter(call.getParameter());
     
     Expression format = parameters.get(0);
     if (format.getType()==ASTCssNodeType.STRING_EXPRESSION) 
-      return evaluate((CssString) format, parameters.subList(1, parameters.size()), param.getUnderlyingStructure());
+      return evaluate((CssString) format, parameters.subList(1, parameters.size()), call.getUnderlyingStructure());
 
     if (format.getType()==ASTCssNodeType.ESCAPED_VALUE) 
-      return evaluate((EscapedValue) format, parameters.subList(1, parameters.size()), param.getUnderlyingStructure());
+      return evaluate((EscapedValue) format, parameters.subList(1, parameters.size()), call.getUnderlyingStructure());
 
     if (!format.isFaulty()) 
-        problemsHandler.errFormatWrongFirstParameter(param);
+        problemsHandler.errFormatWrongFirstParameter(call.getParameter());
     
-    return new FaultyExpression(param);
+    return new FaultyExpression(call);
   }
 
   private Expression evaluate(EscapedValue format, List<Expression> parameters, HiddenTokenAwareTree technicalUnderlying) {
@@ -157,19 +160,6 @@ class Format implements Function {
   private String format(String value, List<Expression> parameters, HiddenTokenAwareTree technicalUnderlying) {
     StringFormatter formatter = new StringFormatter();
     return formatter.replaceIn(value, parameters.iterator(), technicalUnderlying);
-  }
-
-  private List<Expression> splitToParams(Expression param) {
-    if (param==null) 
-      return Collections.emptyList();
-    
-    //TODO: this may stop to work after arguments changes in less.js-1.4.0
-    if (param instanceof ComposedExpression) {
-      ComposedExpression composed = (ComposedExpression) param;
-      return composed.splitByComma();
-    }
-    
-    return Arrays.asList(param);
   }
 
 }

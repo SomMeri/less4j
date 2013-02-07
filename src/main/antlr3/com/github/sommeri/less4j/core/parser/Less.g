@@ -57,6 +57,7 @@ tokens {
   ELEMENT_SUBSEQUENT;
   CHARSET_DECLARATION;
   TERM_FUNCTION;
+  TERM_FUNCTION_NAME;
   TERM;
   MEDIUM_DECLARATION;
   MEDIA_EXPRESSION;
@@ -76,6 +77,7 @@ tokens {
   REUSABLE_STRUCTURE_NAME;
   PSEUDO_PAGE;
   PAGE_MARGIN_BOX;
+  NAMED_EXPRESSION;
 }
 
 @lexer::header {
@@ -710,12 +712,22 @@ hexColor
     ;
 
 function
-    : (a=IDENT | a=PERCENT) LPAREN b=functionParameter? RPAREN -> ^(TERM_FUNCTION $a $b*)
+    : a=functionName LPAREN b=functionParameters? RPAREN -> ^(TERM_FUNCTION $a* $b*)
+    ;
+
+//function names should allow filters: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF0000ff', endColorstr='#FFff0000', GradientType=1)
+functionName
+    : (a+=IDENT (a+=COLON a+=IDENT| a+=DOT a+=IDENT)*
+    | a+=PERCENT)
+    -> ^(TERM_FUNCTION_NAME $a*)
     ;
     
-functionParameter
-    : IDENT OPEQ term -> ^(OPEQ IDENT term)
+functionParameters
+    : a=namedFunctionParameter (b+=COMMA c+=namedFunctionParameter)* -> ^(EXPRESSION $a ($b $c)*)
     | expr;
+
+namedFunctionParameter
+    : IDENT OPEQ term -> ^(NAMED_EXPRESSION IDENT term);
     
 // ==============================================================
 // LEXER

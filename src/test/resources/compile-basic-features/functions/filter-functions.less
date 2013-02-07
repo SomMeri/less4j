@@ -1,0 +1,82 @@
+alpha-function {
+  @color: rgba(10, 20, 30, 0.5);
+  @alpha-less-color: #ff6644;
+  color: @color;
+  @number: 11;
+
+  less.js compatible {
+    -function-alpha: alpha(#ff6644);
+    -function-alpha-less-color-alpha: alpha(@alpha-less-color);
+    -ms-alpha-less-color-alpha: alpha(opacity=@alpha-less-color);
+    -ms-number-alpha: alpha(opacity=34);
+    -function-color-filter: alpha(@color);
+    -ms-color-filter: alpha(opacity=@color);
+    -ms-number-filter: alpha(opacity=@number);
+  }
+
+  less.js incompatible {
+    -ms-color-alpha: alpha(opacity=#ff6644);
+  }
+
+  less.js crash {
+   // -function-number-alpha: alpha(25);
+     -ms-escape-alpha: alpha(opacity=~"25"); 
+     -ms-string-alpha: alpha(opacity="88"); 
+   //  -function-number-filter: alpha(@number); 
+  }
+}
+// based on https://dvcs.w3.org/hg/FXTF/raw-file/tip/filters/index.html
+filters {
+  contrast-1-filter: contrast(10%);
+  contrast-2-filter: contrast(10);
+  saturate-1-filter: saturate(10%);
+  saturate-2-filter: saturate(10);
+  grayscale-1-filter: grayscale(10);
+  grayscale-2-filter: grayscale(10%);
+  sepia-1-filter: sepia(10);
+  sepia-2-filter: sepia(10%);
+  invert-1-filter: invert(10);
+  invert-2-filter: invert(10%);
+  opacity-1-filter: opacity(10);
+  opacity-2-filter: opacity(10%);
+  brightness-1-filter: brightness(10);
+  brightness-2-filter: brightness(10%);
+  hue-rotate-1-filter: hue-rotate(10rad);
+  hue-rotate-2-filter: hue-rotate(10deg);
+  hue-rotate-3-filter: hue-rotate(10grad);
+  hue-rotate-4-filter: hue-rotate(10turn);
+  blur-1-filter: blur(10m);
+  blur-2-filter: blur(10cm);
+  blur-3-filter: blur(10mm);
+  blur-4-filter: blur(10in);
+  blur-5-filter: blur(10pt);
+  blur-6-filter: blur(10pc);
+  drop-shadow-1-filter: drop-shadow(16px 16px 20px #000000);
+  drop-shadow-2-filter: drop-shadow(10px -16px 30px #800080);
+  custom-1-filter: custom(identifier, p1 p2 p3);
+}
+
+e-format {
+  @startColor: #0000ff;
+  @endColor: #ff0000;
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)",argb(@startColor),argb(@endColor)));
+}
+
+e {
+  @startColor: #0000ff;
+  @endColor: #ff0000;
+  not-a-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@{startColor}', endColorstr='@{startColor}', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@{startColor}', endColorstr='@{startColor}', GradientType=1);
+}
+
+.gradient(@from:#fff000, @to:#000fff) {
+  background: @from; // for non-css3 browsers 
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@{from}', endColorstr='@{to}');
+  background: -webkit-gradient(linear, left top, left bottom, from(@from), to(@to)) no-repeat scroll 0 0 transparent; // for webkit browsers 
+  background: -moz-linear-gradient(top,  @from, @to) no-repeat scroll 0 0 transparent; // for firefox 3.6+ 
+}
+
+less.js issue #90 {
+  .gradient();
+}
+

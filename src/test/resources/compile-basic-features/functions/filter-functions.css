@@ -1,0 +1,61 @@
+alpha-function {
+  color: rgba(10, 20, 30, 0.5);
+}
+alpha-function less.js compatible {
+  -function-alpha: 1;
+  -function-alpha-less-color-alpha: 1;
+  -ms-alpha-less-color-alpha: alpha(opacity=#ff6644);
+  -ms-number-alpha: alpha(opacity=34);
+  -function-color-filter: 0.5;
+  -ms-color-filter: alpha(opacity=rgba(10, 20, 30, 0.5));
+  -ms-number-filter: alpha(opacity=11);
+}
+alpha-function less.js incompatible {
+  -ms-color-alpha: alpha(opacity=#ff6644);
+}
+alpha-function less.js crash {
+  -ms-escape-alpha: alpha(opacity=25);
+  -ms-string-alpha: alpha(opacity="88");
+}
+filters {
+  contrast-1-filter: contrast(10%);
+  contrast-2-filter: contrast(10);
+  saturate-1-filter: saturate(10%);
+  saturate-2-filter: saturate(10);
+  grayscale-1-filter: grayscale(10);
+  grayscale-2-filter: grayscale(10%);
+  sepia-1-filter: sepia(10);
+  sepia-2-filter: sepia(10%);
+  invert-1-filter: invert(10);
+  invert-2-filter: invert(10%);
+  opacity-1-filter: opacity(10);
+  opacity-2-filter: opacity(10%);
+  brightness-1-filter: brightness(10);
+  brightness-2-filter: brightness(10%);
+  hue-rotate-1-filter: hue-rotate(10rad);
+  hue-rotate-2-filter: hue-rotate(10deg);
+  hue-rotate-3-filter: hue-rotate(10grad);
+  hue-rotate-4-filter: hue-rotate(10turn);
+  blur-1-filter: blur(10m);
+  blur-2-filter: blur(10cm);
+  blur-3-filter: blur(10mm);
+  blur-4-filter: blur(10in);
+  blur-5-filter: blur(10pt);
+  blur-6-filter: blur(10pc);
+  drop-shadow-1-filter: drop-shadow(16px 16px 20px #000000);
+  drop-shadow-2-filter: drop-shadow(10px -16px 30px #800080);
+  custom-1-filter: custom(identifier, p1 p2 p3);
+}
+e-format {
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0000ff', endColorstr='#ffff0000', GradientType=1);
+}
+e {
+  not-a-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0000ff', endColorstr='#0000ff', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0000ff', endColorstr='#0000ff', GradientType=1);
+}
+less.js issue #90 {
+  background: #fff000;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff000', endColorstr='#000fff');
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff000), to(#000fff)) no-repeat scroll 0 0 transparent;
+  background: -moz-linear-gradient(top, #fff000, #000fff) no-repeat scroll 0 0 transparent;
+}

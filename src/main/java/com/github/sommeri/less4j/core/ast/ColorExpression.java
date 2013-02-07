@@ -106,7 +106,7 @@ public class ColorExpression extends Expression {
   }
 
   public String toARGB() {
-    return "#FF" + toHex(red) + toHex(green) + toHex(blue);
+    return "#ff" + toHex(red) + toHex(green) + toHex(blue);
   }
 
   public Color toColor() {
