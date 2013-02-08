@@ -16,3 +16,7 @@ operations-rgb-rgba {
   plus: #050709;
   minus: #435363;
 }
+operations-rgba-smallNumber {
+  minus: #040506;
+  plus: #050607;
+}
