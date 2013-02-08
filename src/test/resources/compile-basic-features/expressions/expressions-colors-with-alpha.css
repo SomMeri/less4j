@@ -1,0 +1,18 @@
+operations {
+  solidus: rgba(2, 3, 4, 0.6000000000000001);
+  star: rgba(4, 10, 18, 0.30000000000000004);
+  plus: rgba(5, 7, 9, 0.30000000000000004);
+  minus: rgba(3, 3, 3, 0.30000000000000004);
+}
+operations-rgba-rgb {
+  solidus: #020304;
+  star: #44aaff;
+  plus: #455769;
+  minus: #000000;
+}
+operations-rgb-rgba {
+  solidus: #020406;
+  star: #040a12;
+  plus: #050709;
+  minus: #435363;
+}
