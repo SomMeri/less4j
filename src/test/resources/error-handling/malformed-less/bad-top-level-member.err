@@ -1,3 +1,6 @@
+Warnings produced by compilation of testCase
+WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of top level style sheet.
+WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of top level style sheet.
 Errors produced by compilation of testCase
 ERROR 24:1 Appender symbol is not allowed inside top level rulesets.
 ERROR 29:9 Appender symbol is not allowed inside top level rulesets.

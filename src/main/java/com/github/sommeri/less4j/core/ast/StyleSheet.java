@@ -1,9 +1,5 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class StyleSheet extends Body {
@@ -12,15 +8,6 @@ public class StyleSheet extends Body {
     super(underlyingStructure);
   }
 
-  @Override
-  public Set<ASTCssNodeType> getSupportedMembers() {
-    HashSet<ASTCssNodeType> result = new HashSet<ASTCssNodeType>(Arrays.asList(ASTCssNodeType.values()));
-    // removed only the elements that are likely to end there, this method could be done in more precise way  
-    result.remove(ASTCssNodeType.DECLARATION);
-    result.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
-    return result;  
-  }
-  
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.STYLE_SHEET;

@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.parser;
+package com.github.sommeri.less4j.core.validators;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +21,7 @@ public class LessAstValidator {
 
   private final ProblemsHandler problemsHandler;
   private final ASTManipulator manipulator = new ASTManipulator();
+  private final SupportedLessBodyMembers allowedBodyMembers = new SupportedLessBodyMembers();
 
   public LessAstValidator(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
@@ -34,9 +35,9 @@ public class LessAstValidator {
       break;
     }
     case MIXIN_REFERENCE: {
-      checkInterpolatedNamespaceName((MixinReference)node);
-      checkExtendedNamespaceName((MixinReference)node);
-      checkInterpolatedMixinName((MixinReference)node);
+      checkInterpolatedNamespaceName((MixinReference) node);
+      checkExtendedNamespaceName((MixinReference) node);
+      checkInterpolatedMixinName((MixinReference) node);
       break;
     }
     case PSEUDO_CLASS: {
@@ -44,7 +45,7 @@ public class LessAstValidator {
       break;
     }
     case ESCAPED_SELECTOR: {
-      problemsHandler.deprecatedSyntaxEscapedSelector((EscapedSelector)node);
+      problemsHandler.deprecatedSyntaxEscapedSelector((EscapedSelector) node);
       break;
     }
     case KEYFRAMES_BODY: {
@@ -61,23 +62,23 @@ public class LessAstValidator {
   }
 
   private void checkTopLevelNested(RuleSet node) {
-    if (node.getParent().getType()!=ASTCssNodeType.STYLE_SHEET)
-      return ;
-    
+    if (node.getParent().getType() != ASTCssNodeType.STYLE_SHEET)
+      return;
+
     for (Selector selector : node.getSelectors()) {
       NestedSelectorAppender appender = selector.findFirstAppender();
-      if (appender!=null) {
+      if (appender != null) {
         problemsHandler.nestedAppenderOnTopLevel(appender);
         manipulator.removeFromClosestBody(node);
-        return ;
+        return;
       }
     }
-    
+
   }
 
   private void checkForDisallowedMembers(KeyframesBody keyframes) {
-    Set<ASTCssNodeType> supportedMembers = keyframes.getSupportedMembers();
-    for (ASTCssNode member: keyframes.getBody()) {
+    Set<ASTCssNodeType> supportedMembers = allowedBodyMembers.getSupportedMembers(keyframes);
+    for (ASTCssNode member : keyframes.getBody()) {
       ASTCssNodeType type = member.getType();
       if (!supportedMembers.contains(type))
         problemsHandler.unsupportedKeyframesMember(member);
@@ -97,19 +98,20 @@ public class LessAstValidator {
       manipulator.removeFromClosestBody(reference);
     }
   }
+
   private void checkExtendedNamespaceName(MixinReference reference) {
     for (ReusableStructureName name : reference.getNameChain()) {
       if (name.hasMultipleParts()) {
         problemsHandler.extendedNamespaceReferenceSelector(reference);
         manipulator.removeFromClosestBody(reference);
-        return ;
+        return;
       }
     }
   }
-  
+
   private void checkDeprecatedParameterType(PseudoClass pseudo) {
     ASTCssNode parameter = pseudo.getParameter();
-    if (parameter!=null && parameter.getType()==ASTCssNodeType.VARIABLE) {
+    if (parameter != null && parameter.getType() == ASTCssNodeType.VARIABLE) {
       problemsHandler.variableAsPseudoclassParameter(pseudo);
     }
   }

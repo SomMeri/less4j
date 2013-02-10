@@ -65,6 +65,9 @@ public class PrintUtils {
     case DECLARATION:
       return "declaration";
 
+    case KEYFRAMES:
+      return "@keyframes";
+
     case KEYFRAMES_BODY:
       return "@keyframes";
 
@@ -103,6 +106,9 @@ public class PrintUtils {
       
     case STRING_EXPRESSION:
       return "string";
+
+    case RULE_SET:
+      return "rule set";
 
     default:
       //TODO (low priority) replace by something safer

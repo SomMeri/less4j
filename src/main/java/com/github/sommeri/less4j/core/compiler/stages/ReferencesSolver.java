@@ -76,7 +76,7 @@ public class ReferencesSolver {
     case MIXIN_REFERENCE: {
       MixinReference mixinReference = (MixinReference) node;
       GeneralBody replacement = resolveMixinReference(mixinReference, scope.getScope());
-      AstLogic.validateCssBodyCompatibility(mixinReference, replacement.getChilds(), problemsHandler);
+      AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getChilds(), problemsHandler);
       manipulator.replaceInBody(mixinReference, replacement.getChilds());
       break;
     }

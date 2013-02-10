@@ -6,6 +6,7 @@ import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
+import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -29,7 +30,12 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
 
-  
+  public void wrongMemberInCssBody(ASTCssNode member, Body node) {
+    ASTCssNodeType parentType = node.getParent()==null? ASTCssNodeType.STYLE_SHEET : node.getParent().getType(); 
+    collector.addWarning(new CompilationWarning(member, "Compilation resulted in incorrect CSS. The " + PrintUtils.toTypeName(member) + " ended up inside a body of " + PrintUtils.toTypeName(parentType) +"."));
+
+  }
+
   public void notAColor(ASTCssNode node, String text) {
     collector.addError(new CompilationError(node, "The string \"" + text + "\" is not a valid color."));
   }
@@ -81,11 +87,11 @@ public class ProblemsHandler {
   public void errFormatWrongFirstParameter(Expression param) {
     collector.addError(new CompilationError(param, "First argument of format function must be either string or escaped value."));
   }
-  
+
   public void wrongNumberOfArgumentsToFunction(Expression param, String function, int expectedArguments) {
     collector.addError(new CompilationError(param, "Wrong number of arguments to function '" + function + "', should be " + expectedArguments + "."));
   }
-  
+
   public void wrongArgumentTypeToFunction(Expression param, String function, ASTCssNodeType received, ASTCssNodeType... expected) {
     collector.addError(new CompilationError(param, "Wrong argument type to function '" + function + "', expected " + PrintUtils.toTypeNames(expected) + " saw " + PrintUtils.toTypeName(received) + "."));
   }

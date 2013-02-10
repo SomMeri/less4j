@@ -27,6 +27,7 @@ import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.core.validators.CssAstValidator;
 
 public class LessToCssCompiler {
 
@@ -53,6 +54,9 @@ public class LessToCssCompiler {
     bubbleAndMergeMedia(less);
     freeNestedRuleSets(less);
     sortTopLevelElements(less);
+    
+    //final validation
+    validateFinalCss(less);
 
     return less;
   }
@@ -152,6 +156,12 @@ public class LessToCssCompiler {
       evaluateExpressions(node);
       return;
     }
+  }
+
+  private void validateFinalCss(StyleSheet less) {
+    CssAstValidator validator = new CssAstValidator(problemsHandler);
+    validator.validate(less);
+    
   }
 
 }
