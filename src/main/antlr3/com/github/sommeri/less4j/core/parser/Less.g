@@ -701,6 +701,7 @@ value_term
 unsigned_value_term
     : STRING
     | IDENT
+    | UNICODE_RANGE
     ;
 
 special_function
@@ -1135,6 +1136,8 @@ VALUE_ESCAPE : '~' '\'' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
 //
 //
 IDENT : '-'? NMSTART NMCHAR* ;
+fragment UNICODE_RANGE_HEX: HEXCHAR | '?';
+UNICODE_RANGE: U PLUS UNICODE_RANGE_HEX+ (MINUS UNICODE_RANGE_HEX+)?;
 
 // -------------
 // Reference. Reference to an element in the body we are styling, such as <XXXX id="reference">

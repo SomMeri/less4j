@@ -55,6 +55,7 @@ import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
+import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
 import com.github.sommeri.less4j.core.ast.Viewport;
 
 public class CssPrinter {
@@ -142,6 +143,9 @@ public class CssPrinter {
 
     case IDENTIFIER_EXPRESSION:
       return appendIdentifierExpression((IdentifierExpression) node);
+
+    case UNICODE_RANGE_EXPRESSION:
+      return appendUnicodeRangeExpression((UnicodeRangeExpression) node);
 
     case COLOR_EXPRESSION:
       return appendColorExpression((ColorExpression) node);
@@ -656,6 +660,12 @@ public class CssPrinter {
   }
 
   public boolean appendIdentifierExpression(IdentifierExpression expression) {
+    builder.append(expression.getValue());
+
+    return true;
+  }
+
+  public boolean appendUnicodeRangeExpression(UnicodeRangeExpression expression) {
     builder.append(expression.getValue());
 
     return true;

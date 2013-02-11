@@ -1,0 +1,18 @@
+@font-face {
+  unicode-range-1: U+FF0C, U+3001, U+3002;
+  unicode-range-2: U+416;
+  unicode-range-3: U+400-4ff;
+  unicode-range-4: U+4??;
+  unicode-range-5: U+???;
+  unicode-range-6: U+0???;
+  unicode-range-7: U+0000-0FFF;
+  unicode-range-8: U+??????;
+  unicode-range-9: U+A5;
+  unicode-range-10: U+0-7F;
+  unicode-range-11: U+590-5ff;
+  unicode-range-12: U+A5, U+4E00-9FFF, U+30??, U+FF00-FF9F;
+  unicode-range-13: U+00-FF, U+980-9FF;
+  unicode-range-14: U+000-49F, U+2000-27FF, U+2900-2BFF, U+1D400-1D7FF;
+  unicode-range-15: U+3000-9FFF, U+ff??;
+  unicode-range-16: U+000-5FF, U+1e00-1fff, U+2000-2300;
+}

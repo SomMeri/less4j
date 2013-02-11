@@ -16,6 +16,7 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
+import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -84,6 +85,9 @@ public class TermBuilder {
 
     case LessLexer.ESCAPED_VALUE:
       return buildFromEscapedValue(token, offsetChild);
+
+    case LessLexer.UNICODE_RANGE:
+      return buildFromUnicodeRange(token, offsetChild);
 
     default:
       throw new BugHappened("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
@@ -201,6 +205,10 @@ public class TermBuilder {
       return new NamedColorExpression(parent, text);
 
     return new IdentifierExpression(parent, text);
+  }
+
+  private Expression buildFromUnicodeRange(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
+    return new UnicodeRangeExpression(parent, first.getText());
   }
 
   private FunctionExpression buildFromSpecialFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
