@@ -9,6 +9,14 @@ public abstract class TokenTypeSwitch<T> {
   public T switchOn(HiddenTokenAwareTree token) {
     int type = token.getType();
 
+    if (type == LessLexer.LBRACE) {
+      return handleLbrace(token);
+    }
+
+    if (type == LessLexer.RBRACE) {
+      return handleRbrace(token);
+    }
+
     if (type == LessLexer.ELEMENT_SUBSEQUENT) {
       return handleElementSubsequent(token);
     }
@@ -166,6 +174,10 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleSimpleSelector(HiddenTokenAwareTree token);
 
   public abstract T handleNestedAppender(HiddenTokenAwareTree token);
+
+  public abstract T handleLbrace(HiddenTokenAwareTree token);
+  
+  public abstract T handleRbrace(HiddenTokenAwareTree token);
 
   public abstract T handleElementSubsequent(HiddenTokenAwareTree token);
 

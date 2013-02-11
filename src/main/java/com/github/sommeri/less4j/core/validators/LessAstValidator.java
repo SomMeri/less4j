@@ -6,8 +6,8 @@ import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
-import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
@@ -48,8 +48,8 @@ public class LessAstValidator {
       problemsHandler.deprecatedSyntaxEscapedSelector((EscapedSelector) node);
       break;
     }
-    case KEYFRAMES_BODY: {
-      checkForDisallowedMembers((KeyframesBody) node);
+    case GENERAL_BODY: {
+      checkForDisallowedMembers((Body) node);
       break;
     }
     }
@@ -76,12 +76,12 @@ public class LessAstValidator {
 
   }
 
-  private void checkForDisallowedMembers(KeyframesBody keyframes) {
-    Set<ASTCssNodeType> supportedMembers = allowedBodyMembers.getSupportedMembers(keyframes);
-    for (ASTCssNode member : keyframes.getBody()) {
+  private void checkForDisallowedMembers(Body body) {
+    Set<ASTCssNodeType> supportedMembers = allowedBodyMembers.getSupportedMembers(body);
+    for (ASTCssNode member : body.getMembers()) {
       ASTCssNodeType type = member.getType();
       if (!supportedMembers.contains(type))
-        problemsHandler.unsupportedKeyframesMember(member);
+        problemsHandler.wrongMemberInLessBody(member, body);
     }
   }
 

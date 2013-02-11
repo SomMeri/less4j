@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,6 +57,31 @@ public class HiddenTokenAwareTree extends CommonTree {
   public List<Token> getPreceding() {
     return preceding;
 
+  }
+
+  public List<Token> chopPreceedingUpToLastOfType(int type) {
+    List<Token> result = new ArrayList<Token>();
+    List<Token> preceding = getPreceding();
+    
+    int index = lastTokenOfType(preceding, type);
+    for (int i = 0; i <= index; i++) {
+      Token next = preceding.remove(0);
+      result.add(next);
+    }
+    
+    return result;
+  }
+
+  private int lastTokenOfType(List<Token> list, int type) {
+    if (list.isEmpty())
+      return -1;
+
+    for (int i = list.size() - 1; i >= 0; i--) {
+      Token token = (Token) list.get(i);
+      if (token.getType() == type)
+        return i;
+    }
+    return -1;
   }
 
   public List<Token> getFollowing() {
@@ -144,14 +170,18 @@ public class HiddenTokenAwareTree extends CommonTree {
 
   public void pushHiddenToSiblings() {
     HiddenTokenAwareTree previousSibling = getPreviousSibling();
-    if (previousSibling!=null) {
+    if (previousSibling != null) {
       previousSibling.addFollowing(getPreceding());
     }
-    
+
     HiddenTokenAwareTree nextSibling = getNextSibling();
-    if (nextSibling!=null) {
+    if (nextSibling != null) {
       nextSibling.addBeforePreceding(getFollowing());
     }
+  }
+
+  public void removePreceding() {
+    preceding = new ArrayList<Token>();
   }
 
 }

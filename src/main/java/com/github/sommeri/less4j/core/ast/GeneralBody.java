@@ -1,18 +1,22 @@
 package com.github.sommeri.less4j.core.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-//FIXME: !validation! warning on viewport body with nested rulesets in output
 public class GeneralBody extends Body {
 
   public GeneralBody(HiddenTokenAwareTree underlyingStructure) {
-    super(underlyingStructure);
+    this(underlyingStructure, new ArrayList<ASTCssNode>());
   }
 
   public GeneralBody(HiddenTokenAwareTree underlyingStructure, List<ASTCssNode> members) {
-    super(underlyingStructure, members);
+    this(underlyingStructure, SyntaxOnlyElement.lbrace(underlyingStructure), SyntaxOnlyElement.rbrace(underlyingStructure), members);
+  }
+
+  public GeneralBody(HiddenTokenAwareTree underlyingStructure, SyntaxOnlyElement lbrace, SyntaxOnlyElement rbrace, List<ASTCssNode> members) {
+    super(underlyingStructure, lbrace, rbrace, members);
   }
 
   public GeneralBody clone() {

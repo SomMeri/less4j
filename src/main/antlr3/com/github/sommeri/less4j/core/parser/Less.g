@@ -295,7 +295,7 @@ finally { leaveRule(); }
 
 fontface
 @init {enterRule(retval, RULE_FONT_FACE);}
-    : FONT_FACE_SYM^ general_body
+    : FONT_FACE_SYM body+=general_body -> ^(FONT_FACE_SYM $body*)
     ;
 finally { leaveRule(); }
 
@@ -388,9 +388,9 @@ top_level_body_with_declaration
     : LBRACE
             ((declarationWithSemicolon)=> a+=declarationWithSemicolon
             | a+=top_level_element)*
-      RBRACE
+      rbrace+=RBRACE
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
-     -> ^(BODY LBRACE $a*); 
+     -> ^(BODY LBRACE $a* $rbrace*); 
 
 general_body
     : LBRACE
@@ -405,13 +405,13 @@ general_body
                //| a+=imports
              )*
              (  
-                ( (declaration)=>a+=declaration RBRACE)
-                | ( (mixinReference)=>a+=mixinReference RBRACE)
-                | ( (namespaceReference)=>a+=namespaceReference RBRACE)
-                | RBRACE
+                ( (declaration)=>a+=declaration rbrace+=RBRACE)
+                | ( (mixinReference)=>a+=mixinReference rbrace+=RBRACE)
+                | ( (namespaceReference)=>a+=namespaceReference rbrace+=RBRACE)
+                | rbrace+=RBRACE
              )
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
-     -> ^(BODY LBRACE $a*); 
+     -> ^(BODY LBRACE $a* $rbrace*); 
 
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}

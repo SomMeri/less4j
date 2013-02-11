@@ -27,8 +27,6 @@ public class SupportedCSSBodyMembers {
       result.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
       return result;
 
-    case KEYFRAMES_BODY:
-      return createSet(ASTCssNodeType.RULE_SET);
     }
 
     if (ownerType == null)
@@ -48,6 +46,9 @@ public class SupportedCSSBodyMembers {
       return createSet(ASTCssNodeType.DECLARATION);
 
     case MEDIA:
+      return createSet(ASTCssNodeType.RULE_SET);
+
+    case KEYFRAMES:
       return createSet(ASTCssNodeType.RULE_SET);
 
     default:

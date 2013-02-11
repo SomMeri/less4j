@@ -73,7 +73,7 @@ public class MediaBubblerAndMerger {
     parentChainIterator.moveUpToNextBody();
 
     Body emptyClone = bodiesStorage.storeAndReplaceBySingleMemberClone(oldBody, null);
-    astManipulator.moveChildsBetweenBodies(media.getBody(), emptyClone);
+    astManipulator.moveMembersBetweenBodies(media.getBody(), emptyClone);
 
     while (!parentChainIterator.finished()) {
       //store current node and 

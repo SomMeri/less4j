@@ -132,14 +132,17 @@ public class ExtendedStringBuilder {
     return builder.toString();
   }
 
-  public void ensureNewLine() {
+  public ExtendedStringBuilder ensureNewLine() {
     if (!onNewLine)
       newLine();
+    
+    return this;
   }
 
-  public void newLine() {
+  public ExtendedStringBuilder newLine() {
     builder.append(Constants.NEW_LINE);
     onNewLine = true;
+    return this;
   }
 
   public void increaseIndentationLevel() {

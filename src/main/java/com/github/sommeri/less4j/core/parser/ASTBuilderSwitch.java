@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.antlr.runtime.Token;
+
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
@@ -31,7 +33,6 @@ import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.Keyframes;
-import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
@@ -61,6 +62,7 @@ import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
@@ -399,34 +401,28 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public GeneralBody handleGeneralBody(HiddenTokenAwareTree token) {
-    List<ASTCssNode> members = handleBodyMembers(token);
-    return new GeneralBody(token, members);
-  }
-
-  public KeyframesBody handleKeyframesBody(HiddenTokenAwareTree token) {
-    List<ASTCssNode> members = handleBodyMembers(token);
-    return new KeyframesBody(token, members);
+    return createGeneralBody(token);
   }
 
   private List<ASTCssNode> handleBodyMembers(HiddenTokenAwareTree token) {
     if (token.getChildren() == null)
       return new ArrayList<ASTCssNode>();
 
-    //FIXME: report comments bug to less.js? it is not too important
     List<ASTCssNode> members = new ArrayList<ASTCssNode>();
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
-    HiddenTokenAwareTree lbrace = iterator.next();
-    token.addPreceding(lbrace.getPreceding());
-    if (iterator.hasNext()) {
-      token.getChildren().get(1).addBeforePreceding(lbrace.getFollowing());
-    } else {
-      token.addOrphans(lbrace.getFollowing());
-    }
 
     while (iterator.hasNext()) {
       members.add(switchOn(iterator.next()));
     }
     return members;
+  }
+
+  public SyntaxOnlyElement handleLbrace(HiddenTokenAwareTree token) {
+    return new SyntaxOnlyElement(token, token.getText());
+  }
+  
+  public SyntaxOnlyElement handleRbrace(HiddenTokenAwareTree token) {
+    return new SyntaxOnlyElement(token, token.getText());
   }
 
   public Selector handleSelector(HiddenTokenAwareTree token) {
@@ -795,7 +791,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     Keyframes result = new Keyframes(token, children.next().getText());
     result.addNames(handleKeyframesDeclaration(children.next()));
-    result.setBody(handleKeyframesBody(children.next()));
+    result.setBody(handleGeneralBody(children.next()));
 
     return result;
   }
@@ -805,8 +801,25 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Viewport result = new Viewport(token);
     //HiddenTokenAwareTree atName = token.getChild(0);
     HiddenTokenAwareTree body = token.getChild(1);
-    result.setBody(new GeneralBody(body, handleBodyMembers(body)));
+    result.setBody(createGeneralBody(body));
     return result;
+  }
+
+  private GeneralBody createGeneralBody(HiddenTokenAwareTree token) {
+    List<ASTCssNode> list = handleBodyMembers(token);
+    
+    if (list.size()<2)
+      throw new BugHappened(GRAMMAR_MISMATCH, token);
+
+    SyntaxOnlyElement lbrace = (SyntaxOnlyElement)list.remove(0);
+    SyntaxOnlyElement rbrace = (SyntaxOnlyElement)list.remove(list.size()-1);
+    List<Token> orphansOrFollowLastMember = rbrace.getUnderlyingStructure().chopPreceedingUpToLastOfType(LessLexer.NEW_LINE);
+    if (list.isEmpty()) {
+      token.addOrphans(orphansOrFollowLastMember);
+    } else {
+      list.get(list.size()-1).getUnderlyingStructure().addFollowing(orphansOrFollowLastMember);
+    }
+    return new GeneralBody(token, lbrace, rbrace, list);
   }
 
   private List<KeyframesName> handleKeyframesDeclaration(HiddenTokenAwareTree declaration) {
@@ -841,7 +854,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         }
         result.setPseudopage(new Name(kid, ":" + kid.getChild(pseudoPageIndex).getText()));
       } else if (kid.getType() == LessLexer.BODY) {
-        result.setBody(new GeneralBody(kid, handleBodyMembers(kid)));
+        result.setBody(createGeneralBody(kid));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, kid);
       }
@@ -856,7 +869,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       if (kid.getType() == LessLexer.AT_NAME) {
         result.setName(new Name(kid, kid.getText()));
       } else if (kid.getType() == LessLexer.BODY) {
-        result.setBody(new GeneralBody(kid, handleBodyMembers(kid)));
+        result.setBody(createGeneralBody(kid));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, kid);
       }

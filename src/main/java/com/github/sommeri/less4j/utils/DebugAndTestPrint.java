@@ -14,7 +14,7 @@ public class DebugAndTestPrint {
 
   public static final String FILE_SEPARATOR = "#FILE_SEPARATOR#";
   private static boolean printIndexes = true;
-  private static boolean printComments = false;
+  private static boolean printComments = true;
 
   public static void printTokenStream(String expression) {
     LessLexer createLexer = createLexer(expression);

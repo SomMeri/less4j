@@ -136,8 +136,8 @@ public class ASTManipulator {
       removeFromBody(removeNode);
   }
 
-  public void moveChildsBetweenBodies(Body from, Body to) {
-    to.addMembers(from.getChilds());
+  public void moveMembersBetweenBodies(Body from, Body to) {
+    to.addMembers(from.getMembers());
     to.configureParentToAllChilds();
     from.removeAllMembers();
   }

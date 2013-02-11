@@ -33,7 +33,11 @@ public class ProblemsHandler {
   public void wrongMemberInCssBody(ASTCssNode member, Body node) {
     ASTCssNodeType parentType = node.getParent()==null? ASTCssNodeType.STYLE_SHEET : node.getParent().getType(); 
     collector.addWarning(new CompilationWarning(member, "Compilation resulted in incorrect CSS. The " + PrintUtils.toTypeName(member) + " ended up inside a body of " + PrintUtils.toTypeName(parentType) +"."));
+  }
 
+  public void wrongMemberInLessBody(ASTCssNode member, Body node) {
+    ASTCssNodeType parentType = node.getParent()==null? ASTCssNodeType.STYLE_SHEET : node.getParent().getType(); 
+    collector.addError(new CompilationError(member, "The element " + PrintUtils.toTypeName(member) + " is not allowed to be a " + PrintUtils.toTypeName(parentType) +" member."));
   }
 
   public void notAColor(ASTCssNode node, String text) {
@@ -76,12 +80,9 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(reference, "Interpolation is not allowed inside namespace references."));
   }
 
-  public void wrongMemberBroughtIntoBody(ASTCssNode reference, ASTCssNode member, ASTCssNode parent) {
-    collector.addError(new CompilationError(reference, "The reference brought " + PrintUtils.toTypeName(member) + " from " + PrintUtils.toLocation(member) + " into " + PrintUtils.toTypeName(parent) + " which started at " + PrintUtils.toLocation(parent) + ". Compilation produced an incorrect CSS."));
-  }
-
-  public void unsupportedKeyframesMember(ASTCssNode errorNode) {
-    collector.addError(new CompilationError(errorNode, "This element is not allowed to be @keyframes member."));
+  public void wrongMemberBroughtIntoBody(ASTCssNode reference, ASTCssNode member, ASTCssNode body) {
+    ASTCssNode parent = body.getParent()==null? body : body.getParent();
+    collector.addError(new CompilationError(reference, "The reference brought " + PrintUtils.toTypeName(member) + " from " + PrintUtils.toLocation(member) + " into " + PrintUtils.toTypeName(parent) + " which started at " + PrintUtils.toLocation(body) + ". Compilation produced an incorrect CSS."));
   }
 
   public void errFormatWrongFirstParameter(Expression param) {

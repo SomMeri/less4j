@@ -29,7 +29,6 @@ import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Keyframes;
-import com.github.sommeri.less4j.core.ast.KeyframesBody;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
@@ -55,6 +54,7 @@ import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.Viewport;
 
 public class CssPrinter {
@@ -191,9 +191,6 @@ public class CssPrinter {
     case KEYFRAMES_NAME:
       return appendKeyframesName((KeyframesName) node);
 
-    case KEYFRAMES_BODY:
-      return appendBodyOptimizeDuplicates((KeyframesBody) node);
-      
     case VIEWPORT:
       return appendViewport((Viewport) node);
 
@@ -215,6 +212,9 @@ public class CssPrinter {
     case ANONYMOUS:
       return appendAnonymous((AnonymousExpression) node);
 
+    case SYNTAX_ONLY_ELEMENT:
+      return appendSyntaxOnlyElement((SyntaxOnlyElement) node);
+
     case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
@@ -228,6 +228,11 @@ public class CssPrinter {
     }
   }
   
+  private boolean appendSyntaxOnlyElement(SyntaxOnlyElement node) {
+    builder.append(node.getSymbol());
+    return true;
+  }
+
   private boolean appendAnonymous(AnonymousExpression node) {
     builder.append(node.getValue());
     return true;
@@ -349,7 +354,7 @@ public class CssPrinter {
 
   public boolean appendFontFace(FontFace node) {
     builder.append("@font-face").ensureSeparator();
-    appendAllChilds(node);
+    append(node.getBody());
 
     return true;
   }
@@ -433,8 +438,9 @@ public class CssPrinter {
     if (body.isEmpty())
       return false;
 
-    builder.ensureSeparator().append("{").newLine();
-    builder.increaseIndentationLevel();
+    builder.ensureSeparator(); 
+    append(body.getOpeningCurlyBrace());
+    builder.ensureNewLine().increaseIndentationLevel();
     LinkedHashSet<String> declarationsBuilders = collectUniqueBodyMembersStrings(body);
     for (String miniBuilder : declarationsBuilders) {
       builder.appendAsIs(miniBuilder);
@@ -442,7 +448,7 @@ public class CssPrinter {
     
     appendComments(body.getOrphanComments(), false);
     builder.decreaseIndentationLevel();
-    builder.append("}");
+    append(body.getClosingCurlyBrace());
 
     return true;
   }
@@ -451,7 +457,7 @@ public class CssPrinter {
     //the same declaration must be printed only once
     ExtendedStringBuilder storedBuilder = builder;
     LinkedHashSet<String> declarationsStrings = new LinkedHashSet<String>();
-    for (ASTCssNode declaration : body.getChilds()) {
+    for (ASTCssNode declaration : body.getMembers()) {
       builder = new ExtendedStringBuilder(builder);
       append(declaration);
       builder.ensureNewLine();
@@ -491,8 +497,10 @@ public class CssPrinter {
   private void appendBodySortDeclarations(Body node) {
     //this is sort of hack, bypass the usual append method
     appendComments(node.getOpeningComments(), true);
-    builder.ensureSeparator().append("{").newLine();
-    builder.increaseIndentationLevel();
+    
+    builder.ensureSeparator(); 
+    append(node.getOpeningCurlyBrace());
+    builder.ensureNewLine().increaseIndentationLevel();
 
     Iterator<ASTCssNode> declarations = node.getDeclarations().iterator();
     List<ASTCssNode> notDeclarations = node.getNotDeclarations();
@@ -507,8 +515,11 @@ public class CssPrinter {
       if (changedAnything)
         builder.ensureNewLine();
     }
+
+    appendComments(node.getOrphanComments(), false);
     builder.decreaseIndentationLevel();
-    builder.append("}");
+    append(node.getClosingCurlyBrace());
+
     //this is sort of hack, bypass the usual append method
     appendComments(node.getTrailingComments(), false);
   }

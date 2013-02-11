@@ -67,7 +67,7 @@ public class LessToCssCompiler {
   }
 
   private void sortTopLevelElements(StyleSheet less) {
-    Collections.sort(less.getChilds(), new Comparator<ASTCssNode>() {
+    Collections.sort(less.getMembers(), new Comparator<ASTCssNode>() {
 
       @Override
       public int compare(ASTCssNode first, ASTCssNode second) {

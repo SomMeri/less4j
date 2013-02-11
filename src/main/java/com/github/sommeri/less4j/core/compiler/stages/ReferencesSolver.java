@@ -76,8 +76,8 @@ public class ReferencesSolver {
     case MIXIN_REFERENCE: {
       MixinReference mixinReference = (MixinReference) node;
       GeneralBody replacement = resolveMixinReference(mixinReference, scope.getScope());
-      AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getChilds(), problemsHandler);
-      manipulator.replaceInBody(mixinReference, replacement.getChilds());
+      AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getMembers(), problemsHandler);
+      manipulator.replaceInBody(mixinReference, replacement.getMembers());
       break;
     }
     case ESCAPED_SELECTOR: {
@@ -155,7 +155,7 @@ public class ReferencesSolver {
       if (expressionEvaluator.evaluate(mixin.getGuards())) {
         GeneralBody body = mixin.getBody().clone();
         doSolveReferences(body, combinedScope);
-        result.addMembers(body.getChilds());
+        result.addMembers(body.getMembers());
       }
     }
 
@@ -166,7 +166,7 @@ public class ReferencesSolver {
   }
 
   private void shiftComments(MixinReference reference, GeneralBody result) {
-    List<ASTCssNode> childs = result.getChilds();
+    List<ASTCssNode> childs = result.getMembers();
     if (!childs.isEmpty()) {
       childs.get(0).addOpeningComments(reference.getOpeningComments());
       childs.get(childs.size() - 1).addTrailingComments(reference.getTrailingComments());
@@ -180,7 +180,7 @@ public class ReferencesSolver {
   }
 
   private void declarationsAreImportant(GeneralBody result) {
-    for (ASTCssNode kid : result.getChilds()) {
+    for (ASTCssNode kid : result.getMembers()) {
       if (kid instanceof Declaration) {
         Declaration declaration = (Declaration) kid;
         declaration.setImportant(true);

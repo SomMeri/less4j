@@ -26,9 +26,7 @@ public class ListToTreeCombiner {
     initialize(hiddenTokens);
 
     LinkedList<HiddenTokenAwareTree> children = getChildren(ast);
-    for (HiddenTokenAwareTree child : children) {
-      associateAsChild(child);
-    }
+    associateAllchilds(children);
 
     if (children.isEmpty()) {
       addAllContainedTokens(ast);
@@ -51,15 +49,31 @@ public class ListToTreeCombiner {
       return;
     }
 
+    HiddenTokenAwareTree lastChild = associateAllchilds(children);
+    addFollowingTokens(lastChild, ast.getTokenStopIndex());
+  }
+
+  private HiddenTokenAwareTree associateAllchilds(LinkedList<HiddenTokenAwareTree> children) {
     HiddenTokenAwareTree previousChild = null;
     for (HiddenTokenAwareTree child : children) {
       assignFirstCommentsSegment(previousChild, child);
       associateAsChild(child);
       previousChild = child;
     }
-
-    addFollowingTokens(previousChild, ast.getTokenStopIndex());
+    return previousChild;
   }
+
+  private void addFollowingTokens(HiddenTokenAwareTree target, int stop) {
+    List<Token> result = readPrefix(stop);
+    target.addFollowing(result);
+  }
+
+//  private int stopIndexForLastChild(HiddenTokenAwareTree parent) {
+//    int result = parent.getTokenStopIndex();
+//    HiddenTokenAwareTree parentsSibling = parent.getNextSibling();
+//    if (parentsSibling!=null)
+//    return result;
+//  }
 
   private void assignFirstCommentsSegment(HiddenTokenAwareTree firstChild, HiddenTokenAwareTree secondChild) {
     if (firstChild == null)
@@ -79,11 +93,6 @@ public class ListToTreeCombiner {
     int stop = ast.getTokenStopIndex();
     List<Token> result = readPrefix(stop);
     ast.addOrphans(result);
-  }
-
-  private void addFollowingTokens(HiddenTokenAwareTree target, int stop) {
-    List<Token> result = readPrefix(stop);
-    target.addFollowing(result);
   }
 
   private LinkedList<HiddenTokenAwareTree> getChildren(HiddenTokenAwareTree ast) {
