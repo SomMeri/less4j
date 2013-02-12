@@ -13,9 +13,6 @@ import com.github.sommeri.less4j.utils.TestFileUtils;
  *  or w3c specification drafts.
  *  
  */
-//FIXME: !paged+viewport+keyframe!: mixin that brings @top @bottom in page or full page to top level
-//FIXME: !paged+viewport+keyframe!: nested rulesets and variables scoping
-//FIXME: !validation! warnings on bad body-able-members in result
 public class W3CSpecificationsTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/w3c-specifications/CSS Paged Media Module Level 3";
