@@ -1,0 +1,114 @@
+.mixin(...) {
+ catch:all;
+}
+.mixin(@var) when (@var=-0) {
+  declare: minus 0;
+}
+.mixin(@var) when (@var=0) {
+  declare: 0;
+}
+.mixin(@var) when (@var=-2) {
+  declare: -2;
+}
+.mixin(@var) when (@var=-4) {
+  declare: -4;
+}
+.mixin(@var) when (@var=4) {
+  declare: 4;
+}
+.mixin(@var) when (@var=4px) {
+  declare: 4px;
+}
+.mixin(@var) when (@var=-4px) {
+  declare: minus 4px;
+}
+.mixin(@var) when (@var=4%) {
+  declare: 4%;
+}
+.mixin(@var) when (@var=-4%) {
+  declare: minus 4%;
+}
+.mixin(@var) when (isnumber(@var)) and (@var<5) {
+  less-then: 5;
+}
+.mixin(@var) when (isnumber(@var)) and (@var>-5) {
+  more-then: -5;
+}
+.mixin(@var) when (isnumber(@var)) and (@var<5px) {
+  less-then: 5px;
+}
+.mixin(@var) when (isnumber(@var)) and (@var>-5px) {
+  more-then: minus 5px;
+}
+.mixin(@var) when (isnumber(@var)) and (@var<5%) {
+  less-then: 5%;
+}
+.mixin(@var) when (isnumber(@var)) and (@var>=-5%) {
+  more-then: minus 5%;
+}
+.mixin(@var) when (isnumber(@var)) and (@var<3) {
+  less-then: 3;
+}
+.mixin(@var) when (isnumber(@var)) and (@var>-3) {
+  more-then: -3;
+}
+.mixin(@var) when (isnumber(@var)) and (@var<3px) {
+  less-then: 3px;
+}
+.mixin(@var) when (isnumber(@var)) and (@var>-3px) {
+  more-then: minus 3px;
+}
+.mixin(@var) when (isnumber(@var)) and (@var<3%) {
+  less-then: 3%;
+}
+.mixin(@var) when (isnumber(@var)) and (@var>=-3%) {
+  more-then: minus 3%;
+}
+.mixin(@var) when (@var=identifier) {
+  declare: identifier;
+}
+.mixin(@var) when (@var=-identifier) {
+  declare: minus identifier;
+}
+#tryZero {
+  .mixin(0);
+}
+#tryMinusZero {
+  .mixin(-0);
+}
+#tryNegatedNumber {
+  .mixin(-4); 
+}
+#tryNumber {
+  .mixin(4);
+}
+#tryNumberPx {
+  .mixin(4px);
+}
+#tryNumberMinuxPx {
+  .mixin(-4px);
+}
+#tryNumberPercentage {
+  .mixin(4%);
+}
+#tryNumberMinuxPercentage {
+  .mixin(-4%);
+}
+#tryString1 {
+  .mixin('value');
+}
+#tryString2 {
+  .mixin("value");
+}
+#tryIdentifier {
+  .mixin(identifier);
+}
+#tryNegativeIdentifier {
+  .mixin(-identifier);
+}
+#tryColor1 {
+  .mixin(red);
+}
+#tryColor2 {
+  .mixin(#ff0000);
+}

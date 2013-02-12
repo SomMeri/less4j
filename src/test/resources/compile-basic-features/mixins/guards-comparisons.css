@@ -1,0 +1,140 @@
+#tryZero {
+  catch: all;
+  declare: minus 0;
+  declare: 0;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  less-then: 3;
+  more-then: -3;
+  less-then: 3px;
+  more-then: minus 3px;
+  less-then: 3%;
+  more-then: minus 3%;
+}
+#tryMinusZero {
+  catch: all;
+  declare: minus 0;
+  declare: 0;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  less-then: 3;
+  more-then: -3;
+  less-then: 3px;
+  more-then: minus 3px;
+  less-then: 3%;
+  more-then: minus 3%;
+}
+#tryNegatedNumber {
+  catch: all;
+  declare: -4;
+  declare: minus 4px;
+  declare: minus 4%;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  less-then: 3;
+  less-then: 3px;
+  less-then: 3%;
+}
+#tryNumber {
+  catch: all;
+  declare: 4;
+  declare: 4px;
+  declare: 4%;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  more-then: -3;
+  more-then: minus 3px;
+  more-then: minus 3%;
+}
+#tryNumberPx {
+  catch: all;
+  declare: 4;
+  declare: 4px;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  more-then: -3;
+  more-then: minus 3px;
+  more-then: minus 3%;
+}
+#tryNumberMinuxPx {
+  catch: all;
+  declare: -4;
+  declare: minus 4px;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  less-then: 3;
+  less-then: 3px;
+  less-then: 3%;
+}
+#tryNumberPercentage {
+  catch: all;
+  declare: 4;
+  declare: 4%;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  more-then: -3;
+  more-then: minus 3px;
+  more-then: minus 3%;
+}
+#tryNumberMinuxPercentage {
+  catch: all;
+  declare: -4;
+  declare: minus 4%;
+  less-then: 5;
+  more-then: -5;
+  less-then: 5px;
+  more-then: minus 5px;
+  less-then: 5%;
+  more-then: minus 5%;
+  less-then: 3;
+  less-then: 3px;
+  less-then: 3%;
+}
+#tryString1 {
+  catch: all;
+}
+#tryString2 {
+  catch: all;
+}
+#tryIdentifier {
+  catch: all;
+  declare: identifier;
+}
+#tryNegativeIdentifier {
+  catch: all;
+  declare: minus identifier;
+}
+#tryColor1 {
+  catch: all;
+}
+#tryColor2 {
+  catch: all;
+}

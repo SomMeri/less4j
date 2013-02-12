@@ -24,6 +24,7 @@ import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
+import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
@@ -201,10 +202,14 @@ public class ExpressionEvaluator {
     Expression leftE = evaluate(input.getLeft());
     Expression rightE = evaluate(input.getRight());
 
+//    if (input.getOperator().getOperator() == ComparisonExpressionOperator.Operator.OPEQ)
+//      System.out.println(leftE + "" + input.getOperator() + "" + rightE + " is " + comparator.equal(leftE, rightE));
+    
     ComparisonExpressionOperator operator = input.getOperator();
     if (operator.getOperator() == ComparisonExpressionOperator.Operator.OPEQ)
       return comparator.equal(leftE, rightE);
 
+//    System.out.println(leftE + "" + input.getOperator() + "" + rightE);
     if (leftE.getType() != ASTCssNodeType.NUMBER) {
       problemsHandler.incompatibleComparisonOperand(leftE, operator);
       return false;
@@ -215,10 +220,14 @@ public class ExpressionEvaluator {
       return false;
     }
 
+//    System.out.println(leftE + "" + input.getOperator() + "" + rightE + " is " + compareNumbers((NumberExpression) leftE, (NumberExpression) rightE, operator));
     return compareNumbers((NumberExpression) leftE, (NumberExpression) rightE, operator);
   }
 
   private boolean compareNumbers(NumberExpression leftE, NumberExpression rightE, ComparisonExpressionOperator operator) {
+    if (!canCompareDimensions(leftE.getDimension(), rightE.getDimension())) 
+      return false;
+    
     Double left = leftE.getValueAsDouble();
     Double right = rightE.getValueAsDouble();
 
@@ -238,6 +247,14 @@ public class ExpressionEvaluator {
     default:
       throw new BugHappened("Unexpected comparison operator", operator);
     }
+  }
+
+  private boolean canCompareDimensions(Dimension left, Dimension right) {
+    return true;
+//    if (Dimension.NUMBER==left || Dimension.NUMBER==right)
+//      return true;
+//    
+//    return left.equals(right);
   }
 
   public Expression evaluate(FunctionExpression input) {

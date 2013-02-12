@@ -7,6 +7,7 @@ import java.util.Map;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -142,9 +143,9 @@ abstract class AbstractTypeFunction extends AbstractFunction {
 
     Expression parameter = parameters.get(0);
     if (checkType(parameter)) {
-      return new NumberExpression(parameter.getUnderlyingStructure(), 1.0, "", "true", Dimension.UNKNOWN);
+      return new IdentifierExpression(parameter.getUnderlyingStructure(), "true");
     } else {
-      return new NumberExpression(parameter.getUnderlyingStructure(), 0.0, "", "false", Dimension.UNKNOWN);
+      return new IdentifierExpression(parameter.getUnderlyingStructure(), "false");
     }
   }
 

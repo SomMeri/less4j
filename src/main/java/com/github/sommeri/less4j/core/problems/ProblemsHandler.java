@@ -207,8 +207,7 @@ public class ProblemsHandler {
   }
 
   public void incompatibleComparisonOperand(Expression errorNode, ComparisonExpressionOperator operator) {
-    collector.addError(new CompilationError(errorNode, "The operator '" + operator + "' can be used only with numbers."));
-
+    collector.addError(new CompilationError(errorNode, "The operator '" + operator + "' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var "+ operator +" ...)`. The operator is located at position " + PrintUtils.toLocation(operator) +"."));
   }
 
   public void rulesetWithoutSelector(RuleSet errorNode) {

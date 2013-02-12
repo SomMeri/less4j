@@ -7,10 +7,10 @@ ERROR 10:3 The namespace "#undefinedNamespace > #doesNotExists > .mixin(...)" wa
 ERROR 10:43 The mixin ".mixin" was not declared.
 ERROR 10:43 The mixin ".mixin" was not matched.
 ERROR 15:11 Variable indirection works only with string values.
-ERROR 37:17 The operator '>' can be used only with numbers.
+ERROR 37:17 The operator '>' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var > ...)`. The operator is located at position 32:28.
 ERROR 41:4 Undefined parameter @a of mixin .guardedMixin defined on line 32
 ERROR 32:25 The variable "@a" was not declared.
-ERROR 32:25 The operator '>' can be used only with numbers.
+ERROR 32:25 The operator '>' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var > ...)`. The operator is located at position 32:28.
 ERROR 45:4 The mixin ".doesNotExists" was not declared.
 ERROR 45:4 The mixin ".doesNotExists" was not matched.
 ERROR 49:26 The mixin ".doesNotExists" was not declared.
