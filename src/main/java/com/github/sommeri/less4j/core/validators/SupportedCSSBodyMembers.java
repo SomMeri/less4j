@@ -46,7 +46,7 @@ public class SupportedCSSBodyMembers {
       return createSet(ASTCssNodeType.DECLARATION);
 
     case MEDIA:
-      return createSet(ASTCssNodeType.RULE_SET);
+      return createSet(ASTCssNodeType.RULE_SET, ASTCssNodeType.PAGE);
 
     case KEYFRAMES:
       return createSet(ASTCssNodeType.RULE_SET);
