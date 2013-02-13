@@ -21,12 +21,7 @@ public class SupportedCSSBodyMembers {
     //special case - style sheet does not have owner 
     switch (bodyType) {
     case STYLE_SHEET:
-      Set<ASTCssNodeType> result = allNodeTypes();
-      // removed only the elements that are likely to end there, this method could be done in more precise way  
-      result.remove(ASTCssNodeType.DECLARATION);
-      result.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
-      return result;
-
+      return topLevelElements();
     }
 
     if (ownerType == null)
@@ -46,7 +41,7 @@ public class SupportedCSSBodyMembers {
       return createSet(ASTCssNodeType.DECLARATION);
 
     case MEDIA:
-      return createSet(ASTCssNodeType.RULE_SET, ASTCssNodeType.PAGE);
+      return topLevelElements();
 
     case KEYFRAMES:
       return createSet(ASTCssNodeType.RULE_SET);
@@ -55,6 +50,14 @@ public class SupportedCSSBodyMembers {
       return allNodeTypes();
     }
 
+  }
+
+  private Set<ASTCssNodeType> topLevelElements() {
+    Set<ASTCssNodeType> result = allNodeTypes();
+    // removed only the elements that are likely to end there, this method could be done in more precise way  
+    result.remove(ASTCssNodeType.DECLARATION);
+    result.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
+    return result;
   }
 
   private Set<ASTCssNodeType> createSet(ASTCssNodeType... types) {

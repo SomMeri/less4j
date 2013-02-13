@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
+import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
@@ -52,6 +53,10 @@ public class LessAstValidator {
       checkForDisallowedMembers((Body) node);
       break;
     }
+    case MEDIA_QUERY: {
+      checkForPartialInterpolatedMediaQuery((MediaQuery) node);
+      break;
+    }
     }
 
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
@@ -59,6 +64,15 @@ public class LessAstValidator {
       validate(kid);
     }
 
+  }
+
+  private void checkForPartialInterpolatedMediaQuery(MediaQuery node) {
+    if (!node.hasInterpolatedExpression())
+      return ;
+    
+    if (node.getMedium()!=null || node.getExpressions().size()>1)
+      problemsHandler.lessjsDoesNotSupportPartiallyInterpolatedMediaQueries(node);
+    
   }
 
   private void checkTopLevelNested(RuleSet node) {

@@ -12,7 +12,7 @@ import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Media;
-import com.github.sommeri.less4j.core.ast.MediaExpression;
+import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.Page;
 import com.github.sommeri.less4j.core.ast.PageMarginBox;
@@ -126,8 +126,8 @@ public class LessToCssCompiler {
       List<? extends ASTCssNode> childs = node.getChilds();
       for (ASTCssNode kid : childs) {
         switch (kid.getType()) {
-        case MEDIA_EXPRESSION:
-          evaluateInMediaExpressions((MediaExpression) kid);
+        case FIXED_MEDIA_EXPRESSION:
+          evaluateInMediaExpressions((FixedMediaExpression) kid);
           break;
 
         case DECLARATION:
@@ -150,7 +150,7 @@ public class LessToCssCompiler {
     }
   }
 
-  private void evaluateInMediaExpressions(MediaExpression node) {
+  private void evaluateInMediaExpressions(FixedMediaExpression node) {
     MediaExpressionFeature feature = node.getFeature();
     if (!feature.isRatioFeature()) {
       evaluateExpressions(node);

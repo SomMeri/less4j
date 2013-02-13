@@ -61,6 +61,7 @@ tokens {
   TERM;
   MEDIUM_DECLARATION;
   MEDIA_EXPRESSION;
+  INTERPOLATED_MEDIA_EXPRESSION;
   MEDIA_QUERY;
   MEDIUM_TYPE;
   BODY;
@@ -248,9 +249,17 @@ mediaQuery
 finally { leaveRule(); }
     
 mediaExpression
+    : cssMediaExpression | interpolatedMediaExpression
+    ;
+
+cssMediaExpression
     : LPAREN a+=mediaFeature (b+=COLON c+=expr)? RPAREN -> ^(MEDIA_EXPRESSION $a* $b* $c*)
     ;
 
+interpolatedMediaExpression
+    : variablereference -> ^(INTERPOLATED_MEDIA_EXPRESSION variablereference)
+    ;
+    
 mediaFeature
     : IDENT
     ;

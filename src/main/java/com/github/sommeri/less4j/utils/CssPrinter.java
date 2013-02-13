@@ -28,9 +28,11 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
+import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
@@ -171,8 +173,11 @@ public class CssPrinter {
     case MEDIUM_TYPE:
       return appendMediumType((MediumType) node);
 
-    case MEDIA_EXPRESSION:
-      return appendMediaExpression((MediaExpression) node);
+    case FIXED_MEDIA_EXPRESSION:
+      return appendMediaExpression((FixedMediaExpression) node);
+
+    case INTERPOLATED_MEDIA_EXPRESSION:
+      return appendInterpolatedMediaExpression((InterpolatedMediaExpression) node);
 
     case MEDIUM_EX_FEATURE:
       return appendMediaExpressionFeature((MediaExpressionFeature) node);
@@ -590,7 +595,7 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendMediaExpression(MediaExpression expression) {
+  public boolean appendMediaExpression(FixedMediaExpression expression) {
     builder.ensureSeparator().append("(");
     append(expression.getFeature());
     if (expression.getExpression() != null) {
@@ -599,6 +604,11 @@ public class CssPrinter {
     }
     builder.append(")");
     return true;
+  }
+
+  private boolean appendInterpolatedMediaExpression(InterpolatedMediaExpression expression) {
+    builder.ensureSeparator();
+    return append(expression.getExpression());
   }
 
   public boolean appendMediaExpressionFeature(MediaExpressionFeature feature) {

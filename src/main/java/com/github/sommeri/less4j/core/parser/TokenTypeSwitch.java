@@ -92,6 +92,9 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.MEDIA_EXPRESSION)
       return handleMediaExpression(token);
 
+    if (type == LessLexer.INTERPOLATED_MEDIA_EXPRESSION)
+      return handleInterpolatedMediaExpression(token);
+
     if (type == LessLexer.VARIABLE_DECLARATION)
       return handleVariableDeclaration(token);
 
@@ -202,6 +205,8 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleIndirectVariable(HiddenTokenAwareTree token);
 
   public abstract T handleMediaExpression(HiddenTokenAwareTree token);
+  
+  public abstract T handleInterpolatedMediaExpression(HiddenTokenAwareTree token);
 
   public abstract T handleMedium(HiddenTokenAwareTree token);
 

@@ -32,10 +32,11 @@ import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
+import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
-import com.github.sommeri.less4j.core.ast.MediaExpression;
+import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
@@ -637,7 +638,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     // we have three types of children:
     // * MEDIUM_TYPE
     // * identifier AND whose only function is to hold comments
-    // * MEDIA_EXPRESSION
+    // * FIXED_MEDIA_EXPRESSION
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() != LessLexer.IDENT) {
         result.addMember(switchOn(kid));
@@ -659,11 +660,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new Medium(token, toMediumModifier(children.get(0)), new MediumType(type, type.getText()));
   }
 
-  public MediaExpression handleMediaExpression(HiddenTokenAwareTree token) {
+  public FixedMediaExpression handleMediaExpression(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree featureNode = children.get(0);
     if (children.size() == 1)
-      return new MediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), null);
+      return new FixedMediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), null);
 
     if (children.size() == 2)
       throw new BugHappened(GRAMMAR_MISMATCH, token);
@@ -673,7 +674,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     HiddenTokenAwareTree expressionNode = children.get(2);
     Expression expression = (Expression) switchOn(expressionNode);
-    return new MediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), expression);
+    return new FixedMediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), expression);
+  }
+  
+  public InterpolatedMediaExpression  handleInterpolatedMediaExpression(HiddenTokenAwareTree token) {
+    return new InterpolatedMediaExpression(token, (Variable)switchOn(token.getChild(0)));
   }
 
   private MediumModifier toMediumModifier(HiddenTokenAwareTree token) {

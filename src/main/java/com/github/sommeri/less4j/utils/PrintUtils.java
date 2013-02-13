@@ -75,7 +75,7 @@ public class PrintUtils {
       return "indirect variable";
 
     case VARIABLE:
-      return "variable";
+      return "expression";
 
     case NUMBER:
       return "number";

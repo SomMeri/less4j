@@ -12,7 +12,9 @@
 @media screen, (min-width: 117px) and (min-width: 117px) {
 }
 @media screen and (max-device-aspect-ratio: 1367/768), (min-width: 117px) and (min-width: 117px) and (max-device-aspect-ratio: 1367/768), screen and (max-device-aspect-ratio: 2000/768), (min-width: 117px) and (min-width: 117px) and (max-device-aspect-ratio: 2000/768) {
-  color: red;
+  * {
+    color: red;
+  }
 }
 @media print {
   footer {
@@ -39,7 +41,9 @@
   }
 }
 @media all and (orientation: portrait) {
-  color: blue;
+  * {
+    color: blue;
+  }
 }
 @media print {
   @page {
@@ -63,10 +67,14 @@
   }
 }
 @media print {
-  color: blue;
+  * {
+    color: blue;
+  }
 }
 @media only screen and (min-width: 480px) {
-  color: green;
+  * {
+    color: green;
+  }
 }
 @media screen {
   .sidebar {

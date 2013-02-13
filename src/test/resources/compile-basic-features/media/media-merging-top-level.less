@@ -1,18 +1,22 @@
 @media screen, print {
   @media (max-device-aspect-ratio: 1367/768) {
-    color: white;
+    * { color: white; }
   }
 }
 
 @media screen and (min-width: 117px) {
-  @color: #008000;
-  padding: 1 1 1 1;
-  @media (max-device-aspect-ratio: 1367/768) {
-    color: white;
-    background-color: @color;
+  * {
+    @color: #008000;
+    padding: 1 1 1 1;
+    
+    @media (max-device-aspect-ratio: 1367/768) {
+      color: white;
+      background-color: @color;
+    }
+    
+    color: @color;
+    background-color: white;
   }
-  color: @color;
-  background-color: white;
 }
 
 @media screen and (min-width: 117px), print {

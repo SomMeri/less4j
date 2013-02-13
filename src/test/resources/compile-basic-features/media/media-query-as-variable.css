@@ -1,0 +1,40 @@
+@media screen and (max-width: 100px) {
+  h3 {
+    declaration: value;
+  }
+}
+@media screen, (max-width: 500px) {
+  set {
+    padding: 3 3 3 3;
+  }
+}
+@media screen and (max-width: 600px) {
+  set {
+    padding: 3 3 3 3;
+  }
+}
+@media print {
+  #id {
+    size: 2;
+  }
+}
+@media print and screen and (max-width: 100px) {
+  h3 {
+    declaration: value;
+  }
+}
+@media print {
+  h2 #id {
+    size: 3;
+  }
+}
+@media print and screen and (max-width: 100px) {
+  h2 {
+    declaration: value;
+  }
+}
+@media screen and (max-width: 100px) {
+  h5 {
+    declaration: indirect;
+  }
+}

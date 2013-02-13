@@ -14,7 +14,7 @@
 
 @media screen, (min-width: 117px) and (min-width: 117px) {
   @media (max-device-aspect-ratio: 1367/768), (max-device-aspect-ratio: 2000/768) { 
-    color: red;
+    * { color: red; }
   }
 }
 
@@ -39,7 +39,7 @@
 
 // https://github.com/cloudhead/less.js/issues/107
 @media all and (orientation:portrait) {
-  color: blue;
+  * { color: blue; }
 }
 
 @media print {
@@ -64,11 +64,11 @@
 
 // https://github.com/cloudhead/less.js/issues/528
 @media print {
-  color: blue;
+  * { color: blue; }
 }
 
 @media only screen and (min-width: 480px) {
-  color: green;
+  * { color: green; }
 }
 
 // https://github.com/cloudhead/less.js/issues/762

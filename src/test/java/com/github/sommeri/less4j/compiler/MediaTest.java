@@ -7,17 +7,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
-public class MediaTest extends BasicFeaturesTest {
+public class MediaTest extends AbstractErrorReportingTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/media/";
 
-  public MediaTest(File inputFile, File outputFile, String testName) {
-    super(inputFile, outputFile, testName);
+  public MediaTest(File lessFile, File cssOutput, File errorList, String testName) {
+    super(lessFile, cssOutput, errorList, testName);
   }
 
   @Parameters()
   public static Collection<Object[]> allTestsParameters() {
-    return (new TestFileUtils()).loadTestFiles(standardCases);
+    return (new TestFileUtils(".err")).loadTestFiles(standardCases);
   }
 
 }

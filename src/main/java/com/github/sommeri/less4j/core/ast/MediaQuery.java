@@ -63,6 +63,14 @@ public class MediaQuery extends ASTCssNode {
     }
   }
 
+  public boolean hasInterpolatedExpression() {
+    for (MediaExpression mediaExpression : getExpressions()) {
+      if (mediaExpression.getType()==ASTCssNodeType.INTERPOLATED_MEDIA_EXPRESSION)
+        return true;
+    }
+    return false;
+  }
+
   @Override
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)medium);
