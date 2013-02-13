@@ -104,6 +104,7 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IMPORT_MULTIPLE_SYM", "@import-multiple");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NAMED_EXPRESSION", "named expression");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNICODE_RANGE", "unicode range");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("MEDIA_EXPRESSION", "media expression");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INTERPOLATED_MEDIA_EXPRESSION", "variable as media query");
   }
 
