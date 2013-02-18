@@ -33,6 +33,9 @@ public class FontFace extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   @Override
   public FontFace clone() {
-    return (FontFace) super.clone();
+    FontFace result = (FontFace) super.clone();
+    result.body = body==null?null:body.clone();
+    result.configureParentToAllChilds();
+    return result;
   }
 }

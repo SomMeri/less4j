@@ -73,8 +73,11 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
     text = text.replace("content: is #ff0000;", "content: is red;");
     text = text.replace("content: is not #0000ff its #ff0000;", "content: is not blue its red;");
     text = text.replace("content: is not #0000ff its #800080;", "content: is not blue its purple;");
-
-    
+    //css.less
+    text = text.replace("width: 100%!important;", "width: 100% !important;");
+    text = text.replace("height: 20px ! important;", "height: 20px !important;");
+    text = text.replace("background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), to(#0000ff));", "background: -webkit-gradient(linear, left top, left bottom, from(red), to(blue));");
+    text = text.replace("  font-size: 2.2em;", "  font-size: +2.2em;");
     return text;
   }
 

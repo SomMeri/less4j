@@ -411,7 +411,12 @@ general_body
                | a+=pageMarginBox 
                | a+=variabledeclaration
                | a+=media_in_general_body
-               //| a+=imports
+               | a+=viewport
+               | a+=keyframes
+               | a+=page
+               | a+=fontface
+               | a+=imports
+               | SEMI
              )*
              (  
                 ( (declaration)=>a+=declaration rbrace+=RBRACE)
@@ -1079,7 +1084,7 @@ RBRACE : '}' ;
 LBRACKET : '[' ;
 RBRACKET : ']' ;
 OPEQ : '=' ;
-SEMI : ';' ;
+SEMI : ';' ((WS_FRAGMENT? ';')=>WS_FRAGMENT? ';')* ;
 COLON : ':' ;
 PERCENT: '%';
 SOLIDUS : '/' ;
