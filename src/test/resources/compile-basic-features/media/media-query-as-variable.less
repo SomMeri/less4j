@@ -50,3 +50,10 @@ h2 {
     declaration: indirect;
   }
 }
+// use variable conventionally - as a value
+@page-width: 200px;
+@media screen and (max-width: @page-width) {
+  h3 {
+    content: "something";
+  }
+}

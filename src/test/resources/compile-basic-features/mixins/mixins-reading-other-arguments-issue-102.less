@@ -1,0 +1,24 @@
+.testClass (@first: 0, @second: @first) {
+  first: @first;
+  second: @second;
+}
+
+#default {
+  .testClass();
+}
+
+#default-supply-first {
+  .testClass(12);
+}
+
+#default-supply-both {
+  .testClass(12, 55);
+}
+
+#default-named-first {
+  .testClass(@first: 14);
+}
+
+#default-named-second {
+  .testClass(@second: 15);
+}

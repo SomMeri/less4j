@@ -1,0 +1,20 @@
+#default {
+  first: 0;
+  second: 0;
+}
+#default-supply-first {
+  first: 12;
+  second: 12;
+}
+#default-supply-both {
+  first: 12;
+  second: 55;
+}
+#default-named-first {
+  first: 14;
+  second: 14;
+}
+#default-named-second {
+  first: 0;
+  second: 15;
+}

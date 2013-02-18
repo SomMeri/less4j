@@ -38,3 +38,8 @@
     declaration: indirect;
   }
 }
+@media screen and (max-width: 200px) {
+  h3 {
+    content: "something";
+  }
+}

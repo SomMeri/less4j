@@ -563,7 +563,6 @@ mixinReferenceArgument
     : exprNoComma | variabledeclarationLimitedNoSemi
     ;
 
-//FIXME: add additional check - these should NOT trigger interpolation    
 reusableStructureName
     : a+=cssClassOrId ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> a+=cssClassOrId)* -> ^(REUSABLE_STRUCTURE_NAME $a*);
     
