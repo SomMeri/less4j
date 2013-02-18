@@ -41,18 +41,10 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   public boolean usableAsReusableStructure() {
     for (Selector selector : selectors) {
-      if (isReusableSelector(selector))
+      if (selector.isReusableSelector())
         return true;
     }
     return false;
-  }
-
-  private boolean isReusableSelector(Selector selector) {
-    if (selector.isCombined())
-      return false;
-
-    SelectorPart head = selector.getHead();
-    return head.isClassesAndIdsOnlySelector();
   }
 
   /**
@@ -64,9 +56,9 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
       throw new BugHappened("Caller is supposed to check for this.", this);
     
     List<ReusableStructureName> reusableNames = new ArrayList<ReusableStructureName>();
-    for (Selector selector : selectors) if (isReusableSelector(selector)) {
-      SimpleSelector head = (SimpleSelector) selector.getHead();
-      reusableNames.add(new ReusableStructureName(head.getUnderlyingStructure(), head.getSubsequent()));
+    for (Selector selector : selectors) if (selector.isReusableSelector()) {
+      SimpleSelector reusableSelector = selector.asReusableSelector();
+      reusableNames.add(new ReusableStructureName(reusableSelector.getUnderlyingStructure(), reusableSelector.getSubsequent()));
     }
     
     ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), reusableNames);
@@ -82,9 +74,9 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
   public List<String> extractReusableStructureNames() {
     List<String> result = new ArrayList<String>();
     for (Selector selector : selectors) {
-      if (isReusableSelector(selector)) {
-        SimpleSelector simpleSelector = (SimpleSelector)selector.getHead();
-        result.add(simpleSelector.getSubsequent().get(0).getFullName());
+      if (selector.isReusableSelector()) {
+        SimpleSelector reusableSelector = selector.asReusableSelector();
+        result.add(reusableSelector.getSubsequent().get(0).getFullName());
       }
     }
 

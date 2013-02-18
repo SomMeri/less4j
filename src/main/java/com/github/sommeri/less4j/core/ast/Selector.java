@@ -116,4 +116,29 @@ public class Selector extends ASTCssNode implements Cloneable {
     return findFirstAppender() != null;
   }
 
+  public boolean isReusableSelector() {
+    if (isCombined()) {
+      if (!getHead().isAppender())
+        return false;
+      
+      return getRight().hasReusableHead() && !getRight().isCombined();
+    }
+
+    return hasReusableHead();
+  }
+
+  private boolean hasReusableHead() {
+    return getHead().isClassesAndIdsOnlySelector();
+  }
+
+  /**
+   * Assumes that hasReubleHead returns true
+   * @return
+   */
+  public SimpleSelector asReusableSelector() {
+    if (!isCombined())
+      return (SimpleSelector) getHead();
+    
+    return (SimpleSelector) getRight().getHead();
+  }
 }

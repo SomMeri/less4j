@@ -1,0 +1,47 @@
+.amp() {
+    &.support {
+        declaration: before no space;
+    }
+    .support& {
+        declaration: after no space;
+    }
+    & .support {
+        declaration: before with space;
+    }
+    .support & {
+        declaration: after with space;
+    }
+    & .support& {
+        declaration: both;
+    }
+}
+.extended {
+    .amp .support;
+}
+.extended-backward {
+//  .support .amp; // illegal in less-1.4.0.js
+//  .support.amp; // illegal in less-1.4.0.js
+}
+
+.wrapper() {
+    .beginning&.end {
+        declaration: middle no space;
+    }
+    .beginning & .end {
+        declaration: middle with space;
+    }
+}
+
+.extended-middle {
+//  .beginning.wrapper.end; // illegal in less-1.4.0.js
+//  .beginning .wrapper .end; // illegal in less-1.4.0.js
+}
+
+
+#nested {
+  .nested & {
+    declaration: nested;
+  } 
+
+   // .nested(); // illegal in less-1.4.0.js
+}

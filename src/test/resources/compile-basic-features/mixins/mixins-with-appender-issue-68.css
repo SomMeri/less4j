@@ -2,3 +2,6 @@
   declaration: before no space;
   declaration: before with space;
 }
+.nested #nested {
+  declaration: nested;
+}
