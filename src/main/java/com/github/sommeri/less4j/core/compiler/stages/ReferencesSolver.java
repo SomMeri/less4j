@@ -7,6 +7,8 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
+import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.BodyOwner;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
@@ -179,11 +181,15 @@ public class ReferencesSolver {
     }
   }
 
-  private void declarationsAreImportant(GeneralBody result) {
+  @SuppressWarnings("rawtypes")
+  private void declarationsAreImportant(Body result) {
     for (ASTCssNode kid : result.getMembers()) {
       if (kid instanceof Declaration) {
         Declaration declaration = (Declaration) kid;
         declaration.setImportant(true);
+      } else if (kid instanceof BodyOwner<?>) {
+        BodyOwner owner = (BodyOwner) kid;
+        declarationsAreImportant(owner.getBody());
       }
     }
   }

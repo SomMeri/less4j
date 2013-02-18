@@ -1,14 +1,24 @@
-.class {
+.class .inner {
   border: 1;
   boxer: 1;
+}
+.class .inner {
   border: 2 !important;
   boxer: 2 !important;
+}
+.class .inner {
   border: 3;
   boxer: 3;
+}
+.class .inner {
   border: 4 !important;
   boxer: 4 !important;
+}
+.class .inner {
   border: 5;
   boxer: 5;
+}
+.class .inner {
   border: 0 !important;
   boxer: 0 !important;
 }
