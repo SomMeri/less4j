@@ -1,1 +1,1 @@
-/* If the file contains multiple charsets, only the last one counts. */
+/* If the file contains multiple charsets, only the first one counts. */

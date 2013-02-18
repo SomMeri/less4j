@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.compiler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessSource;
@@ -54,11 +55,34 @@ public class LessToCssCompiler {
     bubbleAndMergeMedia(less);
     freeNestedRuleSets(less);
     sortTopLevelElements(less);
+    removeUselessCharsets(less);
     
     //final validation
     validateFinalCss(less);
 
     return less;
+  }
+
+  private void removeUselessCharsets(StyleSheet less) {
+    ASTManipulator astManipulator = new ASTManipulator();
+    Iterator<ASTCssNode> iterator = less.getChilds().iterator();
+    if (!iterator.hasNext())
+      return ;
+    
+    ASTCssNode node = iterator.next();
+    if (node.getType() != ASTCssNodeType.CHARSET_DECLARATION)
+      return;
+
+    if (!iterator.hasNext())
+      return ;
+
+    while (iterator.hasNext()) {
+      node = iterator.next();
+      if (node.getType() != ASTCssNodeType.CHARSET_DECLARATION)
+        return;
+      
+      astManipulator.removeFromBody(node);
+    }
   }
 
   private void bubbleAndMergeMedia(StyleSheet less) {

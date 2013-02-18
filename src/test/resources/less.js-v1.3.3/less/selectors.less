@@ -107,8 +107,12 @@ a {
   ::bnord {color: red }
   &::bnord {color: red }
 }
-// selector interpolation
+// selector interpolation - deprecated
 @theme: blood;
+(~".@{theme}") {
+  color: red;
+}
+// selector interpolation - new format
 @selector: ~".@{theme}";
 @{selector} {
   color:red;
@@ -122,8 +126,8 @@ a {
   }
 }
 @num: 3;
-:nth-child(@{num}) {
-	selector: interpolated;
+:nth-child(@{num}):nth-child(@num) {
+	second-use: deprecated;
 }
 .test {
   &:nth-child(odd):not(:nth-child(3)) {
