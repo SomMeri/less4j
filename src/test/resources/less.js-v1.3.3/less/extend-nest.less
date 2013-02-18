@@ -1,0 +1,22 @@
+.sidebar {
+  width: 300px;
+  background: red;
+
+  .box {
+    background: #FFF;
+    border: 1px solid #000;
+    margin: 10px 0;
+  }
+}
+
+.sidebar2 {
+  &:extend(.sidebar);
+  background: blue;
+}
+
+.type1 {
+    .sidebar3 {
+      &:extend(.sidebar);
+      background: green;
+    }
+}
