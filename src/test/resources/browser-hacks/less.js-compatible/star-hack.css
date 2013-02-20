@@ -1,4 +1,4 @@
 #star-hack {
   width: 400px;
-  *width: 400px;/* IE7 and below (the broken box model browsers) only */
+  *width: 300px;/* IE7 and below (the broken box model browsers) only */
 }

@@ -365,7 +365,7 @@ unaryOperator
     ;
     
 property
-    : {predicates.directlyFollows(input.LT(1), input.LT(2))}?=> STAR IDENT // support for star prefix
+    : STAR IDENT // support for star prefix - more correct and strict solution would require them to directly follow 
     | IDENT // normal property
     ;
     
@@ -413,7 +413,7 @@ top_level_body_with_declaration
 
 general_body
     : LBRACE
-            (   ((declarationWithSemicolon)=> (a+=declarationWithSemicolon) )
+            (   (declarationWithSemicolon)=> (a+=declarationWithSemicolon)
                | (ruleSet)=> a+=ruleSet
                | (mixinReferenceWithSemi)=>a+=mixinReferenceWithSemi
                | (namespaceReferenceWithSemi)=>a+=namespaceReferenceWithSemi
@@ -428,11 +428,10 @@ general_body
                | a+=imports
                | SEMI
              )*
-             (  
-                ( (declaration)=>a+=declaration rbrace+=RBRACE)
-                | ( (mixinReference)=>a+=mixinReference rbrace+=RBRACE)
-                | ( (namespaceReference)=>a+=namespaceReference rbrace+=RBRACE)
-                | rbrace+=RBRACE
+             (  rbrace+=RBRACE
+                | (declaration RBRACE)=>a+=declaration rbrace+=RBRACE               
+                | (mixinReference RBRACE)=>a+=mixinReference rbrace+=RBRACE
+                | (namespaceReference RBRACE)=>a+=namespaceReference rbrace+=RBRACE
              )
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
      -> ^(BODY LBRACE $a* $rbrace*); 
@@ -491,7 +490,7 @@ elementName
     :  a+=elementNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=elementNamePart)* -> ^(ELEMENT_NAME $a*);
     
 elementNamePart
-    : IDENT | MINUS | STAR | allNumberKinds | INTERPOLATED_VARIABLE;
+    : STAR | IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
         
 allNumberKinds: NUMBER | EMS | EXS | LENGTH | ANGLE | TIME | FREQ | REPEATER | PERCENTAGE | UNKNOWN_DIMENSION;
 
