@@ -94,6 +94,7 @@ public class MixinReference extends ASTCssNode {
   }
 
   public void addNamedParameter(VariableDeclaration parameter) {
+    //FIXME: this is wrong way of doing it, if the value changes later on, the map is NOT updated 
     this.namedParameters.put(parameter.getVariable().getName(), parameter.getValue());
   }
 

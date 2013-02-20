@@ -19,6 +19,10 @@ public class ArgumentDeclaration extends AbstractVariableDeclaration {
     this.isCollector = isCollector;
   }
 
+  public ArgumentDeclaration(Variable variable, Expression value) {
+    this(variable.getUnderlyingStructure(), variable, value);
+  }
+
   public boolean isCollector() {
     return isCollector;
   }

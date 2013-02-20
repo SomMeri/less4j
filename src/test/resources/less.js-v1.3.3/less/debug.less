@@ -1,14 +1,11 @@
-.mixin (@a: 0) {
-  .inner {
-    test: @a;
-  }
+.mixin-conflict(@a:defA, @b:defB, @c:defC) {
+  three: @a, @b, @c;
 }
 
-.class {
-  .mixin(1);
-  .mixin(2) !important;
-  .mixin(3);
-  .mixin(4) !important;
-  .mixin(5);
-  .mixin !important;
+.mixin-conflict(@a:defA, @b:defB, @c:defC, @d:defD) {
+  four: @a, @b, @c, @d;
+}
+
+#named-conflict {
+  .mixin-conflict(@a:a, 21, 22, 23);
 }

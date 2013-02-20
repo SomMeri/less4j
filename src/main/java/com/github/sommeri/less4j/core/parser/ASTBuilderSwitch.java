@@ -78,6 +78,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
   @SuppressWarnings("unused")
   private final ProblemsHandler problemsHandler;
+  private final MixinsParametersBuilder mixinsParametersBuilder;
   private final TermBuilder termBuilder;
   // as stated here: http://www.w3.org/TR/css3-selectors/#pseudo-elements
   private static Set<String> COLONLESS_PSEUDOELEMENTS = new HashSet<String>();
@@ -92,6 +93,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     super();
     this.problemsHandler = problemsHandler;
     termBuilder = new TermBuilder(this, problemsHandler);
+    mixinsParametersBuilder = new MixinsParametersBuilder(this, problemsHandler);
   }
 
   public StyleSheet handleStyleSheet(HiddenTokenAwareTree token) {
@@ -264,10 +266,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         result.setBody(handleGeneralBody(kid));
       } else if (kid.getType() == LessLexer.GUARD) {
         result.addGuard(handleGuard(kid));
-      } else if (kid.getType() == LessLexer.DOT3) {
-        result.addParameter(new ArgumentDeclaration(kid, new Variable(kid, "@"), null, true));
-      } else { // anything else is a parameter
-        result.addParameter(switchOn(kid));
+      } else if (kid.getType() == LessLexer.SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS) {
+        mixinsParametersBuilder.handleMixinDeclarationArguments(kid, result);
       }
     }
 
@@ -295,15 +295,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         result.setFinalName(handleReusableStructureName(kid));
       } else if (kid.getType() == LessLexer.IMPORTANT_SYM) {
         result.setImportant(true);
-      } else { // anything else is a parameter
-        ASTCssNode parameter = switchOn(kid);
-        if (parameter.getType() == ASTCssNodeType.VARIABLE_DECLARATION)
-          result.addNamedParameter((VariableDeclaration) parameter);
-        else
-          result.addPositionalParameter((Expression) parameter);
+      } else if (kid.getType() == LessLexer.SEMI_SPLIT_MIXIN_REFERENCE_ARGUMENTS) {
+        mixinsParametersBuilder.handleMixinReferenceArguments(kid, result);
       }
-
     }
+    
     return result;
   }
 
@@ -421,7 +417,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public SyntaxOnlyElement handleLbrace(HiddenTokenAwareTree token) {
     return new SyntaxOnlyElement(token, token.getText());
   }
-  
+
   public SyntaxOnlyElement handleRbrace(HiddenTokenAwareTree token) {
     return new SyntaxOnlyElement(token, token.getText());
   }
@@ -600,7 +596,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Media result = new Media(token);
     handleMediaDeclaration(result, children.next());
     result.setBody(handleGeneralBody(children.next()));
-    
+
     return result;
   }
 
@@ -676,9 +672,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Expression expression = (Expression) switchOn(expressionNode);
     return new FixedMediaExpression(token, new MediaExpressionFeature(featureNode, featureNode.getText()), expression);
   }
-  
-  public InterpolatedMediaExpression  handleInterpolatedMediaExpression(HiddenTokenAwareTree token) {
-    return new InterpolatedMediaExpression(token, (Variable)switchOn(token.getChild(0)));
+
+  public InterpolatedMediaExpression handleInterpolatedMediaExpression(HiddenTokenAwareTree token) {
+    return new InterpolatedMediaExpression(token, (Variable) switchOn(token.getChild(0)));
   }
 
   private MediumModifier toMediumModifier(HiddenTokenAwareTree token) {
@@ -709,10 +705,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }
 
-  //FIXME: fail on wrong distribution of arguments (e.g. collector must be last, those with default must be last)
+  //FIXME: fail on wrong distribution of arguments (e.g. collector must be last, those with default must be first)
   public ArgumentDeclaration handleArgumentDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
-    HiddenTokenAwareTree name = children.get(0);
+    HiddenTokenAwareTree firstChild = children.get(0);
+    if (firstChild.getType()==LessLexer.DOT3)
+      return new ArgumentDeclaration(firstChild, new Variable(firstChild, "@"), null, true);
+    
+    HiddenTokenAwareTree name = firstChild;
 
     if (children.size() == 1)
       return new ArgumentDeclaration(token, new Variable(name, name.getText()), null);
@@ -812,17 +812,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private GeneralBody createGeneralBody(HiddenTokenAwareTree token) {
     List<ASTCssNode> list = handleBodyMembers(token);
-    
-    if (list.size()<2)
+
+    if (list.size() < 2)
       throw new BugHappened(GRAMMAR_MISMATCH, token);
 
-    SyntaxOnlyElement lbrace = (SyntaxOnlyElement)list.remove(0);
-    SyntaxOnlyElement rbrace = (SyntaxOnlyElement)list.remove(list.size()-1);
+    SyntaxOnlyElement lbrace = (SyntaxOnlyElement) list.remove(0);
+    SyntaxOnlyElement rbrace = (SyntaxOnlyElement) list.remove(list.size() - 1);
     List<Token> orphansOrFollowLastMember = rbrace.getUnderlyingStructure().chopPreceedingUpToLastOfType(LessLexer.NEW_LINE);
     if (list.isEmpty()) {
       token.addOrphans(orphansOrFollowLastMember);
     } else {
-      list.get(list.size()-1).getUnderlyingStructure().addFollowing(orphansOrFollowLastMember);
+      list.get(list.size() - 1).getUnderlyingStructure().addFollowing(orphansOrFollowLastMember);
     }
     return new GeneralBody(token, lbrace, rbrace, list);
   }
@@ -902,15 +902,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     result.setUrlExpression(handleTerm(children.next()));
     while (children.hasNext()) {
       HiddenTokenAwareTree kid = children.next();
-      if (kid.getType()==LessLexer.COMMA) {
+      if (kid.getType() == LessLexer.COMMA) {
         kid.pushHiddenToSiblings();
-      } else if (kid.getType()==LessLexer.MEDIA_QUERY) {
+      } else if (kid.getType() == LessLexer.MEDIA_QUERY) {
         result.add(handleMediaQuery(kid));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);
       }
     }
-    
+
     return result;
   }
 

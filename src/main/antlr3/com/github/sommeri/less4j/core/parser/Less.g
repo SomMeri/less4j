@@ -79,6 +79,8 @@ tokens {
   PSEUDO_PAGE;
   PAGE_MARGIN_BOX;
   NAMED_EXPRESSION;
+  SEMI_SPLIT_MIXIN_REFERENCE_ARGUMENTS;
+  SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS;
 }
 
 @lexer::header {
@@ -285,16 +287,24 @@ variabledeclaration
 finally { leaveRule(); }
 
 //used in mixinReferenceArgument
-variabledeclarationLimitedNoSemi
+variabledeclarationNoSemi
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : AT_NAME COLON (a+=exprNoComma) -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* )
+    : AT_NAME COLON (a+=expr) -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* )
     ;
 finally { leaveRule(); }
 
-//This looks like the declaration, but does not allow a comma.
-reusableStructureParameter
-    : AT_NAME ((b=COLON (a+=exprNoComma)) | b=DOT3)? -> ^(ARGUMENT_DECLARATION AT_NAME $b* $a*)
+//This looks like the declaration, allows also three dots
+reusableStructureParameterWithDefault
+    : AT_NAME ((b=COLON a+=expr) | b=DOT3) -> ^(ARGUMENT_DECLARATION AT_NAME $b* $a*)
     ;
+
+reusableStructureParameterWithoutDefault
+    : atName
+    | collector
+    ;
+    
+atName:  AT_NAME  -> ^(ARGUMENT_DECLARATION AT_NAME) ;
+collector:   DOT3 -> ^(ARGUMENT_DECLARATION DOT3);
 
 variablereference
 @init {enterRule(retval, RULE_VARIABLE_REFERENCE);}
@@ -547,25 +557,30 @@ finally { leaveRule(); }
 
 mixinReference
 @init {enterRule(retval, RULE_MIXIN_REFERENCE);}
-    : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM?
+    : a=reusableStructureName (LPAREN b=semiSplitMixinReferenceArguments RPAREN)? c=IMPORTANT_SYM?
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ;
 finally { leaveRule(); }
 
 mixinReferenceWithSemi
 @init {enterRule(retval, RULE_MIXIN_REFERENCE);}
-    : a=reusableStructureName (LPAREN b=mixinReferenceArguments? RPAREN)? c=IMPORTANT_SYM? SEMI
+    : a=reusableStructureName (LPAREN b=semiSplitMixinReferenceArguments RPAREN)? c=IMPORTANT_SYM? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 finally { leaveRule(); }
 
-mixinReferenceArguments
-    : a+=mixinReferenceArgument ( COMMA a+=mixinReferenceArgument)*
-    -> $a*
+semiSplitMixinReferenceArguments
+    : a+=mixinReferenceArguments ( a+=semicolon a+=mixinReferenceArguments)* 
+    -> ^(SEMI_SPLIT_MIXIN_REFERENCE_ARGUMENTS $a*)
     ;
 
-mixinReferenceArgument
-    : exprNoComma | variabledeclarationLimitedNoSemi
+semicolon
+    :SEMI;
+    
+mixinReferenceArguments
+    : // nothing
+    | variabledeclarationNoSemi (COMMA! variabledeclarationNoSemi)*
+    | expr (COMMA! variabledeclarationNoSemi (COMMA! variabledeclarationNoSemi)*)?
     ;
 
 reusableStructureName
@@ -574,7 +589,7 @@ reusableStructureName
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 
 @init {enterRule(retval, RULE_ABSTRACT_MIXIN_OR_NAMESPACE);}
-    : a=reusableStructureName LPAREN c=reusableStructureArguments? RPAREN e=reusableStructureGuards? f=general_body
+    : a=reusableStructureName LPAREN c=semiSplitReusableStructureArguments RPAREN e=reusableStructureGuards? f=general_body
     -> ^(REUSABLE_STRUCTURE $a $c* $e* $f)
     ;
 finally { leaveRule(); }
@@ -598,17 +613,24 @@ compareOperator
     : GREATER | GREATER_OR_EQUAL | OPEQ | LOWER_OR_EQUAL | LOWER
     ;     
     
-//It is OK to loose commas, because mixins are going to be lost anyway    
-reusableStructureArguments
-    : a+=reusableStructureArgument ( COMMA a+=reusableStructureArgument)* (COMMA b+=DOT3)?
-    -> $a* $b*
-    | DOT3
+semiSplitReusableStructureArguments
+    : a+=reusableStructureArgument ( a+=semicolon a+=reusableStructureArgument)*
+    -> ^(SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS $a*)
     ;
 
 reusableStructureArgument
-    : reusableStructureParameter
-    | reusableStructurePattern
+    : // nothing
+    | sequenceOfReusableStructureArgumentsWithDefault (COMMA! collector)?
+    | patternAndNoDefaultOnlyReusableStructureArguments (COMMA! sequenceOfReusableStructureArgumentsWithDefault)?  
     ;
+    
+sequenceOfReusableStructureArgumentsWithDefault
+    : reusableStructureParameterWithDefault (COMMA! reusableStructureParameterWithDefault)*
+    ;
+    
+patternAndNoDefaultOnlyReusableStructureArguments
+    : (reusableStructureParameterWithoutDefault | reusableStructurePattern) (COMMA! (reusableStructureParameterWithoutDefault | reusableStructurePattern))*
+    ;    
 
 reusableStructurePattern
     : (( a+=unaryOperator? (a+=value_term)
@@ -663,12 +685,6 @@ expr
     ;
 finally { leaveRule(); }
 
-exprNoComma
-@init {enterRule(retval, RULE_EXPRESSION);}
-    : a=mathExprHighPrior (b+=operatorNoComma c+=mathExprHighPrior)* -> ^(EXPRESSION $a ($b $c)*)
-    ;
-finally { leaveRule(); }
-    
 mathExprHighPrior
 @init {enterRule(retval, RULE_EXPRESSION);}
     : a=mathExprLowPrior (b+=mathOperatorLowPrior c+=mathExprLowPrior)* -> ^(EXPRESSION $a ($b $c)*)
