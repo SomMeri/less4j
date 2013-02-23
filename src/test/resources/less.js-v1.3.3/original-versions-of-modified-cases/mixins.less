@@ -97,15 +97,14 @@ h3 { .margin_between(15px, 5px); }
   @s: "/";
   .mixin_def( "@{s}a.png", center center);
 }
-// commented lines tested mixins cycle checker - it was not implemented by less4j yet and tests cycled
-//.recursion() {
-//  color: black;
-//}
-//.test-rec {
-//  .recursion {
-//    .recursion();
-//  }
-//}
+.recursion() {
+  color: black;
+}
+.test-rec {
+  .recursion {
+    .recursion();
+  }
+}
 .paddingFloat(@padding) { padding-left: @padding; }
 
 .button { 

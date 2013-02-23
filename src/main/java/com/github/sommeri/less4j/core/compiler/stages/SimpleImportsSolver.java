@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -145,7 +146,7 @@ public class SimpleImportsSolver {
   }
 
   private String normalizeFileName(String filename, String urlParams) {
-    if (filename.toLowerCase().contains("."))
+    if ((new File(filename)).getName().contains("."))
       return filename;
 
     return filename + ".less" + urlParams;
