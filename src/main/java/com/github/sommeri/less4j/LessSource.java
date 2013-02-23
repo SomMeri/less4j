@@ -195,8 +195,17 @@ public abstract class LessSource {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((inputFile == null) ? 0 : inputFile.hashCode());
+      File canonicalInputFile = getCanonicalFile();
+      result = prime * result + ((canonicalInputFile == null) ? 0 : canonicalInputFile.hashCode());
       return result;
+    }
+
+    private File getCanonicalFile() {
+      try {
+        return inputFile.getCanonicalFile();
+      } catch (IOException e) {
+        return inputFile.getAbsoluteFile();
+      }
     }
 
     @Override
@@ -208,10 +217,11 @@ public abstract class LessSource {
       if (getClass() != obj.getClass())
         return false;
       FileSource other = (FileSource) obj;
-      if (inputFile == null) {
+      File absoluteInputFile = getCanonicalFile();
+      if (absoluteInputFile == null) {
         if (other.inputFile != null)
           return false;
-      } else if (!inputFile.equals(other.inputFile))
+      } else if (!absoluteInputFile.equals(other.inputFile.getAbsoluteFile()))
         return false;
       return true;
     }
