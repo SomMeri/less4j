@@ -1,0 +1,94 @@
+.mixin() {
+  & {
+    only-appender: 1;
+  }
+  && {
+    only-appenders: 1;
+  }
+  & + & {
+    only-appenders-combined: 1;
+  }
+  & .something {
+    leading-appender: 1;
+  }
+  && .something {
+    leading-appenders: 1;
+  }
+  & + .something {
+    leading-appender-combinator: 1;
+  }
+  && > .something {
+    leading-appenders-combinator: 1;
+  }
+  ~ & .something {
+    leading-appender-combinator: 2;
+  }
+  + &&.something {
+    leading-appenders-combinator: 2;
+  }
+  ~ & + .something {
+    leading-appender-combinators: 1;
+  }
+  + && ~ .something {
+    leading-appenders-combinators: 1;
+  }
+  .something&  {
+    trailing-appender: 1;
+  }
+  .something&& {
+    trailing-appenders: 1;
+  }
+  .something &  {
+    trailing-appender-descendant: 1;
+  }
+  .something && {
+    trailing-appenders-descendant: 1;
+  }
+  .something ~ &  {
+    trailing-appender-combinator: 1;
+  }
+  .something + && {
+    trailing-appenders-combinator: 1;
+  }
+  .something&#else  {
+    middle-appender: 1;
+  }
+  .something&&#else {
+    middle-appenders: 1;
+  }
+  .something &#else  {
+    middle-appender-space-before: 1;
+  }
+  .something &&#else {
+    middle-appenders-space-before: 1;
+  }
+  .something& #else  {
+    middle-appender-space-after: 1;
+  }
+  .something&& #else {
+    middle-appenders-space-after: 1;
+  }
+  .something & #else  {
+    middle-appender-space-after: 1;
+  }
+  .something && #else {
+    middle-appenders-space-both: 1;
+  }
+  .something + & > #else  {
+    middle-appender-combinator-various: 1;
+  }
+  .something + && ~ #else {
+    middle-appenders-combinator-various: 2;
+  }
+  .something ~ && #else {
+    middle-appenders-combinator-various: 3;
+  }
+  h1, &, h2 {
+    multiple-selectors: to empty;
+  }
+  .something + & ~ & > #else  {
+    middle-appenders-combinator-various: 4;
+  }
+}
+
+.mixin();

@@ -8,6 +8,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ExtendedStringBuilder;
 import com.github.sommeri.less4j.core.NotACssException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AnonymousExpression;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
@@ -54,6 +55,7 @@ import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
+import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
@@ -217,7 +219,7 @@ public class CssPrinter {
 
     case IMPORT:
       return appendImport((Import) node);
-      
+
     case ANONYMOUS:
       return appendAnonymous((AnonymousExpression) node);
 
@@ -236,7 +238,7 @@ public class CssPrinter {
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getCharPositionInSourceLine());
     }
   }
-  
+
   private boolean appendSyntaxOnlyElement(SyntaxOnlyElement node) {
     builder.append(node.getSymbol());
     return true;
@@ -252,7 +254,7 @@ public class CssPrinter {
     append(node.getUrlExpression());
     appendMediums(node.getMediums());
     builder.append(";");
-    
+
     return true;
   }
 
@@ -284,7 +286,6 @@ public class CssPrinter {
     return true;
   }
 
-  
   private boolean appendKeyframesName(KeyframesName node) {
     builder.append(node.getName());
     return true;
@@ -292,7 +293,7 @@ public class CssPrinter {
 
   private boolean appendKeyframes(Keyframes node) {
     builder.append(node.getDialect()).ensureSeparator();
-    
+
     Iterator<KeyframesName> names = node.getNames().iterator();
     if (names.hasNext()) {
       append(names.next());
@@ -301,18 +302,16 @@ public class CssPrinter {
       builder.append(",").ensureSeparator();
       append(names.next());
     }
-    
+
     append(node.getBody());
     return true;
   }
-  
+
   private boolean appendViewport(Viewport node) {
     builder.append("@viewport");
     append(node.getBody());
     return true;
   }
-
-
 
   private boolean appendFaultyNode(FaultyNode node) {
     builder.append("!#error#!");
@@ -447,14 +446,14 @@ public class CssPrinter {
     if (body.isEmpty())
       return false;
 
-    builder.ensureSeparator(); 
+    builder.ensureSeparator();
     append(body.getOpeningCurlyBrace());
     builder.ensureNewLine().increaseIndentationLevel();
     LinkedHashSet<String> declarationsBuilders = collectUniqueBodyMembersStrings(body);
     for (String miniBuilder : declarationsBuilders) {
       builder.appendAsIs(miniBuilder);
     }
-    
+
     appendComments(body.getOrphanComments(), false);
     builder.decreaseIndentationLevel();
     append(body.getClosingCurlyBrace());
@@ -463,7 +462,7 @@ public class CssPrinter {
   }
 
   private LinkedHashSet<String> collectUniqueBodyMembersStrings(Body body) {
-    //the same declaration must be printed only once
+    // the same declaration must be printed only once
     ExtendedStringBuilder storedBuilder = builder;
     LinkedHashSet<String> declarationsStrings = new LinkedHashSet<String>();
     for (ASTCssNode declaration : body.getMembers()) {
@@ -476,7 +475,7 @@ public class CssPrinter {
       }
       declarationsStrings.add(declarationSnipped);
     }
-    
+
     storedBuilder.configureFrom(builder);
     builder = storedBuilder;
     return declarationsStrings;
@@ -504,10 +503,10 @@ public class CssPrinter {
   }
 
   private void appendBodySortDeclarations(Body node) {
-    //this is sort of hack, bypass the usual append method
+    // this is sort of hack, bypass the usual append method
     appendComments(node.getOpeningComments(), true);
-    
-    builder.ensureSeparator(); 
+
+    builder.ensureSeparator();
     append(node.getOpeningCurlyBrace());
     builder.ensureNewLine().increaseIndentationLevel();
 
@@ -529,7 +528,7 @@ public class CssPrinter {
     builder.decreaseIndentationLevel();
     append(node.getClosingCurlyBrace());
 
-    //this is sort of hack, bypass the usual append method
+    // this is sort of hack, bypass the usual append method
     appendComments(node.getTrailingComments(), false);
   }
 
@@ -643,8 +642,10 @@ public class CssPrinter {
       builder.ensureSeparator();
       break;
 
-    //TODO this is a huge hack which goes around "we do not parse fonts and less.js does" lack of feature
-    //left here intentionally, so we can have correct unit test and can come back to it later
+    // TODO this is a huge hack which goes around
+    // "we do not parse fonts and less.js does" lack of feature
+    // left here intentionally, so we can have correct unit test and can come
+    // back to it later
     case MINUS:
       builder.ensureSeparator().append("-");
       break;
@@ -719,6 +720,11 @@ public class CssPrinter {
   }
 
   public void appendSelectors(List<Selector> selectors) {
+    // follow less.js formatting in special case - only one empty selector
+    if (selectors.size() == 1 && isEmptySelector(selectors.get(0))) {
+      builder.append(" ");
+    }
+
     Iterator<Selector> iterator = selectors.iterator();
     while (iterator.hasNext()) {
       Selector selector = iterator.next();
@@ -727,6 +733,25 @@ public class CssPrinter {
       if (iterator.hasNext())
         builder.append(",").newLine();
     }
+  }
+
+  private boolean isEmptySelector(Selector selector) {
+    if (selector.hasRight())
+      return false;
+    
+    SelectorPart head = selector.getHead();
+    if (head.getType() != ASTCssNodeType.SIMPLE_SELECTOR)
+      return false;
+
+    SimpleSelector simpleHead = (SimpleSelector) head;
+    if (!simpleHead.isEmptyForm() || !simpleHead.isStar()) {
+      return false;
+    }
+
+    if (simpleHead.hasSubsequent())
+      return false;
+      
+    return true;
   }
 
   public boolean appendSelector(Selector selector) {
@@ -741,7 +766,7 @@ public class CssPrinter {
     append(selector.getRight());
     return true;
   }
-
+  
   private boolean appendSimpleSelector(SimpleSelector selector) {
     appendSimpleSelectorHead(selector);
     appendSimpleSelectorTail(selector);
@@ -801,7 +826,7 @@ public class CssPrinter {
   private String format(Double valueAsDouble) {
     if (valueAsDouble.isNaN())
       return "NaN";
-    
+
     return FORMATTER.format(valueAsDouble);
   }
 

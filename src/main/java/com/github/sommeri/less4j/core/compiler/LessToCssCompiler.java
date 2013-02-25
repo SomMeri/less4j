@@ -27,6 +27,7 @@ import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
+import com.github.sommeri.less4j.core.compiler.stages.UselessLessElementsRemover;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
 
@@ -54,13 +55,21 @@ public class LessToCssCompiler {
     evaluateExpressions(less);
     bubbleAndMergeMedia(less);
     freeNestedRuleSets(less);
+    removeUselessLessElements(less);
+
+    //final clean up  
     sortTopLevelElements(less);
     removeUselessCharsets(less);
-    
+
     //final validation
     validateFinalCss(less);
 
     return less;
+  }
+
+  private void removeUselessLessElements(StyleSheet node) {
+    UselessLessElementsRemover remover = new UselessLessElementsRemover();
+    remover.removeUselessLessElements(node);
   }
 
   private void removeUselessCharsets(StyleSheet less) {

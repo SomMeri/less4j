@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -100,6 +101,13 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   public void addSelector(Selector selector) {
     this.selectors.add(selector);
+  }
+
+  public void replaceSelector(Selector oldSelector, Selector newSelector) {
+    oldSelector.setParent(null);
+    newSelector.setParent(this);
+    
+    Collections.replaceAll(this.selectors, oldSelector, newSelector);
   }
 
   public void replaceSelectors(List<Selector> result) {
