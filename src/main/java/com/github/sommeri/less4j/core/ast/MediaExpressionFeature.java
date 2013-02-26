@@ -15,7 +15,12 @@ public class MediaExpressionFeature extends ASTCssNode {
   }
 
   public boolean isRatioFeature() {
-    return getFeature()!=null? getFeature().toLowerCase().endsWith("aspect-ratio") : false;
+    if (getFeature()==null)
+      return false;
+    
+    
+    String feature = getFeature().toLowerCase();
+    return feature.endsWith("aspect-ratio") || feature.endsWith("pixel-ratio");
   }
 
   public String getFeature() {

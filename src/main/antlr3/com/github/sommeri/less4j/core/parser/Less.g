@@ -841,7 +841,7 @@ fragment UNKNOWN_DIMENSION : NMSTART NMCHAR* ;
 // The original URL did not allowed characters, '.', '=', ':', ';', ',' and so on
 // I added those characters that appear in less.js css test case.
 fragment URL : (
-                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'|'='|':'|';'|','|'\r'|'\n'|'\t'|' '|'+'
+                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'|'='|':'|';'|','|'\r'|'\n'|'\t'|' '|'+'|'?'
                             | NMCHAR
                           )*
                         ;
