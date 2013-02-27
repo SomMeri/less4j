@@ -1,19 +1,8 @@
-//@import url(http://fonts.googleapis.com/css?family=Open+Sans);
-
-@media a {
-  .first {
-    @media b {
-      .second {
-        .third {
-          width: 300px;
-          @media c {
-            width: 500px;
-          }
-        }
-        .fourth {
-          width: 3;
-        }
-      }
+.amp {
+    &.support {
+        color: orange;
     }
-  }
+}
+.extended {
+    .amp.support;
 }

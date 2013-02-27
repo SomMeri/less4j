@@ -41,6 +41,10 @@ public class ColorExpression extends Expression {
     return value;
   }
 
+  public String getValueInHexadecimal() {
+    return encode(red, green, blue);
+  }
+
   public void setValue(String value) {
     this.value = value;
     red = decode(value, 0);

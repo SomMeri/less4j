@@ -14,9 +14,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * The test reproduces test files found in original less.js implementation. As
- * less.js has only only one tag and that tag is one year old, we took tests
- * from the master branch.
+ * The test reproduces test files found in original less.js implementation. Some of those
+ * test have been modified, original versions are located in 
+ * src/test/resources/less.js-v1.3.3/original-versions-of-modified-cases directory.
  * 
  */
 @Ignore

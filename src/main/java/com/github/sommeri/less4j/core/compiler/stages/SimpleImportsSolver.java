@@ -70,6 +70,10 @@ public class SimpleImportsSolver {
       // css file imports should be left as they are
       return;
 
+//    if (!source.canLocate(filename))
+//      // unknown protocols imports should be left as they are 
+//      return;
+
     // add .less suffix if needed
     filename = normalizeFileName(filename, urlParams);
     LessSource importedSource;

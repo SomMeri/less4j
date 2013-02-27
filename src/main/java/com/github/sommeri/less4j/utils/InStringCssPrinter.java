@@ -20,7 +20,7 @@ public class InStringCssPrinter extends CssPrinter {
 
   @Override
   protected boolean appendColorExpression(ColorExpression expression) {
-    builder.append(expression.getValue());
+    builder.append(expression.getValueInHexadecimal());
     return true;
   }
 }
