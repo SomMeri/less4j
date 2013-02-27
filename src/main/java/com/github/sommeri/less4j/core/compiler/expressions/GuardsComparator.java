@@ -1,5 +1,8 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import com.github.sommeri.less4j.core.ast.EscapedValue;
+import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 
@@ -18,6 +21,24 @@ public class GuardsComparator extends ExpressionComparator {
       return true;
     
     return left.equals(right);
+  }
+  
+  @Override
+  protected boolean equalIdentifier(IdentifierExpression pattern, Expression expression) {
+    if (expression instanceof EscapedValue) {
+      return equals(pattern.getValue(), ((EscapedValue) expression).getValue());
+    }
+
+    return super.equalIdentifier(pattern, expression);
+  }
+
+  @Override
+  protected boolean equalEscapedValue(EscapedValue pattern, Expression expression) {
+    if (expression instanceof IdentifierExpression) {
+      return equals(pattern.getValue(), ((IdentifierExpression) expression).getValue());
+    }
+
+    return super.equalEscapedValue(pattern, expression);
   }
 
 }

@@ -138,3 +138,13 @@
 #tryColor2 {
   catch: all;
 }
+.stringguardtest {
+  content: 1 is theme1;
+  content: 1 is not theme2;
+  reversed-content: 1 is theme1;
+  reversed-content: 1 is not theme2;
+  content: 3 is not theme2;
+  content: 3 is theme1 no quotes;
+  reversed-content: 3 is not theme2;
+  reversed-content: 3 is theme1 no quotes;
+}

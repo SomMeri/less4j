@@ -112,3 +112,19 @@
 #tryColor2 {
   .mixin(#ff0000);
 }
+
+.stringguard(@str, @id) when (@str = "theme1")					{ content: @id is theme1; }
+.stringguard(@str, @id) when not ("theme2" = @str)				{ content: @id is not theme2; }
+.stringguard(@str, @id) when (~"theme1" = @str)					{ content: @id is theme1 no quotes; }
+.stringguard(@str, @id)											{}
+
+.stringguard(@str, @id) when ("theme1" = @str)					{ reversed-content: @id is theme1; }
+.stringguard(@str, @id) when not (@str = "theme2")				{ reversed-content: @id is not theme2; }
+.stringguard(@str, @id) when (@str = ~"theme1")					{ reversed-content: @id is theme1 no quotes; }
+
+
+.stringguardtest {
+    .stringguard("theme1", 1);
+	.stringguard("theme2", 2);
+	.stringguard(theme1, 3);
+}

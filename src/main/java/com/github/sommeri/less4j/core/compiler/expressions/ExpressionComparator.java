@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.compiler.expressions;
 
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
@@ -17,6 +18,9 @@ public abstract class ExpressionComparator {
 
     case IDENTIFIER_EXPRESSION:
       return equalIdentifier((IdentifierExpression) pattern, expression);
+
+    case ESCAPED_VALUE:
+      return equalEscapedValue((EscapedValue) pattern, expression);
 
     case NUMBER:
       return equalNumber((NumberExpression) pattern, expression);
@@ -60,9 +64,17 @@ public abstract class ExpressionComparator {
 
   protected abstract boolean numberEqual(NumberExpression pattern, NumberExpression numberExpression);
 
-  private boolean equalIdentifier(IdentifierExpression pattern, Expression expression) {
+  protected boolean equalIdentifier(IdentifierExpression pattern, Expression expression) {
     if (expression instanceof IdentifierExpression) {
       return equals(pattern.getValue(), ((IdentifierExpression) expression).getValue());
+    }
+
+    return false;
+  }
+
+  protected boolean equalEscapedValue(EscapedValue pattern, Expression expression) {
+    if (expression instanceof EscapedValue) {
+      return equals(pattern.getValue(), ((EscapedValue) expression).getValue());
     }
 
     return false;
