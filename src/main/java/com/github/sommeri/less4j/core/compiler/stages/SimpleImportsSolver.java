@@ -157,7 +157,8 @@ public class SimpleImportsSolver {
   }
 
   private boolean isCssFile(String filename) {
-    return filename.toLowerCase().endsWith(".css");
+    String lowerCase = filename.toLowerCase();
+    return lowerCase.endsWith(".css") || lowerCase.endsWith("/css");
   }
 
   private String evaluateFilename(Expression urlInput) {

@@ -85,7 +85,8 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
     text = text.replace("color: red;", "color: #f00;");
     //functions.less
     text = text.replace("background: linear-gradient(#000, #fff);", "background: linear-gradient(#000000, #ffffff);");
-    
+    //import.less
+    text = text.replace("\n\n", "\n");
     return text;
   }
 
