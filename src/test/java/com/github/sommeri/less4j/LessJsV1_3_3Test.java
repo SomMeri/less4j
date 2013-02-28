@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -19,7 +18,6 @@ import org.junit.runners.Parameterized.Parameters;
  * src/test/resources/less.js-v1.3.3/original-versions-of-modified-cases directory.
  * 
  */
-//@Ignore
 @RunWith(Parameterized.class)
 public class LessJsV1_3_3Test extends AbstractFileBasedTest {
 
