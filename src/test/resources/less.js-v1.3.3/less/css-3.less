@@ -86,28 +86,28 @@ p::before {
   font: 12vmin/15vmin;
   font: 1.2ch/1.5ch;
 }
-
-@supports ( box-shadow: 2px 2px 2px black ) or
-          ( -moz-box-shadow: 2px 2px 2px black ) {
-  .outline {
-    box-shadow: 2px 2px 2px black;
-    -moz-box-shadow: 2px 2px 2px black;
-  }
-}
-
-@-x-document url-prefix(""github.com"") {
-  h1 {
-    color: red;
-  }
-}
-
-@viewport {
-  font-size: 10px;
-}
-@namespace foo url(http://www.example.com);
-
-foo|h1 { color: blue; }
-foo|* { color: yellow; }
-|h1 { color: red; }
-*|h1 { color: green; }
-h1 { color: green; }
+//less4j: not implemented yet
+//@supports ( box-shadow: 2px 2px 2px black ) or
+//          ( -moz-box-shadow: 2px 2px 2px black ) {
+//  .outline {
+//    box-shadow: 2px 2px 2px black;
+//    -moz-box-shadow: 2px 2px 2px black;
+//  }
+//}
+//
+//@-x-document url-prefix(""github.com"") {
+//  h1 {
+//    color: red;
+//  }
+//}
+//
+//@viewport {
+//  font-size: 10px;
+//}
+//@namespace foo url(http://www.example.com);
+//
+//foo|h1 { color: blue; }
+//foo|* { color: yellow; }
+//|h1 { color: red; }
+//*|h1 { color: green; }
+//h1 { color: green; }

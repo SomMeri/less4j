@@ -110,9 +110,6 @@ h3 + * {
   background-image: "/a.png";
   background-position: center center;
 }
-.test-rec .recursion {
-  color: black;
-}
 .button {
   padding-left: 44px;
 }

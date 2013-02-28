@@ -19,14 +19,14 @@ import org.junit.runners.Parameterized.Parameters;
  * src/test/resources/less.js-v1.3.3/original-versions-of-modified-cases directory.
  * 
  */
-@Ignore
+//@Ignore
 @RunWith(Parameterized.class)
 public class LessJsV1_3_3Test extends AbstractFileBasedTest {
 
   private static final String inputLessDir = "src/test/resources/less.js-v1.3.3/less/";
   private static final String expectedCssDir = "src/test/resources/less.js-v1.3.3/css/";
   private static final Set<String> excludeInput = new HashSet<String>(Arrays.asList(new String[] {"comments.less", "whitespace.less"}));
-  private static final Set<String> hack = new HashSet<String>(Arrays.asList(new String[] {"css-3.less"}));
+  private static final Set<String> disabled = new HashSet<String>(Arrays.asList(new String[] {"scope.less", "urls.less"}));
 
   public LessJsV1_3_3Test(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);
@@ -37,7 +37,7 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
     Collection<File> allFiles = FileUtils.listFiles(new File(inputLessDir), null, false);
     Collection<Object[]> result = new ArrayList<Object[]>();
     for (File file : allFiles) {
-      if (!excludeInput.contains(file.getName()) && !hack.contains(file.getName())) {
+      if (!excludeInput.contains(file.getName()) && !disabled.contains(file.getName())) {
         result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
       }
     }
@@ -87,6 +87,14 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
     text = text.replace("background: linear-gradient(#000, #fff);", "background: linear-gradient(#000000, #ffffff);");
     //import.less
     text = text.replace("\n\n", "\n");
+    //scope.less
+    text = text.replace("border-color: black", "border-color: #000000");
+    text = text.replace("background-color: white;", "background-color: #ffffff;");
+    text = text.replace("scoped-val: green;", "scoped-val: #008000;");
+    //css-3.less
+    text = text.replace("text-shadow: -1px -1px 1px red, 6px 5px 5px yellow;", "text-shadow: -1px -1px 1px #ff0000, 6px 5px 5px #ffff00;");
+    text = text.replace("xxxx", "xxxx");
+    
     return text;
   }
 
