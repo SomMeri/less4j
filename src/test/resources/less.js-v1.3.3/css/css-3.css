@@ -80,3 +80,11 @@ p::before {
   font: 12vmin/15vmin;
   font: 1.2ch/1.5ch;
 }
+@-x-document url-prefix("github.com") {
+  h1 {
+    color: red;
+  }
+}
+@viewport {
+  font-size: 10px;
+}
