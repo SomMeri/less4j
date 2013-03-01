@@ -1,0 +1,16 @@
+.call(@variable) {
+  #id {
+    content: @variable;
+  }  
+}
+
+.mixinWithDocument() {
+  @-moz-document url-prefix() {
+    h1 {
+      size: 2 2 2 2;
+    }
+    .call(2);
+  }
+}
+
+.mixinWithDocument();

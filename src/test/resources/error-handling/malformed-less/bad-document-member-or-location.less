@@ -1,0 +1,18 @@
+.mixinWithDeclaration() {
+  declaration: not allowed;
+}
+
+.takeDocumentWithYou(@parameter) {
+  @-prefix-document regexp('aaaa'), url-prefix() {
+  .mixinWithDeclaration();
+  pre {
+      declaration: weird @parameter;
+    }
+  } 
+}
+
+#selector {
+  .takeDocumentWithYou(~"in ruleset");
+}
+
+.takeDocumentWithYou(~"on top");

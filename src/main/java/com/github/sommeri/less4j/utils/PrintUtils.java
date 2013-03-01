@@ -68,6 +68,9 @@ public class PrintUtils {
     case KEYFRAMES:
       return "@keyframes";
 
+    case DOCUMENT:
+      return "@document";
+
     case STYLE_SHEET:
       return "top level style sheet";
 

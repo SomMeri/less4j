@@ -106,6 +106,10 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNICODE_RANGE", "unicode range");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("MEDIA_EXPRESSION", "media expression");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INTERPOLATED_MEDIA_EXPRESSION", "variable as media query");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DOCUMENT", "@document");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("KEYFRAMES_DECLARATION", "@keyframes");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("URL_PREFIX", "url-prefix(...)");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DOMAIN", "domain(...)");
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";
@@ -126,6 +130,7 @@ public abstract class SuperLessParser extends Parser {
   protected static final String RULE_SELECTOR = "selectors";
   protected static final String RULE_MEDIUM = "medium";
   protected static final String RULE_KEYFRAME = "keyframe";
+  protected static final String RULE_DOCUMENT = "document";
   protected static final String RULE_PAGE_MARGIN_BOX = "page margin box";
   
 

@@ -45,10 +45,14 @@ public abstract class AbstractErrorReportingTest {
       ComparisonFailure fail = (ComparisonFailure) ex;
       throw new ComparisonFailure(testName + " " + fail.getMessage(), fail.getExpected(), fail.getActual());
     } catch (Less4jException ex) {
+      printErrors(ex);
       assertCorrectErrors(ex);
     } catch (Throwable ex) {
       throw new RuntimeException(testName + " " + ex.getMessage(), ex);
     }
+  }
+
+  protected void printErrors(Less4jException ex) {
   }
 
   protected CompilationResult compile(File lessFile) throws Less4jException, IOException {
@@ -58,11 +62,11 @@ public abstract class AbstractErrorReportingTest {
   }
 
   private void assertCorrectErrors(Less4jException error) {
-    //validate css
-    assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
     //validate errors and warnings
     String completeErrorReport = generateErrorReport(error);
     assertEquals(lessFile.toString(), canonize(expectedErrors()), canonize(completeErrorReport));
+    //validate css
+    assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
   }
 
   private void assertCorrectWarnings(CompilationResult actual) {
@@ -112,7 +116,7 @@ public abstract class AbstractErrorReportingTest {
     }
   }
 
-  private String generateErrorReport(Less4jException error) {
+  protected String generateErrorReport(Less4jException error) {
     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 

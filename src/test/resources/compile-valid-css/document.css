@@ -1,0 +1,48 @@
+@-moz-document url-prefix() {
+  .icon-spin {
+    height: .9em;
+  }
+  .btn .icon-spin {
+    height: auto;
+  }
+  .icon-spin.icon-large {
+    height: 1.25em;
+  }
+  .btn .icon-spin.icon-large {
+    height: .75em;
+  }
+}
+@document url(http://www.w3.org/), url-prefix(http://www.w3.org/Style/), domain(mozilla.org), regexp("https:.*") {
+  body {
+    color: purple;
+    background: yellow;
+  }
+}
+@-moz-document url(http://www.w3.org/), url-prefix(http://www.w3.org/Style/), domain(mozilla.org), regexp("https:.*") {
+  body {
+    color: purple;
+    background: yellow;
+  }
+}
+@document url("http://www.w3.org/Style/CSS/") {
+  #summary {
+    background: yellow;
+    color: #000000;
+  }
+}
+@document url-prefix("http://www.w3.org/Style/CSS/") {
+  #summary {
+    background: yellow;
+    color: #000000;
+  }
+}
+@document domain("w3.org") {
+  body {
+    font-size: 16px !important;
+  }
+}
+@document regexp("http://www.w3.org/TR/\\d{4}/[^/]*-CSS2-\\d{8}/") {
+  body {
+    font-size: 20px !important;
+  }
+}

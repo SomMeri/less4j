@@ -66,7 +66,13 @@ public class TermBuilder {
       return buildFromNumber(token, offsetChild);
 
     case LessLexer.URI:
-      return buildFromSpecialFunction(token, offsetChild);
+      return buildFromSpecialFunction(token, "url", offsetChild);
+
+    case LessLexer.DOMAIN:
+      return buildFromSpecialFunction(token, "domain", offsetChild);
+
+    case LessLexer.URL_PREFIX:
+      return buildFromSpecialFunction(token, "url-prefix", offsetChild);
 
     case LessLexer.TERM_FUNCTION:
       return buildFromNormalFunction(token, offsetChild);
@@ -211,8 +217,8 @@ public class TermBuilder {
     return new UnicodeRangeExpression(parent, first.getText());
   }
 
-  private FunctionExpression buildFromSpecialFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
-    return new FunctionExpression(token, "url", extractUrlParameter(token, normalizeNewLineSymbols(first.getText())));
+  private FunctionExpression buildFromSpecialFunction(HiddenTokenAwareTree token, String function, HiddenTokenAwareTree first) {
+    return new FunctionExpression(token, function, extractUrlParameter(token, function, normalizeNewLineSymbols(first.getText())));
   }
 
   // some places (e.g. only url) allow new lines in them. Less.js tend to
@@ -221,14 +227,14 @@ public class TermBuilder {
     return text.replaceAll("\r?\n", Constants.NEW_LINE);
   }
 
-  private Expression extractUrlParameter(HiddenTokenAwareTree token, String text) {
+  private Expression extractUrlParameter(HiddenTokenAwareTree token, String function, String text) {
     if (text == null)
       return null;
 
-    if (text.length() < 5)
+    if (text.length() <= function.length()+2)
       return new CssString(token, "", "");
 
-    String string = text.substring(4, text.length() - 1);
+    String string = text.substring(function.length()+1, text.length() - 1);
     return new CssString(token, string, "");
   }
 

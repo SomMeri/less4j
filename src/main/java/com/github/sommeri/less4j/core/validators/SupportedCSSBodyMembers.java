@@ -41,6 +41,7 @@ public class SupportedCSSBodyMembers {
       return createSet(ASTCssNodeType.DECLARATION);
 
     case MEDIA:
+    case DOCUMENT:
       return topLevelElements();
 
     case KEYFRAMES:

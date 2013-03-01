@@ -1,0 +1,39 @@
+//the original requirement from font awesome
+@-moz-document url-prefix() {
+  .icon-spin { height: .9em; }
+  .btn .icon-spin { height: auto; }
+  .icon-spin.icon-large { height: 1.25em; }
+  .btn .icon-spin.icon-large { height: .75em; }
+}
+
+//from https://developer.mozilla.org/en-US/docs/CSS/@document
+@document url(http://www.w3.org/), url-prefix(http://www.w3.org/Style/), domain(mozilla.org), regexp("https:.*")
+{
+  body { color: purple; background: yellow; }
+}
+@-moz-document url(http://www.w3.org/),
+               url-prefix(http://www.w3.org/Style/),
+               domain(mozilla.org),
+               regexp("https:.*")
+{
+  body { color: purple; background: yellow; }
+}
+
+//from http://www.w3.org/TR/2012/WD-css3-conditional-20120911/#at-document
+//example 11
+@document url("http://www.w3.org/Style/CSS/") {
+  #summary { background: yellow; color: #000000}
+}
+//example 12
+@document url-prefix("http://www.w3.org/Style/CSS/") {
+  #summary { background: yellow; color: #000000}
+}
+//example 13
+@document domain("w3.org") {
+  body { font-size: 16px !important }
+}
+//example 14
+@document regexp("http://www.w3.org/TR/\\d{4}/[^/]*-CSS2-\\d{8}/") {
+  body { font-size: 20px !important }
+}
+

@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
+import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
 public class MediaTest extends AbstractErrorReportingTest {
@@ -20,4 +21,9 @@ public class MediaTest extends AbstractErrorReportingTest {
     return (new TestFileUtils(".err")).loadTestFiles(standardCases);
   }
 
+  @Override
+  protected void printErrors(Less4jException ex) {
+    String errorReport = generateErrorReport(ex);
+    System.err.println(errorReport);
+  }
 }

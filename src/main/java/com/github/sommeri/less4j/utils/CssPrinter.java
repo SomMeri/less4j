@@ -18,6 +18,7 @@ import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
@@ -202,6 +203,9 @@ public class CssPrinter {
     case KEYFRAMES_NAME:
       return appendKeyframesName((KeyframesName) node);
 
+    case DOCUMENT:
+      return appendDocument((Document) node);
+
     case VIEWPORT:
       return appendViewport((Viewport) node);
 
@@ -301,6 +305,22 @@ public class CssPrinter {
     while (names.hasNext()) {
       builder.append(",").ensureSeparator();
       append(names.next());
+    }
+
+    append(node.getBody());
+    return true;
+  }
+
+  private boolean appendDocument(Document node) {
+    builder.append(node.getDialect()).ensureSeparator();
+
+    Iterator<FunctionExpression> urlMatchFunctions = node.getUrlMatchFunctions().iterator();
+    if (urlMatchFunctions.hasNext()) {
+      append(urlMatchFunctions.next());
+    }
+    while (urlMatchFunctions.hasNext()) {
+      builder.append(",").ensureSeparator();
+      append(urlMatchFunctions.next());
     }
 
     append(node.getBody());

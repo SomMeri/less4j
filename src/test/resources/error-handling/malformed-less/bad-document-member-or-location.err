@@ -1,0 +1,4 @@
+Warnings produced by compilation of testCase
+WARNING 6:3 Compilation resulted in incorrect CSS. The @document ended up inside a body of rule set.
+WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of @document.
+WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of @document.

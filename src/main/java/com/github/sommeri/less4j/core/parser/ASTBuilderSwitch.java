@@ -18,12 +18,14 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.FontFace;
+import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
@@ -299,7 +301,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         mixinsParametersBuilder.handleMixinReferenceArguments(kid, result);
       }
     }
-    
+
     return result;
   }
 
@@ -430,15 +432,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public CssClass handleCssClass(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     return new CssClass(token, toInterpolableName(token, children));
-    //    HiddenTokenAwareTree nameToken = children.get(0);
+    // HiddenTokenAwareTree nameToken = children.get(0);
     //
-    //    String name = nameToken.getText();
-    //    if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
-    //      name = name.substring(1, name.length());
-    //    }
+    // String name = nameToken.getText();
+    // if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
+    // name = name.substring(1, name.length());
+    // }
     //
-    //    CssClass result = new CssClass(token, name);
-    //    return result;
+    // CssClass result = new CssClass(token, name);
+    // return result;
   }
 
   public SelectorAttribute handleSelectorAttribute(HiddenTokenAwareTree token) {
@@ -575,7 +577,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       if (kid.getType() == LessLexer.INTERPOLATED_VARIABLE) {
         result.add(new VariableNamePart(kid, new Variable(kid, "@" + text.substring(2, text.length() - 1))));
       } else if (kid.getType() == LessLexer.HASH_SYMBOL) {
-        //do nothing
+        // do nothing
       } else {
         result.add(new FixedNamePart(kid, toFixedName(kid.getType(), text)));
       }
@@ -619,7 +621,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     MediaQuery result = new MediaQuery(token);
     List<HiddenTokenAwareTree> originalChildren = token.getChildren();
 
-    //each AND identifier may hold preceding comments must be pushed to other tokens
+    // each AND identifier may hold preceding comments must be pushed to other
+    // tokens
     LinkedList<HiddenTokenAwareTree> children = new LinkedList<HiddenTokenAwareTree>();
     for (HiddenTokenAwareTree kid : originalChildren) {
       if (kid.getType() == LessLexer.IDENT) {
@@ -639,7 +642,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       if (kid.getType() != LessLexer.IDENT) {
         result.addMember(switchOn(kid));
       } else {
-        //we have to copy comments from the AND identifier to surrounding elements.
+        // we have to copy comments from the AND identifier to surrounding
+        // elements.
       }
     }
     return result;
@@ -689,7 +693,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new IllegalStateException("Unexpected medium modifier: " + modifier);
   }
 
-  //this handles both variable declaration and a mixin parameter with default value
+  // this handles both variable declaration and a mixin parameter with default
+  // value
   public VariableDeclaration handleVariableDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree name = children.get(0);
@@ -705,13 +710,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
   }
 
-  //FIXME: fail on wrong distribution of arguments (e.g. collector must be last, those with default must be first)
+  // FIXME: fail on wrong distribution of arguments (e.g. collector must be
+  // last, those with default must be first)
   public ArgumentDeclaration handleArgumentDeclaration(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree firstChild = children.get(0);
-    if (firstChild.getType()==LessLexer.DOT3)
+    if (firstChild.getType() == LessLexer.DOT3)
       return new ArgumentDeclaration(firstChild, new Variable(firstChild, "@"), null, true);
-    
+
     HiddenTokenAwareTree name = firstChild;
 
     if (children.size() == 1)
@@ -802,9 +808,39 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   @Override
+  public Document handleDocument(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    Document result = new Document(token, children.next().getText());
+    result.addUrlMatchFunctions(handleUrlMatchFunctionsDeclaration(children.next()));
+    result.setBody(handleGeneralBody(children.next()));
+
+    return result;
+  }
+
+  private List<FunctionExpression> handleUrlMatchFunctionsDeclaration(HiddenTokenAwareTree declaration) {
+    List<FunctionExpression> result = new ArrayList<FunctionExpression>();
+    Iterator<HiddenTokenAwareTree> iterator = declaration.getChildren().iterator();
+    while (iterator.hasNext()) {
+      HiddenTokenAwareTree token = iterator.next();
+      if (token.getType() == LessLexer.COMMA) {
+        token.pushHiddenToSiblings();
+      } else {
+        ASTCssNode urlMatchFunction = switchOn(token);
+        if (urlMatchFunction.getType() == ASTCssNodeType.FUNCTION)
+          result.add((FunctionExpression) termBuilder.buildFromTerm(token));
+        else
+          throw new BugHappened(GRAMMAR_MISMATCH, token);
+      }
+
+    }
+
+    return result;
+  }
+
+  @Override
   public Viewport handleViewport(HiddenTokenAwareTree token) {
     Viewport result = new Viewport(token);
-    //HiddenTokenAwareTree atName = token.getChild(0);
+    // HiddenTokenAwareTree atName = token.getChild(0);
     HiddenTokenAwareTree body = token.getChild(1);
     result.setBody(createGeneralBody(body));
     return result;

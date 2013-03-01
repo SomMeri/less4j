@@ -74,6 +74,8 @@ tokens {
   DUMMY_MEANINGFULL_WHITESPACE; //ANTLR, please
   KEYFRAMES_DECLARATION;
   KEYFRAMES;
+  DOCUMENT_DECLARATION;
+  DOCUMENT;
   VIEWPORT;
   REUSABLE_STRUCTURE_NAME;
   PSEUDO_PAGE;
@@ -232,6 +234,15 @@ keyframes
     ;
 finally { leaveRule(); }
 
+document
+@init {enterRule(retval, RULE_DOCUMENT);}
+    : {predicates.isDocument(input.LT(1))}? AT_NAME 
+      url_match_fn1+=term_only_function (c+=COMMA url_match_fn2+=term_only_function)*
+      body+=top_level_body
+    -> ^(DOCUMENT AT_NAME ^(DOCUMENT_DECLARATION $url_match_fn1 ($c $url_match_fn2)*) $body)
+    ;
+finally { leaveRule(); }
+
 viewport
 @init {enterRule(retval, RULE_KEYFRAME);}
     : {predicates.isViewport(input.LT(1))}? AT_NAME
@@ -278,6 +289,7 @@ top_level_element
     | page
     | fontface
     | imports
+    | document
     ;
 
 variabledeclaration
@@ -401,15 +413,15 @@ top_level_body
             (a+=top_level_element)*
       RBRACE
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
-     -> ^(BODY LBRACE $a*); 
+     -> ^(BODY LBRACE $a* RBRACE); 
 
 top_level_body_with_declaration
     : LBRACE
             ((declarationWithSemicolon)=> a+=declarationWithSemicolon
             | a+=top_level_element)*
-      rbrace+=RBRACE
+      RBRACE
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
-     -> ^(BODY LBRACE $a* $rbrace*); 
+     -> ^(BODY LBRACE $a* RBRACE); 
 
 general_body
     : LBRACE
@@ -423,6 +435,7 @@ general_body
                | a+=media_in_general_body
                | a+=viewport
                | a+=keyframes
+               | a+=document
                | a+=page
                | a+=fontface
                | a+=imports
@@ -708,6 +721,12 @@ term
         | a+=special_function))
     -> ^(TERM $a*)
     ;
+    
+term_only_function
+    : (a+=function
+    | a+=special_function)
+    -> ^(TERM $a*)
+    ;    
 
 escapedValue: VALUE_ESCAPE -> ^(ESCAPED_VALUE VALUE_ESCAPE);
     
@@ -733,7 +752,7 @@ unsigned_value_term
     ;
 
 special_function
-    : URI
+    : URI | URL_PREFIX | DOMAIN 
     ;
 
 hexColor
@@ -1261,16 +1280,33 @@ NUMBER
     ;
     
 // ------------
-// url and uri.
-URI : (U R L
-        '('
-            ((WS)=>WS)? (URL) WS?
-        ')') => (U R L
-        '('
-            ((WS)=>WS)? (URL) WS?
-        ')')
-        | U R L { $type=IDENT; }
+// special functions that takes url/uri as a parameter, but do not enclose it in quotes.
+URI : ((U R L '(' ((WS)=>WS)? URL WS? ')') 
+           => (U R L '(' ((WS)=>WS)? URL WS? ')'))
+      | U R L { $type=IDENT; } //I have to do this, because lexer never hoists syntactic predicates
+      | U R { $type=IDENT; } //I have to do this, because lexer never hoists syntactic predicates
+      | U { $type=IDENT; } //I have to do this, because lexer never hoists syntactic predicates
     ;
+
+URL_PREFIX : ((U R L MINUS P R E F I X '(' ((WS)=>WS)? URL WS? ')') 
+           => (U R L MINUS P R E F I X '(' ((WS)=>WS)? URL WS? ')'))
+      | U (R (L (MINUS (P (R (E (F (I (X)?)?)?)?)?)?)?)?)? { $type=IDENT; } //I have to do this, because lexer never hoists syntactic predicates
+    ;
+
+DOMAIN : ((D O M A I N '(' ((WS)=>WS)? URL WS? ')') 
+           => (D O M A I N '(' ((WS)=>WS)? URL WS? ')'))
+      | D (O (M (A (I (N)?)?)?)?)? { $type=IDENT; } //I have to do this, because lexer never hoists syntactic predicates
+    ;
+    
+//DOMAIN: (D O M A I N
+//        '('
+//            ((WS)=>WS)? URL WS?
+//        ')') => (D O M A I N
+//        '('
+//            ((WS)=>WS)? URL WS?
+//        ')')
+//        | D O M A I N { $type=IDENT; }
+//    ;
 
 // -------------
 // Whitespace. Though the W3 standard shows a Yacc/Lex style parser and lexer
