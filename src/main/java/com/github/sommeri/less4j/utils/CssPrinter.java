@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.utils;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -66,7 +67,13 @@ import com.github.sommeri.less4j.core.ast.Viewport;
 public class CssPrinter {
 
   protected ExtendedStringBuilder builder = new ExtendedStringBuilder();
-  private static final DecimalFormat FORMATTER = new DecimalFormat("#.##################");
+  private static final DecimalFormat FORMATTER = createFormatter();
+
+  private static DecimalFormat createFormatter() {
+    DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+    symbols.setDecimalSeparator('.');
+    return new DecimalFormat("#.##################", symbols);
+  }
 
   public CssPrinter() {
     super();
