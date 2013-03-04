@@ -9,7 +9,7 @@ Less4j is a port and its behavior should be as close to the original implementat
 * Output files may differ by whitespaces or comments locations.
 * Less4j may do more than less.js in some situations. The input rejected by less.js may be accepted and translated by less4j. 
 
-All known differences are documented on [wiki page](https://github.com/SomMeri/less4j/wiki/Differences-Between-Less.js-and-Less4j). In the future, Less4j will produce warning any time it produces functionally different CSS. That feature was not implemented yet.
+All known differences are documented on [wiki page](https://github.com/SomMeri/less4j/wiki/Differences-Between-Less.js-and-Less4j). Less4j also produces warnings any time it produces functionally different CSS.
 
 ## Continuous Integration
 Continuous integration is set up on [Travis-CI](http://travis-ci.org/SomMeri/less4j), its current status is: [![Build Status](https://secure.travis-ci.org/SomMeri/less4j.png)](http://travis-ci.org/SomMeri/less4j).
@@ -44,21 +44,21 @@ Pom.xml dependency:
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
 ## API:
-Warning: Project is still in alpha and current API is very temporary. It will change in the future. 
-
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes two methods:
+Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
-*  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url, 
-*  `CompilationResult compile(String lessContent)` - compiles a string,
+*  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
+*  `CompilationResult compile(String lessContent)` - compiles a string - unable to import less files, leaves imports as they are,
 *  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type. 
 
-The first and second method differ in one important point: the second method is unable to handle "@import" statements located in compiled string. Files referenced by the import statement are relative to current file. Compiler invoked through string based compile method is unable to find imported less files and therefore leaves the import statement as it is. Use it with caution.
+These methods differ in one important point: how they handle "@import lessFile" statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem, second method assumes that all less imports reference files by relative urls and the third method leaves imports as they are.         
+
+Compiler invoked through string based compile method is unable to find imported less files and therefore leaves the import statement as it is. Use it with caution.
 
 Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list of compilation warnings or an empty list. 
 
-Each warning is described by an error message and knows both line and character number of the place that caused it.  
+Each warning is described by a message and knows both line, character number and filename of the place that caused it.  
 
 <pre><code>// create input file
 File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");

@@ -12,21 +12,17 @@ import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.LessSource.StringSourceException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
-import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Import.ImportKind;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.TypesConversionUtils;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
-import com.github.sommeri.less4j.platform.Constants;
 
 public class SimpleImportsSolver {
 
@@ -54,7 +50,7 @@ public class SimpleImportsSolver {
   }
 
   private void importEncountered(Import node, LessSource source) {
-    String filename = evaluateFilename(node.getUrlExpression());
+    String filename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler);
     if (filename == null) {
       problemsHandler.errorWrongImport(node.getUrlExpression());
       return;
@@ -66,16 +62,12 @@ public class SimpleImportsSolver {
       filename = filename.substring(0, paramsIndx);
     }
 
+    // css file imports should be left as they are
+    // FIXME ! they should be relativized
     if (isCssFile(filename))
-      // css file imports should be left as they are
       return;
 
-//    if (!source.canLocate(filename))
-//      // unknown protocols imports should be left as they are 
-//      return;
-
-    // add .less suffix if needed
-    filename = normalizeFileName(filename, urlParams);
+    filename = addLessSuffixIfNeeded(filename, urlParams);
     LessSource importedSource;
     try {
       importedSource = source.relativeSource(filename);
@@ -149,7 +141,7 @@ public class SimpleImportsSolver {
 
   }
 
-  private String normalizeFileName(String filename, String urlParams) {
+  private String addLessSuffixIfNeeded(String filename, String urlParams) {
     if ((new File(filename)).getName().contains("."))
       return filename;
 
@@ -159,29 +151,6 @@ public class SimpleImportsSolver {
   private boolean isCssFile(String filename) {
     String lowerCase = filename.toLowerCase();
     return lowerCase.endsWith(".css") || lowerCase.endsWith("/css");
-  }
-
-  private String evaluateFilename(Expression urlInput) {
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler);
-    Expression urlExpression = expressionEvaluator.evaluate(urlInput);
-
-    if (urlExpression.getType() != ASTCssNodeType.FUNCTION)
-      return toJavaFileSeparator(conversionUtils.contentToString(urlExpression));
-
-    //this is the only place in the compiler that can interpret the url function
-    FunctionExpression function = (FunctionExpression) urlExpression;
-    if (!"url".equals(function.getName().toLowerCase()))
-      return null;
-
-    return toJavaFileSeparator(conversionUtils.contentToString(expressionEvaluator.evaluate(function.getParameter())));
-  }
-
-  private String toJavaFileSeparator(String path) {
-    if (Constants.FILE_SEPARATOR.equals("/")) {
-      return path;
-    }
-
-    return path.replace(Constants.FILE_SEPARATOR, "/");
   }
 
 }

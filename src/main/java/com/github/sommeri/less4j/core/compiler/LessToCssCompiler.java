@@ -27,6 +27,7 @@ import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
+import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
 import com.github.sommeri.less4j.core.compiler.stages.UselessLessElementsRemover;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
@@ -56,6 +57,7 @@ public class LessToCssCompiler {
     bubbleAndMergeMedia(less);
     freeNestedRuleSets(less);
     removeUselessLessElements(less);
+    normalizeUrlsAndImportsInImportedFiles(less);
 
     //final clean up  
     sortTopLevelElements(less);
@@ -70,6 +72,11 @@ public class LessToCssCompiler {
   private void removeUselessLessElements(StyleSheet node) {
     UselessLessElementsRemover remover = new UselessLessElementsRemover();
     remover.removeUselessLessElements(node);
+  }
+
+  private void normalizeUrlsAndImportsInImportedFiles(StyleSheet node) {
+    UrlsAndImportsNormalizer normalizer = new UrlsAndImportsNormalizer(problemsHandler);
+    normalizer.normalizeUrlsAndImports(node);
   }
 
   private void removeUselessCharsets(StyleSheet less) {
