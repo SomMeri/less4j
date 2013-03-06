@@ -57,7 +57,7 @@ public class LessToCssCompiler {
     bubbleAndMergeMedia(less);
     freeNestedRuleSets(less);
     removeUselessLessElements(less);
-    normalizeUrlsAndImportsInImportedFiles(less);
+    //normalizeUrlsAndImportsInImportedFiles(less);
 
     //final clean up  
     sortTopLevelElements(less);
@@ -74,6 +74,7 @@ public class LessToCssCompiler {
     remover.removeUselessLessElements(node);
   }
 
+  @SuppressWarnings("unused")
   private void normalizeUrlsAndImportsInImportedFiles(StyleSheet node) {
     UrlsAndImportsNormalizer normalizer = new UrlsAndImportsNormalizer(problemsHandler);
     normalizer.normalizeUrlsAndImports(node);
