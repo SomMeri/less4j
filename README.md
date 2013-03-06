@@ -1,4 +1,4 @@
-Less language is an extension of css and this project compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules, and so on. The overview of all these features along with links to detailed descriptions is located on our [wiki page](https://github.com/SomMeri/less4j/wiki/Supported-Less-Language). 
+Less language is an extension of css and this project compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules, and so on. Our [wiki page](https://github.com/SomMeri/less4j/wiki/Supported-Less-Language) contains overview of all these features along with links to their detailed descriptions.  
 
 The original compiler was written in JavaScript and is called [less.js](http://lesscss.org/). Official less is mostly defined in less.js documentation/issues and by what less.js actually do. Links to less.js:
 * [less.js home page](http://lesscss.org/) 
