@@ -5,7 +5,8 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.AbstractFileBasedTest;
+import com.github.sommeri.less4j.AbstractErrorReportingTest;
+import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
 /**
@@ -13,18 +14,24 @@ import com.github.sommeri.less4j.utils.TestFileUtils;
  *  or w3c specification drafts.
  *  
  */
-public class W3CSpecificationsTest extends AbstractFileBasedTest {
+public class W3CSpecificationsTest extends AbstractErrorReportingTest {
 
-  private static final String standardCases = "src/test/resources/w3c-specifications/CSS Paged Media Module Level 3";
+  private static final String pagedMedia = "src/test/resources/w3c-specifications/CSS Paged Media Module Level 3";
+  //private static final String supportsAtRule = "src/test/resources/w3c-specifications/CSS Conditional Rules Module Level 3/6 at-supports";
   
-  public W3CSpecificationsTest(File inputFile, File outputFile, String testName) {
-    super(inputFile, outputFile, testName);
+  public W3CSpecificationsTest(File lessFile, File cssOutput, File errorList, String testName) {
+    super(lessFile, cssOutput, errorList, testName);
   }
 
-  //@Parameters(name="Compile Less: {0}, {2}")
-  @Parameters()
+  @Parameters(name="Less: {3}")
   public static Collection<Object[]> allTestsParameters() {
-    return (new TestFileUtils()).loadTestFiles(standardCases);
+    return (new TestFileUtils(".err")).loadTestFiles(pagedMedia);
+  }
+
+  @Override
+  protected void printErrors(Less4jException ex) {
+    String errorReport = generateErrorReport(ex);
+    System.err.println(errorReport);
   }
 
 }

@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.compiler;
+package com.github.sommeri.less4j;
 
 import static org.junit.Assert.assertEquals;
 

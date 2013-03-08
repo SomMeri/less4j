@@ -18,7 +18,7 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
 
   //TODO: the alternative annotation is going to be useful right after jUnit 11 comes out. It will contain nicer test name.
   //@Parameters(name="Compile Less: {0}, {2}")
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     //return TestFileUtils.loadTestFile(inputDir, "nth-variants.less");
     return (new TestFileUtils()).loadTestFiles(inputDir);

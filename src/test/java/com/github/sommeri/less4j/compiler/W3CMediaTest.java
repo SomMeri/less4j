@@ -30,8 +30,7 @@ public class W3CMediaTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, testName);
   }
 
-  //@Parameters(name="Compile Less: {0}, {2}")
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     Collection<File> allFiles = FileUtils.listFiles(new File(standardCases), new String[] {"less"}, false);
     Collection<Object[]> result = new ArrayList<Object[]>();

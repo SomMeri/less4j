@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j;
+package com.github.sommeri.less4j.compiler;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,6 +11,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import com.github.sommeri.less4j.AbstractFileBasedTest;
 
 /**
  * The test reproduces test files found in original less.js implementation. Some of those
@@ -30,7 +32,7 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
     super(inputFile, cssFile, testName);
   }
 
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     Collection<File> allFiles = FileUtils.listFiles(new File(inputLessDir), null, false);
     Collection<Object[]> result = new ArrayList<Object[]>();

@@ -61,7 +61,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     super(inputFile, cssFile, testName);
   }
 
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     Collection<Object[]> result = new ArrayList<Object[]>();
     result.add(new Object[] { new File(inputLess), new File(outputCss), inputLess });

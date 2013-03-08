@@ -18,7 +18,7 @@ public class ExpressionsTest extends BasicFeaturesTest {
     super(inputFile, outputFile, testName);
   }
 
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     //return TestFileUtils.loadTestFile(standardCases+"todo/", "expressions-flying-minus.less");
     return (new TestFileUtils()).loadTestFiles(standardCases, lessjs, lessjsincompatible);

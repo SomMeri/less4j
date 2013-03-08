@@ -1,0 +1,67 @@
+// http://dev.w3.org/csswg/css3-conditional/#at-supports
+// It was named: 
+//
+//               CSS Conditional Rules Module Level 3
+//               Editor's Draft 21 February 2013 
+
+//Example 5:
+//For example, the following rule applies the rules inside the ‘@supports’ rule only when ‘display: flexbox’ is supported. 
+@supports ( display: flexbox ) {
+  body, #navigation, #content { display: flexbox; }
+  #navigation { background: blue; color: white; }
+  #article { background: white; color: black; }
+}
+
+//Example 6:
+//The following example shows an additional ‘@supports’ rule that can be used to provide an alternative for when ‘display: flexbox’ is not supported:
+//Note that the ‘width’ declarations may be harmful to the flexbox-based layout, so it is important that they be present only in the non-flexbox styles.   
+@supports not ( display: flexbox ) {
+  body { width: 100%; height: 100%; background: white; color: black; }
+  #navigation { width: 25%; }
+  #article { width: 75%; }
+} 
+
+//Example 7:
+//The following example checks for support for the ‘box-shadow’ property, including checking for support for vendor-prefixed versions of it. When the support is present, it specifies both ‘box-shadow’ (with the prefixed versions) and ‘color’ in a way what would cause the text to become invisible were ‘box-shadow’ not supported. 
+@supports ( box-shadow: 2px 2px 2px black ) or
+          ( -moz-box-shadow: 2px 2px 2px black ) or
+          ( -webkit-box-shadow: 2px 2px 2px black ) or
+          ( -o-box-shadow: 2px 2px 2px black ) {
+  .outline {
+    color: white;
+    -moz-box-shadow: 2px 2px 2px black;
+    -webkit-box-shadow: 2px 2px 2px black;
+    -o-box-shadow: 2px 2px 2px black;
+    box-shadow: 2px 2px 2px black; /* unprefixed last */
+  }
+}
+
+//Example 8:
+//For example, the following rule is not valid: 
+@supports (transition-property: color) or
+          (animation-name: foo) and
+          (transform: rotate(10deg)) {
+  div { margin: 2 2 2 2; }
+}
+//Instead, authors must write one of the following: 
+@supports ((transition-property: color) or
+           (animation-name: foo)) and
+          (transform: rotate(10deg)) {
+  div { margin: 3 3 3 3; }
+}
+@supports (transition-property: color) or
+          ((animation-name: foo) and
+           (transform: rotate(10deg))) {
+  div { margin: 4 4 4 4; }
+}
+//Example 9 - skipped:
+
+//Example 10
+//For example, authors may write:  
+@supports ((display: flexbox)) {
+  div { display: flexbox; }
+}
+
+@supports (display: flexbox !important) {
+  .important { display: flexbox !important; }
+}

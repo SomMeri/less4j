@@ -16,7 +16,7 @@ public class NestedRulesetsTest extends BasicFeaturesTest {
     super(inputFile, outputFile, testName);
   }
 
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     return (new TestFileUtils()).loadTestFiles(standardCases, lessjs);
   }

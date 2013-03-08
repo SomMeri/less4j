@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
+import com.github.sommeri.less4j.AbstractErrorReportingTest;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 
 public class MixinsTest extends AbstractErrorReportingTest {
@@ -17,7 +18,7 @@ public class MixinsTest extends AbstractErrorReportingTest {
     super(lessFile, cssOutput, errorList, testName);
   }
 
-  @Parameters()
+  @Parameters(name="Less: {3}")
   public static Collection<Object[]> allTestsParameters() {
     //return (new TestFileUtils()).loadTestFile(standardCases+"todo/", "debug.less");
     return (new TestFileUtils(".err")).loadTestFiles(standardCases, lessjsIncompatible, lessjsTests);

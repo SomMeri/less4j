@@ -1,0 +1,74 @@
+@supports ( display: flexbox ) {
+  body,
+  #navigation,
+  #content {
+    display: flexbox;
+  }
+  #navigation {
+    background: blue;
+    color: white;
+  }
+  #article {
+    background: white;
+    color: black;
+  }
+}
+@supports not ( display: flexbox ) {
+  body {
+    width: 100%;
+    height: 100%;
+    background: white;
+    color: black;
+  }
+  #navigation {
+    width: 25%;
+  }
+  #article {
+    width: 75%;
+  }
+}
+@supports ( box-shadow: 2px 2px 2px black ) or
+          ( -moz-box-shadow: 2px 2px 2px black ) or
+          ( -webkit-box-shadow: 2px 2px 2px black ) or
+          ( -o-box-shadow: 2px 2px 2px black ) {
+  .outline {
+    color: white;
+    -moz-box-shadow: 2px 2px 2px black;
+    -webkit-box-shadow: 2px 2px 2px black;
+    -o-box-shadow: 2px 2px 2px black;
+    box-shadow: 2px 2px 2px black;
+    /* unprefixed last */
+  
+  }
+}
+@supports (transition-property: color) or
+          (animation-name: foo) and
+          (transform: rotate(10deg)) {
+  div {
+    margin: 2 2 2 2;
+  }
+}
+@supports ((transition-property: color) or
+           (animation-name: foo)) and
+          (transform: rotate(10deg)) {
+  div {
+    margin: 3 3 3 3;
+  }
+}
+@supports (transition-property: color) or
+          ((animation-name: foo) and
+           (transform: rotate(10deg))) {
+  div {
+    margin: 4 4 4 4;
+  }
+}
+@supports ((display: flexbox)) {
+  div {
+    display: flexbox;
+  }
+}
+@supports (display: flexbox !important) {
+  .important {
+    display: flexbox !important;
+  }
+}

@@ -40,8 +40,7 @@ public class W3CSelectorsTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, testName);
   }
 
-  //@Parameters(name="Compile Less: {0}, {2}")
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     return (new TestFileUtils()).loadTestFiles(standardCases, lessjsIncompatibleNegatedNth, lessjsIncompatibleNegatedVarious);
   }

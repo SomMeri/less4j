@@ -16,7 +16,7 @@ public class NamespacesTest extends BasicFeaturesTest {
     super(inputFile, outputFile, testName);
   }
 
-  @Parameters()
+  @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
     //return (new TestFileUtils()).loadTestFile(standardCases+"todo/", "namespaces-scoping-mixins-A.less");
     return (new TestFileUtils()).loadTestFiles(standardCases, lessjsIncompatible);
