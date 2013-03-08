@@ -35,8 +35,9 @@ public class ProblemsHandler {
   }
 
   public void wrongMemberInCssBody(ASTCssNode member, Body node) {
+    ASTCssNode parent = node.getParent()==null? node : node.getParent();
     ASTCssNodeType parentType = node.getParent()==null? ASTCssNodeType.STYLE_SHEET : node.getParent().getType(); 
-    collector.addWarning(new CompilationWarning(member, "Compilation resulted in incorrect CSS. The " + PrintUtils.toTypeName(member) + " ended up inside a body of " + PrintUtils.toTypeName(parentType) +"."));
+    collector.addWarning(new CompilationWarning(member, "Compilation resulted in incorrect CSS. The " + PrintUtils.toTypeName(member) + " ended up inside a body of " + PrintUtils.toTypeName(parentType) +" located at "+PrintUtils.toLocation(parent)+"."));
   }
 
   public void wrongMemberInLessBody(ASTCssNode member, Body node) {

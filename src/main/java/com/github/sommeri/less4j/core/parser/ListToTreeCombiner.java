@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.tree.CommonTree;
 
 import com.github.sommeri.less4j.core.parser.LessLexer;
@@ -20,9 +20,9 @@ import com.github.sommeri.less4j.core.parser.LessLexer;
  */
 public class ListToTreeCombiner {
 
-  private LinkedList<Token> hiddenTokens;
+  private LinkedList<CommonToken> hiddenTokens;
 
-  public void associate(HiddenTokenAwareTree ast, LinkedList<Token> hiddenTokens) {
+  public void associate(HiddenTokenAwareTree ast, LinkedList<CommonToken> hiddenTokens) {
     initialize(hiddenTokens);
 
     LinkedList<HiddenTokenAwareTree> children = getChildren(ast);
@@ -36,7 +36,7 @@ public class ListToTreeCombiner {
     }
   }
 
-  private void initialize(LinkedList<Token> hiddenTokens) {
+  private void initialize(LinkedList<CommonToken> hiddenTokens) {
     this.hiddenTokens = hiddenTokens;
   }
 
@@ -64,7 +64,7 @@ public class ListToTreeCombiner {
   }
 
   private void addFollowingTokens(HiddenTokenAwareTree target, int stop) {
-    List<Token> result = readPrefix(stop);
+    List<CommonToken> result = readPrefix(stop);
     target.addFollowing(result);
   }
 
@@ -79,7 +79,7 @@ public class ListToTreeCombiner {
     if (firstChild == null)
       return;
 
-    LinkedList<Token> tail = readTillNewLine(secondChild.getTokenStartIndex());
+    LinkedList<CommonToken> tail = readTillNewLine(secondChild.getTokenStartIndex());
     if (tail.isEmpty())
       return;
 
@@ -91,7 +91,7 @@ public class ListToTreeCombiner {
 
   private void addAllContainedTokens(HiddenTokenAwareTree ast) {
     int stop = ast.getTokenStopIndex();
-    List<Token> result = readPrefix(stop);
+    List<CommonToken> result = readPrefix(stop);
     ast.addOrphans(result);
   }
 
@@ -107,16 +107,16 @@ public class ListToTreeCombiner {
 
   private void addAllPrecedingTokens(HiddenTokenAwareTree target) {
     int start = target.getTokenStartIndex();
-    List<Token> tokens = readPrefix(start);
+    List<CommonToken> tokens = readPrefix(start);
     target.addPreceding(tokens);
   }
 
-  private LinkedList<Token> readTillNewLine(int end) {
-    LinkedList<Token> result = new LinkedList<Token>();
+  private LinkedList<CommonToken> readTillNewLine(int end) {
+    LinkedList<CommonToken> result = new LinkedList<CommonToken>();
     if (hiddenTokens.isEmpty())
       return result;
 
-    Token first = hiddenTokens.peekFirst();
+    CommonToken first = hiddenTokens.peekFirst();
     while (first != null && first.getTokenIndex() < end && first.getType() == LessLexer.COMMENT) {
       result.add(first);
       hiddenTokens.removeFirst();
@@ -130,12 +130,12 @@ public class ListToTreeCombiner {
     return result;
   }
 
-  private List<Token> readPrefix(int end) {
-    List<Token> result = new ArrayList<Token>();
+  private List<CommonToken> readPrefix(int end) {
+    List<CommonToken> result = new ArrayList<CommonToken>();
     if (hiddenTokens.isEmpty())
       return result;
 
-    Token first = hiddenTokens.peekFirst();
+    CommonToken first = hiddenTokens.peekFirst();
     while (first != null && first.getTokenIndex() < end) {
       result.add(first);
       hiddenTokens.removeFirst();

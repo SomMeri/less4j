@@ -3,7 +3,7 @@ package com.github.sommeri.less4j.core.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.CommonToken;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -65,11 +65,11 @@ public class ASTBuilder {
     node.setOrphanComments(orphans);
   }
   
-  private List<Comment> convertToComments(List<Token> preceding, LessSource source) {
+  private List<Comment> convertToComments(List<CommonToken> preceding, LessSource source) {
     List<Comment> result = new ArrayList<Comment>();
 
     Comment comment = null;
-    for (Token token : preceding) {
+    for (CommonToken token : preceding) {
       if (token.getType() == LessLexer.COMMENT) {
         comment = new Comment(new HiddenTokenAwareTree(token, source));
         result.add(comment);

@@ -27,6 +27,7 @@ public abstract class AbstractErrorReportingTest {
   private final File lessFile;
   private final File cssOutput;
   private final File errorList;
+  @SuppressWarnings("unused")
   private final String testName;
 
   public AbstractErrorReportingTest(File lessFile, File cssOutput, File errorList, String testName) {
@@ -43,12 +44,12 @@ public abstract class AbstractErrorReportingTest {
       assertCorrectWarnings(actual);
     } catch (ComparisonFailure ex) {
       ComparisonFailure fail = (ComparisonFailure) ex;
-      throw new ComparisonFailure(testName + " " + fail.getMessage(), fail.getExpected(), fail.getActual());
+      throw new ComparisonFailure(fail.getMessage(), fail.getExpected(), fail.getActual());
     } catch (Less4jException ex) {
       printErrors(ex);
       assertCorrectErrors(ex);
     } catch (Throwable ex) {
-      throw new RuntimeException(testName + " " + ex.getMessage(), ex);
+      throw new RuntimeException(ex.getMessage(), ex);
     }
   }
 
@@ -73,10 +74,10 @@ public abstract class AbstractErrorReportingTest {
     //validate css
     String expectedCss = canonize(expectedCss());
     String actualCss = canonize(actual.getCss());
-    assertEquals(lessFile.toString(), expectedCss, actualCss);
+    assertEquals(expectedCss, actualCss);
     //validate warnings
     String completeErrorReport = generateWarningsReport(actual);
-    assertEquals(lessFile.toString(), canonize(expectedErrors()), canonize(completeErrorReport));
+    assertEquals(canonize(expectedErrors()), canonize(completeErrorReport));
   }
 
   protected String canonize(String text) {
@@ -101,7 +102,7 @@ public abstract class AbstractErrorReportingTest {
     try {
       return IOUtils.toString(new FileReader(cssOutput));
     } catch (Throwable ex) {
-      throw new RuntimeException(testName + " " + ex.getMessage(), ex);
+      throw new RuntimeException(ex.getMessage(), ex);
     }
   }
 
@@ -112,7 +113,7 @@ public abstract class AbstractErrorReportingTest {
     try {
       return DebugAndTestPrint.platformFileSeparator(IOUtils.toString(new FileReader(errorList)));
     } catch (Throwable ex) {
-      throw new RuntimeException(testName + " " + ex.getMessage(), ex);
+      throw new RuntimeException(ex.getMessage(), ex);
     }
   }
 

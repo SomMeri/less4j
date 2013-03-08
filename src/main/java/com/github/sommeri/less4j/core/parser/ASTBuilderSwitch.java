@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.CommonToken;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -23,6 +23,7 @@ import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
@@ -38,7 +39,6 @@ import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
-import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.Medium;
@@ -854,7 +854,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     SyntaxOnlyElement lbrace = (SyntaxOnlyElement) list.remove(0);
     SyntaxOnlyElement rbrace = (SyntaxOnlyElement) list.remove(list.size() - 1);
-    List<Token> orphansOrFollowLastMember = rbrace.getUnderlyingStructure().chopPreceedingUpToLastOfType(LessLexer.NEW_LINE);
+    List<CommonToken> orphansOrFollowLastMember = rbrace.getUnderlyingStructure().chopPreceedingUpToLastOfType(LessLexer.NEW_LINE);
     if (list.isEmpty()) {
       token.addOrphans(orphansOrFollowLastMember);
     } else {

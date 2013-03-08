@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
@@ -88,7 +89,7 @@ public class ANTLRParser {
     return lexer;
   }
 
-  private HiddenTokenAwareTree merge(HiddenTokenAwareTree ast, LinkedList<Token> hiddenTokens) {
+  private HiddenTokenAwareTree merge(HiddenTokenAwareTree ast, LinkedList<CommonToken> hiddenTokens) {
     ListToTreeCombiner combiner = new ListToTreeCombiner();
     combiner.associate(ast, hiddenTokens);
     return ast;
@@ -172,7 +173,7 @@ class CollectorTokenSource implements TokenSource {
 
   private final TokenSource source;
   private final Set<Integer> collectTokenTypes = new HashSet<Integer>();
-  private final LinkedList<Token> collectedTokens = new LinkedList<Token>();
+  private final LinkedList<CommonToken> collectedTokens = new LinkedList<CommonToken>();
 
   public CollectorTokenSource(TokenSource source, Collection<Integer> collectTokenTypes) {
     super();
@@ -186,8 +187,8 @@ class CollectorTokenSource implements TokenSource {
    * 
    */
   @Override
-  public Token nextToken() {
-    Token nextToken = source.nextToken();
+  public CommonToken nextToken() {
+    CommonToken nextToken = (CommonToken)source.nextToken();
     if (shouldCollect(nextToken)) {
       collectedTokens.add(nextToken);
     }
@@ -203,7 +204,7 @@ class CollectorTokenSource implements TokenSource {
     return collectTokenTypes.contains(nextToken.getType());
   }
 
-  public LinkedList<Token> getCollectedTokens() {
+  public LinkedList<CommonToken> getCollectedTokens() {
     return collectedTokens;
   }
 
@@ -225,7 +226,7 @@ class HiddenTokenAwareTreeAdaptor extends CommonTreeAdaptor {
 
   @Override
   public Object create(Token payload) {
-    return new HiddenTokenAwareTree(payload, source);
+    return new HiddenTokenAwareTree((CommonToken)payload, source);
   }
 
   @Override

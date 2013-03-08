@@ -17,7 +17,7 @@ import com.github.sommeri.less4j.utils.TestFileUtils;
 public class W3CSpecificationsTest extends AbstractErrorReportingTest {
 
   private static final String pagedMedia = "src/test/resources/w3c-specifications/CSS Paged Media Module Level 3";
-  //private static final String supportsAtRule = "src/test/resources/w3c-specifications/CSS Conditional Rules Module Level 3/6 at-supports";
+  private static final String supportsAtRule = "src/test/resources/w3c-specifications/CSS Conditional Rules Module Level 3/6 at-supports";
   
   public W3CSpecificationsTest(File lessFile, File cssOutput, File errorList, String testName) {
     super(lessFile, cssOutput, errorList, testName);
@@ -25,7 +25,7 @@ public class W3CSpecificationsTest extends AbstractErrorReportingTest {
 
   @Parameters(name="Less: {3}")
   public static Collection<Object[]> allTestsParameters() {
-    return (new TestFileUtils(".err")).loadTestFiles(pagedMedia);
+    return (new TestFileUtils(".err")).loadTestFiles(pagedMedia, supportsAtRule);
   }
 
   @Override

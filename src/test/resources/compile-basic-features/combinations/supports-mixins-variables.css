@@ -1,0 +1,8 @@
+@supports (color: #ff00ff) {
+  width: 397px;
+}
+@media screen and (width: 397px) {
+  @supports (color: 8) {
+    width: 500px;
+  }
+}

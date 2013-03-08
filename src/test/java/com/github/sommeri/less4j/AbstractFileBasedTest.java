@@ -47,13 +47,13 @@ public abstract class AbstractFileBasedTest {
     } catch (Less4jException ex) {
       String errorReport = generateErrorReport(ex);
       System.err.println(errorReport);
-      throw new RuntimeException(testName + " " + errorReport, ex);
+      throw new RuntimeException(errorReport, ex);
     } catch (Throwable ex) {
       if (ex instanceof ComparisonFailure) {
         ComparisonFailure fail = (ComparisonFailure)ex;
-        throw new ComparisonFailure (testName + " " + fail.getMessage(), fail.getExpected(), fail.getActual());
+        throw new ComparisonFailure (fail.getMessage(), fail.getExpected(), fail.getActual());
       }
-      throw new RuntimeException(testName + " " + ex.getMessage(), ex);
+      throw new RuntimeException(ex.getMessage(), ex);
     }
   }
 

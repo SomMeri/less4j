@@ -1,0 +1,18 @@
+.mixin(@param) {
+  width: @param;
+}
+
+@supports (color: #ff00ff) {
+  @variable: 397px;
+  .mixin(@variable);
+}
+
+@media screen and (width: 397px) {
+  @variable: 500px;
+  @size: (3+4); 
+  @supports (color: (@size+1)) {
+    .mixin(@variable);
+  }
+}
+
+@variable: 900;

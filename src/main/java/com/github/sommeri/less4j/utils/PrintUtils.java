@@ -110,8 +110,14 @@ public class PrintUtils {
     case RULE_SET:
       return "rule set";
 
+    case PAGE:
+      return "@page";
+      
+    case PAGE_MARGIN_BOX:
+      return "page margin box";
+      
     default:
-      //TODO (low priority) replace by something safer
+      //FIXME (hign priority) replace by something safer - ASAP
       return type.name();
     }
   }

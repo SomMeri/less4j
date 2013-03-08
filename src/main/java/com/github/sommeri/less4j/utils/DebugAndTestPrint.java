@@ -77,7 +77,7 @@ public class DebugAndTestPrint {
     System.out.println(base);
   }
 
-  public static String printComments(List<Token> list) {
+  public static String printComments(List<? extends Token> list) {
     String result = "" + list.size();
     for (Token token : list) {
       if (token.getType()==LessLexer.COMMENT)

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 
@@ -13,13 +14,15 @@ import com.github.sommeri.less4j.LessSource;
 public class HiddenTokenAwareTree extends CommonTree {
 
   private final LessSource source;
-  private List<Token> preceding = new LinkedList<Token>();
-  private List<Token> orphans = new LinkedList<Token>();
-  private List<Token> following = new LinkedList<Token>();
+  private List<CommonToken> preceding = new LinkedList<CommonToken>();
+  private List<CommonToken> orphans = new LinkedList<CommonToken>();
+  private List<CommonToken> following = new LinkedList<CommonToken>();
+  private CommonToken tokenAsCommon;
 
-  public HiddenTokenAwareTree(Token payload, LessSource source) {
+  public HiddenTokenAwareTree(CommonToken payload, LessSource source) {
     super(payload);
     this.source = source;
+    tokenAsCommon = payload;
   }
 
   public HiddenTokenAwareTree(LessSource source) {
@@ -49,30 +52,36 @@ public class HiddenTokenAwareTree extends CommonTree {
     return result;
   }
 
+  public boolean hasChildren() {
+    @SuppressWarnings("rawtypes")
+    List children = super.getChildren();
+    return children!=null && !children.isEmpty();
+  }
+
   @Override
   public HiddenTokenAwareTree getParent() {
     return (HiddenTokenAwareTree) super.getParent();
   }
 
-  public List<Token> getPreceding() {
+  public List<CommonToken> getPreceding() {
     return preceding;
 
   }
 
-  public List<Token> chopPreceedingUpToLastOfType(int type) {
-    List<Token> result = new ArrayList<Token>();
-    List<Token> preceding = getPreceding();
+  public List<CommonToken> chopPreceedingUpToLastOfType(int type) {
+    List<CommonToken> result = new ArrayList<CommonToken>();
+    List<CommonToken> preceding = getPreceding();
     
     int index = lastTokenOfType(preceding, type);
     for (int i = 0; i <= index; i++) {
-      Token next = preceding.remove(0);
+      CommonToken next = preceding.remove(0);
       result.add(next);
     }
     
     return result;
   }
 
-  private int lastTokenOfType(List<Token> list, int type) {
+  private int lastTokenOfType(List<CommonToken> list, int type) {
     if (list.isEmpty())
       return -1;
 
@@ -84,43 +93,43 @@ public class HiddenTokenAwareTree extends CommonTree {
     return -1;
   }
 
-  public List<Token> getFollowing() {
+  public List<CommonToken> getFollowing() {
     return following;
   }
 
-  public List<Token> getOrphans() {
+  public List<CommonToken> getOrphans() {
     return orphans;
   }
 
-  public void addPreceding(Token token) {
+  public void addPreceding(CommonToken token) {
     preceding.add(token);
   }
 
-  public void addPreceding(List<Token> tokens) {
+  public void addPreceding(List<CommonToken> tokens) {
     preceding.addAll(tokens);
   }
 
-  public void addBeforePreceding(List<Token> tokens) {
+  public void addBeforePreceding(List<CommonToken> tokens) {
     preceding.addAll(0, tokens);
   }
 
-  public void addOrphan(Token token) {
+  public void addOrphan(CommonToken token) {
     orphans.add(token);
   }
 
-  public void addOrphans(List<Token> tokens) {
+  public void addOrphans(List<CommonToken> tokens) {
     orphans.addAll(tokens);
   }
 
-  public void addFollowing(Token token) {
+  public void addFollowing(CommonToken token) {
     following.add(token);
   }
 
-  public void addBeforeFollowing(List<Token> tokens) {
+  public void addBeforeFollowing(List<CommonToken> tokens) {
     following.addAll(0, tokens);
   }
 
-  public void addFollowing(List<Token> tokens) {
+  public void addFollowing(List<CommonToken> tokens) {
     following.addAll(tokens);
   }
 
@@ -146,6 +155,41 @@ public class HiddenTokenAwareTree extends CommonTree {
     return getChild(getChildCount() - 1);
   }
 
+  public int getLine() {
+    if ( !isReal() ) {
+      HiddenTokenAwareTree realChild = getFirstRealDescendant();
+      if ( realChild!=null ) {
+        return realChild.getLine();
+      }
+      return 0;
+    }
+    return token.getLine();
+  }
+
+  private HiddenTokenAwareTree getFirstRealDescendant() {
+    for (HiddenTokenAwareTree child : getChildren()) {
+      if (child.isReal())
+        return child;
+      else {
+        HiddenTokenAwareTree descendant = child.getFirstRealDescendant();
+        if (descendant!=null)
+          return descendant;
+      }
+    }
+    return null;
+  }
+
+  public int getCharPositionInLine() {
+    if ( !isReal() ) {
+      HiddenTokenAwareTree realChild = getFirstRealDescendant();
+      if ( realChild!=null ) {
+        return realChild.getCharPositionInLine();
+      }
+      return 1;
+    }
+    return token.getCharPositionInLine();
+  }
+  
   public String toString() {
     return super.toString() + " " + getLine() + ":" + getCharPositionInLine() + 1;
   }
@@ -181,7 +225,11 @@ public class HiddenTokenAwareTree extends CommonTree {
   }
 
   public void removePreceding() {
-    preceding = new ArrayList<Token>();
+    preceding = new ArrayList<CommonToken>();
+  }
+
+  public boolean isReal() {
+    return tokenAsCommon!=null && tokenAsCommon.getTokenIndex()!=-1;
   }
 
 }
