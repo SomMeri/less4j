@@ -20,6 +20,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.utils.LessPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
@@ -40,6 +41,10 @@ public class ProblemsHandler {
     collector.addWarning(new CompilationWarning(member, "Compilation resulted in incorrect CSS. The " + PrintUtils.toTypeName(member) + " ended up inside a body of " + PrintUtils.toTypeName(parentType) +" located at "+PrintUtils.toLocation(parent)+"."));
   }
 
+  public void errWrongSupportsLogicalOperator(SupportsLogicalOperator node, String faultyOperator) {
+    collector.addError(new CompilationError(node, "@supports at rule does not support '" + faultyOperator + "' as a binary logical operator. You can use only 'and' and 'or'."));
+  }
+
   public void wrongMemberInLessBody(ASTCssNode member, Body node) {
     ASTCssNodeType parentType = node.getParent()==null? ASTCssNodeType.STYLE_SHEET : node.getParent().getType(); 
     collector.addError(new CompilationError(member, "The element " + PrintUtils.toTypeName(member) + " is not allowed to be a " + PrintUtils.toTypeName(parentType) +" member."));
@@ -51,6 +56,12 @@ public class ProblemsHandler {
 
   public void warnMerginMediaQueryWithMedium(MediaQuery mediaQuery) {
     collector.addWarning(new CompilationWarning(mediaQuery, "Attempt to merge media query with a medium. Merge removed medium from inner media query, because the result CSS would be invalid otherwise."));
+  }
+
+  public void warnUnconsistentSupportsLogicalConditionOperators(SupportsLogicalOperator faulty, SupportsLogicalOperator masterOperator) {
+    String faultySymbol = faulty.getOperator().getSymbol();
+    String masterSymbol = masterOperator.getOperator().getSymbol();
+    collector.addWarning(new CompilationWarning(faulty, "CSS specification does not allow mixing of 'and', 'or', and 'not' operators without a layer of parentheses. Operators '" + faultySymbol + "' at " + PrintUtils.toLocation(faulty) + "' and '" + masterSymbol + "' at " + PrintUtils.toLocation(masterOperator) + " are in the same layer of parentheses."));
   }
 
   public void warnLessImportNoBaseDirectory(Expression urlExpression) {

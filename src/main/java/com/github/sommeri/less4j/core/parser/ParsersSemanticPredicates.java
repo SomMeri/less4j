@@ -13,6 +13,8 @@ public class ParsersSemanticPredicates {
   private static final String KEYFRAMES = "keyframes";
   private static final String DOCUMENT = "document";
   private static final String VIEWPORT = "viewport";
+  private static final String SUPPORTS = "supports";
+  
   private static final Set<String> PAGE_MARGIN_BOXES = new HashSet<String>(Arrays.asList(new String[] { "@top-left-corner", "@top-left", "@top-center", "@top-right", "@top-right-corner", "@bottom-left-corner", "@bottom-left", "@bottom-center", "@bottom-right", "@bottom-right-corner", "@left-top", "@left-middle", "@left-bottom", "@right-top", "@right-middle", "@right-bottom" }));
 
   private static Set<String> NTH_PSEUDOCLASSES = new HashSet<String>();
@@ -169,6 +171,10 @@ public class ParsersSemanticPredicates {
     return isVendorPrefixedAtName(token, VIEWPORT);
   }
 
+  public boolean isSupports(Token token) {
+    return isVendorPrefixedAtName(token, SUPPORTS);
+  }
+  
   public boolean isPageMarginBox(Token token) {
     return isAmongAtNames(token, PAGE_MARGIN_BOXES);
   }

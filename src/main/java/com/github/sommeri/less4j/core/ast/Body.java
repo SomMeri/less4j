@@ -17,16 +17,11 @@ public abstract class Body extends ASTCssNode {
     super(underlyingStructure);
   }
 
-  @Deprecated
-  public Body(HiddenTokenAwareTree underlyingStructure, List<ASTCssNode> members) {
-    this(underlyingStructure);
-    body.addAll(members);
-  }
-
   public Body(HiddenTokenAwareTree underlyingStructure, SyntaxOnlyElement lbrace, SyntaxOnlyElement rbrace, List<ASTCssNode> members) {
-    this(underlyingStructure, members);
+    this(underlyingStructure);
     openingCurlyBrace = lbrace;
     closingCurlyBrace = rbrace;
+    body.addAll(members);
   }
 
   public SyntaxOnlyElement getOpeningCurlyBrace() {

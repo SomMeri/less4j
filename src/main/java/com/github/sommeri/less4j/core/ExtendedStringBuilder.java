@@ -172,6 +172,11 @@ public class ExtendedStringBuilder {
     if (onNewLine() || endsWithSeparator())
       return this;
 
+    appendSpace();
+    return this;
+  }
+
+  public ExtendedStringBuilder appendSpace() {
     builder.append(SPACE);
     return this;
   }

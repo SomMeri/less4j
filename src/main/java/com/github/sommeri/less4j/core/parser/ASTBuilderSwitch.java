@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.antlr.runtime.CommonToken;
@@ -47,12 +48,14 @@ import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
+import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Page;
 import com.github.sommeri.less4j.core.ast.PageMarginBox;
+import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
 import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
@@ -65,6 +68,12 @@ import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.Supports;
+import com.github.sommeri.less4j.core.ast.SupportsCondition;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator.Operator;
+import com.github.sommeri.less4j.core.ast.SupportsQuery;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
@@ -78,7 +87,6 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
-  @SuppressWarnings("unused")
   private final ProblemsHandler problemsHandler;
   private final MixinsParametersBuilder mixinsParametersBuilder;
   private final TermBuilder termBuilder;
@@ -417,11 +425,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public SyntaxOnlyElement handleLbrace(HiddenTokenAwareTree token) {
-    return new SyntaxOnlyElement(token, token.getText());
+    return toSyntaxOnlyElement(token);
   }
 
   public SyntaxOnlyElement handleRbrace(HiddenTokenAwareTree token) {
-    return new SyntaxOnlyElement(token, token.getText());
+    return toSyntaxOnlyElement(token);
   }
 
   public Selector handleSelector(HiddenTokenAwareTree token) {
@@ -805,6 +813,82 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     result.setBody(handleGeneralBody(children.next()));
 
     return result;
+  }
+
+  @Override
+  public Supports handleSupports(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    Supports result = new Supports(token, children.next().getText());
+    result.setCondition((SupportsCondition) switchOn(children.next()));
+    result.setBody(handleGeneralBody(children.next()));
+
+    return result;
+  }
+
+  
+  public SupportsCondition handleSupportsCondition(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    if (token.getChildCount() == 1)
+      return (SupportsCondition) switchOn(children.next());
+    
+    SupportsLogicalCondition result = new SupportsLogicalCondition(token, (SupportsCondition) switchOn(children.next()));
+    while (children.hasNext()) {
+      SupportsLogicalOperator logicalOperator =  toSupportsLogicalOperator(children.next());
+      if (!children.hasNext())
+        throw new BugHappened(GRAMMAR_MISMATCH, token);
+      SupportsCondition condition = (SupportsCondition) switchOn(children.next());
+      result.addCondition(logicalOperator, condition);
+    }
+    return result;
+  }
+
+  private SupportsLogicalOperator toSupportsLogicalOperator(HiddenTokenAwareTree token) {
+    String text = token.getText();
+    Map<String, Operator> operatorsBySymbol = SupportsLogicalOperator.Operator.getSymbolsMap();
+    if (text==null || !operatorsBySymbol.containsKey(text.toLowerCase())) {
+      SupportsLogicalOperator result = new SupportsLogicalOperator(token, null);
+      problemsHandler.errWrongSupportsLogicalOperator(result, token.getText());
+      return result;
+    }
+
+    SupportsLogicalOperator result = new SupportsLogicalOperator(token, operatorsBySymbol.get(text.toLowerCase()));
+    return result;
+  }
+
+  public SupportsCondition handleSupportsSimpleCondition(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    HiddenTokenAwareTree first = children.next();
+    if (first.getType()==LessLexer.LPAREN) {
+      SyntaxOnlyElement openingParentheses = toSyntaxOnlyElement(first);
+      SupportsCondition condition = (SupportsCondition)switchOn(children.next());
+      SyntaxOnlyElement closingParentheses = toSyntaxOnlyElement(children.next());
+      
+      SupportsConditionInParentheses result = new SupportsConditionInParentheses(token, openingParentheses, condition, closingParentheses);
+      return result;
+    } else if (first.getType()==LessLexer.IDENT) {
+      //TODO: warning on wrong operator (anything that is not 'not')
+      SyntaxOnlyElement negation = toSyntaxOnlyElement(first);
+      SupportsCondition condition = (SupportsCondition)switchOn(children.next());
+
+      SupportsConditionNegation result = new SupportsConditionNegation(token, negation, condition);
+      return result;
+    } 
+    
+    return (SupportsCondition) switchOn(first);
+
+  }
+  
+  public SupportsCondition handleSupportsQuery(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    SyntaxOnlyElement openingParentheses = toSyntaxOnlyElement(children.next());
+    Declaration declaration = (Declaration)switchOn(children.next());
+    SyntaxOnlyElement closingParentheses = toSyntaxOnlyElement(children.next());
+    SupportsQuery result = new SupportsQuery(token, openingParentheses, closingParentheses, declaration);
+    return result;
+  }
+
+  private SyntaxOnlyElement toSyntaxOnlyElement(HiddenTokenAwareTree token) {
+    return new SyntaxOnlyElement(token, token.getText());
   }
 
   @Override

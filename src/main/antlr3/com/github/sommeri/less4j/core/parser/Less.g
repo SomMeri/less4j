@@ -77,6 +77,10 @@ tokens {
   DOCUMENT_DECLARATION;
   DOCUMENT;
   VIEWPORT;
+  SUPPORTS;
+  SUPPORTS_CONDITION;
+  SUPPORTS_SIMPLE_CONDITION;
+  SUPPORTS_QUERY;
   REUSABLE_STRUCTURE_NAME;
   PSEUDO_PAGE;
   PAGE_MARGIN_BOX;
@@ -244,12 +248,33 @@ document
 finally { leaveRule(); }
 
 viewport
-@init {enterRule(retval, RULE_KEYFRAME);}
+@init {enterRule(retval, RULE_VIEWPORT);}
     : {predicates.isViewport(input.LT(1))}? AT_NAME
       body+=general_body
     -> ^(VIEWPORT AT_NAME $body )
     ;
 finally { leaveRule(); }
+
+supports
+@init {enterRule(retval, RULE_SUPPORTS);}
+    : {predicates.isSupports(input.LT(1))}? AT_NAME condition+=supportsCondition
+      body+=general_body
+    -> ^(SUPPORTS AT_NAME $condition $body )
+    ;
+finally { leaveRule(); }
+
+supportsCondition: 
+     first+=simpleSupportsCondition ((IDENT)=> oper+=IDENT second+=simpleSupportsCondition)*
+     -> ^(SUPPORTS_CONDITION $first ($oper $second)*)
+    ;
+
+simpleSupportsCondition:   
+     q+=supportsQuery -> ^(SUPPORTS_SIMPLE_CONDITION $q)
+     | IDENT q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT $q)
+     | LPAREN q+=supportsCondition RPAREN -> ^(SUPPORTS_SIMPLE_CONDITION LPAREN $q RPAREN)
+    ;
+    
+supportsQuery: LPAREN q+=declaration RPAREN -> ^(SUPPORTS_QUERY LPAREN $q RPAREN);
 
 // ---------
 // Medium. The name of a medim that are particulare set of rules applies to.
@@ -290,6 +315,7 @@ top_level_element
     | fontface
     | imports
     | document
+    | supports
     ;
 
 variabledeclaration
@@ -436,6 +462,7 @@ general_body
                | a+=viewport
                | a+=keyframes
                | a+=document
+               | a+=supports
                | a+=page
                | a+=fontface
                | a+=imports

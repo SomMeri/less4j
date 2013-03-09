@@ -46,6 +46,9 @@ import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
+import com.github.sommeri.less4j.core.ast.SupportsCondition;
+import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
+import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Page;
@@ -60,12 +63,17 @@ import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.Supports;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
+import com.github.sommeri.less4j.core.ast.SupportsQuery;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
 import com.github.sommeri.less4j.core.ast.Viewport;
 
 public class CssPrinter {
 
+  private static final String ERROR = "!#error#!";
   protected ExtendedStringBuilder builder = new ExtendedStringBuilder();
   private static final DecimalFormat FORMATTER = createFormatter();
 
@@ -237,6 +245,24 @@ public class CssPrinter {
     case SYNTAX_ONLY_ELEMENT:
       return appendSyntaxOnlyElement((SyntaxOnlyElement) node);
 
+    case SUPPORTS:
+      return appendSupports((Supports) node);
+
+    case SUPPORTS_QUERY:
+      return appendSupportsQuery((SupportsQuery) node);
+
+    case SUPPORTS_CONDITION_NEGATION:
+      return appendSupportsConditionNegation((SupportsConditionNegation) node);
+
+    case SUPPORTS_CONDITION_PARENTHESES:
+      return appendSupportsConditionParentheses((SupportsConditionInParentheses) node);
+
+    case SUPPORTS_CONDITION_LOGICAL:
+      return appendSupportsConditionLogical((SupportsLogicalCondition) node);
+
+    case SUPPORTS_LOGICAL_OPERATOR:
+      return appendSupportsLogicalOperator((SupportsLogicalOperator) node);
+
     case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
@@ -318,6 +344,61 @@ public class CssPrinter {
     return true;
   }
 
+  private boolean appendSupports(Supports node) {
+    builder.append(node.getDialect()).ensureSeparator();
+    append(node.getCondition());
+    builder.ensureSeparator();
+    append(node.getBody());
+    return true;
+  }
+
+  private boolean appendSupportsConditionNegation(SupportsConditionNegation node) {
+    append(node.getNegation());
+    builder.ensureSeparator();
+    append(node.getCondition());
+    return true;
+  }
+
+  private boolean appendSupportsConditionParentheses(SupportsConditionInParentheses node) {
+    append(node.getOpeningParentheses());
+    append(node.getCondition());
+    append(node.getClosingParentheses());
+    return true;
+  }
+
+  // FIXME: ! test on comments
+  // FIXME: ! document including !formatting, !evaluation differences, !validation
+  private boolean appendSupportsConditionLogical(SupportsLogicalCondition node) {
+    Iterator<SupportsLogicalOperator> operators = node.getLogicalOperators().iterator();
+    Iterator<SupportsCondition> conditions = node.getConditions().iterator();
+
+    append(conditions.next());
+
+    while (operators.hasNext()) {
+      builder.ensureSeparator();
+      append(operators.next());
+      builder.ensureSeparator();
+      append(conditions.next());
+    }
+    return true;
+  }
+
+  private boolean appendSupportsLogicalOperator(SupportsLogicalOperator node) {
+    if (node.getOperator() == null) {
+      // FIXME: change to faulty system
+      builder.append(ERROR);
+    }
+    builder.append(node.getOperator().getSymbol());
+    return true;
+  }
+
+  private boolean appendSupportsQuery(SupportsQuery node) {
+    append(node.getOpeningParentheses());
+    append(node.getDeclaration());
+    append(node.getClosingParentheses());
+    return true;
+  }
+
   private boolean appendDocument(Document node) {
     builder.append(node.getDialect()).ensureSeparator();
 
@@ -341,12 +422,12 @@ public class CssPrinter {
   }
 
   private boolean appendFaultyNode(FaultyNode node) {
-    builder.append("!#error#!");
+    builder.append(ERROR);
     return true;
   }
 
   private boolean appendFaultyExpression(FaultyExpression node) {
-    builder.append("!#error#!");
+    builder.append(ERROR);
     return true;
   }
 
@@ -516,9 +597,18 @@ public class CssPrinter {
 
     if (declaration.isImportant())
       builder.ensureSeparator().append("!important");
-    builder.appendIgnoreNull(";");
+
+    if (shouldHaveSemicolon(declaration))
+      builder.appendIgnoreNull(";");
 
     return true;
+  }
+
+  private boolean shouldHaveSemicolon(Declaration declaration) {
+    if (null == declaration.getParent() || declaration.getParent().getType() != ASTCssNodeType.SUPPORTS_QUERY)
+      return true;
+
+    return false;
   }
 
   private boolean appendMedia(Media node) {
@@ -765,7 +855,7 @@ public class CssPrinter {
   private boolean isEmptySelector(Selector selector) {
     if (selector.hasRight())
       return false;
-    
+
     SelectorPart head = selector.getHead();
     if (head.getType() != ASTCssNodeType.SIMPLE_SELECTOR)
       return false;
@@ -777,7 +867,7 @@ public class CssPrinter {
 
     if (simpleHead.hasSubsequent())
       return false;
-      
+
     return true;
   }
 
@@ -793,7 +883,7 @@ public class CssPrinter {
     append(selector.getRight());
     return true;
   }
-  
+
   private boolean appendSimpleSelector(SimpleSelector selector) {
     appendSimpleSelectorHead(selector);
     appendSimpleSelectorTail(selector);

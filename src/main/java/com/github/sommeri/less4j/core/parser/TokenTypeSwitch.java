@@ -154,12 +154,32 @@ public abstract class TokenTypeSwitch<T> {
     
     if (type == LessLexer.NAMED_EXPRESSION) 
       return handleNamedExpression(token);
+    
+    if (type == LessLexer.SUPPORTS) 
+      return handleSupports(token);
+
+    if (type == LessLexer.SUPPORTS_CONDITION) 
+      return handleSupportsCondition(token);
+
+    if (type == LessLexer.SUPPORTS_SIMPLE_CONDITION) 
+      return handleSupportsSimpleCondition(token);
+
+    if (type == LessLexer.SUPPORTS_QUERY) 
+      return handleSupportsQuery(token);
 
     if (type == LessLexer.IMPORT_SYM | type == LessLexer.IMPORT_ONCE_SYM |type == LessLexer.IMPORT_MULTIPLE_SYM)
       return handleImport(token);
 
     throw new BugHappened("Unexpected token type: " + type +"("+PrintUtils.toName(type)+ ") for " + token.getText(), token);
   }
+
+  public abstract T handleSupports(HiddenTokenAwareTree token);
+  
+  public abstract T handleSupportsCondition(HiddenTokenAwareTree token);
+
+  public abstract T handleSupportsSimpleCondition(HiddenTokenAwareTree token);
+
+  public abstract T handleSupportsQuery(HiddenTokenAwareTree token);
 
   public abstract T handleNamedExpression(HiddenTokenAwareTree token);
 

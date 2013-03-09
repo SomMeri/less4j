@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.validators;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +16,8 @@ import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -57,6 +60,10 @@ public class LessAstValidator {
       checkForPartialInterpolatedMediaQuery((MediaQuery) node);
       break;
     }
+    case SUPPORTS_CONDITION_LOGICAL: {
+      checkForLogicalConditionConsistency((SupportsLogicalCondition) node);
+      break;
+    }
     }
 
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
@@ -64,6 +71,19 @@ public class LessAstValidator {
       validate(kid);
     }
 
+  }
+
+  private void checkForLogicalConditionConsistency(SupportsLogicalCondition condition) {
+    Iterator<SupportsLogicalOperator> logicalOperators = condition.getLogicalOperators().iterator();
+    if (!logicalOperators.hasNext())
+      return ;
+    
+    SupportsLogicalOperator masterOperator = logicalOperators.next();
+    while (logicalOperators.hasNext()) {
+      SupportsLogicalOperator operator = logicalOperators.next();
+      if (!masterOperator.getOperator().equals(operator.getOperator())) 
+        problemsHandler.warnUnconsistentSupportsLogicalConditionOperators(operator, masterOperator);
+    }
   }
 
   private void checkForPartialInterpolatedMediaQuery(MediaQuery node) {
