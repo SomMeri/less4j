@@ -56,3 +56,17 @@
 /* 0 */ @document /* 1 */ url-prefix() /* 2 */ { /* 3 */
   /* 4 */
 /* 5 */ } /* 6 */
+/* 1 */ @supports /* 2 */ (/* 3 */ transform-origin: 5% 5% /* 4 */ ) /* 5 */ { /* 6 */
+  /* 7 */ .1 /* 8 */ { /* 9 */
+    transform-origin: 5% 5%;
+  /* 10 */ } /* 11 */
+/* 12 */ } /* 13 */
+/* 1 */ @supports /* 2 */ not /* 3 */ (/* 4 */ transform-origin: 10em 10em 10em /* 5 */ ) /* 6 */ { /* 7 */
+  /* body */
+/* 8 */ } /* 9 */
+/* 1 */ @supports /* 2 */ (/* 3 */ display: flexbox /* 4 */ ) /* 5 */ and /* 6 */ (/* 7 */ not /* 8 */ (/* 9 */ display: inline-grid /* 10 */ ) /* 11 */ ) /* 12 */ { /* 13 */
+  /* body begin */
+  .2 {
+    transform-origin: 2px;
+  }
+/* 14 */ } /* 15 */

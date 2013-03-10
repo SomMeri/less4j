@@ -366,8 +366,6 @@ public class CssPrinter {
     return true;
   }
 
-  // FIXME: ! test on comments
-  // FIXME: ! document including !formatting, !evaluation differences, !validation
   private boolean appendSupportsConditionLogical(SupportsLogicalCondition node) {
     Iterator<SupportsLogicalOperator> operators = node.getLogicalOperators().iterator();
     Iterator<SupportsCondition> conditions = node.getConditions().iterator();
@@ -385,7 +383,6 @@ public class CssPrinter {
 
   private boolean appendSupportsLogicalOperator(SupportsLogicalOperator node) {
     if (node.getOperator() == null) {
-      // FIXME: change to faulty system
       builder.append(ERROR);
     }
     builder.append(node.getOperator().getSymbol());

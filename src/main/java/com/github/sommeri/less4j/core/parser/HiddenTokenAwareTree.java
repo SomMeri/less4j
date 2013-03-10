@@ -140,8 +140,10 @@ public class HiddenTokenAwareTree extends CommonTree {
 
     HiddenTokenAwareTree first = children.get(0);
     first.addBeforePreceding(getPreceding());
+    removePreceding();
     HiddenTokenAwareTree last = children.get(children.size() - 1);
     last.addFollowing(getFollowing());
+    removeFollowing();
   }
 
   public void giveHidden(HiddenTokenAwareTree previous, HiddenTokenAwareTree next) {
@@ -226,6 +228,10 @@ public class HiddenTokenAwareTree extends CommonTree {
 
   public void removePreceding() {
     preceding = new ArrayList<CommonToken>();
+  }
+
+  public void removeFollowing() {
+    following = new ArrayList<CommonToken>();
   }
 
   public boolean isReal() {

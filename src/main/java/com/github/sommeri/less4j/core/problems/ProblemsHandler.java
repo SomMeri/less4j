@@ -58,7 +58,7 @@ public class ProblemsHandler {
     collector.addWarning(new CompilationWarning(mediaQuery, "Attempt to merge media query with a medium. Merge removed medium from inner media query, because the result CSS would be invalid otherwise."));
   }
 
-  public void warnUnconsistentSupportsLogicalConditionOperators(SupportsLogicalOperator faulty, SupportsLogicalOperator masterOperator) {
+  public void warnInconsistentSupportsLogicalConditionOperators(SupportsLogicalOperator faulty, SupportsLogicalOperator masterOperator) {
     String faultySymbol = faulty.getOperator().getSymbol();
     String masterSymbol = masterOperator.getOperator().getSymbol();
     collector.addWarning(new CompilationWarning(faulty, "CSS specification does not allow mixing of 'and', 'or', and 'not' operators without a layer of parentheses. Operators '" + faultySymbol + "' at " + PrintUtils.toLocation(faulty) + "' and '" + masterSymbol + "' at " + PrintUtils.toLocation(masterOperator) + " are in the same layer of parentheses."));

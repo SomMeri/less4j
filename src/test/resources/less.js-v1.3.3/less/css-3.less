@@ -86,15 +86,13 @@ p::before {
   font: 12vmin/15vmin;
   font: 1.2ch/1.5ch;
 }
-//less4j: not implemented yet
-//@supports ( box-shadow: 2px 2px 2px black ) or
-//          ( -moz-box-shadow: 2px 2px 2px black ) {
-//  .outline {
-//    box-shadow: 2px 2px 2px black;
-//    -moz-box-shadow: 2px 2px 2px black;
-//  }
-//}
-//
+@supports (box-shadow: 2px 2px 2px black) or (-moz-box-shadow: 2px 2px 2px black) {
+  .outline {
+    box-shadow: 2px 2px 2px black;
+    -moz-box-shadow: 2px 2px 2px black;
+  }
+}
+
 //less4j: not sure where original double quotes came from
 @-x-document url-prefix("github.com") {
   h1 {

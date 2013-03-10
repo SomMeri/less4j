@@ -827,6 +827,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   
   public SupportsCondition handleSupportsCondition(HiddenTokenAwareTree token) {
+    token.pushHiddenToKids();
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     if (token.getChildCount() == 1)
       return (SupportsCondition) switchOn(children.next());
@@ -856,6 +857,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public SupportsCondition handleSupportsSimpleCondition(HiddenTokenAwareTree token) {
+    token.pushHiddenToKids();
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     HiddenTokenAwareTree first = children.next();
     if (first.getType()==LessLexer.LPAREN) {
@@ -875,7 +877,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     } 
     
     return (SupportsCondition) switchOn(first);
-
   }
   
   public SupportsCondition handleSupportsQuery(HiddenTokenAwareTree token) {

@@ -82,7 +82,7 @@ public class LessAstValidator {
     while (logicalOperators.hasNext()) {
       SupportsLogicalOperator operator = logicalOperators.next();
       if (!masterOperator.getOperator().equals(operator.getOperator())) 
-        problemsHandler.warnUnconsistentSupportsLogicalConditionOperators(operator, masterOperator);
+        problemsHandler.warnInconsistentSupportsLogicalConditionOperators(operator, masterOperator);
     }
   }
 
