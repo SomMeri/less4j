@@ -548,14 +548,12 @@ attrib
                     | a+=SUBSTRINGMATCH
                 )
                 (
-                      a+=IDENT
-                    | a+=STRING
-                    | a+=NUMBER
+                      b+=term
                 )
             )?
     
       RBRACKET)
-      -> ^(ATTRIBUTE $a* )
+      -> ^(ATTRIBUTE $a* $b*)
 ;
 
 pseudo

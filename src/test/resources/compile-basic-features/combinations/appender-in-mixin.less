@@ -1,0 +1,13 @@
+//https://github.com/cloudhead/less.js/issues/84
+.x(@width) {
+  &.container {
+    width: @width;
+  }
+}
+#a-app {
+  .x(10px);
+}
+
+#b-app {
+  .x(20px)
+}

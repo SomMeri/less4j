@@ -491,7 +491,7 @@ public class CssPrinter {
     builder.append("[");
     builder.append(node.getName());
     append(node.getOperator());
-    builder.appendIgnoreNull(node.getValue());
+    append(node.getValue());
     builder.append("]");
 
     return true;

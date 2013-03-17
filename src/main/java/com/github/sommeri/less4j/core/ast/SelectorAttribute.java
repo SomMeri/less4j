@@ -9,13 +9,13 @@ public class SelectorAttribute extends ElementSubsequent {
 
   private String name;
   private SelectorOperator operator;
-  private String value;
+  private Expression value;
 
   public SelectorAttribute(HiddenTokenAwareTree token, String name) {
     this(token, name, new SelectorOperator(new HiddenTokenAwareTree(token.getSource()), SelectorOperator.Operator.NONE), null);
   }
   
-  public SelectorAttribute(HiddenTokenAwareTree token, String name, SelectorOperator operator, String value) {
+  public SelectorAttribute(HiddenTokenAwareTree token, String name, SelectorOperator operator, Expression value) {
     super(token);
     this.name = name;
     this.operator = operator;
@@ -43,11 +43,11 @@ public class SelectorAttribute extends ElementSubsequent {
     this.operator = operator;
   }
 
-  public String getValue() {
+  public Expression getValue() {
     return value;
   }
 
-  public void setValue(String value) {
+  public void setValue(Expression value) {
     this.value = value;
   }
 
@@ -62,13 +62,14 @@ public class SelectorAttribute extends ElementSubsequent {
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(operator);
+    return ArraysUtils.asNonNullList(operator, value);
   }
   
   @Override
   public SelectorAttribute clone() {
     SelectorAttribute result = (SelectorAttribute) super.clone();
     result.operator = operator==null?null:operator.clone();
+    result.value = value==null?null:value.clone();
     result.configureParentToAllChilds();
     return result;
   }
