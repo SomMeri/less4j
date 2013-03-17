@@ -1,0 +1,9 @@
+[class*="col-"] {
+  margin: 2 2 2 2;
+}
+[class*="some-class"] {
+  margin: 2 2 2 2;
+}
+[size=5] {
+  margin: 2 2 2 2;
+}

@@ -1,0 +1,2 @@
+Warnings produced by compilation of testCase
+WARNING 86:30 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.

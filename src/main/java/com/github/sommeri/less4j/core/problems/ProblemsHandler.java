@@ -54,6 +54,10 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(node, "The string \"" + text + "\" is not a valid color."));
   }
 
+  public void warnLessjsIncompatibleSelectorAttributeValue(Expression value) {
+    collector.addWarning(new CompilationWarning(value, "This works, but is incompatible with less.js. Only less.js compatible selector attribute values are string, number and identifier."));
+  }
+
   public void warnMerginMediaQueryWithMedium(MediaQuery mediaQuery) {
     collector.addWarning(new CompilationWarning(mediaQuery, "Attempt to merge media query with a medium. Merge removed medium from inner media query, because the result CSS would be invalid otherwise."));
   }

@@ -462,7 +462,19 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.size() < 3)
       throw new BugHappened(GRAMMAR_MISMATCH, token);
 
-    return new SelectorAttribute(token, children.get(0).getText(), handleSelectorOperator(children.get(1)), handleTerm(children.get(2)));
+    Expression value = handleTerm(children.get(2));
+    switch (value.getType()) {
+    case IDENTIFIER_EXPRESSION:
+    case STRING_EXPRESSION:
+    case NUMBER:
+      //those are OK
+      break;
+
+    default:
+      problemsHandler.warnLessjsIncompatibleSelectorAttributeValue(value);
+      break;
+    }
+    return new SelectorAttribute(token, children.get(0).getText(), handleSelectorOperator(children.get(1)), value);
   }
 
   public SelectorOperator handleSelectorOperator(HiddenTokenAwareTree token) {
