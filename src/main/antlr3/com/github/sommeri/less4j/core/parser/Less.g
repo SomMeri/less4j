@@ -651,14 +651,14 @@ compareOperator
     ;     
     
 semiSplitReusableStructureArguments
-    : a+=reusableStructureArgument ( a+=semicolon a+=reusableStructureArgument)*
-    -> ^(SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS $a*)
+    : (    // nothing 
+           | a+=commaSplitReusableStructureArgument ( a+=semicolon a+=commaSplitReusableStructureArgument)*
+      ) -> ^(SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS $a*)
     ;
 
-reusableStructureArgument
-    : // nothing
-    | sequenceOfReusableStructureArgumentsWithDefault (COMMA! collector)?
-    | patternAndNoDefaultOnlyReusableStructureArguments (COMMA! sequenceOfReusableStructureArgumentsWithDefault)?  
+commaSplitReusableStructureArgument
+    : sequenceOfReusableStructureArgumentsWithDefault (COMMA! collector)?
+    | patternAndNoDefaultOnlyReusableStructureArguments (COMMA! sequenceOfReusableStructureArgumentsWithDefault (COMMA! collector)?)?   
     ;
     
 sequenceOfReusableStructureArgumentsWithDefault

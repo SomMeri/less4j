@@ -1,3 +1,5 @@
+// https://github.com/SomMeri/less4j/issues/129
+// Arguments of mixin with comma separated values have not been parsed correctly in this case:
 .box-shadow(@shadowA, @shadowB:X, ...){
   -webkit-box-shadow: @arguments;
      -moz-box-shadow: @arguments;
