@@ -1,0 +1,26 @@
+// output of this will change with 1.4.0 compatibility release
+@return: global;
+
+.mixin() {
+  @return: 1;
+}
+
+.workaround() {
+  @new-name: @return;
+  .mixin();
+}
+
+#use-place-1 {
+  @return: 3;
+  new-name: @new-name;
+  return: @return; // 1.4.0 will print "return: 3 on this"
+  .workaround();
+}
+
+#use-place-2 {
+  new-name: @new-name;
+  // only immediate scope is protected, its parent scope is not 
+  return: @return; 
+  .workaround();
+}
+

@@ -1,0 +1,11 @@
+.box(@new: 22) {
+    box: @new;
+}
+.with-parameter {
+  width: @new; // syntax error - variable not available
+  .box(23);
+}
+.without-parameter {
+  width: @new; // syntax error - variable not available
+  .box();
+}

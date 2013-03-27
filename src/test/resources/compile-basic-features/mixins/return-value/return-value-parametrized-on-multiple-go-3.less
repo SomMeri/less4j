@@ -1,0 +1,32 @@
+.variableMixin1(@first, @second, @third) {
+  first-in-first: @first;
+  second-in-first: @second;
+  third-in-first: @third;
+  @first: 10;
+}
+
+.variableMixin2(@first, @second, @third) {
+  first-in-second: @first;
+  second-in-second: @second;
+  third-in-second: @third;
+  @second: 20;
+}
+
+.variableMixin3(@first, @second, @third) {
+  first-in-third: @first;
+  second-in-third: @second;
+  third-in-third: @third;
+  @third: 30;
+}
+
+#call-variableMixin {
+  first: @first;
+  second: @second;
+  third: @third;
+  .variableMixin1(@first, @second, @third);
+  .variableMixin2(@first, @second, @third);
+  .variableMixin3(@first, @second, @third);
+  @first: 1;
+  @second: 2;
+  @third: 3;
+}

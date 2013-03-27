@@ -1,0 +1,17 @@
+.mixin1() {
+  .mixin2();
+  .mixin2() {
+    .mixin3();
+    .mixin3() {
+      .mixin3();
+      .mixin3() {
+        @width: 20px;
+      }
+    }
+  }
+}
+
+#use-place {
+  width: @width;
+  .mixin1();
+}

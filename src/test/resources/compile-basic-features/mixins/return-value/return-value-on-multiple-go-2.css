@@ -1,0 +1,8 @@
+#call-variableMixin {
+  first: 1;
+  second: 20;
+  third: 30;
+  first-in-second: 1;
+  first-in-third: 1;
+  second-in-third: 20;
+}

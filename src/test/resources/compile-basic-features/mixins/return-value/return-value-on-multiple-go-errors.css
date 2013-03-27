@@ -1,0 +1,22 @@
+#call-variableMixin {
+  first: 10;
+  second: 20;
+  third: 30;
+  second-in-first: 2;
+  third-in-first: 3;
+  first-in-second: 1;
+  third-in-second: 3;
+  first-in-third: 1;
+  second-in-third: 2;
+}
+#call-mixinMixin {
+  first: 10;
+  second: 20;
+  third: 30;
+  second-in-first: 2;
+  third-in-first: 3;
+  first-in-second: 1;
+  third-in-second: 3;
+  first-in-third: 1;
+  second-in-third: 2;
+}

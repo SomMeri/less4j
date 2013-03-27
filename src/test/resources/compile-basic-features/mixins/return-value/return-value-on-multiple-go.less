@@ -1,0 +1,33 @@
+@first: 1;
+@second: 2;
+@third: 3;
+
+.variableMixin1() {
+  @first: 10;
+}
+
+.variableMixin2() {
+  first-in-second: @first;
+  @second: 20;
+}
+
+.variableMixin3(...) {
+  first-in-third: @first;
+  second-in-third: @second;
+  @third: 30;
+}
+
+#call-variableMixin {
+  first: @first;
+  second: @second;
+  third: @third;
+  .variableMixin1();
+  .variableMixin2();
+  .variableMixin3();
+}
+
+/*
+
+TODO: reverse order variable mixin
+TODO: variable inside different scope in 1.4.0
+*/

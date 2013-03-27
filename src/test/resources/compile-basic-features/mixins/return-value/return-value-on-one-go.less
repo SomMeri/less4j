@@ -1,0 +1,63 @@
+@first: 1;
+@second: 2;
+@third: 3;
+
+.variableMixin() {
+  @first: 10;
+  second-in-first: @second;
+  third-in-first: @third;
+}
+
+.variableMixin() {
+  first-in-second: @first;
+  third-in-second: @third;
+  @second: 20;
+}
+
+.variableMixin(...) {
+  first-in-third: @first;
+  second-in-third: @second;
+  @third: 30;
+}
+
+#call-variableMixin {
+  first: @first;
+  second: @second;
+  third: @third;
+  .variableMixin();
+}
+
+
+.mixinMixin() {
+  .inMixinMixin() {
+    @first: 10;
+    second-in-first: @second;
+    third-in-first: @third;
+  }
+  .inMixinMixin();
+}
+
+.mixinMixin() {
+  .inMixinMixin() {
+    first-in-second: @first;
+    third-in-second: @third;
+    @second: 20;
+  }
+  .inMixinMixin();
+}
+
+.mixinMixin(...) {
+  .inMixinMixin() {
+    first-in-third: @first;
+    second-in-third: @second;
+    @third: 30;
+  }
+  .inMixinMixin();
+}
+
+#call-mixinMixin {
+  first: @first;
+  second: @second;
+  third: @third;
+  .mixinMixin();
+}
