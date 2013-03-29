@@ -30,7 +30,7 @@ Less4j can run from [command line](https://github.com/SomMeri/less4j/wiki/Comman
 If you need an old version for some reason, checkout appropriate tag from git and use `mvn package -P standalone` command. The command compiles less4j and all its dependencies into `target/less4j-<version>-shaded.jar` file. 
 
 ## Maven
-Less4j is [available](http://search.maven.org/#artifactdetails|com.github.sommeri|less4j|0.0.1|jar) in Maven central repository.
+Less4j is [available](http://search.maven.org/#browse|1893223923) in Maven central repository.
 
 Pom.xml dependency:
 <pre><code>&lt;dependency&gt;
