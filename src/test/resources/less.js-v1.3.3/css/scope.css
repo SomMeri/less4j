@@ -22,12 +22,6 @@
 .useHeightInMixinCall {
   mixin-height: 1024px;
 }
-.imported {
-  exists: true;
-}
-.testImported {
-  exists: true;
-}
 #allAreUsedHere {
   default: 'top level';
   scope: 'top level';

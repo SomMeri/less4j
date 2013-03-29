@@ -26,7 +26,7 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
   private static final String inputLessDir = "src/test/resources/less.js-v1.3.3/less/";
   private static final String expectedCssDir = "src/test/resources/less.js-v1.3.3/css/";
   private static final Set<String> excludeInput = new HashSet<String>(Arrays.asList(new String[] {"comments.less", "whitespace.less"}));
-  private static final Set<String> disabled = new HashSet<String>(Arrays.asList(new String[] {"scope.less", "urls.less"}));
+  private static final Set<String> disabled = new HashSet<String>(Arrays.asList(new String[] {"urls.less"}));
 
   public LessJsV1_3_3Test(File inputFile, File cssFile, String testName) {
     super(inputFile, cssFile, testName);
@@ -88,6 +88,8 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
     //import.less
     text = text.replace("\n\n", "\n");
     //scope.less
+    text = text.replace("color: #998899", "color: #989");
+    text = text.replace("color: #0000ff", "color: blue");
     text = text.replace("border-color: black", "border-color: #000000");
     text = text.replace("background-color: white;", "background-color: #ffffff;");
     text = text.replace("scoped-val: green;", "scoped-val: #008000;");

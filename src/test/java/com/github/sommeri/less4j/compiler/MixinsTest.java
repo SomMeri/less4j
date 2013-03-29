@@ -21,9 +21,7 @@ public class MixinsTest extends AbstractErrorReportingTest {
 
   @Parameters(name="Less: {3}")
   public static Collection<Object[]> allTestsParameters() {
-    //return (new TestFileUtils()).loadTestFile(standardCases+"todo/", "debug.less");
     return (new TestFileUtils(".err")).loadTestFiles(standardCases, returnValue, lessjsIncompatible, lessjsTests);
-    //return (new TestFileUtils(".err")).loadTestFiles(standardCases, lessjsIncompatible, lessjsTests);
   }
 
 }

@@ -50,16 +50,6 @@
 .heightIsSet { height: @height; }
 .useHeightInMixinCall(@height);
 
-.importRuleset() {
-  .imported {
-    exists: true;
-  }
-}
-.importRuleset();
-.testImported {
-  .imported;
-}
-
 @parameterDefault: 'top level';
 @anotherVariable: 'top level';
 //mixin uses top-level variables
