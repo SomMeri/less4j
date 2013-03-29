@@ -45,10 +45,7 @@ public abstract class LessSource {
 
     protected void setLastModified(long lastModified) {
       this.lastModified = lastModified;
-      this.latestModified = lastModified;
-      if (parent != null && lastModified > parent.latestModified) {
-        parent.latestModified = lastModified;
-      }
+      setLatestModified(lastModified);
     }
 
     protected void addImportedSource(LessSource source) {
@@ -69,6 +66,13 @@ public abstract class LessSource {
 
     public long getLatestModified() {
       return latestModified;
+    }
+
+    public void setLatestModified(long latestModified) {
+      this.latestModified = latestModified;
+      if (parent != null && latestModified > parent.getLatestModified()) {
+        parent.setLatestModified(latestModified);
+      }
     }
 
   }
@@ -179,7 +183,7 @@ public abstract class LessSource {
     }
 
     @Override
-    public LessSource relativeSource(String filename) {
+    public FileSource relativeSource(String filename) {
       return new FileSource(this, filename);
     }
 
