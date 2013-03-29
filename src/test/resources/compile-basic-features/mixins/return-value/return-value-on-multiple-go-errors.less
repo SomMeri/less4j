@@ -1,11 +1,11 @@
 .variableMixin1() {
   @first: 10;
-  second-in-first: @second;
-  third-in-first: @third;
+  second-in-first: @second; // syntax error - not declared
+  third-in-first: @third; // syntax error - not declared
 }
 
 .variableMixin2() {
-  third-in-second: @third;
+  third-in-second: @third; // syntax error - not declared
   @second: 20;
 }
 

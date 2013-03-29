@@ -12,14 +12,15 @@ import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class Scope {
   
   private final ASTCssNode owner;
   private boolean presentInTree = true;
-  private VariablesScope variables = new VariablesScope();
-  private MixinsScope mixins = new MixinsScope(); 
+  private VariablesDeclarationsStorage variables = new VariablesDeclarationsStorage();
+  private MixinsDefinitionsStorage mixins = new MixinsDefinitionsStorage();
 
   private Scope parent;
   private List<Scope> childs = new ArrayList<Scope>();
@@ -81,6 +82,26 @@ public class Scope {
 
   public void registerVariableIfNotPresent(String name, Expression replacementValue) {
     variables.addDeclarationIfNotPresent(name, replacementValue);
+  }
+
+  public void registerVariable(String name, Expression replacementValue) {
+    variables.addDeclaration(name, replacementValue);
+  }
+
+  public void registerPlaceholder() {
+    variables.registerPlaceholder();
+  }
+  
+  public void addToPlaceholder(Scope otherScope) {
+    variables.addToPlaceholder(otherScope.variables);
+  }
+  
+  public void closePlaceholder() {
+    variables.closePlaceholder();
+  }
+
+  public void fillByFilteredVariables(ExpressionFilter filter, Scope variablesSource) {
+    variables.fillByFilteredVariables(filter, variablesSource.variables);
   }
 
   public Expression getValue(Variable variable) {
@@ -154,6 +175,10 @@ public class Scope {
 
   public static Scope createUnnamedScope(ASTCssNode owner, Scope parent) {
     return new Scope(owner, "#unnamed#", parent);
+  }
+
+  public static Scope createUnnamedScope() {
+    return new Scope(null, "#dummy#", null);
   }
 
   public static Scope createScope(ASTCssNode owner, List<String> names, Scope parent) {

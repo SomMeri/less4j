@@ -1,3 +1,8 @@
-#mybox {
-  width: 20px;
+.with-parameter {
+  width: !#error#!;
+  box: 23;
+}
+.without-parameter {
+  width: !#error#!;
+  box: 22;
 }

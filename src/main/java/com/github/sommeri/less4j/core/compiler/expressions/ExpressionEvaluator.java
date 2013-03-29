@@ -88,6 +88,22 @@ public class ExpressionEvaluator {
     return values;
   }
 
+  public Scope evaluateValues(Scope scope) {
+    Scope result = Scope.createUnnamedScope();
+    result.fillByFilteredVariables(toEvaluationFilter(), scope);
+    return result;
+  }
+
+  private ExpressionFilter toEvaluationFilter() {
+    return new ExpressionFilter() {
+      
+      @Override
+      public Expression apply(Expression input) {
+        return evaluate(input);
+      }
+    };
+  }
+
   public Expression evaluate(CssString input) {
     String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
     return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
@@ -202,14 +218,10 @@ public class ExpressionEvaluator {
     Expression leftE = evaluate(input.getLeft());
     Expression rightE = evaluate(input.getRight());
 
-//    if (input.getOperator().getOperator() == ComparisonExpressionOperator.Operator.OPEQ)
-//      System.out.println(leftE + "" + input.getOperator() + "" + rightE + " is " + comparator.equal(leftE, rightE));
-    
     ComparisonExpressionOperator operator = input.getOperator();
     if (operator.getOperator() == ComparisonExpressionOperator.Operator.OPEQ)
       return comparator.equal(leftE, rightE);
 
-//    System.out.println(leftE + "" + input.getOperator() + "" + rightE);
     if (leftE.getType() != ASTCssNodeType.NUMBER) {
       problemsHandler.incompatibleComparisonOperand(leftE, operator);
       return false;
@@ -220,7 +232,6 @@ public class ExpressionEvaluator {
       return false;
     }
 
-//    System.out.println(leftE + "" + input.getOperator() + "" + rightE + " is " + compareNumbers((NumberExpression) leftE, (NumberExpression) rightE, operator));
     return compareNumbers((NumberExpression) leftE, (NumberExpression) rightE, operator);
   }
 
@@ -251,10 +262,6 @@ public class ExpressionEvaluator {
 
   private boolean canCompareDimensions(Dimension left, Dimension right) {
     return true;
-//    if (Dimension.NUMBER==left || Dimension.NUMBER==right)
-//      return true;
-//    
-//    return left.equals(right);
   }
 
   public Expression evaluate(FunctionExpression input) {

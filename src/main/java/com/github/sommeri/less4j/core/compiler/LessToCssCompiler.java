@@ -12,8 +12,8 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
+import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.Page;
 import com.github.sommeri.less4j.core.ast.PageMarginBox;
@@ -22,10 +22,10 @@ import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
+import com.github.sommeri.less4j.core.compiler.stages.InitialScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
 import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
-import com.github.sommeri.less4j.core.compiler.stages.ScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
 import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
 import com.github.sommeri.less4j.core.compiler.stages.UselessLessElementsRemover;
@@ -43,14 +43,8 @@ public class LessToCssCompiler {
   }
 
   public ASTCssNode compileToCss(StyleSheet less, LessSource source) {
-    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
-    importsSolver.solveImports(less, source);
-
-    ScopeExtractor scopeBuilder = new ScopeExtractor();
-    Scope scope = scopeBuilder.extractScope(less);
-
-    ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
-    referencesSolver.solveReferences(less, scope);
+    resolveImports(less, source);
+    resolveReferences(less);
 
     //just a safety measure
     evaluateExpressions(less);
@@ -67,6 +61,20 @@ public class LessToCssCompiler {
     validateFinalCss(less);
 
     return less;
+  }
+
+  private void resolveImports(StyleSheet less, LessSource source) {
+    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
+    importsSolver.solveImports(less, source);
+  }
+
+  private void resolveReferences(StyleSheet less) {
+    InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
+    Scope scope = scopeBuilder.extractScope(less);
+
+    ReferencesSolver variablesReferencesSolver = new ReferencesSolver(problemsHandler);
+    variablesReferencesSolver.solveReferences(less, scope);
+    // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
   }
 
   private void removeUselessLessElements(StyleSheet node) {

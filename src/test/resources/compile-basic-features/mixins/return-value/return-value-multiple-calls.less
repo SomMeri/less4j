@@ -1,0 +1,24 @@
+.mixin(@parameter) {
+  @return: @parameter;
+}
+
+#use-place-1 {
+  returned-value: @return;
+  .mixin(1);
+}
+
+#use-place-2 {
+  returned-value: @return;
+  .mixin(2);
+}
+
+#use-place-3 {
+  .mixin(3);
+  returned-value: @return;
+}
+
+#use-place-4 {
+  .mixin(4);
+  returned-value: @return;
+}
+

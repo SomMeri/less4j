@@ -61,6 +61,16 @@ public class ReusableStructureName extends ASTCssNode {
   }
 
   @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    for (ElementSubsequent namePart : nameParts) {
+      result.append(namePart);
+    }
+    
+    return result.toString();
+  }
+
+  @Override
   public ReusableStructureName clone() {
     ReusableStructureName result = (ReusableStructureName) super.clone();
     result.nameParts = new ArrayList<ElementSubsequent>(nameParts);

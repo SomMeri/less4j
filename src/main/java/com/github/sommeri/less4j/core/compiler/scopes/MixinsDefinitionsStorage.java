@@ -8,11 +8,11 @@ import java.util.Map;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 
 
-public class MixinsScope {
+public class MixinsDefinitionsStorage {
   
   private Map<String, List<FullMixinDefinition>> storage = new HashMap<String, List<FullMixinDefinition>>();
   
-  public MixinsScope() {
+  public MixinsDefinitionsStorage() {
   }
 
   public void registerMixin(FullMixinDefinition mixin) {

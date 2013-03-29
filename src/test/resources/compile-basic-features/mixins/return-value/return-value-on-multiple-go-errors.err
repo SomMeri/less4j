@@ -1,23 +1,4 @@
-.variableMixin1() {
-  @first: 10;
-  second-in-first: @second;
-  third-in-first: @third;
-}
-
-.variableMixin2() {
-  third-in-second: @third;
-  @second: 20;
-}
-
-.variableMixin3(...) {
-  @third: 30;
-}
-
-#call-variableMixin {
-  first: @first;
-  second: @second;
-  third: @third;
-  .variableMixin1();
-  .variableMixin2();
-  .variableMixin3();
-}
+Errors produced by compilation of testCase
+ERROR 3:20 The variable "@second" was not declared.
+ERROR 4:19 The variable "@third" was not declared.
+ERROR 8:20 The variable "@third" was not declared.

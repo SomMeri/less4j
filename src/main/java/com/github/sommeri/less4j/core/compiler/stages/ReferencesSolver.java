@@ -1,8 +1,11 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -39,7 +42,7 @@ public class ReferencesSolver {
   private ASTManipulator manipulator = new ASTManipulator();
   private final ProblemsHandler problemsHandler;
   private StringInterpolator stringInterpolator = new StringInterpolator();
-  
+
   public ReferencesSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
   }
@@ -52,73 +55,102 @@ public class ReferencesSolver {
     doSolveReferences(node, new IteratedScope(scope));
   }
 
-  private void doSolveReferences(ASTCssNode node, IteratedScope scope) {
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope.getScope(), problemsHandler);
+  private void doSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
+    boolean finishedNode = replaceIfVariableReference(node, iteratedScope);
+
+    if (!finishedNode) {
+      List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
+      // first solve all mixin references
+      Map<MixinReference, GeneralBody> solvedMixinReferences = solveMixinReferences(childs, iteratedScope);
+
+      // second whatever is not a mixin reference
+      for (ASTCssNode kid : childs) {
+        if (kid.getType() != ASTCssNodeType.MIXIN_REFERENCE) {
+          if (AstLogic.hasOwnScope(kid)) {
+            doSolveReferences(kid, new IteratedScope(iteratedScope.getNextChild()));
+          } else {
+            doSolveReferences(kid, iteratedScope);
+          }
+        }
+      }
+
+      // third get rid of mixin references
+      replaceMixinReferences(solvedMixinReferences);
+    }
+
+  }
+
+  private void replaceMixinReferences(Map<MixinReference, GeneralBody> solvedMixinReferences) {
+    for (Entry<MixinReference, GeneralBody> entry : solvedMixinReferences.entrySet()) {
+      MixinReference mixinReference = entry.getKey();
+      GeneralBody replacement = entry.getValue();
+      manipulator.replaceInBody(mixinReference, replacement.getMembers());
+    }
+  }
+
+  private Map<MixinReference, GeneralBody> solveMixinReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
+    Map<MixinReference, GeneralBody> solvedMixinReferences = new HashMap<MixinReference, GeneralBody>();
+    for (ASTCssNode kid : childs) {
+      if (kid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
+        MixinReference mixinReference = (MixinReference) kid;
+        GeneralBody replacement = resolveMixinReference(mixinReference, iteratedScope.getScope());
+        AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getMembers(), problemsHandler);
+        
+        solvedMixinReferences.put(mixinReference, replacement);
+      }
+    }
+    return solvedMixinReferences;
+  }
+
+  private boolean replaceIfVariableReference(ASTCssNode node, IteratedScope iteratedScope) {
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler);
     switch (node.getType()) {
     case VARIABLE: {
       Expression replacement = expressionEvaluator.evaluate((Variable) node);
       manipulator.replace(node, replacement);
-      break;
+      return true;
     }
     case INDIRECT_VARIABLE: {
       Expression replacement = expressionEvaluator.evaluate((IndirectVariable) node);
       manipulator.replace(node, replacement);
-      break;
+      return true;
     }
     case STRING_EXPRESSION: {
-      Expression replacement = expressionEvaluator.evaluate((CssString) node); 
+      Expression replacement = expressionEvaluator.evaluate((CssString) node);
       manipulator.replace(node, replacement);
-      break;
+      return true;
     }
     case ESCAPED_VALUE: {
-      Expression replacement = expressionEvaluator.evaluate((EscapedValue) node); 
+      Expression replacement = expressionEvaluator.evaluate((EscapedValue) node);
       manipulator.replace(node, replacement);
-      break;
-    }
-    case MIXIN_REFERENCE: {
-      MixinReference mixinReference = (MixinReference) node;
-      GeneralBody replacement = resolveMixinReference(mixinReference, scope.getScope());
-      AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getMembers(), problemsHandler);
-      manipulator.replaceInBody(mixinReference, replacement.getMembers());
-      break;
+      return true;
     }
     case ESCAPED_SELECTOR: {
-      SimpleSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator); 
+      SimpleSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator);
       manipulator.replace(node, replacement);
-      break;
+      return true;
     }
     case FIXED_NAME_PART: {
       FixedNamePart part = (FixedNamePart) node;
-      FixedNamePart replacement = interpolateFixedNamePart(part, expressionEvaluator); 
+      FixedNamePart replacement = interpolateFixedNamePart(part, expressionEvaluator);
       part.getParent().replaceMember(part, replacement);
-      break;
+      return true;
     }
     case VARIABLE_NAME_PART: {
       VariableNamePart part = (VariableNamePart) node;
       Expression value = expressionEvaluator.evaluate(part.getVariable());
       FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure());
       part.getParent().replaceMember(part, interpolateFixedNamePart(fixedName, expressionEvaluator));
-      break;
+      return true;
     }
     }
-
-    if (node.getType() != ASTCssNodeType.VARIABLE_NAME_PART) {
-      List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-      for (ASTCssNode kid : childs) {
-        if (AstLogic.hasOwnScope(kid)) {
-          doSolveReferences(kid, new IteratedScope(scope.getNextChild()));
-        } else {
-          doSolveReferences(kid, scope);
-        }
-      }
-    }
-    
+    return false;
   }
 
   private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent) {
     QuotesKeepingInStringCssPrinter printer = new QuotesKeepingInStringCssPrinter();
-    printer.append(value);    
-    //property based alternative would be nice, but does not seem to be needed
+    printer.append(value);
+    // property based alternative would be nice, but does not seem to be needed
     FixedNamePart fixedName = new FixedNamePart(parent, printer.toString());
     return fixedName;
   }
@@ -158,9 +190,13 @@ public class ReferencesSolver {
         GeneralBody body = mixin.getBody().clone();
         doSolveReferences(body, combinedScope);
         result.addMembers(body.getMembers());
+
+        Scope returnValues = expressionEvaluator.evaluateValues(combinedScope);
+        referenceScope.addToPlaceholder(returnValues);
       }
     }
 
+    referenceScope.closePlaceholder();
     resolveImportance(reference, result);
     shiftComments(reference, result);
 
@@ -219,17 +255,17 @@ public class ReferencesSolver {
 
 class ArgumentsBuilder {
 
-  //utils
+  // utils
   private final ProblemsHandler problemsHandler;
   private final ExpressionEvaluator referenceEvaluator;
   private final String ALL_ARGUMENTS = ReferencesSolver.ALL_ARGUMENTS;
 
-  //input
+  // input
   private Iterator<Expression> positionalParameters;
   private ReusableStructure mixin;
   private MixinReference reference;
 
-  //results
+  // results
   private List<Expression> allValues = new ArrayList<Expression>();
   private Scope argumentsScope;
 
@@ -252,9 +288,9 @@ class ArgumentsBuilder {
       } else {
         skipPositionalParameter();
       }
-          
-    } 
-    
+
+    }
+
     Expression compoundedValues = referenceEvaluator.joinAll(allValues, reference);
     argumentsScope.registerVariableIfNotPresent(ALL_ARGUMENTS, compoundedValues);
     return argumentsScope;

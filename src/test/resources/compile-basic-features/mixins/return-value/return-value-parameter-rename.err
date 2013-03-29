@@ -1,2 +1,3 @@
-line 5
-line 9
+Errors produced by compilation of testCase
+ERROR 5:10 The variable "@new" was not declared.
+ERROR 9:10 The variable "@new" was not declared.

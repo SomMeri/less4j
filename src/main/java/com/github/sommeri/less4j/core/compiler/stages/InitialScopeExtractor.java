@@ -16,13 +16,13 @@ import com.github.sommeri.less4j.core.compiler.scopes.Scope;
  *
  */
 //Variables, mixins and namespaces are valid within the whole scope, even before they have been defined. 
-public class ScopeExtractor {
+public class InitialScopeExtractor {
   private ASTManipulator manipulator = new ASTManipulator();
 
   private Scope currentScope;
   private List<String> nextChildScopeNames;
 
-  public ScopeExtractor() {
+  public InitialScopeExtractor() {
   }
 
   public Scope extractScope(ASTCssNode node) {
@@ -62,7 +62,9 @@ public class ScopeExtractor {
           Scope bodyScope = currentScope.getChildOwnerOf(ruleSet.getBody());
           currentScope.registerMixin(ruleSet.convertToReusableStructure(), bodyScope);
         }
-      } 
+      } else if (kid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
+        currentScope.registerPlaceholder();
+      }
     }
 
     Scope result = currentScope;
