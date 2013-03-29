@@ -60,24 +60,26 @@ public class ReferencesSolver {
 
     if (!finishedNode) {
       List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-      // first solve all mixin references
+      // solve all mixin references and store solutions
       Map<MixinReference, GeneralBody> solvedMixinReferences = solveMixinReferences(childs, iteratedScope);
-
-      // second whatever is not a mixin reference
-      for (ASTCssNode kid : childs) {
-        if (kid.getType() != ASTCssNodeType.MIXIN_REFERENCE) {
-          if (AstLogic.hasOwnScope(kid)) {
-            doSolveReferences(kid, new IteratedScope(iteratedScope.getNextChild()));
-          } else {
-            doSolveReferences(kid, iteratedScope);
-          }
-        }
-      }
-
-      // third get rid of mixin references
+      // solve whatever is not a mixin reference
+      solveNonMixinReferences(childs, iteratedScope);
+      // replace mixin references by their solutions
       replaceMixinReferences(solvedMixinReferences);
     }
 
+  }
+
+  private void solveNonMixinReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
+    for (ASTCssNode kid : childs) {
+      if (kid.getType() != ASTCssNodeType.MIXIN_REFERENCE) {
+        if (AstLogic.hasOwnScope(kid)) {
+          doSolveReferences(kid, iteratedScope.getNextChild());
+        } else {
+          doSolveReferences(kid, iteratedScope);
+        }
+      }
+    }
   }
 
   private void replaceMixinReferences(Map<MixinReference, GeneralBody> solvedMixinReferences) {

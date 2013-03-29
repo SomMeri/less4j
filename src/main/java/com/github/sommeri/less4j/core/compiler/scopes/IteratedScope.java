@@ -19,13 +19,13 @@ public class IteratedScope {
     return scope;
   }
 
-  public Scope getNextChild() {
+  public IteratedScope getNextChild() {
     Scope child = null;
     do {
       if (childsIterator.hasNext())
         child = childsIterator.next();
     } while (!child.isPresentInTree());
-    return child;
+    return new IteratedScope(child);
   }
 
   @Override
