@@ -1,0 +1,16 @@
+.apples(@width: 100px) {
+  .bananas() {
+    width: @width;
+  }
+}
+
+.bananas() {
+  content: another; 
+}
+  
+.apples(50px); // less.js ignores this unlock
+.apples(700px);
+
+#test {
+  .bananas();
+}

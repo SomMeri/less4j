@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,11 +9,8 @@ import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 
-public class VariablesDeclarationsStorage {
+public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expression> {
 
-  private int registeredPlaceholders = 0;
-  private int usedPlaceholders = 0;
-  private Map<String, Integer> placeholdersWhenModified = new HashMap<String, Integer>();
   private Map<String, Expression> variables = new HashMap<String, Expression>();
 
   public VariablesDeclarationsStorage() {
@@ -22,8 +20,49 @@ public class VariablesDeclarationsStorage {
     return variables.get(name);
   }
 
-  public void registerPlaceholder() {
-    registeredPlaceholders+=1;
+  public void store(AbstractVariableDeclaration node) {
+    store(node.getVariable().getName(), node.getValue());
+  }
+
+  public void storeAll(VariablesDeclarationsStorage otherStorage) {
+    for (Entry<String, Expression> entry : otherStorage.variables.entrySet()) {
+      store(entry.getKey(), entry.getValue());
+    }
+  }
+
+  public void store(AbstractVariableDeclaration node, Expression replacementValue) {
+    store(node.getVariable().getName(), replacementValue);
+  }
+
+  @Override
+  protected void doStore(String name, Expression replacementValue) {
+    variables.put(name, replacementValue);
+  }
+
+  @Override
+  protected void doStore(String name, List<Expression> value) {
+    throw new IllegalStateException("not implemented method");
+  }
+
+  public void storeIfNotPresent(String name, Expression replacementValue) {
+    if (!contains(name))
+      store(name, replacementValue);
+  }
+
+  public void fillByFilteredVariables(ExpressionFilter filter, VariablesDeclarationsStorage variablesSource) {
+    for (Entry<String, Expression> entry : variablesSource.variables.entrySet()) {
+      String name = entry.getKey();
+      Expression value = entry.getValue();
+      store(name, filter.apply(value));
+    }
+  }
+
+  protected boolean contains(String name) {
+    return variables.containsKey(name);
+  }
+
+  public int size() {
+    return variables.size();
   }
 
   public void addToPlaceholder(VariablesDeclarationsStorage otherStorage) {
@@ -31,52 +70,24 @@ public class VariablesDeclarationsStorage {
     for (Entry<String, Expression> entry : otherVariables.entrySet()) {
       String name = entry.getKey();
       Expression value = entry.getValue();
-      if (variables.containsKey(name)) {
-        int position = placeholdersWhenModified.get(name);
-        if (position<=usedPlaceholders)
-          addDeclaration(name, value);
-      } else {
-        addDeclaration(name, value);
-      }
+      
+      if (storedBelowUnusedPlaceholder(name) || !contains(name))
+        store(name, value);
     }
   }
 
-  public void closePlaceholder() {
-    usedPlaceholders+=1;
+  public VariablesDeclarationsStorage clone() {
+    VariablesDeclarationsStorage clone = (VariablesDeclarationsStorage) super.clone();
+    clone.variables = new HashMap<String, Expression>(variables);
+    return clone;
   }
 
-  public void addDeclaration(AbstractVariableDeclaration node) {
-    addDeclaration(node.getVariable().getName(), node.getValue());
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");;
+    result.append("Variables: ").append(variables);
+    return result.toString();
   }
-
-  public void addDeclaration(AbstractVariableDeclaration node, Expression replacementValue) {
-    addDeclaration(node.getVariable().getName(), replacementValue);
-  }
-
-  public void addDeclaration(String name, Expression replacementValue) {
-    variables.put(name, replacementValue);
-    placeholdersWhenModified.put(name, registeredPlaceholders);
-  }
-
-  public void addDeclarationIfNotPresent(String name, Expression replacementValue) {
-    if (!variables.containsKey(name))
-      addDeclaration(name, replacementValue);
-  }
-
-  public void removeDeclaration(String name) {
-    variables.remove(name);
-  }
-
-  public void fillByFilteredVariables(ExpressionFilter filter, VariablesDeclarationsStorage variablesSource) {
-    for (Entry<String, Expression> entry : variablesSource.variables.entrySet()) {
-      String name = entry.getKey();
-      Expression value = entry.getValue();
-      addDeclaration(name, filter.apply(value));
-    }
-  }
-
-  public int size() {
-    return variables.size();
-  }
-
+  
+  
 }

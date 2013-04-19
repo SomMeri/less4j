@@ -1,0 +1,18 @@
+.apples(@width: 100px) { .bananas() { width: @width; } }
+
+
+#outer-namespace {
+  #namespace {
+    .apples(700px);
+  }
+  .apples(600px);
+}
+
+#test-inner {
+  #outer-namespace > #namespace > .bananas();
+}
+
+#test-outer {
+  #outer-namespace > .bananas(); // this is dubious, is less.js doing it right?
+}
+

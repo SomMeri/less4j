@@ -7,5 +7,6 @@
   this-will-survive-too: funny 'nested 2' 'inside';
   declaration: nestedMixin 'nested 2' 'inside';
   declaration: nestedMixinScoped 'inside call' 'inside';
+  declaration: nestedMixinScoped 'nested 2' 'inside';
   declaration: redefined 'nested 2' 'inside';
 }

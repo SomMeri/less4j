@@ -5,21 +5,17 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.github.sommeri.less4j.Less4jException;
-import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.commandline.CommandLinePrint;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
-import com.github.sommeri.less4j.utils.DebugAndTestPrint;
+import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractErrorReportingTest {
@@ -38,25 +34,20 @@ public abstract class AbstractErrorReportingTest {
   }
 
   @Test
-  public final void compileAndCompare() throws Throwable {
+  public final void compileAndCompare() {
     try {
       CompilationResult actual = compile(lessFile);
       assertCorrectWarnings(actual);
-    } catch (ComparisonFailure ex) {
-      ComparisonFailure fail = (ComparisonFailure) ex;
-      throw new ComparisonFailure(fail.getMessage(), fail.getExpected(), fail.getActual());
     } catch (Less4jException ex) {
       printErrors(ex);
       assertCorrectErrors(ex);
-    } catch (Throwable ex) {
-      throw new RuntimeException(ex.getMessage(), ex);
-    }
+    } 
   }
 
   protected void printErrors(Less4jException ex) {
   }
 
-  protected CompilationResult compile(File lessFile) throws Less4jException, IOException {
+  protected CompilationResult compile(File lessFile) throws Less4jException {
     LessCompiler compiler = getCompiler();
     CompilationResult actual = compiler.compile(lessFile);
     return actual;

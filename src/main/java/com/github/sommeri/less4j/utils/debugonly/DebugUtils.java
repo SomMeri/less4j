@@ -1,10 +1,12 @@
-package com.github.sommeri.less4j.utils;
+package com.github.sommeri.less4j.utils.debugonly;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 
+// marked deprecated so I get a warning if it is referenced somewhere
+@Deprecated
 public class DebugUtils {
 
   private Set<ASTCssNode> duplicates = new HashSet<ASTCssNode>();

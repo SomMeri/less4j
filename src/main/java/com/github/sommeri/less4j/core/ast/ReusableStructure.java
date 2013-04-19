@@ -59,6 +59,10 @@ public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBo
     return parameters;
   }
 
+  public boolean hasParameters() {
+    return !getParameters().isEmpty();
+  }
+
   public boolean hasCollectorParameter() {
     if (parameters==null || parameters.isEmpty())
       return false;

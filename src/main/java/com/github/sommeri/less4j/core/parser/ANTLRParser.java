@@ -20,7 +20,7 @@ import org.antlr.runtime.tree.CommonTreeAdaptor;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessCompiler.Problem;
-import com.github.sommeri.less4j.utils.DebugAndTestPrint;
+import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 /**
  * 

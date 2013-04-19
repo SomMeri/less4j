@@ -1,0 +1,6 @@
+#test {
+  rotten-width-namespace: 3px;
+  width: 50px;
+  rotten-width-default: 1px;
+  rotten-width-unlocker: 1px;
+}

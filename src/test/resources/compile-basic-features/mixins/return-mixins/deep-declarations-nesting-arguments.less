@@ -1,0 +1,23 @@
+.threeBucket(@threeBucketParameter) {
+  .twoBucket(@twoBucketParameter: 777) {
+    .oneBucket(@oneBucketParameter) {
+      .mixin() {
+        one: @oneBucketParameter;
+        two: @twoBucketParameter;
+        three: @threeBucketParameter;
+      }
+    }
+    
+    .oneBucket((@twoBucketParameter - 1));
+  }
+  
+  .twoBucket((@threeBucketParameter - 1));
+}
+
+#call {
+  // unlock mixin
+  .threeBucket(3);
+  
+  // call mixin
+  .mixin();
+}

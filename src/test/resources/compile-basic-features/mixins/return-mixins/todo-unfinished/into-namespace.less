@@ -1,0 +1,9 @@
+.apples(@width: 100px) { .bananas() { width: @width; } }
+
+#namespace {
+  .apples(700px);
+}
+
+#test {
+  #namespace > .bananas();
+}

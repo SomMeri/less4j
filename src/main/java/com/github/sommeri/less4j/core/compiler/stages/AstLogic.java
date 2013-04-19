@@ -6,6 +6,8 @@ import java.util.Set;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.BodyOwner;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.SupportedLessBodyMembers;
@@ -13,12 +15,27 @@ import com.github.sommeri.less4j.core.validators.SupportedLessBodyMembers;
 public class AstLogic {
 
   public static boolean hasOwnScope(ASTCssNode node) {
-    return (node instanceof Body);
+    return isBody(node) || isBodyOwner(node);
+  }
+
+  public static boolean isBodyOwner(ASTCssNode node) {
+    return node instanceof BodyOwner;
+  }
+
+  protected static boolean isBody(ASTCssNode node) {
+    return node instanceof Body;
+  }
+  
+  public static boolean canHaveArguments(ASTCssNode owner) {
+    if (owner.getType()!=ASTCssNodeType.REUSABLE_STRUCTURE) 
+      return false;
+    
+    return ((ReusableStructure)owner).hasParameters();
   }
   
   public static void validateLessBodyCompatibility(ASTCssNode reference, List<ASTCssNode> members, ProblemsHandler problemsHandler) {
     ASTCssNode parent = reference.getParent();
-    if (!(parent instanceof Body)) {
+    if (!isBody(parent)) {
       throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
     
@@ -32,5 +49,5 @@ public class AstLogic {
     }
     
   }
-  
+
 }

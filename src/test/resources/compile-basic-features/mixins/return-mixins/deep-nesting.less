@@ -1,0 +1,27 @@
+.oneBucket(@parameter) {
+  .one() {
+    one: @parameter;
+  }
+}
+
+.twoBucket() {
+  .oneBucket(unlocked-from-two);
+}
+
+.threeBucket() {
+  .twoBucket();
+}
+
+#deep {
+  .threeBucket();
+  .one();
+}
+
+.threeBucketWithCall() {
+  .twoBucket();
+  .one();
+}
+
+#deepWithCall {
+  .threeBucketWithCall();
+}

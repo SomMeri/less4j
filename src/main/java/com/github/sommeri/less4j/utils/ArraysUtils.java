@@ -8,6 +8,13 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 
 public class ArraysUtils {
 
+  public static <T> T last(List<T> values) {
+    if (values.isEmpty())
+      return null;
+    
+    return values.get(values.size() - 1);
+  }
+
   public static <T> List<T> asNonNullList(T... a) {
     List<T> result = new ArrayList<T>();
     for (T t : a) {

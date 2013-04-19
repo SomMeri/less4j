@@ -175,7 +175,7 @@ public class ProblemsHandler {
   }
 
   private CompilationError createUndefinedMixin(ReusableStructureName name, MixinReference reference) {
-    return new CompilationError(reference.getFinalName(), "The mixin \"" + name.asString() + "\" was not declared.");
+    return new CompilationError(reference.getFinalName(), "Could not find mixin named \"" + name.asString() + "\".");
   }
 
   public void unmatchedMixin(MixinReference reference) {
@@ -187,7 +187,7 @@ public class ProblemsHandler {
   }
 
   private CompilationError createUnmatchedMixin(ReusableStructureName name, MixinReference reference) {
-    return new CompilationError(reference.getFinalName(), "The mixin \"" + name.asString() + "\" was not matched.");
+    return new CompilationError(reference.getFinalName(), "No mixin named \"" + name.asString() + "\" has the right number of parameters.");
   }
 
   public void undefinedNamespace(MixinReference reference) {

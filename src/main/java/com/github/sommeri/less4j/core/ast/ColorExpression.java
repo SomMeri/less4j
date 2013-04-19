@@ -69,7 +69,6 @@ public class ColorExpression extends Expression {
   }
 
   private int decode(String color, int i) {
-    System.out.println("***" + i + ":" + color);
     if (color.length() < 7) {
       String substring = color.substring(i + 1, i + 2);
       return Integer.parseInt(substring + substring, 16);

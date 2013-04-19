@@ -1,0 +1,28 @@
+.fruit(@width) when (@width < 100) {
+  .bananas() {
+    width: (@width + 1);
+  }
+}
+
+.fruit(@width) when (@width >=100) {
+  .bananas() {
+    width: (@width + 2);
+  }
+}
+
+.bucket(@width: 100px) {
+  .fruit(@width);
+}
+
+.bananas() {
+  content: another; 
+}
+  
+.bucket(50px);
+.bucket(700px);
+
+#test {
+  .bananas();
+}
+
+

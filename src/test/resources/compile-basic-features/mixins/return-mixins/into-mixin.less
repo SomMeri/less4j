@@ -1,0 +1,10 @@
+.apples(@width: 100px) { .bananas() { width: @width; } }
+
+.mixin() {
+  .apples(700px);
+  .bananas();
+}
+
+#test {
+  .mixin();
+}

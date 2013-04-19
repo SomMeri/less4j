@@ -12,3 +12,10 @@
   border: 0 !important;
   boxer: 0 !important;
 }
+div.blueNoBorder {
+  color: blue;
+}
+div.blueNoBorder.withGoldAndRed {
+  border: 1px solid red !important;
+  color: gold !important;
+}

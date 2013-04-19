@@ -1,0 +1,6 @@
+#test-inner {
+  width: 700px;
+}
+#test-outer {
+  width: 700px; // maybe 600px???
+}

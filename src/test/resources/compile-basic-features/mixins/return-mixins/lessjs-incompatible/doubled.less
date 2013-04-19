@@ -1,0 +1,20 @@
+.fruit(@width) {
+  .bananas() {
+    width: (@width + 1);
+  }
+}
+
+.fruit(@width) {
+  .bananas() {
+    width: (@width + 2);
+  }
+}
+
+.fruit(50px);
+.fruit(700px);
+
+#test {
+  .bananas();
+}
+
+

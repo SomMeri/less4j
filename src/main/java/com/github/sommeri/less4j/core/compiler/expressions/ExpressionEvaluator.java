@@ -89,7 +89,7 @@ public class ExpressionEvaluator {
   }
 
   public Scope evaluateValues(Scope scope) {
-    Scope result = Scope.createUnnamedScope();
+    Scope result = Scope.createDummyScope();
     result.fillByFilteredVariables(toEvaluationFilter(), scope);
     return result;
   }
@@ -375,8 +375,10 @@ public class ExpressionEvaluator {
 
 class NullScope extends Scope {
 
+  private static final String NULL = "null";
+
   protected NullScope() {
-    super(null, "empty scope");
+    super(NULL, null, "  ");
   }
 
   @Override

@@ -1,0 +1,37 @@
+.apples(@width: 100px) {  
+  .bananas() {
+    width: @width;
+  }
+}
+
+.rottenApplesInUnlocker() {
+  @width: 1px;
+  .bananas() {
+    rotten-width-unlocker: @width;
+  }
+}
+
+@width: 2px;
+.rottenApplesInDefaultScope() {
+  .bananas() {
+    rotten-width-default: @width; // 1.4.0 will print "rotten-width-default: 2px" on this - it will have local scope protection turned on
+  }
+}
+
+.rottenApplesAsNamespace {
+  @width: 3px;
+  .bananas() {
+    rotten-width-namespace: @width;
+  }
+}
+
+// unlock all
+.apples(50px);
+.rottenApplesInDefaultScope();
+.rottenApplesInUnlocker();
+
+#test {
+  .rottenApplesAsNamespace > .bananas();
+  .bananas();
+  @width: should-ignore;
+}

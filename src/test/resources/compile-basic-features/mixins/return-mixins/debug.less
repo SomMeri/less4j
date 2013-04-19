@@ -1,0 +1,15 @@
+.oneBucket(@oneBucketParameter) {
+  .one() {
+    one: @oneBucketParameter;
+    two: @twoBucketParameter;
+  }
+}
+
+.twoBucket(@twoBucketParameter) {
+  .oneBucket(unlocked-from-two);
+}
+
+#deepWithCall {
+  .twoBucket(two-bucket-with-call);
+  .one();
+}

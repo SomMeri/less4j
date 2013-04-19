@@ -1,0 +1,26 @@
+.tricky(@width) when (@width < 100) {
+  content: do-something;
+}
+
+.tricky(@width) when (@width >=100) {
+  content: do-something-else;
+}
+
+
+.apples(@width: 100px) {
+  .bananas() {
+    .tricky(@width);
+  }
+}
+
+.bananas() {
+  content: another; 
+}
+  
+.apples(50px);
+.apples(700px);
+
+#test {
+  .bananas();
+}
+

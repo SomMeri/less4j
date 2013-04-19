@@ -1,0 +1,24 @@
+.applesBucket(@width: 100px) {
+  .apples(@width) {
+    apple: @width;
+  }
+}
+
+.bananasBucket(@width: 100px) {
+  .bananas(@width) {
+    banana: @width;
+  }
+  .apples(@width)
+}
+
+.fruitsBucket(@width: 100px) {
+  .bananas(@width);
+  .apples(@width);
+}
+
+#test-1 {
+  .applesBucket(50px);
+  .bananasBucket(60px);
+  .fruitsBucket(70px);
+}
+

@@ -15,3 +15,25 @@
   .mixin(5);
   .mixin !important;
 }
+
+//taken from less.js issues database: https://github.com/cloudhead/less.js/issues/1256
+.mixinBorder() {
+    border: 1px solid red;
+}
+
+.mixinText() {
+    color: gold;
+}
+
+.mixinBorderAndText() {
+    .mixinBorder();
+    .mixinText();
+}
+
+div.blueNoBorder {
+    color: blue;
+}
+
+div.blueNoBorder.withGoldAndRed {
+    .mixinBorderAndText() !important;
+}

@@ -25,6 +25,7 @@ public class IteratedScope {
       if (childsIterator.hasNext())
         child = childsIterator.next();
     } while (!child.isPresentInTree());
+    
     return new IteratedScope(child);
   }
 

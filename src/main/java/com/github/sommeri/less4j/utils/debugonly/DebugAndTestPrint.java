@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.utils;
+package com.github.sommeri.less4j.utils.debugonly;
 
 import java.util.List;
 

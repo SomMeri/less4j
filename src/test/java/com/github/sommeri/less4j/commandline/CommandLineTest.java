@@ -9,8 +9,8 @@ import java.io.PrintStream;
 import org.junit.After;
 import org.junit.Before;
 
-import com.github.sommeri.less4j.utils.DebugAndTestPrint;
 import com.github.sommeri.less4j.utils.TestFileUtils;
+import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 public abstract class CommandLineTest {
 

@@ -1,0 +1,17 @@
+.apples(@width: 100px) { 
+  .bananas() {
+    width: @width;
+  }
+}
+
+.bananas() {
+  height: 22;
+}
+
+// unlock
+.apples(50px);
+
+#test {
+  .bananas();
+}
+

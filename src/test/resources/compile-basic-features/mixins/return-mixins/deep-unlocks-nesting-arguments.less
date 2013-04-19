@@ -1,0 +1,29 @@
+.oneBucket(@oneBucketParameter) {
+  .one() {
+    one: @oneBucketParameter;
+    two: @twoBucketParameter;
+    three: @threeBucketParameter;
+  }
+}
+
+.twoBucket(@twoBucketParameter) {
+  .oneBucket(unlocked-from-two);
+}
+
+.threeBucket(@threeBucketParameter) {
+  .twoBucket(unlocked-from-three);
+}
+
+#deep {
+  .threeBucket(three-bucket-in-deep);
+  .one();
+}
+
+.threeBucketWithCall(@threeBucketParameter) {
+  .twoBucket(two-bucket-with-call);
+  .one();
+}
+
+#deepWithCall {
+  .threeBucketWithCall(hack-and-mess);
+}
