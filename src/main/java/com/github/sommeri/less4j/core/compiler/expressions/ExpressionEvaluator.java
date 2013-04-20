@@ -319,6 +319,10 @@ public class ExpressionEvaluator {
     return new FaultyExpression(input);
   }
 
+  public boolean guardsSatisfied(ReusableStructure mixin) {
+    return evaluate(mixin.getGuards());
+  }
+
   public boolean evaluate(List<Guard> guards) {
     if (guards == null || guards.isEmpty())
       return true;

@@ -64,6 +64,8 @@ public class LessAstValidator {
       checkForLogicalConditionConsistency((SupportsLogicalCondition) node);
       break;
     }
+    default:
+      //nothing is needed
     }
 
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());

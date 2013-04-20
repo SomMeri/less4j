@@ -1,4 +1,3 @@
 #deepWithCall {
-  one: unlocked-from-two;
-  two: two-bucket-with-call;
+  one: defined-in-two-bucket;
 }

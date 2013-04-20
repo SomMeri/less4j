@@ -39,6 +39,8 @@ public class MediaBubblerAndMerger {
         astManipulator.addIntoBody(nestedMedia, kid);
         break;
       }
+      default:
+        //nothing is needed
       }
     }
 
@@ -212,6 +214,8 @@ class ParentChainIterator {
       ASTCssNode bodyParent = body.getParent();
       return bodyParent == null || bodyParent.getType() == ASTCssNodeType.MEDIA;
     }
+    default:
+      //nothing is needed
     }
 
     return false;

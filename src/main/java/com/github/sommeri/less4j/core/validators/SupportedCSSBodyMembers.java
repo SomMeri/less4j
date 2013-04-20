@@ -22,6 +22,8 @@ public class SupportedCSSBodyMembers {
     switch (bodyType) {
     case STYLE_SHEET:
       return topLevelElements();
+    default:
+      //nothing is needed
     }
 
     if (ownerType == null)

@@ -31,7 +31,6 @@ import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
 import com.github.sommeri.less4j.core.compiler.stages.UselessLessElementsRemover;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
-import com.github.sommeri.less4j.utils.debugonly.AdHocScopeChecker;
 
 public class LessToCssCompiler {
 
@@ -73,9 +72,6 @@ public class LessToCssCompiler {
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
 
-    AdHocScopeChecker adHocChecker = new AdHocScopeChecker();
-    adHocChecker.validate(scope);
-    
     ReferencesSolver variablesReferencesSolver = new ReferencesSolver(problemsHandler);
     variablesReferencesSolver.solveReferences(less, scope);
     // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
@@ -163,6 +159,8 @@ public class LessToCssCompiler {
         freeNestedRuleSets(marginBox.getBody());
         break;
       }
+      default:
+        //nothing is needed
       }
     }
   }

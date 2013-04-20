@@ -37,6 +37,8 @@ public class SupportedLessBodyMembers {
       result.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
       return result;
 
+    default:
+      //nothing is needed
     }
 
     if (ownerType == null)
@@ -45,10 +47,10 @@ public class SupportedLessBodyMembers {
     switch (ownerType) {
     case KEYFRAMES:
       return Collections.unmodifiableSet(KEYFRAMES_SUPPORTED_MEMBERS);
-    // turns out that the owner type to be is known very rarely
-    // there is no reason to fill this with specifics - 
-    // I'm leaving this here so I do not waste time attempting to do the same thing 
-    
+      // turns out that the owner type to be is known very rarely
+      // there is no reason to fill this with specifics - 
+      // I'm leaving this here so I do not waste time attempting to do the same thing 
+
     default:
       return allNodeTypes();
     }

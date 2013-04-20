@@ -8,10 +8,7 @@ import java.util.Map.Entry;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.Body;
-import com.github.sommeri.less4j.core.ast.BodyOwner;
 import com.github.sommeri.less4j.core.ast.CssString;
-import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -20,40 +17,52 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.MixinReference;
-import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
+import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
-import com.github.sommeri.less4j.utils.debugonly.DebugSysout;
 
 //FIXME: !!!! document does not pass through media 
 public class ReferencesSolver {
 
   public static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
+  private final MixinsSolver mixinsSolver;
   private final ProblemsHandler problemsHandler;
   private StringInterpolator stringInterpolator = new StringInterpolator();
 
   public ReferencesSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
+    mixinsSolver = new MixinsSolver(this, problemsHandler);
   }
 
-  public void solveReferences(ASTCssNode node, Scope scope) {
-    scope.createLocalDataSnapshot(); //FIXME: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ERANBELASDASD
-    doSolveReferences(node, new IteratedScope(scope));
-    scope.discardLastLocalDataSnapshot(); //FIXME: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ERANBELASDASD
+  public void solveReferences(final ASTCssNode node, final Scope scope) {
+    doSolveReferencesInSnapshot(node, new IteratedScope(scope));
   }
 
-  private void doSolveReferences(ASTCssNode node, Scope scope) {
+  protected void doSolveReferences(ASTCssNode node, Scope scope) {
     doSolveReferences(node, new IteratedScope(scope));
+  }
+
+  private void doSolveReferencesInSnapshot(final ASTCssNode node, final IteratedScope scope) {
+    // ... and I'm starting to see the point of closures ...
+    InScopeSnapshotRunner.runInLocalDataSnapshot(scope, new ITask() {
+
+      @Override
+      public void run() {
+        doSolveReferences(node, scope);
+      }
+
+    });
   }
 
   private void doSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
@@ -78,9 +87,7 @@ public class ReferencesSolver {
       if (!isMixinReference(kid)) {
         if (AstLogic.hasOwnScope(kid)) {
           IteratedScope scope = iteratedScope.getNextChild();
-          scope.getScope().createLocalDataSnapshot(); //FIXME: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ERANBELASDASD
-          doSolveReferences(kid, scope);
-          scope.getScope().discardLastLocalDataSnapshot(); //FIXME: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ERANBELASDASD
+          doSolveReferencesInSnapshot(kid, scope);
         } else {
           boolean finishedNode = solveIfVariableReference(kid, iteratedScope.getScope());
           if (!finishedNode)
@@ -108,7 +115,7 @@ public class ReferencesSolver {
       if (isMixinReference(kid)) {
         MixinReference mixinReference = (MixinReference) kid;
         List<FullMixinDefinition> mixins = findReferencedMixins(mixinReference, scope);
-        GeneralBody replacement = resolveReferencedMixins(mixinReference, scope, mixins);
+        GeneralBody replacement = mixinsSolver.resolveReferencedMixins(mixinReference, scope, mixins);
         AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getMembers(), problemsHandler);
         solvedMixinReferences.put(mixinReference, replacement);
       }
@@ -170,6 +177,7 @@ public class ReferencesSolver {
       part.getParent().replaceMember(part, interpolateFixedNamePart(fixedName, expressionEvaluator));
       return true;
     }
+    default: // nothing
     }
     return false;
   }
@@ -192,139 +200,6 @@ public class ReferencesSolver {
   private FixedNamePart interpolateFixedNamePart(FixedNamePart input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceIn(input.getName(), expressionEvaluator, input.getUnderlyingStructure());
     return new FixedNamePart(input.getUnderlyingStructure(), value);
-  }
-
-  // FIXME: !!!! the ugliest code ever seen, refactor it before commit - but
-  // only after it starts to work !!!!
-  private GeneralBody resolveReferencedMixins(MixinReference reference, Scope referenceScope, List<FullMixinDefinition> mixins) {
-    GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
-    for (FullMixinDefinition referencedMixin : mixins) {
-
-      Scope mixinArguments = buildMixinsArguments(reference, referenceScope, referencedMixin);
-      Scope referencedMixinWorkingScope = calculateMixinsWorkingScope(referenceScope, mixinArguments.copyWholeTree(), referencedMixin.getScope());
-
-      ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referencedMixinWorkingScope, problemsHandler);
-      ReusableStructure mixin = referencedMixin.getMixin();
-
-      if (expressionEvaluator.evaluate(mixin.getGuards())) {
-        GeneralBody body = mixin.getBody().clone();
-        referencedMixinWorkingScope.createLocalDataSnapshot(); //FIXME: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ERANBELASDASD
-        doSolveReferences(body, referencedMixinWorkingScope);
-        result.addMembers(body.getMembers());
-
-        List<FullMixinDefinition> allMixinsToImport = new ArrayList<FullMixinDefinition>();
-        for (FullMixinDefinition mixinToImport : referencedMixinWorkingScope.getAllMixins()) {
-          //debug.less a nested
-          // FIXME: !!!!! tie scopes su v zlych poradiach - outer before inner
-          // !! this is wrong:
-          // [#default#] > [.threeBucket] > [.twoBucket] > [.oneBucket] > [#arguments-MixinReference[CssClass [.oneBucket]]#] > [#arguments-MixinReference[CssClass [.twoBucket]]#] > [.mixin]
-          
-          // FIXME: !!!! add unit test imports chain: local import, outside import
-          // FIXME: !!!! zrusit toto: #standard#[#arguments-MixinReference[CssClass [.twoBucket]]#]C
-          // FIXME: !!!! robit kopie len ak to naozaj treba
-          Scope scopeTreeCopy = mixinToImport.getScope().copyWholeTree();
-          if (referencedMixin.getScope().getParent()==referenceScope) {
-            System.out.println("som tu"); // unreachable code
-          }
-          if (AstLogic.canHaveArguments(referencedMixin.getMixin())) { 
-            Scope argumentsAwaitingParent = scopeTreeCopy.findFirstArgumentsAwaitingParent();
-            // mixin can be imported either from inside or outside.
-            
-            if (argumentsAwaitingParent!=null) { // if it is from inside: = this is probably bad way to check it
-              argumentsAwaitingParent.createDataClone();
-              argumentsAwaitingParent.add(mixinArguments);
-              argumentsAwaitingParent.setAwaitingArguments(false);
-            } else { //if it is from outside:
-              DebugSysout.println("I'm outside");
-              scopeTreeCopy.getRootScope().setParent(referencedMixinWorkingScope.copyWithParentsChain());
-            }
-          }
-          
-          
-          //tuto som skoncila
-          
-          
-          
-          //scopeTreeCopy.insertAsParent(mixinArguments.copyWholeTree());
-          if (scopeTreeCopy.toString().contains("[#default#] > [.threeBucket] > [.twoBucket] > [.oneBucket] > [#arguments-MixinReference[CssClass [.oneBucket]]#] > [#arguments-MixinReference[CssClass [.twoBucket]]#] > [.mixin]")) {
-            DebugSysout.println(1);
-            System.out.println();
-          }
-
-          DebugSysout.println(mixinToImport.getMixin());
-          DebugSysout.println(scopeTreeCopy);
-          DebugSysout.println("---------------------------------------------");
-          //
-          allMixinsToImport.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
-        }
-
-        // update scope
-        Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinWorkingScope);
-        referencedMixinWorkingScope.discardLastLocalDataSnapshot(); //FIXME: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ERANBELASDASD
-        returnValues.addAllMixins(allMixinsToImport);
-        referenceScope.addToPlaceholder(returnValues);
-      }
-    }
-
-    referenceScope.closePlaceholder();
-    resolveImportance(reference, result);
-    shiftComments(reference, result);
-
-    return result;
-  }
-
-  private void shiftComments(MixinReference reference, GeneralBody result) {
-    List<ASTCssNode> childs = result.getMembers();
-    if (!childs.isEmpty()) {
-      childs.get(0).addOpeningComments(reference.getOpeningComments());
-      childs.get(childs.size() - 1).addTrailingComments(reference.getTrailingComments());
-    }
-  }
-
-  private void resolveImportance(MixinReference reference, GeneralBody result) {
-    if (reference.isImportant()) {
-      declarationsAreImportant(result);
-    }
-  }
-
-  @SuppressWarnings("rawtypes")
-  private void declarationsAreImportant(Body result) {
-    for (ASTCssNode kid : result.getMembers()) {
-      if (kid instanceof Declaration) {
-        Declaration declaration = (Declaration) kid;
-        declaration.setImportant(true);
-      } else if (kid instanceof BodyOwner<?>) {
-        BodyOwner owner = (BodyOwner) kid;
-        declarationsAreImportant(owner.getBody());
-      }
-    }
-  }
-
-  public static Scope calculateMixinsWorkingScope(Scope callerScope, Scope arguments, Scope mixinsScope) {
-    //FIXME: !!!! find out whether we really need to copy whole tree
-    Scope result = mixinsScope.copyWholeTree();
-    Scope callerScopeCopy = callerScope.copyWithParentsChain();
-
-    result.insertAsParent(arguments);
-
-    Scope resultRoot = result.getRootScope();
-    resultRoot.setParent(callerScopeCopy);
-    return result;
-  }
-
-  public static Scope calculateMixinsWorkingScopeAlt2(Scope callerScope, Scope arguments, Scope mixinsScope) {
-    //FIXME: !!!! find out whether we really need to copy whole tree
-    Scope result = mixinsScope.copyWholeTree();
-    result.insertAsParent(arguments);
-
-    Scope resultRoot = result.getRootScope();
-    resultRoot.setParent(callerScope.copyWithParentsChain());
-    return result;
-  }
-
-  private Scope buildMixinsArguments(MixinReference reference, Scope referenceScope, FullMixinDefinition mixin) {
-    MixinArgumentsBuilder builder = new MixinArgumentsBuilder(reference, mixin.getMixin(), new ExpressionEvaluator(referenceScope, problemsHandler), problemsHandler);
-    return builder.build();
   }
 
 }

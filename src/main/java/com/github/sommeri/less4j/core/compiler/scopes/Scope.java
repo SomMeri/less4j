@@ -19,12 +19,12 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 public class Scope {
 
   private static final String DEFAULT = "#default#";
-  //FIXME:!!!! dummy is weird type and so is unnamed, clean this up!!!!
+  // FIXME:!!!! dummy is weird type and so is unnamed, clean this up!!!!
   private static final String UNNAMED = "#unnamed#";
   private static final String BODY_OWNER = "#body-owner#";
   private static final String DUMMY = "#dummy#";
   private static final String STANDARD = "#standard#";
-  
+
   private final ASTCssNode owner;
   private boolean presentInTree = true;
   private LocalData localData = new LocalData();
@@ -32,9 +32,10 @@ public class Scope {
 
   private Scope parent;
   private List<Scope> childs = new ArrayList<Scope>();
-  private List<String> names; //FIXME: !!!! distinguish type and names - update also toString to show both
-  
-  //this is currently used only during debuging 
+  private List<String> names; // FIXME: !!!! distinguish type and names - update
+                              // also toString to show both
+
+  // this is currently used only during debuging
   private String type;
 
   protected Scope(String type, ASTCssNode owner, List<String> names, Scope parent) {
@@ -89,7 +90,7 @@ public class Scope {
   public boolean isAwaitingArguments() {
     return localData.isAwaitingArguments();
   }
-  
+
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder(toFullName());
@@ -100,13 +101,13 @@ public class Scope {
   private String toFullName() {
     if (hasParent())
       return getParent().toFullName() + " > " + toSimpleName();
-    
+
     return getNames().toString();
   }
 
   private String toSimpleName() {
     List<String> names = getNames();
-    return "" + type + names + (isAwaitingArguments()? "O" : "C");
+    return "" + type + names + (isAwaitingArguments() ? "O" : "C");
   }
 
   public void registerVariable(AbstractVariableDeclaration declaration) {
@@ -136,6 +137,11 @@ public class Scope {
   public void add(Scope otherSope) {
     getLocalMixins().storeAll(otherSope.getLocalMixins());
     getLocalVariables().storeAll(otherSope.getLocalVariables());
+  }
+
+  public void addAsArguments(Scope otherSope) {
+    add(otherSope);
+    setAwaitingArguments(false); 
   }
 
   public Expression getValue(Variable variable) {
@@ -188,10 +194,10 @@ public class Scope {
 
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (Scope namespace : namespaces) {
-      // body owner scope can have only one child  
+      // body owner scope can have only one child
       if (namespace.isBodyOwnerScope())
-        namespace = namespace.firstChild(); 
-        
+        namespace = namespace.firstChild();
+
       result.addAll(namespace.getNearestMixins(reference.getFinalName()));
     }
     return result;
@@ -222,15 +228,18 @@ public class Scope {
   public Scope findFirstArgumentsAwaitingParent() {
     if (!hasParent())
       return null;
-    
+
     Scope parent = getParent();
     if (parent.isAwaitingArguments())
       return parent;
-    
+
     return parent.findFirstArgumentsAwaitingParent();
   }
 
-  public List<Scope> findMatchingChilds(List<String> nameChain) { //FIXME: !!!! can I get here linked list?
+  public List<Scope> findMatchingChilds(List<String> nameChain) { // FIXME: !!!!
+                                                                  // can I get
+                                                                  // here linked
+                                                                  // list?
     if (nameChain.isEmpty())
       return Arrays.asList(this);
 
@@ -248,7 +257,7 @@ public class Scope {
   private Scope skipBodyOwner() {
     if (isBodyOwnerScope())
       return firstChild().skipBodyOwner();
-    
+
     return this;
   }
 
@@ -347,7 +356,7 @@ public class Scope {
     parent.setParent(originalParent);
     setParent(parent);
   }
-  
+
   public void setParent(Scope parent) {
     if (hasParent()) {
       getParent().getChilds().remove(this);
@@ -382,27 +391,26 @@ public class Scope {
     return null;
   }
 
-
   public Scope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
     Scope head = getChildOwnerOf(headNode);
-    if (head==null)
+    if (head == null)
       return null;
-    
+
     for (ASTCssNode node : restNodes) {
       head = head.getChildOwnerOf(node);
-      if (head==null)
+      if (head == null)
         return null;
     }
 
     return head;
   }
-
-  public void createLocalDataSnapshot() {
+  //FIXME: !!!!!!!! change to protected
+  protected void createLocalDataSnapshot() {
     localDataSnapshots.push(localData);
     localData = localData.clone();
   }
-
-  public void discardLastLocalDataSnapshot() {
+  //FIXME: !!!!!!!! change to protected
+  protected void discardLastLocalDataSnapshot() {
     localData = localDataSnapshots.pop();
   }
 
@@ -435,7 +443,8 @@ public class Scope {
 
     @Override
     public String toString() {
-      StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");;
+      StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");
+      ;
       result.append("**Variables storage: ").append(variables).append("\n\n");
       result.append("**Mixins storage: ").append(mixins).append("\n\n");
       return result.toString();

@@ -15,7 +15,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-class MixinArgumentsBuilder {
+class ArgumentsBuilder {
 
   // utils
   private final ProblemsHandler problemsHandler;
@@ -31,7 +31,7 @@ class MixinArgumentsBuilder {
   private List<Expression> allValues = new ArrayList<Expression>();
   private Scope argumentsScope;
 
-  public MixinArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, ExpressionEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
+  public ArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, ExpressionEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
     super();
     this.referenceEvaluator = referenceEvaluator;
     this.problemsHandler = problemsHandler;
