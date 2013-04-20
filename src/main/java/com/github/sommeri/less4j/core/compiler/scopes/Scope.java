@@ -18,13 +18,15 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class Scope {
 
+  // following is used only during debugging - to generate human readable toString
   private static final String DEFAULT = "#default#";
-  // FIXME:!!!! dummy is weird type and so is unnamed, clean this up!!!!
-  private static final String UNNAMED = "#unnamed#";
+  private static final String SCOPE = "#scope#";
   private static final String BODY_OWNER = "#body-owner#";
   private static final String DUMMY = "#dummy#";
-  private static final String STANDARD = "#standard#";
 
+  private String type;
+
+  // real data
   private final ASTCssNode owner;
   private boolean presentInTree = true;
   private LocalData localData = new LocalData();
@@ -32,11 +34,8 @@ public class Scope {
 
   private Scope parent;
   private List<Scope> childs = new ArrayList<Scope>();
-  private List<String> names; // FIXME: !!!! distinguish type and names - update
-                              // also toString to show both
+  private List<String> names; 
 
-  // this is currently used only during debuging
-  private String type;
 
   protected Scope(String type, ASTCssNode owner, List<String> names, Scope parent) {
     super();
@@ -236,10 +235,7 @@ public class Scope {
     return parent.findFirstArgumentsAwaitingParent();
   }
 
-  public List<Scope> findMatchingChilds(List<String> nameChain) { // FIXME: !!!!
-                                                                  // can I get
-                                                                  // here linked
-                                                                  // list?
+  public List<Scope> findMatchingChilds(List<String> nameChain) { 
     if (nameChain.isEmpty())
       return Arrays.asList(this);
 
@@ -265,8 +261,8 @@ public class Scope {
     return new Scope(DEFAULT, owner, new ArrayList<String>());
   }
 
-  public static Scope createUnnamedScope(ASTCssNode owner, Scope parent) {
-    return new Scope(UNNAMED, owner, new ArrayList<String>(), parent, false);
+  public static Scope createScope(ASTCssNode owner, Scope parent) {
+    return new Scope(SCOPE, owner, new ArrayList<String>(), parent, false);
   }
 
   public static Scope createBodyOwnerScope(ASTCssNode owner, Scope parent, boolean awaitingArguments) {
@@ -277,12 +273,8 @@ public class Scope {
     return new Scope(DUMMY, null, new ArrayList<String>(), null, false);
   }
 
-  public static Scope createScope(ASTCssNode owner, List<String> names, Scope parent) {
-    return new Scope(STANDARD, owner, names, parent, false);
-  }
-
-  public static Scope createScope(ASTCssNode owner, String name, Scope parent) {
-    return new Scope(STANDARD, owner, name, parent);
+  public static Scope createDummyScope(ASTCssNode owner, String name) {
+    return new Scope(DUMMY, owner, name, null);
   }
 
   public String toLongString() {
@@ -404,12 +396,12 @@ public class Scope {
 
     return head;
   }
-  //FIXME: !!!!!!!! change to protected
+
   protected void createLocalDataSnapshot() {
     localDataSnapshots.push(localData);
     localData = localData.clone();
   }
-  //FIXME: !!!!!!!! change to protected
+
   protected void discardLastLocalDataSnapshot() {
     localData = localDataSnapshots.pop();
   }

@@ -38,7 +38,7 @@ class ArgumentsBuilder {
     this.positionalParameters = reference.getPositionalParameters().iterator();
     this.reference = reference;
 
-    argumentsScope = Scope.createScope(reference, "#arguments-" + reference + "#", null);
+    argumentsScope = Scope.createDummyScope(reference, "#arguments-" + reference + "#");
     mixin = pureMixin;
   }
 

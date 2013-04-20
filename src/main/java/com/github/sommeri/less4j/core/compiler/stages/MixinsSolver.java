@@ -27,19 +27,19 @@ class MixinsSolver {
     this.problemsHandler = problemsHandler;
   }
 
-  private void resolveMixinReferenceInSnapshot(final Scope referenceScope, final GeneralBody result, final ReusableStructure referencedMixin, final Scope referencedMixinScope, final ExpressionEvaluator expressionEvaluator) {
+  private void resolveMixinReference(final Scope referenceScope, final GeneralBody result, final ReusableStructure referencedMixin, final Scope referencedMixinScope, final ExpressionEvaluator expressionEvaluator) {
     // ... and I'm starting to see the point of closures ...
     InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new ITask() {
 
       @Override
       public void run() {
-        resolveMixinReference(referenceScope, result, referencedMixin, referencedMixinScope, expressionEvaluator);
+        unsafeResolveMixinReference(referenceScope, result, referencedMixin, referencedMixinScope, expressionEvaluator);
       }
 
     });
   }
 
-  private void resolveMixinReference(Scope referenceScope, GeneralBody result, ReusableStructure referencedMixin, Scope referencedMixinScope, ExpressionEvaluator expressionEvaluator) {
+  private void unsafeResolveMixinReference(Scope referenceScope, GeneralBody result, ReusableStructure referencedMixin, Scope referencedMixinScope, ExpressionEvaluator expressionEvaluator) {
     GeneralBody bodyClone = referencedMixin.getBody().clone();
     parentSolver.doSolveReferences(bodyClone, referencedMixinScope);
     result.addMembers(bodyClone.getMembers());
@@ -97,7 +97,7 @@ class MixinsSolver {
           ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referencedMixinScope, problemsHandler);
 
           if (expressionEvaluator.guardsSatisfied(referencedMixin)) {
-            resolveMixinReferenceInSnapshot(referenceScope, result, fullReferencedMixin.getMixin(), referencedMixinScope, expressionEvaluator);
+            resolveMixinReference(referenceScope, result, fullReferencedMixin.getMixin(), referencedMixinScope, expressionEvaluator);
           }
         }
 

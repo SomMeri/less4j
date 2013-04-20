@@ -46,26 +46,26 @@ public class ReferencesSolver {
   }
 
   public void solveReferences(final ASTCssNode node, final Scope scope) {
-    doSolveReferencesInSnapshot(node, new IteratedScope(scope));
-  }
-
-  protected void doSolveReferences(ASTCssNode node, Scope scope) {
     doSolveReferences(node, new IteratedScope(scope));
   }
 
-  private void doSolveReferencesInSnapshot(final ASTCssNode node, final IteratedScope scope) {
+  protected void doSolveReferences(ASTCssNode node, Scope scope) {
+    unsafeDoSolveReferences(node, new IteratedScope(scope));
+  }
+
+  private void doSolveReferences(final ASTCssNode node, final IteratedScope scope) {
     // ... and I'm starting to see the point of closures ...
     InScopeSnapshotRunner.runInLocalDataSnapshot(scope, new ITask() {
 
       @Override
       public void run() {
-        doSolveReferences(node, scope);
+        unsafeDoSolveReferences(node, scope);
       }
 
     });
   }
 
-  private void doSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
+  private void unsafeDoSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     if (!childs.isEmpty()) {
       Scope scope = iteratedScope.getScope();
@@ -87,11 +87,11 @@ public class ReferencesSolver {
       if (!isMixinReference(kid)) {
         if (AstLogic.hasOwnScope(kid)) {
           IteratedScope scope = iteratedScope.getNextChild();
-          doSolveReferencesInSnapshot(kid, scope);
+          doSolveReferences(kid, scope);
         } else {
           boolean finishedNode = solveIfVariableReference(kid, iteratedScope.getScope());
           if (!finishedNode)
-            doSolveReferences(kid, iteratedScope);
+            unsafeDoSolveReferences(kid, iteratedScope);
         }
       }
     }
