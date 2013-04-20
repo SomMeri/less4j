@@ -13,10 +13,11 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
+import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
+//FIXME: !!!!! document poradie v ktorom sa importuju mixiny a variable 
 class MixinsSolver {
 
   private final ProblemsHandler problemsHandler;
@@ -39,35 +40,43 @@ class MixinsSolver {
     });
   }
 
-  private void unsafeResolveMixinReference(Scope referenceScope, GeneralBody result, ReusableStructure referencedMixin, Scope referencedMixinScope, ExpressionEvaluator expressionEvaluator) {
+  private void unsafeResolveMixinReference(Scope referenceScope, GeneralBody result, ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot, ExpressionEvaluator expressionEvaluator) {
+    // compile referenced mixin - keep the original copy unchanged
     GeneralBody bodyClone = referencedMixin.getBody().clone();
-    parentSolver.doSolveReferences(bodyClone, referencedMixinScope);
+    parentSolver.doSolveReferences(bodyClone, referencedMixinScopeSnapshot);
     result.addMembers(bodyClone.getMembers());
 
-    List<FullMixinDefinition> allMixinsToImport = mixinsToImport(referencedMixin, referencedMixinScope);
-
-    // update scope
-    Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScope);
+    // collect variables and mixins to be imported
+    Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScopeSnapshot);
+    List<FullMixinDefinition> allMixinsToImport = mixinsToImport(referenceScope, referencedMixin, referencedMixinScopeSnapshot);
     returnValues.addAllMixins(allMixinsToImport);
+    
+    // update scope with imported variables and mixins
     referenceScope.addToPlaceholder(returnValues);
   }
 
-  private List<FullMixinDefinition> mixinsToImport(ReusableStructure referencedMixin, Scope referencedMixinScope) {
+  private List<FullMixinDefinition> mixinsToImport(Scope referenceScope, ReusableStructure referencedMixin, Scope referencedMixinScope) {
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixinToImport : referencedMixinScope.getAllMixins()) {
-      // FIXME: !!!! add unit test imports chain: local import, outside import
-      // FIXME: !!!! robit kopie len ak to naozaj treba
-      Scope scopeTreeCopy = mixinToImport.getScope().copyWholeTree();
-      if (AstLogic.canHaveArguments(referencedMixin)) {
-        Scope argumentsAwaitingParent = scopeTreeCopy.findFirstArgumentsAwaitingParent();
-        // Mixin can be imported either from inside or outside. If it is from inside, nothing is needed. If it is from 
-        // outside, then we need to join scopes. 
-        if (argumentsAwaitingParent == null) { // FIXME: !!!! this is a bad way of checking inside vs outside import
-          scopeTreeCopy.getRootScope().setParent(referencedMixinScope.copyWithParentsChain());
-        }
+      boolean canHaveArguments = AstLogic.canHaveArguments(referencedMixin);
+      boolean isLocalImport = mixinToImport.getScope().seesLocalDataOf(referenceScope); 
+      
+      if (!canHaveArguments) {
+        // nothing special is needed, the mixin call did not brough in new variables
+        result.add(new FullMixinDefinition(mixinToImport.getMixin(), mixinToImport.getScope()));
+      } else if (isLocalImport) {
+        // we need to copy the whole tree, because this runs inside referenced mixin scope 
+        // snapshot and imported mixin needs to remember the scope as it is now 
+        Scope scopeTreeCopy = mixinToImport.getScope().copyWholeTree();
+        result.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
+      } else {
+        // since this is non-local import, we need to join reference scope and imported mixins scope
+        // imported mixin would not have access to variables defined in caller
+        Scope scopeTreeCopy = mixinToImport.getScope().copyWholeTree();
+        scopeTreeCopy.getRootScope().setParent(referencedMixinScope.copyWithParentsChain());
+        result.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
       }
 
-      result.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
     }
     return result;
   }
@@ -86,23 +95,22 @@ class MixinsSolver {
   }
 
   // FIXME: !!!! the ugliest code ever seen, refactor it before commit 
-  public GeneralBody resolveReferencedMixins(final MixinReference reference, final Scope referenceScope, List<FullMixinDefinition> mixins) {
+  public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final Scope referenceScope, List<FullMixinDefinition> mixins) {
     final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
-    for (final FullMixinDefinition fullReferencedMixin : mixins) {
-      final ReusableStructure referencedMixin = fullReferencedMixin.getMixin();
-      final Scope referencedScope = fullReferencedMixin.getScope();
+    for (final FullMixinDefinition fullMixin : mixins) {
+      final ReusableStructure mixin = fullMixin.getMixin();
+      final Scope referencedScope = fullMixin.getScope();
+      final Scope mixinArguments = buildMixinsArguments(reference, referenceScope, fullMixin);
 
       InScopeSnapshotRunner.runInLocalDataSnapshot(referencedScope.getParent(), new ITask() {
 
         @Override
         public void run() {
-          Scope mixinArguments = buildMixinsArguments(reference, referenceScope, fullReferencedMixin);
-          Scope referencedMixinScope = calculateMixinsWorkingScope(referenceScope, mixinArguments, referencedScope);
+          Scope mixinWorkingScope = calculateMixinsWorkingScope(referenceScope, mixinArguments, referencedScope);
 
-          ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referencedMixinScope, problemsHandler);
-
-          if (expressionEvaluator.guardsSatisfied(referencedMixin)) {
-            resolveMixinReference(referenceScope, result, fullReferencedMixin.getMixin(), referencedMixinScope, expressionEvaluator);
+          ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler);
+          if (expressionEvaluator.guardsSatisfied(mixin)) {
+            resolveMixinReference(referenceScope, result, fullMixin.getMixin(), mixinWorkingScope, expressionEvaluator);
           }
         }
 
@@ -139,7 +147,7 @@ class MixinsSolver {
   private static Scope calculateMixinsWorkingScope(Scope callerScope, Scope arguments, Scope mixinScope) {
     // add arguments
     Scope mixinDeclarationScope = mixinScope.getParent();
-    mixinDeclarationScope.addAsArguments(arguments);
+    mixinDeclarationScope.add(arguments);
 
     // locally defined mixin does not require any other action
     if (mixinDeclarationScope.getParent() == callerScope) {

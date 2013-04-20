@@ -45,11 +45,6 @@ public class Scope {
     setParent(parent);
   }
 
-  protected Scope(String type, ASTCssNode owner, List<String> names, Scope parent, boolean awaitingArguments) {
-    this(type, owner, names, parent);
-    localData.setAwaitingArguments(awaitingArguments);
-  }
-
   private Scope(String type, ASTCssNode owner, String name, Scope parent) {
     this(type, owner, new ArrayList<String>(Arrays.asList(name)), parent);
   }
@@ -86,14 +81,10 @@ public class Scope {
     return getParent() != null;
   }
 
-  public boolean isAwaitingArguments() {
-    return localData.isAwaitingArguments();
-  }
-
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder(toFullName());
-    result.append("\n\n").append(localData);
+    //result.append("\n\n").append(localData); //FIXME: !!!! uncomment this line
     return result.toString();
   }
 
@@ -101,12 +92,12 @@ public class Scope {
     if (hasParent())
       return getParent().toFullName() + " > " + toSimpleName();
 
-    return getNames().toString();
+    return toSimpleName().toString();
   }
 
   private String toSimpleName() {
     List<String> names = getNames();
-    return "" + type + names + (isAwaitingArguments() ? "O" : "C");
+    return "" + type + names;
   }
 
   public void registerVariable(AbstractVariableDeclaration declaration) {
@@ -136,11 +127,6 @@ public class Scope {
   public void add(Scope otherSope) {
     getLocalMixins().storeAll(otherSope.getLocalMixins());
     getLocalVariables().storeAll(otherSope.getLocalVariables());
-  }
-
-  public void addAsArguments(Scope otherSope) {
-    add(otherSope);
-    setAwaitingArguments(false); 
   }
 
   public Expression getValue(Variable variable) {
@@ -224,17 +210,6 @@ public class Scope {
     return result;
   }
 
-  public Scope findFirstArgumentsAwaitingParent() {
-    if (!hasParent())
-      return null;
-
-    Scope parent = getParent();
-    if (parent.isAwaitingArguments())
-      return parent;
-
-    return parent.findFirstArgumentsAwaitingParent();
-  }
-
   public List<Scope> findMatchingChilds(List<String> nameChain) { 
     if (nameChain.isEmpty())
       return Arrays.asList(this);
@@ -262,15 +237,15 @@ public class Scope {
   }
 
   public static Scope createScope(ASTCssNode owner, Scope parent) {
-    return new Scope(SCOPE, owner, new ArrayList<String>(), parent, false);
+    return new Scope(SCOPE, owner, new ArrayList<String>(), parent);
   }
 
-  public static Scope createBodyOwnerScope(ASTCssNode owner, Scope parent, boolean awaitingArguments) {
-    return new Scope(BODY_OWNER, owner, new ArrayList<String>(), parent, awaitingArguments);
+  public static Scope createBodyOwnerScope(ASTCssNode owner, Scope parent) {
+    return new Scope(BODY_OWNER, owner, new ArrayList<String>(), parent);
   }
 
   public static Scope createDummyScope() {
-    return new Scope(DUMMY, null, new ArrayList<String>(), null, false);
+    return new Scope(DUMMY, null, new ArrayList<String>(), null);
   }
 
   public static Scope createDummyScope(ASTCssNode owner, String name) {
@@ -375,6 +350,16 @@ public class Scope {
     return getParent().getRootScope();
   }
 
+  public boolean seesLocalDataOf(Scope otherScope) {
+    if (otherScope.localData==localData)
+      return true;
+
+    if (!hasParent())
+      return false;
+    
+    return getParent().seesLocalDataOf(otherScope);
+  }
+
   public Scope getChildOwnerOf(ASTCssNode body) {
     for (Scope kid : getChilds()) {
       if (kid.owner == body)
@@ -416,7 +401,6 @@ public class Scope {
 
     private VariablesDeclarationsStorage variables = new VariablesDeclarationsStorage();
     private MixinsDefinitionsStorage mixins = new MixinsDefinitionsStorage();
-    private boolean awaitingArguments = false;
 
     @Override
     protected LocalData clone() {
@@ -431,18 +415,9 @@ public class Scope {
       }
     }
 
-    public void setAwaitingArguments(boolean awaitingArguments) {
-      this.awaitingArguments = awaitingArguments;
-    }
-
-    public boolean isAwaitingArguments() {
-      return awaitingArguments;
-    }
-
     @Override
     public String toString() {
       StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");
-      ;
       result.append("**Variables storage: ").append(variables).append("\n\n");
       result.append("**Mixins storage: ").append(mixins).append("\n\n");
       return result.toString();
@@ -459,10 +434,6 @@ public class Scope {
 
   public void createDataClone() {
     localData = localData.clone();
-  }
-
-  public void setAwaitingArguments(boolean awaitingArguments) {
-    localData.setAwaitingArguments(awaitingArguments);
   }
 
 }

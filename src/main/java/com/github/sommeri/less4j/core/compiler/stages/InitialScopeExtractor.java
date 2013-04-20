@@ -98,7 +98,7 @@ public class InitialScopeExtractor {
     if (currentScope == null) {
       currentScope = Scope.createDefaultScope(owner);
     } else if(AstLogic.isBodyOwner(owner)) {
-      currentScope = Scope.createBodyOwnerScope(owner, currentScope, AstLogic.canHaveArguments(owner));
+      currentScope = Scope.createBodyOwnerScope(owner, currentScope);
     } else {
       currentScope = Scope.createScope(owner, currentScope);
     }

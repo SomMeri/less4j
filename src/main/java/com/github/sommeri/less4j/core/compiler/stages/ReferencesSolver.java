@@ -109,13 +109,14 @@ public class ReferencesSolver {
     }
   }
 
-  private Map<MixinReference, GeneralBody> solveMixinReferences(List<ASTCssNode> childs, Scope scope) {
+  private Map<MixinReference, GeneralBody> solveMixinReferences(List<ASTCssNode> childs, Scope mixinReferenceScope) {
     Map<MixinReference, GeneralBody> solvedMixinReferences = new HashMap<MixinReference, GeneralBody>();
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
         MixinReference mixinReference = (MixinReference) kid;
-        List<FullMixinDefinition> mixins = findReferencedMixins(mixinReference, scope);
-        GeneralBody replacement = mixinsSolver.resolveReferencedMixins(mixinReference, scope, mixins);
+        List<FullMixinDefinition> foundMixins = findReferencedMixins(mixinReference, mixinReferenceScope);
+        GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(mixinReference, mixinReferenceScope, foundMixins);
+        
         AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getMembers(), problemsHandler);
         solvedMixinReferences.put(mixinReference, replacement);
       }

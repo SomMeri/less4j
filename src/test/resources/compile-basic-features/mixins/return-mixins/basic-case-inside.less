@@ -1,0 +1,14 @@
+#test {
+  // define mixin
+  .apples(@width: 100px) {  
+    .bananas() {
+      width: @width;
+    }
+  }
+
+  // unlock
+  .apples(50px);
+
+  // use imported mixin
+  .bananas();
+}
