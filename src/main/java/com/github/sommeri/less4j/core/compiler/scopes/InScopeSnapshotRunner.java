@@ -36,7 +36,6 @@ public class InScopeSnapshotRunner {
     } finally {
       scope.discardLastLocalDataSnapshot();
     }
-
   }
 
   public interface ITask {

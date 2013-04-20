@@ -397,11 +397,17 @@ public class Scope {
     return head;
   }
 
+  /**
+   * Do not call this method directly. Use {@link InScopeSnapshotRunner} instead.
+   */
   protected void createLocalDataSnapshot() {
     localDataSnapshots.push(localData);
     localData = localData.clone();
   }
 
+  /**
+   * Do not call this method directly. Use {@link InScopeSnapshotRunner} instead.
+   */
   protected void discardLastLocalDataSnapshot() {
     localData = localDataSnapshots.pop();
   }

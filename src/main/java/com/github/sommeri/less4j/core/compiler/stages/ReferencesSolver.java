@@ -125,10 +125,11 @@ public class ReferencesSolver {
 
   protected List<FullMixinDefinition> findReferencedMixins(MixinReference mixinReference, Scope scope) {
     List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(mixinReference, problemsHandler);
-    if (sameNameMixins.isEmpty())
+    if (sameNameMixins.isEmpty()) {
       problemsHandler.undefinedMixin(mixinReference);
+      return new ArrayList<FullMixinDefinition>();
+    }
 
-    //FIXME: !!!!! create more reasonable error hanling, like do not continue if it is empty and other to not get no found with the same name and no match on the same place
     List<FullMixinDefinition> mixins = (new MixinsReferenceMatcher(scope, problemsHandler)).filter(mixinReference, sameNameMixins);
     if (mixins.isEmpty())
       problemsHandler.unmatchedMixin(mixinReference);

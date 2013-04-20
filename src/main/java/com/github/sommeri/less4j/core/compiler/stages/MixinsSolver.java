@@ -44,7 +44,16 @@ class MixinsSolver {
     parentSolver.doSolveReferences(bodyClone, referencedMixinScope);
     result.addMembers(bodyClone.getMembers());
 
-    List<FullMixinDefinition> allMixinsToImport = new ArrayList<FullMixinDefinition>();
+    List<FullMixinDefinition> allMixinsToImport = mixinsToImport(referencedMixin, referencedMixinScope);
+
+    // update scope
+    Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScope);
+    returnValues.addAllMixins(allMixinsToImport);
+    referenceScope.addToPlaceholder(returnValues);
+  }
+
+  private List<FullMixinDefinition> mixinsToImport(ReusableStructure referencedMixin, Scope referencedMixinScope) {
+    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixinToImport : referencedMixinScope.getAllMixins()) {
       // FIXME: !!!! add unit test imports chain: local import, outside import
       // FIXME: !!!! robit kopie len ak to naozaj treba
@@ -58,13 +67,9 @@ class MixinsSolver {
         }
       }
 
-      allMixinsToImport.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
+      result.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
     }
-
-    // update scope
-    Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScope);
-    returnValues.addAllMixins(allMixinsToImport);
-    referenceScope.addToPlaceholder(returnValues);
+    return result;
   }
 
   private void shiftComments(MixinReference reference, GeneralBody result) {
