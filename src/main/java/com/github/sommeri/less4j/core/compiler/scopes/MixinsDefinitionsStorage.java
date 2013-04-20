@@ -138,7 +138,7 @@ public class MixinsDefinitionsStorage implements Cloneable {
   }
 
   public String placeholdersReport() {
-    return "unused: " + openPlaceholders.size() + " used: ";
+    return "unused: " + openPlaceholders.size();
   }
 
   public MixinsDefinitionsStorage clone() {
@@ -200,7 +200,7 @@ class Placeholder implements Cloneable {
 
   protected int position(FullMixinDefinition mixin, List<FullMixinDefinition> storedList) {
     if (mixin == null)
-      return storedList.size(); // end of list
+      return storedList.size(); 
 
     return storedList.indexOf(mixin);
   }

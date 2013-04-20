@@ -30,19 +30,19 @@ class MixinsSolver {
     this.problemsHandler = problemsHandler;
   }
 
-  private void resolveMixinReference(final Scope referenceScope, final GeneralBody result, final ReusableStructure referencedMixin, final Scope referencedMixinScope, final ExpressionEvaluator expressionEvaluator) {
+  private void resolveMixinReference(final GeneralBody result, final Scope callerScope, final ReusableStructure referencedMixin, final Scope referencedMixinScope, final ExpressionEvaluator expressionEvaluator) {
     // ... and I'm starting to see the point of closures ...
     InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new ITask() {
 
       @Override
       public void run() {
-        unsafeResolveMixinReference(referenceScope, result, referencedMixin, referencedMixinScope, expressionEvaluator);
+        unsafeResolveMixinReference(result, callerScope, referencedMixin, referencedMixinScope, expressionEvaluator);
       }
 
     });
   }
 
-  private void unsafeResolveMixinReference(Scope referenceScope, GeneralBody result, ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot, ExpressionEvaluator expressionEvaluator) {
+  private void unsafeResolveMixinReference(GeneralBody result, Scope callerScope, ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot, ExpressionEvaluator expressionEvaluator) {
     // compile referenced mixin - keep the original copy unchanged
     GeneralBody bodyClone = referencedMixin.getBody().clone();
     parentSolver.doSolveReferences(bodyClone, referencedMixinScopeSnapshot);
@@ -50,11 +50,11 @@ class MixinsSolver {
 
     // collect variables and mixins to be imported
     Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScopeSnapshot);
-    List<FullMixinDefinition> allMixinsToImport = mixinsToImport(referenceScope, referencedMixin, referencedMixinScopeSnapshot);
+    List<FullMixinDefinition> allMixinsToImport = mixinsToImport(callerScope, referencedMixin, referencedMixinScopeSnapshot);
     returnValues.addAllMixins(allMixinsToImport);
     
     // update scope with imported variables and mixins
-    referenceScope.addToPlaceholder(returnValues);
+    callerScope.addToPlaceholder(returnValues);
   }
 
   private List<FullMixinDefinition> mixinsToImport(Scope referenceScope, ReusableStructure referencedMixin, Scope referencedMixinScope) {
@@ -96,23 +96,23 @@ class MixinsSolver {
     return builder.build();
   }
 
-  // FIXME: !!!! the ugliest code ever seen, refactor it before commit 
-  public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final Scope referenceScope, List<FullMixinDefinition> mixins) {
+  public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final Scope callerScope, List<FullMixinDefinition> mixins) {
     final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     for (final FullMixinDefinition fullMixin : mixins) {
       final ReusableStructure mixin = fullMixin.getMixin();
-      final Scope referencedScope = fullMixin.getScope();
-      final Scope mixinArguments = buildMixinsArguments(reference, referenceScope, fullMixin);
-
-      InScopeSnapshotRunner.runInLocalDataSnapshot(referencedScope.getParent(), new ITask() {
+      final Scope mixinScope = fullMixin.getScope();
+      
+      // the following needs to run in snapshot because calculateMixinsWorkingScope modifies that scope
+      InScopeSnapshotRunner.runInLocalDataSnapshot(mixinScope.getParent(), new ITask() {
 
         @Override
         public void run() {
-          Scope mixinWorkingScope = calculateMixinsWorkingScope(referenceScope, mixinArguments, referencedScope);
+          Scope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
+          Scope mixinWorkingScope = calculateMixinsWorkingScope(callerScope, mixinArguments, mixinScope);
 
           ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler);
           if (expressionEvaluator.guardsSatisfied(mixin)) {
-            resolveMixinReference(referenceScope, result, fullMixin.getMixin(), mixinWorkingScope, expressionEvaluator);
+            resolveMixinReference(result, callerScope, fullMixin.getMixin(), mixinWorkingScope, expressionEvaluator);
           }
         }
 
@@ -120,7 +120,7 @@ class MixinsSolver {
 
     }
 
-    referenceScope.closePlaceholder();
+    callerScope.closePlaceholder();
     resolveImportance(reference, result);
     shiftComments(reference, result);
 
@@ -152,7 +152,8 @@ class MixinsSolver {
     mixinDeclarationScope.add(arguments);
 
     // locally defined mixin does not require any other action
-    if (mixinDeclarationScope.getParent() == callerScope) {
+    boolean isLocalImport = mixinDeclarationScope.seesLocalDataOf(callerScope); 
+    if (isLocalImport) {
       return mixinScope;
     }
 
