@@ -18,6 +18,8 @@ import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 //FIXME: !!!!! document poradie v ktorom sa importuju mixiny a variable 
+//FIXME: !!!!! document najprv unlock potom use 
+//FIXME: !!!! document does not pass through media 
 class MixinsSolver {
 
   private final ProblemsHandler problemsHandler;

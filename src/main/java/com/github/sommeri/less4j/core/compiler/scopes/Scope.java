@@ -84,7 +84,7 @@ public class Scope {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder(toFullName());
-    //result.append("\n\n").append(localData); //FIXME: !!!! uncomment this line
+    result.append("\n\n").append(localData); 
     return result.toString();
   }
 

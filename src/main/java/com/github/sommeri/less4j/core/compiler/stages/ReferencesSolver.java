@@ -31,7 +31,6 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
 
-//FIXME: !!!! document does not pass through media 
 public class ReferencesSolver {
 
   public static final String ALL_ARGUMENTS = "@arguments";
