@@ -413,7 +413,7 @@ public class CssPrinter {
   }
 
   private boolean appendViewport(Viewport node) {
-    builder.append("@viewport");
+    builder.append(node.getDialect());
     append(node.getBody());
     return true;
   }

@@ -936,8 +936,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   @Override
   public Viewport handleViewport(HiddenTokenAwareTree token) {
-    Viewport result = new Viewport(token);
-    // HiddenTokenAwareTree atName = token.getChild(0);
+    Viewport result = new Viewport(token, token.getChild(0).getText());
     HiddenTokenAwareTree body = token.getChild(1);
     result.setBody(createGeneralBody(body));
     return result;

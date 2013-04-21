@@ -34,8 +34,6 @@ public class UrlsAndImportsNormalizer {
   @SuppressWarnings("unused")
   private void normalizeImport(Import node) {
     String extractFilename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler);
-    // TODO Auto-generated method stub
-    
   }
 
 }

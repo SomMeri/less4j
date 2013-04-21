@@ -9,9 +9,11 @@ public class Viewport extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   //I have to do this because of a comment in following less: `@viewport /*comment */ { ... }`
   private GeneralBody body;
+  private String dialect;
 
-  public Viewport(HiddenTokenAwareTree token) {
+  public Viewport(HiddenTokenAwareTree token, String dialect) {
     super(token);
+    this.dialect = dialect;
   }
 
   public GeneralBody getBody() {
@@ -20,6 +22,14 @@ public class Viewport extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   public void setBody(GeneralBody body) {
     this.body = body;
+  }
+
+  public String getDialect() {
+    return dialect;
+  }
+
+  public void setDialect(String dialect) {
+    this.dialect = dialect;
   }
 
   @Override

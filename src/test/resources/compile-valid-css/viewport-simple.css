@@ -10,7 +10,7 @@
   zoom: 1.0;
   width: auto;
 }
-@viewport {
+@-ms-viewport {
   width: 480px;
   zoom: 2.0;
   user-zoom: zoom;
