@@ -1,0 +1,12 @@
+.apples(@width: 100px) { .bananas() { width: @width; } }
+
+#namespace {
+  .apples(@ignoreCallersVariable);
+}
+
+#test {
+  @ignoreCallersVariable: 700px;
+  #namespace > .bananas();
+}
+
+@ignoreCallersVariable:500; 
