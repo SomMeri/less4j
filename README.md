@@ -81,7 +81,7 @@ The method may throw `Less4jException`. The exception is checked and can return 
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
 
-## Licence
+## License
 Less4j is distributed under following licences, pick whichever you like:
 * [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt),
 * [Eclipse Public License (EPL)](http://www.eclipse.org/legal/epl-v10.html),
