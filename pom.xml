@@ -23,18 +23,8 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 			<distribution>repo</distribution>
 		</license>
 		<license>
-			<name>GNU GENERAL PUBLIC LICENSE, Version 3</name>
+			<name>Gnu General Public License, Version 3</name>
 			<url>http://www.gnu.org/licenses/gpl-3.0.html</url>
-			<distribution>repo</distribution>
-		</license>
-		<license>
-			<name>GNU GENERAL PUBLIC LICENSE, Version 2</name>
-			<url>http://www.gnu.org/licenses/gpl-2.0.html</url>
-			<distribution>repo</distribution>
-		</license>
-		<license>
-			<name>GNU GENERAL PUBLIC LICENSE, Version 1</name>
-			<url>http://www.gnu.org/licenses/gpl-1.0.html</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
