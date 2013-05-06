@@ -17,9 +17,6 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITas
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-//FIXME: !!!!! document poradie v ktorom sa importuju mixiny a variable 
-//FIXME: !!!!! document najprv unlock potom use 
-//FIXME: !!!! document does not pass through media 
 class MixinsSolver {
 
   private final ProblemsHandler problemsHandler;
@@ -96,6 +93,10 @@ class MixinsSolver {
     return builder.build();
   }
 
+//  public GeneralBody buildPassThroughNamespace(final MixinReference reference, final Scope callerScope, List<FullMixinDefinition> mixins) {
+//    
+//  }
+  
   public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final Scope callerScope, List<FullMixinDefinition> mixins) {
     final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     for (final FullMixinDefinition fullMixin : mixins) {

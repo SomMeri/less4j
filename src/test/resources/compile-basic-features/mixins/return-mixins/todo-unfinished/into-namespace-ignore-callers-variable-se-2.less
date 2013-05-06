@@ -1,0 +1,12 @@
+.apples(@width: 100px) { .bananas() { width: @width; } }
+
+#namespace {
+  // not sure whether this is less.js bug or feature, but it seems to be insignificant enough
+  .apples(@ignoreCallersVariable);
+}
+
+#test {
+  #namespace > .bananas();
+}
+
+

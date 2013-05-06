@@ -437,11 +437,6 @@ class NullScope extends Scope {
   }
 
   @Override
-  public List<Scope> findMatchingChilds(List<String> nameChain) {
-    return Collections.emptyList();
-  }
-
-  @Override
   public Scope copyWithChildChain() {
     return this;
   }

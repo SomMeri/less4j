@@ -210,15 +210,19 @@ public class Scope {
     return result;
   }
 
-  public List<Scope> findMatchingChilds(List<String> nameChain) { 
+  private List<Scope> findMatchingChilds(List<String> nameChain) { 
     if (nameChain.isEmpty())
       return Arrays.asList(this);
 
     String fistName = nameChain.get(0);
     List<String> theRest = nameChain.subList(1, nameChain.size());
+    
     List<Scope> result = new ArrayList<Scope>();
     for (Scope kid : getChilds()) {
       if (kid.getNames().contains(fistName)) {
+        //FIXME: !!!!!!!! pre build that namespace here
+        //FIXME: !! document that namespaces are only pass-through  
+        //TODO:  !!!!!!!! pre build should show warning on not fully build namespace
         result.addAll(kid.skipBodyOwner().findMatchingChilds(theRest));
       }
     }
@@ -406,8 +410,8 @@ public class Scope {
     protected LocalData clone() {
       try {
         LocalData clone = (LocalData) super.clone();
-        variables = getLocalVariables().clone();
-        mixins = getLocalMixins().clone();
+        clone.variables = variables.clone();
+        clone.mixins = mixins.clone();
         return clone;
 
       } catch (CloneNotSupportedException e) {
@@ -430,10 +434,6 @@ public class Scope {
 
   private VariablesDeclarationsStorage getLocalVariables() {
     return localData.variables;
-  }
-
-  public void createDataClone() {
-    localData = localData.clone();
   }
 
 }

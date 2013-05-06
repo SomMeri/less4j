@@ -1,0 +1,15 @@
+.apples() { .bananas() { width: 10; } }
+
+.bringSpace() {
+  #imported-namespace {
+    .apples();
+  }
+}
+
+#namespace {
+  .bringSpace();
+}
+
+#test {
+  #namespace > #imported-namespace > .bananas();
+}
