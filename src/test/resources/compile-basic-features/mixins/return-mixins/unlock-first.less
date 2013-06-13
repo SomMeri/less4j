@@ -1,0 +1,19 @@
+.unlock(@value) { // outer mixin
+  .doSomething() { // nested mixin
+    declaration: @value;
+  }
+}
+
+#namespace() {
+  .doSomething(); // use before unlocking, syntax error 
+  .unlock(5); 
+}
+
+#use-directly { 
+  .doSomething(); // use before unlocking, syntax error 
+  .unlock(5); 
+}
+
+#use-namespace { 
+  #namespace > .doSomething(); 
+}

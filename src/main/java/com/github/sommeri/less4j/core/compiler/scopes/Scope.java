@@ -172,12 +172,10 @@ public class Scope {
     return getLocalMixins().getAllMixins();
   }
 
-  //FIXME: change to private if possibe
   public Scope firstChild() {
     return childs.get(0);
   }
 
-  //FIXME: change to private if possibe
   public boolean isBodyOwnerScope() {
     return BODY_OWNER.equals(type);
   }
