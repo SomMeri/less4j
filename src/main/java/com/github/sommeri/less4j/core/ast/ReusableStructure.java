@@ -39,6 +39,10 @@ public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBo
     return result;
    }
   
+  public boolean hasName(String name) {
+    return getNamesAsStrings().contains(name);
+  }
+
   public void setNames(List<ReusableStructureName> names) {
     this.names = names;
   }

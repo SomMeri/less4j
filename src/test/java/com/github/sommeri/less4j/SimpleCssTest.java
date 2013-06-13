@@ -22,7 +22,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 //  private static final String inputLess = "src/test/resources/minitests/debug.less";
 //  private static final String outputCss = "src/test/resources/minitests/debug.css";
 
-  private static final String inputLess = "src/test/resources/minitests/debug1.less";
+  private static final String inputLess = "../less4j-release-tests-working-dir/bootstrap/less/bootstrap.less ";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
 
   // ***********************************************************************
@@ -63,9 +63,18 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 
   @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
+    justWait();
     Collection<Object[]> result = new ArrayList<Object[]>();
     result.add(new Object[] { new File(inputLess), new File(outputCss), inputLess });
     return result;
+  }
+
+  private static void justWait() {
+    try {
+      Thread.sleep(30000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected String canonize(String text) {

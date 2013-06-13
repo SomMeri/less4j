@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
@@ -52,35 +51,42 @@ public class ComposedExpression extends Expression {
 
   @Override
   public List<Expression> splitByComma() {
-    List<Expression> result = new ArrayList<Expression>();
+    return doSplitByComma();
+  }
+
+  private LinkedList<Expression> doSplitByComma() {
+    LinkedList<Expression> result = new LinkedList<Expression>();
     if (operator.getOperator()!=Operator.COMMA && operator.getOperator()!=Operator.EMPTY_OPERATOR) {
       result.add(this);
       return result;
     }
 
-    List<Expression> left = splitByComma(getLeft());
-    List<Expression> right = splitByComma(getRight());
+    LinkedList<Expression> left = splitByComma(getLeft());
+    LinkedList<Expression> right = splitByComma(getRight());
+    
     if (operator.getOperator()!=Operator.EMPTY_OPERATOR) {
       result.addAll(left);
       result.addAll(right);
       return result;
     }
     
-    Expression lastLeft = left.get(left.size()-1);
-    Expression firstRight = right.get(0);
-    result.addAll(left.subList(0, left.size()-1));
+    Expression lastLeft = left.pollLast();
+    Expression firstRight = right.pollFirst();
+    result.addAll(left);
     result.add(new ComposedExpression(lastLeft.getUnderlyingStructure(), lastLeft, operator, firstRight));
-    result.addAll(right.subList(1, right.size()));
+    result.addAll(right);
 
     return result;
   }
 
-  private List<Expression> splitByComma(Expression expression) {
+  private LinkedList<Expression> splitByComma(Expression expression) {
     if (expression.getType()==ASTCssNodeType.COMPOSED_EXPRESSION) {
       ComposedExpression composed = (ComposedExpression) expression;
-      return composed.splitByComma();
+      return composed.doSplitByComma();
     } else {
-      return Arrays.asList(expression);
+      LinkedList<Expression> result = new LinkedList<Expression>();
+      result.add(expression);
+      return result;
     }
   }
   

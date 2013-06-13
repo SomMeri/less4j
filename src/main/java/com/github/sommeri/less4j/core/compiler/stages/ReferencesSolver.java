@@ -37,6 +37,7 @@ public class ReferencesSolver {
   private ASTManipulator manipulator = new ASTManipulator();
   private final MixinsSolver mixinsSolver;
   private final ProblemsHandler problemsHandler;
+  private final AstNodesStack semiCompiledNodes = new AstNodesStack();
   private StringInterpolator stringInterpolator = new StringInterpolator();
 
   public ReferencesSolver(ProblemsHandler problemsHandler) {
@@ -46,10 +47,6 @@ public class ReferencesSolver {
 
   public void solveReferences(final ASTCssNode node, final Scope scope) {
     doSolveReferences(node, new IteratedScope(scope));
-  }
-
-  protected void doSolveReferences(ASTCssNode node, Scope scope) {
-    unsafeDoSolveReferences(node, new IteratedScope(scope));
   }
 
   private void doSolveReferences(final ASTCssNode node, final IteratedScope scope) {
@@ -64,20 +61,29 @@ public class ReferencesSolver {
     });
   }
 
+  protected void unsafeDoSolveReferences(ASTCssNode node, Scope scope) {
+    unsafeDoSolveReferences(node, new IteratedScope(scope));
+  }
+
   private void unsafeDoSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
-    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-    if (!childs.isEmpty()) {
-      Scope scope = iteratedScope.getScope();
+    semiCompiledNodes.push(node);
+    try {
+      List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
+      if (!childs.isEmpty()) {
+        Scope scope = iteratedScope.getScope();
 
-      // solve all mixin references and store solutions
-      Map<MixinReference, GeneralBody> solvedMixinReferences = solveMixinReferences(childs, scope);
+        // solve all mixin references and store solutions
+        Map<MixinReference, GeneralBody> solvedMixinReferences = solveMixinReferences(childs, scope);
 
-      // solve whatever is not a mixin reference
-      solveNonMixinReferences(childs, iteratedScope);
+        // solve whatever is not a mixin reference
+        solveNonMixinReferences(childs, iteratedScope);
 
-      // replace mixin references by their solutions - we need to do it in the end
-      // the scope and ast would get out of sync otherwise
-      replaceMixinReferences(solvedMixinReferences);
+        // replace mixin references by their solutions - we need to do it in the end
+        // the scope and ast would get out of sync otherwise
+        replaceMixinReferences(solvedMixinReferences);
+      }
+    } finally {
+      semiCompiledNodes.pop();
     }
   }
 
@@ -96,7 +102,7 @@ public class ReferencesSolver {
     }
   }
 
-  protected boolean isMixinReference(ASTCssNode kid) {
+  private boolean isMixinReference(ASTCssNode kid) {
     return kid.getType() == ASTCssNodeType.MIXIN_REFERENCE;
   }
 
@@ -115,7 +121,7 @@ public class ReferencesSolver {
         MixinReference mixinReference = (MixinReference) kid;
         List<FullMixinDefinition> foundMixins = findReferencedMixins(mixinReference, mixinReferenceScope);
         GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(mixinReference, mixinReferenceScope, foundMixins);
-        
+
         AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getMembers(), problemsHandler);
         solvedMixinReferences.put(mixinReference, replacement);
       }
@@ -124,8 +130,13 @@ public class ReferencesSolver {
   }
 
   protected List<FullMixinDefinition> findReferencedMixins(MixinReference mixinReference, Scope scope) {
-    List<FullMixinDefinition> sameNameMixins = scope.getNearestMixins(mixinReference, problemsHandler);
+    MixinReferenceFinder finder = new MixinReferenceFinder(this, semiCompiledNodes);
+    List<FullMixinDefinition> sameNameMixins = finder.getNearestMixins(scope, mixinReference);
     if (sameNameMixins.isEmpty()) {
+      //error reporting
+      if (!finder.foundNamespace())
+        problemsHandler.undefinedNamespace(mixinReference);
+      
       problemsHandler.undefinedMixin(mixinReference);
       return new ArrayList<FullMixinDefinition>();
     }

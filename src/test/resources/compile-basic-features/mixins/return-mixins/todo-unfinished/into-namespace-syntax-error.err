@@ -1,1 +1,2 @@
-some error
+Errors produced by compilation of testCase
+ERROR 4:11 The variable "@ignoreCallersVariable" was not declared.

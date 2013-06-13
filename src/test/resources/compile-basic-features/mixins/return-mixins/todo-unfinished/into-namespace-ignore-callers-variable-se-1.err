@@ -1,3 +1,2 @@
-#test {
-  width: 500;
-}
+Errors produced by compilation of testCase
+ERROR 5:14 The variable "@ignoreCallersVariable" was not declared.

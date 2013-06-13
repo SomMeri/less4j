@@ -9,12 +9,10 @@ import java.util.Stack;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
-import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class Scope {
 
@@ -27,7 +25,8 @@ public class Scope {
   private String type;
 
   // real data
-  private final ASTCssNode owner;
+  @Deprecated //FIXME: make private and remove deprecated
+  public final ASTCssNode owner;
   private boolean presentInTree = true;
   private LocalData localData = new LocalData();
   private Stack<LocalData> localDataSnapshots = new Stack<LocalData>();
@@ -160,6 +159,7 @@ public class Scope {
     getLocalMixins().closePlaceholder();
   }
 
+  @Deprecated
   public List<FullMixinDefinition> getNearestMixins(ReusableStructureName name) {
     List<FullMixinDefinition> value = getLocalMixins().getMixins(name);
     if ((value == null || value.isEmpty()) && hasParent())
@@ -172,64 +172,17 @@ public class Scope {
     return getLocalMixins().getAllMixins();
   }
 
-  public List<FullMixinDefinition> getNearestMixins(MixinReference reference, ProblemsHandler problemsHandler) {
-    List<Scope> namespaces = getNearestNamespaces(reference);
-    if (namespaces.isEmpty())
-      problemsHandler.undefinedNamespace(reference);
-
-    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
-    for (Scope namespace : namespaces) {
-      // body owner scope can have only one child
-      if (namespace.isBodyOwnerScope())
-        namespace = namespace.firstChild();
-
-      result.addAll(namespace.getNearestMixins(reference.getFinalName()));
-    }
-    return result;
-  }
-
-  private Scope firstChild() {
+  //FIXME: change to private if possibe
+  public Scope firstChild() {
     return childs.get(0);
   }
 
-  private boolean isBodyOwnerScope() {
+  //FIXME: change to private if possibe
+  public boolean isBodyOwnerScope() {
     return BODY_OWNER.equals(type);
   }
 
-  private List<Scope> getNearestNamespaces(MixinReference reference) {
-    List<String> nameChain = reference.getNameChainAsStrings();
-    if (nameChain.isEmpty())
-      return Arrays.asList(this);
-
-    Scope space = this;
-    List<Scope> result = findMatchingChilds(nameChain);
-    while (result.isEmpty() && space.hasParent()) {
-      space = space.getParent();
-      result = space.findMatchingChilds(nameChain);
-    }
-    return result;
-  }
-
-  private List<Scope> findMatchingChilds(List<String> nameChain) { 
-    if (nameChain.isEmpty())
-      return Arrays.asList(this);
-
-    String fistName = nameChain.get(0);
-    List<String> theRest = nameChain.subList(1, nameChain.size());
-    
-    List<Scope> result = new ArrayList<Scope>();
-    for (Scope kid : getChilds()) {
-      if (kid.getNames().contains(fistName)) {
-        //FIXME: !!!!!!!! pre build that namespace here
-        //FIXME: !! document that namespaces are only pass-through  
-        //TODO:  !!!!!!!! pre build should show warning on not fully build namespace
-        result.addAll(kid.skipBodyOwner().findMatchingChilds(theRest));
-      }
-    }
-    return result;
-  }
-
-  private Scope skipBodyOwner() {
+  public Scope skipBodyOwner() {
     if (isBodyOwnerScope())
       return firstChild().skipBodyOwner();
 
@@ -428,7 +381,8 @@ public class Scope {
     }
   }
 
-  private MixinsDefinitionsStorage getLocalMixins() {
+  //FIXME: change to private if possibe
+  public MixinsDefinitionsStorage getLocalMixins() {
     return localData.mixins;
   }
 

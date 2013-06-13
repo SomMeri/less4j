@@ -42,7 +42,7 @@ class MixinsSolver {
   private void unsafeResolveMixinReference(GeneralBody result, Scope callerScope, ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot, ExpressionEvaluator expressionEvaluator) {
     // compile referenced mixin - keep the original copy unchanged
     GeneralBody bodyClone = referencedMixin.getBody().clone();
-    parentSolver.doSolveReferences(bodyClone, referencedMixinScopeSnapshot);
+    parentSolver.unsafeDoSolveReferences(bodyClone, referencedMixinScopeSnapshot);
     result.addMembers(bodyClone.getMembers());
 
     // collect variables and mixins to be imported
@@ -93,10 +93,6 @@ class MixinsSolver {
     return builder.build();
   }
 
-//  public GeneralBody buildPassThroughNamespace(final MixinReference reference, final Scope callerScope, List<FullMixinDefinition> mixins) {
-//    
-//  }
-  
   public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final Scope callerScope, List<FullMixinDefinition> mixins) {
     final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     for (final FullMixinDefinition fullMixin : mixins) {
