@@ -12,7 +12,6 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
-//FIXME: make issue for into-namespace-nested.less
 public class MixinReferenceFinder {
 
   private final ReferencesSolver parentSolver;

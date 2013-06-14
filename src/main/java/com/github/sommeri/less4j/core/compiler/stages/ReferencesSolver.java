@@ -66,7 +66,12 @@ public class ReferencesSolver {
   }
 
   private void unsafeDoSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
+    // The stack of nodes under compilation is necessary to prevent 
+    // cycling. The cycling is possible if two namespaces reference 
+    // each other and therefore each effectively requires compiled 
+    // version of itself 
     semiCompiledNodes.push(node);
+    
     try {
       List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       if (!childs.isEmpty()) {
