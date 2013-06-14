@@ -71,7 +71,7 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
       String name = entry.getKey();
       Expression value = entry.getValue();
       
-      if (storedBelowUnusedPlaceholder(name) || !contains(name))
+      if (storedBeforeUnusedPlaceholder(name) && !contains(name))
         store(name, value);
     }
   }

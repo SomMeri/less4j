@@ -41,7 +41,7 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
 
   protected abstract void doStore(String name, List<T> value);
 
-  protected boolean storedBelowUnusedPlaceholder(String name) {
+  protected boolean storedBeforeUnusedPlaceholder(String name) {
     return getPosition(name) <= getUsedPlaceholders();
   }
 

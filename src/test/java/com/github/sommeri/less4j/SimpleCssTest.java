@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -19,11 +20,11 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-//  private static final String inputLess = "src/test/resources/minitests/debug.less";
-//  private static final String outputCss = "src/test/resources/minitests/debug.css";
-
-  private static final String inputLess = "../less4j-release-tests-working-dir/bootstrap/less/bootstrap.less ";
+  private static final String inputLess = "src/test/resources/minitests/debug1.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
+
+//  private static final String inputLess = "../less4j-release-tests-working-dir/bootstrap/less/bootstrap.less ";
+//  private static final String outputCss = "src/test/resources/minitests/debug1.css";
 
   // ***********************************************************************
   // *** fail because of identifiers, functions and missing commas
@@ -63,7 +64,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 
   @Parameters(name="Less: {2}")
   public static Collection<Object[]> allTestsParameters() {
-    justWait();
+    //justWait();
     Collection<Object[]> result = new ArrayList<Object[]>();
     result.add(new Object[] { new File(inputLess), new File(outputCss), inputLess });
     return result;
