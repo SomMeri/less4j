@@ -12,9 +12,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
-//FIXME: document that callers variables are ignored: /less4j/src/test/resources/compile-basic-features/mixins/return-mixins/todo-unfinished/into-namespace-syntax-error.less
-//FIXME: also unlocking will fight with namespaces from everywhere
-//FIXME: document also into-namespace-nested.less
+//FIXME: make issue for into-namespace-nested.less
 public class MixinReferenceFinder {
 
   private final ReferencesSolver parentSolver;
@@ -50,7 +48,7 @@ public class MixinReferenceFinder {
   }
 
   private List<FullMixinDefinition> getNearestLocalMixins(Scope scope, ReusableStructureName name) {
-    List<FullMixinDefinition> value = scope.getLocalMixins().getMixins(name);
+    List<FullMixinDefinition> value = scope.getMixinsByName(name);
     if ((value == null || value.isEmpty()) && scope.hasParent())
       return getNearestLocalMixins(scope.getParent(), name);
 
@@ -94,9 +92,9 @@ public class MixinReferenceFinder {
 
       @Override
       public void run() {
-        //FIXME: document what this does and why it is needed
-        //FIXME: document that it stops regardless of variables
-        if (!semiCompiledNodes.contains(bodyClone)) {
+        // Referenced namespace attempts to import its own mixins. Do not 
+        // try to compile it. 
+        if (!semiCompiledNodes.contains(bodyClone)) { 
           parentSolver.unsafeDoSolveReferences(bodyClone, scope);
         }
 

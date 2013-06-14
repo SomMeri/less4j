@@ -1,0 +1,12 @@
+#space2 {
+ .test2() { 
+   here: there; 
+  }
+  #abc2 > .dependency();
+}
+#abc2 { 
+  .dependency() {
+    voila: voila;
+  }
+  #space2 > .test2(); 
+}

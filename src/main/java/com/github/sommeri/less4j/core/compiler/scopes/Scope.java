@@ -25,8 +25,7 @@ public class Scope {
   private String type;
 
   // real data
-  @Deprecated //FIXME: make private and remove deprecated
-  public final ASTCssNode owner;
+  private final ASTCssNode owner;
   private boolean presentInTree = true;
   private LocalData localData = new LocalData();
   private Stack<LocalData> localDataSnapshots = new Stack<LocalData>();
@@ -170,6 +169,10 @@ public class Scope {
 
   public List<FullMixinDefinition> getAllMixins() {
     return getLocalMixins().getAllMixins();
+  }
+
+  public List<FullMixinDefinition> getMixinsByName(ReusableStructureName name) {
+    return getLocalMixins().getMixins(name);
   }
 
   public Scope firstChild() {
@@ -379,8 +382,7 @@ public class Scope {
     }
   }
 
-  //FIXME: change to private if possibe
-  public MixinsDefinitionsStorage getLocalMixins() {
+  private MixinsDefinitionsStorage getLocalMixins() {
     return localData.mixins;
   }
 

@@ -1,0 +1,15 @@
+#space2 {
+ .test2() { 
+   .nested() {
+     available: not;
+   }
+  }
+  #abc2 > .dependency();
+}
+#abc2 { 
+  .dependency() {
+    voila: voila;
+    .nested();
+  }
+  #space2 > .test2(); 
+}
