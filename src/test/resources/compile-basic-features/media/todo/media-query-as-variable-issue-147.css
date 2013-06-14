@@ -1,0 +1,10 @@
+@media (max-width: 529px) and (min-device-pixel-ratio: 1.5) {
+  h1 {
+    color: #ff0000;
+  }
+}
+@media (max-width: 529px) and (min-device-pixel-ratio: 1.5) {
+  h1 {
+    color: #00ff00;
+  }
+}

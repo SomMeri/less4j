@@ -1,0 +1,7 @@
+@mobile: ~"(max-width: 529px)";
+@highdensity: ~"(min-device-pixel-ratio: 1.5)";
+
+@variable: @mobile and @highdensity;
+@media @variable { h1 {color:#ff0000} }
+
+@media @mobile and @highdensity { h1 {color:#00ff00} }
