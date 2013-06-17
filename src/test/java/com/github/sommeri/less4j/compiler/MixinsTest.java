@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.utils.TestFileUtils;
 
 public class MixinsTest extends AbstractErrorReportingTest {
   
-  //FIXME: report returnMixinsLessjsIncompatible as low priority
+  //TODO: report returnMixinsLessjsIncompatible as low priority e.g., multiple-unlocks.less
   private static final String standardCases = "src/test/resources/compile-basic-features/mixins/";
   private static final String returnVariables = "src/test/resources/compile-basic-features/mixins/return-variables/";
   private static final String returnMixins = "src/test/resources/compile-basic-features/mixins/return-mixins/";

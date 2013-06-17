@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -70,6 +69,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     return result;
   }
 
+  @SuppressWarnings("unused")
   private static void justWait() {
     try {
       Thread.sleep(30000);
