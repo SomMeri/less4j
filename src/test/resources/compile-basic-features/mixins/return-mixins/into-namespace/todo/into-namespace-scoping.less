@@ -1,0 +1,29 @@
+@priority1: 100px;
+.apples() { 
+  .bananas() { 
+    priority-1: @priority1; 
+    priority-2: @priority2; 
+    priority-3: @priority3; 
+    priority-4: @priority4; 
+  } 
+}
+
+#outer {
+  #namespace {
+    .apples();
+    @priority1: 200px;
+    @priority2: 200px;
+  }
+  @priority1: 300px;
+  @priority2: 300px;
+  @priority3: 300px;
+}
+
+#test {
+  #outer > #namespace > .bananas();
+  @priority1: 400px;
+  @priority2: 400px;
+  @priority3: 400px;
+  @priority4: 400px;
+}
+

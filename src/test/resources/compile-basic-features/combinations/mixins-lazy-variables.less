@@ -1,0 +1,10 @@
+.mixin() {
+  @silentParameter: 0;
+  @variable: @silentParameter+1;
+}
+
+.selector {
+  @silentParameter: 10;
+  declaration: @variable;
+  .mixin();
+}

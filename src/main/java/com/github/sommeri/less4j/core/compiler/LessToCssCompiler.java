@@ -72,8 +72,8 @@ public class LessToCssCompiler {
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
 
-    ReferencesSolver variablesReferencesSolver = new ReferencesSolver(problemsHandler);
-    variablesReferencesSolver.solveReferences(less, scope);
+    ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
+    referencesSolver.solveReferences(less, scope);
     // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
   }
 

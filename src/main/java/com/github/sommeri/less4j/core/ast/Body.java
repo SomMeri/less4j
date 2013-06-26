@@ -96,7 +96,7 @@ public abstract class Body extends ASTCssNode {
     body.addAll(body.indexOf(oldMember), newMembers);
     body.remove(oldMember);
     oldMember.setParent(null);
-    configureParentToAllChilds();
+    configureParentToAllChilds();//POSSIBLE OPTIMIZATION: all these could be more targetted
   }
 
   public void replaceMember(ASTCssNode oldMember, ASTCssNode newMember) {
