@@ -57,13 +57,8 @@ class MixinsSolver {
   private List<FullMixinDefinition> mixinsToImport(Scope referenceScope, ReusableStructure referencedMixin, Scope referencedMixinScope) {
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixinToImport : referencedMixinScope.getAllMixins()) {
-      boolean canHaveArguments = AstLogic.canHaveArguments(referencedMixin);
-      boolean isLocalImport = mixinToImport.getScope().seesLocalDataOf(referenceScope); 
-      
-      if (!canHaveArguments) {
-        // nothing special is needed, the mixin call did not brough in new variables
-        result.add(new FullMixinDefinition(mixinToImport.getMixin(), mixinToImport.getScope()));
-      } else if (isLocalImport) {
+      boolean isLocalImport = mixinToImport.getScope().seesLocalDataOf(referenceScope);
+      if (isLocalImport) {
         // we need to copy the whole tree, because this runs inside referenced mixin scope 
         // snapshot and imported mixin needs to remember the scope as it is now 
         Scope scopeTreeCopy = mixinToImport.getScope().copyWholeTree();
