@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -14,13 +16,30 @@ import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
 
-import com.github.sommeri.less4j.utils.URLUtils;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 public abstract class LessSource {
 
   public abstract LessSource relativeSource(String filename) throws FileNotFound, CannotReadFile, StringSourceException;
 
   public abstract String getContent() throws FileNotFound, CannotReadFile;
+
+  /**
+   * @return absolute uri of less source location. Return null if absolute uri
+   *         is not know. If non-null, last path part must be equal to whatever
+   *         {@link #getName()} returns.
+   * 
+   */
+  public URI getAbsoluteURI() {
+    return null;
+  }
+
+  /**
+   * Less source name. If the {@link #getAbsoluteURI()} returns non null.
+   */
+  public String getName() {
+    return "";
+  }
 
   public abstract static class AbstractHierarchicalSource extends LessSource {
 
@@ -89,7 +108,7 @@ public abstract class LessSource {
     public URLSource(URLSource parent, String filename) throws FileNotFound, CannotReadFile {
       super(parent);
       try {
-        this.inputURL = new URL(URLUtils.toParentURL(parent.inputURL), filename);
+        this.inputURL = new URL(URIUtils.toParentURL(parent.inputURL), filename);
       } catch (MalformedURLException e) {
         throw new FileNotFound();
       }
@@ -120,6 +139,20 @@ public abstract class LessSource {
 
     public URL getInputURL() {
       return inputURL;
+    }
+
+    @Override
+    public URI getAbsoluteURI() {
+      try {
+        return inputURL.toURI();
+      } catch (URISyntaxException e) {
+        return null;
+      }
+    }
+
+    @Override
+    public String getName() {
+      return inputURL.getFile();
     }
 
     public String toString() {
@@ -165,6 +198,16 @@ public abstract class LessSource {
       super(parent);
       this.inputFile = new File(parent.inputFile.getParentFile(), filename);
       parent.addImportedSource(this);
+    }
+
+    @Override
+    public URI getAbsoluteURI() {
+      return inputFile.getAbsoluteFile().toURI();
+    }
+
+    @Override
+    public String getName() {
+      return inputFile.getName();
     }
 
     @Override
@@ -235,9 +278,25 @@ public abstract class LessSource {
   public static class StringSource extends LessSource {
 
     private String content;
+    private String name;
 
     public StringSource(String content) {
+      this(content, "");
+    }
+    
+    public StringSource(String content, String name) {
       this.content = content;
+      this.name = name;
+    }
+
+    @Override
+    public URI getAbsoluteURI() {
+      return null;
+    }
+
+    @Override
+    public String getName() {
+      return name;
     }
 
     @Override

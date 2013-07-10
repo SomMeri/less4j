@@ -33,7 +33,7 @@ public class LessPrinter {
     Iterator<Variable> iCycle = cycle.iterator();
     while (iCycle.hasNext()) {
       Variable variable = iCycle.next();
-      result += variable.getName() + " ("+ variable.getSourceLine()+":"+variable.getCharPositionInSourceLine()+") ";
+      result += variable.getName() + " ("+ variable.getSourceLine()+":"+variable.getSourceColumn()+") ";
       if (iCycle.hasNext())
         result +="-> ";
     }
@@ -46,7 +46,7 @@ public class LessPrinter {
     Iterator<MixinReference> iReference = cycle.iterator();
     while (iReference.hasNext()) {
       MixinReference reference = iReference.next();
-      result += reference.getFinalName() + " ("+ reference.getSourceLine()+":"+reference.getCharPositionInSourceLine()+") ";
+      result += reference.getFinalName() + " ("+ reference.getSourceLine()+":"+reference.getSourceColumn()+") ";
       if (iReference.hasNext())
         result +="-> ";
     }

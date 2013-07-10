@@ -1,0 +1,24 @@
+@-moz-document url-prefix() {
+  .icon-spin {
+    height: .9em;
+  }
+  .btn .icon-spin {
+    height: auto;
+  }
+  .icon-spin.icon-large {
+    height: 1.25em;
+  }
+  .btn .icon-spin.icon-large {
+    height: .75em;
+  }
+}
+@media screen, print {
+  .one .two .three {
+    color: white;
+  }
+}
+@media screen and (max-device-aspect-ratio: 1367/768), print and (max-device-aspect-ratio: 1367/768) {
+  .one .two .three {
+    color: black;
+  }
+}

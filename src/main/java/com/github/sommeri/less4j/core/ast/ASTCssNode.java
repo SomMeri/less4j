@@ -96,7 +96,7 @@ public abstract class ASTCssNode implements Cloneable {
     return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getLine();
   }
 
-  public int getCharPositionInSourceLine() {
+  public int getSourceColumn() {
     return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getCharPositionInLine() + 1;
   }
   

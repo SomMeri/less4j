@@ -157,6 +157,9 @@ public class HiddenTokenAwareTree extends CommonTree {
     return getChild(getChildCount() - 1);
   }
 
+  /**
+   * Lines numbering starts with 1.
+   */
   public int getLine() {
     if ( !isReal() ) {
       HiddenTokenAwareTree realChild = getFirstRealDescendant();
@@ -166,6 +169,20 @@ public class HiddenTokenAwareTree extends CommonTree {
       return 0;
     }
     return token.getLine();
+  }
+
+  /**
+   * Columns numbering starts with 1.
+   */
+  public int getColumn() {
+    if ( !isReal() ) {
+      HiddenTokenAwareTree realChild = getFirstRealDescendant();
+      if ( realChild!=null ) {
+        return realChild.getCharPositionInLine();
+      }
+      return 0;
+    }
+    return token.getCharPositionInLine();
   }
 
   private HiddenTokenAwareTree getFirstRealDescendant() {

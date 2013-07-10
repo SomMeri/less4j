@@ -14,13 +14,13 @@ public class InStringCssPrinter extends CssPrinter {
 
   @Override
   public boolean appendCssString(CssString expression) {
-    builder.append(expression.getValue());
+    cssOnly.append(expression.getValue());
     return true;
   }
 
   @Override
   protected boolean appendColorExpression(ColorExpression expression) {
-    builder.append(expression.getValueInHexadecimal());
+    cssOnly.append(expression.getValueInHexadecimal());
     return true;
   }
 }

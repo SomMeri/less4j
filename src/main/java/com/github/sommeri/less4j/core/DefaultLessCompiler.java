@@ -23,13 +23,25 @@ public class DefaultLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(URL inputURL) throws Less4jException {
-	ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
+    ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
     return compiler.compile(inputURL);
   }
 
   public CompilationResult compile(LessSource source) throws Less4jException {
-	ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
-	return compiler.compile(source);
+    ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
+    return compiler.compile(source);
+  }
+
+  @Override
+  public CompilationResult compile(File inputFile, Configuration sourceMapOptions) throws Less4jException {
+    ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
+    return compiler.compile(inputFile, sourceMapOptions);
+  }
+
+  @Override
+  public CompilationResult compile(LessSource source, Configuration sourceMapOptions) throws Less4jException {
+    ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
+    return compiler.compile(source, sourceMapOptions);
   }
 
 }

@@ -24,7 +24,7 @@ public class BugHappened extends RuntimeException {
     if (offendingNode==null)
       return "";
     
-    return "\n Offending place: " + offendingNode.getSourceLine() + ":" + offendingNode.getCharPositionInSourceLine();
+    return "\n Offending place: " + offendingNode.getSourceLine() + ":" + offendingNode.getSourceColumn();
   }
   
   private static String errorPlace(HiddenTokenAwareTree offendingNode) {

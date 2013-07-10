@@ -1,0 +1,10 @@
+@className: name-1;
+@fullClass: ~".name-2";
+
+.@{className} {
+  property-1: value-1;
+}
+//this is not parsed as class currently, may broke if such feature is added
+@{fullClass} {
+  property-2: value-2;
+}

@@ -35,24 +35,33 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   @Override
+  public CompilationResult compile(File inputFile, Configuration sourceMapOptions) throws Less4jException {
+    return compile(new LessSource.FileSource(inputFile), sourceMapOptions);
+  }
+
+  @Override
   public CompilationResult compile(URL inputURL) throws Less4jException {
     return compile(new LessSource.URLSource(inputURL));
   }
 
   @Override
   public CompilationResult compile(LessSource source) throws Less4jException {
+    return compile(source, null);
+  }
+
+  @Override
+  public CompilationResult compile(LessSource source, Configuration sourceMapOptions) throws Less4jException {
     problemsHandler = new ProblemsHandler();
     astBuilder = new ASTBuilder(problemsHandler);
     compiler = new LessToCssCompiler(problemsHandler);
-    String css = doCompile(source);
-    CompilationResult compilationResult = new CompilationResult(css, problemsHandler.getWarnings());
+    CompilationResult compilationResult = doCompile(source, sourceMapOptions);
     if (problemsHandler.hasErrors()) {
       throw new Less4jException(problemsHandler.getErrors(), compilationResult);
     }
     return compilationResult;
   }
 
-  private String doCompile(LessSource source) throws Less4jException {
+  private CompilationResult doCompile(LessSource source, Configuration sourceMapOptions) throws Less4jException {
     ANTLRParser.ParseResult result;
     try {
       result = parser.parseStyleSheet(source.getContent(), source);
@@ -69,9 +78,21 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source);
 
-    CssPrinter builder = new CssPrinter();
+    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, sourceMapOptions);
+    return compilationResult;
+  }
+
+  private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration sourceMapOptions) {
+    LessSource cssDestination = sourceMapOptions == null ? null : sourceMapOptions.getCssResultLocation();
+    
+    CssPrinter builder = new CssPrinter(lessSource, cssDestination);
     builder.append(cssStyleSheet);
-    return builder.toString();
+    String css = builder.toCss();
+    String sourceMap = builder.toSourceMap();
+
+    //FIXME: source map: add command line
+    CompilationResult compilationResult = new CompilationResult(css, sourceMap, problemsHandler.getWarnings());
+    return compilationResult;
   }
 
 }

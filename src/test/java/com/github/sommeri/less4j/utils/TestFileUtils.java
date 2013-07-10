@@ -9,19 +9,20 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 public class TestFileUtils {
 
-  private String additionalDataFileSuffix;
+  private String[] additionalDataFileSuffixes = new String[0];
 
   public TestFileUtils() {
   }
 
-  public TestFileUtils(String additionalDataFileSuffix) {
-    this.additionalDataFileSuffix = additionalDataFileSuffix;
+  public TestFileUtils(String... additionalDataFileSuffix) {
+    this.additionalDataFileSuffixes = additionalDataFileSuffix;
   }
 
   public Collection<Object[]> loadTestFiles(String... directories) {
@@ -48,10 +49,15 @@ public class TestFileUtils {
   }
 
   private Object[] createParameters(File file) {
-    if (additionalDataFileSuffix != null)
-      return new Object[] { file, findCorrespondingExpected(file), findCorrespondingAdditional(file), file.getName() };
-    else
-      return new Object[] { file, findCorrespondingExpected(file), file.getName() };
+    List<Object> parameters = new ArrayList<Object>();
+    parameters.add(file);
+    parameters.add(findCorrespondingExpected(file));
+    for (String suffix : additionalDataFileSuffixes) {
+      parameters.add(findCorrespondingAdditional(file, suffix));
+    }
+
+    parameters.add(file.getName());
+    return parameters.toArray();
   }
 
   private File findCorrespondingExpected(File lessFile) {
@@ -69,16 +75,16 @@ public class TestFileUtils {
     return name;
   }
 
-  private File findCorrespondingAdditional(File lessFile) {
+  private File findCorrespondingAdditional(File lessFile, String newSuffix) {
     String lessFileName = lessFile.getPath();
-    String cssFileName = convertToAdditionalFilename(lessFileName);
+    String cssFileName = convertToAdditionalFilename(lessFileName, newSuffix);
     File cssFile = new File(cssFileName);
     return cssFile;
   }
 
-  private String convertToAdditionalFilename(String name) {
+  private String convertToAdditionalFilename(String name, String newSuffix) { 
     if (name.endsWith(".less")) {
-      return name.substring(0, name.length() - 5) + additionalDataFileSuffix;
+      return name.substring(0, name.length() - 5) + newSuffix;
     }
 
     return name;

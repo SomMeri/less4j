@@ -123,7 +123,7 @@ public class PrintUtils {
   }
 
   public static String toLocation(ASTCssNode node) {
-    return node.getSourceLine() + ":" + node.getCharPositionInSourceLine();
+    return node.getSourceLine() + ":" + node.getSourceColumn();
   }
 
 }

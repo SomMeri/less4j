@@ -12,11 +12,10 @@ import org.apache.commons.io.IOUtils;
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Problem;
-import com.github.sommeri.less4j.platform.Constants;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 public class CommandLinePrint {
 
-  private static final String URI_FILE_SEPARATOR = "/";
   private PrintStream standardOut;
   private PrintStream standardErr;
 
@@ -96,18 +95,20 @@ public class CommandLinePrint {
       return file.getPath();
     }
 
-    String fileAbsoluteName = file.getAbsoluteFile().getAbsolutePath();
-    String rootInputFileAbsoluteName = rootInputFile.getAbsoluteFile().getAbsolutePath();
-    if (fileAbsoluteName.equals(rootInputFileAbsoluteName))
+    File absoluteRoot = rootInputFile.getAbsoluteFile();
+    File absoluteFile = file.getAbsoluteFile();
+    
+    if (sameFile(absoluteRoot, absoluteFile))
       return "";
     
-    return relativize(rootInputFile.getAbsoluteFile().getParent(), fileAbsoluteName);
+    return URIUtils.relativize(absoluteRoot.getParentFile(), absoluteFile);
 }
 
-  private String relativize(String base, String path) {
-    String relative = new File(base).toURI().relativize(new File(path).toURI()).getPath();
-    relative = relative.replace(URI_FILE_SEPARATOR, Constants.FILE_SEPARATOR);
-    return relative;
+  private boolean sameFile(File file1, File file2) {
+    String fileAbsoluteName = file2.getAbsolutePath();
+    String rootInputFileAbsoluteName = file1.getAbsolutePath();
+    boolean equals = fileAbsoluteName.equals(rootInputFileAbsoluteName);
+    return equals;
   }
 
   private void outputFile(String filename, String content) {

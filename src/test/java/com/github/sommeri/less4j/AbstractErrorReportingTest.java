@@ -8,48 +8,78 @@ import java.io.FileReader;
 import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.commandline.CommandLinePrint;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
+import com.github.sommeri.less4j.utils.SourceMapValidator;
+import com.github.sommeri.less4j.utils.TestFileUtils;
 import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractErrorReportingTest {
 
+  private final SourceMapValidator sourceMapValidation = new SourceMapValidator();
+
   private final File lessFile;
   private final File cssOutput;
   private final File errorList;
+  private final File mapdataFile;
   @SuppressWarnings("unused")
   private final String testName;
 
-  public AbstractErrorReportingTest(File lessFile, File cssOutput, File errorList, String testName) {
+  public AbstractErrorReportingTest(File lessFile, File cssOutput, File errorList, File mapdataFile, String testName) {
     this.lessFile = lessFile;
     this.cssOutput = cssOutput;
+    this.mapdataFile = mapdataFile;
     this.testName = testName;
     this.errorList = errorList;
+  }
+
+  protected static TestFileUtils createTestFileUtils() {
+    return new TestFileUtils(".err", ".mapdata");
   }
 
   @Test
   public final void compileAndCompare() {
     try {
-      CompilationResult actual = compile(lessFile);
+      CompilationResult actual = compile(lessFile, cssOutput);
+      System.out.println(actual.getSourceMap());
       assertCorrectWarnings(actual);
+      assertSourceMapValid(actual);
     } catch (Less4jException ex) {
       printErrors(ex);
       assertCorrectErrors(ex);
-    } 
+    } catch (Throwable ex) {
+      if (ex instanceof ComparisonFailure) {
+        ComparisonFailure fail = (ComparisonFailure)ex;
+        throw fail;
+      }
+      if (ex instanceof AssertionError) {
+        AssertionError fail = (AssertionError)ex;
+        throw fail;
+      }
+      throw new RuntimeException(ex.getMessage(), ex);
+    }
+  }
+
+  private void assertSourceMapValid(CompilationResult actual) {
+    sourceMapValidation.validateSourceMap(lessFile, actual, cssOutput.getParentFile(), mapdataFile);
   }
 
   protected void printErrors(Less4jException ex) {
   }
 
-  protected CompilationResult compile(File lessFile) throws Less4jException {
+  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
     LessCompiler compiler = getCompiler();
-    CompilationResult actual = compiler.compile(lessFile);
+    Configuration configuration = new Configuration();
+    configuration.setCssResultLocation(cssOutput);
+    CompilationResult actual = compiler.compile(lessFile, configuration);
     return actual;
   }
 

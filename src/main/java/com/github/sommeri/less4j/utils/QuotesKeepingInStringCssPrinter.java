@@ -13,7 +13,7 @@ public class QuotesKeepingInStringCssPrinter extends CssPrinter {
 
   @Override
   protected boolean appendColorExpression(ColorExpression expression) {
-    builder.append(expression.getValue());
+    cssOnly.append(expression.getValue());
     return true;
   }
 }

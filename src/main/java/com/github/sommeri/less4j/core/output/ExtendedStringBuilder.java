@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core;
+package com.github.sommeri.less4j.core.output;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +10,9 @@ public class ExtendedStringBuilder {
   private static final char SPACE = ' ';
   private static final Set<Character> SEPARATORS = new HashSet<Character>();
   private StringBuilder builder = new StringBuilder();
+  
   private int indentationLevel;
+  private int line = 0;
   private boolean onNewLine = true;
 
   static {
@@ -38,7 +40,12 @@ public class ExtendedStringBuilder {
 
   public ExtendedStringBuilder appendAsIs(String string) {
     builder.append(string);
+    addNewLines(string);
     return this;
+  }
+
+  private void addNewLines(String string) {
+    line=line+string.split(Constants.NEW_LINE).length-1;
   }
 
   public ExtendedStringBuilder append(boolean arg0) {
@@ -110,12 +117,14 @@ public class ExtendedStringBuilder {
   public ExtendedStringBuilder append(String str) {
     handleIndentation();
     builder.append(str);
+    addNewLines(str);
     return this;
   }
 
   public ExtendedStringBuilder append(StringBuffer sb) {
     handleIndentation();
     builder.append(sb);
+    addNewLines(sb.toString());
     return this;
   }
 
@@ -142,6 +151,7 @@ public class ExtendedStringBuilder {
   public ExtendedStringBuilder newLine() {
     builder.append(Constants.NEW_LINE);
     onNewLine = true;
+    line++;
     return this;
   }
 
@@ -187,6 +197,14 @@ public class ExtendedStringBuilder {
       return false;
 
     return SEPARATORS.contains(builder.charAt(length));
+  }
+
+  public int getLine() {
+    return line;
+  }
+
+  public int getColumn() {
+    return builder.length() - builder.lastIndexOf(Constants.NEW_LINE);
   }
 
 }

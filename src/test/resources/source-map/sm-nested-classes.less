@@ -1,0 +1,24 @@
+//in document
+@-moz-document url-prefix() {
+  .icon-spin { height: .9em; }
+  .btn .icon-spin { height: auto; }
+  .icon-spin.icon-large { height: 1.25em; }
+  .btn .icon-spin.icon-large { height: .75em; }
+}
+
+//in bubbled merged media
+.one {
+  .two {
+    @media screen, print {
+    .three {
+      color: white;
+    }
+	@media (max-device-aspect-ratio: 1367/768) {
+        .three {
+          color: black;
+        }
+      }
+    } 
+  }
+} 
+

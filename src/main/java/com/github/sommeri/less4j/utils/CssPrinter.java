@@ -3,10 +3,9 @@ package com.github.sommeri.less4j.utils;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 
-import com.github.sommeri.less4j.core.ExtendedStringBuilder;
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.NotACssException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -25,6 +24,7 @@ import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
+import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
@@ -35,7 +35,6 @@ import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.Media;
-import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
@@ -46,9 +45,6 @@ import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
-import com.github.sommeri.less4j.core.ast.SupportsCondition;
-import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
-import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Page;
@@ -64,18 +60,29 @@ import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Supports;
+import com.github.sommeri.less4j.core.ast.SupportsCondition;
+import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
+import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.SupportsQuery;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
 import com.github.sommeri.less4j.core.ast.Viewport;
+import com.github.sommeri.less4j.core.output.ExtendedStringBuilder;
+import com.github.sommeri.less4j.core.output.ISourceMapBuilder;
+import com.github.sommeri.less4j.core.output.NullSourceMapBuilder;
+import com.github.sommeri.less4j.core.output.SourceMapBuilder;
 
 public class CssPrinter {
 
   private static final String ERROR = "!#error#!";
-  protected ExtendedStringBuilder builder = new ExtendedStringBuilder();
+  protected ExtendedStringBuilder cssOnly = new ExtendedStringBuilder();
+  protected ISourceMapBuilder cssAndSM = new NullSourceMapBuilder(cssOnly);
+  
   private static final DecimalFormat FORMATTER = createFormatter();
+  private LessSource lessSource;
+  private LessSource cssDestination;
 
   private static DecimalFormat createFormatter() {
     DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
@@ -85,6 +92,21 @@ public class CssPrinter {
 
   public CssPrinter() {
     super();
+  }
+
+  public CssPrinter(LessSource lessSource, LessSource cssDestination) {
+    this.lessSource = lessSource;
+    this.cssDestination = cssDestination;
+    //FIXME: source map: create reasonable default values instead!!! - this does not create source map
+    if (cssDestination!=null)
+      this.cssAndSM = new SourceMapBuilder(cssOnly, lessSource, cssDestination);
+  }
+
+  public CssPrinter(CssPrinter configureFromPrinter) {
+    this.lessSource = configureFromPrinter.lessSource;
+    this.cssDestination = configureFromPrinter.cssDestination;
+    this.cssOnly = new ExtendedStringBuilder(configureFromPrinter.cssOnly);
+    this.cssAndSM = new SourceMapBuilder(cssOnly, lessSource, cssDestination);
   }
 
   /**
@@ -108,160 +130,160 @@ public class CssPrinter {
   public boolean switchOnType(ASTCssNode node) {
     switch (node.getType()) {
     case RULE_SET:
-      return appendRuleset((RuleSet) node);
+      return appendRuleset((RuleSet) node); // TODOsm: source map
 
     case CSS_CLASS:
-      return appendCssClass((CssClass) node);
+      return appendCssClass((CssClass) node); // TODOsm: source map
 
     case PSEUDO_CLASS:
-      return appendPseudoClass((PseudoClass) node);
+      return appendPseudoClass((PseudoClass) node); // TODOsm: source map
 
     case PSEUDO_ELEMENT:
-      return appendPseudoElement((PseudoElement) node);
+      return appendPseudoElement((PseudoElement) node); // TODOsm: source map
 
     case NTH:
-      return appendNth((Nth) node);
+      return appendNth((Nth) node); // TODOsm: source map
 
     case SELECTOR:
-      return appendSelector((Selector) node);
+      return appendSelector((Selector) node); // TODOsm: source map
 
     case SIMPLE_SELECTOR:
-      return appendSimpleSelector((SimpleSelector) node);
+      return appendSimpleSelector((SimpleSelector) node); // TODOsm: source map
 
     case SELECTOR_OPERATOR:
-      return appendSelectorOperator((SelectorOperator) node);
+      return appendSelectorOperator((SelectorOperator) node); // TODOsm: source map
 
     case SELECTOR_COMBINATOR:
-      return appendSelectorCombinator((SelectorCombinator) node);
+      return appendSelectorCombinator((SelectorCombinator) node); // TODOsm: source map
 
     case SELECTOR_ATTRIBUTE:
-      return appendSelectorAttribute((SelectorAttribute) node);
+      return appendSelectorAttribute((SelectorAttribute) node); // TODOsm: source map
 
     case ID_SELECTOR:
-      return appendIdSelector((IdSelector) node);
+      return appendIdSelector((IdSelector) node); // TODOsm: source map
 
     case CHARSET_DECLARATION:
-      return appendCharsetDeclaration((CharsetDeclaration) node);
+      return appendCharsetDeclaration((CharsetDeclaration) node); // TODOsm: source map
 
     case FONT_FACE:
-      return appendFontFace((FontFace) node);
+      return appendFontFace((FontFace) node); // TODOsm: source map
 
     case NAMED_EXPRESSION:
-      return appendNamedExpression((NamedExpression) node);
+      return appendNamedExpression((NamedExpression) node); // TODOsm: source map
 
     case COMPOSED_EXPRESSION:
-      return appendComposedExpression((ComposedExpression) node);
+      return appendComposedExpression((ComposedExpression) node); // TODOsm: source map
 
     case EXPRESSION_OPERATOR:
-      return appendExpressionOperator((ExpressionOperator) node);
+      return appendExpressionOperator((ExpressionOperator) node); // TODOsm: source map
 
     case STRING_EXPRESSION:
-      return appendCssString((CssString) node);
+      return appendCssString((CssString) node); // TODOsm: source map
 
     case NUMBER:
-      return appendNumberExpression((NumberExpression) node);
+      return appendNumberExpression((NumberExpression) node); // TODOsm: source map
 
     case IDENTIFIER_EXPRESSION:
-      return appendIdentifierExpression((IdentifierExpression) node);
+      return appendIdentifierExpression((IdentifierExpression) node); // TODOsm: source map
 
     case UNICODE_RANGE_EXPRESSION:
-      return appendUnicodeRangeExpression((UnicodeRangeExpression) node);
+      return appendUnicodeRangeExpression((UnicodeRangeExpression) node); // TODOsm: source map
 
     case COLOR_EXPRESSION:
-      return appendColorExpression((ColorExpression) node);
+      return appendColorExpression((ColorExpression) node); // TODOsm: source map
 
     case FUNCTION:
-      return appendFunctionExpression((FunctionExpression) node);
+      return appendFunctionExpression((FunctionExpression) node); // TODOsm: source map
 
     case DECLARATION:
-      return appendDeclaration((Declaration) node);
+      return appendDeclaration((Declaration) node); // TODOsm: source map
 
     case MEDIA:
-      return appendMedia((Media) node);
+      return appendMedia((Media) node); // TODOsm: source map
 
     case MEDIA_QUERY:
-      return appendMediaQuery((MediaQuery) node);
+      return appendMediaQuery((MediaQuery) node); // TODOsm: source map
 
     case MEDIUM:
-      return appendMedium((Medium) node);
+      return appendMedium((Medium) node); // TODOsm: source map
 
     case MEDIUM_MODIFIER:
-      return appendMediumModifier((MediumModifier) node);
+      return appendMediumModifier((MediumModifier) node); // TODOsm: source map
 
     case MEDIUM_TYPE:
-      return appendMediumType((MediumType) node);
+      return appendMediumType((MediumType) node); // TODOsm: source map
 
     case FIXED_MEDIA_EXPRESSION:
-      return appendMediaExpression((FixedMediaExpression) node);
+      return appendMediaExpression((FixedMediaExpression) node); // TODOsm: source map
 
     case INTERPOLATED_MEDIA_EXPRESSION:
-      return appendInterpolatedMediaExpression((InterpolatedMediaExpression) node);
+      return appendInterpolatedMediaExpression((InterpolatedMediaExpression) node); // TODOsm: source map
 
     case MEDIUM_EX_FEATURE:
-      return appendMediaExpressionFeature((MediaExpressionFeature) node);
+      return appendMediaExpressionFeature((MediaExpressionFeature) node); // TODOsm: source map
 
     case STYLE_SHEET:
-      return appendStyleSheet((StyleSheet) node);
+      return appendStyleSheet((StyleSheet) node); // TODOsm: source map
 
     case FAULTY_EXPRESSION:
-      return appendFaultyExpression((FaultyExpression) node);
+      return appendFaultyExpression((FaultyExpression) node); // TODOsm: source map
 
     case FAULTY_NODE:
-      return appendFaultyNode((FaultyNode) node);
+      return appendFaultyNode((FaultyNode) node); // TODOsm: source map
 
     case ESCAPED_VALUE:
-      return appendEscapedValue((EscapedValue) node);
+      return appendEscapedValue((EscapedValue) node); // TODOsm: source map
 
     case KEYFRAMES:
-      return appendKeyframes((Keyframes) node);
+      return appendKeyframes((Keyframes) node); // TODOsm: source map
 
     case KEYFRAMES_NAME:
-      return appendKeyframesName((KeyframesName) node);
+      return appendKeyframesName((KeyframesName) node); // TODOsm: source map
 
     case DOCUMENT:
-      return appendDocument((Document) node);
+      return appendDocument((Document) node); // TODOsm: source map
 
     case VIEWPORT:
-      return appendViewport((Viewport) node);
+      return appendViewport((Viewport) node); // TODOsm: source map
 
     case GENERAL_BODY:
-      return appendBodyOptimizeDuplicates((GeneralBody) node);
+      return appendBodyOptimizeDuplicates((GeneralBody) node); // TODOsm: source map
 
     case PAGE:
-      return appendPage((Page) node);
+      return appendPage((Page) node); // TODOsm: source map
 
     case PAGE_MARGIN_BOX:
-      return appendPageMarginBox((PageMarginBox) node);
+      return appendPageMarginBox((PageMarginBox) node); // TODOsm: source map
 
     case NAME:
-      return appendName((Name) node);
+      return appendName((Name) node); // TODOsm: source map
 
     case IMPORT:
-      return appendImport((Import) node);
+      return appendImport((Import) node); // TODOsm: source map
 
     case ANONYMOUS:
-      return appendAnonymous((AnonymousExpression) node);
+      return appendAnonymous((AnonymousExpression) node); // TODOsm: source map
 
     case SYNTAX_ONLY_ELEMENT:
-      return appendSyntaxOnlyElement((SyntaxOnlyElement) node);
+      return appendSyntaxOnlyElement((SyntaxOnlyElement) node); // TODOsm: source map
 
     case SUPPORTS:
-      return appendSupports((Supports) node);
+      return appendSupports((Supports) node); // TODOsm: source map
 
     case SUPPORTS_QUERY:
-      return appendSupportsQuery((SupportsQuery) node);
+      return appendSupportsQuery((SupportsQuery) node); // TODOsm: source map
 
     case SUPPORTS_CONDITION_NEGATION:
-      return appendSupportsConditionNegation((SupportsConditionNegation) node);
+      return appendSupportsConditionNegation((SupportsConditionNegation) node); // TODOsm: source map
 
     case SUPPORTS_CONDITION_PARENTHESES:
-      return appendSupportsConditionParentheses((SupportsConditionInParentheses) node);
+      return appendSupportsConditionParentheses((SupportsConditionInParentheses) node); // TODOsm: source map
 
     case SUPPORTS_CONDITION_LOGICAL:
-      return appendSupportsConditionLogical((SupportsLogicalCondition) node);
+      return appendSupportsConditionLogical((SupportsLogicalCondition) node); // TODOsm: source map
 
     case SUPPORTS_LOGICAL_OPERATOR:
-      return appendSupportsLogicalOperator((SupportsLogicalOperator) node);
+      return appendSupportsLogicalOperator((SupportsLogicalOperator) node); // TODOsm: source map
 
     case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
@@ -272,45 +294,45 @@ public class CssPrinter {
       throw new NotACssException(node);
 
     default:
-      throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getCharPositionInSourceLine());
+      throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getSourceColumn());
     }
   }
 
   private boolean appendSyntaxOnlyElement(SyntaxOnlyElement node) {
-    builder.append(node.getSymbol());
+    cssOnly.append(node.getSymbol());
     return true;
   }
 
   private boolean appendAnonymous(AnonymousExpression node) {
-    builder.append(node.getValue());
+    cssOnly.append(node.getValue());
     return true;
   }
 
   private boolean appendImport(Import node) {
-    builder.append("@import").ensureSeparator();
+    cssOnly.append("@import").ensureSeparator();
     append(node.getUrlExpression());
     appendMediums(node.getMediums());
-    builder.append(";");
+    cssOnly.append(";");
 
     return true;
   }
 
   private boolean appendName(Name node) {
-    builder.append(node.getName());
+    cssOnly.append(node.getName());
     return true;
   }
 
   private boolean appendPage(Page node) {
-    builder.append("@page").ensureSeparator();
+    cssOnly.append("@page").ensureSeparator();
     if (node.hasName()) {
       append(node.getName());
       if (!node.hasDockedPseudopage())
-        builder.ensureSeparator();
+        cssOnly.ensureSeparator();
     }
 
     if (node.hasPseudopage()) {
       append(node.getPseudopage());
-      builder.ensureSeparator();
+      cssOnly.ensureSeparator();
     }
 
     appendBodySortDeclarations(node.getBody());
@@ -324,19 +346,19 @@ public class CssPrinter {
   }
 
   private boolean appendKeyframesName(KeyframesName node) {
-    builder.append(node.getName());
+    cssOnly.append(node.getName());
     return true;
   }
 
   private boolean appendKeyframes(Keyframes node) {
-    builder.append(node.getDialect()).ensureSeparator();
+    cssOnly.append(node.getDialect()).ensureSeparator();
 
     Iterator<KeyframesName> names = node.getNames().iterator();
     if (names.hasNext()) {
       append(names.next());
     }
     while (names.hasNext()) {
-      builder.append(",").ensureSeparator();
+      cssOnly.append(",").ensureSeparator();
       append(names.next());
     }
 
@@ -345,16 +367,16 @@ public class CssPrinter {
   }
 
   private boolean appendSupports(Supports node) {
-    builder.append(node.getDialect()).ensureSeparator();
+    cssOnly.append(node.getDialect()).ensureSeparator();
     append(node.getCondition());
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
     append(node.getBody());
     return true;
   }
 
   private boolean appendSupportsConditionNegation(SupportsConditionNegation node) {
     append(node.getNegation());
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
     append(node.getCondition());
     return true;
   }
@@ -373,9 +395,9 @@ public class CssPrinter {
     append(conditions.next());
 
     while (operators.hasNext()) {
-      builder.ensureSeparator();
+      cssOnly.ensureSeparator();
       append(operators.next());
-      builder.ensureSeparator();
+      cssOnly.ensureSeparator();
       append(conditions.next());
     }
     return true;
@@ -383,9 +405,9 @@ public class CssPrinter {
 
   private boolean appendSupportsLogicalOperator(SupportsLogicalOperator node) {
     if (node.getOperator() == null) {
-      builder.append(ERROR);
+      cssOnly.append(ERROR);
     }
-    builder.append(node.getOperator().getSymbol());
+    cssOnly.append(node.getOperator().getSymbol());
     return true;
   }
 
@@ -397,14 +419,14 @@ public class CssPrinter {
   }
 
   private boolean appendDocument(Document node) {
-    builder.append(node.getDialect()).ensureSeparator();
+    cssOnly.append(node.getDialect()).ensureSeparator();
 
     Iterator<FunctionExpression> urlMatchFunctions = node.getUrlMatchFunctions().iterator();
     if (urlMatchFunctions.hasNext()) {
       append(urlMatchFunctions.next());
     }
     while (urlMatchFunctions.hasNext()) {
-      builder.append(",").ensureSeparator();
+      cssOnly.append(",").ensureSeparator();
       append(urlMatchFunctions.next());
     }
 
@@ -413,29 +435,29 @@ public class CssPrinter {
   }
 
   private boolean appendViewport(Viewport node) {
-    builder.append(node.getDialect());
+    cssOnly.append(node.getDialect());
     append(node.getBody());
     return true;
   }
 
   private boolean appendFaultyNode(FaultyNode node) {
-    builder.append(ERROR);
+    cssOnly.append(ERROR);
     return true;
   }
 
   private boolean appendFaultyExpression(FaultyExpression node) {
-    builder.append(ERROR);
+    cssOnly.append(ERROR);
     return true;
   }
 
   private boolean appendNth(Nth node) {
     switch (node.getForm()) {
     case EVEN:
-      builder.append("even");
+      cssOnly.append("even");
       return true;
 
     case ODD:
-      builder.append("odd");
+      cssOnly.append("odd");
       return true;
 
     case STANDARD:
@@ -453,46 +475,46 @@ public class CssPrinter {
     if (comments == null || comments.isEmpty())
       return;
 
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
 
     for (Comment comment : comments) {
-      builder.append(comment.getComment());
+      cssOnly.append(comment.getComment());
       if (comment.hasNewLine())
-        builder.newLine();
+        cssOnly.newLine();
     }
 
     if (ensureSeparator)
-      builder.ensureSeparator();
+      cssOnly.ensureSeparator();
   }
 
   public boolean appendFontFace(FontFace node) {
-    builder.append("@font-face").ensureSeparator();
+    cssOnly.append("@font-face").ensureSeparator();
     append(node.getBody());
 
     return true;
   }
 
   public boolean appendCharsetDeclaration(CharsetDeclaration node) {
-    builder.append("@charset").ensureSeparator();
-    builder.append(node.getCharset());
-    builder.append(";");
+    cssOnly.append("@charset").ensureSeparator();
+    cssOnly.append(node.getCharset());
+    cssOnly.append(";");
 
     return true;
   }
 
   public boolean appendIdSelector(IdSelector node) {
-    builder.append("#");
-    builder.append(node.getName());
+    cssOnly.append("#");
+    cssOnly.append(node.getName());
 
     return true;
   }
 
   public boolean appendSelectorAttribute(SelectorAttribute node) {
-    builder.append("[");
-    builder.append(node.getName());
+    cssOnly.append("[");
+    cssOnly.append(node.getName());
     append(node.getOperator());
     append(node.getValue());
-    builder.append("]");
+    cssOnly.append("]");
 
     return true;
   }
@@ -504,29 +526,29 @@ public class CssPrinter {
       break;
 
     default:
-      builder.append(realOperator.getSymbol());
+      cssOnly.append(realOperator.getSymbol());
     }
     return true;
   }
 
   public boolean appendPseudoClass(PseudoClass node) {
-    builder.append(":");
-    builder.append(node.getName());
+    cssOnly.append(":");
+    cssOnly.append(node.getName());
     if (node.hasParameters()) {
-      builder.append("(");
+      cssOnly.append("(");
       append(node.getParameter());
-      builder.append(")");
+      cssOnly.append(")");
     }
 
     return true;
   }
 
   public boolean appendPseudoElement(PseudoElement node) {
-    builder.append(":");
+    cssOnly.append(":");
     if (!node.isLevel12Form())
-      builder.append(":");
+      cssOnly.append(":");
 
-    builder.append(node.getName());
+    cssOnly.append(node.getName());
 
     return true;
   }
@@ -551,52 +573,56 @@ public class CssPrinter {
     if (body.isEmpty())
       return false;
 
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
     append(body.getOpeningCurlyBrace());
-    builder.ensureNewLine().increaseIndentationLevel();
-    LinkedHashSet<String> declarationsBuilders = collectUniqueBodyMembersStrings(body);
-    for (String miniBuilder : declarationsBuilders) {
-      builder.appendAsIs(miniBuilder);
+    cssOnly.ensureNewLine().increaseIndentationLevel();
+    Iterable<CssPrinter> declarationsBuilders = collectUniqueBodyMembersStrings(body);
+    for (CssPrinter miniBuilder : declarationsBuilders) {
+      //cssOnly.appendAsIs(miniBuilder);
+      append(miniBuilder);
+      //cssAndSM.ap
     }
 
     appendComments(body.getOrphanComments(), false);
-    builder.decreaseIndentationLevel();
+    cssOnly.decreaseIndentationLevel();
     append(body.getClosingCurlyBrace());
 
     return true;
   }
 
-  private LinkedHashSet<String> collectUniqueBodyMembersStrings(Body body) {
+  private void append(CssPrinter miniBuilder) {
+    cssAndSM.append(miniBuilder.cssAndSM);
+  }
+
+  private Iterable<CssPrinter> collectUniqueBodyMembersStrings(Body body) {
     // the same declaration must be printed only once
-    ExtendedStringBuilder storedBuilder = builder;
-    LinkedHashSet<String> declarationsStrings = new LinkedHashSet<String>();
+    //FIXME: source map related clean this up (!)
+    LastOfKindSet<String, CssPrinter> declarationsStrings = new LastOfKindSet<String, CssPrinter>();
     for (ASTCssNode declaration : body.getMembers()) {
-      builder = new ExtendedStringBuilder(builder);
-      append(declaration);
-      builder.ensureNewLine();
-      String declarationSnipped = builder.toString();
-      if (declarationsStrings.contains(declarationSnipped)) {
-        declarationsStrings.remove(declarationSnipped);
-      }
-      declarationsStrings.add(declarationSnipped);
+      CssPrinter miniPrinter = new CssPrinter(this);
+
+      //FIXME: source map: add test that this generates source map (per symbols is enough)
+      miniPrinter.cssAndSM = new SourceMapBuilder(miniPrinter.cssOnly, lessSource, cssDestination); 
+      miniPrinter.append(declaration);
+      miniPrinter.cssOnly.ensureNewLine();
+
+      declarationsStrings.add(miniPrinter.toCss(), miniPrinter);
     }
 
-    storedBuilder.configureFrom(builder);
-    builder = storedBuilder;
     return declarationsStrings;
   }
 
   public boolean appendDeclaration(Declaration declaration) {
-    builder.appendIgnoreNull(declaration.getName());
-    builder.append(":").ensureSeparator();
+    cssOnly.appendIgnoreNull(declaration.getName());
+    cssOnly.append(":").ensureSeparator();
     if (declaration.getExpression() != null)
       append(declaration.getExpression());
 
     if (declaration.isImportant())
-      builder.ensureSeparator().append("!important");
+      cssOnly.ensureSeparator().append("!important");
 
     if (shouldHaveSemicolon(declaration))
-      builder.appendIgnoreNull(";");
+      cssOnly.appendIgnoreNull(";");
 
     return true;
   }
@@ -609,7 +635,7 @@ public class CssPrinter {
   }
 
   private boolean appendMedia(Media node) {
-    builder.append("@media");
+    cssOnly.append("@media");
     appendMediums(node.getMediums());
     appendBodySortDeclarations(node.getBody());
 
@@ -620,9 +646,9 @@ public class CssPrinter {
     // this is sort of hack, bypass the usual append method
     appendComments(node.getOpeningComments(), true);
 
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
     append(node.getOpeningCurlyBrace());
-    builder.ensureNewLine().increaseIndentationLevel();
+    cssOnly.ensureNewLine().increaseIndentationLevel();
 
     Iterator<ASTCssNode> declarations = node.getDeclarations().iterator();
     List<ASTCssNode> notDeclarations = node.getNotDeclarations();
@@ -630,16 +656,16 @@ public class CssPrinter {
       ASTCssNode declaration = declarations.next();
       append(declaration);
       if (declarations.hasNext() || notDeclarations.isEmpty())
-        builder.ensureNewLine();
+        cssOnly.ensureNewLine();
     }
     for (ASTCssNode body : notDeclarations) {
       boolean changedAnything = append(body);
       if (changedAnything)
-        builder.ensureNewLine();
+        cssOnly.ensureNewLine();
     }
 
     appendComments(node.getOrphanComments(), false);
-    builder.decreaseIndentationLevel();
+    cssOnly.decreaseIndentationLevel();
     append(node.getClosingCurlyBrace());
 
     // this is sort of hack, bypass the usual append method
@@ -653,19 +679,19 @@ public class CssPrinter {
     boolean needComma = false;
     for (MediaQuery mediaQuery : mediums) {
       if (needComma)
-        builder.append(",").ensureSeparator();
+        cssOnly.append(",").ensureSeparator();
       append(mediaQuery);
       needComma = true;
     }
   }
 
   public boolean appendMediaQuery(MediaQuery mediaQuery) {
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
     append(mediaQuery.getMedium());
     boolean needSeparator = (mediaQuery.getMedium() != null);
     for (MediaExpression mediaExpression : mediaQuery.getExpressions()) {
       if (needSeparator) {
-        builder.ensureSeparator().append("and");
+        cssOnly.ensureSeparator().append("and");
       }
       append(mediaExpression);
       needSeparator = true;
@@ -685,11 +711,11 @@ public class CssPrinter {
     Modifier kind = modifier.getModifier();
     switch (kind) {
     case ONLY:
-      builder.ensureSeparator().append("only");
+      cssOnly.ensureSeparator().append("only");
       break;
 
     case NOT:
-      builder.ensureSeparator().append("not");
+      cssOnly.ensureSeparator().append("not");
       break;
 
     case NONE:
@@ -703,35 +729,35 @@ public class CssPrinter {
   }
 
   public boolean appendMediumType(MediumType medium) {
-    builder.ensureSeparator().append(medium.getName());
+    cssOnly.ensureSeparator().append(medium.getName());
 
     return true;
   }
 
   public boolean appendMediaExpression(FixedMediaExpression expression) {
-    builder.ensureSeparator().append("(");
+    cssOnly.ensureSeparator().append("(");
     append(expression.getFeature());
     if (expression.getExpression() != null) {
-      builder.append(":").ensureSeparator();
+      cssOnly.append(":").ensureSeparator();
       append(expression.getExpression());
     }
-    builder.append(")");
+    cssOnly.append(")");
     return true;
   }
 
   private boolean appendInterpolatedMediaExpression(InterpolatedMediaExpression expression) {
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
     return append(expression.getExpression());
   }
 
   public boolean appendMediaExpressionFeature(MediaExpressionFeature feature) {
-    builder.append(feature.getFeature());
+    cssOnly.append(feature.getFeature());
     return true;
   }
 
   public boolean appendNamedExpression(NamedExpression expression) {
-    builder.append(expression.getName());
-    builder.append("=");
+    cssOnly.append(expression.getName());
+    cssOnly.append("=");
     append(expression.getExpression());
 
     return true;
@@ -749,11 +775,11 @@ public class CssPrinter {
     ExpressionOperator.Operator realOperator = operator.getOperator();
     switch (realOperator) {
     case COMMA:
-      builder.append(realOperator.getSymbol()).ensureSeparator();
+      cssOnly.append(realOperator.getSymbol()).ensureSeparator();
       break;
 
     case EMPTY_OPERATOR:
-      builder.ensureSeparator();
+      cssOnly.ensureSeparator();
       break;
 
     // TODO this is a huge hack which goes around
@@ -761,11 +787,11 @@ public class CssPrinter {
     // left here intentionally, so we can have correct unit test and can come
     // back to it later
     case MINUS:
-      builder.ensureSeparator().append("-");
+      cssOnly.ensureSeparator().append("-");
       break;
 
     default:
-      builder.append(realOperator.getSymbol());
+      cssOnly.append(realOperator.getSymbol());
     }
 
     return true;
@@ -773,25 +799,25 @@ public class CssPrinter {
 
   public boolean appendCssString(CssString expression) {
     String quoteType = expression.getQuoteType();
-    builder.append(quoteType).append(expression.getValue()).append(quoteType);
+    cssOnly.append(quoteType).append(expression.getValue()).append(quoteType);
 
     return true;
   }
 
   public boolean appendEscapedValue(EscapedValue escaped) {
-    builder.append(escaped.getValue());
+    cssOnly.append(escaped.getValue());
 
     return true;
   }
 
   public boolean appendIdentifierExpression(IdentifierExpression expression) {
-    builder.append(expression.getValue());
+    cssOnly.append(expression.getValue());
 
     return true;
   }
 
   public boolean appendUnicodeRangeExpression(UnicodeRangeExpression expression) {
-    builder.append(expression.getValue());
+    cssOnly.append(expression.getValue());
 
     return true;
   }
@@ -800,34 +826,34 @@ public class CssPrinter {
     // if it is named color expression, write out the name
     if (expression instanceof NamedColorExpression) {
       NamedColorExpression named = (NamedColorExpression) expression;
-      builder.append(named.getColorName());
+      cssOnly.append(named.getColorName());
     } else {
-      builder.append(expression.getValue());
+      cssOnly.append(expression.getValue());
     }
 
     return true;
   }
 
   private boolean appendFunctionExpression(FunctionExpression node) {
-    builder.append(node.getName());
-    builder.append("(");
+    cssOnly.append(node.getName());
+    cssOnly.append("(");
     append(node.getParameter());
-    builder.append(")");
+    cssOnly.append(")");
 
     return true;
   }
 
   private boolean appendNumberExpression(NumberExpression node) {
     if (node.hasOriginalString()) {
-      builder.append(node.getOriginalString());
+      cssOnly.append(node.getOriginalString());
     } else {
       if (node.hasExpliciteSign()) {
         if (0 < node.getValueAsDouble())
-          builder.append("+");
+          cssOnly.append("+");
         else
-          builder.append("-");
+          cssOnly.append("-");
       }
-      builder.append(format(node.getValueAsDouble()) + node.getSuffix());
+      cssOnly.append(format(node.getValueAsDouble()) + node.getSuffix());
     }
 
     return true;
@@ -836,7 +862,7 @@ public class CssPrinter {
   public void appendSelectors(List<Selector> selectors) {
     // follow less.js formatting in special case - only one empty selector
     if (selectors.size() == 1 && isEmptySelector(selectors.get(0))) {
-      builder.append(" ");
+      cssOnly.append(" ");
     }
 
     Iterator<Selector> iterator = selectors.iterator();
@@ -845,7 +871,7 @@ public class CssPrinter {
       append(selector);
 
       if (iterator.hasNext())
-        builder.append(",").newLine();
+        cssOnly.append(",").newLine();
     }
   }
 
@@ -895,17 +921,18 @@ public class CssPrinter {
   }
 
   private boolean appendCssClass(CssClass cssClass) {
-    builder.append(".").append(cssClass.getName());
+    //cssOnly.append(cssClass.getFullName());
+    cssAndSM.appendAsSymbol(cssClass.getFullName(), cssClass.getUnderlyingStructure());
     return true;
   }
 
   private void appendSimpleSelectorHead(SimpleSelector selector) {
-    builder.ensureSeparator();
+    cssOnly.ensureSeparator();
     if (selector.isStar()) {
       if (!selector.isEmptyForm())
-        builder.append("*");
+        cssOnly.append("*");
     } else {
-      builder.appendIgnoreNull(selector.getElementName().getName());
+      cssOnly.appendIgnoreNull(selector.getElementName().getName());
     }
 
   }
@@ -914,11 +941,11 @@ public class CssPrinter {
     SelectorCombinator.Combinator realCombinator = combinator.getCombinator();
     switch (realCombinator) {
     case DESCENDANT:
-      builder.ensureSeparator();
+      cssOnly.ensureSeparator();
       break;
 
     default:
-      builder.ensureSeparator().append(realCombinator.getSymbol());
+      cssOnly.ensureSeparator().append(realCombinator.getSymbol());
 
     }
 
@@ -933,7 +960,7 @@ public class CssPrinter {
   private void appendAll(List<? extends ASTCssNode> all) {
     for (ASTCssNode kid : all) {
       if (append(kid))
-        builder.ensureNewLine();
+        cssOnly.ensureNewLine();
     }
   }
 
@@ -945,7 +972,14 @@ public class CssPrinter {
   }
 
   public String toString() {
-    return builder.toString();
+    return cssOnly.toString();
   }
 
+  public String toCss() {
+    return cssOnly.toString();
+  }
+
+  public String toSourceMap() {
+    return cssAndSM.toSourceMap();
+  }
 }

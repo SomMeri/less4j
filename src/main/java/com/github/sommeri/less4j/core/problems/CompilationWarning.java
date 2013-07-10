@@ -23,7 +23,7 @@ public class CompilationWarning extends AbstractProblem {
     super();
     this.source = offendingNode.getSource();
     this.line = offendingNode.getSourceLine();
-    this.character = offendingNode.getCharPositionInSourceLine();
+    this.character = offendingNode.getSourceColumn();
     this.message = message;
   }
 
