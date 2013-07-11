@@ -10,7 +10,7 @@ import com.github.sommeri.sourcemap.SourceMapFormat;
 import com.github.sommeri.sourcemap.SourceMapGenerator;
 import com.github.sommeri.sourcemap.SourceMapGeneratorFactory;
 
-//FIXME: source map: Line 6: An optional list of source content, useful when the “source” can’t be hosted. - use it in case of input string source
+//FIXME: source map: Line 6: An optional list of source content, useful when the "source" can be hosted. - use it in case of input string source
 public class SourceMapBuilder implements ISourceMapBuilder {
 
   private final ExtendedStringBuilder cssBuilder;
