@@ -19,6 +19,7 @@ package com.github.sommeri.sourcemap;
 /**
  * Throw if an invalid or unknown source map is encountered.
  */
+@SuppressWarnings("serial")
 public class SourceMapParseException extends Exception {
   public SourceMapParseException(String message) {
     super(message);

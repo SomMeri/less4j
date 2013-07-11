@@ -16,8 +16,7 @@
 
 package com.github.sommeri.sourcemap;
 
-import com.google.common.collect.Lists;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -88,7 +87,7 @@ class SourceMapLineDecoder {
   }
 
   private static List<Integer> decodeLine(StringParser reader) {
-    List<Integer> result = Lists.newArrayListWithCapacity(512);
+    List<Integer> result = new ArrayList<Integer>(512);
     int lastId = 0;
     while (reader.hasNext()) {
       LineEntry entry = decodeLineEntry(reader, lastId);

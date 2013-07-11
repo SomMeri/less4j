@@ -63,11 +63,6 @@ public class SourceMapConsumerFactory {
         // Check basic assertions about the format.
         int version = sourceMapRoot.getInt("version");
         switch (version) {
-        case 2: {
-          SourceMapConsumerV2 consumer = new SourceMapConsumerV2();
-          consumer.parse(sourceMapRoot);
-          return consumer;
-        }
         case 3: {
           SourceMapConsumerV3 consumer = new SourceMapConsumerV3();
           consumer.parse(sourceMapRoot, supplier);

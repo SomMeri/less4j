@@ -16,11 +16,6 @@
 
 package com.github.sommeri.sourcemap;
 
-import com.github.sommeri.sourcemap.SourceMapConsumerV3.EntryVisitor;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -28,6 +23,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.beust.jcommander.internal.Lists;
+import com.github.sommeri.sourcemap.SourceMapConsumerV3.EntryVisitor;
 
 /**
  * Collects information mapping the generated (compiled) source back to
@@ -48,14 +46,12 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
   /**
    * A map of source names to source name index
    */
-  private LinkedHashMap<String, Integer> sourceFileMap =
-      Maps.newLinkedHashMap();
+  private LinkedHashMap<String, Integer> sourceFileMap = new LinkedHashMap<String, Integer>();
 
   /**
    * A map of source names to source name index
    */
-  private LinkedHashMap<String, Integer> originalNameMap =
-      Maps.newLinkedHashMap();
+  private LinkedHashMap<String, Integer> originalNameMap = new LinkedHashMap<String, Integer>();
 
   /**
    * Cache of the last mappings source name.
@@ -197,9 +193,8 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
       int nextColumn = mapping.startPosition.getColumn();
       Preconditions.checkState(nextLine > lastLine
           || (nextLine == lastLine && nextColumn >= lastColumn),
-          "Incorrect source mappings order, previous : (%s,%s)\n"
-          + "new : (%s,%s)\nnode : %s",
-          lastLine, lastColumn, nextLine, nextColumn);
+          "Incorrect source mappings order, previous : ("+lastLine+","+lastColumn+")\n"
+          + "new : ("+nextLine+","+nextColumn+")\nnode : %s");
     }
 
     lastMapping = mapping;

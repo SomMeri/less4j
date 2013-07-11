@@ -16,16 +16,6 @@
 
 package com.github.sommeri.sourcemap;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.github.sommeri.sourcemap.Base64VLQ.CharIterator;
-import com.github.sommeri.sourcemap.Mapping.OriginalMapping;
-import com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +23,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.github.sommeri.sourcemap.Base64VLQ.CharIterator;
+import com.github.sommeri.sourcemap.Mapping.OriginalMapping;
+import com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder;
 
 /**
  * Class for parsing version 3 of the SourceMap format, as produced by the
@@ -125,7 +123,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
       sources = getJavaStringArray(sourceMapRoot.getJSONArray("sources"));
       names = getJavaStringArray(sourceMapRoot.getJSONArray("names"));
 
-      lines = Lists.newArrayListWithCapacity(lineCount);
+      lines = new ArrayList<ArrayList<Entry>>(lineCount);
 
       new MappingBuilder(lineMap).build();
     } catch (JSONException ex) {
@@ -225,7 +223,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     }
 
     int index = search(entries, column, 0, entries.size() - 1);
-    Preconditions.checkState(index >= 0, "unexpected:%s", index);
+    Preconditions.checkState(index >= 0, "unexpected: " + index);
     return getOriginalMappingForEntry(entries.get(index));
   }
 
