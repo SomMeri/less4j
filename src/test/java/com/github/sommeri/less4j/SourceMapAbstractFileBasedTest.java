@@ -6,8 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashSet;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.ComparisonFailure;
@@ -60,7 +58,7 @@ public abstract class SourceMapAbstractFileBasedTest {
       String expected = IOUtils.toString(new FileReader(cssFile));
       assertEquals(lessFile.toString(), canonize(expected), canonize(actual.getCss()));
       
-      sourceMapValidation.validateSourceMap(lessFile, actual, cssFile.getParentFile(), mapdataFile);
+      sourceMapValidation.validateSourceMap(actual, mapdataFile, cssFile);
     } catch (Less4jException ex) {
       String errorReport = generateErrorReport(ex);
       System.err.println(errorReport);

@@ -97,9 +97,7 @@ public class CssPrinter {
   public CssPrinter(LessSource lessSource, LessSource cssDestination) {
     this.lessSource = lessSource;
     this.cssDestination = cssDestination;
-    //FIXME: source map: create reasonable default values instead!!! - this does not create source map
-    if (cssDestination!=null)
-      this.cssAndSM = new SourceMapBuilder(cssOnly, lessSource, cssDestination);
+    this.cssAndSM = new SourceMapBuilder(cssOnly, lessSource, cssDestination);
   }
 
   public CssPrinter(CssPrinter configureFromPrinter) {

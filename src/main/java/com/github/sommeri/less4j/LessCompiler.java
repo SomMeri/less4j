@@ -6,19 +6,24 @@ import java.util.Collections;
 import java.util.List;
 
 //FIXME: source map: assume by default that source map, css and original less are all in the same directory
+//FIXME: source map: API unit tests
 public interface LessCompiler {
 
   public CompilationResult compile(String lessContent) throws Less4jException;
 
-  public CompilationResult compile(File inputFile) throws Less4jException;
+  public CompilationResult compile(String lessContent, Configuration options) throws Less4jException;
 
-  public CompilationResult compile(URL inputFile) throws Less4jException;
+  public CompilationResult compile(File lessFile) throws Less4jException;
+
+  public CompilationResult compile(File lessFile, Configuration options) throws Less4jException;
+
+  public CompilationResult compile(URL lessUrl) throws Less4jException;
+
+  public CompilationResult compile(URL lessUrl, Configuration options) throws Less4jException;
 
   public CompilationResult compile(LessSource source) throws Less4jException;
 
-  public CompilationResult compile(File inputFile, Configuration sourceMapOptions) throws Less4jException;
-
-  public CompilationResult compile(LessSource source, Configuration sourceMapOptions) throws Less4jException;
+  public CompilationResult compile(LessSource source, Configuration options) throws Less4jException;
 
   public class Configuration {
     
@@ -27,7 +32,7 @@ public interface LessCompiler {
     /**
      * This is needed in for source map. 
      * 
-     * TODO: source map: document how is this used
+     * FIXME: source map: document how is this used
      */
     public LessSource getCssResultLocation() {
       return cssResultLocation;

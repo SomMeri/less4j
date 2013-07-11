@@ -42,23 +42,29 @@ public class URIUtils {
     if (to==null)
       return "";
     
-    if (to.getAbsoluteURI()==null)
+    if (to.getURI()==null)
       return to.getName();
     
-    if (from==null || from.getAbsoluteURI()==null)
-      return to.getAbsoluteURI().toString();
+    if (from==null || from.getURI()==null)
+      return to.getURI().toString();
     
-    String fromURI = from.getAbsoluteURI().toString();
-    String toURI = to.getAbsoluteURI().toString();
+    //FIXME: source map - (!!!) I used absolute uri here originally, but it does not make sense in some situations - rething
+    String fromURI = from.getURI().toString();
+    String toURI = to.getURI().toString();
 
     return getRelativePath(fromURI, toURI, URIUtils.URI_FILE_SEPARATOR);
   }
 
-  private static String convertUriToPlatformSeparator(String relative) {
+  public static String convertUriToPlatformSeparator(String relative) {
     return relative.replace(URI_FILE_SEPARATOR, Constants.FILE_SEPARATOR);
   }
 
-  /**
+  public static String convertPlatformSeparatorToUri(String relative) {
+    return relative.replace(Constants.FILE_SEPARATOR, URI_FILE_SEPARATOR);
+  }
+
+
+ /**
    * taken from stackoverflow: http://stackoverflow.com/questions/204784/how-to-construct-a-relative-path-in-java-from-two-absolute-paths-or-urls
    * 
    * Get the relative path from one file to another, specifying the directory
@@ -153,6 +159,13 @@ public class URIUtils {
       return "";
     
     return string.substring(beginIndex);
+  }
+
+  public static String addPLatformSlashIfNeeded(String directory) {
+    if (directory.endsWith(Constants.FILE_SEPARATOR))
+      return directory;
+    
+    return directory + Constants.FILE_SEPARATOR;
   }
 
 }

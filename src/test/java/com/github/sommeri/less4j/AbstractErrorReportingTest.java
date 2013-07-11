@@ -69,7 +69,7 @@ public abstract class AbstractErrorReportingTest {
   }
 
   private void assertSourceMapValid(CompilationResult actual) {
-    sourceMapValidation.validateSourceMap(lessFile, actual, cssOutput.getParentFile(), mapdataFile);
+    sourceMapValidation.validateSourceMap(actual, mapdataFile, cssOutput);
   }
 
   protected void printErrors(Less4jException ex) {

@@ -16,15 +16,27 @@ public class DefaultLessCompiler implements LessCompiler {
   }
 
   @Override
-  public CompilationResult compile(File inputFile) throws Less4jException {
+  public CompilationResult compile(String lessContent, Configuration options) throws Less4jException {
     ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
-    return compiler.compile(inputFile);
+    return compiler.compile(lessContent, options);
   }
 
   @Override
-  public CompilationResult compile(URL inputURL) throws Less4jException {
+  public CompilationResult compile(File lessFile) throws Less4jException {
     ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
-    return compiler.compile(inputURL);
+    return compiler.compile(lessFile);
+  }
+
+  @Override
+  public CompilationResult compile(URL lessURL) throws Less4jException {
+    ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
+    return compiler.compile(lessURL);
+  }
+
+  @Override
+  public CompilationResult compile(URL lessURL, Configuration options) throws Less4jException {
+    ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
+    return compiler.compile(lessURL, options);
   }
 
   public CompilationResult compile(LessSource source) throws Less4jException {
@@ -33,15 +45,15 @@ public class DefaultLessCompiler implements LessCompiler {
   }
 
   @Override
-  public CompilationResult compile(File inputFile, Configuration sourceMapOptions) throws Less4jException {
+  public CompilationResult compile(File lessFile, Configuration options) throws Less4jException {
     ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
-    return compiler.compile(inputFile, sourceMapOptions);
+    return compiler.compile(lessFile, options);
   }
 
   @Override
-  public CompilationResult compile(LessSource source, Configuration sourceMapOptions) throws Less4jException {
+  public CompilationResult compile(LessSource source, Configuration options) throws Less4jException {
     ThreadUnsafeLessCompiler compiler = new ThreadUnsafeLessCompiler();
-    return compiler.compile(source, sourceMapOptions);
+    return compiler.compile(source, options);
   }
 
 }

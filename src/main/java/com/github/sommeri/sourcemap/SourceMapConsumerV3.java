@@ -44,6 +44,10 @@ import java.util.Map;
 public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReversable {
   static final int UNMAPPED = -1;
 
+  //TODO: (source map separation):  added this
+  private String file;
+  private String sourceRoot;
+  
   private String[] sources;
   private String[] names;
   private int lineCount;
@@ -101,11 +105,14 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
         throw new SourceMapParseException("Unknown version: " + version);
       }
 
-      String file = sourceMapRoot.getString("file");
+      this.file = sourceMapRoot.getString("file");
       if (file.isEmpty()) {
-        throw new SourceMapParseException("File entry is missing or empty");
+        //TODO: (source map separation):  commented this - I need more tolerant parser
+        //throw new SourceMapParseException("File entry is missing or empty ");
       }
-
+      if (sourceMapRoot.has("sourceRoot"))
+        this.sourceRoot = sourceMapRoot.getString("sourceRoot");
+      
       if (sourceMapRoot.has("sections")) {
         // Looks like a index map, try to parse it that way.
         parseMetaMap(sourceMapRoot, sectionSupplier);
@@ -227,6 +234,15 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     return Arrays.asList(sources);
   }
 
+  public String getFile() {
+    return file;
+  }
+
+  public String getSourceRoot() {
+    return sourceRoot;
+  }
+
+  
   @Override
   public Collection<OriginalMapping> getReverseMapping(String originalFile, int line, int column) {
     // TODO(user): This implementation currently does not make use of the column

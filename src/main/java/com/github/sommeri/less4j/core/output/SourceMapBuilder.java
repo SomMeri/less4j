@@ -63,7 +63,6 @@ public class SourceMapBuilder implements ISourceMapBuilder {
   
   @Override
   public String toSourceMap() {
-    //FIXME: source map: test for string based input - important - it does not have destination
     String name = URIUtils.relativizeSourceURIs(lessSource, cssDestination);
     try {
       StringBuilder sb = new StringBuilder();

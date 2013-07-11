@@ -1,0 +1,5 @@
+{
+  "file":"src/test/resources/source-map/api/does-not-exists.css",
+  "sources":[""],
+  "names":[".class"]
+}

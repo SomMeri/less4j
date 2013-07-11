@@ -18,4 +18,16 @@ public class CustomAssertions {
     assertEquals(new HashSet<String>(expected), new HashSet<String>(actual));
   }
 
+  private static boolean equalsRegardingNull(Object expected, Object actual) {
+    if (expected == null) {
+      return actual == null;
+    }
+
+    return isEquals(expected, actual);
+  }
+
+  private static boolean isEquals(Object expected, Object actual) {
+    return expected.equals(actual);
+  }
+
 }

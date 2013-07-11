@@ -25,12 +25,11 @@ public abstract class LessSource {
   public abstract String getContent() throws FileNotFound, CannotReadFile;
 
   /**
-   * @return absolute uri of less source location. Return null if absolute uri
-   *         is not know. If non-null, last path part must be equal to whatever
-   *         {@link #getName()} returns.
+   * @return less source location uri or <code>null</code>. If non-null, last
+   *         path part must be equal to whatever {@link #getName()} returns.
    * 
    */
-  public URI getAbsoluteURI() {
+  public URI getURI() {
     return null;
   }
 
@@ -142,7 +141,7 @@ public abstract class LessSource {
     }
 
     @Override
-    public URI getAbsoluteURI() {
+    public URI getURI() {
       try {
         return inputURL.toURI();
       } catch (URISyntaxException e) {
@@ -201,8 +200,14 @@ public abstract class LessSource {
     }
 
     @Override
-    public URI getAbsoluteURI() {
-      return inputFile.getAbsoluteFile().toURI();
+    public URI getURI() {
+      try {
+        String path = inputFile.toString();
+        path = URIUtils.convertPlatformSeparatorToUri(path);
+        return new URI(path);
+      } catch (URISyntaxException e) {
+        return null;
+      }
     }
 
     @Override
@@ -283,14 +288,14 @@ public abstract class LessSource {
     public StringSource(String content) {
       this(content, "");
     }
-    
+
     public StringSource(String content, String name) {
       this.content = content;
       this.name = name;
     }
 
     @Override
-    public URI getAbsoluteURI() {
+    public URI getURI() {
       return null;
     }
 

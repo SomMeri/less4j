@@ -9,6 +9,13 @@ import org.json.JSONObject;
 
 public class JSONUtils {
 
+  public static String getString(JSONObject object, String propertyName) throws JSONException {
+    if (object.has(propertyName))
+      return object.getString(propertyName);
+
+    return null;
+  }
+
   public static List<String> getStringList(JSONObject object, String propertyName) throws JSONException {
     if (object.has(propertyName))
       return toStringList(object.getJSONArray(propertyName));

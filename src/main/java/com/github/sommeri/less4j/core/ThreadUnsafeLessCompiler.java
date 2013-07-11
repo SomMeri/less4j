@@ -30,18 +30,28 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   @Override
-  public CompilationResult compile(File inputFile) throws Less4jException {
-    return compile(new LessSource.FileSource(inputFile));
+  public CompilationResult compile(String lessContent, Configuration options) throws Less4jException {
+    return compile(new LessSource.StringSource(lessContent), options);
   }
 
   @Override
-  public CompilationResult compile(File inputFile, Configuration sourceMapOptions) throws Less4jException {
-    return compile(new LessSource.FileSource(inputFile), sourceMapOptions);
+  public CompilationResult compile(File lessFile) throws Less4jException {
+    return compile(new LessSource.FileSource(lessFile));
   }
 
   @Override
-  public CompilationResult compile(URL inputURL) throws Less4jException {
-    return compile(new LessSource.URLSource(inputURL));
+  public CompilationResult compile(File lessFile, Configuration options) throws Less4jException {
+    return compile(new LessSource.FileSource(lessFile), options);
+  }
+
+  @Override
+  public CompilationResult compile(URL lessURL) throws Less4jException {
+    return compile(new LessSource.URLSource(lessURL));
+  }
+
+  @Override
+  public CompilationResult compile(URL lessURL, Configuration options) throws Less4jException {
+    return compile(new LessSource.URLSource(lessURL), options);
   }
 
   @Override
@@ -50,18 +60,18 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   @Override
-  public CompilationResult compile(LessSource source, Configuration sourceMapOptions) throws Less4jException {
+  public CompilationResult compile(LessSource source, Configuration options) throws Less4jException {
     problemsHandler = new ProblemsHandler();
     astBuilder = new ASTBuilder(problemsHandler);
     compiler = new LessToCssCompiler(problemsHandler);
-    CompilationResult compilationResult = doCompile(source, sourceMapOptions);
+    CompilationResult compilationResult = doCompile(source, options);
     if (problemsHandler.hasErrors()) {
       throw new Less4jException(problemsHandler.getErrors(), compilationResult);
     }
     return compilationResult;
   }
 
-  private CompilationResult doCompile(LessSource source, Configuration sourceMapOptions) throws Less4jException {
+  private CompilationResult doCompile(LessSource source, Configuration options) throws Less4jException {
     ANTLRParser.ParseResult result;
     try {
       result = parser.parseStyleSheet(source.getContent(), source);
@@ -78,12 +88,12 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source);
 
-    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, sourceMapOptions);
+    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, options);
     return compilationResult;
   }
 
-  private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration sourceMapOptions) {
-    LessSource cssDestination = sourceMapOptions == null ? null : sourceMapOptions.getCssResultLocation();
+  private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration options) {
+    LessSource cssDestination = options == null ? null : options.getCssResultLocation();
     
     CssPrinter builder = new CssPrinter(lessSource, cssDestination);
     builder.append(cssStyleSheet);

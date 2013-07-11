@@ -5,7 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,21 +32,38 @@ public class SourceMapValidator {
   private static final String INTERPOLATED_SYMBOLS_PROPERTY = "interpolatedNames";
   private static final String SYMBOLS_PROPERTY = "names";
   private static final String SOURCES_PROPERTY = "sources";
+  private static final String CSS_FILE_PROPERTY = "file";
+  private static final String SOURCE_ROOT_PROPERTY = "sourceRoot";
 
   private Map<String, MappedFile> mappedFiles = new HashMap<String, MappedFile>();
+  private Map<String, String> contents = new HashMap<String, String>();
 
   public SourceMapValidator() {
   }
 
-  //FIXME: source map - get rid of root param -- both add and read it from map
-  public void validateSourceMap(File lessFile, CompilationResult compilationResult, File root, File mapdataFile) {
+  public SourceMapValidator(Map<String, String> contents) {
+    this.contents = contents;
+  }
+
+  public void validateSourceMap(CompilationResult compilationResult, File mapdataFile) {
+    validateSourceMap(compilationResult, mapdataFile, null);
+  }
+
+  public void validateSourceMap(CompilationResult compilationResult, File mapdataFile, File cssFileLocation) {
     SourceMapConsumerV3 sourceMap = parseGeneratedMap(compilationResult);
 
     Mapdata mapdata = checkAgainstMapdataFile(sourceMap, mapdataFile);
-    loadMappedSourceFiles(sourceMap.getOriginalSources(), root);
+    loadMappedSourceFiles(sourceMap.getOriginalSources(), getSourceRoot(cssFileLocation));
 
     MappingEntryValidation mappingEntryValidation = new MappingEntryValidation(mapdata);
     sourceMap.visitMappings(mappingEntryValidation);
+  }
+
+  private String getSourceRoot(File cssFileLocation) {
+    if (cssFileLocation != null)
+      return URIUtils.addPLatformSlashIfNeeded(cssFileLocation.getParentFile().getAbsolutePath());
+
+    return "";
   }
 
   private SourceMapConsumerV3 parseGeneratedMap(CompilationResult compilationResult) {
@@ -60,11 +80,17 @@ public class SourceMapValidator {
     Mapdata expectedMapdata = loadMapdata(mapdataFile);
 
     // validate mapdata file
-    if (expectedMapdata.hasSources()) { 
+    if (expectedMapdata.hasSources()) {
       CustomAssertions.assertEqualsAsSets(expectedMapdata.getSources(), sourceMap.getOriginalSources());
     }
     if (expectedMapdata.hasSymbols()) {
       CustomAssertions.assertEqualsAsSets(expectedMapdata.getSymbols(), allSymbols(sourceMap));
+    }
+    if (expectedMapdata.hasFile()) {
+      assertEquals(expectedMapdata.getFile(), sourceMap.getFile());
+    }
+    if (expectedMapdata.hasSourceRoot()) {
+      assertEquals(expectedMapdata.getSourceRoot(), sourceMap.getSourceRoot());
     }
     return expectedMapdata;
   }
@@ -87,18 +113,19 @@ public class SourceMapValidator {
       List<String> expectedSources = JSONUtils.getStringList(mapdata, SOURCES_PROPERTY);
       List<String> expectedSymbols = JSONUtils.getStringList(mapdata, SYMBOLS_PROPERTY);
       List<String> interpolatedSymbols = JSONUtils.getStringList(mapdata, INTERPOLATED_SYMBOLS_PROPERTY);
+      String file = JSONUtils.getString(mapdata, CSS_FILE_PROPERTY);
+      String sourceRoot = JSONUtils.getString(mapdata, SOURCE_ROOT_PROPERTY);
 
-      return new Mapdata(expectedSources, expectedSymbols, interpolatedSymbols);
+      return new Mapdata(expectedSources, expectedSymbols, interpolatedSymbols, file, sourceRoot);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
   }
 
-  private void loadMappedSourceFiles(Collection<String> originalSources, File root) {
+  private void loadMappedSourceFiles(Collection<String> originalSources, String root) {
     for (String name : originalSources) {
       try {
-        File file = new File(root, URLDecoder.decode(name, "utf-8"));
-        String content = IOUtils.toString(new FileReader(file));
+        String content = getFileContent(root, name);
         String[] lines = content.split("\r?\n|\r");
         MappedFile mapped = new MappedFile(lines);
         mappedFiles.put(name, mapped);
@@ -106,6 +133,16 @@ public class SourceMapValidator {
         fail("Could not read source file " + name);
       }
     }
+
+  }
+
+  private String getFileContent(String root, String name) throws UnsupportedEncodingException, IOException, FileNotFoundException {
+    if (contents.containsKey(name))
+      return contents.get(name);
+
+    File file = new File(root + URLDecoder.decode(name, "utf-8"));
+    String content = IOUtils.toString(new FileReader(file));
+    return content;
   }
 
   private final class SymbolsCollector implements EntryVisitor {
@@ -140,7 +177,7 @@ public class SourceMapValidator {
       MappedFile mappedFile = mappedFiles.get(sourceName);
       if (symbolName != null && !mapdata.isInterpolated(symbolName)) {
         String sourceSnippet = mappedFile.getSnippet(sourceStartPosition, symbolName.length());
-        
+
         assertNotNull(sourceName + ": css symbol " + symbolName + " " + startPosition + " is mapped non-existent source position  " + sourceStartPosition, sourceSnippet);
         assertEquals(sourceName + ": css symbol " + symbolName + " " + startPosition + " is mapped to less " + sourceSnippet + " " + sourceStartPosition, symbolName, sourceSnippet);
       }
@@ -179,11 +216,15 @@ class Mapdata {
   private List<String> sources = null;
   private List<String> symbols = null;
   private List<String> interpolatedSymbols = null;
+  private String file;
+  private String sourceRoot;
 
-  public Mapdata(List<String> sources, List<String> symbols, List<String> interpolatedSymbols) {
+  public Mapdata(List<String> sources, List<String> symbols, List<String> interpolatedSymbols, String file, String sourceRoot) {
     this.sources = sources;
     this.symbols = symbols;
     this.interpolatedSymbols = interpolatedSymbols;
+    this.file = file;
+    this.sourceRoot = sourceRoot;
   }
 
   public Mapdata() {
@@ -215,6 +256,22 @@ class Mapdata {
 
   public boolean isInterpolated(String symbolName) {
     return hasInterpolatedSymbols() && interpolatedSymbols.contains(symbolName);
+  }
+
+  public String getFile() {
+    return file;
+  }
+
+  public boolean hasFile() {
+    return file != null;
+  }
+
+  public String getSourceRoot() {
+    return sourceRoot;
+  }
+
+  public boolean hasSourceRoot() {
+    return sourceRoot != null;
   }
 
 }
