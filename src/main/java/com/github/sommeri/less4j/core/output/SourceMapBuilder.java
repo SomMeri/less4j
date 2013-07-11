@@ -57,7 +57,6 @@ public class SourceMapBuilder implements ISourceMapBuilder {
   }
 
   private String toSourceName(HiddenTokenAwareTree underlyingStructure) {
-    //FIXME: source map: fails with nulls and bad data
     return URIUtils.relativizeSourceURIs(cssDestination, underlyingStructure.getSource());
   }
   

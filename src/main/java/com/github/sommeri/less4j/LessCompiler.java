@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-//FIXME: source map: assume by default that source map, css and original less are all in the same directory
-//FIXME: source map: API unit tests
 public interface LessCompiler {
 
   public CompilationResult compile(String lessContent) throws Less4jException;

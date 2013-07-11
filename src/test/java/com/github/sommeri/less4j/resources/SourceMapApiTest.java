@@ -1,8 +1,10 @@
 package com.github.sommeri.less4j.resources;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.utils.SourceMapValidator;
 
@@ -21,8 +24,20 @@ public class SourceMapApiTest {
   public static final String NO_IMPORT_LESS_INPUT = ".class { color: red; }";
   public static final String NO_DATA_AVAILABLE_MAPDATA = "src/test/resources/source-map/api/no-location-available.mapdata";
   public static final String FAKE_CSS_DATA_AVAILABLE_MAPDATA = "src/test/resources/source-map/api/fake-css-available.mapdata";
+  public static final String FAKE_URL_DATA_AVAILABLE_MAPDATA = "src/test/resources/source-map/api/fake-url-available.mapdata";
   public static final String FAKE_CSS_RESULT_LOCATION = "src/test/resources/source-map/api/does-not-exists.css";
   public static final File FAKE_CSS_RESULT_FILE = new File(FAKE_CSS_RESULT_LOCATION);
+
+  public static final String FAKE_URL_RESULT_LOCATION = "http://www.somewhere.com/dummy.html#here?parameter=value";
+  public static final URL FAKE_URL_RESULT_URL = toUrl();
+
+  private static URL toUrl() {
+    try {
+      return new URL(FAKE_URL_RESULT_LOCATION);
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   public static final String ONE_IMPORT_LESS_PATH = "src/test/resources/source-map/api/file-import.less";
   public static final File ONE_IMPORT_LESS_FILE = new File(ONE_IMPORT_LESS_PATH);
@@ -74,6 +89,21 @@ public class SourceMapApiTest {
   }
  
   @Test
+  public void stringWithURLConfiguration() throws Less4jException {
+    Configuration configuration = new Configuration();
+    configuration.setCssResultLocation(new LessSource.URLSource(FAKE_URL_RESULT_URL));
+    
+    LessCompiler compiler = new DefaultLessCompiler();
+    CompilationResult compilationResult = compiler.compile(NO_IMPORT_LESS_INPUT, configuration);
+    
+    assertNotNull(compilationResult.getCss());
+    assertNotNull(compilationResult.getSourceMap());
+    
+    SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
+    validator.validateSourceMap(compilationResult, new File(FAKE_URL_DATA_AVAILABLE_MAPDATA));
+  }
+ 
+  @Test
   public void file() throws Less4jException {
     LessCompiler compiler = new DefaultLessCompiler();
     CompilationResult compilationResult = compiler.compile(ONE_IMPORT_LESS_FILE);
@@ -112,6 +142,4 @@ public class SourceMapApiTest {
     validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_CSS_KNOWN_MAPDATA), FAKE_CSS_RESULT_FILE);
   }
   
-
-  //FIXME: source map test lesssource with combinations
 }

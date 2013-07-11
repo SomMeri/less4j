@@ -15,7 +15,6 @@ import org.junit.runners.Parameterized.Parameters;
  * 
  */
 //@Ignore
-//FIXME: source map: stuff inside -moz-def should cause source maps too - and create separate test out of it
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends SourceMapAbstractFileBasedTest {
 

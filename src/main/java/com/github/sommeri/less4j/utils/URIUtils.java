@@ -48,7 +48,6 @@ public class URIUtils {
     if (from==null || from.getURI()==null)
       return to.getURI().toString();
     
-    //FIXME: source map - (!!!) I used absolute uri here originally, but it does not make sense in some situations - rething
     String fromURI = from.getURI().toString();
     String toURI = to.getURI().toString();
 
