@@ -383,7 +383,6 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     appendField(out, name, "");
   }
 
-  @SuppressWarnings("unused")
   private static void appendFieldEnd(Appendable out)
      throws IOException {
   }
