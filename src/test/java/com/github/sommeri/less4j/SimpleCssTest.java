@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -14,9 +15,9 @@ import org.junit.runners.Parameterized.Parameters;
  * from the master branch.
  * 
  */
-//@Ignore
+@Ignore
 @RunWith(Parameterized.class)
-public class SimpleCssTest extends SourceMapAbstractFileBasedTest {
+public class SimpleCssTest extends AbstractErrorReportingTest {
 
   private static final String inputLess = "src/test/resources/minitests/debug1.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
@@ -57,15 +58,15 @@ public class SimpleCssTest extends SourceMapAbstractFileBasedTest {
   // ***********************************************************************
   // *** fail but it is OK - not implemented in less-1.3.0.js
 
-  public SimpleCssTest(File inputFile, File cssFile, File mapdataFile, String testName) {
-    super(inputFile, cssFile, mapdataFile, testName);
+  public SimpleCssTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
-  @Parameters(name="Less: {3}")
+  @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
     //justWait();
     Collection<Object[]> result = new ArrayList<Object[]>();
-    result.add(new Object[] { new File(inputLess), new File(outputCss), new File(mapdata), inputLess });
+    result.add(new Object[] { new File(inputLess), new File(outputCss), null, new File(mapdata), inputLess });
     return result;
   }
 

@@ -24,8 +24,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 /**
  * Collects information mapping the generated (compiled) source back to
  * its original source for debugging purposes.
@@ -179,7 +177,7 @@ public class SourceMapGeneratorV1 implements SourceMapGenerator {
    */
   @Override
   public void addMapping(
-      String sourceName, @Nullable String symbolName,
+      String sourceName, String symbolName,
       FilePosition sourceStartPosition,
       FilePosition startPosition, FilePosition endPosition) {
 

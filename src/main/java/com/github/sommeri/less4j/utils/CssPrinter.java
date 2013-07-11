@@ -70,15 +70,13 @@ import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
 import com.github.sommeri.less4j.core.ast.Viewport;
 import com.github.sommeri.less4j.core.output.ExtendedStringBuilder;
-import com.github.sommeri.less4j.core.output.ISourceMapBuilder;
-import com.github.sommeri.less4j.core.output.NullSourceMapBuilder;
 import com.github.sommeri.less4j.core.output.SourceMapBuilder;
 
 public class CssPrinter {
 
   private static final String ERROR = "!#error#!";
   protected ExtendedStringBuilder cssOnly = new ExtendedStringBuilder();
-  protected ISourceMapBuilder cssAndSM = new NullSourceMapBuilder(cssOnly);
+  protected SourceMapBuilder cssAndSM = new SourceMapBuilder(cssOnly, null, null);
   
   private static final DecimalFormat FORMATTER = createFormatter();
   private LessSource lessSource;
@@ -594,13 +592,10 @@ public class CssPrinter {
 
   private Iterable<CssPrinter> collectUniqueBodyMembersStrings(Body body) {
     // the same declaration must be printed only once
-    //FIXME: source map related clean this up (!)
     LastOfKindSet<String, CssPrinter> declarationsStrings = new LastOfKindSet<String, CssPrinter>();
     for (ASTCssNode declaration : body.getMembers()) {
       CssPrinter miniPrinter = new CssPrinter(this);
 
-      //FIXME: source map: add test that this generates source map (per symbols is enough)
-      miniPrinter.cssAndSM = new SourceMapBuilder(miniPrinter.cssOnly, lessSource, cssDestination); 
       miniPrinter.append(declaration);
       miniPrinter.cssOnly.ensureNewLine();
 

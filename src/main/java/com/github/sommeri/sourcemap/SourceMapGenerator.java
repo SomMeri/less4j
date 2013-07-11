@@ -20,8 +20,6 @@ package com.github.sommeri.sourcemap;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 /**
  * Collects information mapping the generated (compiled) source back to
  * its original source for debugging purposes
@@ -70,7 +68,7 @@ public interface SourceMapGenerator {
    * @param outputStartPosition The position on the starting line
    * @param outputEndPosition The position on the ending line.
    */
-  void addMapping(String sourceName, @Nullable String symbolName,
+  void addMapping(String sourceName, String symbolName,
            FilePosition sourceStartPosition,
            FilePosition outputStartPosition, FilePosition outputEndPosition);
 

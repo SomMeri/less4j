@@ -1,11 +1,8 @@
 package com.github.sommeri.less4j.core.output;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
-import com.github.sommeri.sourcemap.SourceMapFormat;
-import com.github.sommeri.sourcemap.SourceMapGenerator;
-import com.github.sommeri.sourcemap.SourceMapGeneratorFactory;
 
-public class NullSourceMapBuilder implements ISourceMapBuilder {
+public class NullSourceMapBuilder {
 
   private final ExtendedStringBuilder cssBuilder;
 
@@ -13,7 +10,6 @@ public class NullSourceMapBuilder implements ISourceMapBuilder {
     this.cssBuilder = cssBuilder;
   }
 
-  @Override
   public void appendAsSymbol(String str, HiddenTokenAwareTree underlyingStructure) {
     cssBuilder.append(str);
   }
@@ -22,18 +18,11 @@ public class NullSourceMapBuilder implements ISourceMapBuilder {
     return cssBuilder;
   }
 
-  @Override
   public String toSourceMap() {
     return null;
   }
 
-  @Override
-  public SourceMapGenerator getInternalGenerator() {
-    return SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
-  }
-
-  @Override
-  public void append(ISourceMapBuilder other) {
+  public void append(SourceMapBuilder other) {
     cssBuilder.appendAsIs(other.getCssBuilder().toString());
   }
 

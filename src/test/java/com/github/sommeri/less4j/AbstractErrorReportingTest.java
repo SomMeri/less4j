@@ -49,7 +49,7 @@ public abstract class AbstractErrorReportingTest {
   public final void compileAndCompare() {
     try {
       CompilationResult actual = compile(lessFile, cssOutput);
-      System.out.println(actual.getSourceMap());
+      //System.out.println(actual.getSourceMap());
       assertCorrectWarnings(actual);
       assertSourceMapValid(actual);
     } catch (Less4jException ex) {

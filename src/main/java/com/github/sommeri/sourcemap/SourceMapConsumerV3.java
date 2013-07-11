@@ -696,10 +696,9 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     if (pending) {
       FilePosition endPosition = new FilePosition(startPosition.getLine(), startPosition.getColumn());
       visitor.visit(sourceName, symbolName, sourceStartPosition, startPosition, endPosition);
-
     }
 
-    //FIXME: source map - investigate and maybe fill bug to closure - they generate additional mappings to mark ends which is weird.
+    //TODO: source map (closure) - investigate and maybe fill bug to closure - they generate additional mappings to mark ends which is weird.
 
   }
 }

@@ -11,7 +11,7 @@ import com.github.sommeri.sourcemap.SourceMapGenerator;
 import com.github.sommeri.sourcemap.SourceMapGeneratorFactory;
 
 //FIXME: source map: Line 6: An optional list of source content, useful when the "source" can be hosted. - use it in case of input string source
-public class SourceMapBuilder implements ISourceMapBuilder {
+public class SourceMapBuilder {
 
   private final ExtendedStringBuilder cssBuilder;
   private final SourceMapGenerator generator;
@@ -26,10 +26,6 @@ public class SourceMapBuilder implements ISourceMapBuilder {
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
   }
 
-  /* (non-Javadoc)
-   * @see com.github.sommeri.less4j.core.output.IISourceMapBuilder#appendAsSymbol(java.lang.String, com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree)
-   */
-  @Override
   public void appendAsSymbol(String str, HiddenTokenAwareTree underlyingStructure) {
     FilePosition outputStartPosition = new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
     cssBuilder.append(str);
@@ -40,17 +36,13 @@ public class SourceMapBuilder implements ISourceMapBuilder {
     generator.addMapping(sourceName, str, sourceStartPosition, outputStartPosition, outputEndPosition);
   }
   
-  public void append(ISourceMapBuilder other) {
+  public void append(SourceMapBuilder other) {
     FilePosition offset = new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
-    cssBuilder.appendAsIs(other.getCssBuilder().toString());
-    SourceMapGenerator otherGenerator = other.getInternalGenerator();
+    cssBuilder.appendAsIs(other.cssBuilder.toString());
+    SourceMapGenerator otherGenerator = other.generator;
     generator.offsetAndAppend(otherGenerator, offset);
   }
 
-  public ExtendedStringBuilder getCssBuilder() {
-    return cssBuilder;
-  }
-  
   private FilePosition toFilePosition(HiddenTokenAwareTree underlyingStructure) {
     FilePosition result = new FilePosition(underlyingStructure.getLine()-1, underlyingStructure.getCharPositionInLine()-1);
     return result;
@@ -60,7 +52,6 @@ public class SourceMapBuilder implements ISourceMapBuilder {
     return URIUtils.relativizeSourceURIs(cssDestination, underlyingStructure.getSource());
   }
   
-  @Override
   public String toSourceMap() {
     String name = URIUtils.relativizeSourceURIs(lessSource, cssDestination);
     try {
@@ -72,9 +63,8 @@ public class SourceMapBuilder implements ISourceMapBuilder {
     }
   }
 
-  @Override
-  public SourceMapGenerator getInternalGenerator() {
-    return generator;
+  protected ExtendedStringBuilder getCssBuilder() {
+    return cssBuilder;
   }
 
 }

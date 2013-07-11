@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
-
 /**
  * Collects information mapping the generated (compiled) source back to
  * its original source for debugging purposes.
@@ -161,7 +159,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
    */
   @Override
   public void addMapping(
-      String sourceName, @Nullable String symbolName,
+      String sourceName, String symbolName,
       FilePosition sourceStartPosition,
       FilePosition startPosition, FilePosition endPosition) {
 

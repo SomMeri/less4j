@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -161,7 +159,7 @@ public class SourceMapGeneratorV2 implements SourceMapGenerator {
    */
   @Override
   public void addMapping(
-      String sourceName, @Nullable String symbolName,
+      String sourceName, String symbolName,
       FilePosition sourceStartPosition,
       FilePosition startPosition, FilePosition endPosition) {
 
