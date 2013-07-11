@@ -54,8 +54,7 @@ public abstract class AbstractFileBasedTest {
         throw new ComparisonFailure (fail.getMessage(), fail.getExpected(), fail.getActual());
       }
       if (ex instanceof AssertionError) {
-        AssertionError fail = (AssertionError)ex;
-        throw new AssertionError (fail.getMessage(), fail);
+        throw (AssertionError)ex;
       }
       throw new RuntimeException(ex.getMessage(), ex);
     }
