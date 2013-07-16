@@ -4,25 +4,27 @@
 package com.github.sommeri.sourcemap;
 
 public final class Mapping {
-  private Mapping() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
+  private Mapping() {
   }
-  public interface LineMappingOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+
+  public static void registerAllExtensions(com.google.protobuf.ExtensionRegistry registry) {
+  }
+
+  public interface LineMappingOrBuilder extends com.google.protobuf.MessageOrBuilder {
 
     // optional int32 line_number = 1;
     /**
      * <code>optional int32 line_number = 1;</code>
-     *
+     * 
      * <pre>
      * The line number of the generated code.
      * </pre>
      */
     boolean hasLineNumber();
+
     /**
      * <code>optional int32 line_number = 1;</code>
-     *
+     * 
      * <pre>
      * The line number of the generated code.
      * </pre>
@@ -32,15 +34,16 @@ public final class Mapping {
     // optional int32 column_position = 2;
     /**
      * <code>optional int32 column_position = 2;</code>
-     *
+     * 
      * <pre>
      * The column position on the line.
      * </pre>
      */
     boolean hasColumnPosition();
+
     /**
      * <code>optional int32 column_position = 2;</code>
-     *
+     * 
      * <pre>
      * The column position on the line.
      * </pre>
@@ -50,48 +53,53 @@ public final class Mapping {
     // optional .sourcemap.OriginalMapping original_mapping = 3;
     /**
      * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-     *
+     * 
      * <pre>
      * The original mapping for this line mapping.
      * </pre>
      */
     boolean hasOriginalMapping();
+
     /**
      * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-     *
+     * 
      * <pre>
      * The original mapping for this line mapping.
      * </pre>
      */
     com.github.sommeri.sourcemap.Mapping.OriginalMapping getOriginalMapping();
+
     /**
      * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-     *
+     * 
      * <pre>
      * The original mapping for this line mapping.
      * </pre>
      */
     com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder getOriginalMappingOrBuilder();
   }
+
   /**
    * Protobuf type {@code sourcemap.LineMapping}
-   *
+   * 
    * <pre>
    * Maps a position on a given line to the mapping describing
    * the original code.
    * </pre>
    */
-  public static final class LineMapping extends
-      com.google.protobuf.GeneratedMessage
-      implements LineMappingOrBuilder {
+  public static final class LineMapping extends com.google.protobuf.GeneratedMessage implements LineMappingOrBuilder {
     // Use LineMapping.newBuilder() to construct.
     private LineMapping(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private LineMapping(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private LineMapping(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
 
     private static final LineMapping defaultInstance;
+
     public static LineMapping getDefaultInstance() {
       return defaultInstance;
     }
@@ -101,87 +109,75 @@ public final class Mapping {
     }
 
     private final com.google.protobuf.UnknownFieldSet unknownFields;
+
     @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
       return this.unknownFields;
     }
-    private LineMapping(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    private LineMapping(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
       initFields();
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
           int tag = input.readTag();
           switch (tag) {
-            case 0:
+          case 0:
+            done = true;
+            break;
+          default: {
+            if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
               done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
             }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              lineNumber_ = input.readInt32();
-              break;
+            break;
+          }
+          case 8: {
+            bitField0_ |= 0x00000001;
+            lineNumber_ = input.readInt32();
+            break;
+          }
+          case 16: {
+            bitField0_ |= 0x00000002;
+            columnPosition_ = input.readInt32();
+            break;
+          }
+          case 26: {
+            com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder subBuilder = null;
+            if (((bitField0_ & 0x00000004) == 0x00000004)) {
+              subBuilder = originalMapping_.toBuilder();
             }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              columnPosition_ = input.readInt32();
-              break;
+            originalMapping_ = input.readMessage(com.github.sommeri.sourcemap.Mapping.OriginalMapping.PARSER, extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(originalMapping_);
+              originalMapping_ = subBuilder.buildPartial();
             }
-            case 26: {
-              com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                subBuilder = originalMapping_.toBuilder();
-              }
-              originalMapping_ = input.readMessage(com.github.sommeri.sourcemap.Mapping.OriginalMapping.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(originalMapping_);
-                originalMapping_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000004;
-              break;
-            }
+            bitField0_ |= 0x00000004;
+            break;
+          }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new com.google.protobuf.InvalidProtocolBufferException(e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
       return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_LineMapping_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_LineMapping_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.github.sommeri.sourcemap.Mapping.LineMapping.class, com.github.sommeri.sourcemap.Mapping.LineMapping.Builder.class);
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+      return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_LineMapping_fieldAccessorTable.ensureFieldAccessorsInitialized(com.github.sommeri.sourcemap.Mapping.LineMapping.class, com.github.sommeri.sourcemap.Mapping.LineMapping.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<LineMapping> PARSER =
-        new com.google.protobuf.AbstractParser<LineMapping>() {
-      public LineMapping parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.google.protobuf.Parser<LineMapping> PARSER = new com.google.protobuf.AbstractParser<LineMapping>() {
+      public LineMapping parsePartialFrom(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
         return new LineMapping(input, extensionRegistry);
       }
     };
@@ -195,9 +191,10 @@ public final class Mapping {
     // optional int32 line_number = 1;
     public static final int LINE_NUMBER_FIELD_NUMBER = 1;
     private int lineNumber_;
+
     /**
      * <code>optional int32 line_number = 1;</code>
-     *
+     * 
      * <pre>
      * The line number of the generated code.
      * </pre>
@@ -205,9 +202,10 @@ public final class Mapping {
     public boolean hasLineNumber() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>optional int32 line_number = 1;</code>
-     *
+     * 
      * <pre>
      * The line number of the generated code.
      * </pre>
@@ -219,9 +217,10 @@ public final class Mapping {
     // optional int32 column_position = 2;
     public static final int COLUMN_POSITION_FIELD_NUMBER = 2;
     private int columnPosition_;
+
     /**
      * <code>optional int32 column_position = 2;</code>
-     *
+     * 
      * <pre>
      * The column position on the line.
      * </pre>
@@ -229,9 +228,10 @@ public final class Mapping {
     public boolean hasColumnPosition() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+
     /**
      * <code>optional int32 column_position = 2;</code>
-     *
+     * 
      * <pre>
      * The column position on the line.
      * </pre>
@@ -243,9 +243,10 @@ public final class Mapping {
     // optional .sourcemap.OriginalMapping original_mapping = 3;
     public static final int ORIGINAL_MAPPING_FIELD_NUMBER = 3;
     private com.github.sommeri.sourcemap.Mapping.OriginalMapping originalMapping_;
+
     /**
      * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-     *
+     * 
      * <pre>
      * The original mapping for this line mapping.
      * </pre>
@@ -253,9 +254,10 @@ public final class Mapping {
     public boolean hasOriginalMapping() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+
     /**
      * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-     *
+     * 
      * <pre>
      * The original mapping for this line mapping.
      * </pre>
@@ -263,9 +265,10 @@ public final class Mapping {
     public com.github.sommeri.sourcemap.Mapping.OriginalMapping getOriginalMapping() {
       return originalMapping_;
     }
+
     /**
      * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-     *
+     * 
      * <pre>
      * The original mapping for this line mapping.
      * </pre>
@@ -279,17 +282,19 @@ public final class Mapping {
       columnPosition_ = 0;
       originalMapping_ = com.github.sommeri.sourcemap.Mapping.OriginalMapping.getDefaultInstance();
     }
+
     private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1)
+        return isInitialized == 1;
 
       memoizedIsInitialized = 1;
       return true;
     }
 
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+    public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, lineNumber_);
@@ -304,22 +309,21 @@ public final class Mapping {
     }
 
     private int memoizedSerializedSize = -1;
+
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1)
+        return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, lineNumber_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(1, lineNumber_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, columnPosition_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(2, columnPosition_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, originalMapping_);
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(3, originalMapping_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -327,99 +331,89 @@ public final class Mapping {
     }
 
     private static final long serialVersionUID = 0L;
+
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(com.google.protobuf.ByteString data) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(com.google.protobuf.ByteString data, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(byte[] data) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(byte[] data, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(java.io.InputStream input) throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseDelimitedFrom(java.io.InputStream input) throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseDelimitedFrom(java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.github.sommeri.sourcemap.Mapping.LineMapping parseFrom(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
     public static Builder newBuilder(com.github.sommeri.sourcemap.Mapping.LineMapping prototype) {
       return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() { return newBuilder(this); }
+
+    public Builder toBuilder() {
+      return newBuilder(this);
+    }
 
     @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+    protected Builder newBuilderForType(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      * Protobuf type {@code sourcemap.LineMapping}
-     *
+     * 
      * <pre>
      * Maps a position on a given line to the mapping describing
      * the original code.
      * </pre>
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.github.sommeri.sourcemap.Mapping.LineMappingOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
+    public static final class Builder extends com.google.protobuf.GeneratedMessage.Builder<Builder> implements com.github.sommeri.sourcemap.Mapping.LineMappingOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
         return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_LineMapping_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_LineMapping_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.github.sommeri.sourcemap.Mapping.LineMapping.class, com.github.sommeri.sourcemap.Mapping.LineMapping.Builder.class);
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+        return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_LineMapping_fieldAccessorTable.ensureFieldAccessorsInitialized(com.github.sommeri.sourcemap.Mapping.LineMapping.class, com.github.sommeri.sourcemap.Mapping.LineMapping.Builder.class);
       }
 
       // Construct using com.github.sommeri.sourcemap.Mapping.LineMapping.newBuilder()
@@ -427,16 +421,17 @@ public final class Mapping {
         maybeForceBuilderInitialization();
       }
 
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      private Builder(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getOriginalMappingFieldBuilder();
         }
       }
+
       private static Builder create() {
         return new Builder();
       }
@@ -460,8 +455,7 @@ public final class Mapping {
         return create().mergeFrom(buildPartial());
       }
 
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
         return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_LineMapping_descriptor;
       }
 
@@ -504,7 +498,7 @@ public final class Mapping {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.github.sommeri.sourcemap.Mapping.LineMapping) {
-          return mergeFrom((com.github.sommeri.sourcemap.Mapping.LineMapping)other);
+          return mergeFrom((com.github.sommeri.sourcemap.Mapping.LineMapping) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -512,7 +506,8 @@ public final class Mapping {
       }
 
       public Builder mergeFrom(com.github.sommeri.sourcemap.Mapping.LineMapping other) {
-        if (other == com.github.sommeri.sourcemap.Mapping.LineMapping.getDefaultInstance()) return this;
+        if (other == com.github.sommeri.sourcemap.Mapping.LineMapping.getDefaultInstance())
+          return this;
         if (other.hasLineNumber()) {
           setLineNumber(other.getLineNumber());
         }
@@ -530,10 +525,7 @@ public final class Mapping {
         return true;
       }
 
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      public Builder mergeFrom(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
         com.github.sommeri.sourcemap.Mapping.LineMapping parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -547,13 +539,15 @@ public final class Mapping {
         }
         return this;
       }
+
       private int bitField0_;
 
       // optional int32 line_number = 1;
-      private int lineNumber_ ;
+      private int lineNumber_;
+
       /**
        * <code>optional int32 line_number = 1;</code>
-       *
+       * 
        * <pre>
        * The line number of the generated code.
        * </pre>
@@ -561,9 +555,10 @@ public final class Mapping {
       public boolean hasLineNumber() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>optional int32 line_number = 1;</code>
-       *
+       * 
        * <pre>
        * The line number of the generated code.
        * </pre>
@@ -571,9 +566,10 @@ public final class Mapping {
       public int getLineNumber() {
         return lineNumber_;
       }
+
       /**
        * <code>optional int32 line_number = 1;</code>
-       *
+       * 
        * <pre>
        * The line number of the generated code.
        * </pre>
@@ -584,9 +580,10 @@ public final class Mapping {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional int32 line_number = 1;</code>
-       *
+       * 
        * <pre>
        * The line number of the generated code.
        * </pre>
@@ -599,10 +596,11 @@ public final class Mapping {
       }
 
       // optional int32 column_position = 2;
-      private int columnPosition_ ;
+      private int columnPosition_;
+
       /**
        * <code>optional int32 column_position = 2;</code>
-       *
+       * 
        * <pre>
        * The column position on the line.
        * </pre>
@@ -610,9 +608,10 @@ public final class Mapping {
       public boolean hasColumnPosition() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+
       /**
        * <code>optional int32 column_position = 2;</code>
-       *
+       * 
        * <pre>
        * The column position on the line.
        * </pre>
@@ -620,9 +619,10 @@ public final class Mapping {
       public int getColumnPosition() {
         return columnPosition_;
       }
+
       /**
        * <code>optional int32 column_position = 2;</code>
-       *
+       * 
        * <pre>
        * The column position on the line.
        * </pre>
@@ -633,9 +633,10 @@ public final class Mapping {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional int32 column_position = 2;</code>
-       *
+       * 
        * <pre>
        * The column position on the line.
        * </pre>
@@ -649,11 +650,11 @@ public final class Mapping {
 
       // optional .sourcemap.OriginalMapping original_mapping = 3;
       private com.github.sommeri.sourcemap.Mapping.OriginalMapping originalMapping_ = com.github.sommeri.sourcemap.Mapping.OriginalMapping.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          com.github.sommeri.sourcemap.Mapping.OriginalMapping, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder, com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder> originalMappingBuilder_;
+      private com.google.protobuf.SingleFieldBuilder<com.github.sommeri.sourcemap.Mapping.OriginalMapping, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder, com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder> originalMappingBuilder_;
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
@@ -661,9 +662,10 @@ public final class Mapping {
       public boolean hasOriginalMapping() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
@@ -675,9 +677,10 @@ public final class Mapping {
           return originalMappingBuilder_.getMessage();
         }
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
@@ -695,15 +698,15 @@ public final class Mapping {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
        */
-      public Builder setOriginalMapping(
-          com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder builderForValue) {
+      public Builder setOriginalMapping(com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder builderForValue) {
         if (originalMappingBuilder_ == null) {
           originalMapping_ = builderForValue.build();
           onChanged();
@@ -713,19 +716,18 @@ public final class Mapping {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
        */
       public Builder mergeOriginalMapping(com.github.sommeri.sourcemap.Mapping.OriginalMapping value) {
         if (originalMappingBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              originalMapping_ != com.github.sommeri.sourcemap.Mapping.OriginalMapping.getDefaultInstance()) {
-            originalMapping_ =
-              com.github.sommeri.sourcemap.Mapping.OriginalMapping.newBuilder(originalMapping_).mergeFrom(value).buildPartial();
+          if (((bitField0_ & 0x00000004) == 0x00000004) && originalMapping_ != com.github.sommeri.sourcemap.Mapping.OriginalMapping.getDefaultInstance()) {
+            originalMapping_ = com.github.sommeri.sourcemap.Mapping.OriginalMapping.newBuilder(originalMapping_).mergeFrom(value).buildPartial();
           } else {
             originalMapping_ = value;
           }
@@ -736,9 +738,10 @@ public final class Mapping {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
@@ -753,9 +756,10 @@ public final class Mapping {
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
@@ -765,9 +769,10 @@ public final class Mapping {
         onChanged();
         return getOriginalMappingFieldBuilder().getBuilder();
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
@@ -779,22 +784,17 @@ public final class Mapping {
           return originalMapping_;
         }
       }
+
       /**
        * <code>optional .sourcemap.OriginalMapping original_mapping = 3;</code>
-       *
+       * 
        * <pre>
        * The original mapping for this line mapping.
        * </pre>
        */
-      private com.google.protobuf.SingleFieldBuilder<
-          com.github.sommeri.sourcemap.Mapping.OriginalMapping, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder, com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder> 
-          getOriginalMappingFieldBuilder() {
+      private com.google.protobuf.SingleFieldBuilder<com.github.sommeri.sourcemap.Mapping.OriginalMapping, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder, com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder> getOriginalMappingFieldBuilder() {
         if (originalMappingBuilder_ == null) {
-          originalMappingBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              com.github.sommeri.sourcemap.Mapping.OriginalMapping, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder, com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder>(
-                  originalMapping_,
-                  getParentForChildren(),
-                  isClean());
+          originalMappingBuilder_ = new com.google.protobuf.SingleFieldBuilder<com.github.sommeri.sourcemap.Mapping.OriginalMapping, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder, com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder>(originalMapping_, getParentForChildren(), isClean());
           originalMapping_ = null;
         }
         return originalMappingBuilder_;
@@ -811,48 +811,49 @@ public final class Mapping {
     // @@protoc_insertion_point(class_scope:sourcemap.LineMapping)
   }
 
-  public interface OriginalMappingOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface OriginalMappingOrBuilder extends com.google.protobuf.MessageOrBuilder {
 
     // optional string original_file = 1;
     /**
      * <code>optional string original_file = 1;</code>
-     *
+     * 
      * <pre>
      * The original source file.
      * </pre>
      */
     boolean hasOriginalFile();
+
     /**
      * <code>optional string original_file = 1;</code>
-     *
+     * 
      * <pre>
      * The original source file.
      * </pre>
      */
     java.lang.String getOriginalFile();
+
     /**
      * <code>optional string original_file = 1;</code>
-     *
+     * 
      * <pre>
      * The original source file.
      * </pre>
      */
-    com.google.protobuf.ByteString
-        getOriginalFileBytes();
+    com.google.protobuf.ByteString getOriginalFileBytes();
 
     // optional int32 line_number = 2;
     /**
      * <code>optional int32 line_number = 2;</code>
-     *
+     * 
      * <pre>
      * The line in the original file.
      * </pre>
      */
     boolean hasLineNumber();
+
     /**
      * <code>optional int32 line_number = 2;</code>
-     *
+     * 
      * <pre>
      * The line in the original file.
      * </pre>
@@ -862,15 +863,16 @@ public final class Mapping {
     // optional int32 column_position = 3;
     /**
      * <code>optional int32 column_position = 3;</code>
-     *
+     * 
      * <pre>
      * The column number on the line.
      * </pre>
      */
     boolean hasColumnPosition();
+
     /**
      * <code>optional int32 column_position = 3;</code>
-     *
+     * 
      * <pre>
      * The column number on the line.
      * </pre>
@@ -880,44 +882,48 @@ public final class Mapping {
     // optional string identifier = 4;
     /**
      * <code>optional string identifier = 4;</code>
-     *
+     * 
      * <pre>
      * The original name of the identifier.
      * </pre>
      */
     boolean hasIdentifier();
+
     /**
      * <code>optional string identifier = 4;</code>
-     *
+     * 
      * <pre>
      * The original name of the identifier.
      * </pre>
      */
     java.lang.String getIdentifier();
+
     /**
      * <code>optional string identifier = 4;</code>
-     *
+     * 
      * <pre>
      * The original name of the identifier.
      * </pre>
      */
-    com.google.protobuf.ByteString
-        getIdentifierBytes();
+    com.google.protobuf.ByteString getIdentifierBytes();
   }
+
   /**
    * Protobuf type {@code sourcemap.OriginalMapping}
    */
-  public static final class OriginalMapping extends
-      com.google.protobuf.GeneratedMessage
-      implements OriginalMappingOrBuilder {
+  public static final class OriginalMapping extends com.google.protobuf.GeneratedMessage implements OriginalMappingOrBuilder {
     // Use OriginalMapping.newBuilder() to construct.
     private OriginalMapping(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private OriginalMapping(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private OriginalMapping(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
 
     private static final OriginalMapping defaultInstance;
+
     public static OriginalMapping getDefaultInstance() {
       return defaultInstance;
     }
@@ -927,84 +933,72 @@ public final class Mapping {
     }
 
     private final com.google.protobuf.UnknownFieldSet unknownFields;
+
     @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
       return this.unknownFields;
     }
-    private OriginalMapping(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    private OriginalMapping(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
       initFields();
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
           int tag = input.readTag();
           switch (tag) {
-            case 0:
+          case 0:
+            done = true;
+            break;
+          default: {
+            if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
               done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
             }
-            case 10: {
-              bitField0_ |= 0x00000001;
-              originalFile_ = input.readBytes();
-              break;
-            }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              lineNumber_ = input.readInt32();
-              break;
-            }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              columnPosition_ = input.readInt32();
-              break;
-            }
-            case 34: {
-              bitField0_ |= 0x00000008;
-              identifier_ = input.readBytes();
-              break;
-            }
+            break;
+          }
+          case 10: {
+            bitField0_ |= 0x00000001;
+            originalFile_ = input.readBytes();
+            break;
+          }
+          case 16: {
+            bitField0_ |= 0x00000002;
+            lineNumber_ = input.readInt32();
+            break;
+          }
+          case 24: {
+            bitField0_ |= 0x00000004;
+            columnPosition_ = input.readInt32();
+            break;
+          }
+          case 34: {
+            bitField0_ |= 0x00000008;
+            identifier_ = input.readBytes();
+            break;
+          }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new com.google.protobuf.InvalidProtocolBufferException(e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
       return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_OriginalMapping_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_OriginalMapping_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.github.sommeri.sourcemap.Mapping.OriginalMapping.class, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder.class);
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+      return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_OriginalMapping_fieldAccessorTable.ensureFieldAccessorsInitialized(com.github.sommeri.sourcemap.Mapping.OriginalMapping.class, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<OriginalMapping> PARSER =
-        new com.google.protobuf.AbstractParser<OriginalMapping>() {
-      public OriginalMapping parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.google.protobuf.Parser<OriginalMapping> PARSER = new com.google.protobuf.AbstractParser<OriginalMapping>() {
+      public OriginalMapping parsePartialFrom(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
         return new OriginalMapping(input, extensionRegistry);
       }
     };
@@ -1018,9 +1012,10 @@ public final class Mapping {
     // optional string original_file = 1;
     public static final int ORIGINAL_FILE_FIELD_NUMBER = 1;
     private java.lang.Object originalFile_;
+
     /**
      * <code>optional string original_file = 1;</code>
-     *
+     * 
      * <pre>
      * The original source file.
      * </pre>
@@ -1028,9 +1023,10 @@ public final class Mapping {
     public boolean hasOriginalFile() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>optional string original_file = 1;</code>
-     *
+     * 
      * <pre>
      * The original source file.
      * </pre>
@@ -1040,8 +1036,7 @@ public final class Mapping {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
+        com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
           originalFile_ = s;
@@ -1049,20 +1044,18 @@ public final class Mapping {
         return s;
       }
     }
+
     /**
      * <code>optional string original_file = 1;</code>
-     *
+     * 
      * <pre>
      * The original source file.
      * </pre>
      */
-    public com.google.protobuf.ByteString
-        getOriginalFileBytes() {
+    public com.google.protobuf.ByteString getOriginalFileBytes() {
       java.lang.Object ref = originalFile_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+        com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
         originalFile_ = b;
         return b;
       } else {
@@ -1073,9 +1066,10 @@ public final class Mapping {
     // optional int32 line_number = 2;
     public static final int LINE_NUMBER_FIELD_NUMBER = 2;
     private int lineNumber_;
+
     /**
      * <code>optional int32 line_number = 2;</code>
-     *
+     * 
      * <pre>
      * The line in the original file.
      * </pre>
@@ -1083,9 +1077,10 @@ public final class Mapping {
     public boolean hasLineNumber() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+
     /**
      * <code>optional int32 line_number = 2;</code>
-     *
+     * 
      * <pre>
      * The line in the original file.
      * </pre>
@@ -1097,9 +1092,10 @@ public final class Mapping {
     // optional int32 column_position = 3;
     public static final int COLUMN_POSITION_FIELD_NUMBER = 3;
     private int columnPosition_;
+
     /**
      * <code>optional int32 column_position = 3;</code>
-     *
+     * 
      * <pre>
      * The column number on the line.
      * </pre>
@@ -1107,9 +1103,10 @@ public final class Mapping {
     public boolean hasColumnPosition() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+
     /**
      * <code>optional int32 column_position = 3;</code>
-     *
+     * 
      * <pre>
      * The column number on the line.
      * </pre>
@@ -1121,9 +1118,10 @@ public final class Mapping {
     // optional string identifier = 4;
     public static final int IDENTIFIER_FIELD_NUMBER = 4;
     private java.lang.Object identifier_;
+
     /**
      * <code>optional string identifier = 4;</code>
-     *
+     * 
      * <pre>
      * The original name of the identifier.
      * </pre>
@@ -1131,9 +1129,10 @@ public final class Mapping {
     public boolean hasIdentifier() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+
     /**
      * <code>optional string identifier = 4;</code>
-     *
+     * 
      * <pre>
      * The original name of the identifier.
      * </pre>
@@ -1143,8 +1142,7 @@ public final class Mapping {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
+        com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
           identifier_ = s;
@@ -1152,20 +1150,18 @@ public final class Mapping {
         return s;
       }
     }
+
     /**
      * <code>optional string identifier = 4;</code>
-     *
+     * 
      * <pre>
      * The original name of the identifier.
      * </pre>
      */
-    public com.google.protobuf.ByteString
-        getIdentifierBytes() {
+    public com.google.protobuf.ByteString getIdentifierBytes() {
       java.lang.Object ref = identifier_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+        com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
         identifier_ = b;
         return b;
       } else {
@@ -1179,17 +1175,19 @@ public final class Mapping {
       columnPosition_ = 0;
       identifier_ = "";
     }
+
     private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1)
+        return isInitialized == 1;
 
       memoizedIsInitialized = 1;
       return true;
     }
 
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+    public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getOriginalFileBytes());
@@ -1207,26 +1205,24 @@ public final class Mapping {
     }
 
     private int memoizedSerializedSize = -1;
+
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1)
+        return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getOriginalFileBytes());
+        size += com.google.protobuf.CodedOutputStream.computeBytesSize(1, getOriginalFileBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, lineNumber_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(2, lineNumber_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, columnPosition_);
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(3, columnPosition_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getIdentifierBytes());
+        size += com.google.protobuf.CodedOutputStream.computeBytesSize(4, getIdentifierBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1234,94 +1230,84 @@ public final class Mapping {
     }
 
     private static final long serialVersionUID = 0L;
+
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(com.google.protobuf.ByteString data) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(com.google.protobuf.ByteString data, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(byte[] data) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(byte[] data, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(java.io.InputStream input) throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseDelimitedFrom(java.io.InputStream input) throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseDelimitedFrom(java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.github.sommeri.sourcemap.Mapping.OriginalMapping parseFrom(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
     public static Builder newBuilder(com.github.sommeri.sourcemap.Mapping.OriginalMapping prototype) {
       return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() { return newBuilder(this); }
+
+    public Builder toBuilder() {
+      return newBuilder(this);
+    }
 
     @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+    protected Builder newBuilderForType(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      * Protobuf type {@code sourcemap.OriginalMapping}
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
+    public static final class Builder extends com.google.protobuf.GeneratedMessage.Builder<Builder> implements com.github.sommeri.sourcemap.Mapping.OriginalMappingOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
         return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_OriginalMapping_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_OriginalMapping_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.github.sommeri.sourcemap.Mapping.OriginalMapping.class, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder.class);
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+        return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_OriginalMapping_fieldAccessorTable.ensureFieldAccessorsInitialized(com.github.sommeri.sourcemap.Mapping.OriginalMapping.class, com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder.class);
       }
 
       // Construct using com.github.sommeri.sourcemap.Mapping.OriginalMapping.newBuilder()
@@ -1329,15 +1315,16 @@ public final class Mapping {
         maybeForceBuilderInitialization();
       }
 
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      private Builder(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+
       private static Builder create() {
         return new Builder();
       }
@@ -1359,8 +1346,7 @@ public final class Mapping {
         return create().mergeFrom(buildPartial());
       }
 
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
         return com.github.sommeri.sourcemap.Mapping.internal_static_sourcemap_OriginalMapping_descriptor;
       }
 
@@ -1403,7 +1389,7 @@ public final class Mapping {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.github.sommeri.sourcemap.Mapping.OriginalMapping) {
-          return mergeFrom((com.github.sommeri.sourcemap.Mapping.OriginalMapping)other);
+          return mergeFrom((com.github.sommeri.sourcemap.Mapping.OriginalMapping) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -1411,7 +1397,8 @@ public final class Mapping {
       }
 
       public Builder mergeFrom(com.github.sommeri.sourcemap.Mapping.OriginalMapping other) {
-        if (other == com.github.sommeri.sourcemap.Mapping.OriginalMapping.getDefaultInstance()) return this;
+        if (other == com.github.sommeri.sourcemap.Mapping.OriginalMapping.getDefaultInstance())
+          return this;
         if (other.hasOriginalFile()) {
           bitField0_ |= 0x00000001;
           originalFile_ = other.originalFile_;
@@ -1436,10 +1423,7 @@ public final class Mapping {
         return true;
       }
 
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      public Builder mergeFrom(com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
         com.github.sommeri.sourcemap.Mapping.OriginalMapping parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -1453,13 +1437,15 @@ public final class Mapping {
         }
         return this;
       }
+
       private int bitField0_;
 
       // optional string original_file = 1;
       private java.lang.Object originalFile_ = "";
+
       /**
        * <code>optional string original_file = 1;</code>
-       *
+       * 
        * <pre>
        * The original source file.
        * </pre>
@@ -1467,9 +1453,10 @@ public final class Mapping {
       public boolean hasOriginalFile() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>optional string original_file = 1;</code>
-       *
+       * 
        * <pre>
        * The original source file.
        * </pre>
@@ -1477,54 +1464,52 @@ public final class Mapping {
       public java.lang.String getOriginalFile() {
         java.lang.Object ref = originalFile_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
+          java.lang.String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
           originalFile_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>optional string original_file = 1;</code>
-       *
+       * 
        * <pre>
        * The original source file.
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getOriginalFileBytes() {
+      public com.google.protobuf.ByteString getOriginalFileBytes() {
         java.lang.Object ref = originalFile_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
+          com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
           originalFile_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>optional string original_file = 1;</code>
-       *
+       * 
        * <pre>
        * The original source file.
        * </pre>
        */
-      public Builder setOriginalFile(
-          java.lang.String value) {
+      public Builder setOriginalFile(java.lang.String value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
         originalFile_ = value;
         onChanged();
         return this;
       }
+
       /**
        * <code>optional string original_file = 1;</code>
-       *
+       * 
        * <pre>
        * The original source file.
        * </pre>
@@ -1535,29 +1520,30 @@ public final class Mapping {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional string original_file = 1;</code>
-       *
+       * 
        * <pre>
        * The original source file.
        * </pre>
        */
-      public Builder setOriginalFileBytes(
-          com.google.protobuf.ByteString value) {
+      public Builder setOriginalFileBytes(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
         originalFile_ = value;
         onChanged();
         return this;
       }
 
       // optional int32 line_number = 2;
-      private int lineNumber_ ;
+      private int lineNumber_;
+
       /**
        * <code>optional int32 line_number = 2;</code>
-       *
+       * 
        * <pre>
        * The line in the original file.
        * </pre>
@@ -1565,9 +1551,10 @@ public final class Mapping {
       public boolean hasLineNumber() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+
       /**
        * <code>optional int32 line_number = 2;</code>
-       *
+       * 
        * <pre>
        * The line in the original file.
        * </pre>
@@ -1575,9 +1562,10 @@ public final class Mapping {
       public int getLineNumber() {
         return lineNumber_;
       }
+
       /**
        * <code>optional int32 line_number = 2;</code>
-       *
+       * 
        * <pre>
        * The line in the original file.
        * </pre>
@@ -1588,9 +1576,10 @@ public final class Mapping {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional int32 line_number = 2;</code>
-       *
+       * 
        * <pre>
        * The line in the original file.
        * </pre>
@@ -1603,10 +1592,11 @@ public final class Mapping {
       }
 
       // optional int32 column_position = 3;
-      private int columnPosition_ ;
+      private int columnPosition_;
+
       /**
        * <code>optional int32 column_position = 3;</code>
-       *
+       * 
        * <pre>
        * The column number on the line.
        * </pre>
@@ -1614,9 +1604,10 @@ public final class Mapping {
       public boolean hasColumnPosition() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+
       /**
        * <code>optional int32 column_position = 3;</code>
-       *
+       * 
        * <pre>
        * The column number on the line.
        * </pre>
@@ -1624,9 +1615,10 @@ public final class Mapping {
       public int getColumnPosition() {
         return columnPosition_;
       }
+
       /**
        * <code>optional int32 column_position = 3;</code>
-       *
+       * 
        * <pre>
        * The column number on the line.
        * </pre>
@@ -1637,9 +1629,10 @@ public final class Mapping {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional int32 column_position = 3;</code>
-       *
+       * 
        * <pre>
        * The column number on the line.
        * </pre>
@@ -1653,9 +1646,10 @@ public final class Mapping {
 
       // optional string identifier = 4;
       private java.lang.Object identifier_ = "";
+
       /**
        * <code>optional string identifier = 4;</code>
-       *
+       * 
        * <pre>
        * The original name of the identifier.
        * </pre>
@@ -1663,9 +1657,10 @@ public final class Mapping {
       public boolean hasIdentifier() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+
       /**
        * <code>optional string identifier = 4;</code>
-       *
+       * 
        * <pre>
        * The original name of the identifier.
        * </pre>
@@ -1673,54 +1668,52 @@ public final class Mapping {
       public java.lang.String getIdentifier() {
         java.lang.Object ref = identifier_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
+          java.lang.String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
           identifier_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>optional string identifier = 4;</code>
-       *
+       * 
        * <pre>
        * The original name of the identifier.
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getIdentifierBytes() {
+      public com.google.protobuf.ByteString getIdentifierBytes() {
         java.lang.Object ref = identifier_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
+          com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
           identifier_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>optional string identifier = 4;</code>
-       *
+       * 
        * <pre>
        * The original name of the identifier.
        * </pre>
        */
-      public Builder setIdentifier(
-          java.lang.String value) {
+      public Builder setIdentifier(java.lang.String value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000008;
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000008;
         identifier_ = value;
         onChanged();
         return this;
       }
+
       /**
        * <code>optional string identifier = 4;</code>
-       *
+       * 
        * <pre>
        * The original name of the identifier.
        * </pre>
@@ -1731,19 +1724,19 @@ public final class Mapping {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional string identifier = 4;</code>
-       *
+       * 
        * <pre>
        * The original name of the identifier.
        * </pre>
        */
-      public Builder setIdentifierBytes(
-          com.google.protobuf.ByteString value) {
+      public Builder setIdentifierBytes(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000008;
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000008;
         identifier_ = value;
         onChanged();
         return this;
@@ -1760,58 +1753,29 @@ public final class Mapping {
     // @@protoc_insertion_point(class_scope:sourcemap.OriginalMapping)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_sourcemap_LineMapping_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_sourcemap_LineMapping_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_sourcemap_OriginalMapping_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_sourcemap_OriginalMapping_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor internal_static_sourcemap_LineMapping_descriptor;
+  private static com.google.protobuf.GeneratedMessage.FieldAccessorTable internal_static_sourcemap_LineMapping_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor internal_static_sourcemap_OriginalMapping_descriptor;
+  private static com.google.protobuf.GeneratedMessage.FieldAccessorTable internal_static_sourcemap_OriginalMapping_fieldAccessorTable;
 
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
+  public static com.google.protobuf.Descriptors.FileDescriptor getDescriptor() {
     return descriptor;
   }
-  private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
+
+  private static com.google.protobuf.Descriptors.FileDescriptor descriptor;
   static {
-    java.lang.String[] descriptorData = {
-      "\n\rmapping.proto\022\tsourcemap\"q\n\013LineMappin" +
-      "g\022\023\n\013line_number\030\001 \001(\005\022\027\n\017column_positio" +
-      "n\030\002 \001(\005\0224\n\020original_mapping\030\003 \001(\0132\032.sour" +
-      "cemap.OriginalMapping\"j\n\017OriginalMapping" +
-      "\022\025\n\roriginal_file\030\001 \001(\t\022\023\n\013line_number\030\002" +
-      " \001(\005\022\027\n\017column_position\030\003 \001(\005\022\022\n\nidentif" +
-      "ier\030\004 \001(\tB\036\n\034com.github.sommeri.sourcema" +
-      "p"
+    java.lang.String[] descriptorData = { "\n\rmapping.proto\022\tsourcemap\"q\n\013LineMappin" + "g\022\023\n\013line_number\030\001 \001(\005\022\027\n\017column_positio" + "n\030\002 \001(\005\0224\n\020original_mapping\030\003 \001(\0132\032.sour" + "cemap.OriginalMapping\"j\n\017OriginalMapping" + "\022\025\n\roriginal_file\030\001 \001(\t\022\023\n\013line_number\030\002" + " \001(\005\022\027\n\017column_position\030\003 \001(\005\022\022\n\nidentif" + "ier\030\004 \001(\tB\036\n\034com.github.sommeri.sourcema" + "p" };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner = new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+      public com.google.protobuf.ExtensionRegistry assignDescriptors(com.google.protobuf.Descriptors.FileDescriptor root) {
+        descriptor = root;
+        internal_static_sourcemap_LineMapping_descriptor = getDescriptor().getMessageTypes().get(0);
+        internal_static_sourcemap_LineMapping_fieldAccessorTable = new com.google.protobuf.GeneratedMessage.FieldAccessorTable(internal_static_sourcemap_LineMapping_descriptor, new java.lang.String[] { "LineNumber", "ColumnPosition", "OriginalMapping", });
+        internal_static_sourcemap_OriginalMapping_descriptor = getDescriptor().getMessageTypes().get(1);
+        internal_static_sourcemap_OriginalMapping_fieldAccessorTable = new com.google.protobuf.GeneratedMessage.FieldAccessorTable(internal_static_sourcemap_OriginalMapping_descriptor, new java.lang.String[] { "OriginalFile", "LineNumber", "ColumnPosition", "Identifier", });
+        return null;
+      }
     };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_sourcemap_LineMapping_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_sourcemap_LineMapping_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_sourcemap_LineMapping_descriptor,
-              new java.lang.String[] { "LineNumber", "ColumnPosition", "OriginalMapping", });
-          internal_static_sourcemap_OriginalMapping_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_sourcemap_OriginalMapping_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_sourcemap_OriginalMapping_descriptor,
-              new java.lang.String[] { "OriginalFile", "LineNumber", "ColumnPosition", "Identifier", });
-          return null;
-        }
-      };
-    com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
+    com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(descriptorData, new com.google.protobuf.Descriptors.FileDescriptor[] {}, assigner);
   }
 
   // @@protoc_insertion_point(outer_class_scope)
