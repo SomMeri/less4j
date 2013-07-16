@@ -14,9 +14,11 @@ public class MultiModeTest extends CommandLineTest {
   public void oneInputFile() {
     String lessFile = inputDir+"one.less";
     String cssFile = inputDir+"one.css";
+    String mapFile = inputDir+"one.css.map";
     fileUtils.removeFile(cssFile);
     CommandLine.main(new String[] {"-m", lessFile});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
+    fileUtils.assertFileNotExists(mapFile);
     assertNoErrors();
   }
 
@@ -24,18 +26,46 @@ public class MultiModeTest extends CommandLineTest {
   public void multipleInputFiles() {
     String multiLessFile1 = inputDir+"multi1.less";
     String multiCssFile1 = inputDir+"multi1.css";
+    String multiMapFile1 = inputDir+"multi1.map";
     String multiLessFile2 = inputDir+"multi2.less";
     String multiCssFile2 = inputDir+"multi2.css";
+    String multiMapFile2 = inputDir+"multi2.map";
     String multiLessFile3 = inputDir+"multi3.less";
     String multiCssFile3 = inputDir+"multi3.css";
+    String multiMapFile3 = inputDir+"multi3.map";
     String wrongFile = inputDir+"doesNotExists.less";
 
-    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiCssFile3);
+    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiCssFile3, multiMapFile1, multiMapFile2, multiMapFile3);
     CommandLine.main(new String[] {"-m", multiLessFile1, wrongFile, multiLessFile2, multiLessFile3});
     fileUtils.assertFileContent(multiCssFile1, correctCss("multi1"));
+    fileUtils.assertFileNotExists(multiMapFile1);
     fileUtils.assertFileContent(multiCssFile2, correctCss("multi2"));
+    fileUtils.assertFileNotExists(multiMapFile2);
     fileUtils.assertFileContent(multiCssFile3, correctCss("multi3"));
+    fileUtils.assertFileNotExists(multiMapFile3);
     assertError(FILE_DOES_NOT_EXISTS);
+  }
+
+  @Test
+  public void sourceMap() {
+    String multiLessFile1 = inputDir+"multi1.less";
+    String multiCssFile1 = inputDir+"multi1.css";
+    String multiMapFile1 = inputDir+"multi1.css.map";
+    String multiLessFile2 = inputDir+"multi2.less";
+    String multiCssFile2 = inputDir+"multi2.css";
+    String multiMapFile2 = inputDir+"multi2.css.map";
+    
+    String mapdataFile1 = inputDir+"multi1.mapdata";
+    String mapdataFile2 = inputDir+"multi2.mapdata";
+
+
+    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiMapFile1, multiMapFile2);
+    CommandLine.main(new String[] {"-m", "--sourceMap", multiLessFile1, multiLessFile2});
+    fileUtils.assertFileContent(multiCssFile1, correctCss("multi1"));
+    validateSourceMap(mapdataFile1, multiCssFile1, multiMapFile1);
+    fileUtils.assertFileContent(multiCssFile2, correctCss("multi2"));
+    validateSourceMap(mapdataFile2, multiCssFile2, multiMapFile2);
+    assertNoErrors();
   }
 
   @Test
@@ -67,9 +97,11 @@ public class MultiModeTest extends CommandLineTest {
     String newDir = inputDir + "doesNotExists/";
     String lessFile = inputDir+"one.less";
     String cssFile = newDir+"one.css";
+    String mapFile = newDir+"one.map";
     fileUtils.removeFile(newDir);
     CommandLine.main(new String[] {"--multiMode", "--outputDir", newDir, lessFile});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
+    fileUtils.assertFileNotExists(mapFile);
     assertNoErrors();
   }
 

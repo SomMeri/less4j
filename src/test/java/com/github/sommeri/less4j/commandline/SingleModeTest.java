@@ -1,18 +1,9 @@
 package com.github.sommeri.less4j.commandline;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Test;
-
-import com.github.sommeri.less4j.LessCompiler.CompilationResult;
-import com.github.sommeri.less4j.LessCompiler.Problem;
-import com.github.sommeri.less4j.utils.SourceMapValidator;
 
 public class SingleModeTest extends CommandLineTest {
   
-  private SourceMapValidator sourceMapValidator = new SourceMapValidator();
 
   @Test
   public void oneInputFile() {
@@ -31,8 +22,8 @@ public class SingleModeTest extends CommandLineTest {
     fileUtils.removeFile(mapFile);
     CommandLine.main(new String[] {lessFile, cssFile});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
-    assertNoErrors();
     fileUtils.assertFileNotExists(mapFile);
+    assertNoErrors();
   }
 
   @Test
@@ -46,13 +37,7 @@ public class SingleModeTest extends CommandLineTest {
     CommandLine.main(new String[] {lessFile, cssFile, "-sm"});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
     assertNoErrors();
-    CompilationResult result = new CompilationResult(fileUtils.readFile(cssFile), fileUtils.readFile(mapFile), noProblems());
-    sourceMapValidator.validateSourceMap(result, new File(mapdataFile), new File(cssFile));
-  }
-
-  private List<Problem> noProblems() {
-    List<Problem> result = Collections.emptyList();
-    return result;
+    validateSourceMap(mapdataFile, cssFile, mapFile);
   }
 
   @Test
@@ -110,4 +95,5 @@ public class SingleModeTest extends CommandLineTest {
     assertSysoutAsInFile(expectedCssFile);
     assertErrorsAsInFile(inputDir+"errorsandwarnings.err");
   }
+
 }

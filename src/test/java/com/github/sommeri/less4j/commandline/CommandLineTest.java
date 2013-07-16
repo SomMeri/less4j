@@ -4,11 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 
+import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.utils.SourceMapValidator;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
@@ -23,6 +29,7 @@ public abstract class CommandLineTest {
   private static final String WARNINGS_CSS = "{\n  padding: 2 2 2 2;\n}\n";
   //private static final String ERRORS_CSS = ".test h4 {\n  declaration: !#error#!;\n  padding: 2 2 2 2;\n}\n";
 
+  protected SourceMapValidator sourceMapValidator = new SourceMapValidator();
   protected TestFileUtils fileUtils = new TestFileUtils();
 
   protected final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -105,5 +112,14 @@ public abstract class CommandLineTest {
     return WARNINGS_CSS;
   }
   
+  protected List<Problem> noProblems() {
+    List<Problem> result = Collections.emptyList();
+    return result;
+  }
+
+  protected void validateSourceMap(String mapdataFile, String cssFile, String mapFile) {
+    CompilationResult result = new CompilationResult(fileUtils.readFile(cssFile), fileUtils.readFile(mapFile), noProblems());
+    sourceMapValidator.validateSourceMap(result, new File(mapdataFile), new File(cssFile));
+  }
 
 }
