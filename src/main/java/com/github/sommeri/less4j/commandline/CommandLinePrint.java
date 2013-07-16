@@ -42,13 +42,15 @@ public class CommandLinePrint {
     reportError("Could not compile the file " + inputfile);
   }
 
-  public void printToFile(CompilationResult content, String outputFile, String inputfileName, File rootInputFile) {
+  public void printToFiles(CompilationResult content, String lessFileName, File rootLessFile, String cssFilename, String mapFilename) {
     if (content == null || content.getCss() == null) {
-      reportCouldNotCompileTheFile(inputfileName);
+      reportCouldNotCompileTheFile(lessFileName);
       return;
     }
-    outputFile(outputFile, content.getCss());
-    printWarnings(inputfileName, rootInputFile, content);
+    outputFile(cssFilename, content.getCss());
+    if (mapFilename!=null && content.getSourceMap()!=null)
+      outputFile(mapFilename, content.getSourceMap());
+    printWarnings(lessFileName, rootLessFile, content);
   }
 
   public void printWarnings(String inputfileName, File rootInputFile, CompilationResult content) {
@@ -113,16 +115,20 @@ public class CommandLinePrint {
 
   private void outputFile(String filename, String content) {
     File file = new File(filename);
+    outputFile(filename, file, content);
+  }
+
+  private void outputFile(String reportFilename, File file, String content) {
     try {
       file.createNewFile();
     } catch (IOException e) {
-      reportError("Could not create the file " + filename);
+      reportError("Could not create the file " + reportFilename);
       reportError(e);
       return;
     }
 
     if (!file.canWrite()) {
-      reportError("Can not write into file " + filename);
+      reportError("Can not write into file " + reportFilename);
       return;
     }
     try {
@@ -130,7 +136,7 @@ public class CommandLinePrint {
       IOUtils.write(content, output);
       output.close();
     } catch (IOException e) {
-      reportError("Can not write into file " + filename);
+      reportError("Can not write into file " + reportFilename);
       reportError(e);
       return;
     }

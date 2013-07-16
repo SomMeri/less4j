@@ -24,11 +24,12 @@ public interface LessCompiler {
   public CompilationResult compile(LessSource source, Configuration options) throws Less4jException;
 
   public class Configuration {
-    
+
     private LessSource cssResultLocation;
-    
+    private boolean linkSourceMap = true;
+
     /**
-     * This is needed in for source map. 
+     * This is needed in for source map.
      * 
      * FIXME: source map: document how is this used
      */
@@ -41,7 +42,16 @@ public interface LessCompiler {
     }
 
     public void setCssResultLocation(File cssResultLocation) {
-      this.cssResultLocation = new LessSource.FileSource(cssResultLocation);
+      this.cssResultLocation = cssResultLocation == null ? null : new LessSource.FileSource(cssResultLocation);
+    }
+
+    //FIXME: source map: add source map link to the end of file - unless turned off here
+    public boolean shouldLinkSourceMap() {
+      return linkSourceMap;
+    }
+
+    public void setLinkSourceMap(boolean linkSourceMap) {
+      this.linkSourceMap = linkSourceMap;
     }
 
   }

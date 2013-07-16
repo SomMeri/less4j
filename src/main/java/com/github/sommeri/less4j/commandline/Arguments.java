@@ -22,6 +22,9 @@ public class Arguments {
   @Parameter(names={"-m", "--multiMode"}, description="Turn on multi less files mode.")
   private boolean multiMode;
   
+  @Parameter(names={"-sm", "--sourceMap"}, description="Generate source map.")
+  private boolean sourceMap;
+
   @Parameter(names={"-o", "--outputDir"}, description="Specify the output directory. If not present, Less4j will place output files into current directory. This option is available only in multiple files mode.")
   private String outputDirectory;
 
@@ -34,6 +37,10 @@ public class Arguments {
 
   public boolean isMultiMode() {
     return multiMode;
+  }
+
+  public boolean isSourceMap() {
+    return sourceMap;
   }
 
   public String getOutputDirectory() {
