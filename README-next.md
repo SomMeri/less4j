@@ -44,9 +44,7 @@ Pom.xml dependency:
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
 ## API Basics:
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is in `DefaultLessCompiler` class. 
-
-The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css. Returned object `CompilationResult` has three methods: 
+Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is in `DefaultLessCompiler` class. The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css. Returned object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list of compilation warnings,
 * `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
@@ -55,7 +53,7 @@ Each warning is described by a message and knows line, character number and file
 
 Example:
 ````java
-public static void example() { 
+public void example() { 
   // create input file
   File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
 
@@ -67,15 +65,15 @@ public static void example() {
   print(CompilationResult compilationResult)
 }
 
-// helper methods
-private static void print(CompilationResult compilationResult) {
+/* helper methods */
+private void print(CompilationResult compilationResult) {
   System.out.println(compilationResult.getCss());
   for (Problem warning : compilationResult.getWarnings()) {
     System.err.println(format(warning));
   }
 }
 
-private static String format(Problem warning) {
+private String format(Problem warning) {
   return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
 }
 ````
