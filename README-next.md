@@ -55,10 +55,7 @@ Each warning is described by a message and knows line, character number and file
 
 Example:
 ````java
-  // create input file
-  File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
-````
-<pre><code>public static void example() { 
+public static void example() { 
   // create input file
   File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
 
@@ -81,7 +78,7 @@ private static void print(CompilationResult compilationResult) {
 private static String format(Problem warning) {
   return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
 }
-</code></pre>
+````
 
 The interface exposes following basic methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
