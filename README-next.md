@@ -46,8 +46,7 @@ The easiest way to integrate less4j into Java project is to use [wro4j](http://a
 ## API Basics:
 Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is in `DefaultLessCompiler` class. 
 
-The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css:
-````java
+The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css:````java
 public void example() { 
   // create input file
   File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
@@ -57,7 +56,7 @@ public void example() {
   CompilationResult compilationResult = compiler.compile(inputLessFile);
 
   // print results to console
-  print(CompilationResult compilationResult)
+  print(compilationResult)
 }
 ````
 
@@ -72,14 +71,14 @@ private void print(CompilationResult compilationResult) {
   System.out.println(compilationResult.getCss());
   // print source map
   System.out.println(compilationResult.getSourceMap());
+  // print all warnings
   for (Problem warning : compilationResult.getWarnings()) {
     System.err.println(format(warning));
   }
 }
 ````
 
-Each Warning is described by a message and know source less file, line, character and column that caused it:
-````java
+Each Warning is described by a message and know source less file, line, character and column that caused it:````java
 private String format(Problem warning) {
   return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
 }
