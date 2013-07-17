@@ -46,10 +46,10 @@ The easiest way to integrate less4j into Java project is to use [wro4j](http://a
 ## API Basics:
 Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is in `DefaultLessCompiler` class. 
 
-The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css. They all return `CompilationResult` class which has three methods: 
-* `getCss` - returns compiled css,
-* `getWarnings` - returns list of compilation warnings,
-* `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
+The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css. They all return an instance of `CompilationResult` class which has three methods: 
+* `getCss` - compiled css,
+* `getWarnings` - list of compilation warnings,
+* `getSourceMap` - generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
 
 Example:
 ````java
@@ -78,8 +78,15 @@ private String format(Problem warning) {
 }
 ````
 
-Each warning is described by a message and knows line, character number and filename of the place that caused it.  
+### Error Handling
+The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
 
+* `List<Problem> getErrors` - list of all found compilation errors.
+* `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
+
+Each problem or warning is described by a message and knows source less file, line, character and column that caused it.  
+
+### Compile Methods
 The interface exposes following basic methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
@@ -94,20 +101,6 @@ You can supply additional configuration options through optional `Configuration 
 *  `CompilationResult compile(URL inputFile, Configuration options)` 
 *  `CompilationResult compile(String lessContent, Configuration options)` 
 *  `CompilationResult compile(LessSource inputFile, Configuration options)` 
-
- 
-
-Returned object `CompilationResult` has three methods: 
-* `getCss` - returns compiled css,
-* `getWarnings` - returns list of compilation warnings or an empty list,
-* `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
-
-
-## Error Handling
-The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
-
-* `List<Problem> getErrors` - list of all found compilation errors.
-* `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
 
 ## License
 Less4j is distributed under following licences, pick whichever you like:
