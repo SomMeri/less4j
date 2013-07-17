@@ -44,12 +44,35 @@ Pom.xml dependency:
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
 ## API Basics:
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. 
+Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is in `DefaultLessCompiler` class. 
 
-The interface exposes multiple `compile` methods, each takes file, url, string or other resource with less code and compiles it into css. Returned object `CompilationResult` has three methods: 
+The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css. Returned object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list of compilation warnings or an empty list,
 * `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
+
+Each warning is described by a message and knows line, character number and filename of the place that caused it.  
+
+Example:
+<pre><code>private static void example() { 
+  // create input file
+  File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
+
+  // compile it
+  LessCompiler compiler = new ThreadUnsafeLessCompiler();
+  CompilationResult compilationResult = compiler.compile(inputLessFile);
+
+  // print results to console
+  System.out.println(compilationResult.getCss());
+  for (Problem warning : compilationResult.getWarnings()) {
+    System.err.println(format(warning));
+  }
+}
+
+private static String format(Problem warning) {
+  return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
+}
+</code></pre>
 
 The interface exposes following basic methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
@@ -73,25 +96,6 @@ Returned object `CompilationResult` has three methods:
 * `getWarnings` - returns list of compilation warnings or an empty list,
 * `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
 
-Each warning is described by a message and knows both line, character number and filename of the place that caused it.  
-
-<pre><code>// create input file
-File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
-
-// compile it
-LessCompiler compiler = new ThreadUnsafeLessCompiler();
-CompilationResult compilationResult = compiler.compile(inputLessFile);
-
-// print results to console
-System.out.println(compilationResult.getCss());
-for (Problem warning : compilationResult.getWarnings()) {
-  System.err.println(format(warning));
-}
-
-private static String format(Problem warning) {
-  return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
-}
-</code></pre>
 
 ## Error Handling
 The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
