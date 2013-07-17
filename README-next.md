@@ -48,13 +48,17 @@ Access the compiler either through the `com.github.less4j.LessCompiler` interfac
 
 The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css. Returned object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
-* `getWarnings` - returns list of compilation warnings or an empty list,
+* `getWarnings` - returns list of compilation warnings,
 * `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
 
 Each warning is described by a message and knows line, character number and filename of the place that caused it.  
 
 Example:
-<pre><code>private static void example() { 
+````java
+  // create input file
+  File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
+````
+<pre><code>public static void example() { 
   // create input file
   File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
 
@@ -63,6 +67,11 @@ Example:
   CompilationResult compilationResult = compiler.compile(inputLessFile);
 
   // print results to console
+  print(CompilationResult compilationResult)
+}
+
+// helper methods
+private static void print(CompilationResult compilationResult) {
   System.out.println(compilationResult.getCss());
   for (Problem warning : compilationResult.getWarnings()) {
     System.err.println(format(warning));
