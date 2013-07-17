@@ -696,7 +696,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
       visitor.visit(sourceName, symbolName, sourceStartPosition, startPosition, endPosition);
     }
 
-    //TODO: source map (closure) - investigate and maybe fill bug to closure - they generate additional mappings to mark ends which is weird.
+    //TODO: source map (closure report) - investigate and maybe fill bug to closure - they generate additional mappings to mark ends which is weird.
 
   }
 }

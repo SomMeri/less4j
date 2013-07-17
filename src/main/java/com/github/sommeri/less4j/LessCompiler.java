@@ -23,6 +23,9 @@ public interface LessCompiler {
 
   public CompilationResult compile(LessSource source, Configuration options) throws Less4jException;
 
+  /**
+   * WARNING: experimental API 
+   */
   public class Configuration {
 
     private LessSource cssResultLocation;
@@ -31,7 +34,6 @@ public interface LessCompiler {
     /**
      * This is needed in for source map.
      * 
-     * FIXME: source map: document how is this used
      */
     public LessSource getCssResultLocation() {
       return cssResultLocation;

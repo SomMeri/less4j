@@ -13,6 +13,7 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
+//FIXME: source map: add link to map file to the end of css file and add test for it
 public class CommandLine {
   private static final String CSS_SUFFIX = ".css";
   private static final String SOURCE_MAP_SUFFIX = ".css.map";
