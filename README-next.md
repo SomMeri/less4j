@@ -48,7 +48,7 @@ Access the compiler either through the `com.github.less4j.LessCompiler` interfac
 
 The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css:
 ````java
-public void example() { 
+public void example() throws Less4jException { 
   // create input file
   File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
 
@@ -87,14 +87,14 @@ private String format(Problem warning) {
 ````
 
 ### Error Handling
-The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
+The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, some syntactically incorrect inputs may still lead to some output or produce a list of warnings. This output is most likely invalid and the list of warnings incomplete. Since they can occasionally help with debugging, the exception provides access to them. 
 
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
 
-Each problem or warning is described by a message and knows source less file, line, character and column that caused it.  
+Each problem or warning is described by a message. They also know source less file, line, character and column that caused them.  
 
-### Compile Methods
+### Compilation Options
 The interface exposes following basic methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
