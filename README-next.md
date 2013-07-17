@@ -43,8 +43,15 @@ Pom.xml dependency:
 ## Integration With Wro4j
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
-## API:
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following basic methods:
+## API Basics:
+Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes multiple `compile` methods, each takes file, url, string or other resource with less code and compiles it into css.   
+
+Returned object `CompilationResult` has three methods: 
+* `getCss` - returns compiled css,
+* `getWarnings` - returns list of compilation warnings or an empty list,
+* `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
+
+The interface exposes following basic methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
 *  `CompilationResult compile(String lessContent)` - compiles a string - unable to import less files, leaves imports as they are,
@@ -86,6 +93,7 @@ private static String format(Problem warning) {
 }
 </code></pre>
 
+## Error Handling
 The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
 
 * `List<Problem> getErrors` - list of all found compilation errors.
