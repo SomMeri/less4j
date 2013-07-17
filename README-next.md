@@ -44,19 +44,23 @@ Pom.xml dependency:
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
 ## API:
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following methods:
+Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following basic methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
-*  `CompilationResult compile(File inputFile, Configuration options)` - same as before but with additional options, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
-*  `CompilationResult compile(URL inputFile, Configuration options)` - same as before but with additional options,
 *  `CompilationResult compile(String lessContent)` - compiles a string - unable to import less files, leaves imports as they are,
-*  `CompilationResult compile(String lessContent, Configuration options)` - same as before but with additional options,
-*  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type,
-*  `CompilationResult compile(LessSource inputFile, Configuration options)` - same as before but with additional options. 
+*  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type.
 
 These methods differ in one important point: how they handle "@import lessFile" statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem, second method assumes that all less imports reference files by relative urls and the third method leaves imports as they are.         
 
-Return object `CompilationResult` has three methods: 
+Additional configuration options are supplied through optional `options` parameter:
+*  `CompilationResult compile(File inputFile, Configuration options)`  
+*  `CompilationResult compile(URL inputFile, Configuration options)` 
+*  `CompilationResult compile(String lessContent, Configuration options)` 
+*  `CompilationResult compile(LessSource inputFile, Configuration options)` 
+
+The `Configuration` class is still considered experimental and may change in the future. 
+
+Returned object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list of compilation warnings or an empty list,
 * `getSourceMap` - returns generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
