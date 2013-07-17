@@ -46,12 +46,7 @@ The easiest way to integrate less4j into Java project is to use [wro4j](http://a
 ## API Basics:
 Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is in `DefaultLessCompiler` class. 
 
-The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css. They all return an instance of `CompilationResult` class which has three methods: 
-* `getCss` - compiled css,
-* `getWarnings` - list of compilation warnings,
-* `getSourceMap` - generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
-
-Example:
+The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css:
 ````java
 public void example() { 
   // create input file
@@ -64,15 +59,27 @@ public void example() {
   // print results to console
   print(CompilationResult compilationResult)
 }
+````
 
-/* helper methods */
+Returned `CompilationResult` object has three methods: 
+* `getCss` - compiled css,
+* `getWarnings` - list of compilation warnings,
+* `getSourceMap` - generated [source map](https://github.com/SomMeri/less4j/wiki/Command-Line-Options#source-map).
+
+````java
 private void print(CompilationResult compilationResult) {
+  // print css
   System.out.println(compilationResult.getCss());
+  // print source map
+  System.out.println(compilationResult.getSourceMap());
   for (Problem warning : compilationResult.getWarnings()) {
     System.err.println(format(warning));
   }
 }
+````
 
+Each Warning is described by a message and know source less file, line, character and column that caused it:
+````java
 private String format(Problem warning) {
   return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
 }
