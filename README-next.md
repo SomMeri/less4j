@@ -52,13 +52,14 @@ Access the compiler either through the `com.github.less4j.LessCompiler` interfac
 
 These methods differ in one important point: how they handle "@import lessFile" statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem, second method assumes that all less imports reference files by relative urls and the third method leaves imports as they are.         
 
-Additional configuration options are supplied through optional `options` parameter:
+You can supply additional configuration options through optional `Configuration options` parameter. The `Configuration` class is still considered experimental and may change in the future.
+
 *  `CompilationResult compile(File inputFile, Configuration options)`  
 *  `CompilationResult compile(URL inputFile, Configuration options)` 
 *  `CompilationResult compile(String lessContent, Configuration options)` 
 *  `CompilationResult compile(LessSource inputFile, Configuration options)` 
 
-The `Configuration` class is still considered experimental and may change in the future. 
+ 
 
 Returned object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
