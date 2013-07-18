@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 //FIXME: source map: add link to map file to the end of css file and add test for it
+//FIXME: source map: warning if destination css file is not know
 public class CommandLine {
   private static final String CSS_SUFFIX = ".css";
   private static final String SOURCE_MAP_SUFFIX = ".css.map";

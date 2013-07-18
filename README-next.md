@@ -98,18 +98,15 @@ Each problem or warning is described by a message. They also know source less fi
 The interface exposes following basic methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
-*  `CompilationResult compile(String lessContent)` - compiles a string - unable to import less files and leaves imports as they are,
-*  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type.
+*  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type,
+*  `CompilationResult compile(String lessContent)` - compiles a string. It is unable to import less files and leaves imports as they are.
 
 These methods differ in one important point: how they handle "@import lessFile" statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem, second method assumes that all less imports reference files by relative urls and the third method leaves imports as they are.         
 
-Each of these methods has an alternative version which takes an additional `Configuration options` parameter. 
-*  `CompilationResult compile(File inputFile, Configuration options)`  
-*  `CompilationResult compile(URL inputFile, Configuration options)` 
-*  `CompilationResult compile(String lessContent, Configuration options)` 
-*  `CompilationResult compile(LessSource inputFile, Configuration options)` 
+Each of these methods has an alternative version which takes an additional `Configuration options` parameter. For example, this is an alternative to the compile the file method: 
+*  `CompilationResult compile(File inputFile, Configuration options)`.
 
-Note that the `Configuration` class is still considered experimental and may change in the future.
+The `Configuration` class is still considered experimental and may change in the future.  
 
 ## License
 Less4j is distributed under following licences, pick whichever you like:
