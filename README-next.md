@@ -44,16 +44,16 @@ Pom.xml dependency:
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
 ## API Basics:
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is in `DefaultLessCompiler` class. 
+Access the compiler either through the `com.github.less4j.LessCompiler` interface. The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css.
 
-The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css:
+Thread safe implementation of `LessCompiler` interface is in `DefaultLessCompiler` class:
 ````java
 public void example() throws Less4jException { 
   // create input file
   File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
 
   // compile it
-  LessCompiler compiler = new ThreadUnsafeLessCompiler();
+  LessCompiler compiler = new DefaultLessCompiler();
   CompilationResult compilationResult = compiler.compile(inputLessFile);
 
   // print results to console
@@ -87,7 +87,7 @@ private String format(Problem warning) {
 ````
 
 ### Error Handling
-The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, some syntactically incorrect inputs may still lead to some output or produce a list of warnings. This output is most likely invalid and the list of warnings incomplete. Since they can occasionally help with debugging, the exception provides access to them. 
+The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, some syntactically incorrect inputs may still lead to some output or produce a list of warnings. This output is most likely invalid and the list of warnings incomplete. The exception provides access to them anyway, because they can occasionally help with debugging. 
 
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
