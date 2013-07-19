@@ -1,0 +1,3 @@
+Warnings produced by compilation of testCase
+WARNING 6:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 5:1.
+WARNING 12:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 5:1.

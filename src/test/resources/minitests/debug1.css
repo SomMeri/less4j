@@ -1,34 +1,6 @@
-/*
-    Many 
-    Comment
-    Lines
-*/
 .box,
 .extended {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
-.chained-import-1 {
-  content: chained-import-1;
-}
-.chained-import-2 {
-  content: chained-import-2;
-}
-h1 {
-  color: green;
-}
-@-moz-document url-prefix() {
-  .icon-spin {
-    height: .9em;
-  }
-  .btn .icon-spin {
-    height: auto;
-  }
-  .icon-spin.icon-large {
-    height: 1.25em;
-  }
-  .btn .icon-spin.icon-large {
-    height: .75em;
-  }
 }

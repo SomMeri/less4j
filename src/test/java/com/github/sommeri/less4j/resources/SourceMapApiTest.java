@@ -15,7 +15,9 @@ import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.commandline.FileSystemUtils;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.SourceMapValidator;
 
 //FIXME: source map: add source root to map and test for it
@@ -41,7 +43,8 @@ public class SourceMapApiTest {
 
   public static final String ONE_IMPORT_LESS_PATH = "src/test/resources/source-map/api/file-import.less";
   public static final File ONE_IMPORT_LESS_FILE = new File(ONE_IMPORT_LESS_PATH);
-  public static final String ONE_IMPORT_MAPDATA = "src/test/resources/source-map/api/file-import.mapdata";
+  public static final String ONE_IMPORT_MAPDATA_UNKNOWN_CSS = "src/test/resources/source-map/api/file-import-unknown-css.mapdata";
+  public static final String ONE_IMPORT_MAPDATA_GUESSED_CSS = "src/test/resources/source-map/api/file-import-guessed-css.mapdata";
   public static final String ONE_IMPORT_CSS_KNOWN_MAPDATA = "src/test/resources/source-map/api/file-import-css-location-known.mapdata";
 
   public static final Map<String, String> LESS_INPUT_CONTENTS = new HashMap<String, String>();
@@ -103,6 +106,7 @@ public class SourceMapApiTest {
     validator.validateSourceMap(compilationResult, new File(FAKE_URL_DATA_AVAILABLE_MAPDATA));
   }
  
+  //FIXME: source map - document that if css output file location is not known, the same as less file is assumend and explain why (runningon the server)
   @Test
   public void file() throws Less4jException {
     LessCompiler compiler = new DefaultLessCompiler();
@@ -112,7 +116,7 @@ public class SourceMapApiTest {
     assertNotNull(compilationResult.getSourceMap());
     
     SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
-    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA));
+    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_GUESSED_CSS), FileSystemUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.SOURCE_MAP_SUFFIX));
   }
 
   @Test
@@ -124,7 +128,7 @@ public class SourceMapApiTest {
     assertNotNull(compilationResult.getSourceMap());
     
     SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
-    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA));
+    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_UNKNOWN_CSS));
   }
 
   @Test

@@ -1,39 +1,9 @@
-/******************\
-*                  *
-*   3line Comment  *
-*                  *
-\******************/
 .box-shadow() {
   box-shadow:         0 0 5px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
  
-/*
-    Many 
-    Comment
-    Lines
-*/
 .box, .extended {
   .box-shadow;
   -moz-box-shadow:    0 0 5px rgba(0, 0, 0, 0.3);
-}
-
-/*
- * Comment Test
- *
- * - last long
- *
- */
-@import-once "import/chained-import-1.less";
-h1 {
-  color: green;
-}
-@import-once "import/chained-import-2.less";
-
-//ANOTHER HARD CASE
-@-moz-document url-prefix() {
-  .icon-spin { height: .9em; }
-  .btn .icon-spin { height: auto; }
-  .icon-spin.icon-large { height: 1.25em; }
-  .btn .icon-spin.icon-large { height: .75em; }
 }

@@ -14,57 +14,110 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.commandline.CommandLinePrint;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
+import com.github.sommeri.less4j.utils.SourceMapValidator;
+import com.github.sommeri.less4j.utils.TestFileUtils;
+import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
-/**
- * The test reproduces test files found in original less.js implementation. As
- * less.js has only only one tag and that tag is one year old, we took tests
- * from the master branch.
- * 
- */
 @RunWith(Parameterized.class)
 public abstract class AbstractFileBasedTest {
 
+  private final SourceMapValidator sourceMapValidation = new SourceMapValidator();
+
   private final File lessFile;
-  private final File cssFile;
+  private final File cssOutput;
+  private final File errorList;
+  private final File mapdataFile;
+  @SuppressWarnings("unused")
   private final String testName;
 
-  public AbstractFileBasedTest(File lessFile, File cssFile, String testName) {
+  public AbstractFileBasedTest(File lessFile, File cssOutput, File errorList, File mapdataFile, String testName) {
     this.lessFile = lessFile;
-    this.cssFile = cssFile;
+    this.cssOutput = cssOutput;
+    this.mapdataFile = mapdataFile;
     this.testName = testName;
+    this.errorList = errorList;
+  }
+
+  protected static TestFileUtils createTestFileUtils() {
+    return new TestFileUtils(".err", ".mapdata");
   }
 
   @Test
-  public final void compileAndCompare() throws Throwable {
+  public final void compileAndCompare() {
     try {
-      LessCompiler compiler = getCompiler();
-      CompilationResult actual = compiler.compile(lessFile);
-      
-      String expected = IOUtils.toString(new FileReader(cssFile));
-      assertEquals(lessFile.toString(), canonize(expected), canonize(actual.getCss()));
+      CompilationResult actual = compile(lessFile, cssOutput);
+      //System.out.println(actual.getSourceMap());
+      assertCorrectWarnings(actual);
+      assertSourceMapValid(actual);
     } catch (Less4jException ex) {
-      String errorReport = generateErrorReport(ex);
-      System.err.println(errorReport);
-      throw new RuntimeException(errorReport, ex);
+      printErrors(ex);
+      assertCorrectErrors(ex);
     } catch (Throwable ex) {
       if (ex instanceof ComparisonFailure) {
         ComparisonFailure fail = (ComparisonFailure)ex;
-        throw new ComparisonFailure (fail.getMessage(), fail.getExpected(), fail.getActual());
+        throw fail;
       }
       if (ex instanceof AssertionError) {
-        throw (AssertionError)ex;
+        AssertionError fail = (AssertionError)ex;
+        throw fail;
       }
       throw new RuntimeException(ex.getMessage(), ex);
     }
   }
 
+  private void assertSourceMapValid(CompilationResult actual) {
+    sourceMapValidation.validateSourceMap(actual, mapdataFile, cssOutput);
+  }
+
+  protected void printErrors(Less4jException ex) {
+  }
+
+  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
+    LessCompiler compiler = getCompiler();
+    Configuration configuration = createConfiguration(cssOutput);
+    CompilationResult actual = compiler.compile(lessFile, configuration);
+    return actual;
+  }
+
+  protected Configuration createConfiguration(File cssOutput) {
+    Configuration configuration = new Configuration();
+    configuration.setCssResultLocation(new LessSource.FileSource(cssOutput));
+    configuration.setLinkSourceMap(false);
+    return configuration;
+  }
+
+  private void assertCorrectErrors(Less4jException error) {
+    //validate errors and warnings
+    String completeErrorReport = generateErrorReport(error);
+    assertEquals(lessFile.toString(), canonize(expectedErrors()), canonize(completeErrorReport));
+    //validate css
+    assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
+  }
+
+  private void assertCorrectWarnings(CompilationResult actual) {
+    //validate css
+    String expectedCss = canonize(expectedCss());
+    String actualCss = canonize(actual.getCss());
+    assertEquals(expectedCss, actualCss);
+    //validate warnings
+    String completeErrorReport = generateWarningsReport(actual);
+    assertEquals(canonize(expectedErrors()), canonize(completeErrorReport));
+  }
+
   protected String canonize(String text) {
+    //ignore end of line separator differences
     text = text.replace("\r\n", "\n");
+
+    //ignore differences in various ways to write "1/1"
+    text = text.replaceAll("1 */ *1", "1/1");
+
     //ignore occasional end lines
-    if (text.endsWith("\n"))
-      return text.substring(0, text.length()-1);
+    while (text.endsWith("\n"))
+      text=text.substring(0, text.length()-1);
+    
     return text;
   }
 
@@ -72,15 +125,44 @@ public abstract class AbstractFileBasedTest {
     return new ThreadUnsafeLessCompiler();
   }
 
-  private String generateErrorReport(Less4jException error) {
+  private String expectedCss() {
+    try {
+      return IOUtils.toString(new FileReader(cssOutput));
+    } catch (Throwable ex) {
+      throw new RuntimeException(ex.getMessage(), ex);
+    }
+  }
+
+  private String expectedErrors() {
+    if (errorList==null || !errorList.exists())
+      return "";
+    
+    try {
+      return DebugAndTestPrint.platformFileSeparator(IOUtils.toString(new FileReader(errorList)));
+    } catch (Throwable ex) {
+      throw new RuntimeException(ex.getMessage(), ex);
+    }
+  }
+
+  protected String generateErrorReport(Less4jException error) {
     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
     CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
-    printer.printToSysout(error.getPartialResult(), testName, lessFile);
-    printer.reportErrorsAndWarnings(error, testName, lessFile);
+    printer.reportErrorsAndWarnings(error, "testCase", lessFile);
     
-    String completeErrorReport = outContent.toString() + errContent.toString();
+    String completeErrorReport = errContent.toString();
+    return completeErrorReport;
+  }
+
+  private String generateWarningsReport(CompilationResult result) {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+
+    CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
+    printer.printWarnings("testCase", lessFile, result);
+    
+    String completeErrorReport = errContent.toString();
     return completeErrorReport;
   }
 

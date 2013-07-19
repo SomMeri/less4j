@@ -574,9 +574,7 @@ public class CssPrinter {
     cssOnly.ensureNewLine().increaseIndentationLevel();
     Iterable<CssPrinter> declarationsBuilders = collectUniqueBodyMembersStrings(body);
     for (CssPrinter miniBuilder : declarationsBuilders) {
-      //cssOnly.appendAsIs(miniBuilder);
       append(miniBuilder);
-      //cssAndSM.ap
     }
 
     appendComments(body.getOrphanComments(), false);

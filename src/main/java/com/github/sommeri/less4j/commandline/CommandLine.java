@@ -12,12 +12,12 @@ import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.platform.Constants;
 
 //FIXME: source map: add link to map file to the end of css file and add test for it
 //FIXME: source map: warning if destination css file is not know
+//FIXME: source map: update help screen
 public class CommandLine {
-  private static final String CSS_SUFFIX = ".css";
-  private static final String SOURCE_MAP_SUFFIX = ".css.map";
   private static final String NAME = "less4j";
   private static final String INTRO = "Less4j compiles less files into css files. It can run in two modes: single input file mode or in multiple input files mode. Less4j uses single file mode by default. \n\nSingle file mode: Less4j expects one or two arguments. First one contains input less filename and the second one contains " + "the output css filename. If the output file argument is not present, less4j will print the result into standard output." + "\n\n" + "Multiple files mode: Must be turned on by '-m' or '--multiMode' parameter. Less4j assumes that all input files are " + "less files. All are going to be compiled into css files. Each input file will generate " + "an output file with the same name and suffix '.css'." + "\n\n";
   private static final String OUTRO = "\nExamples:\n" + " - Compile 'test.less' file and print the result into standard output:\n  # less4j test.less\n\n" + " - Compile 'test.less' file and print the result into 'test.css' file:\n  # less4j test.less test.css\n\n" + " - Compile 't1.less', 't2.less' and 't3.less' files into 't1.css', 't2.css' and 't3.css':\n  # less4j -m t1.less t2.less t3.less\n\n" + " - Compile 't1.less', 't2.less', 't3.less' files into 't1.css', 't2.css', 't3.css'. Place the result \n  into '..\\css\\' directory:\n  # less4j -m -o ..\\css\\ t1.less t2.less t3.less\n\n";
@@ -102,7 +102,7 @@ public class CommandLine {
   }
 
   private String singleModeMapFilename(String cssFileName, boolean generateSourceMap) {
-    return !generateSourceMap || cssFileName==null? null: FileSystemUtils.changeSuffix(cssFileName, SOURCE_MAP_SUFFIX);
+    return !generateSourceMap || cssFileName==null? null: FileSystemUtils.changeSuffix(cssFileName, Constants.SOURCE_MAP_SUFFIX);
   }
 
   private File toFile(String fileName) {
@@ -130,8 +130,8 @@ public class CommandLine {
 
     for (String filename : files) {
       File inputFile = new File(filename);
-      String cssFilename = toOutputFilename(outputDirectory, filename, CSS_SUFFIX);
-      String mapFilename = generateSourceMap? toOutputFilename(outputDirectory, filename, SOURCE_MAP_SUFFIX): null;
+      String cssFilename = toOutputFilename(outputDirectory, filename, Constants.CSS_SUFFIX);
+      String mapFilename = generateSourceMap? toOutputFilename(outputDirectory, filename, Constants.SOURCE_MAP_SUFFIX): null;
       try {
         CompilationResult content = compile(inputFile, toFile(cssFilename), generateSourceMap);
         print.printToFiles(content, filename, inputFile, cssFilename, mapFilename);

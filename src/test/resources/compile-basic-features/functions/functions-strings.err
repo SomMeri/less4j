@@ -1,0 +1,5 @@
+Warnings produced by compilation of testCase
+WARNING 36:19 Escape function argument should be a string.
+WARNING 37:20 Escape function argument should be a string.
+WARNING 38:19 Escape function argument should be a string.
+WARNING 39:19 Escape function argument should be a string.

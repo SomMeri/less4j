@@ -20,11 +20,13 @@ import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 public abstract class CommandLineTest {
 
+
   protected static final String FILE_DOES_NOT_EXISTS = "Errors produced by compilation of src/test/resources/command-line/doesNotExists.less\nERROR The file " + DebugAndTestPrint.slashToplatformFileSeparator("src/test/resources/command-line/doesNotExists.less")+" does not exists.\nCould not compile the file src/test/resources/command-line/doesNotExists.less\n";
 
   protected static final String inputDir = "src/test/resources/command-line/";
   protected static final String customOutputDir = "src/test/resources/command-line/output";
   private static final String EXPECTED_CSS = ".test h4 {\n  declaration: ##ID;\n}\n";
+  private static final String SOURCE_MAP_LINK = "/*# sourceMappingURL=##FILENAME */\n";
   private static final String ERRORS_CSS = "";
   private static final String WARNINGS_CSS = "{\n  padding: 2 2 2 2;\n}\n";
   //private static final String ERRORS_CSS = ".test h4 {\n  declaration: !#error#!;\n  padding: 2 2 2 2;\n}\n";
@@ -102,6 +104,11 @@ public abstract class CommandLineTest {
 
   protected String correctCss(String id) {
     return EXPECTED_CSS.replace("##ID", id);
+  }
+
+  protected String correctCssWithSourceMap(String id, String filename) {
+    String correctCss = correctCss(id);
+    return correctCss + SOURCE_MAP_LINK.replace("##FILENAME", filename);
   }
 
   protected String incorrectCss() {

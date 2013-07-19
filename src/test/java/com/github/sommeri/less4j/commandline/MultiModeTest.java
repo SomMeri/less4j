@@ -61,9 +61,9 @@ public class MultiModeTest extends CommandLineTest {
 
     fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiMapFile1, multiMapFile2);
     CommandLine.main(new String[] {"-m", "--sourceMap", multiLessFile1, multiLessFile2});
-    fileUtils.assertFileContent(multiCssFile1, correctCss("multi1"));
+    fileUtils.assertFileContent(multiCssFile1, correctCssWithSourceMap("multi1", "multi1.css.map"));
     validateSourceMap(mapdataFile1, multiCssFile1, multiMapFile1);
-    fileUtils.assertFileContent(multiCssFile2, correctCss("multi2"));
+    fileUtils.assertFileContent(multiCssFile2, correctCssWithSourceMap("multi2", "multi2.css.map"));
     validateSourceMap(mapdataFile2, multiCssFile2, multiMapFile2);
     assertNoErrors();
   }

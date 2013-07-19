@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.AbstractErrorReportingTest;
+import com.github.sommeri.less4j.AbstractFileBasedTest;
 
-public class MixinsTest extends AbstractErrorReportingTest {
+public class MixinsTest extends AbstractFileBasedTest {
   
   //TODO: report returnMixinsLessjsIncompatible as low priority e.g., multiple-unlocks.less
   private static final String standardCases = "src/test/resources/compile-basic-features/mixins/";

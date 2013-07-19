@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.AbstractErrorReportingTest;
+import com.github.sommeri.less4j.AbstractFileBasedTest;
 
-public class SourceMapContentTest extends AbstractErrorReportingTest {
+public class SourceMapContentTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/source-map/content/";
 

@@ -8,14 +8,14 @@ import java.util.Collection;
 import org.apache.commons.io.IOUtils;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.AbstractErrorReportingTest;
+import com.github.sommeri.less4j.AbstractFileBasedTest;
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource.StringSource;;
 
-public class ImportsUnknownInputFileTest extends AbstractErrorReportingTest {
+public class ImportsUnknownInputFileTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/import/unknown-input-file/";
 
@@ -33,8 +33,7 @@ public class ImportsUnknownInputFileTest extends AbstractErrorReportingTest {
     try {
       String less = IOUtils.toString(new FileReader(lessFile));
       LessCompiler compiler = getCompiler();
-      Configuration configuration = new Configuration();
-      configuration.setCssResultLocation(cssOutput);
+      Configuration configuration = createConfiguration(cssOutput);
       CompilationResult actual = compiler.compile(new StringSource(less), configuration);
       return actual;
     } catch (IOException ex) {

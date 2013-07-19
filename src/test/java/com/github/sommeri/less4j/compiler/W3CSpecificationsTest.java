@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.AbstractErrorReportingTest;
+import com.github.sommeri.less4j.AbstractFileBasedTest;
 import com.github.sommeri.less4j.Less4jException;
 
 /**
@@ -13,7 +13,7 @@ import com.github.sommeri.less4j.Less4jException;
  *  or w3c specification drafts.
  *  
  */
-public class W3CSpecificationsTest extends AbstractErrorReportingTest {
+public class W3CSpecificationsTest extends AbstractFileBasedTest {
 
   private static final String pagedMedia = "src/test/resources/w3c-specifications/CSS Paged Media Module Level 3";
   private static final String supportsAtRule = "src/test/resources/w3c-specifications/CSS Conditional Rules Module Level 3/6 at-supports";

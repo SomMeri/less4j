@@ -6,10 +6,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.commandline.FileSystemUtils;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
@@ -31,18 +34,20 @@ import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
 import com.github.sommeri.less4j.core.compiler.stages.UselessLessElementsRemover;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
+import com.github.sommeri.less4j.platform.Constants;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class LessToCssCompiler {
 
   private ProblemsHandler problemsHandler;
-  ASTManipulator astManipulator = new ASTManipulator();
+  private ASTManipulator astManipulator = new ASTManipulator();
 
   public LessToCssCompiler(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
   }
 
-  public ASTCssNode compileToCss(StyleSheet less, LessSource source) {
+  public ASTCssNode compileToCss(StyleSheet less, LessSource source, Configuration options) {
     resolveImports(less, source);
     resolveReferences(less);
 
@@ -57,10 +62,38 @@ public class LessToCssCompiler {
     sortTopLevelElements(less);
     removeUselessCharsets(less);
 
+    //source map  
+    handleSourceMapLink(less, options);
+
     //final validation
     validateFinalCss(less);
 
     return less;
+  }
+
+  private void handleSourceMapLink(StyleSheet less, Configuration options) {
+    if (!options.shouldLinkSourceMap())
+      return;
+
+    List<Comment> comments = less.getTrailingComments();
+
+    // add new line to last comment
+    if (!comments.isEmpty())
+      ArraysUtils.last(comments).setHasNewLine(true);
+
+    //compose linking comment
+    String cssResultLocation = getCssResultLocationName(options);
+    String url = FileSystemUtils.changeSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
+    String commentTest = "/*# sourceMappingURL=" + url + " */";
+    Comment linkComment = new Comment(less.getUnderlyingStructure(), commentTest, true);
+
+    //add linking comment
+    comments.add(linkComment);
+  }
+
+  private String getCssResultLocationName(Configuration options) {
+    LessSource location = options.getCssResultLocation();
+    return location == null ? null : location.getName();
   }
 
   private void resolveImports(StyleSheet less, LessSource source) {
@@ -92,20 +125,20 @@ public class LessToCssCompiler {
     ASTManipulator astManipulator = new ASTManipulator();
     Iterator<ASTCssNode> iterator = less.getChilds().iterator();
     if (!iterator.hasNext())
-      return ;
-    
+      return;
+
     ASTCssNode node = iterator.next();
     if (node.getType() != ASTCssNodeType.CHARSET_DECLARATION)
       return;
 
     if (!iterator.hasNext())
-      return ;
+      return;
 
     while (iterator.hasNext()) {
       node = iterator.next();
       if (node.getType() != ASTCssNodeType.CHARSET_DECLARATION)
         return;
-      
+
       astManipulator.removeFromBody(node);
     }
   }
@@ -128,7 +161,7 @@ public class LessToCssCompiler {
           return 0;
         if (node.getType() == ASTCssNodeType.IMPORT)
           return 1;
-        
+
         return 2;
       }
     });
@@ -212,7 +245,7 @@ public class LessToCssCompiler {
   private void validateFinalCss(StyleSheet less) {
     CssAstValidator validator = new CssAstValidator(problemsHandler);
     validator.validate(less);
-    
+
   }
 
 }

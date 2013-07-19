@@ -5,10 +5,10 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.AbstractErrorReportingTest;
+import com.github.sommeri.less4j.AbstractFileBasedTest;
 import com.github.sommeri.less4j.Less4jException;
 
-public class MediaTest extends AbstractErrorReportingTest {
+public class MediaTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/media/";
 

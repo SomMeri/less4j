@@ -36,6 +36,7 @@ public class SourceMapValidator {
   private static final String SOURCE_ROOT_PROPERTY = "sourceRoot";
 
   private Map<String, MappedFile> mappedFiles = new HashMap<String, MappedFile>();
+  private MappedFile cssFile;
   private Map<String, String> contents = new HashMap<String, String>();
 
   public SourceMapValidator() {
@@ -50,6 +51,7 @@ public class SourceMapValidator {
   }
 
   public void validateSourceMap(CompilationResult compilationResult, File mapdataFile, File cssFileLocation) {
+    initializeGeneratedCss(compilationResult);
     SourceMapConsumerV3 sourceMap = parseGeneratedMap(compilationResult);
 
     Mapdata mapdata = checkAgainstMapdataFile(sourceMap, mapdataFile);
@@ -126,14 +128,22 @@ public class SourceMapValidator {
     for (String name : originalSources) {
       try {
         String content = getFileContent(root, name);
-        String[] lines = content.split("\r?\n|\r");
-        MappedFile mapped = new MappedFile(lines);
+        MappedFile mapped = toMappedFile(name, content);
         mappedFiles.put(name, mapped);
       } catch (Throwable th) {
         fail("Could not read source file " + name);
       }
     }
+  }
 
+  private void initializeGeneratedCss(CompilationResult compilationResult) {
+    cssFile = toMappedFile("", compilationResult.getCss());
+  }
+
+  private MappedFile toMappedFile(String name, String content) {
+    String[] lines = content.split("\r?\n|\r");
+    MappedFile mapped = new MappedFile(lines, name);
+    return mapped;
   }
 
   private String getFileContent(String root, String name) throws UnsupportedEncodingException, IOException, FileNotFoundException {
@@ -178,9 +188,19 @@ public class SourceMapValidator {
       if (symbolName != null && !mapdata.isInterpolated(symbolName)) {
         String sourceSnippet = mappedFile.getSnippet(sourceStartPosition, symbolName.length());
 
-        assertNotNull(sourceName + ": css symbol " + symbolName + " " + startPosition + " is mapped non-existent source position  " + sourceStartPosition, sourceSnippet);
-        assertEquals(sourceName + ": css symbol " + symbolName + " " + startPosition + " is mapped to less " + sourceSnippet + " " + sourceStartPosition, symbolName, sourceSnippet);
+        assertNotNull(sourceName + ": css symbol " + symbolName + " " + ts(startPosition) + " is mapped non-existent source position  " + ts(sourceStartPosition), sourceSnippet);
+        assertEquals(sourceName + ": css symbol " + symbolName + " " + ts(startPosition) + " is mapped to less " + sourceSnippet + " " + ts(sourceStartPosition), symbolName, sourceSnippet);
       }
+      if (symbolName != null && cssFile.isAvailable()) {
+        String cssSnippet = cssFile.getSnippet(startPosition, symbolName.length());
+        assertEquals(cssFile.getName() + ": position " + ts(startPosition) + " should contain " + symbolName + " it has " + cssSnippet + " instead", symbolName, cssSnippet);
+      }
+    }
+
+    private String ts(FilePosition p) {
+      StringBuilder builder = new StringBuilder();
+      builder.append("[").append(p.getLine() + 1).append(":").append(p.getColumn() + 1).append("]");
+      return builder.toString();
     }
 
   }
@@ -188,10 +208,20 @@ public class SourceMapValidator {
 
 class MappedFile {
 
+  private final String name;
   private final String[] lines;
 
-  public MappedFile(String[] lines) {
+  public MappedFile() {
+    this(new String[0], null);
+  }
+
+  public MappedFile(String[] lines, String name) {
     this.lines = lines;
+    this.name = name;
+  }
+
+  public boolean isAvailable() {
+    return name != null;
   }
 
   public String getSnippet(FilePosition start, int length) {
@@ -203,10 +233,14 @@ class MappedFile {
     int startColumn = start.getColumn();
     int end = startColumn + length;
     if (end >= line.length())
-      return null;
+      end = line.length();
 
     String substring = line.substring(startColumn, end);
     return substring;
+  }
+
+  public String getName() {
+    return name;
   }
 
 }

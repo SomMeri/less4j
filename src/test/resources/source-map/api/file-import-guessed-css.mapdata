@@ -1,0 +1,5 @@
+{
+  "file":"file-import.css",
+  "sources":["file-import.less", "import/imported.less"],
+  "names":[".class", ".imported"]
+}

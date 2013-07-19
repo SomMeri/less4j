@@ -54,6 +54,6 @@ public class FilePosition {
     builder.append("[").append(getLine()).append(":").append(getColumn()).append("]");
     return builder.toString();
   }
-  
+
   
 }

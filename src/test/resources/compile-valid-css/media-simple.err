@@ -1,0 +1,8 @@
+Warnings produced by compilation of testCase
+WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 1:3.
+WARNING 5:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 4:1.
+WARNING 8:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 7:1.
+WARNING 11:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 10:1.
+WARNING 31:5 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 27:1.
+WARNING 34:5 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 27:1.
+WARNING 35:5 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 27:1.

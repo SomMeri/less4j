@@ -13,6 +13,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
+import com.github.sommeri.less4j.commandline.FileSystemUtils;
+import com.github.sommeri.less4j.platform.Constants;
 
 /**
  * The test reproduces test files found in original less.js implementation. Some of those
@@ -28,17 +30,20 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
   private static final Set<String> excludeInput = new HashSet<String>(Arrays.asList(new String[] {"comments.less", "whitespace.less"}));
   private static final Set<String> disabled = new HashSet<String>(Arrays.asList(new String[] {"urls.less"}));
 
-  public LessJsV1_3_3Test(File inputFile, File cssFile, String testName) {
-    super(inputFile, cssFile, testName);
+  public LessJsV1_3_3Test(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
-  @Parameters(name="Less: {2}")
+  @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
     Collection<File> allFiles = FileUtils.listFiles(new File(inputLessDir), null, false);
     Collection<Object[]> result = new ArrayList<Object[]>();
-    for (File file : allFiles) {
-      if (!excludeInput.contains(file.getName()) && !disabled.contains(file.getName())) {
-        result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
+    for (File less : allFiles) {
+      if (!excludeInput.contains(less.getName()) && !disabled.contains(less.getName())) {
+        File css = findCorrespondingCss(less);
+        File err = FileSystemUtils.changeSuffix(css, ".err");
+        File mapdata = FileSystemUtils.changeSuffix(css, ".mapdata");
+        result.add(new Object[] { less, css, err, mapdata, less.getName() });
       }
     }
     return result;
@@ -46,13 +51,13 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
 
   protected static File findCorrespondingCss(File lessFile) {
     String lessFileName = lessFile.getName();
-    String cssFileName = convertToOutputFilename(lessFileName);
+    String cssFileName = toCssFile(lessFileName);
     File cssFile = new File(expectedCssDir + cssFileName);
     return cssFile;
   }
 
-  private static String convertToOutputFilename(String name) {
-    return name.substring(0, name.length() - 5) + ".css";
+  private static String toCssFile(String name) {
+    return FileSystemUtils.changeSuffix(name, Constants.CSS_SUFFIX);
   }
 
   @Override

@@ -1,0 +1,13 @@
+Warnings produced by compilation of testCase
+WARNING 4:17 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 4:48 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 10:18 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 10:41 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 13:19 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 13:46 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 18:17 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 18:48 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 24:18 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 24:41 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 26:18 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+WARNING 26:39 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.

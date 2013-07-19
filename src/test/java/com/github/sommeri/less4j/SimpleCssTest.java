@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+
 /**
  * The test reproduces test files found in original less.js implementation. As
  * less.js has only only one tag and that tag is one year old, we took tests
@@ -17,7 +19,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @Ignore
 @RunWith(Parameterized.class)
-public class SimpleCssTest extends AbstractErrorReportingTest {
+public class SimpleCssTest extends AbstractFileBasedTest {
 
   private static final String inputLess = "src/test/resources/minitests/debug1.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
@@ -60,6 +62,13 @@ public class SimpleCssTest extends AbstractErrorReportingTest {
 
   public SimpleCssTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
     super(inputFile, outputFile, errorList, mapdataFile, testName);
+  }
+
+  @Override
+  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
+    CompilationResult result = super.compile(lessFile, cssOutput);
+    System.out.println(result.getSourceMap());
+    return result;
   }
 
   @Parameters(name="Less: {4}")

@@ -35,7 +35,7 @@ public class SingleModeTest extends CommandLineTest {
     fileUtils.removeFile(cssFile);
     fileUtils.removeFile(mapFile);
     CommandLine.main(new String[] {lessFile, cssFile, "-sm"});
-    fileUtils.assertFileContent(cssFile, correctCss("one"));
+    fileUtils.assertFileContent(cssFile, correctCssWithSourceMap("one", "oneNew.css.map"));
     assertNoErrors();
     validateSourceMap(mapdataFile, cssFile, mapFile);
   }

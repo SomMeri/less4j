@@ -1,0 +1,9 @@
+Warnings produced by compilation of testCase
+WARNING 1:2 Selector fragment (~"escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 9:6 Selector fragment (~".escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 16:5 Selector fragment (~"escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 22:6 Selector fragment (~"#escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 28:2 Selector fragment (~"#escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 29:5 Selector fragment (~".escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 34:2 Selector fragment (~"#escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+WARNING 35:6 Selector fragment (~".escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.

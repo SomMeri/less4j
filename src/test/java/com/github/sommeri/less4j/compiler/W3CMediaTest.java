@@ -26,25 +26,24 @@ public class W3CMediaTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/w3c-official-test-cases/CSS3-Media/";
 
-  public W3CMediaTest(File inputFile, File outputFile, String testName) {
-    super(inputFile, outputFile, testName);
+  public W3CMediaTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
-  @Parameters(name="Less: {2}")
+  @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
     Collection<File> allFiles = FileUtils.listFiles(new File(standardCases), new String[] {"less"}, false);
     Collection<Object[]> result = new ArrayList<Object[]>();
     for (File file : allFiles) {
       addFiles(result, file);
     }
-//    addFiles(result, new File(inputDir + "css3-modsel-144.less"));
 
     return result;
   }
 
   protected static void addFiles(Collection<Object[]> result, File... files) {
     for (File file : files) {
-      result.add(new Object[] { file, findCorrespondingCss(file), file.getName() });
+      result.add(new Object[] { file, findCorrespondingCss(file), null, null, file.getName() });
     }
   }
 

@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessSource.CannotReadFile;
 import com.github.sommeri.less4j.LessSource.FileNotFound;
+import com.github.sommeri.less4j.commandline.FileSystemUtils;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
@@ -15,6 +16,7 @@ import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
 import com.github.sommeri.less4j.core.problems.GeneralProblem;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.CssPrinter;
 
 public class ThreadUnsafeLessCompiler implements LessCompiler {
@@ -26,7 +28,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(String lessContent) throws Less4jException {
-    return compile(new LessSource.StringSource(lessContent));
+    return compile(new LessSource.StringSource(lessContent), null);
   }
 
   @Override
@@ -36,7 +38,15 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(File lessFile) throws Less4jException {
-    return compile(new LessSource.FileSource(lessFile));
+    Configuration options = new Configuration();
+
+    //FIXME: source map (!): do the same for url and general less source
+    LessSource.FileSource lessSource = new LessSource.FileSource(lessFile);
+    LessSource.FileSource cssSource = FileSystemUtils.changeSuffix(lessSource, Constants.CSS_SUFFIX);
+
+    options.setCssResultLocation(cssSource);
+    
+    return compile(lessSource, options);
   }
 
   @Override
@@ -72,6 +82,9 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private CompilationResult doCompile(LessSource source, Configuration options) throws Less4jException {
+    if (options==null)
+      options = new Configuration();
+      
     ANTLRParser.ParseResult result;
     try {
       result = parser.parseStyleSheet(source.getContent(), source);
@@ -86,11 +99,22 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       throw new Less4jException(result.getErrors(), compilationResult);
     }
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
-    ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source);
+    ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
 
     CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, options);
     return compilationResult;
   }
+
+//  private Configuration defaultConfiguration(LessSource less) {
+//    if (less==null)
+//      return new Configuration();
+//
+//    String defaultCssDestination = FileSystemUtils.changeSuffix(less, Constants.CSS_SUFFIX);
+//
+//    Configuration configuration = new Configuration();
+//    configuration.setCssResultLocation(new LessSource.StringSource("", defaultCssDestination));
+//    return configuration;
+//  }
 
   private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration options) {
     LessSource cssDestination = options == null ? null : options.getCssResultLocation();

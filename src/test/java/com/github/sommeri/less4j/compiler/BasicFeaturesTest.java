@@ -6,8 +6,8 @@ import com.github.sommeri.less4j.AbstractFileBasedTest;
 
 public abstract class BasicFeaturesTest extends AbstractFileBasedTest {
 
-  public BasicFeaturesTest(File inputFile, File outputFile, String testName) {
-    super(inputFile, outputFile, testName);
+  public BasicFeaturesTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
   protected String canonize(String text) {

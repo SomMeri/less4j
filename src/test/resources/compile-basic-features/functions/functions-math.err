@@ -1,0 +1,4 @@
+Warnings produced by compilation of testCase
+WARNING 2:24 function 'percentage' requires number as a parameter.
+WARNING 3:24 function 'percentage' requires number as a parameter.
+WARNING 11:14 function 'percentage' requires number as a parameter.

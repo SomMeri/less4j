@@ -39,15 +39,15 @@ public class URIUtils {
   }
 
   public static String relativizeSourceURIs(LessSource from, LessSource to) {
-    if (to==null)
+    if (to == null)
       return "";
-    
-    if (to.getURI()==null)
-      return to.getName();
-    
-    if (from==null || from.getURI()==null)
+
+    if (to.getURI() == null)
+      return to.getName() == null ? "" : to.getName();
+
+    if (from == null || from.getURI() == null)
       return to.getURI().toString();
-    
+
     String fromURI = from.getURI().toString();
     String toURI = to.getURI().toString();
 
@@ -62,13 +62,15 @@ public class URIUtils {
     return relative.replace(Constants.FILE_SEPARATOR, URI_FILE_SEPARATOR);
   }
 
-
- /**
-   * taken from stackoverflow: http://stackoverflow.com/questions/204784/how-to-construct-a-relative-path-in-java-from-two-absolute-paths-or-urls
+  /**
+   * taken from stackoverflow:
+   * http://stackoverflow.com/questions/204784/how-to-construct
+   * -a-relative-path-in-java-from-two-absolute-paths-or-urls
    * 
    * Get the relative path from one file to another, specifying the directory
    * separator. If one of the provided resources does not exist, it is assumed
    * to be a file unless it ends with '/' or '\'.
+   * 
    * @param basePath
    *          basePath is calculated from this file
    * @param targetPath
@@ -116,7 +118,7 @@ public class URIUtils {
       // likely indicates differing drive letters, like C: and D:.
       // These paths cannot be relativized.
       return normalizedTargetPath;
-//      throw new PathResolutionException("No common path element found for '" + normalizedTargetPath + "' and '" + normalizedBasePath + "'");
+      //      throw new PathResolutionException("No common path element found for '" + normalizedTargetPath + "' and '" + normalizedBasePath + "'");
     }
 
     // The number of directories we have to backtrack depends on whether the base is a file or a dir
@@ -154,16 +156,16 @@ public class URIUtils {
   }
 
   private static String safeSubstring(String string, int beginIndex) {
-    if (beginIndex>string.length())
+    if (beginIndex > string.length())
       return "";
-    
+
     return string.substring(beginIndex);
   }
 
   public static String addPLatformSlashIfNeeded(String directory) {
     if (directory.endsWith(Constants.FILE_SEPARATOR))
       return directory;
-    
+
     return directory + Constants.FILE_SEPARATOR;
   }
 

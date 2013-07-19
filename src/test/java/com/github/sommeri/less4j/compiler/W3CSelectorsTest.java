@@ -6,7 +6,6 @@ import java.util.Collection;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.utils.TestFileUtils;
 
 /**
  *  Testing whether less4j correctly compiles css3 selectors conforming to 
@@ -36,13 +35,13 @@ public class W3CSelectorsTest extends AbstractFileBasedTest {
   private static final String lessjsIncompatibleNegatedNth = "src/test/resources/w3c-official-test-cases/CSS3-Selectors/less.js-incompatible/correct-css/negated-nth";
   private static final String lessjsIncompatibleNegatedVarious = "src/test/resources/w3c-official-test-cases/CSS3-Selectors/less.js-incompatible/correct-css/negated-various";
 
-  public W3CSelectorsTest(File inputFile, File outputFile, String testName) {
-    super(inputFile, outputFile, testName);
+  public W3CSelectorsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
-  @Parameters(name="Less: {2}")
+  @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
-    return (new TestFileUtils()).loadTestFiles(standardCases, lessjsIncompatibleNegatedNth, lessjsIncompatibleNegatedVarious);
+    return createTestFileUtils().loadTestFiles(standardCases, lessjsIncompatibleNegatedNth, lessjsIncompatibleNegatedVarious);
   }
 
 }

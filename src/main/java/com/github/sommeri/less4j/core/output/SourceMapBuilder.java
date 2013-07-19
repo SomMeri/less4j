@@ -27,17 +27,23 @@ public class SourceMapBuilder {
   }
 
   public void appendAsSymbol(String str, HiddenTokenAwareTree underlyingStructure) {
-    FilePosition outputStartPosition = new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
+    //indentation must be handled before measuring symbol start position
+    cssBuilder.handleIndentation();
+    FilePosition outputStartPosition = toPosition();
     cssBuilder.append(str);
-    FilePosition outputEndPosition = new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
+    FilePosition outputEndPosition = toPosition();
     
     FilePosition sourceStartPosition = toFilePosition(underlyingStructure);
     String sourceName = toSourceName(underlyingStructure);
     generator.addMapping(sourceName, str, sourceStartPosition, outputStartPosition, outputEndPosition);
   }
+
+  private FilePosition toPosition() {
+    return new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
+  }
   
   public void append(SourceMapBuilder other) {
-    FilePosition offset = new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
+    FilePosition offset = toPosition();
     cssBuilder.appendAsIs(other.cssBuilder.toString());
     SourceMapGenerator otherGenerator = other.generator;
     generator.offsetAndAppend(otherGenerator, offset);

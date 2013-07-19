@@ -1,3 +1,8 @@
+h1,
+h2 {
+  declaration-1: value-1;
+  declaration-2: value-2;
+}
 @-moz-document url-prefix() {
   .icon-spin {
     height: .9em;

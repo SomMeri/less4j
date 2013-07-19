@@ -10,7 +10,7 @@ public class ExtendedStringBuilder {
   private static final char SPACE = ' ';
   private static final Set<Character> SEPARATORS = new HashSet<Character>();
   private StringBuilder builder = new StringBuilder();
-  
+
   private int indentationLevel;
   private int line = 0;
   private boolean onNewLine = true;
@@ -24,7 +24,7 @@ public class ExtendedStringBuilder {
   public ExtendedStringBuilder() {
     this("");
   }
-  
+
   public ExtendedStringBuilder(String string) {
     builder = new StringBuilder(string);
   }
@@ -45,7 +45,11 @@ public class ExtendedStringBuilder {
   }
 
   private void addNewLines(String string) {
-    line=line+string.split(Constants.NEW_LINE).length-1;
+    int addedLines = string.split(Constants.NEW_LINE).length - 1;
+    if (string.endsWith(Constants.NEW_LINE))
+      addedLines++;
+    
+    line = line + addedLines;
   }
 
   public ExtendedStringBuilder append(boolean arg0) {
@@ -144,7 +148,7 @@ public class ExtendedStringBuilder {
   public ExtendedStringBuilder ensureNewLine() {
     if (!onNewLine)
       newLine();
-    
+
     return this;
   }
 
@@ -152,6 +156,7 @@ public class ExtendedStringBuilder {
     builder.append(Constants.NEW_LINE);
     onNewLine = true;
     line++;
+
     return this;
   }
 
@@ -165,7 +170,7 @@ public class ExtendedStringBuilder {
       indentationLevel = 0;
   }
 
-  private void handleIndentation() {
+  public void handleIndentation() {
     if (onNewLine()) {
       onNewLine = false;
       for (int i = 0; i < indentationLevel; i++) {
@@ -204,7 +209,8 @@ public class ExtendedStringBuilder {
   }
 
   public int getColumn() {
-    return builder.length() - builder.lastIndexOf(Constants.NEW_LINE);
+    int lastNewLine = builder.lastIndexOf(Constants.NEW_LINE);
+    return builder.length() - (lastNewLine+1);
   }
 
 }

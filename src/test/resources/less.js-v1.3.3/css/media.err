@@ -1,0 +1,2 @@
+Warnings produced by compilation of testCase
+WARNING 110:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 109:1.

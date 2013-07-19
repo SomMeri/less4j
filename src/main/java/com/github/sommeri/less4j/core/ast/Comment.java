@@ -14,6 +14,10 @@ public class Comment extends ASTCssNode {
     this(underlyingStructure, underlyingStructure.getText(), false);
   }
   
+  public Comment(HiddenTokenAwareTree underlyingStructure, String comment) {
+    this(underlyingStructure, comment, false);
+  }
+
   public Comment(HiddenTokenAwareTree underlyingStructure, String comment, boolean hasNewLine) {
     super(underlyingStructure);
     this.comment = comment;

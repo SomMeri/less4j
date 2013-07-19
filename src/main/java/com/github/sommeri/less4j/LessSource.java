@@ -25,8 +25,7 @@ public abstract class LessSource {
   public abstract String getContent() throws FileNotFound, CannotReadFile;
 
   /**
-   * @return less source location uri or <code>null</code>. If non-null, last
-   *         path part must be equal to whatever {@link #getName()} returns.
+   * @return less source location uri or <code>null</code>. If non-null, last path part must be equal to whatever {@link #getName()} returns.
    * 
    */
   public URI getURI() {
@@ -34,10 +33,10 @@ public abstract class LessSource {
   }
 
   /**
-   * Less source name. If the {@link #getAbsoluteURI()} returns non null.
+   * Less source name. Can be anything if the {@link #getAbsoluteURI()} returns non null, otherwise last path part.
    */
   public String getName() {
-    return "";
+    return null;
   }
 
   public abstract static class AbstractHierarchicalSource extends LessSource {
@@ -286,7 +285,7 @@ public abstract class LessSource {
     private String name;
 
     public StringSource(String content) {
-      this(content, "");
+      this(content, null);
     }
 
     public StringSource(String content, String name) {
