@@ -43,14 +43,14 @@ Pom.xml dependency:
 ## Integration With Wro4j
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
-## API:
+## API Description
 Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
 *  `CompilationResult compile(String lessContent)` - compiles a string,
 *  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type. 
 
-Each of these method has an additional optional parameter `Configuration options`. Additional options are used only during [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps) generation, so you may ignore them if you do not need source map. Conversely, source map requires information from the `options` object and will not be generated if it is not present.    
+Each of these method has an additional optional parameter `Configuration options`. Additional options are used only during [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps) generation, so you may ignore them if you do not need it. However, source map generator requires information from the `options` object. Source map will not be generated if it is not present.    
  
 These methods differ in one important point: how they handle `@import file.less` statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem and second method assumes that all less imports reference files by relative urls. The third method is special, it leaves all imports as they are. It does not load and compile any files.         
 
@@ -61,6 +61,7 @@ Return object `CompilationResult` has two methods:
 
 Each warning is described by message, line, character number and filename of the place that caused it.
   
+## Example
 ````java
 // create input file
 File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
@@ -80,7 +81,8 @@ private static String format(Problem warning) {
 }
 ````
 
-The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
+## Error Handling
+`Compile` method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
 
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
