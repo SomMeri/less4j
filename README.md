@@ -50,10 +50,6 @@ Access the compiler either through the `com.github.less4j.LessCompiler` interfac
 *  `CompilationResult compile(String lessContent)` - compiles a string,
 *  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type. 
 
-Each of these method has an additional optional parameter `Configuration options`. Additional options are used only during [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps) generation, so you may ignore them if you do not need it. However, source map generator requires information from the `options` object. Source map will not be generated if it is not present.    
- 
-These methods differ in one important point: how they handle `@import file.less` statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem and second method assumes that all less imports reference files by relative urls. The third method is special, it leaves all imports as they are. It does not load and compile any files.         
-
 Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
 * `getSourceMap` - returns either null or [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps),
@@ -61,6 +57,10 @@ Return object `CompilationResult` has two methods:
 
 Each warning is described by message, line, character number and filename of the place that caused it.
   
+Each of these method has an additional optional parameter `Configuration options`. Additional options are used only during [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps) generation, so you may ignore them if you do not need it. However, source map generator requires information from the `options` object. Source map will not be generated if it is not present.    
+ 
+These methods differ in one important point: how they handle `@import file.less` statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem and second method assumes that all less imports reference files by relative urls. The third method is special, it leaves all imports as they are. It does not load and compile any files.         
+
 ### Example
 ````java
 // create input file
