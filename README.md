@@ -47,18 +47,19 @@ The easiest way to integrate less4j into Java project is to use [wro4j](http://a
 Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
-*  `CompilationResult compile(String lessContent)` - compiles a string - unable to import less files, leaves imports as they are,
+*  `CompilationResult compile(String lessContent)` - compiles a string,
 *  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type. 
 
-These methods differ in one important point: how they handle "@import lessFile" statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem, second method assumes that all less imports reference files by relative urls and the third method leaves imports as they are.         
+These methods differ in one important point: how they handle `@import file.less` statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem and second method assumes that all less imports reference files by relative urls. The third method is special, it leaves all imports as they are. It does not load and compile any files.         
 
 Return object `CompilationResult` has two methods: 
 * `getCss` - returns compiled css,
 * `getWarnings` - returns list of compilation warnings or an empty list. 
 
-Each warning is described by a message and knows both line, character number and filename of the place that caused it.  
+Each warning is described by a message, line, character number and filename of the place that caused it.  
 
-<pre><code>// create input file
+````java
+// create input file
 File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
 
 // compile it
@@ -74,7 +75,7 @@ for (Problem warning : compilationResult.getWarnings()) {
 private static String format(Problem warning) {
   return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
 }
-</code></pre>
+````
 
 The method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
 
