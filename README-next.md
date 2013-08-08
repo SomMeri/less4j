@@ -44,8 +44,7 @@ Pom.xml dependency:
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
 ## API Basics:
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. The interface exposes multiple `compile` methods. Each takes file, url, string or other resource with less code and compiles it into css.
-
+Less files are compiled using `compile` method of `com.github.less4j.LessCompiler` interface. The interface is able to compile files, urls, strings or custom resources hidden behind `LessSource` interface.
 Thread safe implementation of `LessCompiler` interface is in `DefaultLessCompiler` class:
 ````java
 public void example() throws Less4jException { 
