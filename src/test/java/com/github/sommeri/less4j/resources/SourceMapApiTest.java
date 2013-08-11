@@ -166,8 +166,6 @@ public class SourceMapApiTest {
 
     LessCompiler compiler = new DefaultLessCompiler();
     CompilationResult compilationResult = compiler.compile(ONE_IMPORT_LESS_FILE, configuration);
-    System.out.println(compilationResult.getCss());
-    System.out.println(compilationResult.getSourceMap());
     
     assertNotNull(compilationResult.getCss());
     assertNotNull(compilationResult.getSourceMap());
