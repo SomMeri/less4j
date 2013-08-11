@@ -150,7 +150,7 @@ public abstract class LessSource {
 
     @Override
     public String getName() {
-      return inputURL.getFile();
+      return new File(inputURL.getPath()).getName();
     }
 
     public String toString() {
@@ -283,6 +283,7 @@ public abstract class LessSource {
 
     private String content;
     private String name;
+    private URI uri;
 
     public StringSource(String content) {
       this(content, null);
@@ -293,9 +294,15 @@ public abstract class LessSource {
       this.name = name;
     }
 
+    public StringSource(String content, String name, URI uri) {
+      this.content = content;
+      this.name = name;
+      this.uri = uri;
+    }
+
     @Override
     public URI getURI() {
-      return null;
+      return uri;
     }
 
     @Override

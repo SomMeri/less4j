@@ -1,0 +1,5 @@
+{
+  "file":"dummy.html",
+  "sources":["src/test/resources/source-map/api/file-import.less","src/test/resources/source-map/api/import/imported.less"],
+  "names":[".class", ".imported"]
+}

@@ -102,7 +102,7 @@ public class CommandLine {
   }
 
   private String singleModeMapFilename(String cssFileName, boolean generateSourceMap) {
-    return !generateSourceMap || cssFileName==null? null: FileSystemUtils.changeSuffix(cssFileName, Constants.SOURCE_MAP_SUFFIX);
+    return !generateSourceMap || cssFileName==null? null: FileSystemUtils.addSuffix(cssFileName, Constants.SOURCE_MAP_SUFFIX);
   }
 
   private File toFile(String fileName) {
@@ -131,7 +131,7 @@ public class CommandLine {
     for (String filename : files) {
       File inputFile = new File(filename);
       String cssFilename = toOutputFilename(outputDirectory, filename, Constants.CSS_SUFFIX);
-      String mapFilename = generateSourceMap? toOutputFilename(outputDirectory, filename, Constants.SOURCE_MAP_SUFFIX): null;
+      String mapFilename = generateSourceMap? toOutputFilename(outputDirectory, filename, Constants.FULL_SOURCE_MAP_SUFFIX): null;
       try {
         CompilationResult content = compile(inputFile, toFile(cssFilename), generateSourceMap);
         print.printToFiles(content, filename, inputFile, cssFilename, mapFilename);

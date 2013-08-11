@@ -1,5 +1,5 @@
 {
-  "file":"http://www.somewhere.com/dummy.html#here?parameter=value",
+  "file":"dummy.html",
   "sources":[""],
   "names":[".class"]
 }

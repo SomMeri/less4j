@@ -15,7 +15,7 @@ public class MultiModeTest extends CommandLineTest {
     String lessFile = inputDir+"one.less";
     String cssFile = inputDir+"one.css";
     String mapFile = inputDir+"one.css.map";
-    fileUtils.removeFile(cssFile);
+    fileUtils.removeFiles(cssFile, mapFile);
     CommandLine.main(new String[] {"-m", lessFile});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
     fileUtils.assertFileNotExists(mapFile);

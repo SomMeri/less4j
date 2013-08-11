@@ -76,7 +76,7 @@ public class CssPrinter {
 
   private static final String ERROR = "!#error#!";
   protected ExtendedStringBuilder cssOnly = new ExtendedStringBuilder();
-  protected SourceMapBuilder cssAndSM = new SourceMapBuilder(cssOnly, null, null);
+  protected SourceMapBuilder cssAndSM = new SourceMapBuilder(cssOnly, null);
   
   private static final DecimalFormat FORMATTER = createFormatter();
   private LessSource lessSource;
@@ -95,14 +95,14 @@ public class CssPrinter {
   public CssPrinter(LessSource lessSource, LessSource cssDestination) {
     this.lessSource = lessSource;
     this.cssDestination = cssDestination;
-    this.cssAndSM = new SourceMapBuilder(cssOnly, lessSource, cssDestination);
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination);
   }
 
   public CssPrinter(CssPrinter configureFromPrinter) {
     this.lessSource = configureFromPrinter.lessSource;
     this.cssDestination = configureFromPrinter.cssDestination;
     this.cssOnly = new ExtendedStringBuilder(configureFromPrinter.cssOnly);
-    this.cssAndSM = new SourceMapBuilder(cssOnly, lessSource, cssDestination);
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination);
   }
 
   /**

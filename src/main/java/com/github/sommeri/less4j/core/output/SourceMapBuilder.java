@@ -16,12 +16,10 @@ public class SourceMapBuilder {
   private final ExtendedStringBuilder cssBuilder;
   private final SourceMapGenerator generator;
 
-  private LessSource lessSource;
   private LessSource cssDestination;
 
-  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource lessSource, LessSource cssDestination) {
+  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource cssDestination) {
     this.cssBuilder = cssBuilder;
-    this.lessSource = lessSource;
     this.cssDestination = cssDestination;
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
   }
@@ -59,7 +57,8 @@ public class SourceMapBuilder {
   }
   
   public String toSourceMap() {
-    String name = URIUtils.relativizeSourceURIs(lessSource, cssDestination);
+    // map file is assumed to have the same location as generated css 
+    String name = cssDestination.getName()==null? "" : cssDestination.getName();
     try {
       StringBuilder sb = new StringBuilder();
       generator.appendTo(sb, name);

@@ -1,11 +1,36 @@
 package com.github.sommeri.less4j.commandline;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessSource.FileSource;
 
 public class FileSystemUtils {
+//  URI
+//  public URI(String scheme,
+//     String userInfo,
+//     String host,
+//     int port,
+//     String path,
+//     String query,
+//     String fragment)
+//      throws URISyntaxException
+
+  public static URI changeSuffix(URI uri, String dottedSuffix) {
+    if (uri==null)
+      return null;
+    
+    String newPath = changeSuffix(uri.getPath(), dottedSuffix);
+    try {
+      URI result = new URI(uri.getScheme(),uri.getUserInfo(), uri.getHost(), uri.getPort(), newPath, null, null);
+      return result;
+    } catch (URISyntaxException ex) {
+      //TODO do something more reasonable, maybe return null?
+      throw new IllegalStateException(ex);
+    }
+  }
 
   public static String changeSuffix(String filename, String dottedSuffix) {
     if (filename == null)
@@ -16,6 +41,13 @@ public class FileSystemUtils {
       return filename + dottedSuffix;
 
     return filename.substring(0, lastIndexOf) + dottedSuffix;
+  }
+
+  public static String addSuffix(String filename, String dottedSuffix) {
+    if (filename == null)
+      return null;
+
+    return filename + dottedSuffix;
   }
 
   public static File changeSuffix(File file, String dottedSuffix) {

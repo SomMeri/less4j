@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 
 import com.github.sommeri.less4j.Less4jException;
@@ -118,6 +119,11 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration options) {
     LessSource cssDestination = options == null ? null : options.getCssResultLocation();
+    if (cssDestination==null) {
+      String guessedCssName = FileSystemUtils.changeSuffix(lessSource.getName(), Constants.CSS_SUFFIX);
+      URI guessedURI = FileSystemUtils.changeSuffix(lessSource.getURI(), Constants.CSS_SUFFIX);
+      cssDestination = new LessSource.StringSource("", guessedCssName, guessedURI);
+    }
     
     CssPrinter builder = new CssPrinter(lessSource, cssDestination);
     builder.append(cssStyleSheet);

@@ -11,6 +11,8 @@ public interface Constants {
 
   public static final String CSS_SUFFIX = ".css";
   
-  public static final String SOURCE_MAP_SUFFIX = ".css.map";
+  public static final String SOURCE_MAP_SUFFIX = ".map";
+
+  public static final String FULL_SOURCE_MAP_SUFFIX = ".css.map";
 
 }

@@ -63,7 +63,7 @@ public class LessToCssCompiler {
     removeUselessCharsets(less);
 
     //source map  
-    handleSourceMapLink(less, options);
+    handleSourceMapLink(less, options, source);
 
     //final validation
     validateFinalCss(less);
@@ -71,8 +71,9 @@ public class LessToCssCompiler {
     return less;
   }
 
-  private void handleSourceMapLink(StyleSheet less, Configuration options) {
-    if (!options.shouldLinkSourceMap())
+  private void handleSourceMapLink(StyleSheet less, Configuration options, LessSource source) {
+    String cssResultLocation = getCssResultLocationName(options, source);
+    if (!options.shouldLinkSourceMap() || cssResultLocation==null)
       return;
 
     List<Comment> comments = less.getTrailingComments();
@@ -82,8 +83,7 @@ public class LessToCssCompiler {
       ArraysUtils.last(comments).setHasNewLine(true);
 
     //compose linking comment
-    String cssResultLocation = getCssResultLocationName(options);
-    String url = FileSystemUtils.changeSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
+    String url = FileSystemUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
     String commentTest = "/*# sourceMappingURL=" + url + " */";
     Comment linkComment = new Comment(less.getUnderlyingStructure(), commentTest, true);
 
@@ -91,9 +91,14 @@ public class LessToCssCompiler {
     comments.add(linkComment);
   }
 
-  private String getCssResultLocationName(Configuration options) {
-    LessSource location = options.getCssResultLocation();
-    return location == null ? null : location.getName();
+  private String getCssResultLocationName(Configuration options, LessSource source) {
+    LessSource location = options.getCssResultLocation(); 
+    String name = location == null ? null : location.getName();
+    
+    if (name==null)
+      name = FileSystemUtils.changeSuffix(source.getName(), Constants.CSS_SUFFIX);
+
+    return name;
   }
 
   private void resolveImports(StyleSheet less, LessSource source) {
