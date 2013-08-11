@@ -690,7 +690,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
         }
       }
     }
-    //TODO: (source map separation) I added this to because last mapping was never visited 
+    //TODO: (closure report) (source map separation) I added this to because last mapping was never visited 
     if (pending) {
       FilePosition endPosition = new FilePosition(startPosition.getLine(), startPosition.getColumn());
       visitor.visit(sourceName, symbolName, sourceStartPosition, startPosition, endPosition);

@@ -39,15 +39,8 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(File lessFile) throws Less4jException {
-    Configuration options = new Configuration();
-
-    //FIXME: source map (!): do the same for url and general less source
     LessSource.FileSource lessSource = new LessSource.FileSource(lessFile);
-    LessSource.FileSource cssSource = FileSystemUtils.changeSuffix(lessSource, Constants.CSS_SUFFIX);
-
-    options.setCssResultLocation(cssSource);
-    
-    return compile(lessSource, options);
+    return compile(lessSource, null);
   }
 
   @Override
@@ -130,7 +123,6 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     String css = builder.toCss();
     String sourceMap = builder.toSourceMap();
 
-    //FIXME: source map: add command line
     CompilationResult compilationResult = new CompilationResult(css, sourceMap, problemsHandler.getWarnings());
     return compilationResult;
   }

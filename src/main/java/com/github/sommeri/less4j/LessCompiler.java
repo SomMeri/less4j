@@ -47,7 +47,6 @@ public interface LessCompiler {
       this.cssResultLocation = cssResultLocation == null ? null : new LessSource.FileSource(cssResultLocation);
     }
 
-    //FIXME: source map: add source map link to the end of file - unless turned off here
     public boolean shouldLinkSourceMap() {
       return linkSourceMap;
     }

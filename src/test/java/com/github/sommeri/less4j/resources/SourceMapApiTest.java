@@ -117,7 +117,6 @@ public class SourceMapApiTest {
     validator.validateSourceMap(compilationResult, new File(FAKE_URL_DATA_AVAILABLE_MAPDATA));
   }
  
-  //FIXME: source map - document that if css output file location is not known, the same as less file is assumend and explain why (runningon the server)
   @Test
   public void file() throws Less4jException {
     LessCompiler compiler = new DefaultLessCompiler();
@@ -140,9 +139,6 @@ public class SourceMapApiTest {
     assertNotNull(compilationResult.getSourceMap());
     assertLinksSourceMap(compilationResult.getCss(), toFullMapSuffix()); 
     
-    System.out.println(compilationResult.getCss());
-    System.out.println(compilationResult.getSourceMap());
-
     SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
     validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_GUESSED_CSS), FileSystemUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.CSS_SUFFIX));
   }
