@@ -24,7 +24,7 @@ public class Less4jExceptionTest {
   @Test
   public void testTwoErrors() {
     String less = ".class { margin: @variable; .mixin(); }";
-    String expectedError = "Could not compile less. 2 error(s) occured:\nERROR 1:30 Could not find mixin named \".mixin\".\nERROR 1:18 The variable \"@variable\" was not declared.\n";
+    String expectedError = "Could not compile less. 2 error(s) occured:\nERROR 1:29 Could not find mixin named \".mixin\".\nERROR 1:18 The variable \"@variable\" was not declared.\n";
 
     expectCompileError(less, expectedError);
   }
@@ -32,7 +32,7 @@ public class Less4jExceptionTest {
   @Test
   public void testThreeErrors() {
     String less = ".class { margin: @variable; .mixin(); size: @other;}";
-    String expectedError = "Could not compile less. 3 error(s) occured:\nERROR 1:30 Could not find mixin named \".mixin\".\nERROR 1:18 The variable \"@variable\" was not declared.\n...\n";
+    String expectedError = "Could not compile less. 3 error(s) occured:\nERROR 1:29 Could not find mixin named \".mixin\".\nERROR 1:18 The variable \"@variable\" was not declared.\n...\n";
 
     expectCompileError(less, expectedError);
   }

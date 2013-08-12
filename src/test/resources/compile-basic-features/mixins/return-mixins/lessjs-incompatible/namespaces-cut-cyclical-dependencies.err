@@ -1,2 +1,2 @@
 Errors produced by compilation of testCase
-ERROR 12:6 Could not find mixin named ".nested".
+ERROR 12:5 Could not find mixin named ".nested".

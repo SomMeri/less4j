@@ -1,17 +1,17 @@
 Errors produced by compilation of testCase
 ERROR 2:11 The variable "@undefinedVariable" was not declared.
 ERROR 6:3 The namespace "#doesNotExists > .mixin(...)" was not declared.
-ERROR 6:21 Could not find mixin named ".mixin".
+ERROR 6:20 Could not find mixin named ".mixin".
 ERROR 10:3 The namespace "#undefinedNamespace > #doesNotExists > .mixin(...)" was not declared.
-ERROR 10:43 Could not find mixin named ".mixin".
+ERROR 10:42 Could not find mixin named ".mixin".
 ERROR 15:11 Variable indirection works only with string values.
 ERROR 37:17 The operator '>' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var > ...)`. The operator is located at position 32:28.
-ERROR 41:4 Undefined parameter @a of mixin .guardedMixin defined on line 32
+ERROR 41:3 Undefined parameter @a of mixin .guardedMixin defined on line 32
 ERROR 32:25 The variable "@a" was not declared.
 ERROR 32:25 The operator '>' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var > ...)`. The operator is located at position 32:28.
-ERROR 45:4 Could not find mixin named ".doesNotExists".
-ERROR 49:26 Could not find mixin named ".doesNotExists".
-ERROR 56:4 No mixin named ".mixinWithPattern" has the right number of parameters.
+ERROR 45:3 Could not find mixin named ".doesNotExists".
+ERROR 49:25 Could not find mixin named ".doesNotExists".
+ERROR 56:3 No mixin named ".mixinWithPattern" has the right number of parameters.
 ERROR 19:11 Cannot negate non number.
 ERROR 22:12 Can't subtract or divide a color from a number
 ERROR 23:11 Can't subtract or divide a color from a number

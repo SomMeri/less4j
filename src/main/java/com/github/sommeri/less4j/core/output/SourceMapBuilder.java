@@ -50,7 +50,7 @@ public class SourceMapBuilder {
   }
 
   private FilePosition toFilePosition(HiddenTokenAwareTree underlyingStructure) {
-    FilePosition result = new FilePosition(underlyingStructure.getLine()-1, underlyingStructure.getCharPositionInLine()-1);
+    FilePosition result = new FilePosition(underlyingStructure.getLine()-1, underlyingStructure.getCharPositionInLine());
     return result;
   }
 

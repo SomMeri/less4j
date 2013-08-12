@@ -71,7 +71,8 @@ import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
 import com.github.sommeri.less4j.core.ast.Viewport;
 import com.github.sommeri.less4j.core.output.ExtendedStringBuilder;
 import com.github.sommeri.less4j.core.output.SourceMapBuilder;
-
+//SelectorCombinator
+//EscapedSelector
 public class CssPrinter {
 
   private static final String ERROR = "!#error#!";
@@ -499,9 +500,8 @@ public class CssPrinter {
   }
 
   public boolean appendIdSelector(IdSelector node) {
-    cssOnly.append("#");
-    cssOnly.append(node.getName());
-
+    cssOnly.append(node.getFullName());
+    //cssAndSM.appendAsSymbol(node.getFullName(), node.getUnderlyingStructure());
     return true;
   }
 

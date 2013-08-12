@@ -1,2 +1,2 @@
 Errors produced by compilation of testCase
-ERROR 5:4 Could not find mixin named ".bananas".
+ERROR 5:3 Could not find mixin named ".bananas".

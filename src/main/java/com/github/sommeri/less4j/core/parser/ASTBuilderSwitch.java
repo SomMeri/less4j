@@ -81,6 +81,7 @@ import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.ast.Viewport;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 //FIXME: better error message for required (...)+ loop did not match anything at input errors
 //FIXME: better error message missing EOF at blahblah
@@ -439,16 +440,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public CssClass handleCssClass(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
-    return new CssClass(token, toInterpolableName(token, children));
-    // HiddenTokenAwareTree nameToken = children.get(0);
-    //
-    // String name = nameToken.getText();
-    // if (nameToken.getType() != LessLexer.IDENT && name.length() > 1) {
-    // name = name.substring(1, name.length());
-    // }
-    //
-    // CssClass result = new CssClass(token, name);
-    // return result;
+    List<HiddenTokenAwareTree> childrenWithoutdot = ArraysUtils.safeSublist(children, 1, children.size());
+    return new CssClass(token, toInterpolableName(token, childrenWithoutdot));
   }
 
   public SelectorAttribute handleSelectorAttribute(HiddenTokenAwareTree token) {

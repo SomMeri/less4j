@@ -521,7 +521,7 @@ idSelector:
     
 //A class name can be also a number e.g., .56 or .5cm or anything else that starts with a dot '.'.
 cssClass
-    : DOT a+=idOrClassNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=idOrClassNamePart)* -> ^(CSS_CLASS $a*); 
+    : dot=DOT a+=idOrClassNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=idOrClassNamePart)* -> ^(CSS_CLASS $dot $a*); 
     
 idOrClassNamePart
     : IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;

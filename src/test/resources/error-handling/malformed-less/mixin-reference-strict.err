@@ -1,4 +1,4 @@
 Errors produced by compilation of testCase
-ERROR 7:4 Interpolation is not allowed inside mixin references.
-ERROR 18:17 Interpolation is not allowed inside mixin references.
+ERROR 7:3 Interpolation is not allowed inside mixin references.
+ERROR 18:16 Interpolation is not allowed inside mixin references.
 ERROR 23:3 Interpolation is not allowed inside namespace references.
