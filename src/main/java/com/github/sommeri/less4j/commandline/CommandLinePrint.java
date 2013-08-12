@@ -4,14 +4,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
-import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.utils.ProblemsPrinter;
+import com.github.sommeri.less4j.utils.ProblemsPrinter.SourceNamePrinter;
 import com.github.sommeri.less4j.utils.URIUtils;
 
 public class CommandLinePrint {
@@ -48,69 +48,20 @@ public class CommandLinePrint {
       return;
     }
     outputFile(cssFilename, content.getCss());
-    if (mapFilename!=null && content.getSourceMap()!=null)
+    if (mapFilename != null && content.getSourceMap() != null)
       outputFile(mapFilename, content.getSourceMap());
     printWarnings(lessFileName, rootLessFile, content);
   }
 
   public void printWarnings(String inputfileName, File rootInputFile, CompilationResult content) {
+    SourceNamePrinter sourceNamePrinter = new RelativeFileSourceNamePrinter(rootInputFile);
+    ProblemsPrinter problemsPrinter = new ProblemsPrinter(sourceNamePrinter);
+    
     if (!content.getWarnings().isEmpty())
       standardErr.println("Warnings produced by compilation of " + inputfileName);
 
-    for (Problem warning : content.getWarnings()) {
-      standardErr.println(toWarning(warning, rootInputFile));
-    }
-  }
-
-  private String toWarning(Problem warning, File rootInputFile) {
-    return "WARNING " + toString(warning, rootInputFile);
-  }
-
-  private String toError(Problem warning, File rootInputFile) {
-    return "ERROR " + toString(warning, rootInputFile);
-  }
-
-  private String toString(Problem problem, File rootInputFile) {
-    String filename = toFilenameReport(rootInputFile, problem.getFile());
-    if (!filename.isEmpty())
-      filename = filename + " ";
-    String lineChar = toLineCharReport(problem);
-
-    if (!lineChar.isEmpty())
-      lineChar = lineChar + " ";
-    
-    return filename + lineChar + problem.getMessage();
-  }
-
-  private String toLineCharReport(Problem problem) {
-    if (problem.getLine()==-1 || problem.getCharacter()==-1)
-      return "";
-    
-    return problem.getLine() + ":" + problem.getCharacter();
-  }
-  
-  private String toFilenameReport(File rootInputFile, File file) {
-    if (file==null)
-      return "";
-
-    if (rootInputFile==null) {
-      return file.getPath();
-    }
-
-    File absoluteRoot = rootInputFile.getAbsoluteFile();
-    File absoluteFile = file.getAbsoluteFile();
-    
-    if (sameFile(absoluteRoot, absoluteFile))
-      return "";
-    
-    return URIUtils.relativize(absoluteRoot.getParentFile(), absoluteFile);
-}
-
-  private boolean sameFile(File file1, File file2) {
-    String fileAbsoluteName = file2.getAbsolutePath();
-    String rootInputFileAbsoluteName = file1.getAbsolutePath();
-    boolean equals = fileAbsoluteName.equals(rootInputFileAbsoluteName);
-    return equals;
+    String warnings = problemsPrinter.printWarnings(content.getWarnings());
+    standardErr.print(warnings);
   }
 
   private void outputFile(String filename, String content) {
@@ -152,21 +103,56 @@ public class CommandLinePrint {
   }
 
   public void reportErrors(Less4jException ex, String inputfileName, File rootInputFile) {
+    SourceNamePrinter sourceNamePrinter = new RelativeFileSourceNamePrinter(rootInputFile);
+    ProblemsPrinter problemsPrinter = new ProblemsPrinter(sourceNamePrinter);
+
     if (!ex.getErrors().isEmpty())
       standardErr.println("Errors produced by compilation of " + inputfileName);
 
-    Set<String> previousMessages = new HashSet<String>();
-    for (Problem error : ex.getErrors()) {
-      String message = toError(error, rootInputFile);
-      if (!previousMessages.contains(message)) {
-        standardErr.println(message);
-        previousMessages.add(message);
-      }
-    }
+    String errors = problemsPrinter.printErrors(ex.getErrors());
+    standardErr.print(errors);
   }
 
   protected void reportError(Throwable e) {
     e.printStackTrace(standardErr);
+  }
+
+}
+
+class RelativeFileSourceNamePrinter implements SourceNamePrinter {
+
+  private final File rootInputFile;
+
+  public RelativeFileSourceNamePrinter(File rootInputFile) {
+    super();
+    this.rootInputFile = rootInputFile;
+  }
+
+  @Override
+  public String printSourceName(LessSource source) {
+    File file = source instanceof LessSource.FileSource ? ((LessSource.FileSource) source).getInputFile() : null;
+
+    if (file == null)
+      return "";
+
+    if (rootInputFile == null) {
+      return file.getPath();
+    }
+
+    File absoluteRoot = rootInputFile.getAbsoluteFile();
+    File absoluteFile = file.getAbsoluteFile();
+
+    if (sameFile(absoluteRoot, absoluteFile))
+      return "";
+
+    return URIUtils.relativize(absoluteRoot.getParentFile(), absoluteFile);
+  }
+
+  private boolean sameFile(File file1, File file2) {
+    String fileAbsoluteName = file2.getAbsolutePath();
+    String rootInputFileAbsoluteName = file1.getAbsolutePath();
+    boolean equals = fileAbsoluteName.equals(rootInputFileAbsoluteName);
+    return equals;
   }
 
 }

@@ -8,6 +8,19 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 
 public class ArraysUtils {
 
+  public static <T> List<T> safeSublist(List<T> values, int from, int to) {
+    if (values.isEmpty())
+      return null;
+    
+    if (from>values.size())
+      from=values.size();
+
+    if (to>values.size())
+      to=values.size();
+
+    return values.subList(from, to);
+  }
+
   public static <T> T last(List<T> values) {
     if (values.isEmpty())
       return null;
