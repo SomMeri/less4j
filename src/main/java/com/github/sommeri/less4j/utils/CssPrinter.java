@@ -500,8 +500,8 @@ public class CssPrinter {
   }
 
   public boolean appendIdSelector(IdSelector node) {
-    cssOnly.append(node.getFullName());
-    //cssAndSM.appendAsSymbol(node.getFullName(), node.getUnderlyingStructure());
+    //cssOnly.append(node.getFullName());
+    cssAndSM.appendAndMap(node.getFullName(), node.getUnderlyingStructure());
     return true;
   }
 
@@ -913,7 +913,7 @@ public class CssPrinter {
 
   private boolean appendCssClass(CssClass cssClass) {
     //cssOnly.append(cssClass.getFullName());
-    cssAndSM.appendAsSymbol(cssClass.getFullName(), cssClass.getUnderlyingStructure());
+    cssAndSM.appendAndMap(cssClass.getFullName(), cssClass.getUnderlyingStructure());
     return true;
   }
 

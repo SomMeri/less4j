@@ -26,7 +26,7 @@ public class SourceMapBuilder {
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
   }
 
-  public void appendAsSymbol(String str, HiddenTokenAwareTree underlyingStructure) {
+  public void appendAndMap(String str, HiddenTokenAwareTree underlyingStructure) {
     //indentation must be handled before measuring symbol start position
     cssBuilder.handleIndentation();
     FilePosition outputStartPosition = toPosition();
