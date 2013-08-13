@@ -68,7 +68,7 @@ public abstract class AbstractFileBasedTest {
     }
   }
 
-  private void assertSourceMapValid(CompilationResult actual) {
+  protected void assertSourceMapValid(CompilationResult actual) {
     sourceMapValidation.validateSourceMap(actual, mapdataFile, cssOutput);
   }
 

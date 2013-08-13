@@ -26,24 +26,45 @@ public class SourceMapBuilder {
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
   }
 
-  public void appendAndMap(String str, HiddenTokenAwareTree underlyingStructure) {
+  public void append(String str, HiddenTokenAwareTree sourceToken) {
     //indentation must be handled before measuring symbol start position
-    cssBuilder.handleIndentation();
-    FilePosition outputStartPosition = toPosition();
+    FilePosition outputStartPosition = beforeSymbolPosition();
     cssBuilder.append(str);
-    FilePosition outputEndPosition = toPosition();
+    FilePosition outputEndPosition = afterSymbolPosition();
     
-    FilePosition sourceStartPosition = toFilePosition(underlyingStructure);
-    String sourceName = toSourceName(underlyingStructure);
+    createMapping(str, sourceToken, outputStartPosition, outputEndPosition);
+  }
+
+  public void appendIgnoreNull(String str, HiddenTokenAwareTree sourceToken) {
+    FilePosition outputStartPosition = beforeSymbolPosition();
+    cssBuilder.append(str);
+    FilePosition outputEndPosition = afterSymbolPosition();
+    
+    createMapping(str, sourceToken, outputStartPosition, outputEndPosition);
+  }
+
+  private void createMapping(String str, HiddenTokenAwareTree sourceToken, FilePosition outputStartPosition, FilePosition outputEndPosition) {
+    FilePosition sourceStartPosition = toFilePosition(sourceToken);
+    String sourceName = toSourceName(sourceToken);
     generator.addMapping(sourceName, str, sourceStartPosition, outputStartPosition, outputEndPosition);
   }
 
-  private FilePosition toPosition() {
+  private FilePosition beforeSymbolPosition() {
+    cssBuilder.handleIndentation();
+    FilePosition outputStartPosition = afterSymbolPosition();
+    return outputStartPosition;
+  }
+
+  private FilePosition afterSymbolPosition() {
+    return currentPosition();
+  }
+
+  private FilePosition currentPosition() {
     return new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
   }
   
   public void append(SourceMapBuilder other) {
-    FilePosition offset = toPosition();
+    FilePosition offset = afterSymbolPosition();
     cssBuilder.appendAsIs(other.cssBuilder.toString());
     SourceMapGenerator otherGenerator = other.generator;
     generator.offsetAndAppend(otherGenerator, offset);

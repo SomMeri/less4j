@@ -2,7 +2,7 @@
 "version":3,
 "file":"multi1.css",
 "lineCount":1,
-"mappings":"AAAAA;",
+"mappings":"AAAAA,K,CAAMC;",
 "sources":["multi1.less"],
-"names":[".test"]
+"names":[".test","h4"]
 }

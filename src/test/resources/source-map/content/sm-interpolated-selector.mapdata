@@ -1,5 +1,5 @@
 {
 "sources":["sm-interpolated-selector.less"],
-"names":[".name-1"],
-"interpolatedNames":[".name-1"]
+"names":[".name-1", ".name-2"],
+"interpolatedNames":[".name-1", ".name-2"]
 }

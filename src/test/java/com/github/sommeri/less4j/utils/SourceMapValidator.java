@@ -29,11 +29,13 @@ import com.github.sommeri.sourcemap.SourceMapParseException;
 
 public class SourceMapValidator {
 
+  //FIXME: !!! source map: rename to calculatedSymbols
   private static final String INTERPOLATED_SYMBOLS_PROPERTY = "interpolatedNames";
   private static final String SYMBOLS_PROPERTY = "names";
   private static final String SOURCES_PROPERTY = "sources";
   private static final String CSS_FILE_PROPERTY = "file";
   private static final String SOURCE_ROOT_PROPERTY = "sourceRoot";
+  protected static final String ALL = "*all*";
 
   private Map<String, MappedFile> mappedFiles = new HashMap<String, MappedFile>();
   private MappedFile cssFile;
@@ -125,7 +127,7 @@ public class SourceMapValidator {
   }
 
   private void loadMappedSourceFiles(Collection<String> originalSources, String root) {
-    for (String name : originalSources) {
+    for (String name : originalSources)
       try {
         String content = getFileContent(root, name);
         MappedFile mapped = toMappedFile(name, content);
@@ -133,7 +135,6 @@ public class SourceMapValidator {
       } catch (Throwable th) {
         fail("Could not read source file " + name);
       }
-    }
   }
 
   private void initializeGeneratedCss(CompilationResult compilationResult) {
@@ -289,7 +290,10 @@ class Mapdata {
   }
 
   public boolean isInterpolated(String symbolName) {
-    return hasInterpolatedSymbols() && interpolatedSymbols.contains(symbolName);
+    if (!hasInterpolatedSymbols())
+      return false;
+
+    return interpolatedSymbols.contains(SourceMapValidator.ALL) || interpolatedSymbols.contains(symbolName);
   }
 
   public String getFile() {

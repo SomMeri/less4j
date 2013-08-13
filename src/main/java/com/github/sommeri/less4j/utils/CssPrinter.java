@@ -31,6 +31,7 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
@@ -157,7 +158,7 @@ public class CssPrinter {
       return appendSelectorAttribute((SelectorAttribute) node); // TODOsm: source map
 
     case ID_SELECTOR:
-      return appendIdSelector((IdSelector) node); // TODOsm: source map
+      return appendIdSelector((IdSelector) node); 
 
     case CHARSET_DECLARATION:
       return appendCharsetDeclaration((CharsetDeclaration) node); // TODOsm: source map
@@ -501,7 +502,7 @@ public class CssPrinter {
 
   public boolean appendIdSelector(IdSelector node) {
     //cssOnly.append(node.getFullName());
-    cssAndSM.appendAndMap(node.getFullName(), node.getUnderlyingStructure());
+    cssAndSM.append(node.getFullName(), node.getUnderlyingStructure());
     return true;
   }
 
@@ -913,11 +914,20 @@ public class CssPrinter {
 
   private boolean appendCssClass(CssClass cssClass) {
     //cssOnly.append(cssClass.getFullName());
-    cssAndSM.appendAndMap(cssClass.getFullName(), cssClass.getUnderlyingStructure());
+    cssAndSM.append(cssClass.getFullName(), cssClass.getUnderlyingStructure());
     return true;
   }
 
+  //FIXME: !!!! source map : add to various test 
   private void appendSimpleSelectorHead(SimpleSelector selector) {
+    cssOnly.ensureSeparator();
+    if (!selector.isStar() || !selector.isEmptyForm()) {
+      InterpolableName elementName = selector.getElementName();
+      cssAndSM.appendIgnoreNull(elementName.getName(), elementName.getUnderlyingStructure());
+    }
+  }
+
+  private void appendSimpleSelectorHead_Old(SimpleSelector selector) {
     cssOnly.ensureSeparator();
     if (selector.isStar()) {
       if (!selector.isEmptyForm())

@@ -1,5 +1,5 @@
 {
 "sources":["sm-nested-classes.less"],
-"names":[".btn", ".icon-spin", ".icon-large", ".one", ".two", ".three"]
+"names":[".btn", ".icon-spin", ".icon-large", ".one", ".two", ".three", "h1", "h2"]
 }
 
