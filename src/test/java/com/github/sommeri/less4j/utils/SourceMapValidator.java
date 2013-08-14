@@ -30,7 +30,7 @@ import com.github.sommeri.sourcemap.SourceMapParseException;
 public class SourceMapValidator {
 
   //FIXME: !!! source map: rename to calculatedSymbols
-  private static final String INTERPOLATED_SYMBOLS_PROPERTY = "interpolatedNames";
+  private static final String CALCULATED_SYMBOLS_PROPERTY = "calculatedNames";
   private static final String SYMBOLS_PROPERTY = "names";
   private static final String SOURCES_PROPERTY = "sources";
   private static final String CSS_FILE_PROPERTY = "file";
@@ -116,7 +116,7 @@ public class SourceMapValidator {
 
       List<String> expectedSources = JSONUtils.getStringList(mapdata, SOURCES_PROPERTY);
       List<String> expectedSymbols = JSONUtils.getStringList(mapdata, SYMBOLS_PROPERTY);
-      List<String> interpolatedSymbols = JSONUtils.getStringList(mapdata, INTERPOLATED_SYMBOLS_PROPERTY);
+      List<String> interpolatedSymbols = JSONUtils.getStringList(mapdata, CALCULATED_SYMBOLS_PROPERTY);
       String file = JSONUtils.getString(mapdata, CSS_FILE_PROPERTY);
       String sourceRoot = JSONUtils.getString(mapdata, SOURCE_ROOT_PROPERTY);
 
