@@ -918,7 +918,6 @@ public class CssPrinter {
     return true;
   }
 
-  //FIXME: !!!! source map : add to various test 
   private void appendSimpleSelectorHead(SimpleSelector selector) {
     cssOnly.ensureSeparator();
     if (!selector.isStar() || !selector.isEmptyForm()) {

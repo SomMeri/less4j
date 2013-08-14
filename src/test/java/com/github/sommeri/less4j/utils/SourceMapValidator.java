@@ -29,7 +29,6 @@ import com.github.sommeri.sourcemap.SourceMapParseException;
 
 public class SourceMapValidator {
 
-  //FIXME: !!! source map: rename to calculatedSymbols
   private static final String CALCULATED_SYMBOLS_PROPERTY = "calculatedNames";
   private static final String SYMBOLS_PROPERTY = "names";
   private static final String SOURCES_PROPERTY = "sources";
