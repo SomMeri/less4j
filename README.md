@@ -36,7 +36,7 @@ Pom.xml dependency:
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;com.github.sommeri&lt;/groupId&gt;
   &lt;artifactId&gt;less4j&lt;/artifactId&gt;
-  &lt;version&gt;1.0.4&lt;/version&gt;
+  &lt;version&gt;1.0.5&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
@@ -44,7 +44,7 @@ Pom.xml dependency:
 The easiest way to integrate less4j into Java project is to use [wro4j](http://alexo.github.com/wro4j/) library. More about wro4j can be found either in a [blog post](http://meri-stuff.blogspot.sk/2012/08/wro4j-page-load-optimization-and-lessjs.html) or on wro4j [google code](http://code.google.com/p/wro4j/) page.
 
 ## API Description
-Access the compiler either through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following methods:
+Access the compiler through the `com.github.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.less4j.core.DefaultLessCompiler`. The interface exposes following methods:
 *  `CompilationResult compile(File inputFile)` - compiles a file, 
 *  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri,
 *  `CompilationResult compile(String lessContent)` - compiles a string,
@@ -54,7 +54,7 @@ Each of these method has an additional optional parameter `Configuration options
  
 Return object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
-* `getSourceMap` - returns either null or [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps),
+* `getSourceMap` - returns [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps),
 * `getWarnings` - returns list of compilation warnings or an empty list. 
 
 Each warning is described by message, line, character number and filename of the place that caused it.
