@@ -927,17 +927,6 @@ public class CssPrinter {
     }
   }
 
-  private void appendSimpleSelectorHead_Old(SimpleSelector selector) {
-    cssOnly.ensureSeparator();
-    if (selector.isStar()) {
-      if (!selector.isEmptyForm())
-        cssOnly.append("*");
-    } else {
-      cssOnly.appendIgnoreNull(selector.getElementName().getName());
-    }
-
-  }
-
   public boolean appendSelectorCombinator(SelectorCombinator combinator) {
     SelectorCombinator.Combinator realCombinator = combinator.getCombinator();
     switch (realCombinator) {

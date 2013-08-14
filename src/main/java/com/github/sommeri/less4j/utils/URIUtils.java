@@ -84,21 +84,14 @@ public class URIUtils {
   public static String getRelativePath(String basePath, String targetPath, String pathSeparator) {
 
     // Normalize the paths
-    String normalizedTargetPath = FilenameUtils.normalizeNoEndSeparator(targetPath);
-    String normalizedBasePath = FilenameUtils.normalizeNoEndSeparator(basePath);
-
-    // Undo the changes to the separators made by normalization
-    if (pathSeparator.equals("/")) {
-      normalizedTargetPath = FilenameUtils.separatorsToUnix(normalizedTargetPath);
-      normalizedBasePath = FilenameUtils.separatorsToUnix(normalizedBasePath);
-
-    } else if (pathSeparator.equals("\\")) {
-      normalizedTargetPath = FilenameUtils.separatorsToWindows(normalizedTargetPath);
-      normalizedBasePath = FilenameUtils.separatorsToWindows(normalizedBasePath);
-
-    } else {
-      throw new IllegalArgumentException("Unrecognised dir separator '" + pathSeparator + "'");
-    }
+    String normalizedTargetPath = normalizeNoEndSeparator(targetPath, pathSeparator);
+    String normalizedBasePath = normalizeNoEndSeparator(basePath, pathSeparator);
+    
+    if (normalizedTargetPath==null)
+      return "";
+    
+    if (normalizedBasePath==null)
+      return targetPath;
 
     String[] base = normalizedBasePath.split(Pattern.quote(pathSeparator));
     String[] target = normalizedTargetPath.split(Pattern.quote(pathSeparator));
@@ -153,6 +146,22 @@ public class URIUtils {
     }
     relative.append(safeSubstring(normalizedTargetPath, common.length()));
     return relative.toString();
+  }
+
+  public static String normalizeNoEndSeparator(String path, String separator) {
+    String result = RelativeFilenameUtils.normalizeNoEndSeparator(path);
+
+    // Undo the changes to the separators made by normalization
+    if (separator.equals("/")) {
+      result = FilenameUtils.separatorsToUnix(result);
+
+    } else if (separator.equals("\\")) {
+      result = FilenameUtils.separatorsToWindows(result);
+    } else {
+      throw new IllegalArgumentException("Unrecognised dir separator '" + separator + "'");
+    }
+
+    return result;
   }
 
   private static String safeSubstring(String string, int beginIndex) {
