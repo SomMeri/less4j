@@ -18,7 +18,7 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
-public class StringFunctions implements FunctionsPackage {
+public class StringFunctions extends BuiltInFunctionsPack {
 
   protected static final String ESCAPE = "escape";
   protected static final String E = "e";
@@ -31,22 +31,13 @@ public class StringFunctions implements FunctionsPackage {
     FUNCTIONS.put(FORMAT, new Format());
   }
 
-  private final ProblemsHandler problemsHandler;
-
   public StringFunctions(ProblemsHandler problemsHandler) {
-    this.problemsHandler = problemsHandler;
+    super(problemsHandler);
   }
 
-  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
-    return FUNCTIONS.containsKey(input.getName());
-  }
-  
-  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter) {
-    if (!canEvaluate(input, parameters))
-      return input;
-
-    Function function = FUNCTIONS.get(input.getName());
-    return function.evaluate(parameters, problemsHandler, input, evaluatedParameter);
+  @Override
+  protected Map<String, Function> getFunctions() {
+    return FUNCTIONS;
   }
 
 }

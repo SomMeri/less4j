@@ -50,11 +50,10 @@
   padding4: 2%;
   padding5: 2cm;
 }
-#caseSensitivity {
-  padding1: Percentage(0.3);
-  padding1: Floor(0.3);
-  padding1: Round(0.3);
-  padding1: Ceil(0.3);
+#caseInsensitivity-101 {
+  padding1: 30%;
+  padding1: 0;
+  padding1: 1;
 }
 documentation {
   sqrt-cm: 5cm;

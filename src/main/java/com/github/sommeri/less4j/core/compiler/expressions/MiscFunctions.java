@@ -11,14 +11,13 @@ import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
-import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.parser.ConversionUtils;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-public class MiscFunctions implements FunctionsPackage {
+public class MiscFunctions extends BuiltInFunctionsPack {
 
   protected static final String COLOR = "color";
   protected static final String UNIT = "unit";
@@ -33,39 +32,13 @@ public class MiscFunctions implements FunctionsPackage {
     FUNCTIONS.put(EXTRACT, new Extract());
   }
 
-  private final ProblemsHandler problemsHandler;
-
   public MiscFunctions(ProblemsHandler problemsHandler) {
-    this.problemsHandler = problemsHandler;
+    super(problemsHandler);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#
-   * canEvaluate(com.github.sommeri.less4j.core.ast.FunctionExpression,
-   * com.github.sommeri.less4j.core.ast.Expression)
-   */
   @Override
-  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
-    return FUNCTIONS.containsKey(input.getName());
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage#evaluate
-   * (com.github.sommeri.less4j.core.ast.FunctionExpression,
-   * com.github.sommeri.less4j.core.ast.Expression)
-   */
-  @Override
-  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter) {
-    if (!canEvaluate(input, parameters))
-      return input;
-
-    Function function = FUNCTIONS.get(input.getName());
-    return function.evaluate(parameters, problemsHandler, input, evaluatedParameter);
+  protected Map<String, Function> getFunctions() {
+    return FUNCTIONS;
   }
 
 }
