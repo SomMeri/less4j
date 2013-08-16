@@ -56,7 +56,7 @@ public class CommandLinePrint {
   public void printWarnings(String inputfileName, File rootInputFile, CompilationResult content) {
     SourceNamePrinter sourceNamePrinter = new RelativeFileSourceNamePrinter(rootInputFile);
     ProblemsPrinter problemsPrinter = new ProblemsPrinter(sourceNamePrinter);
-    
+
     if (!content.getWarnings().isEmpty())
       standardErr.println("Warnings produced by compilation of " + inputfileName);
 
@@ -115,6 +115,26 @@ public class CommandLinePrint {
 
   protected void reportError(Throwable e) {
     e.printStackTrace(standardErr);
+  }
+
+  public boolean ensureDirectory(String outputDirectory) {
+    if (outputDirectory == null || outputDirectory.isEmpty())
+      return true;
+
+    File directory = new File(outputDirectory);
+    if (directory.exists() && !directory.isDirectory()) {
+      reportError(directory + " is not a directory.");
+      return false;
+    }
+
+    if (!directory.exists()) {
+      if (!directory.mkdirs()) {
+        reportError("Could not create the directory " + directory + ".");
+        return false;
+      }
+    }
+
+    return true;
   }
 
 }

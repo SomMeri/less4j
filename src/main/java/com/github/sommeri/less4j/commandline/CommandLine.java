@@ -13,6 +13,7 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.platform.Constants;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 public class CommandLine {
   private static final String NAME = "less4j";
@@ -99,7 +100,7 @@ public class CommandLine {
   }
 
   private String singleModeMapFilename(String cssFileName, boolean generateSourceMap) {
-    return !generateSourceMap || cssFileName==null? null: FileSystemUtils.addSuffix(cssFileName, Constants.SOURCE_MAP_SUFFIX);
+    return !generateSourceMap || cssFileName==null? null: URIUtils.addSuffix(cssFileName, Constants.SOURCE_MAP_SUFFIX);
   }
 
   private File toFile(String fileName) {
@@ -122,7 +123,7 @@ public class CommandLine {
   }
 
   private void runAsMultimode(List<String> files, String outputDirectory, boolean generateSourceMap, boolean printPartial) {
-    if (!FileSystemUtils.ensureDirectory(outputDirectory, print))
+    if (!print.ensureDirectory(outputDirectory))
       return;
 
     for (String filename : files) {
@@ -147,7 +148,7 @@ public class CommandLine {
   }
 
   private String toOutputFilename(String outputDirectory, String inputFilename, String dottedSuffix) {
-    String filename = FileSystemUtils.changeSuffix(inputFilename, dottedSuffix);
+    String filename = URIUtils.changeSuffix(inputFilename, dottedSuffix);
     if (outputDirectory == null || outputDirectory.isEmpty()) {
       return filename;
     }

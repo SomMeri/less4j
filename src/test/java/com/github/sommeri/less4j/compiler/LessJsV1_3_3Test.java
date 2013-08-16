@@ -13,8 +13,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.AbstractFileBasedTest;
-import com.github.sommeri.less4j.commandline.FileSystemUtils;
 import com.github.sommeri.less4j.platform.Constants;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 /**
  * The test reproduces test files found in original less.js implementation. Some of those
@@ -41,8 +41,8 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
     for (File less : allFiles) {
       if (!excludeInput.contains(less.getName()) && !disabled.contains(less.getName())) {
         File css = findCorrespondingCss(less);
-        File err = FileSystemUtils.changeSuffix(css, ".err");
-        File mapdata = FileSystemUtils.changeSuffix(css, ".mapdata");
+        File err = URIUtils.changeSuffix(css, ".err");
+        File mapdata = URIUtils.changeSuffix(css, ".mapdata");
         result.add(new Object[] { less, css, err, mapdata, less.getName() });
       }
     }
@@ -57,7 +57,7 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
   }
 
   private static String toCssFile(String name) {
-    return FileSystemUtils.changeSuffix(name, Constants.CSS_SUFFIX);
+    return URIUtils.changeSuffix(name, Constants.CSS_SUFFIX);
   }
 
   @Override

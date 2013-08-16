@@ -19,10 +19,10 @@ import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
-import com.github.sommeri.less4j.commandline.FileSystemUtils;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.SourceMapValidator;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 public class SourceMapApiTest {
   
@@ -127,7 +127,7 @@ public class SourceMapApiTest {
     assertLinksSourceMap(compilationResult.getCss(), toFullMapSuffix());
     
     SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
-    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_GUESSED_CSS), FileSystemUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.FULL_SOURCE_MAP_SUFFIX));
+    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_GUESSED_CSS), URIUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.FULL_SOURCE_MAP_SUFFIX));
   }
 
   @Test
@@ -140,7 +140,7 @@ public class SourceMapApiTest {
     assertLinksSourceMap(compilationResult.getCss(), toFullMapSuffix()); 
     
     SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
-    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_GUESSED_CSS), FileSystemUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.CSS_SUFFIX));
+    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_GUESSED_CSS), URIUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.CSS_SUFFIX));
   }
 
   @Test
@@ -196,7 +196,7 @@ public class SourceMapApiTest {
   }
 
   private String toFullMapSuffix() {
-    return FileSystemUtils.changeSuffix(ONE_IMPORT_LESS_FILE.getName(), Constants.FULL_SOURCE_MAP_SUFFIX);
+    return URIUtils.changeSuffix(ONE_IMPORT_LESS_FILE.getName(), Constants.FULL_SOURCE_MAP_SUFFIX);
   }
 
 }

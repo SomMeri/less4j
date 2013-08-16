@@ -3,12 +3,14 @@ package com.github.sommeri.less4j.utils;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.LessSource.FileSource;
 import com.github.sommeri.less4j.platform.Constants;
 
 public class URIUtils {
@@ -176,6 +178,53 @@ public class URIUtils {
       return directory;
 
     return directory + Constants.FILE_SEPARATOR;
+  }
+
+  public static URI changeSuffix(URI uri, String dottedSuffix) {
+    if (uri==null)
+      return null;
+    
+    String newPath = changeSuffix(uri.getPath(), dottedSuffix);
+    try {
+      URI result = new URI(uri.getScheme(),uri.getUserInfo(), uri.getHost(), uri.getPort(), newPath, null, null);
+      return result;
+    } catch (URISyntaxException ex) {
+      //TODO do something more reasonable, maybe return null?
+      throw new IllegalStateException(ex);
+    }
+  }
+
+  public static String changeSuffix(String filename, String dottedSuffix) {
+    if (filename == null)
+      return null;
+
+    int lastIndexOf = filename.lastIndexOf('.');
+    if (lastIndexOf == -1)
+      return filename + dottedSuffix;
+
+    return filename.substring(0, lastIndexOf) + dottedSuffix;
+  }
+
+  public static String addSuffix(String filename, String dottedSuffix) {
+    if (filename == null)
+      return null;
+
+    return filename + dottedSuffix;
+  }
+
+  public static File changeSuffix(File file, String dottedSuffix) {
+    if (file == null)
+      return null;
+
+    String filename = changeSuffix(file.toString(), dottedSuffix);
+    return new File(filename);
+  }
+
+  public static FileSource changeSuffix(FileSource source, String dottedSuffix) {
+    if (source == null)
+      return null;
+
+    return new LessSource.FileSource(changeSuffix(source.getInputFile(), dottedSuffix));
   }
 
 }

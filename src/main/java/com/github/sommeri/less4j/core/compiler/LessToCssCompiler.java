@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
-import com.github.sommeri.less4j.commandline.FileSystemUtils;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
@@ -36,6 +35,7 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.ArraysUtils;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 public class LessToCssCompiler {
 
@@ -83,7 +83,7 @@ public class LessToCssCompiler {
       ArraysUtils.last(comments).setHasNewLine(true);
 
     //compose linking comment
-    String url = FileSystemUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
+    String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
     String commentTest = "/*# sourceMappingURL=" + url + " */";
     Comment linkComment = new Comment(less.getUnderlyingStructure(), commentTest, true);
 
@@ -96,7 +96,7 @@ public class LessToCssCompiler {
     String name = location == null ? null : location.getName();
     
     if (name==null)
-      name = FileSystemUtils.changeSuffix(source.getName(), Constants.CSS_SUFFIX);
+      name = URIUtils.changeSuffix(source.getName(), Constants.CSS_SUFFIX);
 
     return name;
   }

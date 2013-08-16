@@ -9,7 +9,6 @@ import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessSource.CannotReadFile;
 import com.github.sommeri.less4j.LessSource.FileNotFound;
-import com.github.sommeri.less4j.commandline.FileSystemUtils;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
@@ -19,6 +18,7 @@ import com.github.sommeri.less4j.core.problems.GeneralProblem;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.CssPrinter;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 public class ThreadUnsafeLessCompiler implements LessCompiler {
   private ProblemsHandler problemsHandler;
@@ -113,8 +113,8 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration options) {
     LessSource cssDestination = options == null ? null : options.getCssResultLocation();
     if (cssDestination==null) {
-      String guessedCssName = FileSystemUtils.changeSuffix(lessSource.getName(), Constants.CSS_SUFFIX);
-      URI guessedURI = FileSystemUtils.changeSuffix(lessSource.getURI(), Constants.CSS_SUFFIX);
+      String guessedCssName = URIUtils.changeSuffix(lessSource.getName(), Constants.CSS_SUFFIX);
+      URI guessedURI = URIUtils.changeSuffix(lessSource.getURI(), Constants.CSS_SUFFIX);
       cssDestination = new LessSource.StringSource("", guessedCssName, guessedURI);
     }
     
