@@ -58,6 +58,7 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 			<groupId>com.beust</groupId>
 			<artifactId>jcommander</artifactId>
 			<version>1.29</version>
+			<optional>true</optional>
 		</dependency>
 		<!-- There are needed for source map, should be moved to separate project -->
 		<dependency>

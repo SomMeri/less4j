@@ -18,13 +18,13 @@ package com.github.sommeri.sourcemap;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.beust.jcommander.internal.Lists;
 import com.github.sommeri.sourcemap.SourceMapConsumerV3.EntryVisitor;
 
 /**
@@ -41,7 +41,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
   /**
    * A pre-order traversal ordered list of mappings stored in this map.
    */
-  private List<Mapping> mappings = Lists.newArrayList();
+  private List<Mapping> mappings = new ArrayList<Mapping>();
 
   /**
    * A map of source names to source name index
