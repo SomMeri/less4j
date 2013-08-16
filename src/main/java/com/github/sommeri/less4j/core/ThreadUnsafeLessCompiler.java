@@ -79,6 +79,15 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     if (options==null)
       options = new Configuration();
       
+    ANTLRParser.ParseResult result = toAntlrTree(source);
+    StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
+    ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
+
+    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, options);
+    return compilationResult;
+  }
+
+  private ANTLRParser.ParseResult toAntlrTree(LessSource source) throws Less4jException {
     ANTLRParser.ParseResult result;
     try {
       result = parser.parseStyleSheet(source.getContent(), source);
@@ -92,23 +101,8 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       CompilationResult compilationResult = new CompilationResult("Errors during parsing phase, partial result is not available.");
       throw new Less4jException(result.getErrors(), compilationResult);
     }
-    StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
-    ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
-
-    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, options);
-    return compilationResult;
+    return result;
   }
-
-//  private Configuration defaultConfiguration(LessSource less) {
-//    if (less==null)
-//      return new Configuration();
-//
-//    String defaultCssDestination = FileSystemUtils.changeSuffix(less, Constants.CSS_SUFFIX);
-//
-//    Configuration configuration = new Configuration();
-//    configuration.setCssResultLocation(new LessSource.StringSource("", defaultCssDestination));
-//    return configuration;
-//  }
 
   private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration options) {
     LessSource cssDestination = options == null ? null : options.getCssResultLocation();
