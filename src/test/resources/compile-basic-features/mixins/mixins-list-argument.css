@@ -6,3 +6,14 @@
 #gradientBarUsePlace {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
+#semiUsePlace {
+  content: 12 23 33px 4%;
+  content11: 12 23 33px 4%;
+  content12: 4% identifier "hello";
+  content21: 12 23 33px 4%;
+  content22: 4% identifier "hello";
+  content-optional-11: default, 1, 2, 3;
+  content-optional-12: default, 1, 2, 3;
+  content-optional-21: other, 1, 2, 3;
+  content-optional-22: other, 1, 2, 3;
+}

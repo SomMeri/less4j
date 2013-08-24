@@ -7,8 +7,10 @@ import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public abstract class ASTCssNode implements Cloneable {
-  
+
   private ASTCssNode parent;
+  //I'm using underlying structure as identified in cycle detector. If it stops to be identifying,
+  //cycle detector must be modified. !
   private HiddenTokenAwareTree underlyingStructure;
   private List<Comment> openingComments = new ArrayList<Comment>();
   private List<Comment> orphanComments = new ArrayList<Comment>();
@@ -16,27 +18,27 @@ public abstract class ASTCssNode implements Cloneable {
 
   public ASTCssNode(HiddenTokenAwareTree underlyingStructure) {
     this.underlyingStructure = underlyingStructure;
-    if (underlyingStructure==null)
+    if (underlyingStructure == null)
       throw new IllegalArgumentException("Underlying can not be null. It is used for error reporting, so place there the closest token possible.");
   }
-  
+
   /**
-   * WARNING: it is up to the programmer to keep parent and childs getters 
-   * and setters consistent. Members of this hierarchy are not responsible for that.  
+   * WARNING: it is up to the programmer to keep parent and childs getters and
+   * setters consistent. Members of this hierarchy are not responsible for that.
    */
   public abstract List<? extends ASTCssNode> getChilds();
-  
+
   /**
-   * WARNING: it is up to the programmer to keep parent and childs getters 
-   * and setters consistent. Members of this hierarchy are not responsible for that.  
+   * WARNING: it is up to the programmer to keep parent and childs getters and
+   * setters consistent. Members of this hierarchy are not responsible for that.
    */
   public ASTCssNode getParent() {
     return parent;
   }
 
   /**
-   * WARNING: it is up to the programmer to keep parent and childs getters 
-   * and setters consistent. Members of this hierarchy are not responsible for that.  
+   * WARNING: it is up to the programmer to keep parent and childs getters and
+   * setters consistent. Members of this hierarchy are not responsible for that.
    */
   public void setParent(ASTCssNode parent) {
     this.parent = parent;
@@ -57,11 +59,11 @@ public abstract class ASTCssNode implements Cloneable {
   public void setTrailingComments(List<Comment> trailingComments) {
     this.trailingComments = trailingComments;
   }
-  
+
   public void addTrailingComments(List<Comment> comments) {
     this.trailingComments.addAll(comments);
   }
-  
+
   public List<Comment> getOpeningComments() {
     return openingComments;
   }
@@ -73,7 +75,7 @@ public abstract class ASTCssNode implements Cloneable {
   public void addOpeningComments(List<Comment> openingComments) {
     this.openingComments.addAll(openingComments);
   }
-  
+
   public List<Comment> getOrphanComments() {
     return orphanComments;
   }
@@ -83,23 +85,23 @@ public abstract class ASTCssNode implements Cloneable {
   }
 
   public abstract ASTCssNodeType getType();
-  
+
   public boolean isFaulty() {
     return false;
   }
 
   public LessSource getSource() {
-    return getUnderlyingStructure()==null? null : getUnderlyingStructure().getSource();
+    return getUnderlyingStructure() == null ? null : getUnderlyingStructure().getSource();
   }
 
   public int getSourceLine() {
-    return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getLine();
+    return getUnderlyingStructure() == null ? -1 : getUnderlyingStructure().getLine();
   }
 
   public int getSourceColumn() {
-    return getUnderlyingStructure()==null? -1 : getUnderlyingStructure().getCharPositionInLine() + 1;
+    return getUnderlyingStructure() == null ? -1 : getUnderlyingStructure().getCharPositionInLine() + 1;
   }
-  
+
   @Override
   public ASTCssNode clone() {
     try {

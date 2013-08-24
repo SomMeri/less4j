@@ -652,7 +652,7 @@ compareOperator
     
 semiSplitReusableStructureArguments
     : (    // nothing 
-           | a+=commaSplitReusableStructureArgument ( a+=semicolon a+=commaSplitReusableStructureArgument)*
+           | a+=commaSplitReusableStructureArgument ( a+=semicolon a+=commaSplitReusableStructureArgument)* (a+=semicolon)?
       ) -> ^(SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS $a*)
     ;
 

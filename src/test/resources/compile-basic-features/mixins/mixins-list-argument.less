@@ -20,3 +20,33 @@
 #gradientBarUsePlace {
   .gradientBar();
 }
+
+//issue #160 https://github.com/SomMeri/less4j/issues/160
+.semiMixinOne(@parameter;) {
+   content: @parameter;
+ }
+.semiMixinTwo1(@parameter1; @parameter2;) {
+   content11: @parameter1;
+   content12: @parameter2;
+ }
+.semiMixinTwo2(@parameter1; @parameter2) {
+   content21: @parameter1;
+   content22: @parameter2;
+ }
+.semiMixinOptional(@parameter1: default,1,2,3; @parameter2: default,1,2,3) {
+   content-optional-11: @parameter1;
+   content-optional-12: @parameter2;
+}
+
+.semiMixinOptional(@parameter1: other,1,2,3; @parameter2: other,1,2,3;) {
+   content-optional-21: @parameter1;
+   content-optional-22: @parameter2;
+}
+
+ #semiUsePlace {
+   @variable: 4%;
+   .semiMixinOne(12 23 33px @variable);
+   .semiMixinTwo1(12 23 33px @variable, @variable identifier "hello");
+   .semiMixinTwo2(12 23 33px @variable, @variable identifier "hello");
+   .semiMixinOptional();
+ }

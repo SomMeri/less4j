@@ -15,12 +15,14 @@ import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.stages.MixinsCycleDetector.CycleType;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 class MixinsSolver {
 
   private final ProblemsHandler problemsHandler;
   private final ReferencesSolver parentSolver;
+  private final MixinsCycleDetector cycleDetector = new MixinsCycleDetector();
 
   public MixinsSolver(ReferencesSolver parentSolver, ProblemsHandler problemsHandler) {
     this.parentSolver = parentSolver;
@@ -28,6 +30,17 @@ class MixinsSolver {
   }
 
   private void resolveMixinReference(final GeneralBody result, final Scope callerScope, final ReusableStructure referencedMixin, final Scope referencedMixinScope, final ExpressionEvaluator expressionEvaluator) {
+    CycleType cycle = cycleDetector.detectCycle(referencedMixin);
+    if (cycle==CycleType.LEGITIMATE)
+      return ;
+    
+    if (cycle==CycleType.FAULTY) {
+      System.out.println("Bwahaha");
+      //FIXME: (!!!) add error to problems handler
+      return ;
+    }
+
+    cycleDetector.entering(referencedMixin);
     // ... and I'm starting to see the point of closures ...
     InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new ITask() {
 
@@ -37,6 +50,7 @@ class MixinsSolver {
       }
 
     });
+    cycleDetector.leaving(referencedMixin);
   }
 
   private void unsafeResolveMixinReference(GeneralBody result, Scope callerScope, ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot, ExpressionEvaluator expressionEvaluator) {
