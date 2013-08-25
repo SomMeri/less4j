@@ -42,7 +42,7 @@ public class ReferencesSolver {
 
   public ReferencesSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
-    mixinsSolver = new MixinsSolver(this, problemsHandler);
+    this.mixinsSolver = new MixinsSolver(this, semiCompiledNodes, problemsHandler);
   }
 
   public void solveReferences(final ASTCssNode node, final Scope scope) {

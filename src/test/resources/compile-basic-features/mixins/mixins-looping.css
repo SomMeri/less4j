@@ -1,0 +1,19 @@
+#loop-here {
+  loop: member 5;
+  loop: member 4;
+  loop: member 3;
+  loop: member 2;
+  loop: member 1;
+  loop: end;
+}
+.simpleCase {
+  property: value;
+}
+.img-responsive {
+  inner: inner;
+  property: mixin;
+}
+.img-responsive .img-responsive {
+  inner: inner;
+  property: mixin;
+}

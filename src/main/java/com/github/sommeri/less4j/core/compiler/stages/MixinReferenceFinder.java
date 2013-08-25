@@ -24,9 +24,12 @@ public class MixinReferenceFinder {
   }
 
   /**
-   * Find referenced mixins by name. It does not check number of parameters nor guards,
-   * because the search should stop once any mixin with referenced name is
-   * found.
+   * Find referenced mixins by name. It does not check number of parameters nor
+   * guards, because the search should stop once any mixin with referenced name
+   * is found.
+   * 
+   * However, it checks every encountered mixin for "legal" cycle (e.g. ruleset
+   * needing itself) and completely ignores those who would cycle that way.
    * 
    */
   public List<FullMixinDefinition> getNearestMixins(Scope scope, MixinReference reference) {
@@ -47,17 +50,42 @@ public class MixinReferenceFinder {
   }
 
   private List<FullMixinDefinition> getNearestLocalMixins(Scope scope, ReusableStructureName name) {
-    List<FullMixinDefinition> value = scope.getMixinsByName(name);
-    if ((value == null || value.isEmpty()) && scope.hasParent())
+    List<FullMixinDefinition> mixins = scope.getMixinsByName(name);
+    if (mixins != null)
+      mixins = removeLegalCycles(mixins, name);
+
+    if ((mixins == null || mixins.isEmpty()) && scope.hasParent())
       return getNearestLocalMixins(scope.getParent(), name);
 
-    return value == null ? new ArrayList<FullMixinDefinition>() : value;
+    return mixins==null? new ArrayList<FullMixinDefinition>() : mixins;
+  }
+
+  private List<FullMixinDefinition> removeLegalCycles(List<FullMixinDefinition> value, ReusableStructureName name) {
+    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
+    for (FullMixinDefinition mixin : value) {
+      if (!participatesInCuttableCycle(mixin)) 
+        result.add(mixin);
+    }
+    return result;
+  }
+
+  private boolean participatesInCuttableCycle(FullMixinDefinition mixin) {
+    /*
+     * Detecting following kind of cycle:
+     * 
+     * .simpleCase {
+     *   .simpleCase();
+     * }
+     * 
+     * Note: the detection feels too hackish, but works and hotfix is needed (bootstrap).    
+     */
+    return mixin.getMixin().isAlsoRuleset() && semiCompiledNodes.contains(mixin.getMixin());
   }
 
   private List<FullMixinDefinition> findInMatchingNamespace(Scope scope, List<String> nameChain, MixinReference reference) {
     if (nameChain.isEmpty()) {
       foundNamespace = true;
-      
+
       if (scope.isBodyOwnerScope())
         scope = scope.firstChild();
 
@@ -93,7 +121,7 @@ public class MixinReferenceFinder {
       public void run() {
         // Referenced namespace attempts to import its own mixins. Do not 
         // try to compile it. 
-        if (!semiCompiledNodes.contains(bodyClone)) { 
+        if (!semiCompiledNodes.contains(bodyClone)) {
           parentSolver.unsafeDoSolveReferences(bodyClone, scope);
         }
 

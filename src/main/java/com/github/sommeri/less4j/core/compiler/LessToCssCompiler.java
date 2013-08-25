@@ -250,7 +250,6 @@ public class LessToCssCompiler {
   private void validateFinalCss(StyleSheet less) {
     CssAstValidator validator = new CssAstValidator(problemsHandler);
     validator.validate(less);
-
   }
 
 }

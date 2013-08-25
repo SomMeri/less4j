@@ -158,15 +158,6 @@ public class Scope {
     getLocalMixins().closePlaceholder();
   }
 
-  @Deprecated
-  public List<FullMixinDefinition> getNearestMixins(ReusableStructureName name) {
-    List<FullMixinDefinition> value = getLocalMixins().getMixins(name);
-    if ((value == null || value.isEmpty()) && hasParent())
-      return getParent().getNearestMixins(name);
-
-    return value == null ? new ArrayList<FullMixinDefinition>() : value;
-  }
-
   public List<FullMixinDefinition> getAllMixins() {
     return getLocalMixins().getAllMixins();
   }

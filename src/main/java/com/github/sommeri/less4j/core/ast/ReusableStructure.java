@@ -8,6 +8,9 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBody> {
 
+  //TODO: This is needed for simple cycle cutting. Having proper solution would be nicer,
+  //this feels like hack
+  private final boolean isAlsoRuleset;
   private List<ReusableStructureName> names = new ArrayList<ReusableStructureName>();
   //Allows: variable, argument declaration, pattern
   private List<ASTCssNode> parameters = new ArrayList<ASTCssNode>();
@@ -15,11 +18,16 @@ public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBo
   private GeneralBody body;
 
   public ReusableStructure(HiddenTokenAwareTree token) {
+    this(token, false);
+  }
+
+  public ReusableStructure(HiddenTokenAwareTree token, boolean isAlsoRuleset) {
     super(token);
+    this.isAlsoRuleset = isAlsoRuleset;
   }
   
-  public ReusableStructure(HiddenTokenAwareTree token, List<ReusableStructureName> names) {
-    this(token);
+  public ReusableStructure(HiddenTokenAwareTree token, List<ReusableStructureName> names, boolean isAlsoRuleset) {
+    this(token, isAlsoRuleset);
     this.names=names;
   }
 
@@ -115,6 +123,10 @@ public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBo
 
   public ASTCssNodeType getType() {
     return ASTCssNodeType.REUSABLE_STRUCTURE;
+  }
+
+  public boolean isAlsoRuleset() {
+    return isAlsoRuleset;
   }
 
   @Override

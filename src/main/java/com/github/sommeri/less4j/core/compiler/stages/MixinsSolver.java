@@ -15,32 +15,21 @@ import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
-import com.github.sommeri.less4j.core.compiler.stages.MixinsCycleDetector.CycleType;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 class MixinsSolver {
 
   private final ProblemsHandler problemsHandler;
   private final ReferencesSolver parentSolver;
-  private final MixinsCycleDetector cycleDetector = new MixinsCycleDetector();
+  private final AstNodesStack semiCompiledNodes;
 
-  public MixinsSolver(ReferencesSolver parentSolver, ProblemsHandler problemsHandler) {
+  public MixinsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler) {
     this.parentSolver = parentSolver;
+    this.semiCompiledNodes = semiCompiledNodes;
     this.problemsHandler = problemsHandler;
   }
 
   private void resolveMixinReference(final GeneralBody result, final Scope callerScope, final ReusableStructure referencedMixin, final Scope referencedMixinScope, final ExpressionEvaluator expressionEvaluator) {
-    CycleType cycle = cycleDetector.detectCycle(referencedMixin);
-    if (cycle==CycleType.LEGITIMATE)
-      return ;
-    
-    if (cycle==CycleType.FAULTY) {
-      System.out.println("Bwahaha");
-      //FIXME: (!!!) add error to problems handler
-      return ;
-    }
-
-    cycleDetector.entering(referencedMixin);
     // ... and I'm starting to see the point of closures ...
     InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new ITask() {
 
@@ -50,22 +39,31 @@ class MixinsSolver {
       }
 
     });
-    cycleDetector.leaving(referencedMixin);
   }
 
   private void unsafeResolveMixinReference(GeneralBody result, Scope callerScope, ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot, ExpressionEvaluator expressionEvaluator) {
     // compile referenced mixin - keep the original copy unchanged
-    GeneralBody bodyClone = referencedMixin.getBody().clone();
-    parentSolver.unsafeDoSolveReferences(bodyClone, referencedMixinScopeSnapshot);
-    result.addMembers(bodyClone.getMembers());
+    result.addMembers(compileReferencedMixin(referencedMixin, referencedMixinScopeSnapshot));
 
     // collect variables and mixins to be imported
     Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScopeSnapshot);
     List<FullMixinDefinition> allMixinsToImport = mixinsToImport(callerScope, referencedMixin, referencedMixinScopeSnapshot);
     returnValues.addAllMixins(allMixinsToImport);
-    
+
     // update scope with imported variables and mixins
     callerScope.addToPlaceholder(returnValues);
+  }
+
+  //TODO: all these methods names are too similar to each other - better and clearer naming is needed
+  private List<ASTCssNode> compileReferencedMixin(ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot) {
+    semiCompiledNodes.push(referencedMixin);
+    try {
+      GeneralBody bodyClone = referencedMixin.getBody().clone();
+      parentSolver.unsafeDoSolveReferences(bodyClone, referencedMixinScopeSnapshot);
+      return bodyClone.getMembers();
+    } finally {
+      semiCompiledNodes.pop();
+    }
   }
 
   private List<FullMixinDefinition> mixinsToImport(Scope referenceScope, ReusableStructure referencedMixin, Scope referencedMixinScope) {
@@ -107,7 +105,7 @@ class MixinsSolver {
     for (final FullMixinDefinition fullMixin : mixins) {
       final ReusableStructure mixin = fullMixin.getMixin();
       final Scope mixinScope = fullMixin.getScope();
-      
+
       // the following needs to run in snapshot because calculateMixinsWorkingScope modifies that scope
       InScopeSnapshotRunner.runInLocalDataSnapshot(mixinScope.getParent(), new ITask() {
 
@@ -158,7 +156,7 @@ class MixinsSolver {
     mixinDeclarationScope.add(arguments);
 
     // locally defined mixin does not require any other action
-    boolean isLocalImport = mixinDeclarationScope.seesLocalDataOf(callerScope); 
+    boolean isLocalImport = mixinDeclarationScope.seesLocalDataOf(callerScope);
     if (isLocalImport) {
       return mixinScope;
     }

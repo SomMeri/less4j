@@ -1,0 +1,31 @@
+//looping case
+.spanX (@index) when (@index > 0) {
+  loop: member @index;
+  .spanX((@index - 1));
+}
+.spanX (@index) when (@index =< 0) { 
+  loop: end;
+}
+
+#loop-here {
+ .spanX(5);
+}
+//simple non-looping case
+.simpleCase() {
+  property: value;
+}
+.simpleCase {
+  .simpleCase();
+}
+//complicated non-looping case
+.img-responsive() {
+  property: mixin;
+}
+
+.img-responsive {
+  .img-responsive {
+    inner: inner;
+    .img-responsive();
+  }
+  .img-responsive();
+}
