@@ -27,3 +27,18 @@ before1, before2 {
     declaration: value;
   }
 }
+.abc > .def {
+  &.selector {
+    property: value;
+  }
+}
+.abc > .def {
+  & .selector {
+    property: value;
+  }
+}
+.abc {
+  &+.selector {
+    property: value;
+  }
+}

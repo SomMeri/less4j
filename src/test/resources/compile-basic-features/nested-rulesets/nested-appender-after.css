@@ -46,3 +46,12 @@ nested3 :after2,
 :after2 nested4 {
   declaration: value;
 }
+.selector .abc > .def {
+  property: value;
+}
+.selector.abc > .def {
+  property: value;
+}
+.a.b {
+  color: red;
+}

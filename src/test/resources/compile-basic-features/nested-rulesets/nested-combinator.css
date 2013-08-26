@@ -72,3 +72,9 @@ h2 {
 .class:nth-child(4n+2):hover {
   declaration: 3 4;
 }
+.something.def + .selector {
+  property: value;
+}
+.something > .ghi + .selector {
+  property: value;
+}

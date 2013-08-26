@@ -46,3 +46,12 @@ before1 nested4,
 before2 nested4 {
   declaration: value;
 }
+.abc > .def.selector {
+  property: value;
+}
+.abc > .def .selector {
+  property: value;
+}
+.abc + .selector {
+  property: value;
+}

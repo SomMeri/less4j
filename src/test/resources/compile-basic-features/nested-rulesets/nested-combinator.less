@@ -46,3 +46,13 @@ h1, h2 {
    declaration: 3 4;
   }
 }
+.def {
+  .something&+.selector {
+    property: value;
+  }
+}
+.ghi {
+  .something>&+.selector {
+    property: value;
+  }
+}

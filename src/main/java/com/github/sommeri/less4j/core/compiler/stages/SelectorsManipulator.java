@@ -80,6 +80,9 @@ public class SelectorsManipulator {
 
     if (second.getHead().isAppender())
       return indirectJoinNoClone(first, second.getLeadingCombinator(), second);
+    
+//    if (second.hasLeadingCombinator())
+//      return indirectJoinNoClone(first, second.getLeadingCombinator(), second);
 
     Selector attachTo = first.getRightestPart();
     SimpleSelector attachToHead = (SimpleSelector) attachTo.getHead();
@@ -100,7 +103,7 @@ public class SelectorsManipulator {
     attachToHead.configureParentToAllChilds();
 
     if (second.hasRight())
-      indirectJoinNoClone(attachTo, second.getLeadingCombinator(), second.getRight());
+      indirectJoinNoClone(attachTo, second.getRight().getLeadingCombinator(), second.getRight());
 
     return first;
   }
@@ -123,19 +126,26 @@ public class SelectorsManipulator {
   }
 
   private List<Selector> joinAll(Selector first, List<Selector> seconds, SelectorCombinator leadingCombinator, boolean appenderDirectlyPlaced) {
-    boolean directJoin = isDirect(leadingCombinator, appenderDirectlyPlaced);
+    //pretending null as after appender, less.js does not handle this case anyway
+    //this case being:
+    //.input-group-addon + {
+    //  .selector {
+    //    heeej: hoou;
+    //  }
+    //}
+    boolean directJoin = isDirect(leadingCombinator, appenderDirectlyPlaced, null); 
     if (directJoin)
       return directJoinAll(first, seconds);
     else
       return indirectJoinAll(leadingCombinator, first, seconds);
   }
 
-  private List<Selector> joinAll(List<Selector> firsts, Selector second, SelectorCombinator leadingCombinator, boolean appenderDirectlyPlaced) {
-    boolean directJoin = isDirect(leadingCombinator, appenderDirectlyPlaced);
+  private List<Selector> joinAll(List<Selector> firsts, Selector second, SelectorCombinator beforeAppenderCombinator, boolean appenderDirectlyPlaced) {
+    boolean directJoin = isDirect(beforeAppenderCombinator, appenderDirectlyPlaced, second);
     if (directJoin)
       return directJoinAll(firsts, second);
     else
-      return indirectJoinAll(firsts, leadingCombinator, second);
+      return indirectJoinAll(firsts, beforeAppenderCombinator, second);
   }
 
   private Selector chopOffHead(Selector selector) {
@@ -175,8 +185,8 @@ public class SelectorsManipulator {
     return result;
   }
 
-  private boolean isDirect(SelectorCombinator leadingCombinator, boolean appenderDirectlyPlaced) {
-    return leadingCombinator == null && appenderDirectlyPlaced;
+  private boolean isDirect(SelectorCombinator beforeAppenderCombinator, boolean appenderDirectlyPlaced, Selector afterAppender) {
+    return beforeAppenderCombinator == null && appenderDirectlyPlaced && (afterAppender == null || !afterAppender.hasLeadingCombinator());
   }
 
   private Selector splitOn(Selector rightSelectorStart) {
