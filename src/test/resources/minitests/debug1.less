@@ -1,3 +1,124 @@
-* {
-  property: rgba(0,0,0,.0001);
+.box-shadow(@shadow) {
+  -webkit-box-shadow: @shadow; // iOS <4.3 & Android <4.1
+          box-shadow: @shadow;
+}
+
+.color-test {
+  @color: #66afe9;
+  @color-rgba: rgba(red(@color), green(@color), blue(@color), .6);
+  color-rgba-content: @color-rgba;
+  .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px @{color-rgba}");
+  .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+}
+
+.navbar-inverse {
+  background-color: rgba(102,175,233,0.6);
+  border-color: black;
+
+  .navbar-text {
+    color:red;
+  }
+
+  .navbar-nav {
+    > li > a {
+      color: green;
+
+      &:hover,
+      &:focus {
+        color: white;
+        background-color: black;
+      }
+    }
+    > .active > a {
+      &,
+      &:hover,
+      &:focus {
+        color: green;
+        background-color: green;
+      }
+    }
+    > .disabled > a {
+      &,
+      &:hover,
+      &:focus {
+        color: white;
+      }
+    }
+  }
+
+  .navbar-collapse,
+  .navbar-form {
+    border-color: darken(red, 7%);
+  }
+
+  // Dropdowns
+  .navbar-nav {
+    > .open > a {
+      &,
+      &:hover,
+      &:focus {
+        background-color: green;
+        color: green;
+      }
+    }
+    > .dropdown > a:hover .caret {
+      border-top-color: white;
+      border-bottom-color: white;
+    }
+    > .dropdown > a .caret {
+      border-top-color: green;
+      border-bottom-color: green;
+    }
+    > .open > a {
+      &,
+      &:hover,
+      &:focus {
+        .caret {
+          border-top-color: green;
+          border-bottom-color: green;
+        }
+      }
+    }
+
+    @media (max-width: 1075) {
+      // Dropdowns get custom display
+      .open .dropdown-menu {
+        > .dropdown-header {
+          border-color: black;
+        }
+        > li > a {
+          color: green;
+          &:hover,
+          &:focus {
+            color: white;
+            background-color: black;
+          }
+        }
+        > .active > a {
+          &,
+          &:hover,
+          &:focus {
+            color: green;
+            background-color: green;
+          }
+        }
+        > .disabled > a {
+          &,
+          &:hover,
+          &:focus {
+            color: white;
+            background-color: white;
+          }
+        }
+      }
+    }
+  }
+
+  .navbar-link {
+    color: green;
+    &:hover {
+      color: white;
+    }
+  }
+
 }

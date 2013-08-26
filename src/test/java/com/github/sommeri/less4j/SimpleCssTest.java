@@ -1,9 +1,11 @@
 package com.github.sommeri.less4j;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -21,12 +23,15 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-//  private static final String inputLess = "src/test/resources/minitests/debug1.less";
+    private static final String inputLess = "src/test/resources/minitests/debug1.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
   private static final String mapdata = "src/test/resources/minitests/debug1.css.mapdata";
 
-  private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.0-experiment//less//bootstrap.less";
-//  private static final String outputCss = "src/test/resources/minitests/debug1.css";
+  //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.0-experiment//less//bootstrap.less";
+  //private static final String printTo = "c://data//meri//less4java//workspace-juno-sr2//less4j-release-tests-working-dir//testTwitterBootstrap_3_0_0//less4j-compiled.css ";
+  private static final String printTo = null;
+
+  //  private static final String outputCss = "src/test/resources/minitests/debug1.css";
 
   // ***********************************************************************
   // *** fail because of identifiers, functions and missing commas
@@ -34,8 +39,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   //    private static final String outputCss = "src/test/resources/minitests/mixins-guards.css";
 
   // *** fail because of wrong mixins reference - does not accept #mixin see debug.less
-//    private static final String inputLess = "src/test/resources/minitests/mixins.less";
-//    private static final String outputCss = "src/test/resources/minitests/mixins.css";
+  //    private static final String inputLess = "src/test/resources/minitests/mixins.less";
+  //    private static final String outputCss = "src/test/resources/minitests/mixins.css";
 
   // ***********************************************************************
   // *** work as they are
@@ -51,8 +56,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   //  private static final String inputLess = "src/test/resources/minitests/mixins-pattern.less";
   //  private static final String outputCss = "src/test/resources/minitests/mixins-pattern.css";
 
- //  private static final String inputLess = "src/test/resources/minitests/mixins-closure.less";
- //  private static final String outputCss = "src/test/resources/minitests/mixins-closure.css";
+  //  private static final String inputLess = "src/test/resources/minitests/mixins-closure.less";
+  //  private static final String outputCss = "src/test/resources/minitests/mixins-closure.css";
 
   // *** work with minor modification
   //private static final String inputLess = "src/test/resources/minitests/mixins-args.less";
@@ -67,11 +72,18 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   @Override
   protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
     CompilationResult result = super.compile(lessFile, cssOutput);
+    if (printTo != null) {
+      try {
+        FileUtils.writeStringToFile(new File(printTo), result.getCss());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
     System.out.println(result.getSourceMap());
     return result;
   }
 
-  @Parameters(name="Less: {4}")
+  @Parameters(name = "Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
     //justWait();
     Collection<Object[]> result = new ArrayList<Object[]>();

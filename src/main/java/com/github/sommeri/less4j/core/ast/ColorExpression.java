@@ -146,6 +146,12 @@ public class ColorExpression extends Expression {
       return "rgba(" + roundFormat(red) + ", " + roundFormat(green) + ", " + roundFormat(blue) + ", " + format(alpha) + ")";
     }
 
+    //alpha colors do not have hexadecimal value for now
+    @Override
+    public String getValueInHexadecimal() {
+      return getValue();
+    }
+    
     private String format(double value) {
       return PrintUtils.formatNumber(value);
     }
