@@ -20,3 +20,6 @@ operations-rgba-smallNumber {
   minus: #040506;
   plus: #050607;
 }
+formatting {
+  property: rgba(0, 0, 0, 0.0001);
+}

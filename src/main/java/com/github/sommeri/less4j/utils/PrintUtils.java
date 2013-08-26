@@ -2,12 +2,33 @@ package com.github.sommeri.less4j.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.parser.LessParser;
 
 public class PrintUtils {
+
+  private static final DecimalFormat FORMATTER = createFormatter();
+
+  private static DecimalFormat createFormatter() {
+    DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+    symbols.setDecimalSeparator('.');
+    return new DecimalFormat("#.##################", symbols);
+  }
+
+  public static String formatNumber(Long value) {
+    return formatNumber(value.doubleValue());
+  }
+
+  public static String formatNumber(Double value) {
+    if (value.isNaN())
+      return "NaN";
+
+    return FORMATTER.format(value);
+  }
 
   public static String toName(int tokenType) {
     if (tokenType == -1)
@@ -52,14 +73,14 @@ public class PrintUtils {
     String result = "";
     for (ASTCssNodeType type : types) {
       if (!result.isEmpty())
-        result +=" or ";
-      
-      result +=toTypeName(type);
+        result += " or ";
+
+      result += toTypeName(type);
     }
-    
+
     return result;
   }
-  
+
   public static String toTypeName(ASTCssNodeType type) {
     switch (type) {
     case DECLARATION:
@@ -103,7 +124,7 @@ public class PrintUtils {
 
     case COLOR_EXPRESSION:
       return "color";
-      
+
     case STRING_EXPRESSION:
       return "string";
 
@@ -112,10 +133,10 @@ public class PrintUtils {
 
     case PAGE:
       return "@page";
-      
+
     case PAGE_MARGIN_BOX:
       return "page margin box";
-      
+
     default:
       //FIXME (hign priority) replace by something safer - ASAP
       return type.name();

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.PrintUtils;
 
 public class ColorExpression extends Expression {
 
@@ -142,7 +143,15 @@ public class ColorExpression extends Expression {
     }
 
     protected String encode(double red, double green, double blue, double alpha) {
-      return "rgba(" + Math.round(red) + ", " + Math.round(green) + ", " + Math.round(blue) + ", " + alpha + ")";
+      return "rgba(" + roundFormat(red) + ", " + roundFormat(green) + ", " + roundFormat(blue) + ", " + format(alpha) + ")";
+    }
+
+    private String format(double value) {
+      return PrintUtils.formatNumber(value);
+    }
+
+    private String roundFormat(double value) {
+      return PrintUtils.formatNumber(Math.round(value));
     }
 
     @Override

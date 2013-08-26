@@ -1,7 +1,5 @@
 package com.github.sommeri.less4j.utils;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
 import java.util.List;
 
@@ -80,15 +78,8 @@ public class CssPrinter {
   protected ExtendedStringBuilder cssOnly = new ExtendedStringBuilder();
   protected SourceMapBuilder cssAndSM = new SourceMapBuilder(cssOnly, null);
   
-  private static final DecimalFormat FORMATTER = createFormatter();
   private LessSource lessSource;
   private LessSource cssDestination;
-
-  private static DecimalFormat createFormatter() {
-    DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
-    symbols.setDecimalSeparator('.');
-    return new DecimalFormat("#.##################", symbols);
-  }
 
   public CssPrinter() {
     super();
@@ -845,7 +836,7 @@ public class CssPrinter {
         else
           cssOnly.append("-");
       }
-      cssOnly.append(format(node.getValueAsDouble()) + node.getSuffix());
+      cssOnly.append(PrintUtils.formatNumber(node.getValueAsDouble()) + node.getSuffix());
     }
 
     return true;
@@ -951,13 +942,6 @@ public class CssPrinter {
       if (append(kid))
         cssOnly.ensureNewLine();
     }
-  }
-
-  private String format(Double valueAsDouble) {
-    if (valueAsDouble.isNaN())
-      return "NaN";
-
-    return FORMATTER.format(valueAsDouble);
   }
 
   public String toString() {
