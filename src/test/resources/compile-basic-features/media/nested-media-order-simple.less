@@ -1,0 +1,25 @@
+.media-with-declaration {
+  .first { 
+    first: first;
+  }
+  @media print {
+    media: direct;
+  }
+  .second {
+    second: second;
+  }
+}
+.media-with-ruleset {
+  .first { 
+    first: first;
+  }
+  @media print {
+    media: direct;
+	in-media {
+      media: in-set;
+    }
+  }
+  .second {
+    second: second;
+  }
+}

@@ -1,0 +1,32 @@
+.outer {
+  .first { 
+    first: first;
+  }
+  @media print {
+    beginning: beginning;
+    .first { 
+      first: first;
+    }
+    before-nested: before;
+    @media (max-device-aspect-ratio: 1367/768) {
+      deep: deep;
+      .deep-ruleset {
+        ruleset: ruleset;
+        @media (max-width: 678px) {
+          color: blue;
+        }
+        .yet-another-exception {
+          color: green;
+        }
+      }
+    }
+    after-nested: after;
+    .second {
+      second: second;
+    }
+    end: end;
+  }
+  .second {
+    second-second: second-second;
+  }
+}

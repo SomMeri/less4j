@@ -6,19 +6,22 @@ import java.util.List;
 import java.util.Stack;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
+/**
+ * Collects all nested media childs. It assumes that all media at-rules already bubbled on top and
+ * are nested only inside other media at-rules.
+ */
 public class NestedMediaCollector {
 
   private final ASTManipulator manipulator = new ASTManipulator();
   private Stack<List<MediaQuery>> mediums;
   private LinkedList<Media> finalMedia;
   private ProblemsHandler problemsHandler;
-  
+
   public NestedMediaCollector(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
   }
@@ -36,19 +39,31 @@ public class NestedMediaCollector {
 
   private void collectChildMedia(ASTCssNode node) {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-    for (ASTCssNode kid : childs) {
-      if (kid.getType() == ASTCssNodeType.MEDIA) {
+    for (ASTCssNode kid : childs)
+      switch (kid.getType()) {
+      case MEDIA: {
         Media nestedMedia = (Media) kid;
         manipulator.removeFromBody(nestedMedia);
         collect(nestedMedia);
         pushMediums(nestedMedia);
-      }
-      //TODO: possible optimization: there is no reason to go inside rulesets and other childs types 
-      collectChildMedia(kid);
-      if (kid.getType() == ASTCssNodeType.MEDIA) {
+
+        collectChildMedia(nestedMedia.getBody());
+
         popMediums();
+        break;
       }
-    }
+      case GENERAL_BODY: {
+        collectChildMedia(kid);
+        break;
+      }
+
+      default:
+        // The collector assumes that all media already
+        // bubbled no top of rulesets. There is no reason 
+        // to go into anything other then media and their 
+        // bodies.
+        break;
+      }
   }
 
   private void collect(Media media) {
@@ -70,10 +85,10 @@ public class NestedMediaCollector {
 
   private MediaQuery combine(MediaQuery previousMediaQuery, MediaQuery mediaQuery) {
     MediaQuery previousMediaQueryClone = previousMediaQuery.clone();
-    if (mediaQuery.getMedium()!=null) {
+    if (mediaQuery.getMedium() != null) {
       problemsHandler.warnMerginMediaQueryWithMedium(mediaQuery);
     }
-      
+
     previousMediaQueryClone.addExpressions(ArraysUtils.deeplyClonedList(mediaQuery.getExpressions()));
     previousMediaQueryClone.configureParentToAllChilds();
     return previousMediaQueryClone;

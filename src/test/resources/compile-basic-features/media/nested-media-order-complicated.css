@@ -1,0 +1,36 @@
+.outer .first {
+  first: first;
+}
+@media print {
+  .outer {
+    beginning: beginning;
+    before-nested: before;
+    after-nested: after;
+    end: end;
+  }
+  .outer .first {
+    first: first;
+  }
+  .outer .second {
+    second: second;
+  }
+}
+@media print and (max-device-aspect-ratio: 1367/768) {
+  .outer {
+    deep: deep;
+  }
+  .outer .deep-ruleset {
+    ruleset: ruleset;
+  }
+  .outer .deep-ruleset .yet-another-exception {
+    color: green;
+  }
+}
+@media print and (max-device-aspect-ratio: 1367/768) and (max-width: 678px) {
+  .outer .deep-ruleset {
+    color: blue;
+  }
+}
+.outer .second {
+  second-second: second-second;
+}

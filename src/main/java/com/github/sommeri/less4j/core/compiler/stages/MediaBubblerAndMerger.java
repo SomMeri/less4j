@@ -13,6 +13,11 @@ import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
+/**
+ * Bubbles media at-rules on top of stylesheet and merges their media queries. It
+ * assumes that all media already bubbled on top of rulesets. 
+ *
+ */
 public class MediaBubblerAndMerger {
 
   private ASTManipulator astManipulator = new ASTManipulator();
@@ -52,13 +57,19 @@ public class MediaBubblerAndMerger {
       bubbleUp((Media) node);
       break;
     }
-    default:
+    case RULE_SET: {
+      // media are supposed to be bubble over rulesets in previous step. There is no 
+      // reason to go deeper 
+      return ;
+    }
+    default: {
+      List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
+      for (ASTCssNode kid : childs) {
+        bubbleUp(kid);
+      }
+    }
     }
 
-    List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-    for (ASTCssNode kid : childs) {
-      bubbleUp(kid);
-    }
   }
 
   private void bubbleUp(Media media) {

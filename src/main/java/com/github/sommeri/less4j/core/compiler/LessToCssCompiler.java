@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -10,27 +9,22 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
-import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
-import com.github.sommeri.less4j.core.ast.Page;
-import com.github.sommeri.less4j.core.ast.PageMarginBox;
-import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.InitialScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
-import com.github.sommeri.less4j.core.compiler.stages.NestedRulesCollector;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
 import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
 import com.github.sommeri.less4j.core.compiler.stages.UselessLessElementsRemover;
+import com.github.sommeri.less4j.core.compiler.stages.experimental.UnNestingAndBubbling;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
 import com.github.sommeri.less4j.platform.Constants;
@@ -40,7 +34,6 @@ import com.github.sommeri.less4j.utils.URIUtils;
 public class LessToCssCompiler {
 
   private ProblemsHandler problemsHandler;
-  private ASTManipulator astManipulator = new ASTManipulator();
 
   public LessToCssCompiler(ProblemsHandler problemsHandler) {
     super();
@@ -51,10 +44,10 @@ public class LessToCssCompiler {
     resolveImports(less, source);
     resolveReferences(less);
 
-    //just a safety measure
     evaluateExpressions(less);
-    bubbleAndMergeMedia(less);
-    freeNestedRuleSets(less);
+    freeNestedRulesetsAndMedia(less);
+    finalMediaMergingAndBubbling(less);
+
     removeUselessLessElements(less);
     //normalizeUrlsAndImportsInImportedFiles(less);
 
@@ -71,9 +64,14 @@ public class LessToCssCompiler {
     return less;
   }
 
+  private void freeNestedRulesetsAndMedia(StyleSheet less) {
+    UnNestingAndBubbling nestingBubbling = new UnNestingAndBubbling();
+    nestingBubbling.unnestRulesetAndMedia(less);
+  }
+
   private void handleSourceMapLink(StyleSheet less, Configuration options, LessSource source) {
     String cssResultLocation = getCssResultLocationName(options, source);
-    if (!options.shouldLinkSourceMap() || cssResultLocation==null)
+    if (!options.shouldLinkSourceMap() || cssResultLocation == null)
       return;
 
     List<Comment> comments = less.getTrailingComments();
@@ -92,10 +90,10 @@ public class LessToCssCompiler {
   }
 
   private String getCssResultLocationName(Configuration options, LessSource source) {
-    LessSource location = options.getCssResultLocation(); 
+    LessSource location = options.getCssResultLocation();
     String name = location == null ? null : location.getName();
-    
-    if (name==null)
+
+    if (name == null)
       name = URIUtils.changeSuffix(source.getName(), Constants.CSS_SUFFIX);
 
     return name;
@@ -148,7 +146,7 @@ public class LessToCssCompiler {
     }
   }
 
-  private void bubbleAndMergeMedia(StyleSheet less) {
+  private void finalMediaMergingAndBubbling(StyleSheet less) {
     MediaBubblerAndMerger bubblerAndMerger = new MediaBubblerAndMerger(problemsHandler);
     bubblerAndMerger.bubbleAndMergeMedia(less);
   }
@@ -170,37 +168,6 @@ public class LessToCssCompiler {
         return 2;
       }
     });
-  }
-
-  private void freeNestedRuleSets(Body body) {
-    NestedRulesCollector nestedRulesCollector = new NestedRulesCollector();
-
-    List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(body.getChilds());
-    for (ASTCssNode kid : childs) {
-      switch (kid.getType()) {
-      case RULE_SET: {
-        List<RuleSet> nestedRulesets = nestedRulesCollector.collectNestedRuleSets((RuleSet) kid);
-        astManipulator.addIntoBody(nestedRulesets, kid);
-        break;
-      }
-      case MEDIA: {
-        freeNestedRuleSets(((Media) kid).getBody());
-        break;
-      }
-      case PAGE: {
-        Page page = (Page) kid;
-        freeNestedRuleSets(page.getBody());
-        break;
-      }
-      case PAGE_MARGIN_BOX: {
-        PageMarginBox marginBox = (PageMarginBox) kid;
-        freeNestedRuleSets(marginBox.getBody());
-        break;
-      }
-      default:
-        //nothing is needed
-      }
-    }
   }
 
   private void evaluateExpressions(ASTCssNode node) {

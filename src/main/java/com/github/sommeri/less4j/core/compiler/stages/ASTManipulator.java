@@ -138,8 +138,8 @@ public class ASTManipulator {
 
   public void moveMembersBetweenBodies(Body from, Body to) {
     to.addMembers(from.getMembers());
-    to.configureParentToAllChilds();
     from.removeAllMembers();
+    to.configureParentToAllChilds();
   }
 
 }
