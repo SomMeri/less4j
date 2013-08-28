@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.stages.experimental;
+package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -9,7 +9,6 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
-import com.github.sommeri.less4j.core.compiler.stages.SelectorsManipulator;
 
 public class NestedInRulesetStack {
   private final SelectorsManipulator selectorsManipulator = new SelectorsManipulator();
