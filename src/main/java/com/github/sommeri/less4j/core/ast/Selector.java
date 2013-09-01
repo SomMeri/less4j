@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -117,14 +118,18 @@ public class Selector extends ASTCssNode implements Cloneable {
   }
 
   public boolean isReusableSelector() {
-    if (isCombined()) {
-      if (!getHead().isAppender())
+    if (getHead().isAppender())
+      return isCombined() && getRight().isReusableSelector();
+    
+    Selector current = this;
+    while (current.isCombined()) {
+      if (!current.hasReusableHead())
         return false;
       
-      return getRight().hasReusableHead() && !getRight().isCombined();
+      current = current.getRight();
     }
-
-    return hasReusableHead();
+    
+    return current.hasReusableHead();
   }
 
   private boolean hasReusableHead() {
@@ -132,13 +137,32 @@ public class Selector extends ASTCssNode implements Cloneable {
   }
 
   /**
-   * Assumes that hasReubleHead returns true
+   * Assumes that hasReusableHead returns true
    * @return
    */
-  public SimpleSelector asReusableSelector() {
-    if (!isCombined())
-      return (SimpleSelector) getHead();
+  public ReusableStructureName toReusableStructureName() {
+    List<ElementSubsequent> nameParts = extractReusableNameParts();
     
-    return (SimpleSelector) getRight().getHead();
+    ReusableStructureName result = new ReusableStructureName(nameParts.get(0).getUnderlyingStructure(), nameParts);
+    return result;
+  }
+
+  // We are loosing a lot of information during the extraction. It is ok, 
+  // because less.js is not using combinators and does not distinguish 
+  // between .aaa.bbb and .aaa .bbb
+  private List<ElementSubsequent> extractReusableNameParts() {
+    List<ElementSubsequent> result = new ArrayList<ElementSubsequent>();
+    Selector current = null;
+    do {
+      //initialize or move to next
+      current = current==null? this : current.getRight();
+      //extract name parts
+      SelectorPart currentHead = current.getHead();
+      if (!currentHead.isAppender()) {
+        result.addAll(((SimpleSelector) currentHead).getSubsequent());
+      }
+    } while (current.isCombined());
+    
+    return result;
   }
 }

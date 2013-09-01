@@ -71,7 +71,7 @@ public class ReferencesSolver {
     // each other and therefore each effectively requires compiled 
     // version of itself 
     semiCompiledNodes.push(node);
-    
+
     try {
       List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       if (!childs.isEmpty()) {
@@ -141,7 +141,7 @@ public class ReferencesSolver {
       //error reporting
       if (!finder.foundNamespace())
         problemsHandler.undefinedNamespace(mixinReference);
-      
+
       problemsHandler.undefinedMixin(mixinReference);
       return new ArrayList<FullMixinDefinition>();
     }

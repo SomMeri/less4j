@@ -49,21 +49,21 @@ public class MixinReferenceFinder {
     return foundNamespace;
   }
 
-  private List<FullMixinDefinition> getNearestLocalMixins(Scope scope, ReusableStructureName name) {
-    List<FullMixinDefinition> mixins = scope.getMixinsByName(name);
+  private List<FullMixinDefinition> getNearestLocalMixins(Scope scope, List<String> nameChain, ReusableStructureName name) {
+    if (scope.isBodyOwnerScope())
+      scope = scope.firstChild();
+
+    List<FullMixinDefinition> mixins = scope.getMixinsByName(nameChain, name);
     if (mixins != null)
       mixins = removeLegalCycles(mixins, name);
 
-    if ((mixins == null || mixins.isEmpty()) && scope.hasParent())
-      return getNearestLocalMixins(scope.getParent(), name);
-
-    return mixins==null? new ArrayList<FullMixinDefinition>() : mixins;
+    return mixins == null ? new ArrayList<FullMixinDefinition>() : mixins;
   }
 
   private List<FullMixinDefinition> removeLegalCycles(List<FullMixinDefinition> value, ReusableStructureName name) {
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixin : value) {
-      if (!participatesInCuttableCycle(mixin)) 
+      if (!participatesInCuttableCycle(mixin))
         result.add(mixin);
     }
     return result;
@@ -83,27 +83,23 @@ public class MixinReferenceFinder {
   }
 
   private List<FullMixinDefinition> findInMatchingNamespace(Scope scope, List<String> nameChain, MixinReference reference) {
-    if (nameChain.isEmpty()) {
-      foundNamespace = true;
-
-      if (scope.isBodyOwnerScope())
-        scope = scope.firstChild();
-
-      return getNearestLocalMixins(scope, reference.getFinalName());
-    }
-
-    String firstName = nameChain.get(0);
-    List<String> theRest = nameChain.subList(1, nameChain.size());
-
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
 
-    for (FullMixinDefinition fullMixin : scope.getAllMixins()) {
-      if (fullMixin.getMixin().hasName(firstName)) {
-        List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
-        result.addAll(foundInNamespaces);
+    if (nameChain.isEmpty()) {
+      foundNamespace = true;
+    } else {
+      String firstName = nameChain.get(0);
+      List<String> theRest = nameChain.subList(1, nameChain.size());
+
+      for (FullMixinDefinition fullMixin : scope.getAllMixins()) {
+        if (fullMixin.getMixin().hasName(firstName)) {
+          List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
+          result.addAll(foundInNamespaces);
+        }
       }
     }
 
+    result.addAll(getNearestLocalMixins(scope, nameChain, reference.getFinalName()));
     return result;
   }
 

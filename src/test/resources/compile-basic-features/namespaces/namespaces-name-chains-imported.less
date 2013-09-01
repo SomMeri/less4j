@@ -1,0 +1,21 @@
+.importer() {
+  .class > .child {
+    property1: value1;
+  }
+}
+
+#use-place {
+  .importer();
+  .class > .child();
+}
+
+.importer-tricky() {
+  .class > .child {
+    property1: value1;
+  }
+}
+
+#use-place-tricky {
+  .importer-tricky();
+  .class > .child();
+}

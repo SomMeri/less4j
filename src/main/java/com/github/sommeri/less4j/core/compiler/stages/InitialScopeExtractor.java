@@ -56,7 +56,7 @@ public class InitialScopeExtractor {
         manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.RULE_SET) {
         RuleSet ruleSet = (RuleSet) kid;
-        if (ruleSet.usableAsReusableStructure()) {
+        if (ruleSet.isUsableAsReusableStructure()) {
           Scope bodyScope = currentScope.childByOwners(ruleSet, ruleSet.getBody());
           currentScope.registerMixin(ruleSet.convertToReusableStructure(), bodyScope);
         }
@@ -80,7 +80,7 @@ public class InitialScopeExtractor {
 
     case RULE_SET: {
       RuleSet ruleSet = (RuleSet) node;
-      if (ruleSet.usableAsReusableStructure()) {
+      if (ruleSet.isUsableAsReusableStructure()) {
         currentScope.addNames(ruleSet.extractReusableStructureNames());
       }
       break;

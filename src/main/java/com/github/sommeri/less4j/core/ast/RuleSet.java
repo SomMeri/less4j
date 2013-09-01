@@ -40,7 +40,7 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
     this.body = body;
   }
 
-  public boolean usableAsReusableStructure() {
+  public boolean isUsableAsReusableStructure() {
     for (Selector selector : selectors) {
       if (selector.isReusableSelector())
         return true;
@@ -53,13 +53,13 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
    * @return 
    */
   public ReusableStructure convertToReusableStructure() {
-    if (!usableAsReusableStructure()) 
+    if (!isUsableAsReusableStructure()) 
       throw new BugHappened("Caller is supposed to check for this.", this);
     
     List<ReusableStructureName> reusableNames = new ArrayList<ReusableStructureName>();
     for (Selector selector : selectors) if (selector.isReusableSelector()) {
-      SimpleSelector reusableSelector = selector.asReusableSelector();
-      reusableNames.add(new ReusableStructureName(reusableSelector.getUnderlyingStructure(), reusableSelector.getSubsequent()));
+      ReusableStructureName reusableStructureName = selector.toReusableStructureName();
+      reusableNames.add(reusableStructureName);
     }
     
     ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), reusableNames, true);
@@ -76,8 +76,8 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
     List<String> result = new ArrayList<String>();
     for (Selector selector : selectors) {
       if (selector.isReusableSelector()) {
-        SimpleSelector reusableSelector = selector.asReusableSelector();
-        result.add(reusableSelector.getSubsequent().get(0).getFullName());
+        ReusableStructureName reusableStructureName = selector.toReusableStructureName();
+        result.add(reusableStructureName.asString());
       }
     }
 

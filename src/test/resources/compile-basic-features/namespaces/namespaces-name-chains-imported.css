@@ -1,0 +1,12 @@
+#use-place {
+  property1: value1;
+}
+#use-place .class > .child {
+  property1: value1;
+}
+#use-place-tricky {
+  property1: value1;
+}
+#use-place-tricky .class > .child {
+  property1: value1;
+}

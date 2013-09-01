@@ -492,7 +492,6 @@ public class CssPrinter {
   }
 
   public boolean appendIdSelector(IdSelector node) {
-    //cssOnly.append(node.getFullName());
     cssAndSM.append(node.getFullName(), node.getUnderlyingStructure());
     return true;
   }

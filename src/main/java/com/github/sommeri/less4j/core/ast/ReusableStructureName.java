@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
+//TODO: this name no longer reflects the reality, it should be abstract reusable structure name at best
 public class ReusableStructureName extends ASTCssNode {
 
   private List<ElementSubsequent> nameParts = new ArrayList<ElementSubsequent>();
@@ -52,6 +53,7 @@ public class ReusableStructureName extends ASTCssNode {
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
+    //TODO: review needed: this is suspect, shouldnt it return list of name parts?
     return Collections.emptyList();
   }
 

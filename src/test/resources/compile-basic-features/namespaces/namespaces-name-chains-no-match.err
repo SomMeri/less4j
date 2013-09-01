@@ -1,0 +1,5 @@
+Errors produced by compilation of testCase
+ERROR 13:3 The namespace ".beginning > .middle > .end(...)" was not declared.
+ERROR 13:26 Could not find mixin named ".end".
+ERROR 16:3 The namespace ".middle > .beginning > .end(...)" was not declared.
+ERROR 16:26 Could not find mixin named ".end".

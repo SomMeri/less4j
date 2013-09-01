@@ -1,0 +1,6 @@
+.beginning .middle .end {
+  property: value;
+}
+.beginning > .middle > .end {
+  property: value;
+}

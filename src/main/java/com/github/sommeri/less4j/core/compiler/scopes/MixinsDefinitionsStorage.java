@@ -41,8 +41,25 @@ public class MixinsDefinitionsStorage implements Cloneable {
     }
   }
 
+  public List<FullMixinDefinition> getMixins(List<String> nameChain, ReusableStructureName name) {
+    return getMixins(toMixinName(nameChain, name));
+  }
+
+  private String toMixinName(List<String> nameChain, ReusableStructureName name) {
+    StringBuilder result = new StringBuilder();
+    for (String str : nameChain) {
+      result.append(str);
+    }
+    result.append(name.asString());
+    return result.toString();
+  }
+
   public List<FullMixinDefinition> getMixins(ReusableStructureName name) {
     return storage.get(name.asString());
+  }
+
+  public List<FullMixinDefinition> getMixins(String name) {
+    return storage.get(name);
   }
 
   public List<FullMixinDefinition> getAllMixins() {

@@ -1,0 +1,17 @@
+.mixin() {
+  scope: global;
+}
+#namespace() {
+  beginning: beginning;
+}
+#namespace {
+  .mixin() {
+    scope: namespace;
+  }	
+}
+#use-place {
+  #namespace > .mixin();
+}
+#namespace() {
+  end: end;
+}

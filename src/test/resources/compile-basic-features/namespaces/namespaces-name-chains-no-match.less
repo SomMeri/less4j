@@ -1,0 +1,18 @@
+.middle {
+  .beginning & .end {
+    property: value;
+  }
+}
+.beginning > .middle {
+  > .end {
+    property: value;
+  }
+}
+
+#error-1 {
+  .beginning > .middle > .end;
+}
+#error-2 {
+  .middle > .beginning > .end;
+}
+

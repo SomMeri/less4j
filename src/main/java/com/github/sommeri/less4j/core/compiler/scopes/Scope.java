@@ -86,7 +86,7 @@ public class Scope {
     return result.toString();
   }
 
-  private String toFullName() {
+  public String toFullName() {
     if (hasParent())
       return getParent().toFullName() + " > " + toSimpleName();
 
@@ -162,7 +162,15 @@ public class Scope {
     return getLocalMixins().getAllMixins();
   }
 
+  public List<FullMixinDefinition> getMixinsByName(List<String> nameChain, ReusableStructureName name) {
+    return getLocalMixins().getMixins(nameChain, name);
+  }
+
   public List<FullMixinDefinition> getMixinsByName(ReusableStructureName name) {
+    return getLocalMixins().getMixins(name);
+  }
+
+  public List<FullMixinDefinition> getMixinsByName(String name) {
     return getLocalMixins().getMixins(name);
   }
 

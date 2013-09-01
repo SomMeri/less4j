@@ -1,0 +1,43 @@
+.class > .child {
+  property0: value0;
+}
+.class > .child {
+  property1: value1;
+}
+.class + .child {
+  property2: value2;
+}
+.class .child {
+  property3: value3;
+}
+.class ~ .child {
+  property4: value4;
+}
+#use-place-less {
+  property0: value0;
+  property1: value1;
+  property2: value2;
+  property3: value3;
+  property4: value4;
+}
+#use-place-space {
+  property0: value0;
+  property1: value1;
+  property2: value2;
+  property3: value3;
+  property4: value4;
+}
+.namespace .class > .child {
+  in-namespace-1: value1;
+}
+.namespace .class + .child {
+  in-namespace-2: value2;
+}
+#use-place-namespace-less {
+  in-namespace-1: value1;
+  in-namespace-2: value2;
+}
+#use-place-namespace-space {
+  in-namespace-1: value1;
+  in-namespace-2: value2;
+}
