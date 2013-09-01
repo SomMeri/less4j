@@ -19,19 +19,19 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
  * from the master branch.
  * 
  */
-//@Ignore
+@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-  private static final String inputLess = "src/test/resources/minitests/debug1.less";
+//  private static final String inputLess = "src/test/resources/minitests/debug1.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
   private static final String mapdata = "src/test/resources/minitests/debug1.css.mapdata";
 
-//  private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.0-experiment//less//bootstrap.less";
-//  private static final String printTo = "c://data//meri//less4java//workspace-juno-sr2//less4j-release-tests-working-dir//testTwitterBootstrap_3_0_0//less4j-compiled.css";
+  private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.0-experiment//less//bootstrap.less";
+  private static final String printTo = "c://data//meri//less4java//workspace-juno-sr2//less4j-release-tests-working-dir//testTwitterBootstrap_3_0_0//less4j-compiled.css";
   
 //  private static final String inputLess = "c://data//meri//less4java//slow-recursion//recursion-minimized//style.less"; 
-  private static final String printTo = null;
+//  private static final String printTo = null;
 
   //  private static final String outputCss = "src/test/resources/minitests/debug1.css";
 
