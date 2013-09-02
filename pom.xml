@@ -35,8 +35,14 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 	<dependencies>
 		<dependency>
 			<groupId>org.antlr</groupId>
-			<artifactId>antlr</artifactId>
+			<artifactId>antlr-runtime</artifactId>
 			<version>${antlr.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.antlr</groupId>
+					<artifactId>stringtemplate</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
