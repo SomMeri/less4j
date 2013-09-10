@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
 //marked deprecated so I get a warning if it is referenced somewhere
 @Deprecated

@@ -1,9 +1,7 @@
-.outer {
-  @media print {
-    @media (min-width: 45px) {
-      .deep-ruleset {
-        ruleset: ruleset;
-      }
-    }
-  }
+.box() {
+  @width: 20px;
+}
+.mybox {
+  width: @width;
+  .box();
 }

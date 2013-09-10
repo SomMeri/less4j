@@ -124,6 +124,7 @@ public class ReferencesSolver {
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
         MixinReference mixinReference = (MixinReference) kid;
+        
         List<FullMixinDefinition> foundMixins = findReferencedMixins(mixinReference, mixinReferenceScope);
         GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(mixinReference, mixinReferenceScope, foundMixins);
 

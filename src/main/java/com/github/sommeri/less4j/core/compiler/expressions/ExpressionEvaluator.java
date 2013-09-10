@@ -27,10 +27,13 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.RequestCollector;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -395,7 +398,7 @@ class NullScope extends Scope {
 
   @Override
   public List<String> getNames() {
-    return super.getNames();
+    return Collections.emptyList();
   }
 
   @Override
@@ -465,6 +468,126 @@ class NullScope extends Scope {
   @Override
   public Scope getChildOwnerOf(ASTCssNode body) {
     return null;
+  }
+
+  @Override
+  public void addNames(List<String> names) {
+  }
+
+  @Override
+  public String toFullName() {
+    return toLongString();
+  }
+
+  @Override
+  public void registerVariable(String name, Expression replacementValue) {
+  }
+
+  @Override
+  public void fillByFilteredVariables(ExpressionFilter filter, Scope source) {
+  }
+
+  @Override
+  public void addAllMixins(List<FullMixinDefinition> mixins) {
+  }
+
+  @Override
+  public void add(Scope otherSope) {
+  }
+
+  @Override
+  @Deprecated
+  public void addVariables(Scope otherSope) {
+  }
+
+  @Override
+  @Deprecated
+  public Expression getVariableValueDoNotRegister(String name) {
+    return null;
+  }
+
+  @Override
+  public void createPlaceholder() {
+  }
+
+  @Override
+  public void addToPlaceholder(Scope otherScope) {
+  }
+
+  @Override
+  public void closePlaceholder() {
+ }
+
+  @Override
+  public List<FullMixinDefinition> getAllMixins() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getMixinsByName(List<String> nameChain, ReusableStructureName name) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getMixinsByName(ReusableStructureName name) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getMixinsByName(String name) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Scope firstChild() {
+    return null;
+  }
+
+  @Override
+  public boolean isBodyOwnerScope() {
+    return false;
+  }
+
+  @Override
+  public Scope skipBodyOwner() {
+    return this;
+  }
+
+  @Override
+  public String toLongString() {
+    return NULL;
+  }
+
+  @Override
+  public Scope copyWholeTree() {
+    return this;
+  }
+
+  @Override
+  public void insertAsParent(Scope parent) {
+  }
+
+  @Override
+  public boolean seesLocalDataOf(Scope otherScope) {
+    return false;
+  }
+
+  @Override
+  public Scope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
+    return this;
+  }
+
+  @Override
+  public void addRequestCollector(RequestCollector requestCollector) {
+  }
+
+  @Override
+  public void removeRequestCollector(RequestCollector requestCollector) {
+  }
+
+  @Override
+  public int getTreeSize() {
+    return 1;
   }
 
 }

@@ -91,11 +91,9 @@ public class MixinReferenceFinder {
       String firstName = nameChain.get(0);
       List<String> theRest = nameChain.subList(1, nameChain.size());
 
-      for (FullMixinDefinition fullMixin : scope.getAllMixins()) {
-        if (fullMixin.getMixin().hasName(firstName)) {
-          List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
-          result.addAll(foundInNamespaces);
-        }
+      for (FullMixinDefinition fullMixin : scope.getMixinsByName(firstName)) {
+        List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
+        result.addAll(foundInNamespaces);
       }
     }
 

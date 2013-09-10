@@ -13,9 +13,14 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
+import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.IFunction;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
+import com.github.sommeri.less4j.core.compiler.scopes.RequestCollector;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeView;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 class MixinsSolver {
 
@@ -23,35 +28,53 @@ class MixinsSolver {
   private final ReferencesSolver parentSolver;
   private final AstNodesStack semiCompiledNodes;
 
+  private final CompiledMixinsCache cache = new CompiledMixinsCache();
+
   public MixinsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler) {
     this.parentSolver = parentSolver;
     this.semiCompiledNodes = semiCompiledNodes;
     this.problemsHandler = problemsHandler;
   }
 
-  private void resolveMixinReference(final GeneralBody result, final Scope callerScope, final ReusableStructure referencedMixin, final Scope referencedMixinScope, final ExpressionEvaluator expressionEvaluator) {
+  private MixinCompilationResult resolveMixinReference(final Scope callerScope, final FullMixinDefinition referencedMixin, final Scope mixinWorkingScope, final ExpressionEvaluator expressionEvaluator) {
+    final ReusableStructure mixin = referencedMixin.getMixin();
+    final Scope mixinScope = referencedMixin.getScope();
+
+    MixinCompilationResult compiled = null;
+    compiled = cache.getCompiled(mixin, mixinScope, mixinWorkingScope);
+    if (compiled != null) {
+      compiled.setCached(true);
+
+      List<FullMixinDefinition> allMixinsToImport = mixinsToImport(callerScope, mixinWorkingScope, compiled.getUnmodifiedMixinsToImport());
+      Scope originalReturnValues = compiled.getReturnValues();//.replaceAllMixins(allMixinsToImport);
+      Scope returnValues = Scope.createDummyScope();
+      returnValues.addVariables(originalReturnValues);
+      returnValues.addAllMixins(allMixinsToImport);
+      compiled.setReturnValues(returnValues);
+      return compiled;
+    }
+//    System.out.println("Compiling: " + mixin.getNamesAsStrings() + " scopes created: " + Scope.copiedScope);
+
+    final Scope referencedMixinScope = mixinWorkingScope;
     // ... and I'm starting to see the point of closures ...
-    InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new ITask() {
+    return InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new IFunction<MixinCompilationResult>() {
 
       @Override
-      public void run() {
-        unsafeResolveMixinReference(result, callerScope, referencedMixin, referencedMixinScope, expressionEvaluator);
+      public MixinCompilationResult run() {
+        // compile referenced mixin - keep the original copy unchanged
+        List<ASTCssNode> replacement = compileReferencedMixin(mixin, referencedMixinScope);
+
+        // collect variables and mixins to be imported
+        Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScope);
+        List<FullMixinDefinition> unmodifiedMixinsToImport = referencedMixinScope.getAllMixins();
+        
+        List<FullMixinDefinition> allMixinsToImport = mixinsToImport(callerScope, referencedMixinScope, unmodifiedMixinsToImport);
+        returnValues.addAllMixins(allMixinsToImport);
+
+        return new MixinCompilationResult(replacement, returnValues, unmodifiedMixinsToImport);
       }
 
     });
-  }
-
-  private void unsafeResolveMixinReference(GeneralBody result, Scope callerScope, ReusableStructure referencedMixin, Scope referencedMixinScopeSnapshot, ExpressionEvaluator expressionEvaluator) {
-    // compile referenced mixin - keep the original copy unchanged
-    result.addMembers(compileReferencedMixin(referencedMixin, referencedMixinScopeSnapshot));
-
-    // collect variables and mixins to be imported
-    Scope returnValues = expressionEvaluator.evaluateValues(referencedMixinScopeSnapshot);
-    List<FullMixinDefinition> allMixinsToImport = mixinsToImport(callerScope, referencedMixin, referencedMixinScopeSnapshot);
-    returnValues.addAllMixins(allMixinsToImport);
-
-    // update scope with imported variables and mixins
-    callerScope.addToPlaceholder(returnValues);
   }
 
   //TODO: all these methods names are too similar to each other - better and clearer naming is needed
@@ -66,9 +89,9 @@ class MixinsSolver {
     }
   }
 
-  private List<FullMixinDefinition> mixinsToImport(Scope referenceScope, ReusableStructure referencedMixin, Scope referencedMixinScope) {
+  private List<FullMixinDefinition> mixinsToImport(Scope referenceScope, Scope referencedMixinScope, List<FullMixinDefinition> unmodifiedMixinsToImport) {
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
-    for (FullMixinDefinition mixinToImport : referencedMixinScope.getAllMixins()) {
+    for (FullMixinDefinition mixinToImport : unmodifiedMixinsToImport) {
       boolean isLocalImport = mixinToImport.getScope().seesLocalDataOf(referenceScope);
       if (isLocalImport) {
         // we need to copy the whole tree, because this runs inside referenced mixin scope 
@@ -77,7 +100,8 @@ class MixinsSolver {
         result.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
       } else {
         // since this is non-local import, we need to join reference scope and imported mixins scope
-        // imported mixin would not have access to variables defined in caller
+        // imported mixin needs to have access to variables defined in caller
+        //FIXME: (!!!) less important HHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh
         Scope scopeTreeCopy = mixinToImport.getScope().copyWholeTree();
         scopeTreeCopy.getRootScope().setParent(referencedMixinScope.copyWithParentsChain());
         result.add(new FullMixinDefinition(mixinToImport.getMixin(), scopeTreeCopy));
@@ -114,12 +138,27 @@ class MixinsSolver {
           Scope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
           Scope mixinWorkingScope = calculateMixinsWorkingScope(callerScope, mixinArguments, mixinScope);
 
+          RequestCollector requestCollector = new RequestCollector();
+          if (mixinWorkingScope.hasParent())
+            mixinWorkingScope.getParent().addRequestCollector(requestCollector);
+
           ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler);
           if (expressionEvaluator.guardsSatisfied(mixin)) {
-            resolveMixinReference(result, callerScope, fullMixin.getMixin(), mixinWorkingScope, expressionEvaluator);
-          }
-        }
+            MixinCompilationResult compiled = resolveMixinReference(callerScope, fullMixin, mixinWorkingScope, expressionEvaluator);
 
+            // update mixin replacements and update scope with imported variables and mixins
+            result.addMembers(compiled.getReplacement());
+            callerScope.addToPlaceholder(compiled.getReturnValues());
+
+            //requestCollector.printAllCollected();
+            if (!requestCollector.usedScope() && !compiled.wasCached()) { //FIXME: (!!!!) I have no idea why was cached is important there ... Do not commit until you understand what you created, right?
+              cache.theMixinUsedOnlyHisOwnScope(mixin, mixinScope, compiled, requestCollector);
+            }
+          }
+          if (mixinWorkingScope.hasParent())
+            mixinWorkingScope.getParent().removeRequestCollector(requestCollector);
+
+        }
       });
 
     }
@@ -156,15 +195,69 @@ class MixinsSolver {
     mixinDeclarationScope.add(arguments);
 
     // locally defined mixin does not require any other action
-    boolean isLocalImport = mixinDeclarationScope.seesLocalDataOf(callerScope);
-    if (isLocalImport) {
+    boolean isLocallyDefined = mixinDeclarationScope.seesLocalDataOf(callerScope);
+    if (isLocallyDefined) {
       return mixinScope;
     }
 
     //join scopes
+    //FIXME: (!!!) HHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh
     Scope result = mixinScope.copyWholeTree();
     result.getRootScope().setParent(callerScope.copyWithParentsChain());
+    result = new ScopeView(result);
     return result;
+  }
+
+}
+
+class MixinCompilationResult {
+
+  private List<ASTCssNode> replacement;
+  private Scope returnValues;
+  private boolean cached = false;
+  private List<FullMixinDefinition> unmodifiedMixinsToImport;
+
+  public MixinCompilationResult(List<ASTCssNode> replacement, Scope returnValues, List<FullMixinDefinition> unmodifiedMixinsToImport) {
+    this.replacement = replacement;
+    this.returnValues = returnValues;
+    this.unmodifiedMixinsToImport = unmodifiedMixinsToImport;
+  }
+
+  public boolean wasCached() {
+    return cached;
+  }
+
+  public void setCached(boolean cached) {
+    this.cached = cached;
+  }
+
+  public List<ASTCssNode> getReplacement() {
+    return replacement;
+  }
+
+  public void setReplacement(List<ASTCssNode> replacement) {
+    this.replacement = replacement;
+  }
+
+  public Scope getReturnValues() {
+    return returnValues;
+  }
+
+  public void setReturnValues(Scope returnValues) {
+    this.returnValues = returnValues;
+  }
+
+  public List<FullMixinDefinition> getUnmodifiedMixinsToImport() {
+    return unmodifiedMixinsToImport;
+  }
+
+  public void setUnmodifiedMixinsToImport(List<FullMixinDefinition> unmodifiedMixinsToImport) {
+    this.unmodifiedMixinsToImport = unmodifiedMixinsToImport;
+  }
+
+  @Override
+  protected MixinCompilationResult clone() {
+    return new MixinCompilationResult(ArraysUtils.deeplyClonedList(replacement), returnValues, unmodifiedMixinsToImport);
   }
 
 }

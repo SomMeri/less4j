@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 
-public class Scope {
+public class Scope extends LocalScope {
 
+  public static int copiedScope = 0;
   // following is used only during debugging - to generate human readable toString
   private static final String DEFAULT = "#default#";
   private static final String SCOPE = "#scope#";
@@ -24,21 +23,24 @@ public class Scope {
 
   private String type;
 
-  // real data
-  private final ASTCssNode owner;
+  // scope data
   private boolean presentInTree = true;
-  private LocalData localData = new LocalData();
-  private Stack<LocalData> localDataSnapshots = new Stack<LocalData>();
+  private List<String> names;
 
+  // tree structure
   private Scope parent;
   private List<Scope> childs = new ArrayList<Scope>();
-  private List<String> names; 
-
 
   protected Scope(String type, ASTCssNode owner, List<String> names, Scope parent) {
-    super();
+    super(owner);
     this.names = names;
-    this.owner = owner;
+    this.type = type;
+    setParent(parent);
+  }
+
+  protected Scope(String type, ASTCssNode owner, List<String> names, Scope parent, LocalData initialLocalData) {
+    super(owner, initialLocalData);
+    this.names = names;
     this.type = type;
     setParent(parent);
   }
@@ -82,7 +84,7 @@ public class Scope {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder(toFullName());
-    result.append("\n\n").append(localData); 
+    result.append("\n\n").append(super.toString());
     return result.toString();
   }
 
@@ -127,15 +129,29 @@ public class Scope {
     getLocalVariables().storeAll(otherSope.getLocalVariables());
   }
 
+  //FIXME: (!!!) ugly
+  @Deprecated
+  public void addVariables(Scope otherSope) {
+    getLocalVariables().storeAll(otherSope.getLocalVariables());
+  }
+
   public Expression getValue(Variable variable) {
     return getValue(variable.getName());
   }
 
   public Expression getValue(String name) {
+    Expression value = getVariableValueDoNotRegister(name);
+
+    registerVariableRequest(name, value);
+    return value;
+  }
+
+  //FIXME: (!!!) crime against programming, but I'm in prototype phase
+  @Deprecated
+  public Expression getVariableValueDoNotRegister(String name) {
     Expression value = getLocalVariables().getValue(name);
     if (value == null && hasParent())
-      return getParent().getValue(name);
-
+      value = getParent().getValue(name);
     return value;
   }
 
@@ -158,24 +174,8 @@ public class Scope {
     getLocalMixins().closePlaceholder();
   }
 
-  public List<FullMixinDefinition> getAllMixins() {
-    return getLocalMixins().getAllMixins();
-  }
-
-  public List<FullMixinDefinition> getMixinsByName(List<String> nameChain, ReusableStructureName name) {
-    return getLocalMixins().getMixins(nameChain, name);
-  }
-
-  public List<FullMixinDefinition> getMixinsByName(ReusableStructureName name) {
-    return getLocalMixins().getMixins(name);
-  }
-
-  public List<FullMixinDefinition> getMixinsByName(String name) {
-    return getLocalMixins().getMixins(name);
-  }
-
   public Scope firstChild() {
-    return childs.get(0);
+    return getChilds().get(0);
   }
 
   public boolean isBodyOwnerScope() {
@@ -242,8 +242,8 @@ public class Scope {
   }
 
   public Scope copyWithChildChain(Scope parent) {
-    Scope result = new Scope(type, owner, new ArrayList<String>(getNames()), parent);
-    result.localData = localData;
+    copiedScope++;
+    Scope result = new Scope(type, owner, new ArrayList<String>(getNames()), parent, getLocalData());
     result.presentInTree = presentInTree;
     for (Scope kid : getChilds()) {
       kid.copyWithChildChain(result);
@@ -261,8 +261,9 @@ public class Scope {
           kid.copyWithChildChain(parent);
         }
     }
-    Scope result = new Scope(type, owner, new ArrayList<String>(getNames()), parent);
-    result.localData = localData;
+    copiedScope++;
+    Scope result = new Scope(type, owner, new ArrayList<String>(getNames()), parent, getLocalData());
+
     result.presentInTree = presentInTree;
     return result;
   }
@@ -308,12 +309,12 @@ public class Scope {
   }
 
   public boolean seesLocalDataOf(Scope otherScope) {
-    if (otherScope.localData==localData)
+    if (super.hasTheSameLocalData(otherScope))
       return true;
 
     if (!hasParent())
       return false;
-    
+
     return getParent().seesLocalDataOf(otherScope);
   }
 
@@ -339,54 +340,12 @@ public class Scope {
     return head;
   }
 
-  /**
-   * Do not call this method directly. Use {@link InScopeSnapshotRunner} instead.
-   */
-  protected void createLocalDataSnapshot() {
-    localDataSnapshots.push(localData);
-    localData = localData.clone();
-  }
-
-  /**
-   * Do not call this method directly. Use {@link InScopeSnapshotRunner} instead.
-   */
-  protected void discardLastLocalDataSnapshot() {
-    localData = localDataSnapshots.pop();
-  }
-
-  class LocalData implements Cloneable {
-
-    private VariablesDeclarationsStorage variables = new VariablesDeclarationsStorage();
-    private MixinsDefinitionsStorage mixins = new MixinsDefinitionsStorage();
-
-    @Override
-    protected LocalData clone() {
-      try {
-        LocalData clone = (LocalData) super.clone();
-        clone.variables = variables.clone();
-        clone.mixins = mixins.clone();
-        return clone;
-
-      } catch (CloneNotSupportedException e) {
-        throw new IllegalStateException("Impossible to happen.");
-      }
+  public int getTreeSize() {
+    int result = 1;
+    for (Scope kid : getChilds()) {
+      result = result + kid.getTreeSize();
     }
-
-    @Override
-    public String toString() {
-      StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");
-      result.append("**Variables storage: ").append(variables).append("\n\n");
-      result.append("**Mixins storage: ").append(mixins).append("\n\n");
-      return result.toString();
-    }
-  }
-
-  private MixinsDefinitionsStorage getLocalMixins() {
-    return localData.mixins;
-  }
-
-  private VariablesDeclarationsStorage getLocalVariables() {
-    return localData.variables;
+    return result;
   }
 
 }

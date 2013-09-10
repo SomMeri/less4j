@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.compiler;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeView;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.InitialScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
@@ -41,7 +43,10 @@ public class LessToCssCompiler {
   }
 
   public ASTCssNode compileToCss(StyleSheet less, LessSource source, Configuration options) {
+    long before = Calendar.getInstance().getTimeInMillis();
     resolveImports(less, source);
+    long after = Calendar.getInstance().getTimeInMillis();
+//    System.out.println("Imports: " + (after-before));
     resolveReferences(less);
 
     evaluateExpressions(less);
@@ -105,9 +110,17 @@ public class LessToCssCompiler {
   }
 
   private void resolveReferences(StyleSheet less) {
+    long before = Calendar.getInstance().getTimeInMillis();
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
     Scope scope = scopeBuilder.extractScope(less);
+    long after = Calendar.getInstance().getTimeInMillis();
+//    System.out.println("scopeBuilder: " + (after-before));
+    
+//    System.out.println("Initial scope size: " + scope.getTreeSize() +" check on that: " + scopeBuilder.counter);
 
+//    //FIXME: (!!!!!!!!!!) testing only
+//    scope = new ScopeView(scope);
+//    
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);
     // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
