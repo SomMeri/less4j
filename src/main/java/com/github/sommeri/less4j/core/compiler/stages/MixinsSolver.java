@@ -95,17 +95,12 @@ class MixinsSolver {
       if (isLocalImport) {
         // we need to copy the whole tree, because this runs inside referenced mixin scope 
         // snapshot and imported mixin needs to remember the scope as it is now 
-//        Scope oldWay = mixinToImport.getScope().copyWholeTree();
         ScopeView newWay = new ScopeView(mixinToImport.getScope(), null);
         newWay.saveLocalDataForTheWholeWayUp();
         result.add(new FullMixinDefinition(mixinToImport.getMixin(), newWay));
       } else {
         // since this is non-local import, we need to join reference scope and imported mixins scope
         // imported mixin needs to have access to variables defined in caller
-        //FIXME: (!!!) less important HHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh
-        //        Scope oldWay = mixinToImport.getScope().copyWholeTree();
-        //        oldWay.getRootScope().setParent(referencedMixinScope.copyWithParentsChain());
-
         ScopeView newWay = new ScopeView(mixinToImport.getScope(), referencedMixinScope);
         newWay.saveLocalDataForTheWholeWayUp();
         result.add(new FullMixinDefinition(mixinToImport.getMixin(), newWay));
@@ -140,12 +135,7 @@ class MixinsSolver {
         @Override
         public void run() {
           Scope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
-          System.out.println(reference);
-          System.out.println("mixinScope: " +mixinScope.getValue("@width"));
-          System.out.println("mixinArguments: " +mixinArguments.getValue("@width"));
-          System.out.println("callerScope: " +callerScope.getValue("@width"));
           Scope mixinWorkingScope = calculateMixinsWorkingScope(callerScope, mixinArguments, mixinScope);
-          System.out.println("mixinWorkingScope: " + mixinWorkingScope.getValue("@width"));
 
           RequestCollector requestCollector = new RequestCollector();
           if (mixinWorkingScope.hasParent())
@@ -158,12 +148,6 @@ class MixinsSolver {
             // update mixin replacements and update scope with imported variables and mixins
             result.addMembers(compiled.getReplacement());
             callerScope.addToPlaceholder(compiled.getReturnValues());
-            //            Scope interestingScope = callerScope.getAllMixins().get(0).getScope();
-            //            Scope scopeThatGotIt = interestingScope.getParent().getParent().getParent().getParent().getParent().getParent();
-            //            System.out.println(scopeThatGotIt.getValue("@width"));
-            //            System.out.println(scopeThatGotIt.getParent().getValue("@width"));
-            //            System.out.println(scopeThatGotIt.getValue("@width"));
-            //            System.out.println("asdf");
 
             //requestCollector.printAllCollected();
             if (!requestCollector.usedScope() && !compiled.wasCached()) { //FIXME: (!!!!) I have no idea why was cached is important there ... Do not commit until you understand what you created, right?
@@ -178,18 +162,6 @@ class MixinsSolver {
 
     }
 
-    //    Scope whywasthisdiscardedtoo = callerScope.getAllMixins().get(0).getScope();
-    //    System.out.println("whywasthisdiscardedtoo: " + whywasthisdiscardedtoo.getValue("@width"));
-    //    Scope lastWithout = whywasthisdiscardedtoo.getParent().getParent();
-    //    System.out.println(lastWithout.getValue("@width"));
-    //    System.out.println(lastWithout.getParent().getValue("@width"));
-    //    System.out.println(lastWithout.getValue("@width"));
-    //    Scope scopeThatShouldHaveIt = whywasthisdiscardedtoo.getParent().getParent().getParent().getParent().getParent().getParent();
-    //    System.out.println("scopeThatShouldHaveIt: " + scopeThatShouldHaveIt.getValue("@width"));
-    if (callerScope.getAllMixins().size() >= 3) {
-      System.out.println(callerScope.getAllMixins().get(2).getMixin());
-      System.out.println(callerScope.getAllMixins().get(2).getScope().getValue("@width"));
-    }
     callerScope.closePlaceholder();
     resolveImportance(reference, result);
     shiftComments(reference, result);
@@ -228,19 +200,7 @@ class MixinsSolver {
     }
 
     //join scopes
-    //FIXME: (!!!) HHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh
-    //    Scope result = mixinScope.copyWholeTree();
-    //    Scope resultRootScope = result.getRootScope();
-    //    resultRootScope.setParent(callerScope.copyWithParentsChain());
-
-    //result = new ScopeJointChild(callerScope, resultRootScope);
     Scope result = new ScopeView(mixinScope, callerScope);
-//    Scope lastCorrect = mixinScope.getParent().getParent().getParent();
-//    System.out.println(lastCorrect.getLocalValue("@width"));
-//    System.out.println(lastCorrect.getValue("@width"));
-//    Scope firstWrong = lastCorrect.getParent();
-//    System.out.println(result.getParent().getParent().getParent().getValue("@width"));
-//    System.out.println(result.getValue("@width"));
     return result;
   }
 

@@ -24,6 +24,7 @@ public class ScopeView extends ScopeDecorator {
     this.joinToParentTree = joinToParentTree;
   }
 
+  //FIXME: (!!!) functional but hack
   public void saveLocalDataForTheWholeWayUp() {
     this.fakeLocalData = decoree.getLocalData().clone();
     if (hasParent())
@@ -119,7 +120,6 @@ public class ScopeView extends ScopeDecorator {
 
   @Override
   public Expression getValue(Variable variable) {
-    System.out.println(variable + " from " + toFullName());
     if (fakeLocalData!=null) {
       //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
       Expression value = fakeLocalData.getVariables().getValue(variable.getName());
