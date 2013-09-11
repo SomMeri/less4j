@@ -9,6 +9,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.scopes.LocalScope.LocalScopeData;
 
 public class ScopeDecorator extends Scope {
 
@@ -151,6 +152,14 @@ public class ScopeDecorator extends Scope {
     return decoree.getValue(name);
   }
 
+  public Expression getLocalValue(Variable variable) {
+    return decoree.getLocalValue(variable);
+  }
+
+  public Expression getLocalValue(String name) {
+    return decoree.getLocalValue(name);
+  }
+
   public Expression getVariableValueDoNotRegister(String name) {
     return decoree.getVariableValueDoNotRegister(name);
   }
@@ -232,6 +241,16 @@ public class ScopeDecorator extends Scope {
   @Override
   protected VariablesDeclarationsStorage getLocalVariables() {
     return decoree.getLocalVariables();
+  }
+
+  protected LocalScopeData getLocalData() {
+    return decoree.getLocalData();
+  }
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder(toFullName());
+    result.append("\n\n").append(decoree.toString());
+    return result.toString();
   }
 
 }

@@ -12,19 +12,19 @@ public class LocalScope {
 
   //FIXME: (!!!) does this needs to be protected?
   protected final ASTCssNode owner;
-  private LocalData localData = new LocalData();
-  private Stack<LocalData> localDataSnapshots = new Stack<LocalData>();
+  private LocalScopeData localData = new LocalScopeData();
+  private Stack<LocalScopeData> localDataSnapshots = new Stack<LocalScopeData>();
 
   public LocalScope(ASTCssNode owner) {
     this.owner = owner;
   }
 
-  public LocalScope(ASTCssNode owner, LocalData initialLocalData) {
+  public LocalScope(ASTCssNode owner, LocalScopeData initialLocalData) {
     this(owner);
     localData =  initialLocalData;
   }
 
-  protected LocalData getLocalData() {
+  protected LocalScopeData getLocalData() {
     return localData;
   }
 
@@ -82,15 +82,15 @@ public class LocalScope {
     return localData.toString();
   }
 
-  protected class LocalData implements Cloneable {
+  protected class LocalScopeData implements Cloneable {
 
     private VariablesDeclarationsStorage variables = new VariablesDeclarationsStorage();
     private MixinsDefinitionsStorage mixins = new MixinsDefinitionsStorage();
 
     @Override
-    protected LocalData clone() {
+    protected LocalScopeData clone() {
       try {
-        LocalData clone = (LocalData) super.clone();
+        LocalScopeData clone = (LocalScopeData) super.clone();
         clone.variables = variables.clone();
         clone.mixins = mixins.clone();
         return clone;
@@ -98,6 +98,14 @@ public class LocalScope {
       } catch (CloneNotSupportedException e) {
         throw new IllegalStateException("Impossible to happen.");
       }
+    }
+
+    public VariablesDeclarationsStorage getVariables() {
+      return variables;
+    }
+
+    public MixinsDefinitionsStorage getMixins() {
+      return mixins;
     }
 
     @Override

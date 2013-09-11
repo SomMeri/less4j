@@ -5,21 +5,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.Variable;
+
 public class ScopeView extends ScopeDecorator {
 
-  private Scope publicParent = null;
+  private ScopeView publicParent = null;
   private List<Scope> publicChilds = null;
 
   private Map<Scope, ScopeView> fakeChildsMap = new HashMap<Scope, ScopeView>();
   private Scope decoree;
+  private Scope joinToParentTree;
+  private LocalScopeData fakeLocalData;
 
-  public ScopeView(Scope decoree) {
+  public ScopeView(Scope decoree, Scope joinToParentTree) {
     super(decoree);
     this.decoree = decoree;
+    this.joinToParentTree = joinToParentTree;
+  }
+
+  public void saveLocalDataForTheWholeWayUp() {
+    this.fakeLocalData = decoree.getLocalData().clone();
+    if (hasParent())
+      getParent().saveLocalDataForTheWholeWayUp();
   }
 
   @Override
-  public Scope getParent() {
+  public ScopeView getParent() {
     if (publicParent != null)
       return publicParent;
 
@@ -27,16 +39,23 @@ public class ScopeView extends ScopeDecorator {
     return publicParent;
   }
 
-  protected Scope createPublicParent() {
+  public boolean hasParent() {
+    return getParent()!=null;
+  }
+
+  protected ScopeView createPublicParent() {
     Scope realParent = super.getParent();
-    if (realParent == null)
+    if (realParent != null)
+      return createParentScopeView(realParent, decoree, this);
+
+    if (joinToParentTree==null)
       return null;
     
-    return createParentScopeView(realParent, decoree, this);
+    return new ScopeJointParent(joinToParentTree, this);
   }
 
   protected ScopeView createParentScopeView(Scope realParent, Scope realChild, ScopeView fakeChild) {
-    ScopeView result = new ScopeView(realParent);
+    ScopeView result = new ScopeView(realParent, joinToParentTree);
     result.fakeChildsMap.put(realChild, fakeChild);
 
     return result;
@@ -70,10 +89,69 @@ public class ScopeView extends ScopeDecorator {
   }
 
   protected Scope createChildScopeView(Scope realChild) {
-    ScopeView result = new ScopeView(realChild);
+    ScopeView result = new ScopeView(realChild, joinToParentTree);
     result.publicParent = this;
 
     return result;
   }
+
+  public Scope getRootScope() {
+    if (!hasParent())
+      return this;
+
+    return getParent().getRootScope();
+  }
+  
+  //FIXME: (!!!) well split and clean up
+  public Expression getValue(String name) {
+    if (fakeLocalData!=null) {
+      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
+      Expression value = fakeLocalData.getVariables().getValue(name);
+      if (value!=null)
+        return value;
+    }
+    Expression value = super.getLocalValue(name);
+    if (value!=null || !hasParent())
+      return value;
+    
+    return getParent().getValue(name);
+  }
+
+  @Override
+  public Expression getValue(Variable variable) {
+    System.out.println(variable + " from " + toFullName());
+    if (fakeLocalData!=null) {
+      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
+      Expression value = fakeLocalData.getVariables().getValue(variable.getName());
+      if (value!=null)
+        return value;
+    }
+    Expression value = super.getLocalValue(variable);
+    if (value!=null || !hasParent())
+      return value;
+    
+    return getParent().getValue(variable);
+  }
+
+  public Expression getLocalValue(Variable variable) {
+    if (fakeLocalData!=null) {
+      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
+      Expression value = fakeLocalData.getVariables().getValue(variable.getName());
+      if (value!=null)
+        return value;
+    }
+    return decoree.getLocalValue(variable);
+  }
+
+  public Expression getLocalValue(String name) {
+    if (fakeLocalData!=null) {
+      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
+      Expression value = fakeLocalData.getVariables().getValue(name);
+      if (value!=null)
+        return value;
+    }
+    return decoree.getLocalValue(name);
+  }
+
 
 }

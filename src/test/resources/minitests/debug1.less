@@ -1,7 +1,12 @@
-.box() {
-  @width: 20px;
+.apples(@width) {  
+  .bananas() {
+    width: @width;
+  }
 }
-.mybox {
-  width: @width;
-  .box();
+
+@width: 2px;
+.apples(50px);
+
+#test {
+  .bananas();
 }

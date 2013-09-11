@@ -5,11 +5,11 @@ import java.util.List;
 
 public class ScopeJointParent extends ScopeView {
 
-  private ScopeJointChild additionalChild;
+  private ScopeView additionalChild;
   private Scope decoree;
 
-  public ScopeJointParent(Scope decoree, ScopeJointChild additionalChild) {
-    super(decoree);
+  public ScopeJointParent(Scope decoree, ScopeView additionalChild) {
+    super(decoree, null);
     this.decoree = decoree;
     this.additionalChild = additionalChild;
   }

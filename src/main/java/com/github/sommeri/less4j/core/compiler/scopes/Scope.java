@@ -38,7 +38,7 @@ public class Scope extends LocalScope {
     setParent(parent);
   }
 
-  protected Scope(String type, ASTCssNode owner, List<String> names, Scope parent, LocalData initialLocalData) {
+  protected Scope(String type, ASTCssNode owner, List<String> names, Scope parent, LocalScopeData initialLocalData) {
     super(owner, initialLocalData);
     this.names = names;
     this.type = type;
@@ -149,10 +149,18 @@ public class Scope extends LocalScope {
   //FIXME: (!!!) crime against programming, but I'm in prototype phase
   @Deprecated
   public Expression getVariableValueDoNotRegister(String name) {
-    Expression value = getLocalVariables().getValue(name);
+    Expression value = getLocalValue(name);
     if (value == null && hasParent())
       value = getParent().getValue(name);
     return value;
+  }
+
+  public Expression getLocalValue(Variable variable) {
+    return getLocalVariables().getValue(variable.getName());
+  }
+
+  public Expression getLocalValue(String name) {
+    return getLocalVariables().getValue(name);
   }
 
   public void registerMixin(ReusableStructure mixin, Scope mixinsBodyScope) {
@@ -237,10 +245,12 @@ public class Scope extends LocalScope {
     return text;
   }
 
+  @Deprecated
   public Scope copyWithChildChain() {
     return copyWithChildChain(null);
   }
 
+  @Deprecated
   public Scope copyWithChildChain(Scope parent) {
     copiedScope++;
     Scope result = new Scope(type, owner, new ArrayList<String>(getNames()), parent, getLocalData());
@@ -252,6 +262,7 @@ public class Scope extends LocalScope {
     return result;
   }
 
+  @Deprecated
   public Scope copyWithParentsChain() {
     Scope parent = null;
     if (hasParent()) {
@@ -268,6 +279,7 @@ public class Scope extends LocalScope {
     return result;
   }
 
+  @Deprecated
   public Scope copyWholeTree() {
     Scope parentalTree = copyWithParentsChain();
     Scope parentalTreeConnector = parentalTree.getParent();
