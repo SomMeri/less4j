@@ -433,21 +433,6 @@ class NullScope extends Scope {
   }
 
   @Override
-  public Scope copyWithChildChain() {
-    return this;
-  }
-
-  @Override
-  public Scope copyWithChildChain(Scope parent) {
-    return this;
-  }
-
-  @Override
-  public Scope copyWithParentsChain() {
-    return this;
-  }
-
-  @Override
   public void setParent(Scope parent) {
   }
 
@@ -556,15 +541,6 @@ class NullScope extends Scope {
   @Override
   public String toLongString() {
     return NULL;
-  }
-
-  @Override
-  public Scope copyWholeTree() {
-    return this;
-  }
-
-  @Override
-  public void insertAsParent(Scope parent) {
   }
 
   @Override

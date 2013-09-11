@@ -9,18 +9,15 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
-import com.github.sommeri.less4j.core.compiler.scopes.LocalScope.LocalScopeData;
 
 public class ScopeDecorator extends Scope {
 
   private static final String DECORATOR = "#decorator#";
-  private Scope decoree; //FIXME: (!!!!!!!!!!!!) change to final 
+  private final Scope decoree;  
   
   //FIXME: (!!!) do correctly
   protected ScopeDecorator(Scope decoree) {
     super(DECORATOR, null, decoree.toFullName());
-//    if (decoree==null)
-//      throw new IllegalArgumentException("Null decoree is not allowed.");
     this.decoree = decoree;
   }
 
@@ -82,22 +79,6 @@ public class ScopeDecorator extends Scope {
 
   public Scope firstChild() {
     return decoree.firstChild();
-  }
-
-  public Scope copyWithChildChain() {
-    return decoree.copyWithChildChain();
-  }
-
-  public Scope copyWithChildChain(Scope parent) {
-    return decoree.copyWithChildChain(parent);
-  }
-
-  public Scope copyWithParentsChain() {
-    return decoree.copyWithParentsChain();
-  }
-
-  public Scope copyWholeTree() {
-    return decoree.copyWholeTree();
   }
 
   public Scope getChildOwnerOf(ASTCssNode body) {
@@ -178,10 +159,6 @@ public class ScopeDecorator extends Scope {
 
   public String toLongString() {
     return decoree.toLongString();
-  }
-
-  public void insertAsParent(Scope parent) {
-    decoree.insertAsParent(parent);
   }
 
   public void setParent(Scope parent) {

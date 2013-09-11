@@ -14,7 +14,6 @@ import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 
 public class Scope extends LocalScope {
 
-  public static int copiedScope = 0;
   // following is used only during debugging - to generate human readable toString
   private static final String DEFAULT = "#default#";
   private static final String SCOPE = "#scope#";
@@ -243,55 +242,6 @@ public class Scope extends LocalScope {
     text.append(prefix).append("}").append("\n");
     ;
     return text;
-  }
-
-  @Deprecated
-  public Scope copyWithChildChain() {
-    return copyWithChildChain(null);
-  }
-
-  @Deprecated
-  public Scope copyWithChildChain(Scope parent) {
-    copiedScope++;
-    Scope result = new Scope(type, owner, new ArrayList<String>(getNames()), parent, getLocalData());
-    result.presentInTree = presentInTree;
-    for (Scope kid : getChilds()) {
-      kid.copyWithChildChain(result);
-    }
-
-    return result;
-  }
-
-  @Deprecated
-  public Scope copyWithParentsChain() {
-    Scope parent = null;
-    if (hasParent()) {
-      parent = getParent().copyWithParentsChain();
-      for (Scope kid : getParent().getChilds())
-        if (kid != this) {
-          kid.copyWithChildChain(parent);
-        }
-    }
-    copiedScope++;
-    Scope result = new Scope(type, owner, new ArrayList<String>(getNames()), parent, getLocalData());
-
-    result.presentInTree = presentInTree;
-    return result;
-  }
-
-  @Deprecated
-  public Scope copyWholeTree() {
-    Scope parentalTree = copyWithParentsChain();
-    Scope parentalTreeConnector = parentalTree.getParent();
-    parentalTree.setParent(null);
-    Scope copyWithchildTree = copyWithChildChain(parentalTreeConnector);
-    return copyWithchildTree;
-  }
-
-  public void insertAsParent(Scope parent) {
-    Scope originalParent = getParent();
-    parent.setParent(originalParent);
-    setParent(parent);
   }
 
   public void setParent(Scope parent) {

@@ -10,7 +10,6 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.scopes.LocalScope.VariableRequest;
 import com.github.sommeri.less4j.core.compiler.scopes.RequestCollector;
 import com.github.sommeri.less4j.core.compiler.scopes.Scope;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 
 public class CompiledMixinsCache {
 
@@ -37,7 +36,7 @@ public class CompiledMixinsCache {
     
     MixinCompilationResult preCompiledMixins = result.getIfMatch(mixinWorkingScope);
     if (preCompiledMixins!=null)
-      System.out.println("using cached value of " + mixin.getNamesAsStrings() + " scopes created: " + Scope.copiedScope);
+      System.out.println("using cached value of " + mixin.getNamesAsStrings());
     return preCompiledMixins==null? null : preCompiledMixins.clone();
   }
 
