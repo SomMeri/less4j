@@ -7,7 +7,7 @@ public class LocalScopeData implements Cloneable {
   private MixinsDefinitionsStorage mixins = new MixinsDefinitionsStorage();
 
   @Override
-  protected LocalScopeData clone() {
+  public LocalScopeData clone() {
     try {
       LocalScopeData clone = (LocalScopeData) super.clone();
       clone.variables = variables.clone();

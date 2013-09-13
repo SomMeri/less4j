@@ -5,73 +5,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.AbstractSurroundingScopes;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.BasicScope;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ISurroundingScopes;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SaveableLocalScope;
 
 public class ScopeView extends BasicScope {
 
   private ScopeView publicParent = null;
-  private List<IScope> publicChilds = null;
-
   private Map<IScope, ScopeView> fakeChildsMap = new HashMap<IScope, ScopeView>();
-  private IScope decoree;
+  
+  private IScope underlying;
   private IScope joinToParentTree;
-  private LocalScopeData fakeLocalData;
+  
+  private SurroundingScopesView surroundingScopesView;
+  private SaveableLocalScope saveableLocalScope;
 
-  public ScopeView(IScope decoree, IScope joinToParentTree) {
-    super(decoree.getLocalScope(), decoree.getSurroundingScopes());
-    this.decoree = decoree;
+  public ScopeView(IScope underlying, IScope joinToParentTree) {
+    super(new SaveableLocalScope(underlying.getLocalScope()), underlying.getSurroundingScopes());
+    
+    this.underlying = underlying;
     this.joinToParentTree = joinToParentTree;
+    
+    this.surroundingScopesView = new SurroundingScopesView(this, underlying.getSurroundingScopes());
+    this.saveableLocalScope = (SaveableLocalScope)super.getLocalScope();
   }
 
   //FIXME: (!!!) functional but hack
   public void saveLocalDataForTheWholeWayUp() {
-    this.fakeLocalData = decoree.getLocalData().clone();
-    if (hasParent())
+    this.saveableLocalScope.save();
+    
+    if (hasParent()) {
       getParent().saveLocalDataForTheWholeWayUp();
+    }
   }
 
   @Override
   public ScopeView getParent() {
-    if (publicParent != null)
-      return publicParent;
-
-    publicParent = createPublicParent();
-    return publicParent;
-  }
-
-  public boolean hasParent() {
-    return getParent()!=null;
-  }
-
-  protected ScopeView createPublicParent() {
-    IScope realParent = super.getParent();
-    if (realParent != null)
-      return createParentScopeView(realParent, decoree, this);
-
-    if (joinToParentTree==null)
-      return null;
-    
-    return new ScopeJointParent(joinToParentTree, this);
-  }
-
-  protected ScopeView createParentScopeView(IScope realParent, IScope realChild, ScopeView fakeChild) {
-    ScopeView result = new ScopeView(realParent, joinToParentTree);
-    result.fakeChildsMap.put(realChild, fakeChild);
-
-    return result;
-  }
-
-  @Override
-  public List<IScope> getChilds() {
-    if (publicChilds != null)
-      return publicChilds;
-
-    publicChilds = createPublicChilds();
-    return publicChilds;
+    return getSurroundingScopes().getParent();
   }
 
   protected List<IScope> createPublicChilds() {
@@ -99,73 +70,74 @@ public class ScopeView extends BasicScope {
     return result;
   }
 
-  public IScope getRootScope() {
-    if (!hasParent())
-      return this;
-
-    return getParent().getRootScope();
+  public SurroundingScopesView getSurroundingScopes() {
+    return surroundingScopesView;
   }
-  
-  public Expression getLocalValue(Variable variable) {
-    if (fakeLocalData!=null) {
-      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
-      Expression value = fakeLocalData.getVariables().getValue(variable.getName());
-      if (value!=null)
-        return value;
+
+  class SurroundingScopesView extends AbstractSurroundingScopes {
+    
+    private final ScopeView owner;
+    private final ISurroundingScopes originalStructure;
+
+    private List<IScope> publicChilds = null;
+
+    public SurroundingScopesView(ScopeView owner, ISurroundingScopes originalStructure) {
+      super();
+      this.owner = owner;
+      this.originalStructure = originalStructure;
     }
-    return decoree.getLocalValue(variable);
-  }
-
-  public Expression getLocalValue(String name) {
-    if (fakeLocalData!=null) {
-      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
-      Expression value = fakeLocalData.getVariables().getValue(name);
-      if (value!=null)
-        return value;
-    }
-    return decoree.getLocalValue(name);
-  }
-
-  public ISurroundingScopes getSurroundingScopes() {
-    return new DummySurroundingScopes();
-  }
-
-  public ILocalScope getLocalScope() {
-    return this;
-  }
-  
-  class DummySurroundingScopes implements ISurroundingScopes {
 
     @Override
     public void addChild(IScope child) {
-      ScopeView.this.addChild(child);
+      throw new IllegalStateException("Scopes view does not accept new childs.");
     }
 
     @Override
-    public IScope getParent() {
-      return ScopeView.this.getParent();
+    public ScopeView getParent() {
+      if (publicParent != null)
+        return publicParent;
+
+      publicParent = createPublicParent();
+      return publicParent;
     }
 
     @Override
     public List<IScope> getChilds() {
-      return ScopeView.this.getChilds();
+      if (publicChilds != null)
+        return publicChilds;
+
+      publicChilds = createPublicChilds();
+      return publicChilds;
     }
 
     @Override
     public boolean hasParent() {
-      return ScopeView.this.hasParent();
+      return getParent()!=null;
     }
 
     @Override
     public void setParent(IScope parent) {
-      ScopeView.this.setParent(parent);
+      throw new IllegalStateException("Scopes view does not accept new parents.");
     }
 
-    @Override
-    public int getTreeSize() {
-      return ScopeView.this.getTreeSize();
+    protected ScopeView createPublicParent() {
+      IScope realParent = originalStructure.getParent();
+      if (realParent != null)
+        return createParentScopeView(realParent, underlying, owner);
+
+      if (joinToParentTree==null)
+        return null;
+      
+      return new ScopeJointParent(joinToParentTree, owner);
     }
-    
+
+    protected ScopeView createParentScopeView(IScope realParent, IScope realChild, ScopeView fakeChild) {
+      ScopeView result = new ScopeView(realParent, joinToParentTree);
+      result.fakeChildsMap.put(realChild, fakeChild);
+
+      return result;
+    }
+
   }
 
 }

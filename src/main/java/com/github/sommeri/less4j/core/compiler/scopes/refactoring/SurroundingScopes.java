@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
-public class SurroundingScopes implements ISurroundingScopes {
+public class SurroundingScopes extends AbstractSurroundingScopes {
 
   // tree structure
   private IScope parent;
@@ -42,15 +42,5 @@ public class SurroundingScopes implements ISurroundingScopes {
   public void setParent(IScope parent) {
     this.parent = parent;
   }
-
-  @Override
-  public int getTreeSize() {
-    int result = 1;
-    for (IScope kid : getChilds()) {
-      result = result + kid.getTreeSize();
-    }
-    return result;
-  }
-
 
 }
