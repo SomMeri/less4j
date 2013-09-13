@@ -7,9 +7,11 @@ import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.BasicScope;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ISurroundingScopes;
 
-public class ScopeView extends ScopeDecorator {
+public class ScopeView extends BasicScope {
 
   private ScopeView publicParent = null;
   private List<IScope> publicChilds = null;
@@ -20,7 +22,7 @@ public class ScopeView extends ScopeDecorator {
   private LocalScopeData fakeLocalData;
 
   public ScopeView(IScope decoree, IScope joinToParentTree) {
-    super(decoree);
+    super(decoree.getLocalScope(), decoree.getSurroundingScopes());
     this.decoree = decoree;
     this.joinToParentTree = joinToParentTree;
   }
@@ -104,36 +106,6 @@ public class ScopeView extends ScopeDecorator {
     return getParent().getRootScope();
   }
   
-  //FIXME: (!!!) well split and clean up
-  public Expression getValue(String name) {
-    if (fakeLocalData!=null) {
-      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
-      Expression value = fakeLocalData.getVariables().getValue(name);
-      if (value!=null)
-        return value;
-    }
-    Expression value = super.getLocalValue(name);
-    if (value!=null || !hasParent())
-      return value;
-    
-    return getParent().getValue(name);
-  }
-
-  @Override
-  public Expression getValue(Variable variable) {
-    if (fakeLocalData!=null) {
-      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
-      Expression value = fakeLocalData.getVariables().getValue(variable.getName());
-      if (value!=null)
-        return value;
-    }
-    Expression value = super.getLocalValue(variable);
-    if (value!=null || !hasParent())
-      return value;
-    
-    return getParent().getValue(variable);
-  }
-
   public Expression getLocalValue(Variable variable) {
     if (fakeLocalData!=null) {
       //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
@@ -158,6 +130,10 @@ public class ScopeView extends ScopeDecorator {
     return new DummySurroundingScopes();
   }
 
+  public ILocalScope getLocalScope() {
+    return this;
+  }
+  
   class DummySurroundingScopes implements ISurroundingScopes {
 
     @Override
