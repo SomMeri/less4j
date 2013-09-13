@@ -16,7 +16,7 @@ import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.InitialScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
@@ -106,7 +106,7 @@ public class LessToCssCompiler {
 
   private void resolveReferences(StyleSheet less) {
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
-    Scope scope = scopeBuilder.extractScope(less);
+    IScope scope = scopeBuilder.extractScope(less);
 
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);

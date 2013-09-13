@@ -6,25 +6,25 @@ import java.util.Iterator;
 
 public class IteratedScope {
 
-  private final Scope scope;
-  private Iterator<Scope> childsIterator;
+  private final IScope scope;
+  private Iterator<IScope> childsIterator;
 
-  public IteratedScope(Scope scope) {
+  public IteratedScope(IScope scope) {
     super();
     this.scope = scope;
-    childsIterator = (new ArrayList<Scope>(scope.getChilds())).iterator();
+    childsIterator = (new ArrayList<IScope>(scope.getChilds())).iterator();
   }
 
-  public Scope getScope() {
+  public IScope getScope() {
     return scope;
   }
 
   public IteratedScope getNextChild() {
-    Scope child = null;
+    IScope child = null;
     do {
       if (childsIterator.hasNext())
         child = childsIterator.next();
-    } while (!child.isPresentInTree());
+    } while (!child.isPresentInAst());
     
     return new IteratedScope(child);
   }

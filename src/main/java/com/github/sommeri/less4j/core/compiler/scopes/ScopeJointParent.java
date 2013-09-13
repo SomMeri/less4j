@@ -6,18 +6,18 @@ import java.util.List;
 public class ScopeJointParent extends ScopeView {
 
   private ScopeView additionalChild;
-  private Scope decoree;
+  private IScope decoree;
 
-  public ScopeJointParent(Scope decoree, ScopeView additionalChild) {
+  public ScopeJointParent(IScope decoree, ScopeView additionalChild) {
     super(decoree, null);
     this.decoree = decoree;
     this.additionalChild = additionalChild;
   }
 
   @Override
-  protected List<Scope> createPublicChilds() {
-    List<Scope> result = new ArrayList<Scope>();
-    for (Scope childScope : decoree.getChilds()) {
+  protected List<IScope> createPublicChilds() {
+    List<IScope> result = new ArrayList<IScope>();
+    for (IScope childScope : decoree.getChilds()) {
       result.add(createChildScopeView(childScope));
     }
 

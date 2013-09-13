@@ -33,15 +33,16 @@ import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.RequestCollector;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.compiler.scopes.OldScope;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ScopeFactory;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class ExpressionEvaluator {
 
   private VariableCycleDetector cycleDetector = new VariableCycleDetector();
-  private final Scope scope;
+  private final IScope scope;
   private final ProblemsHandler problemsHandler;
   private ArithmeticCalculator arithmeticCalculator;
   private ListCalculator listCalculator = new ListCalculator();
@@ -54,7 +55,7 @@ public class ExpressionEvaluator {
     this(new NullScope(), problemsHandler);
   }
 
-  public ExpressionEvaluator(Scope scope, ProblemsHandler problemsHandler) {
+  public ExpressionEvaluator(IScope scope, ProblemsHandler problemsHandler) {
     super();
     this.scope = scope == null ? new NullScope() : scope;
     this.problemsHandler = problemsHandler;
@@ -89,9 +90,9 @@ public class ExpressionEvaluator {
     return values;
   }
 
-  public Scope evaluateValues(Scope scope) {
-    Scope result = Scope.createDummyScope();
-    result.fillByFilteredVariables(toEvaluationFilter(), scope);
+  public IScope evaluateValues(IScope scope) {
+    IScope result = ScopeFactory.createDummyScope();
+    result.addFilteredVariables(toEvaluationFilter(), scope);
     return result;
   }
 
@@ -378,7 +379,7 @@ public class ExpressionEvaluator {
 
 }
 
-class NullScope extends Scope {
+class NullScope extends OldScope {
 
   private static final String NULL = "null";
 
@@ -387,12 +388,12 @@ class NullScope extends Scope {
   }
 
   @Override
-  public Scope getParent() {
+  public IScope getParent() {
     return this;
   }
 
   @Override
-  public List<Scope> getChilds() {
+  public List<IScope> getChilds() {
     return Collections.emptyList();
   }
 
@@ -429,29 +430,29 @@ class NullScope extends Scope {
   }
 
   @Override
-  public void registerMixin(ReusableStructure mixin, Scope mixinsBodyScope) {
+  public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
   }
 
   @Override
-  public void setParent(Scope parent) {
+  public void setParent(IScope parent) {
   }
 
   @Override
-  public void removedFromTree() {
+  public void removedFromAst() {
   }
 
   @Override
-  public boolean isPresentInTree() {
+  public boolean isPresentInAst() {
     return false;
   }
 
   @Override
-  public Scope getRootScope() {
+  public IScope getRootScope() {
     return this;
   }
 
   @Override
-  public Scope getChildOwnerOf(ASTCssNode body) {
+  public IScope getChildOwnerOf(ASTCssNode body) {
     return null;
   }
 
@@ -469,7 +470,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public void fillByFilteredVariables(ExpressionFilter filter, Scope source) {
+  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
   }
 
   @Override
@@ -477,18 +478,12 @@ class NullScope extends Scope {
   }
 
   @Override
-  public void add(Scope otherSope) {
+  public void add(IScope otherSope) {
   }
 
   @Override
   @Deprecated
-  public void addVariables(Scope otherSope) {
-  }
-
-  @Override
-  @Deprecated
-  public Expression getVariableValueDoNotRegister(String name) {
-    return null;
+  public void addVariables(IScope otherSope) {
   }
 
   @Override
@@ -496,7 +491,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public void addToPlaceholder(Scope otherScope) {
+  public void addToPlaceholder(IScope otherScope) {
   }
 
   @Override
@@ -524,7 +519,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public Scope firstChild() {
+  public IScope firstChild() {
     return null;
   }
 
@@ -534,7 +529,7 @@ class NullScope extends Scope {
   }
 
   @Override
-  public Scope skipBodyOwner() {
+  public IScope skipBodyOwner() {
     return this;
   }
 
@@ -544,21 +539,13 @@ class NullScope extends Scope {
   }
 
   @Override
-  public boolean seesLocalDataOf(Scope otherScope) {
+  public boolean seesLocalDataOf(IScope otherScope) {
     return false;
   }
 
   @Override
-  public Scope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
+  public IScope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
     return this;
-  }
-
-  @Override
-  public void addRequestCollector(RequestCollector requestCollector) {
-  }
-
-  @Override
-  public void removeRequestCollector(RequestCollector requestCollector) {
   }
 
   @Override

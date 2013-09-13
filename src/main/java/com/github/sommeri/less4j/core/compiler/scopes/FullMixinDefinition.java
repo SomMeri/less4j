@@ -4,9 +4,9 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 
 public class FullMixinDefinition {
   private final ReusableStructure mixin;
-  private final Scope bodyScope;
+  private final IScope bodyScope;
 
-  public FullMixinDefinition(ReusableStructure mixin, Scope mixinsBodyScope) {
+  public FullMixinDefinition(ReusableStructure mixin, IScope mixinsBodyScope) {
     super();
     this.mixin = mixin;
     this.bodyScope = mixinsBodyScope;
@@ -16,7 +16,7 @@ public class FullMixinDefinition {
     return mixin;
   }
 
-  public Scope getScope() {
+  public IScope getScope() {
     return bodyScope;
   }
 

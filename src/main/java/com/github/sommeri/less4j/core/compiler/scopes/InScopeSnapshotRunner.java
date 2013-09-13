@@ -1,9 +1,9 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
 public class InScopeSnapshotRunner {
-  private final Scope scope;
+  private final IScope scope;
 
-  public InScopeSnapshotRunner(Scope scope) {
+  public InScopeSnapshotRunner(IScope scope) {
     this.scope = scope;
   }
 
@@ -19,7 +19,7 @@ public class InScopeSnapshotRunner {
    * Convenience method. See {@link #runInLocalDataSnapshot(ITask)}
    * 
    */
-  public static void runInLocalDataSnapshot(Scope scope, ITask task) {
+  public static void runInLocalDataSnapshot(IScope scope, ITask task) {
     InScopeSnapshotRunner runner = new InScopeSnapshotRunner(scope);
     runner.runInLocalDataSnapshot(task);
   }
@@ -28,7 +28,7 @@ public class InScopeSnapshotRunner {
    * Convenience method. See {@link #runInLocalDataSnapshot(IFunction)}
    * 
    */
-  public static <T> T runInLocalDataSnapshot(Scope scope, IFunction<T> task) {
+  public static <T> T runInLocalDataSnapshot(IScope scope, IFunction<T> task) {
     InScopeSnapshotRunner runner = new InScopeSnapshotRunner(scope);
     return runner.runInLocalDataSnapshot(task);
   }

@@ -9,14 +9,15 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ILocalScope;
 
-public class ScopeDecorator extends Scope {
+public class ScopeDecorator extends OldScope {
 
   private static final String DECORATOR = "#decorator#";
-  private final Scope decoree;  
+  private final IScope decoree;  
   
   //FIXME: (!!!) do correctly
-  protected ScopeDecorator(Scope decoree) {
+  protected ScopeDecorator(IScope decoree) {
     super(DECORATOR, null, decoree.toFullName());
     this.decoree = decoree;
   }
@@ -25,7 +26,7 @@ public class ScopeDecorator extends Scope {
     decoree.addNames(names);
   }
 
-  public List<Scope> getChilds() {
+  public List<IScope> getChilds() {
     return decoree.getChilds();
   }
 
@@ -33,19 +34,19 @@ public class ScopeDecorator extends Scope {
     return decoree.getNames();
   }
 
-  public void fillByFilteredVariables(ExpressionFilter filter, Scope source) {
-    decoree.fillByFilteredVariables(filter, source);
+  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
+    decoree.addFilteredVariables(filter, source);
   }
 
   public void addAllMixins(List<FullMixinDefinition> mixins) {
     decoree.addAllMixins(mixins);
   }
 
-  public void add(Scope otherSope) {
+  public void add(IScope otherSope) {
     decoree.add(otherSope);
   }
 
-  public void addVariables(Scope otherSope) {
+  public void addVariables(IScope otherSope) {
     decoree.addVariables(otherSope);
   }
 
@@ -53,7 +54,7 @@ public class ScopeDecorator extends Scope {
     decoree.createPlaceholder();
   }
 
-  public void addToPlaceholder(Scope otherScope) {
+  public void addToPlaceholder(IScope otherScope) {
     decoree.addToPlaceholder(otherScope);
   }
 
@@ -77,27 +78,23 @@ public class ScopeDecorator extends Scope {
     return decoree.getMixinsByName(name);
   }
 
-  public Scope firstChild() {
+  public IScope firstChild() {
     return decoree.firstChild();
   }
 
-  public Scope getChildOwnerOf(ASTCssNode body) {
+  public IScope getChildOwnerOf(ASTCssNode body) {
     return decoree.getChildOwnerOf(body);
   }
 
-  public Scope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
+  public IScope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
     return decoree.childByOwners(headNode, restNodes);
-  }
-
-  public void addRequestCollector(RequestCollector requestCollector) {
-    decoree.addRequestCollector(requestCollector);
   }
 
   public boolean equals(Object obj) {
     return decoree.equals(obj);
   }
 
-  public Scope getParent() {
+  public IScope getParent() {
     return decoree.getParent();
   }
 
@@ -141,11 +138,7 @@ public class ScopeDecorator extends Scope {
     return decoree.getLocalValue(name);
   }
 
-  public Expression getVariableValueDoNotRegister(String name) {
-    return decoree.getVariableValueDoNotRegister(name);
-  }
-
-  public void registerMixin(ReusableStructure mixin, Scope mixinsBodyScope) {
+  public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
     decoree.registerMixin(mixin, mixinsBodyScope);
   }
 
@@ -153,7 +146,7 @@ public class ScopeDecorator extends Scope {
     return decoree.isBodyOwnerScope();
   }
 
-  public Scope skipBodyOwner() {
+  public IScope skipBodyOwner() {
     return decoree.skipBodyOwner();
   }
 
@@ -161,30 +154,26 @@ public class ScopeDecorator extends Scope {
     return decoree.toLongString();
   }
 
-  public void setParent(Scope parent) {
+  public void setParent(IScope parent) {
     //FIXME: (!!!) following check is needed due to constructor call in Scope - needs clean up after we know things really got faster
     if (decoree!=null)
       decoree.setParent(parent);
   }
 
-  public void removedFromTree() {
-    decoree.removedFromTree();
+  public void removedFromAst() {
+    decoree.removedFromAst();
   }
 
-  public boolean isPresentInTree() {
-    return decoree.isPresentInTree();
+  public boolean isPresentInAst() {
+    return decoree.isPresentInAst();
   }
 
-  public Scope getRootScope() {
+  public IScope getRootScope() {
     return decoree.getRootScope();
   }
 
-  public boolean seesLocalDataOf(Scope otherScope) {
+  public boolean seesLocalDataOf(IScope otherScope) {
     return decoree.seesLocalDataOf(otherScope);
-  }
-
-  public void removeRequestCollector(RequestCollector requestCollector) {
-    decoree.removeRequestCollector(requestCollector);
   }
 
   public int getTreeSize() {
@@ -196,33 +185,30 @@ public class ScopeDecorator extends Scope {
   }
 
   @Override
-  public boolean hasTheSameLocalData(LocalScope otherScope) {
-    return decoree.hasTheSameLocalData(otherScope);
+  public boolean hasTheSameLocalData(ILocalScope otherScope) {
+    return decoree.getLocalScope().hasTheSameLocalData(otherScope);
   }
 
   @Override
-  protected void createLocalDataSnapshot() {
+  public void createLocalDataSnapshot() {
     decoree.createLocalDataSnapshot();
   }
 
   @Override
-  protected void discardLastLocalDataSnapshot() {
+  public void discardLastLocalDataSnapshot() {
     decoree.discardLastLocalDataSnapshot();
   }
 
   @Override
-  protected void registerVariableRequest(String name, Expression value) {
-    decoree.registerVariableRequest(name, value);
-  }
-
-  @Override
-  protected VariablesDeclarationsStorage getLocalVariables() {
+  public VariablesDeclarationsStorage getLocalVariables() {
     return decoree.getLocalVariables();
   }
 
-  protected LocalScopeData getLocalData() {
+  @Override
+  public LocalScopeData getLocalData() {
     return decoree.getLocalData();
   }
+  
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder(toFullName());

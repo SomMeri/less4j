@@ -11,14 +11,14 @@ import com.github.sommeri.less4j.core.ast.Variable;
 public class ScopeView extends ScopeDecorator {
 
   private ScopeView publicParent = null;
-  private List<Scope> publicChilds = null;
+  private List<IScope> publicChilds = null;
 
-  private Map<Scope, ScopeView> fakeChildsMap = new HashMap<Scope, ScopeView>();
-  private Scope decoree;
-  private Scope joinToParentTree;
+  private Map<IScope, ScopeView> fakeChildsMap = new HashMap<IScope, ScopeView>();
+  private IScope decoree;
+  private IScope joinToParentTree;
   private LocalScopeData fakeLocalData;
 
-  public ScopeView(Scope decoree, Scope joinToParentTree) {
+  public ScopeView(IScope decoree, IScope joinToParentTree) {
     super(decoree);
     this.decoree = decoree;
     this.joinToParentTree = joinToParentTree;
@@ -45,7 +45,7 @@ public class ScopeView extends ScopeDecorator {
   }
 
   protected ScopeView createPublicParent() {
-    Scope realParent = super.getParent();
+    IScope realParent = super.getParent();
     if (realParent != null)
       return createParentScopeView(realParent, decoree, this);
 
@@ -55,7 +55,7 @@ public class ScopeView extends ScopeDecorator {
     return new ScopeJointParent(joinToParentTree, this);
   }
 
-  protected ScopeView createParentScopeView(Scope realParent, Scope realChild, ScopeView fakeChild) {
+  protected ScopeView createParentScopeView(IScope realParent, IScope realChild, ScopeView fakeChild) {
     ScopeView result = new ScopeView(realParent, joinToParentTree);
     result.fakeChildsMap.put(realChild, fakeChild);
 
@@ -63,7 +63,7 @@ public class ScopeView extends ScopeDecorator {
   }
 
   @Override
-  public List<Scope> getChilds() {
+  public List<IScope> getChilds() {
     if (publicChilds != null)
       return publicChilds;
 
@@ -71,13 +71,13 @@ public class ScopeView extends ScopeDecorator {
     return publicChilds;
   }
 
-  protected List<Scope> createPublicChilds() {
-    List<Scope> realChilds = super.getChilds();
+  protected List<IScope> createPublicChilds() {
+    List<IScope> realChilds = super.getChilds();
     if (realChilds == null)
       return null;
 
-    List<Scope> result = new ArrayList<Scope>();
-    for (Scope childScope : realChilds) {
+    List<IScope> result = new ArrayList<IScope>();
+    for (IScope childScope : realChilds) {
       if (fakeChildsMap.containsKey(childScope)) {
         result.add(fakeChildsMap.get(childScope));
       } else {
@@ -89,14 +89,14 @@ public class ScopeView extends ScopeDecorator {
 
   }
 
-  protected Scope createChildScopeView(Scope realChild) {
+  protected IScope createChildScopeView(IScope realChild) {
     ScopeView result = new ScopeView(realChild, joinToParentTree);
     result.publicParent = this;
 
     return result;
   }
 
-  public Scope getRootScope() {
+  public IScope getRootScope() {
     if (!hasParent())
       return this;
 
