@@ -9,16 +9,19 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.BasicScope;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ILocalScope;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SurroundingScopes;
 
-public class ScopeDecorator extends OldScope {
+public class ScopeDecorator extends BasicScope {
 
   private static final String DECORATOR = "#decorator#";
   private final IScope decoree;  
   
-  //FIXME: (!!!) do correctly
+  //FIXME: (!!!) do naming correctly
   protected ScopeDecorator(IScope decoree) {
-    super(DECORATOR, null, decoree.toFullName());
+    //super(DECORATOR, null, decoree.toFullName());
+    super(decoree, decoree.getSurroundingScopes());
     this.decoree = decoree;
   }
 

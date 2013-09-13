@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -34,8 +35,11 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.compiler.scopes.LocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.OldScope;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.BasicScope;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ScopeFactory;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SurroundingScopes;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -379,12 +383,12 @@ public class ExpressionEvaluator {
 
 }
 
-class NullScope extends OldScope {
+class NullScope extends BasicScope {
 
-  private static final String NULL = "null";
+  private static final String NULL = "#null#";
 
   protected NullScope() {
-    super(NULL, null, "  ");
+    super(new LocalScope(null, Arrays.asList(NULL), NULL), new SurroundingScopes()); 
   }
 
   @Override
