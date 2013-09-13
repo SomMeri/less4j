@@ -18,22 +18,19 @@ import com.github.sommeri.less4j.core.compiler.scopes.VariablesDeclarationsStora
 
 public class BasicScope implements IScope {
 
-  // scope data - where should this belong to?
-  private boolean presentInAst = true;
-
   private ILocalScope localScope;
-  private SurroundingScopes surroundingScopes;
+  private ISurroundingScopes surroundingScopes;
 
-  public BasicScope(ILocalScope localScope, SurroundingScopes tree) {
+  public BasicScope(ILocalScope localScope, ISurroundingScopes tree) {
     this.localScope = localScope;
     this.surroundingScopes = tree;
   }
 
-  public SurroundingScopes getSurroundingScopes() {
+  public ISurroundingScopes getSurroundingScopes() {
     return surroundingScopes;
   }
 
-  public void setSurroundingScopes(SurroundingScopes surroundingScopes) {
+  public void setSurroundingScopes(ISurroundingScopes surroundingScopes) {
     this.surroundingScopes = surroundingScopes;
   }
 
@@ -251,15 +248,15 @@ public class BasicScope implements IScope {
     return localScope.getValue(name);
   }
 
-  /* ******************************************************************** */
-
   public void removedFromAst() {
-    presentInAst = false;
+    localScope.removedFromAst();
   }
 
   public boolean isPresentInAst() {
-    return presentInAst;
+    return localScope.isPresentInAst();
   }
+
+  /* ******************************************************************** */
 
   public void setParent(IScope parent) {
     if (getSurroundingScopes().hasParent()) {
@@ -275,7 +272,6 @@ public class BasicScope implements IScope {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder(toFullName());
-    result.append("\n\n").append(super.toString());
     return result.toString();
   }
 

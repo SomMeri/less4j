@@ -82,4 +82,8 @@ public interface ILocalScope {
 
   public void discardLastLocalDataSnapshot();
 
+  public boolean isPresentInAst();
+
+  public void removedFromAst();
+
 }

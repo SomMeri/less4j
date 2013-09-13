@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ISurroundingScopes;
 
 public class ScopeView extends ScopeDecorator {
 
@@ -153,5 +154,42 @@ public class ScopeView extends ScopeDecorator {
     return decoree.getLocalValue(name);
   }
 
+  public ISurroundingScopes getSurroundingScopes() {
+    return new DummySurroundingScopes();
+  }
+
+  class DummySurroundingScopes implements ISurroundingScopes {
+
+    @Override
+    public void addChild(IScope child) {
+      ScopeView.this.addChild(child);
+    }
+
+    @Override
+    public IScope getParent() {
+      return ScopeView.this.getParent();
+    }
+
+    @Override
+    public List<IScope> getChilds() {
+      return ScopeView.this.getChilds();
+    }
+
+    @Override
+    public boolean hasParent() {
+      return ScopeView.this.hasParent();
+    }
+
+    @Override
+    public void setParent(IScope parent) {
+      ScopeView.this.setParent(parent);
+    }
+
+    @Override
+    public int getTreeSize() {
+      return ScopeView.this.getTreeSize();
+    }
+    
+  }
 
 }

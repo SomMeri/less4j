@@ -17,8 +17,9 @@ public class LocalScope implements ILocalScope {
 
   // following is used only during debugging - to generate human readable toString
   private String type;
-  //FIXME (!!!): does not belong here 
   private final ASTCssNode owner;
+  private boolean presentInAst = true;
+  
   private LocalScopeData localData = new LocalScopeData();
   private Stack<LocalScopeData> localDataSnapshots = new Stack<LocalScopeData>();
 
@@ -46,6 +47,14 @@ public class LocalScope implements ILocalScope {
 
   public boolean isBodyOwnerScope() {
     return ScopeFactory.BODY_OWNER.equals(getType());
+  }
+
+  public void removedFromAst() {
+    presentInAst = false;
+  }
+
+  public boolean isPresentInAst() {
+    return presentInAst;
   }
 
   public void addNames(List<String> names) {

@@ -5,11 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
-public class SurroundingScopes {
-
-  //FIXME: (!!!) rename to `presentInAst`
-  // scope data
-  private boolean presentInTree = true;
+public class SurroundingScopes implements ISurroundingScopes {
 
   // tree structure
   private IScope parent;
@@ -22,34 +18,32 @@ public class SurroundingScopes {
     setParent(parent);
   }
 
+  @Override
   public void addChild(IScope child) {
     childs.add(child);
   }
 
+  @Override
   public IScope getParent() {
     return parent;
   }
 
+  @Override
   public List<IScope> getChilds() {
     return childs;
   }
 
+  @Override
   public boolean hasParent() {
     return getParent() != null;
   }
 
+  @Override
   public void setParent(IScope parent) {
     this.parent = parent;
   }
 
-  public void removedFromTree() {
-    presentInTree = false;
-  }
-
-  public boolean isPresentInTree() {
-    return presentInTree;
-  }
-
+  @Override
   public int getTreeSize() {
     int result = 1;
     for (IScope kid : getChilds()) {

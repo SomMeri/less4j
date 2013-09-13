@@ -6,7 +6,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ILocalScope;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SurroundingScopes;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ISurroundingScopes;
 
 public interface IScope extends ILocalScope {
 
@@ -59,6 +59,6 @@ public interface IScope extends ILocalScope {
 
   //FIXME (!!!) this MUST be removed 
   @Deprecated
-  public SurroundingScopes getSurroundingScopes();
+  public ISurroundingScopes getSurroundingScopes();
 
 }
