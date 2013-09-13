@@ -36,7 +36,6 @@ import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpo
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.LocalScope;
-import com.github.sommeri.less4j.core.compiler.scopes.OldScope;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.BasicScope;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SurroundingScopes;
