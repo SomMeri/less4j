@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.compiler.scopes.refactoring;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
@@ -8,21 +9,22 @@ import com.github.sommeri.less4j.core.compiler.scopes.ScopeView;
 
 public class SurroundingScopesView extends AbstractSurroundingScopes {
 
-  private ScopeView owner;
-  private ScopeView publicParent;
-  private IScope joinToParentTree;
-  private final ISurroundingScopes originalStructure;
+  //FIXME: (!!!) turn to private
+  protected IScope joinToParentTree;
+  protected AbstractScopeView owner;
+  protected AbstractScopeView publicParent;
+  protected final ISurroundingScopes originalStructure;
 
   private List<IScope> publicChilds = null;
 
-  public SurroundingScopesView(ISurroundingScopes originalStructure, ScopeView publicParent, IScope joinToParentTree) {
+  public SurroundingScopesView(ISurroundingScopes originalStructure, AbstractScopeView publicParent, IScope joinToParentTree) {
     super();
     this.originalStructure = originalStructure;
     this.joinToParentTree = joinToParentTree;
     this.publicParent = publicParent;
   }
 
-  public void setOwner(ScopeView owner) {
+  public void setOwner(AbstractScopeView owner) {
     this.owner = owner;
   }
 
@@ -32,7 +34,7 @@ public class SurroundingScopesView extends AbstractSurroundingScopes {
   }
 
   @Override
-  public ScopeView getParent() {
+  public AbstractScopeView getParent() {
     if (publicParent != null)
       return publicParent;
 
@@ -45,21 +47,33 @@ public class SurroundingScopesView extends AbstractSurroundingScopes {
     if (publicChilds != null)
       return publicChilds;
 
-    publicChilds = owner.createPublicChilds();
+    publicChilds = createPublicChilds();
     return publicChilds;
   }
 
-  @Override
-  public boolean hasParent() {
-    return getParent() != null;
-  }
+  public List<IScope> createPublicChilds() {
+    List<IScope> realChilds = originalStructure.getChilds();
+    if (realChilds == null)
+      return null;
 
+    List<IScope> result = new ArrayList<IScope>();
+    for (IScope childScope : realChilds) {
+      if (owner.fakeChildsMap.containsKey(childScope)) {
+        result.add(owner.fakeChildsMap.get(childScope));
+      } else {
+        result.add(new ScopeView(childScope, owner, joinToParentTree));
+      }
+    }
+    
+    return result;
+
+  }
   @Override
   public void setParent(IScope parent) {
     throw new IllegalStateException("Scopes view does not accept new parents.");
   }
 
-  protected ScopeView createPublicParent() {
+  protected AbstractScopeView createPublicParent() {
     IScope realParent = originalStructure.getParent();
     if (realParent != null)
       return createParentScopeView(realParent, owner.underlying, owner);
@@ -70,7 +84,7 @@ public class SurroundingScopesView extends AbstractSurroundingScopes {
     return new ScopeJointParent(joinToParentTree, null, owner);
   }
 
-  protected ScopeView createParentScopeView(IScope realParent, IScope realChild, ScopeView fakeChild) {
+  protected ScopeView createParentScopeView(IScope realParent, IScope realChild, AbstractScopeView fakeChild) {
     ScopeView result = new ScopeView(realParent, null, joinToParentTree);
     result.fakeChildsMap.put(realChild, fakeChild);
 

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
-import com.github.sommeri.less4j.core.compiler.scopes.ScopeView;
 
 public class AbstractScopeView extends BasicScope {
 
@@ -12,7 +11,7 @@ public class AbstractScopeView extends BasicScope {
   public IScope joinToParentTree;
   
   private SaveableLocalScope saveableLocalScope;
-  public Map<IScope, ScopeView> fakeChildsMap = new HashMap<IScope, ScopeView>();
+  public Map<IScope, AbstractScopeView> fakeChildsMap = new HashMap<IScope, AbstractScopeView>();
 
   public AbstractScopeView(SaveableLocalScope localScope, ISurroundingScopes surroundingScopes, IScope joinToParentTree) {
     super(localScope, surroundingScopes);

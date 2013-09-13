@@ -34,11 +34,6 @@ public class SurroundingScopes extends AbstractSurroundingScopes {
   }
 
   @Override
-  public boolean hasParent() {
-    return getParent() != null;
-  }
-
-  @Override
   public void setParent(IScope parent) {
     this.parent = parent;
   }

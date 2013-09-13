@@ -1,27 +1,17 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.AbstractScopeView;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SaveableLocalScope;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SurroundingScopesJointParentView;
+import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SurroundingScopesView;
 
-public class ScopeJointParent extends ScopeView {
 
-  private ScopeView additionalChild;
-  private IScope decoree;
+public class ScopeJointParent extends AbstractScopeView {
 
-  public ScopeJointParent(IScope decoree, ScopeView publicParent, ScopeView additionalChild) {
-    super(decoree, publicParent, null);
-    this.decoree = decoree;
-    this.additionalChild = additionalChild;
+  public ScopeJointParent(IScope underlying, AbstractScopeView publicParent, AbstractScopeView additionalChild) {
+    super(new SaveableLocalScope(underlying.getLocalScope()), new SurroundingScopesJointParentView(underlying.getSurroundingScopes(), publicParent, additionalChild), null);
+    ((SurroundingScopesView)super.getSurroundingScopes()).setOwner(this);
+    this.underlying = underlying;
   }
 
-  @Override
-  public List<IScope> createPublicChilds() {
-    List<IScope> result = new ArrayList<IScope>();
-    for (IScope childScope : decoree.getChilds()) {
-      result.add(new ScopeView(childScope, this, joinToParentTree));
-    }
-
-    result.add(additionalChild);
-    return result;
-  }
 }
