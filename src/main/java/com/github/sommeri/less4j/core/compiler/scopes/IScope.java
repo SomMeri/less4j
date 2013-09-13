@@ -47,8 +47,6 @@ public interface IScope extends ILocalScope, ISurroundingScopes {
 
   public Expression getLocalValue(String name);
 
-  //FIXME (!!!) this MUST be removed 
-  @Deprecated
   public ISurroundingScopes getSurroundingScopes();
 
 }
