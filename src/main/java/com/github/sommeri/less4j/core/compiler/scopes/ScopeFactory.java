@@ -43,8 +43,8 @@ public class ScopeFactory {
     return result;
   }
 
-  public static ScopeView createInitialScopeView(IScope underlying, IScope joinToParentTree) {
-    return createChildScopeView(underlying, null, joinToParentTree);  
+  public static ScopeView createJoinedScopesView(IScope parent, IScope underlyingChild) {
+    return createChildScopeView(underlyingChild, null, parent);  
   }
   
   public static ScopeView createChildScopeView(IScope underlying, ScopeView publicParent, IScope joinToParentTree) {
