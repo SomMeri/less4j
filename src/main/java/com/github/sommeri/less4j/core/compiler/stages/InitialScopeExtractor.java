@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ScopeFactory;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 
 /**
  * Splits the input tree into separate scope tree and the trees. Removes

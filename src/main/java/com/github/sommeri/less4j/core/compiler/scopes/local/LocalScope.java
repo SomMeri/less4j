@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes;
+package com.github.sommeri.less4j.core.compiler.scopes.local;
 
 import java.util.List;
 import java.util.Stack;
@@ -10,8 +10,11 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ILocalScope;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ScopeFactory;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 
 public class LocalScope implements ILocalScope {
 

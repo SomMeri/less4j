@@ -33,12 +33,12 @@ import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
+import com.github.sommeri.less4j.core.compiler.scopes.BasicScope;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
-import com.github.sommeri.less4j.core.compiler.scopes.LocalScope;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.BasicScope;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.ScopeFactory;
-import com.github.sommeri.less4j.core.compiler.scopes.refactoring.SurroundingScopes;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopesTree;
+import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScope;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -387,7 +387,7 @@ class NullScope extends BasicScope {
   private static final String NULL = "#null#";
 
   protected NullScope() {
-    super(new LocalScope(null, Arrays.asList(NULL), NULL), new SurroundingScopes()); 
+    super(new LocalScope(null, Arrays.asList(NULL), NULL), new ScopesTree()); 
   }
 
   @Override

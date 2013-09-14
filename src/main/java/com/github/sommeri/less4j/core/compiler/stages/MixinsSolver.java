@@ -14,9 +14,10 @@ import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.IFunction;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
-import com.github.sommeri.less4j.core.compiler.scopes.ScopeView;
+import com.github.sommeri.less4j.core.compiler.scopes.view.ScopeView;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -76,13 +77,13 @@ class MixinsSolver {
       if (isLocalImport) {
         // we need to copy the whole tree, because this runs inside referenced mixin scope 
         // snapshot and imported mixin needs to remember the scope as it is now 
-        ScopeView newWay = new ScopeView(mixinToImport.getScope(), null, null);
+        ScopeView newWay = ScopeFactory.createInitialScopeView(mixinToImport.getScope(), null);
         newWay.saveLocalDataForTheWholeWayUp();
         result.add(new FullMixinDefinition(mixinToImport.getMixin(), newWay));
       } else {
         // since this is non-local import, we need to join reference scope and imported mixins scope
         // imported mixin needs to have access to variables defined in caller
-        ScopeView newWay = new ScopeView(mixinToImport.getScope(), null, referencedMixinScope);
+        ScopeView newWay = ScopeFactory.createInitialScopeView(mixinToImport.getScope(), referencedMixinScope);
         newWay.saveLocalDataForTheWholeWayUp();
         result.add(new FullMixinDefinition(mixinToImport.getMixin(), newWay));
       }
@@ -171,7 +172,7 @@ class MixinsSolver {
     }
 
     //join scopes
-    IScope result = new ScopeView(mixinScope, null, callerScope);
+    IScope result = ScopeFactory.createInitialScopeView(mixinScope, callerScope);
     return result;
   }
 

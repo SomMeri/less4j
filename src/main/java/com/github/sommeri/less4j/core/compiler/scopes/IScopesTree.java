@@ -1,10 +1,9 @@
-package com.github.sommeri.less4j.core.compiler.scopes.refactoring;
+package com.github.sommeri.less4j.core.compiler.scopes;
 
 import java.util.List;
 
-import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
-public interface ISurroundingScopes {
+public interface IScopesTree {
 
   public void addChild(IScope child);
 

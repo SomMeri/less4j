@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes.refactoring;
+package com.github.sommeri.less4j.core.compiler.scopes;
 
 import java.util.List;
 
@@ -9,18 +9,16 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
-import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.IScope;
-import com.github.sommeri.less4j.core.compiler.scopes.LocalScopeData;
-import com.github.sommeri.less4j.core.compiler.scopes.MixinsDefinitionsStorage;
-import com.github.sommeri.less4j.core.compiler.scopes.VariablesDeclarationsStorage;
+import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScopeData;
+import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage;
+import com.github.sommeri.less4j.core.compiler.scopes.local.VariablesDeclarationsStorage;
 
-public abstract class ComposedDumbScope implements ILocalScope, ISurroundingScopes{
+public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
   
   private ILocalScope localScope;
-  private ISurroundingScopes surroundingScopes;
+  private IScopesTree surroundingScopes;
 
-  public ComposedDumbScope(ILocalScope localScope, ISurroundingScopes surroundingScopes) {
+  public ComposedDumbScope(ILocalScope localScope, IScopesTree surroundingScopes) {
     this.localScope = localScope;
     this.surroundingScopes = surroundingScopes;
   }
@@ -177,7 +175,7 @@ public abstract class ComposedDumbScope implements ILocalScope, ISurroundingScop
     return surroundingScopes.getTreeSize();
   }
 
-  public ISurroundingScopes getSurroundingScopes() {
+  public IScopesTree getSurroundingScopes() {
     return surroundingScopes;
   }
 

@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes.refactoring;
+package com.github.sommeri.less4j.core.compiler.scopes.local;
 
 import java.util.List;
 
@@ -10,10 +10,8 @@ import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
-import com.github.sommeri.less4j.core.compiler.scopes.LocalScopeData;
-import com.github.sommeri.less4j.core.compiler.scopes.MixinsDefinitionsStorage;
-import com.github.sommeri.less4j.core.compiler.scopes.VariablesDeclarationsStorage;
 
 public class SaveableLocalScope implements ILocalScope {
   

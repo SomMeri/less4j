@@ -1,8 +1,7 @@
-package com.github.sommeri.less4j.core.compiler.scopes.refactoring;
+package com.github.sommeri.less4j.core.compiler.scopes;
 
-import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
-public abstract class AbstractSurroundingScopes implements ISurroundingScopes {
+public abstract class AbstractScopesTree implements IScopesTree {
 
   @Override
   public boolean hasParent() {

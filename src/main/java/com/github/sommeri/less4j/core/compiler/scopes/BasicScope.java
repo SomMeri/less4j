@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes.refactoring;
+package com.github.sommeri.less4j.core.compiler.scopes;
 
 import java.util.Iterator;
 import java.util.List;
@@ -6,11 +6,10 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
 public class BasicScope extends ComposedDumbScope implements IScope {
 
-  public BasicScope(ILocalScope localScope, ISurroundingScopes surroundingScopes) {
+  public BasicScope(ILocalScope localScope, IScopesTree surroundingScopes) {
     super(localScope, surroundingScopes);
   }
 
