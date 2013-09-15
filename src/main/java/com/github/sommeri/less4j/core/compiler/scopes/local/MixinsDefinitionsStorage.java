@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes;
+package com.github.sommeri.less4j.core.compiler.scopes.local;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,12 +9,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 
 public class MixinsDefinitionsStorage implements Cloneable {
 
   private Map<String, List<FullMixinDefinition>> storage = new HashMap<String, List<FullMixinDefinition>>();
   private LinkedList<Placeholder> openPlaceholders = new LinkedList<Placeholder>();
-  
+
   public MixinsDefinitionsStorage() {
   }
 
@@ -55,11 +56,12 @@ public class MixinsDefinitionsStorage implements Cloneable {
   }
 
   public List<FullMixinDefinition> getMixins(ReusableStructureName name) {
-    return storage.get(name.asString());
+    return getMixins(name.asString());
   }
 
   public List<FullMixinDefinition> getMixins(String name) {
-    return storage.get(name);
+    List<FullMixinDefinition> mixins = storage.get(name);
+    return mixins != null ? mixins : new ArrayList<FullMixinDefinition>();
   }
 
   public List<FullMixinDefinition> getAllMixins() {
@@ -73,14 +75,14 @@ public class MixinsDefinitionsStorage implements Cloneable {
   protected void doStore(String name, FullMixinDefinition mixin) {
     List<FullMixinDefinition> list = getStoredList(name);
     list.add(mixin);
-    
+
     updatePlaceholdersPositions(name, mixin);
   }
 
   protected void doStore(String name, List<FullMixinDefinition> mixins) {
     List<FullMixinDefinition> list = getStoredList(name);
     list.addAll(mixins);
-    
+
     updatePlaceholdersPositions(name, mixins);
   }
 
@@ -92,17 +94,17 @@ public class MixinsDefinitionsStorage implements Cloneable {
   private void updatePlaceholdersPositions(String name, FullMixinDefinition mixin) {
     Iterator<Placeholder> iterator = openPlaceholders.descendingIterator();
     if (!iterator.hasNext())
-      return ;
-    
+      return;
+
     Placeholder placeholder = iterator.next();
     while (!placeholder.knowPosition(name)) {
       placeholder.setPosition(name, mixin);
-      
+
       // we can safely stay where we are if there is no next 
       if (iterator.hasNext())
         placeholder = iterator.next();
     }
-    
+
   }
 
   protected List<FullMixinDefinition> getStoredList(String name) {
@@ -176,10 +178,10 @@ public class MixinsDefinitionsStorage implements Cloneable {
     }
     return result;
   }
-  
+
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");;
+    StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");
     result.append("Mixins: ").append(storage.keySet());
     return result.toString();
   }
@@ -206,7 +208,7 @@ class Placeholder implements Cloneable {
   public void addToSelf(String name, List<FullMixinDefinition> values) {
     List<FullMixinDefinition> storedList = owner.getStoredList(name);
     int position = position(name, storedList);
-    
+
     storedList.addAll(position, values);
   }
 
@@ -217,7 +219,7 @@ class Placeholder implements Cloneable {
 
   protected int position(FullMixinDefinition mixin, List<FullMixinDefinition> storedList) {
     if (mixin == null)
-      return storedList.size(); 
+      return storedList.size();
 
     return storedList.indexOf(mixin);
   }

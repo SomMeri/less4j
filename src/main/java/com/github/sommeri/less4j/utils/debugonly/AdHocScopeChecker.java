@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
 //marked deprecated so I get a warning if it is referenced somewhere
 @Deprecated
@@ -13,19 +13,19 @@ public class AdHocScopeChecker {
   public AdHocScopeChecker() {
   }
 
-  public void validate(Scope scope) {
+  public void validate(IScope scope) {
     check(scope);
 
-    List<Scope> childs = new ArrayList<Scope>(scope.getChilds());
-    for (Scope kid : childs) {
+    List<IScope> childs = new ArrayList<IScope>(scope.getChilds());
+    for (IScope kid : childs) {
       validate(kid);
     }
 
   }
 
-  private void check(Scope scope) {
+  private void check(IScope scope) {
     for (FullMixinDefinition mixinDefinition : scope.getAllMixins()) {
-      Scope mixinScope = mixinDefinition.getScope();
+      IScope mixinScope = mixinDefinition.getScope();
       if (mixinScope == null)
         throw new IllegalStateException("double WTF: mixin definition without scope");
       
@@ -34,7 +34,7 @@ public class AdHocScopeChecker {
     }
   }
 
-  private Scope grandParent(Scope mixinScope) {
+  private IScope grandParent(IScope mixinScope) {
     if (!mixinScope.hasParent())
       return null;
     

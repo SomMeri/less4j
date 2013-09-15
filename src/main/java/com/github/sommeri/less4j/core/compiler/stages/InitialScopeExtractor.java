@@ -8,7 +8,8 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 
 /**
  * Splits the input tree into separate scope tree and the trees. Removes
@@ -20,19 +21,19 @@ import com.github.sommeri.less4j.core.compiler.scopes.Scope;
 public class InitialScopeExtractor {
   private ASTManipulator manipulator = new ASTManipulator();
 
-  private Scope currentScope;
+  private IScope currentScope;
 
   public InitialScopeExtractor() {
   }
 
-  public Scope extractScope(ASTCssNode node) {
+  public IScope extractScope(ASTCssNode node) {
     currentScope = null;
 
-    Scope result = buildScope(node);
+    IScope result = buildScope(node);
     return result;
   }
 
-  private Scope buildScope(ASTCssNode node) {
+  private IScope buildScope(ASTCssNode node) {
     boolean hasOwnScope = AstLogic.hasOwnScope(node);
     if (hasOwnScope)
       increaseScope(node);
@@ -48,16 +49,16 @@ public class InitialScopeExtractor {
         manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.REUSABLE_STRUCTURE) {
         ReusableStructure mixin = (ReusableStructure) kid;
-        Scope bodyScope = currentScope.childByOwners(mixin, mixin.getBody());
+        IScope bodyScope = currentScope.childByOwners(mixin, mixin.getBody());
         currentScope.registerMixin(mixin, bodyScope);
-        bodyScope.removedFromTree();
+        bodyScope.removedFromAst();
         if (bodyScope.hasParent())
-          bodyScope.getParent().removedFromTree(); // remove also arguments scope from tree
+          bodyScope.getParent().removedFromAst(); // remove also arguments scope from tree
         manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.RULE_SET) {
         RuleSet ruleSet = (RuleSet) kid;
         if (ruleSet.isUsableAsReusableStructure()) {
-          Scope bodyScope = currentScope.childByOwners(ruleSet, ruleSet.getBody());
+          IScope bodyScope = currentScope.childByOwners(ruleSet, ruleSet.getBody());
           currentScope.registerMixin(ruleSet.convertToReusableStructure(), bodyScope);
         }
       } else if (kid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
@@ -65,7 +66,7 @@ public class InitialScopeExtractor {
       }
     }
 
-    Scope result = currentScope;
+    IScope result = currentScope;
     if (hasOwnScope)
       decreaseScope();
 
@@ -96,11 +97,11 @@ public class InitialScopeExtractor {
 
   private void increaseScope(ASTCssNode owner) {
     if (currentScope == null) {
-      currentScope = Scope.createDefaultScope(owner);
+      currentScope = ScopeFactory.createDefaultScope(owner);
     } else if(AstLogic.isBodyOwner(owner)) {
-      currentScope = Scope.createBodyOwnerScope(owner, currentScope);
+      currentScope = ScopeFactory.createBodyOwnerScope(owner, currentScope);
     } else {
-      currentScope = Scope.createScope(owner, currentScope);
+      currentScope = ScopeFactory.createScope(owner, currentScope);
     }
 
     return;

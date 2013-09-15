@@ -11,7 +11,8 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -29,7 +30,7 @@ class ArgumentsBuilder {
 
   // results
   private List<Expression> allValues = new ArrayList<Expression>();
-  private Scope argumentsScope;
+  private IScope argumentsScope;
 
   public ArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, ExpressionEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
     super();
@@ -38,11 +39,11 @@ class ArgumentsBuilder {
     this.positionalParameters = reference.getPositionalParameters().iterator();
     this.reference = reference;
 
-    argumentsScope = Scope.createDummyScope(reference, "#arguments-" + reference + "#");
+    argumentsScope = ScopeFactory.createDummyScope(reference, "#arguments-" + reference + "#");
     mixin = pureMixin;
   }
 
-  public Scope build() {
+  public IScope build() {
     int length = mixin.getParameters().size();
     for (int i = 0; i < length; i++) {
       ASTCssNode parameter = mixin.getParameters().get(i);

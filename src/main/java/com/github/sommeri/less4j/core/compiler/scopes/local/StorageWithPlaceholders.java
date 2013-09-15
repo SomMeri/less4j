@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes;
+package com.github.sommeri.less4j.core.compiler.scopes.local;
 
 import java.util.HashMap;
 import java.util.List;

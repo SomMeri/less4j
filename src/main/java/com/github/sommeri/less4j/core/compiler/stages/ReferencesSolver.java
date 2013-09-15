@@ -26,7 +26,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
@@ -45,7 +45,7 @@ public class ReferencesSolver {
     this.mixinsSolver = new MixinsSolver(this, semiCompiledNodes, problemsHandler);
   }
 
-  public void solveReferences(final ASTCssNode node, final Scope scope) {
+  public void solveReferences(final ASTCssNode node, final IScope scope) {
     doSolveReferences(node, new IteratedScope(scope));
   }
 
@@ -61,7 +61,7 @@ public class ReferencesSolver {
     });
   }
 
-  protected void unsafeDoSolveReferences(ASTCssNode node, Scope scope) {
+  protected void unsafeDoSolveReferences(ASTCssNode node, IScope scope) {
     unsafeDoSolveReferences(node, new IteratedScope(scope));
   }
 
@@ -75,7 +75,7 @@ public class ReferencesSolver {
     try {
       List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
       if (!childs.isEmpty()) {
-        Scope scope = iteratedScope.getScope();
+        IScope scope = iteratedScope.getScope();
 
         // solve all mixin references and store solutions
         Map<MixinReference, GeneralBody> solvedMixinReferences = solveMixinReferences(childs, scope);
@@ -119,11 +119,12 @@ public class ReferencesSolver {
     }
   }
 
-  private Map<MixinReference, GeneralBody> solveMixinReferences(List<ASTCssNode> childs, Scope mixinReferenceScope) {
+  private Map<MixinReference, GeneralBody> solveMixinReferences(List<ASTCssNode> childs, IScope mixinReferenceScope) {
     Map<MixinReference, GeneralBody> solvedMixinReferences = new HashMap<MixinReference, GeneralBody>();
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
         MixinReference mixinReference = (MixinReference) kid;
+        
         List<FullMixinDefinition> foundMixins = findReferencedMixins(mixinReference, mixinReferenceScope);
         GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(mixinReference, mixinReferenceScope, foundMixins);
 
@@ -134,7 +135,7 @@ public class ReferencesSolver {
     return solvedMixinReferences;
   }
 
-  protected List<FullMixinDefinition> findReferencedMixins(MixinReference mixinReference, Scope scope) {
+  protected List<FullMixinDefinition> findReferencedMixins(MixinReference mixinReference, IScope scope) {
     MixinReferenceFinder finder = new MixinReferenceFinder(this, semiCompiledNodes);
     List<FullMixinDefinition> sameNameMixins = finder.getNearestMixins(scope, mixinReference);
     if (sameNameMixins.isEmpty()) {
@@ -153,7 +154,7 @@ public class ReferencesSolver {
     return mixins;
   }
 
-  private boolean solveIfVariableReference(ASTCssNode node, Scope scope) {
+  private boolean solveIfVariableReference(ASTCssNode node, IScope scope) {
     ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler);
     switch (node.getType()) {
     case VARIABLE: {

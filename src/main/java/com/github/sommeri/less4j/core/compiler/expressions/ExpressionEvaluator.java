@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -27,18 +28,24 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.BasicScope;
+import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
+import com.github.sommeri.less4j.core.compiler.scopes.ScopesTree;
+import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScope;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class ExpressionEvaluator {
 
   private VariableCycleDetector cycleDetector = new VariableCycleDetector();
-  private final Scope scope;
+  private final IScope scope;
   private final ProblemsHandler problemsHandler;
   private ArithmeticCalculator arithmeticCalculator;
   private ListCalculator listCalculator = new ListCalculator();
@@ -51,7 +58,7 @@ public class ExpressionEvaluator {
     this(new NullScope(), problemsHandler);
   }
 
-  public ExpressionEvaluator(Scope scope, ProblemsHandler problemsHandler) {
+  public ExpressionEvaluator(IScope scope, ProblemsHandler problemsHandler) {
     super();
     this.scope = scope == null ? new NullScope() : scope;
     this.problemsHandler = problemsHandler;
@@ -86,9 +93,9 @@ public class ExpressionEvaluator {
     return values;
   }
 
-  public Scope evaluateValues(Scope scope) {
-    Scope result = Scope.createDummyScope();
-    result.fillByFilteredVariables(toEvaluationFilter(), scope);
+  public IScope evaluateValues(IScope scope) {
+    IScope result = ScopeFactory.createDummyScope();
+    result.addFilteredVariables(toEvaluationFilter(), scope);
     return result;
   }
 
@@ -375,27 +382,27 @@ public class ExpressionEvaluator {
 
 }
 
-class NullScope extends Scope {
+class NullScope extends BasicScope {
 
-  private static final String NULL = "null";
+  private static final String NULL = "#null#";
 
   protected NullScope() {
-    super(NULL, null, "  ");
+    super(new LocalScope(null, Arrays.asList(NULL), NULL), new ScopesTree()); 
   }
 
   @Override
-  public Scope getParent() {
+  public IScope getParent() {
     return this;
   }
 
   @Override
-  public List<Scope> getChilds() {
+  public List<IScope> getChilds() {
     return Collections.emptyList();
   }
 
   @Override
   public List<String> getNames() {
-    return super.getNames();
+    return Collections.emptyList();
   }
 
   @Override
@@ -426,45 +433,122 @@ class NullScope extends Scope {
   }
 
   @Override
-  public void registerMixin(ReusableStructure mixin, Scope mixinsBodyScope) {
+  public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
   }
 
   @Override
-  public Scope copyWithChildChain() {
-    return this;
+  public void setParent(IScope parent) {
   }
 
   @Override
-  public Scope copyWithChildChain(Scope parent) {
-    return this;
+  public void removedFromAst() {
   }
 
   @Override
-  public Scope copyWithParentsChain() {
-    return this;
-  }
-
-  @Override
-  public void setParent(Scope parent) {
-  }
-
-  @Override
-  public void removedFromTree() {
-  }
-
-  @Override
-  public boolean isPresentInTree() {
+  public boolean isPresentInAst() {
     return false;
   }
 
   @Override
-  public Scope getRootScope() {
+  public IScope getRootScope() {
     return this;
   }
 
   @Override
-  public Scope getChildOwnerOf(ASTCssNode body) {
+  public IScope getChildOwnerOf(ASTCssNode body) {
     return null;
+  }
+
+  @Override
+  public void addNames(List<String> names) {
+  }
+
+  @Override
+  public String toFullName() {
+    return toLongString();
+  }
+
+  @Override
+  public void registerVariable(String name, Expression replacementValue) {
+  }
+
+  @Override
+  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
+  }
+
+  @Override
+  public void addAllMixins(List<FullMixinDefinition> mixins) {
+  }
+
+  @Override
+  public void add(IScope otherSope) {
+  }
+
+  @Override
+  public void createPlaceholder() {
+  }
+
+  @Override
+  public void addToPlaceholder(IScope otherScope) {
+  }
+
+  @Override
+  public void closePlaceholder() {
+ }
+
+  @Override
+  public List<FullMixinDefinition> getAllMixins() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getMixinsByName(List<String> nameChain, ReusableStructureName name) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getMixinsByName(ReusableStructureName name) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FullMixinDefinition> getMixinsByName(String name) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public IScope firstChild() {
+    return null;
+  }
+
+  @Override
+  public boolean isBodyOwnerScope() {
+    return false;
+  }
+
+  @Override
+  public IScope skipBodyOwner() {
+    return this;
+  }
+
+  @Override
+  public String toLongString() {
+    return NULL;
+  }
+
+  @Override
+  public boolean seesLocalDataOf(IScope otherScope) {
+    return false;
+  }
+
+  @Override
+  public IScope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
+    return this;
+  }
+
+  @Override
+  public int getTreeSize() {
+    return 1;
   }
 
 }

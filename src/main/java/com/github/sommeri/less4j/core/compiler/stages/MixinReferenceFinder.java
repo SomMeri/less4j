@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
-import com.github.sommeri.less4j.core.compiler.scopes.Scope;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
 public class MixinReferenceFinder {
 
@@ -32,10 +32,10 @@ public class MixinReferenceFinder {
    * needing itself) and completely ignores those who would cycle that way.
    * 
    */
-  public List<FullMixinDefinition> getNearestMixins(Scope scope, MixinReference reference) {
+  public List<FullMixinDefinition> getNearestMixins(IScope scope, MixinReference reference) {
     foundNamespace = false;
     List<String> nameChain = reference.getNameChainAsStrings();
-    Scope space = scope;
+    IScope space = scope;
 
     List<FullMixinDefinition> result = findInMatchingNamespace(scope, nameChain, reference);
     while (result.isEmpty() && space.hasParent()) {
@@ -49,7 +49,7 @@ public class MixinReferenceFinder {
     return foundNamespace;
   }
 
-  private List<FullMixinDefinition> getNearestLocalMixins(Scope scope, List<String> nameChain, ReusableStructureName name) {
+  private List<FullMixinDefinition> getNearestLocalMixins(IScope scope, List<String> nameChain, ReusableStructureName name) {
     if (scope.isBodyOwnerScope())
       scope = scope.firstChild();
 
@@ -82,7 +82,7 @@ public class MixinReferenceFinder {
     return mixin.getMixin().isAlsoRuleset() && semiCompiledNodes.contains(mixin.getMixin());
   }
 
-  private List<FullMixinDefinition> findInMatchingNamespace(Scope scope, List<String> nameChain, MixinReference reference) {
+  private List<FullMixinDefinition> findInMatchingNamespace(IScope scope, List<String> nameChain, MixinReference reference) {
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
 
     if (nameChain.isEmpty()) {
@@ -91,11 +91,9 @@ public class MixinReferenceFinder {
       String firstName = nameChain.get(0);
       List<String> theRest = nameChain.subList(1, nameChain.size());
 
-      for (FullMixinDefinition fullMixin : scope.getAllMixins()) {
-        if (fullMixin.getMixin().hasName(firstName)) {
-          List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
-          result.addAll(foundInNamespaces);
-        }
+      for (FullMixinDefinition fullMixin : scope.getMixinsByName(firstName)) {
+        List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
+        result.addAll(foundInNamespaces);
       }
     }
 
@@ -109,7 +107,7 @@ public class MixinReferenceFinder {
 
     final ReusableStructure mixin = fullMixin.getMixin();
     final GeneralBody bodyClone = mixin.getBody().clone();
-    final Scope scope = fullMixin.getScope();
+    final IScope scope = fullMixin.getScope();
 
     InScopeSnapshotRunner.runInLocalDataSnapshot(scope, new ITask() {
 

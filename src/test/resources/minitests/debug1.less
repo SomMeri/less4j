@@ -1,9 +1,12 @@
-.outer {
-  @media print {
-    @media (min-width: 45px) {
-      .deep-ruleset {
-        ruleset: ruleset;
-      }
-    }
+.apples(@width) {  
+  .bananas() {
+    width: @width;
   }
+}
+
+@width: 2px;
+.apples(50px);
+
+#test {
+  .bananas();
 }

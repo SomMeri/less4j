@@ -1,9 +1,9 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
 public class InScopeSnapshotRunner {
-  private final Scope scope;
+  private final IScope scope;
 
-  public InScopeSnapshotRunner(Scope scope) {
+  public InScopeSnapshotRunner(IScope scope) {
     this.scope = scope;
   }
 
@@ -19,9 +19,18 @@ public class InScopeSnapshotRunner {
    * Convenience method. See {@link #runInLocalDataSnapshot(ITask)}
    * 
    */
-  public static void runInLocalDataSnapshot(Scope scope, ITask task) {
+  public static void runInLocalDataSnapshot(IScope scope, ITask task) {
     InScopeSnapshotRunner runner = new InScopeSnapshotRunner(scope);
     runner.runInLocalDataSnapshot(task);
+  }
+
+  /**
+   * Convenience method. See {@link #runInLocalDataSnapshot(IFunction)}
+   * 
+   */
+  public static <T> T runInLocalDataSnapshot(IScope scope, IFunction<T> task) {
+    InScopeSnapshotRunner runner = new InScopeSnapshotRunner(scope);
+    return runner.runInLocalDataSnapshot(task);
   }
 
   /**
@@ -30,15 +39,33 @@ public class InScopeSnapshotRunner {
    * 
    */
   public void runInLocalDataSnapshot(ITask task) {
-    scope.createLocalDataSnapshot();
+    scope.createDataSnapshot();
     try {
       task.run();
     } finally {
-      scope.discardLastLocalDataSnapshot();
+      scope.discardLastDataSnapshot();
+    }
+  }
+
+  /**
+   * Create local data snapshot on the scope and runs the task. Use this method to make sure
+   * that each local data snapshot is closed on proper place and regardless of thrown exceptions.
+   * 
+   */
+  public <T> T runInLocalDataSnapshot(IFunction<T> task) {
+    scope.createDataSnapshot();
+    try {
+      return task.run();
+    } finally {
+      scope.discardLastDataSnapshot();
     }
   }
 
   public interface ITask {
     public void run();
+  }
+
+  public interface IFunction <T> {
+    public T run();
   }
 }

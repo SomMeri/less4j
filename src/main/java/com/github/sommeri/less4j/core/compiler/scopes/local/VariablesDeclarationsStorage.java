@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.scopes;
+package com.github.sommeri.less4j.core.compiler.scopes.local;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,7 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
       store(name, replacementValue);
   }
 
-  public void fillByFilteredVariables(ExpressionFilter filter, VariablesDeclarationsStorage variablesSource) {
+  public void addFilteredVariables(ExpressionFilter filter, VariablesDeclarationsStorage variablesSource) {
     for (Entry<String, Expression> entry : variablesSource.variables.entrySet()) {
       String name = entry.getKey();
       Expression value = entry.getValue();
