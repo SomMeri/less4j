@@ -485,11 +485,6 @@ class NullScope extends BasicScope {
   }
 
   @Override
-  @Deprecated
-  public void addVariables(IScope otherSope) {
-  }
-
-  @Override
   public void createPlaceholder() {
   }
 

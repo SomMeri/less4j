@@ -11,11 +11,10 @@ import com.github.sommeri.less4j.core.compiler.scopes.view.ScopesTreeViewJoint;
 
 public class ScopeFactory {
 
-  private static final String DEFAULT = "#default#";
-  private static final String SCOPE = "#scope#";
-  //FIXME: (!) remove and clean up
+  public static final String DEFAULT = "#default#";
+  public static final String SCOPE = "#scope#";
   public static final String BODY_OWNER = "#body-owner#";
-  private static final String DUMMY = "#dummy#";
+  public static final String DUMMY = "#dummy#";
 
   public static IScope createDefaultScope(ASTCssNode owner) {
     return new BasicScope(new LocalScope(owner, new ArrayList<String>(), DEFAULT), new ScopesTree());

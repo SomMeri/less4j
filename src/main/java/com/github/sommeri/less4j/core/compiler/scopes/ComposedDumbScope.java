@@ -91,10 +91,6 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     localScope.add(otherSope);
   }
 
-  public void addVariables(IScope otherSope) {
-    localScope.addVariables(otherSope);
-  }
-
   public List<FullMixinDefinition> getAllMixins() {
     return localScope.getAllMixins();
   }
@@ -119,16 +115,21 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     return localScope.getLocalVariables();
   }
 
+  @Override
+  public ILocalScope cloneCurrentDataSnapshot() {
+    return localScope.cloneCurrentDataSnapshot();
+  }
+
   public LocalScopeData getLocalData() {
     return localScope.getLocalData();
   }
 
-  public void createLocalDataSnapshot() {
-    localScope.createLocalDataSnapshot();
+  public void createDataSnapshot() {
+    localScope.createDataSnapshot();
   }
 
-  public void discardLastLocalDataSnapshot() {
-    localScope.discardLastLocalDataSnapshot();
+  public void discardLastDataSnapshot() {
+    localScope.discardLastDataSnapshot();
   }
 
   public boolean isBodyOwnerScope() {

@@ -88,12 +88,6 @@ public class LocalScope implements ILocalScope {
     getLocalVariables().addFilteredVariables(filter, source.getLocalVariables());
   }
 
-  //FIXME: (!!!) ugly
-  @Deprecated
-  public void addVariables(IScope otherSope) {
-    getLocalVariables().storeAll(otherSope.getLocalVariables());
-  }
-
   public Expression getValue(Variable variable) {
     return getLocalVariables().getValue(variable.getName());
   }
@@ -135,6 +129,12 @@ public class LocalScope implements ILocalScope {
     return localData;
   }
 
+  public ILocalScope cloneCurrentDataSnapshot() {
+    LocalScopeData dataClone = localData.clone();
+    return new LocalScope(owner, dataClone, names, type);
+  }
+
+  
   public boolean hasTheSameLocalData(ILocalScope otherScope) {
     return otherScope.getLocalData() == localData;
   }
@@ -143,7 +143,7 @@ public class LocalScope implements ILocalScope {
    * Do not call this method directly. Use {@link InScopeSnapshotRunner}
    * instead.
    */
-  public void createLocalDataSnapshot() {
+  public void createDataSnapshot() {
     localDataSnapshots.push(localData);
     localData = localData.clone();
   }
@@ -152,7 +152,7 @@ public class LocalScope implements ILocalScope {
    * Do not call this method directly. Use {@link InScopeSnapshotRunner}
    * instead.
    */
-  public void discardLastLocalDataSnapshot() {
+  public void discardLastDataSnapshot() {
     localData = localDataSnapshots.pop();
   }
 

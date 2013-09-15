@@ -6,37 +6,29 @@ import com.github.sommeri.less4j.core.ast.Variable;
 
 public interface IScope extends ILocalScope, IScopesTree {
 
+  // debug printing
+  public StringBuilder toLongString(int indentationLevel);
+
   public String toString();
 
   public String toFullName();
 
-  //TODO: (!!!) skoncila som tu
+  public boolean seesLocalDataOf(IScope otherScope);
+
+  //smart util methods
   public IScope firstChild();
 
   public IScope skipBodyOwner();
 
   public String toLongString();
 
-  public void removedFromAst();
-
-  public boolean isPresentInAst();
-
   public IScope getRootScope();
-
-  public boolean seesLocalDataOf(IScope otherScope);
 
   public IScope getChildOwnerOf(ASTCssNode body);
 
   public IScope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes);
 
-  //FIXME (!!!) these used to be private
-  public StringBuilder toLongString(int level);
-
-  public ASTCssNode getOwner();
-
-  //FIXME (!!!) these did not exists at all 
-  public ILocalScope getLocalScope();
-
+  // data access methods 
   public Expression getValue(Variable variable);
 
   public Expression getValue(String name);
@@ -45,6 +37,8 @@ public interface IScope extends ILocalScope, IScopesTree {
 
   public Expression getLocalValue(String name);
 
+  // internals access 
   public IScopesTree getSurroundingScopes();
 
+  public ILocalScope getLocalScope();
 }

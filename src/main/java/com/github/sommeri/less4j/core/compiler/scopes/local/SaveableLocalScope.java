@@ -16,7 +16,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 public class SaveableLocalScope implements ILocalScope {
   
   private final ILocalScope originalLocalScope;
-  private LocalScopeData savedLocalData;
+  private ILocalScope savedData;
 
   public SaveableLocalScope(ILocalScope originalLocalScope) {
     super();
@@ -24,147 +24,142 @@ public class SaveableLocalScope implements ILocalScope {
   }
 
   public void save() {
-    this.savedLocalData = getLocalData().clone();
+    this.savedData = getActiveLocalScope().cloneCurrentDataSnapshot();
+  }
+
+  private ILocalScope getActiveLocalScope() {
+    if (savedData!=null)
+      return savedData;
+    
+    return originalLocalScope;
   }
   
   public Expression getValue(Variable variable) {
-    if (savedLocalData!=null) {
-      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
-      Expression value = savedLocalData.getVariables().getValue(variable.getName());
-      if (value!=null)
-        return value;
-    }
-    return originalLocalScope.getValue(variable);
+    return getActiveLocalScope().getValue(variable);
   }
 
   public Expression getValue(String name) {
-    if (savedLocalData!=null) {
-      //FIXME: (!!!) wrong and weird, probably incorrect (unsnapshoted version will be searched)
-      Expression value = savedLocalData.getVariables().getValue(name);
-      if (value!=null)
-        return value;
-    }
-    return originalLocalScope.getValue(name);
+    return getActiveLocalScope().getValue(name);
   }
 
   public ASTCssNode getOwner() {
-    return originalLocalScope.getOwner();
+    return getActiveLocalScope().getOwner();
   }
 
   public String getType() {
-    return originalLocalScope.getType();
+    return getActiveLocalScope().getType();
   }
 
   public boolean isBodyOwnerScope() {
-    return originalLocalScope.isBodyOwnerScope();
+    return getActiveLocalScope().isBodyOwnerScope();
   }
 
   public void removedFromAst() {
-    originalLocalScope.removedFromAst();
+    getActiveLocalScope().removedFromAst();
   }
 
   public boolean isPresentInAst() {
-    return originalLocalScope.isPresentInAst();
+    return getActiveLocalScope().isPresentInAst();
   }
 
   public void addNames(List<String> names) {
-    originalLocalScope.addNames(names);
+    getActiveLocalScope().addNames(names);
   }
 
   public List<String> getNames() {
-    return originalLocalScope.getNames();
+    return getActiveLocalScope().getNames();
   }
 
   public void registerVariable(AbstractVariableDeclaration declaration) {
-    originalLocalScope.registerVariable(declaration);
+    getActiveLocalScope().registerVariable(declaration);
   }
 
   public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue) {
-    originalLocalScope.registerVariable(node, replacementValue);
+    getActiveLocalScope().registerVariable(node, replacementValue);
   }
-
+  
   public void registerVariableIfNotPresent(String name, Expression replacementValue) {
-    originalLocalScope.registerVariableIfNotPresent(name, replacementValue);
+    getActiveLocalScope().registerVariableIfNotPresent(name, replacementValue);
   }
 
   public void registerVariable(String name, Expression replacementValue) {
-    originalLocalScope.registerVariable(name, replacementValue);
+    getActiveLocalScope().registerVariable(name, replacementValue);
   }
 
   public void addFilteredVariables(ExpressionFilter filter, IScope source) {
-    originalLocalScope.addFilteredVariables(filter, source);
-  }
-
-  public void addVariables(IScope otherSope) {
-    originalLocalScope.addVariables(otherSope);
+    getActiveLocalScope().addFilteredVariables(filter, source);
   }
 
   public void addAllMixins(List<FullMixinDefinition> mixins) {
-    originalLocalScope.addAllMixins(mixins);
+    getActiveLocalScope().addAllMixins(mixins);
   }
 
   public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
-    originalLocalScope.registerMixin(mixin, mixinsBodyScope);
+    getActiveLocalScope().registerMixin(mixin, mixinsBodyScope);
   }
 
   public void createPlaceholder() {
-    originalLocalScope.createPlaceholder();
+    getActiveLocalScope().createPlaceholder();
   }
 
   public void addToPlaceholder(IScope otherScope) {
-    originalLocalScope.addToPlaceholder(otherScope);
+    getActiveLocalScope().addToPlaceholder(otherScope);
   }
 
   public void closePlaceholder() {
-    originalLocalScope.closePlaceholder();
+    getActiveLocalScope().closePlaceholder();
   }
 
   public void add(IScope otherSope) {
-    originalLocalScope.add(otherSope);
+    getActiveLocalScope().add(otherSope);
   }
 
   public LocalScopeData getLocalData() {
-    return originalLocalScope.getLocalData();
+    return getActiveLocalScope().getLocalData();
+  }
+
+  public ILocalScope cloneCurrentDataSnapshot() {
+    return getActiveLocalScope().cloneCurrentDataSnapshot();
   }
 
   public boolean hasTheSameLocalData(ILocalScope otherScope) {
-    return originalLocalScope.hasTheSameLocalData(otherScope);
+    return getActiveLocalScope().hasTheSameLocalData(otherScope);
   }
 
-  public void createLocalDataSnapshot() {
-    originalLocalScope.createLocalDataSnapshot();
+  public void createDataSnapshot() {
+    getActiveLocalScope().createDataSnapshot();
   }
 
-  public void discardLastLocalDataSnapshot() {
-    originalLocalScope.discardLastLocalDataSnapshot();
+  public void discardLastDataSnapshot() {
+    getActiveLocalScope().discardLastDataSnapshot();
   }
 
   public MixinsDefinitionsStorage getLocalMixins() {
-    return originalLocalScope.getLocalMixins();
+    return getActiveLocalScope().getLocalMixins();
   }
 
   public VariablesDeclarationsStorage getLocalVariables() {
-    return originalLocalScope.getLocalVariables();
+    return getActiveLocalScope().getLocalVariables();
   }
 
   public List<FullMixinDefinition> getAllMixins() {
-    return originalLocalScope.getAllMixins();
+    return getActiveLocalScope().getAllMixins();
   }
 
   public List<FullMixinDefinition> getMixinsByName(List<String> nameChain, ReusableStructureName name) {
-    return originalLocalScope.getMixinsByName(nameChain, name);
+    return getActiveLocalScope().getMixinsByName(nameChain, name);
   }
 
   public List<FullMixinDefinition> getMixinsByName(ReusableStructureName name) {
-    return originalLocalScope.getMixinsByName(name);
+    return getActiveLocalScope().getMixinsByName(name);
   }
 
   public List<FullMixinDefinition> getMixinsByName(String name) {
-    return originalLocalScope.getMixinsByName(name);
+    return getActiveLocalScope().getMixinsByName(name);
   }
 
   public String toString() {
-    return originalLocalScope.toString();
+    return getActiveLocalScope().toString();
   }
 
 }

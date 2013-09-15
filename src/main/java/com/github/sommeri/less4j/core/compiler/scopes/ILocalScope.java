@@ -20,7 +20,7 @@ public interface ILocalScope {
 
   public List<String> getNames();
   
-  //FIXME (!!!): does not belong here (maybe IScopeDescription)
+  // scope description
   public ASTCssNode getOwner();
 
   public String getType();
@@ -28,6 +28,24 @@ public interface ILocalScope {
   public boolean isBodyOwnerScope();
 
   public boolean hasTheSameLocalData(ILocalScope otherScope);
+
+  public boolean isPresentInAst();
+
+  public void removedFromAst();
+
+  // placeholders for data from references
+  public void createPlaceholder();
+
+  public void addToPlaceholder(IScope otherScope);
+
+  public void closePlaceholder();
+
+  // snapshots for temporary evalution that does not require tree change
+  public void createDataSnapshot();
+
+  public void discardLastDataSnapshot();
+
+  public ILocalScope cloneCurrentDataSnapshot();
 
   // variables
   public void registerVariable(AbstractVariableDeclaration declaration);
@@ -44,22 +62,10 @@ public interface ILocalScope {
 
   public Expression getValue(String name);
 
+  // mixins
   public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope);
 
-  public void createPlaceholder();
-
-  public void addToPlaceholder(IScope otherScope);
-
-  public void closePlaceholder();
-
-  // mixins
   public void addAllMixins(List<FullMixinDefinition> mixins);
-
-  // other scopes
-  public void add(IScope otherSope);
-
-  //FIXME: (!!!) ugly - it should take different parameter
-  public void addVariables(IScope otherSope);
 
   public List<FullMixinDefinition> getAllMixins();
 
@@ -69,19 +75,13 @@ public interface ILocalScope {
 
   public List<FullMixinDefinition> getMixinsByName(String name);
   
-  //FIXME (!!!) these used to be protected
+  // other scopes and internals - these could be removed with proper refactoring. It would be technically cleaner, but it does not seem to be too important rigth now
+  public void add(IScope otherSope);
+
   public MixinsDefinitionsStorage getLocalMixins();
 
   public VariablesDeclarationsStorage getLocalVariables();
 
   public LocalScopeData getLocalData();
-
-  public void createLocalDataSnapshot();
-
-  public void discardLastLocalDataSnapshot();
-
-  public boolean isPresentInAst();
-
-  public void removedFromAst();
 
 }

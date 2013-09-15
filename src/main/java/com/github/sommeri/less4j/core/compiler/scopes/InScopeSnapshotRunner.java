@@ -39,11 +39,11 @@ public class InScopeSnapshotRunner {
    * 
    */
   public void runInLocalDataSnapshot(ITask task) {
-    scope.createLocalDataSnapshot();
+    scope.createDataSnapshot();
     try {
       task.run();
     } finally {
-      scope.discardLastLocalDataSnapshot();
+      scope.discardLastDataSnapshot();
     }
   }
 
@@ -53,11 +53,11 @@ public class InScopeSnapshotRunner {
    * 
    */
   public <T> T runInLocalDataSnapshot(IFunction<T> task) {
-    scope.createLocalDataSnapshot();
+    scope.createDataSnapshot();
     try {
       return task.run();
     } finally {
-      scope.discardLastLocalDataSnapshot();
+      scope.discardLastDataSnapshot();
     }
   }
 

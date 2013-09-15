@@ -16,7 +16,6 @@ public class ScopeView extends BasicScope {
     this.saveableLocalScope = getLocalScope();
   }
 
-  //FIXME: (!!!) functional but hack
   public void saveLocalDataForTheWholeWayUp() {
     this.saveableLocalScope.save();
     

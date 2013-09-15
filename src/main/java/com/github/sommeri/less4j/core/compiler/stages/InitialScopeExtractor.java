@@ -22,8 +22,6 @@ public class InitialScopeExtractor {
   private ASTManipulator manipulator = new ASTManipulator();
 
   private IScope currentScope;
-  //FIXME: (!!!)remove
-  public static int counter=0;
 
   public InitialScopeExtractor() {
   }
@@ -98,7 +96,6 @@ public class InitialScopeExtractor {
   }
 
   private void increaseScope(ASTCssNode owner) {
-    counter++;
     if (currentScope == null) {
       currentScope = ScopeFactory.createDefaultScope(owner);
     } else if(AstLogic.isBodyOwner(owner)) {
