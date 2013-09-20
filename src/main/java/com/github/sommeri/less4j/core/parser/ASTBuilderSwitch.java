@@ -24,6 +24,7 @@ import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.FontFace;
@@ -100,6 +101,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
 
+  private static String EXTEND_PSEUDO = "extend";
+  
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
@@ -438,6 +441,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return builder.buildSelector();
   }
 
+  public Extend handleExtendedSelector(HiddenTokenAwareTree token) {
+    List<HiddenTokenAwareTree> children = token.getChildren();
+    Selector selector = (Selector) switchOn(children.get(0));
+    if (children.size()==1)
+      return new Extend(token, selector);
+    // I simply assume that grammar is correct and the other child is "all"
+    return new Extend(token, selector, true);
+  }
+
   public CssClass handleCssClass(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     List<HiddenTokenAwareTree> childrenWithoutdot = ArraysUtils.safeSublist(children, 1, children.size());
@@ -525,6 +537,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         return new PseudoClass(token, children.get(1).getText(), new NumberExpression(parameter, parameter.getText()));
       if (parameter.getType() == LessLexer.IDENT)
         return new PseudoClass(token, children.get(1).getText(), new IdentifierExpression(parameter, parameter.getText()));
+      //FIXME: this is not really sufficient for all cases less.js supports (1@{num}n+3)
+      if (parameter.getType() == LessLexer.INTERPOLATED_VARIABLE)
+        return new PseudoClass(token, children.get(1).getText(), toInterpolabledVariable(parameter, parameter.getText()));
 
       return new PseudoClass(token, children.get(1).getText(), switchOn(parameter));
     }
@@ -588,7 +603,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         throw new BugHappened(GRAMMAR_MISMATCH, kid);
 
       if (kid.getType() == LessLexer.INTERPOLATED_VARIABLE) {
-        result.add(new VariableNamePart(kid, new Variable(kid, "@" + text.substring(2, text.length() - 1))));
+        result.add(new VariableNamePart(kid, toInterpolabledVariable(kid, text)));
       } else if (kid.getType() == LessLexer.HASH_SYMBOL) {
         // do nothing
       } else {
@@ -596,6 +611,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       }
     }
     return result;
+  }
+
+  private Variable toInterpolabledVariable(HiddenTokenAwareTree token, String text) {
+    return new Variable(token, "@" + text.substring(2, text.length() - 1), true);
   }
 
   private String toFixedName(int typeCode, String text) {
@@ -758,7 +777,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       directlyAfter = false;
     }
 
-    return new NestedSelectorAppender(token, directlyBefore, directlyAfter);
+    return new NestedSelectorAppender(token, directlyBefore, directlyAfter, null);
   }
 
   public ASTCssNode handleSimpleSelector(HiddenTokenAwareTree token) {
@@ -769,26 +788,46 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (kid.getType() == LessLexer.ELEMENT_NAME) {
       List<HiddenTokenAwareTree> elementNameParts = kid.getChildren();
       InterpolableName interpolableName = toInterpolableName(kid, elementNameParts);
-      result = new SimpleSelector(kid, interpolableName, isStarElementName(elementNameParts));
-      if (iterator.hasNext())
-        kid = iterator.next();
-      else
+      result = new SimpleSelector(kid, null, interpolableName, isStarElementName(elementNameParts));
+      if (!iterator.hasNext())
         return result;
+      kid = iterator.next();
     } else {
-      result = new SimpleSelector(kid, null, true);
+      result = new SimpleSelector(kid, null, null, true);
       result.setEmptyForm(true);
     }
 
-    do {
-      result.addSubsequent((ElementSubsequent) switchOn(kid));
-
-      if (iterator.hasNext())
-        kid = iterator.next();
-      else
-        kid = null;
-    } while (kid != null);
+    addSubsequent(result, kid);
+    while (iterator.hasNext())  {
+      kid = iterator.next();
+      addSubsequent(result, kid);
+    }
 
     return result;
+  }
+
+  private void addSubsequent(SimpleSelector result, HiddenTokenAwareTree kid) {
+    ElementSubsequent subsequent = (ElementSubsequent) switchOn(kid);
+    if (isExtends(subsequent)) {
+      PseudoClass extend = (PseudoClass) subsequent;
+      Extend extendReal = convertToExtend(extend);
+      result.addExtend(extendReal);
+    } else {
+      result.addSubsequent(subsequent);
+    }
+  }
+
+  private Extend convertToExtend(PseudoClass extend) {
+    ASTCssNode parameter = extend.getParameter();
+    if (parameter.getType()!=ASTCssNodeType.EXTEND) {
+      throw new BugHappened(GRAMMAR_MISMATCH, parameter.getUnderlyingStructure());
+    }
+    
+    return (Extend) parameter;
+  }
+
+  private boolean isExtends(ElementSubsequent subsequent) {
+    return (subsequent instanceof PseudoClass) && EXTEND_PSEUDO.equals(subsequent.getName());
   }
 
   private boolean isStarElementName(List<HiddenTokenAwareTree> elementNameParts) {
@@ -802,7 +841,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     token.pushHiddenToKids();
     HiddenTokenAwareTree valueToken = token.getChild(0);
     String quotedText = valueToken.getText();
-    return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), "" + quotedText.charAt(1));
+    return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), "" + quotedText.charAt(1), null);
   }
 
   private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {

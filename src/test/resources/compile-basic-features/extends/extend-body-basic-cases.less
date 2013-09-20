@@ -1,0 +1,16 @@
+h1 {
+  border: 1px solid blue;
+}
+.a {
+  &:extend(h1);
+  color: black;
+}
+
+.b {
+  &:extend(h1);
+  color: black;
+}
+.c,.d+e,f {
+  &:extend(h1);
+  color: black;
+}

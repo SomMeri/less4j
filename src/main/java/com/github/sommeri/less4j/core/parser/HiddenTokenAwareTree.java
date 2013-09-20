@@ -153,6 +153,17 @@ public class HiddenTokenAwareTree extends CommonTree {
       next.addBeforePreceding(getFollowing());
   }
 
+  public void moveHidden(HiddenTokenAwareTree previous, HiddenTokenAwareTree next) {
+    if (previous != null) {
+      previous.addFollowing(getPreceding());
+      preceding = new LinkedList<CommonToken>();
+    }
+    if (next != null) {
+      next.addBeforePreceding(getFollowing());
+      following = new LinkedList<CommonToken>();
+    }
+  }
+
   public HiddenTokenAwareTree getLastChild() {
     return getChild(getChildCount() - 1);
   }

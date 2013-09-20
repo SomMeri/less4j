@@ -37,6 +37,14 @@ public class ArraysUtils {
     return result;
   }
 
+  public static <T> List<T> addIfNonNull(List<T> destination, T... a) {
+    for (T t : a) {
+      if (t != null)
+        destination.add(t);
+    }
+    return destination;
+  }
+
   @SuppressWarnings("unchecked")
   public static <T extends ASTCssNode> List<T> deeplyClonedList(List<T> list) {
     List<T> result = new ArrayList<T>();

@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -11,15 +10,15 @@ public class NestedSelectorAppender extends SelectorPart {
   private boolean directlyBefore;
   private boolean directlyAfter;
 
-  public NestedSelectorAppender(HiddenTokenAwareTree underlyingStructure, boolean directlyBefore, boolean directlyAfter) {
-    super(underlyingStructure);
+  public NestedSelectorAppender(HiddenTokenAwareTree underlyingStructure, boolean directlyBefore, boolean directlyAfter, SelectorCombinator leadingCombinator) {
+    super(underlyingStructure, leadingCombinator);
     this.directlyBefore = directlyBefore;
     this.directlyAfter = directlyAfter;
   }
 
   @Override
-  public List<? extends ASTCssNode> getChilds() {
-    return Collections.emptyList();
+  public List<ASTCssNode> getChilds() {
+    return super.getChilds();
   }
 
   public boolean isDirectlyBefore() {

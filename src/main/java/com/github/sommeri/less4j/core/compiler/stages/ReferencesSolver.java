@@ -212,7 +212,7 @@ public class ReferencesSolver {
     HiddenTokenAwareTree underlying = input.getUnderlyingStructure();
     String value = stringInterpolator.replaceIn(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
     InterpolableName interpolableName = new InterpolableName(underlying, new FixedNamePart(underlying, value));
-    return new SimpleSelector(input.getUnderlyingStructure(), interpolableName, false);
+    return new SimpleSelector(input.getUnderlyingStructure(), input.getLeadingCombinator(), interpolableName, false);
   }
 
   private FixedNamePart interpolateFixedNamePart(FixedNamePart input, ExpressionEvaluator expressionEvaluator) {

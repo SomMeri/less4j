@@ -42,7 +42,7 @@ public class UselessLessElementsRemover {
       return ;
     
     SelectorsManipulator manipulator= new SelectorsManipulator();
-    Selector empty = new Selector(selector.getUnderlyingStructure(), null, createEmptySimpleSelector(selector));
+    Selector empty = new Selector(selector.getUnderlyingStructure(), createEmptySimpleSelector(selector));
     List<Selector> replaceAppenders = manipulator.replaceAppenders(selector, Arrays.asList(empty));
     Selector replacement = replaceAppenders.get(0);
     parentRuleSet.replaceSelector(selector, replacement);
@@ -56,7 +56,7 @@ public class UselessLessElementsRemover {
     SimpleSelector empty = createEmptySimpleSelector(selector.getHead());
     // selector contains only non appenders
     if (firstNonAppender==null) {
-      Selector replacement = new Selector(empty.getUnderlyingStructure(), null, empty);
+      Selector replacement = new Selector(empty.getUnderlyingStructure(), empty);
       parentRuleSet.replaceSelector(selector, replacement);
       return replacement;
     }
@@ -70,7 +70,7 @@ public class UselessLessElementsRemover {
   }
 
   private SimpleSelector createEmptySimpleSelector(ASTCssNode underlyingStructureSource) {
-    SimpleSelector empty = new SimpleSelector(underlyingStructureSource.getUnderlyingStructure(), null, true);
+    SimpleSelector empty = new SimpleSelector(underlyingStructureSource.getUnderlyingStructure(), null, null, true);
     empty.setEmptyForm(true);
     return empty;
   }

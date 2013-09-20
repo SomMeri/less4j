@@ -82,4 +82,14 @@ public class InterpolableName extends ASTCssNode {
     
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (InterpolableNamePart part : getParts()) {
+      builder.append(part);
+    }
+    return builder.toString();
+  }
+
+  
 }

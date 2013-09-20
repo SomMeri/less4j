@@ -41,6 +41,10 @@ public abstract class TokenTypeSwitch<T> {
       return handleSelector(token);
     }
 
+    if (type == LessLexer.EXTENDED_SELECTOR) {
+      return handleExtendedSelector(token);
+    }
+
     if (type == LessLexer.STYLE_SHEET) {
       return handleStyleSheet(token);
     }
@@ -266,6 +270,8 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleStyleSheet(HiddenTokenAwareTree token);
 
   public abstract T handleSelector(HiddenTokenAwareTree token);
+
+  public abstract T handleExtendedSelector(HiddenTokenAwareTree token);
 
   public abstract T handleRuleSet(HiddenTokenAwareTree token);
 

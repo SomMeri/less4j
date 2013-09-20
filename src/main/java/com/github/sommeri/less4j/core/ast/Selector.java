@@ -8,7 +8,6 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class Selector extends ASTCssNode implements Cloneable {
   
-  private SelectorCombinator leadingCombinator;
   private SelectorPart head;
   private Selector right;
 
@@ -16,29 +15,23 @@ public class Selector extends ASTCssNode implements Cloneable {
     super(token);
   }
   
-  public Selector(HiddenTokenAwareTree token, SelectorCombinator leadingCombinator, SelectorPart head) {
-    this(token, leadingCombinator, head, null);
+  public Selector(HiddenTokenAwareTree token, SelectorPart head) {
+    this(token, head, null);
   }
 
-  public Selector(HiddenTokenAwareTree token, SelectorCombinator leadingCombinator, SelectorPart head, Selector right) {
+  public Selector(HiddenTokenAwareTree token, SelectorPart head, Selector right) {
     super(token);
-    this.leadingCombinator = leadingCombinator;
     this.head = head;
     this.right = right;
   }
 
-  public boolean hasLeadingCombinator() {
-    return leadingCombinator!=null;
+  public boolean isExtending() {
+    if (hasRight())
+      return getRightestPart().isExtending();
+
+    return head.isExtending();
   }
   
-  public SelectorCombinator getLeadingCombinator() {
-    return leadingCombinator;
-  }
-
-  public void setLeadingCombinator(SelectorCombinator leadingCombinator) {
-    this.leadingCombinator = leadingCombinator;
-  }
-
   public SelectorPart getHead() {
     return head;
   }
@@ -57,7 +50,7 @@ public class Selector extends ASTCssNode implements Cloneable {
 
   @Override
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList((ASTCssNode)leadingCombinator, head, right);
+    return ArraysUtils.asNonNullList(head, right);
   }
 
   public ASTCssNodeType getType() {
@@ -67,7 +60,6 @@ public class Selector extends ASTCssNode implements Cloneable {
   @Override
   public Selector clone() {
     Selector clone = (Selector) super.clone();
-    clone.setLeadingCombinator(getLeadingCombinator()==null? null : getLeadingCombinator().clone());
     clone.setHead(getHead().clone());
     clone.setRight(!hasRight()? null : getRight().clone());
     clone.configureParentToAllChilds();
@@ -94,7 +86,6 @@ public class Selector extends ASTCssNode implements Cloneable {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("Selector [");
-    builder.append(leadingCombinator);
     builder.append(head);
     builder.append(" ");
     builder.append(right);
@@ -164,5 +155,23 @@ public class Selector extends ASTCssNode implements Cloneable {
     } while (current.isCombined());
     
     return result;
+  }
+
+  //FIXME: (!!!!!) remove
+  @Deprecated
+  public void setLeadingCombinator(SelectorCombinator combinator) {
+    head.setLeadingCombinator(combinator);
+  }
+
+  //FIXME: (!!!!!) remove
+  @Deprecated
+  public SelectorCombinator getLeadingCombinator() {
+    return head.getLeadingCombinator();
+  }
+
+  //FIXME: (!!!!!) remove
+  @Deprecated
+  public boolean hasLeadingCombinator() {
+    return head.hasLeadingCombinator();
   }
 }

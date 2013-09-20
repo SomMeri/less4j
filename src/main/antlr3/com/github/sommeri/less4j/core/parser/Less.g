@@ -39,6 +39,7 @@ tokens {
   RULESET;
   NESTED_APPENDER;
   SELECTOR;
+  EXTENDED_SELECTOR;
   SIMPLE_SELECTOR;
   ESCAPED_SELECTOR;
   EXPRESSION;
@@ -476,15 +477,31 @@ general_body
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
      -> ^(BODY LBRACE $a* $rbrace*); 
 
+// if this is changed, changes are the extendedSelector must be changed too
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
-    : ((combinator)=>a+=combinator | ) 
-      (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax) 
-      ( 
+    : ( 
         ((combinator)=>a+=combinator | ) 
         (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax)
-      )*
+      )+
     -> ^(SELECTOR $a* ) 
+    ;
+finally { leaveRule(); }
+
+// if this is changed, changes are the selector must be changed too
+// Less keyword-pseudoclass "extend" takes selector as an argument. The selector can be optionally
+// followed by keyword all. The grammar is ambiguous as a result and its predictability suffers.  
+extendedSelector 
+@init {enterRule(retval, RULE_SELECTOR);}
+    : ( { !predicates.matchingAllRparent(input)}?=>(
+            ((combinator)=>a+=combinator | ) 
+            (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax)
+        )
+      )+
+      (  { predicates.matchingAllRparent(input)}?=>b+=IDENT
+         |
+      )
+    -> ^(EXTENDED_SELECTOR ^(SELECTOR $a* ) $b*) 
     ;
 finally { leaveRule(); }
 
@@ -557,11 +574,14 @@ attrib
 ;
 
 pseudo
-    : (c+=COLON c+=COLON? a=IDENT ((
-        { predicates.insideNth(input)}?=> LPAREN (b1=nth| b2=variablereference) RPAREN
-        | LPAREN b3=pseudoparameters RPAREN
-        )?)
-      ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3*)
+    : (c+=COLON c+=COLON? a=IDENT (
+        (LPAREN)=>(
+          { predicates.insideNth(input)}?=> LPAREN (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) RPAREN
+          | { predicates.insideExtend(input)}?=> LPAREN (b4=extendedSelector) RPAREN
+          | LPAREN b5=pseudoparameters RPAREN 
+        )
+        |)
+      ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3* $b4* $b5*)
     ;
     
 pseudoparameters:

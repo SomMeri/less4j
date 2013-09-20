@@ -8,10 +8,16 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 public class Variable extends Expression {
   
   private String name;
+  private boolean hasInterpolatedForm;
 
   public Variable(HiddenTokenAwareTree underlyingStructure, String name) {
+    this(underlyingStructure, name, false);
+  }
+
+  public Variable(HiddenTokenAwareTree underlyingStructure, String name, boolean hasInterpolatedForm) {
     super(underlyingStructure);
     this.name = name;
+    this.hasInterpolatedForm = hasInterpolatedForm;
   }
 
   public String getName() {
@@ -20,6 +26,14 @@ public class Variable extends Expression {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public boolean hasInterpolatedForm() {
+    return hasInterpolatedForm;
+  }
+
+  public void setInterpolatedForm(boolean has) {
+    this.hasInterpolatedForm = has;
   }
 
   @Override

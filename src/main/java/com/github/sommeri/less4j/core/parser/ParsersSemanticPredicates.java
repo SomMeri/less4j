@@ -25,6 +25,21 @@ public class ParsersSemanticPredicates {
     NTH_PSEUDOCLASSES.add("nth-last-of-type");
   }
 
+  private static String EXTEND_PSEUDOCLASS = "extend";
+  
+  public boolean matchingAllRparent(TokenStream input) {
+    Token all = input.LT(1);
+    Token rparent = input.LT(2);
+    
+    if (all.getType() != LessParser.IDENT || all.getText() == null)
+      return false;
+
+    if (rparent.getType() != LessParser.RPAREN)
+      return false;
+
+    return "all".equals(all.getText().toLowerCase());
+  }
+  
   public boolean insideNth(TokenStream input) {
     return isNthPseudoClass(input.LT(-1));
   }
@@ -36,6 +51,19 @@ public class ParsersSemanticPredicates {
     if (text == null)
       return false;
     return NTH_PSEUDOCLASSES.contains(text.toLowerCase());
+  }
+
+  public boolean insideExtend(TokenStream input) {
+    return isExtendPseudoClass(input.LT(-1));
+  }
+
+  private boolean isExtendPseudoClass(Token a) {
+    if (a == null)
+      return false;
+    String text = a.getText();
+    if (text == null)
+      return false;
+    return EXTEND_PSEUDOCLASS.equals(text.toLowerCase());
   }
 
   /**
@@ -196,4 +224,7 @@ public class ParsersSemanticPredicates {
     return text.startsWith("@") && text.endsWith(atName);
   }
 
+  public boolean truthy() {
+    return true;
+  }
 }

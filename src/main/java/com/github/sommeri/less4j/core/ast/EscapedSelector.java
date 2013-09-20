@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -10,8 +9,8 @@ public class EscapedSelector extends SelectorPart {
   private String value;
   private String quoteType;
 
-  public EscapedSelector(HiddenTokenAwareTree underlyingStructure, String value, String quoteTypes) {
-    super(underlyingStructure);
+  public EscapedSelector(HiddenTokenAwareTree underlyingStructure, String value, String quoteTypes, SelectorCombinator leadingCombinator) {
+    super(underlyingStructure, leadingCombinator);
     this.value = value;
     this.quoteType = quoteTypes;
   }
@@ -44,8 +43,8 @@ public class EscapedSelector extends SelectorPart {
 
 
   @Override
-  public List<? extends ASTCssNode> getChilds() {
-    return Collections.emptyList();
+  public List<ASTCssNode> getChilds() {
+    return super.getChilds();
   }
 
   @Override

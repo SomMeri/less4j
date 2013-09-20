@@ -37,8 +37,11 @@ public class SelectorBuilder {
         //if it is not a combinator, then it is either nested appender, simple selector or escaped selector   
         head = (SelectorPart) parent.switchOn(kid);
       }
-
-      Selector part = new Selector(token, combinator, head);
+      
+      head.setLeadingCombinator(combinator);
+      if (combinator!=null) 
+        head.getUnderlyingStructure().moveHidden(combinator.getUnderlyingStructure(), null);
+      Selector part = new Selector(token, head);
       if (result == null) {
         result = part;
         rightest = part;

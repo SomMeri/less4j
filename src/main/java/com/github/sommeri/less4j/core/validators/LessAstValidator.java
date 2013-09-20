@@ -18,6 +18,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
+import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -78,23 +79,23 @@ public class LessAstValidator {
   private void checkForLogicalConditionConsistency(SupportsLogicalCondition condition) {
     Iterator<SupportsLogicalOperator> logicalOperators = condition.getLogicalOperators().iterator();
     if (!logicalOperators.hasNext())
-      return ;
-    
+      return;
+
     SupportsLogicalOperator masterOperator = logicalOperators.next();
     while (logicalOperators.hasNext()) {
       SupportsLogicalOperator operator = logicalOperators.next();
-      if (!masterOperator.getOperator().equals(operator.getOperator())) 
+      if (!masterOperator.getOperator().equals(operator.getOperator()))
         problemsHandler.warnInconsistentSupportsLogicalConditionOperators(operator, masterOperator);
     }
   }
 
   private void checkForPartialInterpolatedMediaQuery(MediaQuery node) {
     if (!node.hasInterpolatedExpression())
-      return ;
-    
-    if (node.getMedium()!=null || node.getExpressions().size()>1)
+      return;
+
+    if (node.getMedium() != null || node.getExpressions().size() > 1)
       problemsHandler.lessjsDoesNotSupportPartiallyInterpolatedMediaQueries(node);
-    
+
   }
 
   private void checkTopLevelNested(RuleSet node) {
@@ -147,9 +148,12 @@ public class LessAstValidator {
 
   private void checkDeprecatedParameterType(PseudoClass pseudo) {
     ASTCssNode parameter = pseudo.getParameter();
-    if (parameter != null && parameter.getType() == ASTCssNodeType.VARIABLE) {
+    if (parameter == null || parameter.getType() != ASTCssNodeType.VARIABLE)
+      return;
+    
+    Variable variable = (Variable) parameter;
+    if (!variable.hasInterpolatedForm())
       problemsHandler.variableAsPseudoclassParameter(pseudo);
-    }
   }
 
   private void checkEmptySelector(RuleSet ruleSet) {

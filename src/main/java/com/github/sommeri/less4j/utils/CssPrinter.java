@@ -877,9 +877,6 @@ public class CssPrinter {
   }
 
   public boolean appendSelector(Selector selector) {
-    if (selector.hasLeadingCombinator())
-      append(selector.getLeadingCombinator());
-
     if (!selector.isCombined()) {
       append(selector.getHead());
       return true;
@@ -890,6 +887,9 @@ public class CssPrinter {
   }
 
   private boolean appendSimpleSelector(SimpleSelector selector) {
+    if (selector.hasLeadingCombinator())
+      append(selector.getLeadingCombinator());
+
     appendSimpleSelectorHead(selector);
     appendSimpleSelectorTail(selector);
     return true;

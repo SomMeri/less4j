@@ -17,9 +17,10 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
   //relevant only if the selector is a star
   private boolean isEmptyForm = false;
   private List<ElementSubsequent> subsequent = new ArrayList<ElementSubsequent>();
+  private List<Extend> extend = new ArrayList<Extend>();
 
-  public SimpleSelector(HiddenTokenAwareTree token, InterpolableName elementName, boolean isStar) {
-    super(token);
+  public SimpleSelector(HiddenTokenAwareTree token, SelectorCombinator leadingCombinator, InterpolableName elementName, boolean isStar) {
+    super(token, leadingCombinator);
     this.elementName = elementName;
     this.isStar = isStar;
   }
@@ -89,10 +90,20 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     this.subsequent.addAll(subsequent);
   }
 
+  public List<Extend> getExtend() {
+    return extend;
+  }
+
+  public void addExtend(Extend selector) {
+    extend.add(selector);
+  }
+
   @Override
   public List<ASTCssNode> getChilds() {
-    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)elementName);
+    List<ASTCssNode> result = super.getChilds();
+    ArraysUtils.addIfNonNull(result, elementName);
     result.addAll(subsequent);
+    result.addAll(extend);
     return result;
   }
 
@@ -105,6 +116,7 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     SimpleSelector clone = (SimpleSelector) super.clone();
     clone.subsequent = ArraysUtils.deeplyClonedList(getSubsequent());
     clone.elementName = elementName==null? null : elementName.clone();
+    clone.extend = ArraysUtils.deeplyClonedList(getExtend());
     clone.configureParentToAllChilds();
     return clone;
   }
@@ -129,6 +141,10 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
       isStar=false;
     }
     getElementName().extendName(extension);
+  }
+
+  public boolean isExtending() {
+    return !extend.isEmpty();
   }
 
 }
