@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.Collections;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class UnicodeRangeExpression extends Expression {
@@ -27,6 +28,7 @@ public class UnicodeRangeExpression extends Expression {
   }
 
   @Override
+  @NotAstProperty
   public List<ASTCssNode> getChilds() {
     return Collections.emptyList();
   }

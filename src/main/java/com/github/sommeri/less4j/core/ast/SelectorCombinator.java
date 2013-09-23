@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.Collections;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class SelectorCombinator extends ASTCssNode implements Cloneable {
@@ -32,6 +33,7 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
   }
 
   @Override
+  @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     return Collections.emptyList();
   }

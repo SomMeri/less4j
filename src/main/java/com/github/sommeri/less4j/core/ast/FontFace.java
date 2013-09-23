@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.ast;
 
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -22,6 +23,7 @@ public class FontFace extends ASTCssNode implements BodyOwner<GeneralBody> {
   }
 
   @Override
+  @NotAstProperty
   public List<ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList((ASTCssNode)body);
   }

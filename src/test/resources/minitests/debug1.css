@@ -1,3 +1,10 @@
-#test {
-  width: 50px;
+h1,
+h2 {
+  declaration: value;
+}
+p h1 + h1 em,
+p h1 + h2 em,
+p h2 + h1 em,
+p h2 + h2 em {
+  declaration: 3 4;
 }

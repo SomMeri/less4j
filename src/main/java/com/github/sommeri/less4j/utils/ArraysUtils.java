@@ -62,4 +62,12 @@ public class ArraysUtils {
     return result;
   }
 
+  public static <T> List<T> asModifiableList(T... head) {
+    List<T> result = new ArrayList<T>();
+    for (T t : head) {
+      result.add(t);
+    }
+    return result;
+  }
+
 }

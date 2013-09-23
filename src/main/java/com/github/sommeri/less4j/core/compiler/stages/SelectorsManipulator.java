@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
-import com.github.sommeri.less4j.core.ast.SimpleSelector;
+import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class SelectorsManipulator {
@@ -58,11 +58,23 @@ public class SelectorsManipulator {
   }
 
   public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, Selector second) {
-    Selector attachTo = first.getRightestPart();
-    attachTo.setRight(second);
-    second.setParent(attachTo);
+    //FIXME: (!) what with extend? 
     if (combinator != null)
       second.setLeadingCombinator(combinator);
+    
+    first.addParts(second.getParts());
+    first.configureParentToAllChilds();
+
+    return first;
+  }
+
+  public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, List<SelectorPart> second) {
+    //FIXME: (!) what with extend? 
+    if (combinator != null)
+      second.get(0).setLeadingCombinator(combinator);
+    
+    first.addParts(second);
+    first.configureParentToAllChilds();
 
     return first;
   }
@@ -81,12 +93,16 @@ public class SelectorsManipulator {
     if (second.getHead().isAppender())
       return indirectJoinNoClone(first, second.getLeadingCombinator(), second);
     
-//    if (second.hasLeadingCombinator())
-//      return indirectJoinNoClone(first, second.getLeadingCombinator(), second);
-
-    Selector attachTo = first.getRightestPart();
-    SimpleSelector attachToHead = (SimpleSelector) attachTo.getHead();
-    SimpleSelector secondHead = (SimpleSelector) second.getHead();
+    /*
+     * FIXME: test on old whether sufvives if first is not simple selector. (say, if:
+     * (~"escaped") {
+     *   &:pseudo() {
+     *   }
+     * }
+     * 
+     */
+    SelectorPart attachToHead = first.findLastPart();
+    SelectorPart secondHead = second.getHead();
     if (!secondHead.hasElement()) {
       attachToHead.addSubsequent(secondHead.getSubsequent());
     } else {
@@ -102,8 +118,10 @@ public class SelectorsManipulator {
 
     attachToHead.configureParentToAllChilds();
 
-    if (second.hasRight())
-      indirectJoinNoClone(attachTo, second.getRight().getLeadingCombinator(), second.getRight());
+    if (second.hasRight()) {
+      second.getAllExceptHead();
+      indirectJoinNoClone(first, second.findSecondPart().getLeadingCombinator(), second.getAllExceptHead());
+    }
 
     return first;
   }
@@ -119,10 +137,16 @@ public class SelectorsManipulator {
     if (appender == null)
       throw new BugHappened("This is very weird error and should not happen.", selector);
 
-    Selector rightSelectorBeginning = appender.getParentAsSelector();
-    Selector leftSelectorBeginning = splitOn(rightSelectorBeginning);
-    List<Selector> partialResults = joinAll(leftSelectorBeginning, previousSelectors, rightSelectorBeginning.getLeadingCombinator(), appender.isDirectlyAfter());
-    return joinAll(partialResults, chopOffHead(rightSelectorBeginning), null, appender.isDirectlyBefore());
+    Selector  afterAppender = splitOn(selector, appender);
+    
+    List<Selector> partialResults = joinAll(selector, previousSelectors, appender.getLeadingCombinator(), appender.isDirectlyAfter());
+    return joinAll(partialResults, afterAppender, null, appender.isDirectlyBefore());
+    
+    //FIXME (!!) when it is all done, remove following. Also refactor this class.
+//    Selector rightSelectorBeginning = appender.getParentAsSelector();
+//    Selector leftSelectorBeginning = splitOn(rightSelectorBeginning);
+//    List<Selector> partialResults = joinAll(leftSelectorBeginning, previousSelectors, rightSelectorBeginning.getLeadingCombinator(), appender.isDirectlyAfter());
+//    return joinAll(partialResults, chopOffHead(rightSelectorBeginning), null, appender.isDirectlyBefore());
   }
 
   private List<Selector> joinAll(Selector first, List<Selector> seconds, SelectorCombinator leadingCombinator, boolean appenderDirectlyPlaced) {
@@ -151,11 +175,9 @@ public class SelectorsManipulator {
   private Selector chopOffHead(Selector selector) {
     if (!selector.hasRight())
       return null;
-
-    Selector right = selector.getRight();
-    right.setParent(null);
-    selector.setRight(null);
-    return right;
+    
+    selector.removeHead();
+    return selector;
   }
 
   private List<Selector> directJoinAll(List<Selector> firsts, Selector second) {
@@ -189,15 +211,37 @@ public class SelectorsManipulator {
     return beforeAppenderCombinator == null && appenderDirectlyPlaced && (afterAppender == null || !afterAppender.hasLeadingCombinator());
   }
 
-  private Selector splitOn(Selector rightSelectorStart) {
-    Selector leftSelectorEnding = (Selector) rightSelectorStart.getParent();
-    leftSelectorEnding.setRight(null);
-    rightSelectorStart.setParent(null);
-    Selector leftSelectorBeginning = leftSelectorEnding;
-    while (leftSelectorBeginning.getParent() instanceof Selector) {
-      leftSelectorBeginning = (Selector) leftSelectorBeginning.getParent();
-    }
+//  private Selector splitOn(Selector rightSelectorStart) {
+//    Selector leftSelectorEnding = (Selector) rightSelectorStart.getParent();
+//    leftSelectorEnding.setRight(null);
+//    rightSelectorStart.setParent(null);
+//    Selector leftSelectorBeginning = leftSelectorEnding;
+//    while (leftSelectorBeginning.getParent() instanceof Selector) {
+//      leftSelectorBeginning = (Selector) leftSelectorBeginning.getParent();
+//    }
+//
+//    return leftSelectorBeginning;
+//  }
 
-    return leftSelectorBeginning;
+  private Selector splitOn(Selector selector, NestedSelectorAppender appender) {
+    //FIXME (!!!) do not manipulate selectors list from outside
+    List<SelectorPart> parts = selector.getParts();
+    int indexOfAppender = parts.indexOf(appender);
+    List<SelectorPart> appenderAndAfter = parts.subList(indexOfAppender, parts.size());
+    appenderAndAfter.remove(0);
+    //FIXME (!!!) iny underlying and refactor whole class so it does not create middle selecotrs
+    Selector result = null;
+    if (!appenderAndAfter.isEmpty())
+      result = new Selector(selector.getUnderlyingStructure(), new ArrayList<SelectorPart>(appenderAndAfter));
+    
+    appenderAndAfter.clear();
+    
+    appender.setParent(null);
+    if (result!=null)
+      result.configureParentToAllChilds();
+    selector.configureParentToAllChilds();
+    
+    return result;
   }
+
 }

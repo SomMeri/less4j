@@ -7,6 +7,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
+import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 
 public class UselessLessElementsRemover {
@@ -49,23 +50,24 @@ public class UselessLessElementsRemover {
   }
 
   private Selector replaceLeadingAppendersByEmptiness(Selector selector, RuleSet parentRuleSet) {
-    Selector firstNonAppender = findFirstNonAppenderPartOwner(selector);
-    if (firstNonAppender==selector)
-      return selector;
-    
-    SimpleSelector empty = createEmptySimpleSelector(selector.getHead());
+    SelectorPart firstNonAppender = findFirstNonAppenderPartOwner(selector);
     // selector contains only non appenders
     if (firstNonAppender==null) {
+      SimpleSelector empty = createEmptySimpleSelector(selector.getHead());
       Selector replacement = new Selector(empty.getUnderlyingStructure(), empty);
       parentRuleSet.replaceSelector(selector, replacement);
       return replacement;
     }
-    //found non appender
-    if (firstNonAppender!=selector) {
-      parentRuleSet.replaceSelector(selector, firstNonAppender);
-      return firstNonAppender;
-    }
     
+    //found non appender
+    //FIXME (!!!) do it in a cleaner way
+    List<SelectorPart> parts = selector.getParts();
+    int firstNonAppenderIndex = parts.indexOf(firstNonAppender);
+    List<SelectorPart> leadingAppenders = parts.subList(0, firstNonAppenderIndex);
+    for (SelectorPart app : leadingAppenders) {
+      app.setParent(null);
+    }
+    leadingAppenders.clear();
     return selector;
   }
 
@@ -75,15 +77,8 @@ public class UselessLessElementsRemover {
     return empty;
   }
 
-  private Selector findFirstNonAppenderPartOwner(Selector selector) {
-    while (selector.getHead().isAppender() && selector.hasRight()) {
-      selector = selector.getRight();
-    }
-    
-    if (selector.getHead().isAppender())
-      return null;
-    
-    return selector;
+  private SelectorPart findFirstNonAppenderPartOwner(Selector selector) {
+    return selector.findFirstNonAppender();
   }
 
 }

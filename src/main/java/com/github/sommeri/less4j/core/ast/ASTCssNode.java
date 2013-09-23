@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public abstract class ASTCssNode implements Cloneable {
@@ -26,6 +27,7 @@ public abstract class ASTCssNode implements Cloneable {
    * WARNING: it is up to the programmer to keep parent and childs getters and
    * setters consistent. Members of this hierarchy are not responsible for that.
    */
+  @NotAstProperty
   public abstract List<? extends ASTCssNode> getChilds();
 
   /**
@@ -52,6 +54,7 @@ public abstract class ASTCssNode implements Cloneable {
     this.underlyingStructure = underlyingStructure;
   }
 
+  @NotAstProperty
   public List<Comment> getTrailingComments() {
     return trailingComments;
   }
@@ -64,6 +67,7 @@ public abstract class ASTCssNode implements Cloneable {
     this.trailingComments.addAll(comments);
   }
 
+  @NotAstProperty
   public List<Comment> getOpeningComments() {
     return openingComments;
   }
@@ -76,6 +80,7 @@ public abstract class ASTCssNode implements Cloneable {
     this.openingComments.addAll(openingComments);
   }
 
+  @NotAstProperty
   public List<Comment> getOrphanComments() {
     return orphanComments;
   }

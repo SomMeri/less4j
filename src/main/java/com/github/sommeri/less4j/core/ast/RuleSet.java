@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -89,6 +90,7 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
   }
 
   @Override
+  @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)body);
     result.addAll(0, selectors);

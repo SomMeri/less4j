@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -39,6 +40,7 @@ public class Media extends ASTCssNode implements BodyOwner<GeneralBody> {
   }
 
   @Override
+  @NotAstProperty
   public List<ASTCssNode> getChilds() {
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>();
     childs.addAll(mediums);

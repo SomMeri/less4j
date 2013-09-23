@@ -8,29 +8,58 @@ import org.apache.commons.beanutils.PropertyUtils;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
+//FIXME: (!!!) now I can probably remove all those replace in body methods
 public class ASTManipulator {
 
   public void replace(ASTCssNode oldChild, ASTCssNode newChild) {
-    if (oldChild==newChild)
-      return ;
-    
+    if (oldChild == newChild)
+      return;
+
     ASTCssNode parent = oldChild.getParent();
     PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(parent.getClass());
     for (PropertyDescriptor descriptor : propertyDescriptors) {
       Class<?> propertyType = descriptor.getPropertyType();
-      if (propertyType!=null && propertyType.isInstance(newChild)) {
+
+      if (propertyType != null && propertyType.isInstance(newChild)) {
         Object value = getPropertyValue(parent, descriptor);
         if (value == oldChild) {
-          setPropertyValue(newChild, parent, "parent");
-          setPropertyValue(oldChild, null, "parent");
-          setPropertyValue(parent, newChild, descriptor);
-          //todo maybe set parents to childs?
+          replaceInProperty(descriptor, parent, oldChild, newChild);
+          return;
+        }
+      } else if (isList(propertyType) && !isAstProperty(descriptor)) {
+        List<?> list = (List<?>) getPropertyValue(parent, descriptor);
+        if (list.contains(oldChild)) {
+          replaceInList(parent, list, oldChild, newChild);
           return;
         }
       }
     }
+  }
+
+  private boolean isAstProperty(PropertyDescriptor descriptor) {
+    return descriptor.getReadMethod().isAnnotationPresent(NotAstProperty.class);
+  }
+
+  private boolean isList(Class<?> propertyType) {
+    return propertyType != null && propertyType.isAssignableFrom(List.class);
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private void replaceInList(ASTCssNode parent, List list, ASTCssNode oldChild, ASTCssNode newChild) {
+    int childsIndex = list.indexOf(oldChild);
+    list.remove(oldChild);
+    list.add(childsIndex, newChild);
+    oldChild.setParent(null);
+    newChild.setParent(parent);
+  }
+
+  private void replaceInProperty(PropertyDescriptor propertyDescriptor, ASTCssNode parent, ASTCssNode oldChild, ASTCssNode newChild) {
+    setPropertyValue(newChild, parent, "parent");
+    setPropertyValue(oldChild, null, "parent");
+    setPropertyValue(parent, newChild, propertyDescriptor);
   }
 
   public void removeFromBody(ASTCssNode node) {
@@ -49,7 +78,7 @@ public class ASTManipulator {
     if (!(parent instanceof Body)) {
       throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
-    
+
     Body pBody = (Body) parent;
     pBody.replaceMember(oldNode, newNode);
   }
@@ -59,7 +88,7 @@ public class ASTManipulator {
     if (!(parent instanceof Body)) {
       throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
-    
+
     Body pBody = (Body) parent;
     pBody.replaceMember(oldNode, newNodes);
   }
@@ -69,7 +98,7 @@ public class ASTManipulator {
     if (!(parent instanceof Body)) {
       throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
-    
+
     Body pBody = (Body) parent;
     pBody.addMemberAfter(newNode, afterNode);
     newNode.setParent(parent);
@@ -80,7 +109,7 @@ public class ASTManipulator {
     if (!(parent instanceof Body)) {
       throw new BugHappened("Parent is not a body instance. " + parent, parent);
     }
-    
+
     Body pBody = (Body) parent;
     pBody.addMembersAfter(newNodes, afterNode);
     for (ASTCssNode newNode : newNodes) {
@@ -128,11 +157,11 @@ public class ASTManipulator {
 
   public void removeFromClosestBody(ASTCssNode node) {
     ASTCssNode removeNode = node;
-    while (removeNode!=null && !(removeNode.getParent() instanceof Body)) {
+    while (removeNode != null && !(removeNode.getParent() instanceof Body)) {
       removeNode = removeNode.getParent();
     }
-    
-    if (removeNode!=null)
+
+    if (removeNode != null)
       removeFromBody(removeNode);
   }
 

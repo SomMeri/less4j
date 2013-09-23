@@ -1,56 +1,51 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class Selector extends ASTCssNode implements Cloneable {
-
+public class SelectorOld extends ASTCssNode implements Cloneable {
+  
+  private SelectorPart head;
+  private SelectorOld right;
+  
   private List<SelectorPart> combinedParts = new ArrayList<SelectorPart>();
 
-  public Selector(HiddenTokenAwareTree token) {
+  public SelectorOld(HiddenTokenAwareTree token) {
     super(token);
   }
-
-  public Selector(HiddenTokenAwareTree token, SelectorPart head) {
-    this(token, ArraysUtils.asModifiableList(head));
+  
+  public SelectorOld(HiddenTokenAwareTree token, SelectorPart head) {
+    this(token, head, null);
   }
 
-  public Selector(HiddenTokenAwareTree token, List<SelectorPart> combinedParts) {
+  public SelectorOld(HiddenTokenAwareTree token, SelectorPart head, SelectorOld right) {
     super(token);
-    this.combinedParts = combinedParts;
+    this.head = head;
+    this.right = right;
   }
-
+  
   public List<SelectorPart> getParts() {
-    return combinedParts;
-  }
-
-  public void addPart(SelectorPart part) {
-    combinedParts.add(part);
-  }
-
-  public void addParts(List<SelectorPart> parts) {
-    combinedParts.addAll(parts);
-  }
-
-  public void removeHead() {
-    combinedParts.remove(0);
+    List<SelectorPart> parts = new ArrayList<SelectorPart>();
+    parts.add(head);
+    if (hasRight())
+      parts.addAll(getRight().getParts());
+    
+    return parts;
   }
 
   /* *********************************************************** */
   //FIXME (!!!!!!-selector refactoring)
   public boolean isExtending() {
     if (hasRight())
-      return findLastPart().isExtending();
+      return getRightestPart().isExtending();
 
-    return getHead().isExtending();
+    return head.isExtending();
   }
-
+  
   //FIXME (!!!- semi - selector refactoring)
   public SelectorPart getHead() {
     List<SelectorPart> parts = getParts();
@@ -61,45 +56,58 @@ public class Selector extends ASTCssNode implements Cloneable {
   }
 
   //FIXME (!!!!!!-selector refactoring)
-  public void setHead(SelectorPart head) {
-    if (!combinedParts.isEmpty())
-      combinedParts.remove(0);
+  public SelectorOld getRight() {
+    return right;
+  }
 
-    combinedParts.add(0, head);
+  //FIXME (!!!!!!-selector refactoring)
+  public void setHead(SelectorPart head) {
+    this.head = head;
+  }
+
+  //FIXME (!!!!!!-selector refactoring)
+  public void setRight(SelectorOld right) {
+    this.right = right;
   }
 
   //FIXME (!!!!!!-selector refactoring)
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
-    return new ArrayList<ASTCssNode>(combinedParts);
+    return ArraysUtils.asNonNullList(head, right);
   }
 
   public ASTCssNodeType getType() {
     return ASTCssNodeType.SELECTOR;
   }
 
+  //FIXME (!!!!!!-selector refactoring)
   @Override
-  public Selector clone() {
-    Selector clone = (Selector) super.clone();
-    clone.combinedParts = ArraysUtils.deeplyClonedList(combinedParts);
+  public SelectorOld clone() {
+    SelectorOld clone = (SelectorOld) super.clone();
+    clone.setHead(getHead().clone());
+    clone.setRight(!hasRight()? null : getRight().clone());
     clone.configureParentToAllChilds();
-
+    
     return clone;
   }
 
   //FIXME (!!!!!!-selector refactoring)
-  public SelectorPart findLastPart() {
-    return ArraysUtils.last(getParts());
+  public SelectorOld getRightestPart() {
+    if (!hasRight())
+      return this;
+    
+    return getRight().getRightestPart();
   }
 
   //FIXME (!!!!!!-selector refactoring)
   public boolean hasRight() {
-    return isCombined();
+    return getRight()!=null;
   }
 
+  //FIXME (!!!!!!-selector refactoring)
   public boolean isCombined() {
-    return combinedParts.size() > 1;
+    return getRight()!=null;
   }
 
   //FIXME (!!!!!!-selector refactoring)
@@ -107,58 +115,59 @@ public class Selector extends ASTCssNode implements Cloneable {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("Selector [");
-    builder.append(combinedParts);
+    builder.append(head);
+    builder.append(" ");
+    builder.append(right);
     builder.append("]");
     return builder.toString();
   }
 
+  //FIXME (!!!!!!-selector refactoring)
   public NestedSelectorAppender findFirstAppender() {
-    for (SelectorPart part : getParts()) {
-      if (part.isAppender())
-        return (NestedSelectorAppender) part;
+    if (getHead().isAppender()) {
+      return (NestedSelectorAppender) getHead();
     }
-    
-    return null;
+
+    if (!hasRight())
+      return null;
+
+    return getRight().findFirstAppender();
   }
 
-  public SelectorPart findFirstNonAppender() {
-    for (SelectorPart part : getParts()) {
-      if (!part.isAppender())
-        return part;
-    }
-    
-    return null;
-  }
-
+  //FIXME (!!!!!!-selector refactoring)
   public boolean containsAppender() {
     return findFirstAppender() != null;
   }
 
   //FIXME (!!!!!!-selector refactoring)
   public boolean isReusableSelector() {
-    Iterator<SelectorPart> parts = getParts().iterator();
-    SelectorPart current = parts.next();
-    // skip initial appernders
-    while (current.isAppender() && parts.hasNext()) {
-      current = parts.next();
+    if (getHead().isAppender())
+      return isCombined() && getRight().isReusableSelector();
+    
+    SelectorOld current = this;
+    while (current.isCombined()) {
+      if (!current.hasReusableHead())
+        return false;
+      
+      current = current.getRight();
     }
+    
+    return current.hasReusableHead();
+  }
 
-    // find out whether there is something not reausable 
-    while (current.isClassesAndIdsOnlySelector() && parts.hasNext()) {
-      current = parts.next();
-    }
-
-    return current.isClassesAndIdsOnlySelector();
+  //FIXME (!!!!!!-selector refactoring)
+  private boolean hasReusableHead() {
+    return getHead().isClassesAndIdsOnlySelector();
   }
 
   /**
    * Assumes that hasReusableHead returns true
-   * 
    * @return
    */
+  //FIXME (!!!!!!-selector refactoring)
   public ReusableStructureName toReusableStructureName() {
     List<ElementSubsequent> nameParts = extractReusableNameParts();
-
+    
     ReusableStructureName result = new ReusableStructureName(nameParts.get(0).getUnderlyingStructure(), nameParts);
     return result;
   }
@@ -168,43 +177,35 @@ public class Selector extends ASTCssNode implements Cloneable {
   // between .aaa.bbb and .aaa .bbb
   private List<ElementSubsequent> extractReusableNameParts() {
     List<ElementSubsequent> result = new ArrayList<ElementSubsequent>();
-    for (SelectorPart part : getParts()) {
-      if (!part.isAppender()) {
-        result.addAll(((SimpleSelector) part).getSubsequent());
+    SelectorOld current = null;
+    do {
+      //initialize or move to next
+      current = current==null? this : current.getRight();
+      //extract name parts
+      SelectorPart currentHead = current.getHead();
+      if (!currentHead.isAppender()) {
+        result.addAll(((SimpleSelector) currentHead).getSubsequent());
       }
-    }
+    } while (current.isCombined());
+    
     return result;
   }
 
   //FIXME: (!!!!!) remove
   @Deprecated
   public void setLeadingCombinator(SelectorCombinator combinator) {
-    getHead().setLeadingCombinator(combinator);
+    head.setLeadingCombinator(combinator);
   }
 
   //FIXME: (!!!!!) remove
   @Deprecated
   public SelectorCombinator getLeadingCombinator() {
-    return getHead().getLeadingCombinator();
+    return head.getLeadingCombinator();
   }
 
   //FIXME: (!!!!!) remove
   @Deprecated
   public boolean hasLeadingCombinator() {
-    return getHead().hasLeadingCombinator();
+    return head.hasLeadingCombinator();
   }
-
-  //FIXME: (!!!!!) remove
-  @NotAstProperty
-  public List<SelectorPart> getAllExceptHead() {
-    List<SelectorPart> result = new ArrayList<SelectorPart>(getParts());
-    result.remove(0);
-    return result;
-  }
-
-  //FIXME: (!!!!!) remove
-  public SelectorPart findSecondPart() {
-    return combinedParts.get(1);
-  }
-
 }

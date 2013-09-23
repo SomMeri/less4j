@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -99,6 +100,7 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
   }
 
   @Override
+  @NotAstProperty
   public List<ASTCssNode> getChilds() {
     List<ASTCssNode> result = super.getChilds();
     ArraysUtils.addIfNonNull(result, elementName);

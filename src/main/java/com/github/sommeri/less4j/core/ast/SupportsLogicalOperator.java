@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class SupportsLogicalOperator extends ASTCssNode implements Cloneable {
@@ -34,6 +35,7 @@ public class SupportsLogicalOperator extends ASTCssNode implements Cloneable {
   }
 
   @Override
+  @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     return Collections.emptyList();
   }

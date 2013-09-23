@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -41,6 +42,7 @@ public abstract class Body extends ASTCssNode {
   }
 
   @Override
+  @NotAstProperty
   public List<ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode) openingCurlyBrace);
     result.addAll(body);

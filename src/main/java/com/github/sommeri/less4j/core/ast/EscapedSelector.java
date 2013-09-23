@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.ast;
 
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class EscapedSelector extends SelectorPart {
@@ -43,6 +44,7 @@ public class EscapedSelector extends SelectorPart {
 
 
   @Override
+  @NotAstProperty
   public List<ASTCssNode> getChilds() {
     return super.getChilds();
   }

@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.ast;
 
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -33,6 +34,7 @@ public class IdSelector extends ElementSubsequent {
   }
   
   @Override
+  @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(name);
   }

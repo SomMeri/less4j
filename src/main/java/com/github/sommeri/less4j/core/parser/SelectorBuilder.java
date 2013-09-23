@@ -20,7 +20,6 @@ public class SelectorBuilder {
   public Selector buildSelector() {
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
     Selector result = null;
-    Selector rightest = null;
     while (iterator.hasNext()) {
       SelectorCombinator combinator = null;
       SelectorPart head = null;
@@ -41,13 +40,10 @@ public class SelectorBuilder {
       head.setLeadingCombinator(combinator);
       if (combinator!=null) 
         head.getUnderlyingStructure().moveHidden(combinator.getUnderlyingStructure(), null);
-      Selector part = new Selector(token, head);
       if (result == null) {
-        result = part;
-        rightest = part;
+        result = new Selector(token, head);
       } else {
-        rightest.setRight(part);
-        rightest = part;
+        result.addPart(head);
       }
     }
     return result;

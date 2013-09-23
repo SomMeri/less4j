@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 //the system would be nicer and more consistent if they all would be cloneable. 
@@ -84,6 +85,7 @@ public class NumberExpression extends Expression implements Cloneable {
   }
 
   @Override
+  @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     return Collections.emptyList();
   }

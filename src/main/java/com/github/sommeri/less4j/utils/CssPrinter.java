@@ -877,12 +877,9 @@ public class CssPrinter {
   }
 
   public boolean appendSelector(Selector selector) {
-    if (!selector.isCombined()) {
-      append(selector.getHead());
-      return true;
+    for (SelectorPart part : selector.getParts()) {
+      append(part);
     }
-    append(selector.getHead());
-    append(selector.getRight());
     return true;
   }
 

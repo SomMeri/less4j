@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -91,6 +92,7 @@ public class ComposedExpression extends Expression {
   }
   
   @Override
+  @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     return ArraysUtils.asNonNullList(left, operator, right);
   }

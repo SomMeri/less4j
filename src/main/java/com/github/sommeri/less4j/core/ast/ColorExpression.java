@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
@@ -90,6 +91,7 @@ public class ColorExpression extends Expression {
   }
 
   @Override
+  @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     return Collections.emptyList();
   }
