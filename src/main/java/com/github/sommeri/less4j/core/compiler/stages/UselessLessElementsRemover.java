@@ -7,7 +7,6 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
-import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 
 public class UselessLessElementsRemover {
@@ -50,24 +49,15 @@ public class UselessLessElementsRemover {
   }
 
   private Selector replaceLeadingAppendersByEmptiness(Selector selector, RuleSet parentRuleSet) {
-    SelectorPart firstNonAppender = findFirstNonAppenderPartOwner(selector);
-    // selector contains only non appenders
-    if (firstNonAppender==null) {
-      SimpleSelector empty = createEmptySimpleSelector(selector.getHead());
-      Selector replacement = new Selector(empty.getUnderlyingStructure(), empty);
-      parentRuleSet.replaceSelector(selector, replacement);
-      return replacement;
+    while (!selector.isEmpty() && selector.getHead().isAppender()) {
+      selector.getHead().setParent(null);
+      selector.removeHead();
     }
     
-    //found non appender
-    //FIXME (!!!) do it in a cleaner way
-    List<SelectorPart> parts = selector.getParts();
-    int firstNonAppenderIndex = parts.indexOf(firstNonAppender);
-    List<SelectorPart> leadingAppenders = parts.subList(0, firstNonAppenderIndex);
-    for (SelectorPart app : leadingAppenders) {
-      app.setParent(null);
+    if (selector.isEmpty()) {
+      SimpleSelector empty = createEmptySimpleSelector(selector);
+      selector.addPart(empty);
     }
-    leadingAppenders.clear();
     return selector;
   }
 
@@ -75,10 +65,6 @@ public class UselessLessElementsRemover {
     SimpleSelector empty = new SimpleSelector(underlyingStructureSource.getUnderlyingStructure(), null, null, true);
     empty.setEmptyForm(true);
     return empty;
-  }
-
-  private SelectorPart findFirstNonAppenderPartOwner(Selector selector) {
-    return selector.findFirstNonAppender();
   }
 
 }

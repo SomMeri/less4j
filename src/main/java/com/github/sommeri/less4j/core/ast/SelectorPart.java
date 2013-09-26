@@ -54,7 +54,6 @@ public abstract class SelectorPart extends ASTCssNode {
     return clone;
   }
 
-  //FIXME (!!!) should these be here? it certainly helps to avoid casts
   public List<ElementSubsequent> getSubsequent() {
     return new ArrayList<ElementSubsequent>();
   }
@@ -68,23 +67,24 @@ public abstract class SelectorPart extends ASTCssNode {
   }
 
   public ElementSubsequent getLastSubsequent() {
-    // FIXME  (!!!)  implement for real
-    return null;
-  }
+    List<ElementSubsequent> subsequent = getSubsequent();
+    if (subsequent.isEmpty())
+      return null;
 
-  public void addSubsequent(List<ElementSubsequent> subsequent) {
-    //FIXME: try to force this and if it is possible solve correctly
-    throw new BugHappened("Attempt to add subsequent element to wrong selector part.", this);
+    return subsequent.get(subsequent.size() - 1);
   }
 
   public boolean hasSubsequent() {
-    // FIXME  (!!!)  implement for real
-    return false;
+    return !getSubsequent().isEmpty();
+  }
+
+
+  public void addSubsequent(List<ElementSubsequent> subsequent) {
+    throw new BugHappened("Attempt to add subsequent element to unexpected selector part.", this);
   }
 
   public void extendName(String secondName) {
-    //FIXME: try to force this and if it is possible solve correctly
-    throw new BugHappened("Attempt to extend a name of wrong selector part.", this);
+    throw new BugHappened("Attempt to extend a name of unexpected selector part.", this);
   }
 
 }

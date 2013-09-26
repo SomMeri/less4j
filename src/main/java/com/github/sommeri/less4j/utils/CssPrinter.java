@@ -858,7 +858,7 @@ public class CssPrinter {
   }
 
   private boolean isEmptySelector(Selector selector) {
-    if (selector.hasRight())
+    if (selector.isCombined())
       return false;
 
     SelectorPart head = selector.getHead();

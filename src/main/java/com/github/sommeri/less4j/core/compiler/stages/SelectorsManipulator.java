@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.problems.BugHappened;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class SelectorsManipulator {
 
@@ -52,27 +53,20 @@ public class SelectorsManipulator {
     Selector first = firstI.clone();
     Selector second = secondI.clone();
 
-    indirectJoinNoClone(first, combinator, second);
-
-    return first;
+    return indirectJoinNoClone(first, combinator, second);
   }
 
   public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, Selector second) {
-    //FIXME: (!) what with extend? 
-    if (combinator != null)
-      second.setLeadingCombinator(combinator);
-    
-    first.addParts(second.getParts());
-    first.configureParentToAllChilds();
-
-    return first;
+    return indirectJoinNoClone(first, combinator, second.getParts());
   }
 
   public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, List<SelectorPart> second) {
-    //FIXME: (!) what with extend? 
-    if (combinator != null)
-      second.get(0).setLeadingCombinator(combinator);
+    if (second.isEmpty())
+      return first;
     
+    if (combinator != null) {
+      second.get(0).setLeadingCombinator(combinator);
+    }
     first.addParts(second);
     first.configureParentToAllChilds();
 
@@ -88,48 +82,50 @@ public class SelectorsManipulator {
       return secondI.clone();
 
     Selector first = firstI.clone();
-    Selector second = secondI.clone();
+    List<SelectorPart> secondParts = ArraysUtils.deeplyClonedList(secondI.getParts());
+    SelectorPart secondHead = secondParts.get(0);
 
-    if (second.getHead().isAppender())
-      return indirectJoinNoClone(first, second.getLeadingCombinator(), second);
+    if (secondHead.isAppender())
+      return indirectJoinNoClone(first, secondHead.getLeadingCombinator(), secondParts);
     
     /*
-     * FIXME: test on old whether sufvives if first is not simple selector. (say, if:
+     * FIXME: test on old whether survives if first is not simple selector. (say, if:
      * (~"escaped") {
      *   &:pseudo() {
      *   }
      * }
      * 
      */
-    SelectorPart attachToHead = first.findLastPart();
-    SelectorPart secondHead = second.getHead();
-    if (!secondHead.hasElement()) {
-      attachToHead.addSubsequent(secondHead.getSubsequent());
-    } else {
-      String secondName = secondHead.hasElement() ? secondHead.getElementName().getName() : "";
-      if (attachToHead.hasSubsequent()) {
-        ElementSubsequent subsequent = attachToHead.getLastSubsequent();
-        subsequent.extendName(secondName);
-      } else {
-        attachToHead.extendName(secondName);
-      }
-      attachToHead.addSubsequent(secondHead.getSubsequent());
-    }
+    SelectorPart attachToHead = first.getLastPart();
+    directlyJoinParts(attachToHead, secondHead);
 
-    attachToHead.configureParentToAllChilds();
-
-    if (second.hasRight()) {
-      second.getAllExceptHead();
-      indirectJoinNoClone(first, second.findSecondPart().getLeadingCombinator(), second.getAllExceptHead());
+    secondParts.remove(0);
+    if (!secondParts.isEmpty()) {
+      return indirectJoinNoClone(first, secondParts.get(0).getLeadingCombinator(), secondParts);
     }
 
     return first;
   }
 
+  private void directlyJoinParts(SelectorPart first, SelectorPart second) {
+    if (second.hasElement()) {
+      String secondName = second.hasElement() ? second.getElementName().getName() : "";
+      if (first.hasSubsequent()) {
+        ElementSubsequent subsequent = first.getLastSubsequent();
+        subsequent.extendName(secondName);
+      } else {
+        first.extendName(secondName);
+      }
+    }
+
+    first.addSubsequent(second.getSubsequent());
+    first.configureParentToAllChilds();
+  }
+
   private Collection<Selector> replaceFirstAppender(Selector selector, List<Selector> previousSelectors) {
     if (selector.getHead().isAppender()) {
       NestedSelectorAppender appender = (NestedSelectorAppender) selector.getHead();
-      return joinAll(previousSelectors, chopOffHead(selector), selector.getLeadingCombinator(), appender.isDirectlyBefore());
+      return joinAll(previousSelectors, chopOffHead(selector), appender.getLeadingCombinator(), appender.isDirectlyBefore());
     }
 
     // appender somewhere in the middle
@@ -138,15 +134,8 @@ public class SelectorsManipulator {
       throw new BugHappened("This is very weird error and should not happen.", selector);
 
     Selector  afterAppender = splitOn(selector, appender);
-    
     List<Selector> partialResults = joinAll(selector, previousSelectors, appender.getLeadingCombinator(), appender.isDirectlyAfter());
     return joinAll(partialResults, afterAppender, null, appender.isDirectlyBefore());
-    
-    //FIXME (!!) when it is all done, remove following. Also refactor this class.
-//    Selector rightSelectorBeginning = appender.getParentAsSelector();
-//    Selector leftSelectorBeginning = splitOn(rightSelectorBeginning);
-//    List<Selector> partialResults = joinAll(leftSelectorBeginning, previousSelectors, rightSelectorBeginning.getLeadingCombinator(), appender.isDirectlyAfter());
-//    return joinAll(partialResults, chopOffHead(rightSelectorBeginning), null, appender.isDirectlyBefore());
   }
 
   private List<Selector> joinAll(Selector first, List<Selector> seconds, SelectorCombinator leadingCombinator, boolean appenderDirectlyPlaced) {
@@ -173,7 +162,7 @@ public class SelectorsManipulator {
   }
 
   private Selector chopOffHead(Selector selector) {
-    if (!selector.hasRight())
+    if (!selector.isCombined())
       return null;
     
     selector.removeHead();
@@ -211,36 +200,24 @@ public class SelectorsManipulator {
     return beforeAppenderCombinator == null && appenderDirectlyPlaced && (afterAppender == null || !afterAppender.hasLeadingCombinator());
   }
 
-//  private Selector splitOn(Selector rightSelectorStart) {
-//    Selector leftSelectorEnding = (Selector) rightSelectorStart.getParent();
-//    leftSelectorEnding.setRight(null);
-//    rightSelectorStart.setParent(null);
-//    Selector leftSelectorBeginning = leftSelectorEnding;
-//    while (leftSelectorBeginning.getParent() instanceof Selector) {
-//      leftSelectorBeginning = (Selector) leftSelectorBeginning.getParent();
-//    }
-//
-//    return leftSelectorBeginning;
-//  }
-
   private Selector splitOn(Selector selector, NestedSelectorAppender appender) {
-    //FIXME (!!!) do not manipulate selectors list from outside
     List<SelectorPart> parts = selector.getParts();
     int indexOfAppender = parts.indexOf(appender);
     List<SelectorPart> appenderAndAfter = parts.subList(indexOfAppender, parts.size());
+    
+    //remove appender
     appenderAndAfter.remove(0);
-    //FIXME (!!!) iny underlying and refactor whole class so it does not create middle selecotrs
-    Selector result = null;
-    if (!appenderAndAfter.isEmpty())
-      result = new Selector(selector.getUnderlyingStructure(), new ArrayList<SelectorPart>(appenderAndAfter));
-    
-    appenderAndAfter.clear();
-    
     appender.setParent(null);
-    if (result!=null)
+
+    //create selector with after appender parts
+    Selector result = null;
+    if (!appenderAndAfter.isEmpty()) {
+      result = new Selector(selector.getUnderlyingStructure(), new ArrayList<SelectorPart>(appenderAndAfter));
       result.configureParentToAllChilds();
-    selector.configureParentToAllChilds();
+    }
     
+    //leave only before appender parts in original selector
+    appenderAndAfter.clear();
     return result;
   }
 

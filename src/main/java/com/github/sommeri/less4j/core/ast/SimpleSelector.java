@@ -79,10 +79,6 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     return subsequent;
   }
 
-  public boolean hasSubsequent() {
-    return !subsequent.isEmpty();
-  }
-
   public void addSubsequent(ElementSubsequent subsequent) {
     this.subsequent.add(subsequent);
   }
@@ -129,13 +125,6 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     builder.append(isStar ? "*" : getElementName());
     builder.append(subsequent);
     return builder.toString();
-  }
-
-  public ElementSubsequent getLastSubsequent() {
-    if (subsequent.isEmpty())
-      return null;
-
-    return subsequent.get(subsequent.size() - 1);
   }
 
   public void extendName(String extension) {

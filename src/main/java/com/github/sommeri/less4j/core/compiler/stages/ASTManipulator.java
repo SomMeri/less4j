@@ -11,7 +11,6 @@ import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
-//FIXME: (!!!) now I can probably remove all those replace in body methods
 public class ASTManipulator {
 
   public void replace(ASTCssNode oldChild, ASTCssNode newChild) {
@@ -20,27 +19,28 @@ public class ASTManipulator {
 
     ASTCssNode parent = oldChild.getParent();
     PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(parent.getClass());
-    for (PropertyDescriptor descriptor : propertyDescriptors) {
-      Class<?> propertyType = descriptor.getPropertyType();
+    for (PropertyDescriptor descriptor : propertyDescriptors)
+      if (isAstProperty(descriptor)) {
+        Class<?> propertyType = descriptor.getPropertyType();
 
-      if (propertyType != null && propertyType.isInstance(newChild)) {
-        Object value = getPropertyValue(parent, descriptor);
-        if (value == oldChild) {
-          replaceInProperty(descriptor, parent, oldChild, newChild);
-          return;
-        }
-      } else if (isList(propertyType) && !isAstProperty(descriptor)) {
-        List<?> list = (List<?>) getPropertyValue(parent, descriptor);
-        if (list.contains(oldChild)) {
-          replaceInList(parent, list, oldChild, newChild);
-          return;
+        if (propertyType != null && propertyType.isInstance(newChild)) {
+          Object value = getPropertyValue(parent, descriptor);
+          if (value == oldChild) {
+            replaceInProperty(descriptor, parent, oldChild, newChild);
+            return;
+          }
+        } else if (isList(propertyType)) {
+          List<?> list = (List<?>) getPropertyValue(parent, descriptor);
+          if (list.contains(oldChild)) {
+            replaceInList(parent, list, oldChild, newChild);
+            return;
+          }
         }
       }
-    }
   }
 
   private boolean isAstProperty(PropertyDescriptor descriptor) {
-    return descriptor.getReadMethod().isAnnotationPresent(NotAstProperty.class);
+    return !descriptor.getReadMethod().isAnnotationPresent(NotAstProperty.class);
   }
 
   private boolean isList(Class<?> propertyType) {
