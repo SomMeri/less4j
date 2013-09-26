@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.github.sommeri.less4j.core.ast.Selector;
@@ -19,7 +20,7 @@ public class SelectorBuilder {
 
   public Selector buildSelector() {
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
-    Selector result = null;
+    Selector result = new Selector(token, new ArrayList<SelectorPart>());
     while (iterator.hasNext()) {
       SelectorCombinator combinator = null;
       SelectorPart head = null;
@@ -36,15 +37,12 @@ public class SelectorBuilder {
         //if it is not a combinator, then it is either nested appender, simple selector or escaped selector   
         head = (SelectorPart) parent.switchOn(kid);
       }
-      
+
       head.setLeadingCombinator(combinator);
-      if (combinator!=null) 
+      if (combinator != null)
         head.getUnderlyingStructure().moveHidden(combinator.getUnderlyingStructure(), null);
-      if (result == null) {
-        result = new Selector(token, head);
-      } else {
-        result.addPart(head);
-      }
+
+      result.addPart(head);
     }
     return result;
   }
