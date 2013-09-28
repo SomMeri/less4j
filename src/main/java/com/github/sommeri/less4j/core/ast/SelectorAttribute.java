@@ -81,4 +81,8 @@ public class SelectorAttribute extends ElementSubsequent {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return "[" + name + operator + value + "]";
+  }
 }

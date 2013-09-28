@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 public class Selector extends ASTCssNode implements Cloneable {
 
   private List<SelectorPart> combinedParts = new ArrayList<SelectorPart>();
+  private List<Extend> extend = new ArrayList<Extend>();
 
   public Selector(HiddenTokenAwareTree token) {
     super(token);
@@ -42,8 +43,15 @@ public class Selector extends ASTCssNode implements Cloneable {
   }
 
   public boolean isExtending() {
-    List<SelectorPart> parts = getParts();
-    return !parts.isEmpty() && getLastPart().isExtending();
+    return !extend.isEmpty();
+  }
+
+  public List<Extend> getExtend() {
+    return extend;
+  }
+
+  public void setExtend(List<Extend> extend) {
+    this.extend = extend;
   }
 
   @NotAstProperty
@@ -58,7 +66,9 @@ public class Selector extends ASTCssNode implements Cloneable {
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
-    return new ArrayList<ASTCssNode>(combinedParts);
+    ArrayList<ASTCssNode> result = new ArrayList<ASTCssNode>(combinedParts);
+    result.addAll(extend);
+    return result;
   }
 
   public ASTCssNodeType getType() {
@@ -69,6 +79,7 @@ public class Selector extends ASTCssNode implements Cloneable {
   public Selector clone() {
     Selector clone = (Selector) super.clone();
     clone.combinedParts = ArraysUtils.deeplyClonedList(combinedParts);
+    clone.extend = ArraysUtils.deeplyClonedList(extend);
     clone.configureParentToAllChilds();
 
     return clone;
@@ -158,6 +169,10 @@ public class Selector extends ASTCssNode implements Cloneable {
 
   public boolean isEmpty() {
     return getParts().isEmpty();
+  }
+
+  public void addExtend(Extend extend) {
+    this.extend.add(extend);
   }
 
 }

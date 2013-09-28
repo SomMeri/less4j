@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.stages;
+package com.github.sommeri.less4j.core.compiler.selectors;
 
 import java.util.ArrayList;
 import java.util.Arrays;

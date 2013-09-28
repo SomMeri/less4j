@@ -1,0 +1,80 @@
+h1,
+.simpleElementName1,
+.simpleElementName2,
+.simpleElementName3,
+.simpleElementName4 {
+  border: 1px solid blue;
+}
+h1,
+.simpleElementName1,
+.simpleElementName2,
+.simpleElementName3,
+.simpleElementName4 {
+  color: blue;
+}
+h2 {
+  property: should-not-match;
+}
+:empty:hover,
+.emptyFirst {
+  subsequent-order: empty-first;
+}
+:hover:empty,
+.hoverFirst {
+  subsequent-order: hover-first;
+}
+:visited:active,
+.combinatorMattersDirect {
+  combinator: directly-follows;
+}
+:visited :active,
+.combinatorMattersDescendant {
+  combinator: descendant;
+}
+:visited + :active,
+.combinatorMattersAdjacent {
+  combinator: adjacent-sibling-1;
+}
+:visited + :active,
+.combinatorMattersAdjacent {
+  combinator: adjacent-sibling-2;
+}
+:visited > :active,
+.combinatorMattersChild {
+  combinator: child;
+}
+:visited ~ :active,
+.combinatorMattersGeneral {
+  combinator: general-sibling;
+}
+body:visited pre:active,
+.combinatorMattersElementsDescendant {
+  combinator-with-element: descendant;
+}
+body:visited + pre:active,
+.combinatorMattersElementsAdjacent {
+  combinator-with-element: adjacent-sibling;
+}
+*,
+.expliciteStar {
+  star: explicite;
+}
+*:hover,
+.expliciteStarOneSubsequent {
+  star-with-subsequent: explicite;
+}
+:hover,
+.impliciteStarOneSubsequent {
+  star-with-subsequent: implicite;
+}
+:first-child:focus {
+  star: directly-follows;
+}
+:first-child *:focus,
+.starBeforeSecondSimple {
+  star: is there;
+}
+:first-child :focus,
+.noStarBeforeSecondSimple {
+  star: none;
+}

@@ -88,7 +88,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 //FIXME: better error message missing EOF at blahblah
 class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
-  private static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
+  protected static final String GRAMMAR_MISMATCH = "ASTBuilderSwitch grammar mismatch";
   private final ProblemsHandler problemsHandler;
   private final MixinsParametersBuilder mixinsParametersBuilder;
   private final TermBuilder termBuilder;
@@ -101,8 +101,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
 
-  private static String EXTEND_PSEUDO = "extend";
-  
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
@@ -808,26 +806,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   private void addSubsequent(SimpleSelector result, HiddenTokenAwareTree kid) {
     ElementSubsequent subsequent = (ElementSubsequent) switchOn(kid);
-    if (isExtends(subsequent)) {
-      PseudoClass extend = (PseudoClass) subsequent;
-      Extend extendReal = convertToExtend(extend);
-      result.addExtend(extendReal);
-    } else {
-      result.addSubsequent(subsequent);
-    }
-  }
-
-  private Extend convertToExtend(PseudoClass extend) {
-    ASTCssNode parameter = extend.getParameter();
-    if (parameter.getType()!=ASTCssNodeType.EXTEND) {
-      throw new BugHappened(GRAMMAR_MISMATCH, parameter.getUnderlyingStructure());
-    }
-    
-    return (Extend) parameter;
-  }
-
-  private boolean isExtends(ElementSubsequent subsequent) {
-    return (subsequent instanceof PseudoClass) && EXTEND_PSEUDO.equals(subsequent.getName());
+    result.addSubsequent(subsequent);
   }
 
   private boolean isStarElementName(List<HiddenTokenAwareTree> elementNameParts) {

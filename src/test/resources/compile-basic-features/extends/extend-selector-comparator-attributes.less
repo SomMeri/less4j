@@ -1,0 +1,111 @@
+// *************************** basic values types
+[title] {
+  parameter-types: none;
+}
+[title=identifier] {
+  parameter-types: match identifier; 
+}
+[title=no-match-identifier] { 
+  parameter-types: no match identifier; 
+}
+[title='single quote 1'] {
+  parameter-types:single quote 1;
+}
+[title='single quote 2'] {
+  parameter-types:single quote 2;
+}
+[title="double quote 1"] {
+  parameter-types:double quote 1;
+}
+[title="double quote 2"] {
+  parameter-types:double quote 2;
+}
+[title=1] {
+  parameter-types:number 2;
+}
+[title=2] {
+  parameter-types:number 2;
+}
+
+.valueTypeNone:extend([title]){}
+.valueTypeIdentifier:extend([title=identifier]){}
+.valueTypeSingleString:extend([title='single quote 1']){}
+.valueTypeDoubletring:extend([title="double quote 1"]){}
+.valueTypeNumber:extend([title=1]){}
+
+// *************************** numbers values types
+[width=10] {
+  dimension: number; 
+}
+[width=-10] {
+  dimension: negative number; 
+}
+[width=10cm] {
+  dimension: cm; 
+}
+[width=100mm] {
+  dimension: mm; 
+}
+[width=10deg] {
+  dimension: deg; 
+}
+[width=10%] {
+  dimension: percent; 
+}
+
+.numberType:extend([width=10]){}
+.numberTypeNegative:extend([width=-10]){}
+.numberTypeCm:extend([width=10cm]){}
+.numberTypeMm:extend([width=100mm]){}
+.numberTypeDeg:extend([width=10deg]){}
+.numberTypePercent:extend([width=10%]){}
+// *************************** operators
+[attr] {
+	operator: none;
+}
+[attr=value] {
+	operator: exactly;
+}
+[attr~=value] {
+	operator: has member;
+}
+[attr|=value] {
+	operator: vendor prefix;
+}
+[attr^=value] {
+	operator: prefix;
+}
+[attr$=value] {
+	operator: suffix;
+}
+[attr*=value] {
+	operator: substring;
+}
+
+.operatorNone:extend([attr]){}
+.operatorExact:extend([attr=value]){}
+.operatorMember:extend([attr~=value]){}
+.operatorVendor:extend([attr|=value]){}
+.operatorPrefix:extend([attr^=value]){}
+.operatorSuffix:extend([attr$=value]){}
+.operatorSubstring:extend([attr*=value]){}
+
+// *************************** inside longer selectors
+input[type="text"]{
+	longer: text;
+}
+input[type="button"]:hover {
+	longer: button;
+}
+input[type="button"] + :hover {
+	longer: ignore this;
+}
+input[type="text"] > input[type="button"]:hover{
+	longer: composed;
+}
+.longerInputText:extend(input[type="text"]) {}
+.longerInputButton:extend(input[type="button"]:hover) {}
+.longerInputComposed:extend(input[type="text"] > input[type="button"]:hover) {}
+
+// *************************** values lists TODO
+

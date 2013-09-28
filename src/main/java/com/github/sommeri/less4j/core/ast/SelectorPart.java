@@ -37,7 +37,7 @@ public abstract class SelectorPart extends ASTCssNode {
     return false;
   }
 
-  public boolean isExtending() {
+  public boolean isEmpty() {
     return false;
   }
 
@@ -81,6 +81,10 @@ public abstract class SelectorPart extends ASTCssNode {
 
   public void addSubsequent(List<ElementSubsequent> subsequent) {
     throw new BugHappened("Attempt to add subsequent element to unexpected selector part.", this);
+  }
+
+  public void removeSubsequent(ElementSubsequent subsequent) {
+    throw new BugHappened("Attempt to remove subsequent element from unexpected selector part.", this);
   }
 
   public void extendName(String secondName) {

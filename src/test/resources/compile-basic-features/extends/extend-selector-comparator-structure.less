@@ -1,0 +1,88 @@
+// *************************** element name
+h1 {
+  border: 1px solid blue;
+}
+ h1 {
+   color: blue;
+ }
+ h2 {
+   property: should-not-match;
+ }
+.simpleElementName1:extend(h1) {}
+.simpleElementName2:extend( h1) {}
+.simpleElementName3:extend(h1 ) {}
+.simpleElementName4:extend( h1 ) {}
+
+// *************************** subsequent order does matter
+:empty:hover {
+  subsequent-order: empty-first;
+}
+:hover:empty {
+  subsequent-order: hover-first;
+}
+.emptyFirst:extend(:empty:hover) {}
+.hoverFirst:extend(:hover:empty) {}
+
+// *************************** combinator does matter
+:visited:active {
+  combinator: directly-follows;
+}
+:visited :active {
+  combinator: descendant;
+}
+:visited + :active {
+  combinator: adjacent-sibling-1;
+}
+:visited+:active {
+  combinator: adjacent-sibling-2;
+}
+:visited > :active {
+  combinator: child;
+}
+:visited ~ :active {
+  combinator: general-sibling;
+}
+.combinatorMattersDirect:extend(:visited:active) {}
+.combinatorMattersDescendant:extend(:visited :active) {}
+.combinatorMattersAdjacent:extend(:visited + :active) {}
+.combinatorMattersChild:extend(:visited>:active) {}
+.combinatorMattersGeneral:extend(:visited ~:active) {}
+
+// *************************** combinator does matter - with elements
+body:visited pre:active {
+    combinator-with-element: descendant;
+}
+body:visited + pre:active {
+    combinator-with-element: adjacent-sibling;
+}
+.combinatorMattersElementsDescendant:extend(body:visited pre:active) {}
+.combinatorMattersElementsAdjacent:extend(body:visited + pre:active) {}
+// *************************** stars no subsequent
+* {
+  star: explicite;
+}
+.expliciteStar:extend(*) {}
+
+// *************************** stars with one subsequent
+*:hover {
+  star-with-subsequent: explicite;
+}
+:hover {
+  star-with-subsequent: implicite;
+}
+.expliciteStarOneSubsequent:extend(*:hover) {}
+.impliciteStarOneSubsequent:extend(:hover) {}
+
+// *************************** star before next simple selector does matter 
+:first-child:focus {
+  star: directly-follows;
+}
+:first-child *:focus {
+  star: is there;
+}
+:first-child :focus {
+  star: none;
+}
+.starBeforeSecondSimple:extend(:first-child *:focus) {}
+.noStarBeforeSecondSimple:extend(:first-child :focus) {}
+

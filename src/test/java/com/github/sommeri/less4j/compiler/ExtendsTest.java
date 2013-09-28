@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
+//FIXME (!!!) add tests for values lists for attributes
 @Ignore
 public class ExtendsTest extends BasicFeaturesTest {
 

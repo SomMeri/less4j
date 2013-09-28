@@ -3,12 +3,20 @@ package com.github.sommeri.less4j.core.parser;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.Extend;
+import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator.Combinator;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class SelectorBuilder {
+
+  private static String EXTEND_PSEUDO = "extend";
 
   private final HiddenTokenAwareTree token;
   private final ASTBuilderSwitch parent;
@@ -23,29 +31,57 @@ public class SelectorBuilder {
     Selector result = new Selector(token, new ArrayList<SelectorPart>());
     while (iterator.hasNext()) {
       SelectorCombinator combinator = null;
-      SelectorPart head = null;
+      SelectorPart part = null;
       HiddenTokenAwareTree kid = iterator.next();
 
       if (ConversionUtils.isSelectorCombinator(kid)) {
         combinator = ConversionUtils.createSelectorCombinator(kid);
         kid = iterator.next();
-        head = (SelectorPart) parent.switchOn(kid);
+        part = (SelectorPart) parent.switchOn(kid);
         // Ignore descendant combinator before appender. This info is already hidden in appender.isDirectlyBefore. 
         if (isDescendant(combinator) && kid.getType() == LessLexer.NESTED_APPENDER)
           combinator = null;
       } else {
         //if it is not a combinator, then it is either nested appender, simple selector or escaped selector   
-        head = (SelectorPart) parent.switchOn(kid);
+        part = (SelectorPart) parent.switchOn(kid);
       }
 
-      head.setLeadingCombinator(combinator);
+      part.setLeadingCombinator(combinator);
       if (combinator != null)
-        head.getUnderlyingStructure().moveHidden(combinator.getUnderlyingStructure(), null);
+        part.getUnderlyingStructure().moveHidden(combinator.getUnderlyingStructure(), null);
 
-      result.addPart(head);
+      addPart(result, part);
     }
     return result;
   }
+
+  private void addPart(Selector selector, SelectorPart part) {
+    ElementSubsequent lastSubsequent = part.getLastSubsequent();
+    while (lastSubsequent!=null && isExtends(lastSubsequent)) {
+      Extend extend = convertToExtend((PseudoClass) lastSubsequent);
+      selector.addExtend(extend);
+      part.removeSubsequent(lastSubsequent);
+      lastSubsequent = part.getLastSubsequent();
+    } 
+    
+    //if the part had only extend as members
+    if (!part.isEmpty())
+      selector.addPart(part);
+  }
+  
+  private Extend convertToExtend(PseudoClass extend) {
+    ASTCssNode parameter = extend.getParameter();
+    if (parameter.getType()!=ASTCssNodeType.EXTEND) {
+      throw new BugHappened(ASTBuilderSwitch.GRAMMAR_MISMATCH, parameter.getUnderlyingStructure());
+    }
+    
+    return (Extend) parameter;
+  }
+
+  private boolean isExtends(ElementSubsequent subsequent) {
+    return (subsequent instanceof PseudoClass) && EXTEND_PSEUDO.equals(subsequent.getName());
+  }
+
 
   private boolean isDescendant(SelectorCombinator combinator) {
     return combinator != null && combinator.getCombinator() == Combinator.DESCENDANT;

@@ -1,0 +1,99 @@
+[title],
+.valueTypeNone {
+  parameter-types: none;
+}
+[title=identifier],
+.valueTypeIdentifier {
+  parameter-types: match identifier;
+}
+[title=no-match-identifier] {
+  parameter-types: no match identifier;
+}
+[title='single quote 1'],
+.valueTypeSingleString {
+  parameter-types: single quote 1;
+}
+[title='single quote 2'] {
+  parameter-types: single quote 2;
+}
+[title="double quote 1"],
+.valueTypeDoubletring {
+  parameter-types: double quote 1;
+}
+[title="double quote 2"] {
+  parameter-types: double quote 2;
+}
+[title=1],
+.valueTypeNumber {
+  parameter-types: number 2;
+}
+[title=2] {
+  parameter-types: number 2;
+}
+[width=10],
+.numberType {
+  dimension: number;
+}
+[width=-10],
+.numberTypeNegative {
+  dimension: negative number;
+}
+[width=10cm],
+.numberTypeCm {
+  dimension: cm;
+}
+[width=100mm],
+.numberTypeMm {
+  dimension: mm;
+}
+[width=10deg],
+.numberTypeDeg {
+  dimension: deg;
+}
+[width=10%],
+.numberTypePercent {
+  dimension: percent;
+}
+[attr],
+.operatorNone {
+  operator: none;
+}
+[attr=value],
+.operatorExact {
+  operator: exactly;
+}
+[attr~=value],
+.operatorMember {
+  operator: has member;
+}
+[attr|=value],
+.operatorVendor {
+  operator: vendor prefix;
+}
+[attr^=value],
+.operatorPrefix {
+  operator: prefix;
+}
+[attr$=value],
+.operatorSuffix {
+  operator: suffix;
+}
+[attr*=value],
+.operatorSubstring {
+  operator: substring;
+}
+input[type="text"],
+.longerInputText {
+  longer: text;
+}
+input[type="button"]:hover,
+.longerInputButton {
+  longer: button;
+}
+input[type="button"] + :hover {
+  longer: ignore this;
+}
+input[type="text"] > input[type="button"]:hover,
+.longerInputComposed {
+  longer: composed;
+}
