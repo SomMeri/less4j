@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.Selector;
 
 public class ExtendsSolver {
 
-  private GeneralComparator comparator = new GeneralComparator();
+  private GeneralComparatorForExtend comparator = new GeneralComparatorForExtend();
 
   private List<RuleSet> allRulesets = new ArrayList<RuleSet>();
   private List<Selector> inlineExtends = new ArrayList<Selector>();

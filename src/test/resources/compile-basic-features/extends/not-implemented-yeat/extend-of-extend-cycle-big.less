@@ -1,0 +1,19 @@
+// big cycle
+h1 {
+  border: 1px solid blue;
+}
+.a:extend(.e) {
+  color: black;
+}
+.b:extend(.a) {
+  color: red;
+}
+.c:extend(.b) {
+  color: red;
+}
+.d:extend(.c) {
+  color: red;
+}
+.e:extend(.d) {
+  color: red;
+}

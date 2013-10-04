@@ -1,0 +1,53 @@
+input[type],
+.empty {
+  border: 1px solid blue;
+}
+input[type=something],
+.identifier,
+.singleQuotes,
+.doubleQuotes {
+  border: 1px solid blue;
+}
+input[type="something"],
+.identifier,
+.singleQuotes,
+.doubleQuotes {
+  border: 1px solid blue;
+}
+input[type='something'],
+.identifier,
+.singleQuotes,
+.doubleQuotes {
+  border: 1px solid blue;
+}
+input[type=0],
+.zero {
+  border: 1px solid blue;
+}
+input[type=-0],
+.minusZero {
+  border: 1px solid blue;
+}
+input[type=1],
+.one {
+  border: 1px solid blue;
+}
+input[type=-1],
+.minusOne {
+  border: 1px solid blue;
+}
+pre[width=10],
+.longerInputPseudoClass {
+  longer: text;
+}
+pre[width=auto]:hover,
+.longerInputNth {
+  longer: text;
+}
+pre[width=auto]:hover + :hover {
+  longer: ignore this;
+}
+pre[width=10] > pre[width=auto]:hover,
+.longerInputComposed {
+  longer: composed;
+}

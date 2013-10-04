@@ -7,9 +7,7 @@ import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 //FIXME (!!!) add tests for values lists for attributes - e.g. error handling
-//FIXME (!!!) add tests for nth in pseudo classes
-//FIXME (!!!) add tests for selectors in pseudo classes with selectors in pseudoclasses - ultimate comparator test
-@Ignore
+//@Ignore
 public class ExtendsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/extends/";

@@ -4,26 +4,14 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Selector;
-import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
+import com.github.sommeri.less4j.core.compiler.expressions.FormalisticExpressionComparator;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
-/**
- *
- * FIXME: (!!!) extend should not be among candidates!!!!! 
- * EXTEND
- * SELECTOR
- * NTH
-
- * IDENTIFIER_EXPRESSION
- * VARIABLE
- * NUMBER
- * STRING_EXPRESSION
- *
- */
-public class GeneralComparator {
+public class GeneralComparatorForExtend {
   
-  private PatternsComparator simpleExpressionComparator = new PatternsComparator();
-  private SelectorsComparator selectorsComparator = new SelectorsComparator(this);
-  private NthComparator nthComparator = new NthComparator();
+  private FormalisticExpressionComparator formal = new FormalisticExpressionComparator();
+  private SelectorsComparatorForExtend selectorsComparator = new SelectorsComparatorForExtend(this);
+  private NthComparatorForExtend nthComparator = new NthComparatorForExtend();
 
   public boolean equals(ASTCssNode node1, ASTCssNode node2) {
     if (node1==null && node2==null)
@@ -33,7 +21,7 @@ public class GeneralComparator {
       return false;
 
     if (isExpression(node1) && isExpression(node2))
-      return simpleExpressionComparator.equal((Expression) node1, (Expression) node2);
+      return formal.equal((Expression) node1, (Expression) node2);
 
     if (node1.getType()!=node2.getType())
       return false;
@@ -44,11 +32,10 @@ public class GeneralComparator {
 
     case NTH:
       return nthComparator.equals((Nth) node1, (Nth) node2);
+      
     default:
-      //FIXME (!!!) report error
-      break;
+      throw new BugHappened("Need to compare unexpected node types. " + node1 + " with " + node2, node1);
     }
-    return false;
   }
 
   private boolean isExpression(ASTCssNode node) {

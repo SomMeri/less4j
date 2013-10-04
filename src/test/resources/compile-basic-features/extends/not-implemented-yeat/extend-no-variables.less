@@ -1,0 +1,11 @@
+@variable: .second.;
+h1:nth-child(2) {
+  & { 
+    property: escaped;
+  }
+}
+@integer:2;
+.super:extend(h1:nth-child(@{integer})) {
+  property-3: value-3;
+}
+

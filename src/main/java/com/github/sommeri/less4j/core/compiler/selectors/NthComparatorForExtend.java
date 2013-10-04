@@ -3,10 +3,9 @@ package com.github.sommeri.less4j.core.compiler.selectors;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.compiler.expressions.FormalisticExpressionComparator;
-import com.github.sommeri.less4j.core.compiler.expressions.GuardsComparator;
-import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
-public class NthComparator {
+public class NthComparatorForExtend {
   
   private FormalisticExpressionComparator expressionComparator = new FormalisticExpressionComparator();
 
@@ -21,10 +20,10 @@ public class NthComparator {
 
     case STANDARD:
       return equals(nth1.getRepeater(), nth2.getRepeater()) && equals(nth1.getMod(), nth2.getMod());
-    default:
-      //FIXME (!!!) report error
-      return false;
+      
     }
+
+    throw new BugHappened("Should not happen. " + nth1 + " vs " + nth2, nth1);
   }
 
   private boolean equals(NumberExpression v1, NumberExpression v2) {

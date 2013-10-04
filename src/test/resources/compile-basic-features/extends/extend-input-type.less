@@ -1,7 +1,55 @@
-//from https://github.com/cloudhead/less.js/issues/1295
-input[type]{
+//similar to https://github.com/cloudhead/less.js/issues/1295
+input[type] {
   border: 1px solid blue;
 }
-.a :extend(input[type] all) {
-  color: black;
+input[type=something] {
+  border: 1px solid blue;
 }
+input[type="something"] {
+  border: 1px solid blue;
+}
+input[type='something'] {
+  border: 1px solid blue;
+}
+.empty :extend(input[type]) {}
+.identifier :extend(input[type=something]) {}
+.identifierWrong :extend(input[type=somethingElse]) {}
+.singleQuotes :extend(input[type='something']) {}
+.doubleQuotes :extend(input[type="something"]) {}
+
+input[type=0] {
+  border: 1px solid blue;
+}
+input[type=-0] {
+  border: 1px solid blue;
+}
+input[type=1] {
+  border: 1px solid blue;
+}
+input[type=-1] {
+  border: 1px solid blue;
+}
+
+.zero :extend(input[type=0]) {}
+.minusZero :extend(input[type=-0]) {}
+.one :extend(input[type=1]) {}
+.minusOne :extend(input[type=-1]) {}
+
+// *************************** inside longer selectors
+pre[width=10] {
+	longer: text;
+}
+pre[width=auto]:hover {
+	longer: text;
+}
+pre[width=auto]:hover + :hover {
+	longer: ignore this;
+}
+pre[width=10] > pre[width=auto]:hover {
+	longer: composed;
+}
+.longerInputPseudoClass:extend(pre[width=10]) {}
+.longerInputNth:extend(pre[width=auto]:hover) {}
+.longerInputComposed:extend(pre[width=10] > pre[width=auto]:hover) {}
+
+
