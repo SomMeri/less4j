@@ -1,0 +1,165 @@
+// *************************** basic values types - most of them are pointless and unused in real
+:pointless {
+  parameter-types: none;
+}
+:pointless(fr-ca) {
+  parameter-types: match identifier; 
+}
+:pointless(en) { 
+  parameter-types: no match identifier; 
+}
+:pointless('single quote 1') {
+  parameter-types:single quote 1;
+}
+:pointless('single quote 2') {
+  parameter-types:single quote 2;
+}
+:pointless("double quote 1") {
+  parameter-types:double quote 1;
+}
+:pointless("double quote 2") {
+  parameter-types:double quote 2;
+}
+:pointless(1) {
+  parameter-types:number 2;
+}
+:pointless(2) {
+  parameter-types:number 2;
+}
+
+.valueTypeNone:extend(:pointless){}
+.valueTypeIdentifier:extend(:pointless(identifier)){}
+.valueTypeSingleString:extend(:pointless('single quote 1')){}
+.valueTypeDoubletring:extend(:pointless("double quote 1")){}
+.valueTypeNumber:extend(:pointless(1)){}
+
+// *************************** numbers values types - skipped cause they do not really exist in practice 
+// *************************** nth 
+:nth-child(even) {
+	nth: no spaces even;
+}
+:nth-child( even ) {
+	nth: spaces even;
+}
+:nth-child(odd) {
+	nth: odd;
+}
+:nth-child(0) {
+	nth: zero;
+}
+:nth-child(-0) {
+	nth: minus zero;
+}
+:nth-child(1) {
+	nth: one;
+}
+:nth-child(-1) {
+	nth: minus one;
+}
+:nth-child(0n) {
+	nth: zero n;
+}
+:nth-child(-0n) {
+	nth: minus zero n;
+}
+:nth-child(1n) {
+	nth: one n;
+}
+:nth-child(-1n) {
+	nth: minus one n;
+}
+:nth-child(n) {
+	nth: n;
+}
+:nth-child(-n) {
+	nth: minus n;
+}
+:nth-child(n+0) {
+	nth: n;
+}
+:nth-child(-n+0) {
+	nth: minus n;
+}
+:nth-child(0n+0) {
+	nth: zeros;
+}
+:nth-child(-0n-0) {
+	nth: minus zeros;
+}
+:nth-child(4n-2) {
+	nth: regular 1;
+}
+:nth-child(4n+2) {
+	nth: regular 2;
+}
+
+.even:extend(:nth-child(even)){}
+.spacedEven:extend(:nth-child( even )){}
+.odd:extend(:nth-child(odd)){}
+.zero:extend(:nth-child(0)){}
+.minusZero:extend(:nth-child(-0)){}
+.one:extend(:nth-child(1)){}
+.minusOne:extend(:nth-child(-1)){}
+.zeroN:extend(:nth-child(0n)){}
+.minusZeroN:extend(:nth-child(-0n)){}
+.oneN:extend(:nth-child(1n)){}
+.minusOneN:extend(:nth-child(-1n)){}
+.n:extend(:nth-child(n)){}
+.minusN:extend(:nth-child(-n)){}
+.nPlusZero:extend(:nth-child(n+0)){}
+.minusNPlusZero:extend(:nth-child(-n+0)){}
+.zeroNPlusN:extend(:nth-child(0n+0)){}
+.minusZeroNMinusZero:extend(:nth-child(-0n-0)){}
+.regular-1:extend(:nth-child(4n-2)){}
+.regular-2:extend(:nth-child(4n+2)){}
+// *************************** selector
+:not(h1) {
+  selector: element;
+}
+:not(h1:nth-child(odd)) {
+  selector: nth odd;
+}
+:not(h1:nth-child(even)) {
+  selector: ignore;
+}
+:not(h1:nth-child(3n+1)) {
+  selector: nth standard;
+}
+:not(.class) :not(h1:nth-child(odd)) {
+  selector: class;
+}
+:not(.class[title="here we go"]) :not(h1:nth-child(odd)) {
+  selector: class attribute;
+}
+:not(:visited > :active) :not(h1:nth-child(odd)) {
+  selector: combined 1;
+}
+:not(:active > :visited) :not(h1:nth-child(odd)) {
+  selector: combined 2;
+}
+
+.element:extend(:not(h1)) {}
+.elementNth1:extend(:not(h1:nth-child(odd))) {}
+.elementNth2:extend(:not(h1:nth-child(3n+1))) {}
+.class:extend(:not(.class)) {}
+.classAttribute:extend(:not(.class[title="here we go"])) {}
+.combined:extend(:not(:visited > :active)) {}
+.combined :extend(:not(:active > :visited)) {}
+
+// *************************** inside longer selectors
+input:pseudoClass(.class) {
+	longer: text;
+}
+input:pseudo(2n+1):hover {
+	longer: button;
+}
+input:pseudo(2n+1) + :hover {
+	longer: ignore this;
+}
+input:pseudoClass(.class) > input:pseudo(2n+1):hover {
+	longer: composed;
+}
+.longerInputPseudoClass:extend(input:pseudoClass(.class)) {}
+.longerInputNth:extend(input:pseudo(2n+1):hover) {}
+.longerInputComposed:extend(input:pseudoClass(.class) > input:pseudo(2n+1):hover) {}
+

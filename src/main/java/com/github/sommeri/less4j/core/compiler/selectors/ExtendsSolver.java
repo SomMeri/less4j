@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.compiler.selectors;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -11,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.Selector;
 
 public class ExtendsSolver {
 
-  private SelectorsComparator comparator = new SelectorsComparator();
+  private GeneralComparator comparator = new GeneralComparator();
 
   private List<RuleSet> allRulesets = new ArrayList<RuleSet>();
   private List<Selector> inlineExtends = new ArrayList<Selector>();

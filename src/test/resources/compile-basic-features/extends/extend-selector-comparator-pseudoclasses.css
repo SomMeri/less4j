@@ -1,0 +1,151 @@
+:pointless,
+.valueTypeNone {
+  parameter-types: none;
+}
+:pointless(fr-ca) {
+  parameter-types: match identifier;
+}
+:pointless(en) {
+  parameter-types: no match identifier;
+}
+:pointless('single quote 1'),
+.valueTypeSingleString {
+  parameter-types: single quote 1;
+}
+:pointless('single quote 2') {
+  parameter-types: single quote 2;
+}
+:pointless("double quote 1"),
+.valueTypeDoubletring {
+  parameter-types: double quote 1;
+}
+:pointless("double quote 2") {
+  parameter-types: double quote 2;
+}
+:pointless(1),
+.valueTypeNumber {
+  parameter-types: number 2;
+}
+:pointless(2) {
+  parameter-types: number 2;
+}
+:nth-child(even),
+.even,
+.spacedEven {
+  nth: no spaces even;
+}
+:nth-child(even),
+.even,
+.spacedEven {
+  nth: spaces even;
+}
+:nth-child(odd),
+.odd {
+  nth: odd;
+}
+:nth-child(0),
+.zero {
+  nth: zero;
+}
+:nth-child(-0),
+.minusZero {
+  nth: minus zero;
+}
+:nth-child(1),
+.one {
+  nth: one;
+}
+:nth-child(-1),
+.minusOne {
+  nth: minus one;
+}
+:nth-child(0n),
+.zeroN {
+  nth: zero n;
+}
+:nth-child(-0n),
+.minusZeroN {
+  nth: minus zero n;
+}
+:nth-child(1n),
+.oneN {
+  nth: one n;
+}
+:nth-child(-1n),
+.minusOneN {
+  nth: minus one n;
+}
+:nth-child(n),
+.n {
+  nth: n;
+}
+:nth-child(-n),
+.minusN {
+  nth: minus n;
+}
+:nth-child(n+0),
+.nPlusZero {
+  nth: n;
+}
+:nth-child(-n+0),
+.minusNPlusZero {
+  nth: minus n;
+}
+:nth-child(0n+0),
+.zeroNPlusN {
+  nth: zeros;
+}
+:nth-child(-0n-0),
+.minusZeroNMinusZero {
+  nth: minus zeros;
+}
+:nth-child(4n-2),
+.regular-1 {
+  nth: regular 1;
+}
+:nth-child(4n+2),
+.regular-2 {
+  nth: regular 2;
+}
+:not(h1),
+.element {
+  selector: element;
+}
+:not(h1:nth-child(odd)),
+.elementNth1 {
+  selector: nth odd;
+}
+:not(h1:nth-child(even)) {
+  selector: ignore;
+}
+:not(h1:nth-child(3n+1)),
+.elementNth2 {
+  selector: nth standard;
+}
+:not(.class) :not(h1:nth-child(odd)) {
+  selector: class;
+}
+:not(.class[title="here we go"]) :not(h1:nth-child(odd)) {
+  selector: class attribute;
+}
+:not(:visited > :active) :not(h1:nth-child(odd)) {
+  selector: combined 1;
+}
+:not(:active > :visited) :not(h1:nth-child(odd)) {
+  selector: combined 2;
+}
+input:pseudoClass(.class),
+.longerInputPseudoClass {
+  longer: text;
+}
+input:pseudo(2n + 1):hover,
+.longerInputNth {
+  longer: button;
+}
+input:pseudo(2n + 1) + :hover {
+  longer: ignore this;
+}
+input:pseudoClass(.class) > input:pseudo(2n + 1):hover,
+.longerInputComposed {
+  longer: composed;
+}

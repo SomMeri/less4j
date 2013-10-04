@@ -585,9 +585,7 @@ pseudo
     ;
     
 pseudoparameters:
-      (IDENT) => IDENT
-    | (NUMBER) => NUMBER
-    | (variablereference) => variablereference
+     ((IDENT | STRING | NUMBER | variablereference) RPAREN) => term
     | selector
  ;
 

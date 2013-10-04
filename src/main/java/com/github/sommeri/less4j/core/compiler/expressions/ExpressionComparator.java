@@ -109,8 +109,8 @@ public abstract class ExpressionComparator {
   }
 
   protected boolean equals(Double value, Double value2) {
-    if (value == null)
-      return value2 == null;
+    if (value == null || value2==null)
+      return value2 == null && value==null;
 
     value = normalize0(value);
     value2 = normalize0(value2);

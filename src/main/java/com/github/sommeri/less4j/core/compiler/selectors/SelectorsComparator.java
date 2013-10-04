@@ -19,8 +19,17 @@ import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
 
 public class SelectorsComparator {
   
+  //FIXME: (!!!) use general instead of this ond 
   private PatternsComparator simpleExpressionComparator = new PatternsComparator();
+  private GeneralComparator generalComparator;
+  
+  public SelectorsComparator(GeneralComparator generalComparator) {
+    this.generalComparator = generalComparator;
+  }
 
+  //FIXME: (!!!) unit test na pseudoclassu inside longer 
+  //FIXME: (!!!) unit test na pseudoclassu so selectorom 
+  
   //FIXME: (!!!) document - quote type must match; only form not meaning (*, order, number types)
   //FIXME (!!!) unit tests for calculated values - how it behaves if (1+1)
   //FIXME (!!!) extends - test with appenders on top replaced to nothing
@@ -122,7 +131,7 @@ public class SelectorsComparator {
       return attributesEqual(attribute1, attribute2);
     }
     default:
-      //FIXME (!!!) extend implement
+      //FIXME: (!!) report error
       return false;
     }
   }
@@ -160,9 +169,7 @@ public class SelectorsComparator {
     if (parameter1==null && parameter2==null)
       return true;
     
-    //FIXME (!!!) extend implement
-    System.out.println("Not implemented yet PSEUDO_CLASS");
-    return false;
+    return generalComparator.equals(parameter1, parameter2);
   }
 
   private boolean interpolableNamesEqual(InterpolableName firstName, InterpolableName secondName) {

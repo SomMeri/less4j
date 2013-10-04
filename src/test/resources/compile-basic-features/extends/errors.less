@@ -1,0 +1,13 @@
+// *************************** values lists
+[list=identifier "string" 'single quotes' 1 10cm] {
+	list: space-separated;
+}
+[list=identifier,"string",'single quotes',1,10cm] {
+	list: comma-separated;
+}
+[list=identifier "string", 'single quotes', 1 10cm] {
+	list: combinations;
+}
+.listSpace:extend([list=identifier "string" 'single quotes' 1 10cm]) {}
+.listComma:extend([list=identifier,"string",'single quotes',1,10cm]) {}
+.listCombinations:extend([list=identifier "string", 'single quotes', 1 10cm]) {}

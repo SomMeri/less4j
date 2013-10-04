@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
@@ -29,6 +30,12 @@ public class NumberExpression extends Expression implements Cloneable {
   public NumberExpression(HiddenTokenAwareTree token, String originalString, Dimension dimension) {
     this(token, originalString);
     this.dimension = dimension;
+  }
+
+  
+  public NumberExpression(HiddenTokenAwareTree token, String lowerCaseValue, Dimension repeater, boolean expliciteSign) {
+    this(token, lowerCaseValue, repeater);
+    this.expliciteSign = expliciteSign;
   }
 
   public NumberExpression(HiddenTokenAwareTree token, Double valueAsDouble, String suffix, String originalString, Dimension dimension) {

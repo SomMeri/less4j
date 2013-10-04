@@ -6,7 +6,9 @@ import java.util.Collection;
 import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
-//FIXME (!!!) add tests for values lists for attributes
+//FIXME (!!!) add tests for values lists for attributes - e.g. error handling
+//FIXME (!!!) add tests for nth in pseudo classes
+//FIXME (!!!) add tests for selectors in pseudo classes with selectors in pseudoclasses - ultimate comparator test
 @Ignore
 public class ExtendsTest extends BasicFeaturesTest {
 

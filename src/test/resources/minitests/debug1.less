@@ -1,7 +1,5 @@
-.mixin() {
-  & + & {
-    only-appenders-combined: 1;
-  }
+:nth-child(n) {
+	nth: zero;
 }
-
-.mixin();
+.plus:extend(:nth-child(n)){}
+.minus:extend(:nth-child(-n)){}

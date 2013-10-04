@@ -12,7 +12,7 @@ public class PseudoClass extends Pseudo {
 
   public PseudoClass(HiddenTokenAwareTree token, String name, ASTCssNode parameter) {
     super(token, name);
-    this.parameter = parameter;
+    setParameter(parameter);
   }
 
   public PseudoClass(HiddenTokenAwareTree token, String name) {

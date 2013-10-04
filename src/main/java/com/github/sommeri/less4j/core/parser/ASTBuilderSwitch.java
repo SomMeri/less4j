@@ -49,14 +49,12 @@ import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
-import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Page;
 import com.github.sommeri.less4j.core.ast.PageMarginBox;
-import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
 import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
@@ -71,6 +69,8 @@ import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.Supports;
 import com.github.sommeri.less4j.core.ast.SupportsCondition;
+import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
+import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator.Operator;
@@ -531,14 +531,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     if (children.size() == 3) {
       HiddenTokenAwareTree parameter = children.get(2);
-      if (parameter.getType() == LessLexer.NUMBER)
-        return new PseudoClass(token, children.get(1).getText(), new NumberExpression(parameter, parameter.getText()));
-      if (parameter.getType() == LessLexer.IDENT)
-        return new PseudoClass(token, children.get(1).getText(), new IdentifierExpression(parameter, parameter.getText()));
       //FIXME: this is not really sufficient for all cases less.js supports (1@{num}n+3)
       if (parameter.getType() == LessLexer.INTERPOLATED_VARIABLE)
         return new PseudoClass(token, children.get(1).getText(), toInterpolabledVariable(parameter, parameter.getText()));
-
       return new PseudoClass(token, children.get(1).getText(), switchOn(parameter));
     }
 
@@ -565,7 +560,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         } else if ("odd".equals(lowerCaseValue)) {
           return new Nth(token, null, null, Form.ODD);
         } else if ("n".equals(lowerCaseValue) || "-n".equals(lowerCaseValue) || "+n".equals(lowerCaseValue)) {
-          first = new NumberExpression(token.getChild(0), lowerCaseValue, NumberExpression.Dimension.REPEATER);
+          boolean expliciteSign = !"n".equals(lowerCaseValue);
+          first = new NumberExpression(token.getChild(0), lowerCaseValue, NumberExpression.Dimension.REPEATER, expliciteSign);
         } else
           throw new IllegalStateException("Unexpected identifier value for nth: " + ident.getValue());
       }
