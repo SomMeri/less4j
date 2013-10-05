@@ -1,0 +1,38 @@
+h1 {
+  border: 1px solid blue;
+}
+.a,
+.b,
+.c,
+.d,
+.e {
+  color: black;
+}
+.b,
+.c,
+.d,
+.e,
+.a {
+  color: red;
+}
+.c,
+.d,
+.e,
+.a,
+.b {
+  color: red;
+}
+.d,
+.e,
+.a,
+.b,
+.c {
+  color: red;
+}
+.e,
+.a,
+.b,
+.c,
+.d {
+  color: red;
+}

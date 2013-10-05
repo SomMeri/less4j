@@ -1,0 +1,14 @@
+h1 {
+  border: 1px solid blue;
+}
+h2 {
+  border: 2px solid red;
+}
+//case 1 
+.a :extend(h1):extend(h1) {
+  color: black;
+}
+//case 2
+.a:extend(h1):extend(h2) {
+  color: black;
+}

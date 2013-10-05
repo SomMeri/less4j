@@ -1,0 +1,18 @@
+h1,
+.a,
+.b,
+.c {
+  border: 1px solid blue;
+}
+.c {
+  color: red;
+}
+.b,
+.c {
+  color: red;
+}
+.a,
+.b,
+.c {
+  color: black;
+}
