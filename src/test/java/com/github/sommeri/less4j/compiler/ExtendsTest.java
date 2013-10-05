@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 //FIXME (!!!) does and should it extend rulesets in media?
 //FIXME (!!!) add tests for values lists for attributes - e.g. error handling
-@Ignore
+//@Ignore
 public class ExtendsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/extends/";

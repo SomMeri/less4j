@@ -1,5 +1,19 @@
-:nth-child(n) {
-	nth: zero;
+// big cycle
+h1 {
+  border: 1px solid blue;
 }
-.plus:extend(:nth-child(n)){}
-.minus:extend(:nth-child(-n)){}
+.a:extend(.e) {
+  color: black;
+}
+.b:extend(.a) {
+  color: red;
+}
+.c:extend(.b) {
+  color: red;
+}
+.d:extend(.c) {
+  color: red;
+}
+.e:extend(.d) {
+  color: red;
+}

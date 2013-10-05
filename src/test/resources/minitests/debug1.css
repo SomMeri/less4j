@@ -1,10 +1,38 @@
-h1,
-h2 {
-  declaration: value;
+h1 {
+  border: 1px solid blue;
 }
-p h1 + h1 em,
-p h1 + h2 em,
-p h2 + h1 em,
-p h2 + h2 em {
-  declaration: 3 4;
+.a,
+.b,
+.c,
+.d,
+.e {
+  color: black;
+}
+.b,
+.c,
+.d,
+.e,
+.a {
+  color: red;
+}
+.c,
+.d,
+.e,
+.a,
+.b {
+  color: red;
+}
+.d,
+.e,
+.a,
+.b,
+.c {
+  color: red;
+}
+.e,
+.a,
+.b,
+.c,
+.d {
+  color: red;
 }
