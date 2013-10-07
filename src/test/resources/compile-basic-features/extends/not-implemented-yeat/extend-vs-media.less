@@ -1,0 +1,25 @@
+@media print {
+  .print {
+    declaration: value;
+  }
+  .printExtending:extend(.print):extend(.screen):extend(.outside):extend(.tablet) {}
+  @media tablet {
+    .tablet {
+      declaration: value;
+    }
+    .tabletExtending:extend(.print):extend(.screen):extend(.outside):extend(.tablet) {}
+  }
+}
+@media screen {
+  .screen {
+    declaration: value;
+  }
+  .screenExtending:extend(.print):extend(.screen):extend(.outside):extend(.tablet) {}
+}
+.outside {
+  declaration: value;
+}
+
+.outsideExtending:extend(.print):extend(.screen):extend(.outside):extend(.tablet) {}
+
+

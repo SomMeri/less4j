@@ -27,8 +27,6 @@ public class SelectorsComparatorForExtend {
     this.generalComparator = generalComparator;
   }
 
-  //FIXME: (!!!) document - quote type must match; only form not meaning (*, order, number types) - the only exception is input type parameter - that one ignores quotes in css strings
-  //FIXME (!!!) unit tests for calculated values - how it behaves if (1+1)
   //FIXME (!!!) extends - test with appenders on top replaced to nothing
   public boolean equals(Selector first, Selector second) {
     List<SelectorPart> firstParts = first.getParts();

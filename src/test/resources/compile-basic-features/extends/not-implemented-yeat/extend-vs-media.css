@@ -1,0 +1,25 @@
+@media print {
+  .print,
+  .printExtending,
+  .outsideExtending {
+    declaration: value;
+  }
+}
+@media print and tablet {
+  .tablet,
+  .tabletExtending,
+  .outsideExtending {
+    declaration: value;
+  }
+}
+@media screen {
+  .screen,
+  .screenExtending,
+  .outsideExtending {
+    declaration: value;
+  }
+}
+.outside,
+.outsideExtending {
+  declaration: value;
+}
