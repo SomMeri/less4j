@@ -1,19 +1,20 @@
-// big cycle
-h1 {
-  border: 1px solid blue;
+@media print {
+  .print {
+    declaration: value;
+  }
+  @media (min-width: 120px) {
+    .tablet {
+      declaration: value;
+    }
+    .tabletExtending:extend(.print):extend(.screen):extend(.outside):extend(.tablet) {}
+  }
 }
-.a:extend(.e) {
-  color: black;
+@media screen {
+  .screen {
+    declaration: value;
+  }
 }
-.b:extend(.a) {
-  color: red;
+.outside {
+  declaration: value;
 }
-.c:extend(.b) {
-  color: red;
-}
-.d:extend(.c) {
-  color: red;
-}
-.e:extend(.d) {
-  color: red;
-}
+

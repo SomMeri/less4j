@@ -2,17 +2,34 @@ package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class ASTManipulator {
 
+  public ASTCssNode findParentOfType(ASTCssNode node, ASTCssNodeType... type) {
+    Set<ASTCssNodeType> allTypes = new HashSet<ASTCssNodeType>();
+    Collections.addAll(allTypes, type);
+    
+    ASTCssNode candidate = node;
+    while (candidate.getParent()!=null) {
+      candidate=candidate.getParent();
+      if (allTypes.contains(candidate.getType()))
+        return candidate;
+    }
+    return candidate;
+  }
+  
   public void replace(ASTCssNode oldChild, ASTCssNode newChild) {
     if (oldChild == newChild)
       return;

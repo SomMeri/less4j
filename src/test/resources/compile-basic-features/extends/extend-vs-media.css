@@ -5,7 +5,7 @@
     declaration: value;
   }
 }
-@media print and tablet {
+@media print and (min-width: 120px) {
   .tablet,
   .tabletExtending,
   .outsideExtending {

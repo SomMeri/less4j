@@ -8,13 +8,16 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
+import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 
 public class ExtendsSolver {
 
   private GeneralComparatorForExtend comparator = new GeneralComparatorForExtend();
+  private ASTManipulator manipulator = new ASTManipulator();
 
   private List<RuleSet> allRulesets = new ArrayList<RuleSet>();
   private List<Selector> inlineExtends = new ArrayList<Selector>();
@@ -58,23 +61,39 @@ public class ExtendsSolver {
     for (Selector extendedExtending : thoseWhoExtendedExtending) {
       if (canExtend(extendedExtending, alreadyExtended, ruleSet)) {
         doTheExtend(extendedExtending, alreadyExtended, ruleSet, targetSelector);
-//        performExtend(extendedExtending, ruleSet);
-//        alreadyExtended.markAsAlreadyExtended(extendingSelector, ruleSet);
-//        addToThoseWhoExtended(extendedExtending, targetSelector);
       }
     }
   }
 
-  private boolean canExtend(Selector extendingSelector, AlreadyExtended alreadyExtended, RuleSet ruleSet) {
-    if (alreadyExtended.alreadyExtended(extendingSelector, ruleSet))
+  private boolean canExtend(Selector extendingSelector, AlreadyExtended alreadyExtended, RuleSet targetRuleSet) {
+    if (alreadyExtended.alreadyExtended(extendingSelector, targetRuleSet))
       return false;
-    
-    //FIXME: (!!!!) properly initialize alreadyExtended instead of this nonsense
-    for (Selector selector : ruleSet.getSelectors()) {
+
+    if (containsSelector(extendingSelector, targetRuleSet))
+      return false;
+
+    // selectors are able to extend only rulesets inside the same @media body.
+    return compatibleMediaLocation(extendingSelector, targetRuleSet);
+  }
+
+  private boolean compatibleMediaLocation(Selector extendingSelector, RuleSet targetRuleSet) {
+    ASTCssNode grandParent = findOwnerNode(extendingSelector);
+    if (grandParent == null || grandParent.getType() == ASTCssNodeType.STYLE_SHEET)
+      return true;
+
+    return grandParent == findOwnerNode(targetRuleSet);
+  }
+
+  private boolean containsSelector(Selector extendingSelector, RuleSet targetRuleSet) {
+    for (Selector selector : targetRuleSet.getSelectors()) {
       if (comparator.equals(selector, extendingSelector))
-        return false;
+        return true;
     }
-    return true;
+    return false;
+  }
+
+  private ASTCssNode findOwnerNode(ASTCssNode extendingSelector) {
+    return manipulator.findParentOfType(extendingSelector, ASTCssNodeType.STYLE_SHEET, ASTCssNodeType.MEDIA);
   }
 
   private void performExtend(Selector extendingSelector, RuleSet ruleSet) {

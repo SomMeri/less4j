@@ -1,38 +1,19 @@
-h1 {
-  border: 1px solid blue;
+@media print {
+  .print {
+    declaration: value;
+  }
 }
-.a,
-.b,
-.c,
-.d,
-.e {
-  color: black;
+@media print and (min-width: 120px) {
+  .tablet,
+  .tabletExtending {
+    declaration: value;
+  }
 }
-.b,
-.c,
-.d,
-.e,
-.a {
-  color: red;
+@media screen {
+  .screen {
+    declaration: value;
+  }
 }
-.c,
-.d,
-.e,
-.a,
-.b {
-  color: red;
-}
-.d,
-.e,
-.a,
-.b,
-.c {
-  color: red;
-}
-.e,
-.a,
-.b,
-.c,
-.d {
-  color: red;
+.outside {
+  declaration: value;
 }
