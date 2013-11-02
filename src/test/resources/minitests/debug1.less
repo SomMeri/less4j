@@ -1,20 +1,27 @@
-@media print {
-  .print {
-    declaration: value;
-  }
-  @media (min-width: 120px) {
-    .tablet {
-      declaration: value;
-    }
-    .tabletExtending:extend(.print):extend(.screen):extend(.outside):extend(.tablet) {}
-  }
-}
-@media screen {
-  .screen {
-    declaration: value;
-  }
-}
-.outside {
-  declaration: value;
+a:first {
+	property: value;
 }
 
+negated:not(a:first) {
+	property: value;
+}
+
+b:first:second {
+	property: value;
+}
+negated:not(b:first:second) {
+	property: value;
+}
+
+:first:third  {
+	property: value;
+}
+negated:not(:first:third) {
+	property: value;
+}
+
+eb-First :extend(:first all) {}
+eb-AFirst :extend(a:first all) {}
+eb-BFirst :extend(b:first all) {}
+eb-BFirstSecond :extend(b:first:second all) {}
+eb-AFirstSecond :extend(a:first:second all) {}

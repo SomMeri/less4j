@@ -41,5 +41,9 @@ public class GeneralComparatorForExtend {
   private boolean isExpression(ASTCssNode node) {
     return (node instanceof Expression);
   }
+
+  public boolean contains(Selector lookFor, Selector inSelector) {
+    return selectorsComparator.contains(lookFor, inSelector);
+  }
   
 }

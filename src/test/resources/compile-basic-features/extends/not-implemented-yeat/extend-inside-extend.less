@@ -1,0 +1,7 @@
+.aha {
+  color: blue;
+}
+.selector:extend(.aha) {  
+  color: blue;
+}
+.topLevel:extend(.selector:extend(.aha)) {} // this should not be recognized 

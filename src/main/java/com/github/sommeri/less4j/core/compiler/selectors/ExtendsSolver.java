@@ -29,7 +29,6 @@ public class ExtendsSolver {
     solveInlineExtends();
   }
 
-  //FIXME: (!!!) test less.js for extends of extends
   private void solveInlineExtends() {
     for (Selector selector : inlineExtends) {
       solveInlineExtends(selector);
@@ -45,7 +44,6 @@ public class ExtendsSolver {
       for (Selector targetSelector : selectors) {
         if (shouldExtend(extendingSelector, targetSelector) && canExtend(extendingSelector, alreadyExtended, ruleSet)) {
           doTheExtend(extendingSelector, alreadyExtended, ruleSet, targetSelector);
-
         }
       }
 
@@ -86,7 +84,8 @@ public class ExtendsSolver {
 
   private boolean containsSelector(Selector extendingSelector, RuleSet targetRuleSet) {
     for (Selector selector : targetRuleSet.getSelectors()) {
-      if (comparator.equals(selector, extendingSelector))
+      //if (comparator.contains(selector, extendingSelector))  
+      if (comparator.equals(selector, extendingSelector))  
         return true;
     }
     return false;
@@ -123,7 +122,10 @@ public class ExtendsSolver {
 
     List<Extend> extendds = extending.getExtend();
     for (Extend extend : extendds) {
-      if (comparator.equals(possibleTarget, extend.getTarget()))
+      if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget())) 
+        return true;
+
+      if (extend.isAll() && comparator.contains(extend.getTarget(), possibleTarget)) //FIXME: (!!!!!!) does not belong here, only for testing purposes
         return true;
     }
     return false;
@@ -148,8 +150,9 @@ public class ExtendsSolver {
 
   private void collectAllSelectors(RuleSet ruleset) {
     for (Selector selector : ruleset.getSelectors()) {
-      if (selector.isExtending())
+      if (selector.isExtending()) {
         inlineExtends.add(selector);
+      }
     }
   }
 

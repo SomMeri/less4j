@@ -488,7 +488,7 @@ selector
     ;
 finally { leaveRule(); }
 
-// if this is changed, changes are the selector must be changed too
+// if this is changed, chances are the selector must be changed too
 // Less keyword-pseudoclass "extend" takes selector as an argument. The selector can be optionally
 // followed by keyword all. The grammar is ambiguous as a result and its predictability suffers.  
 extendedSelector 
