@@ -45,5 +45,9 @@ public class GeneralComparatorForExtend {
   public boolean contains(Selector lookFor, Selector inSelector) {
     return selectorsComparator.contains(lookFor, inSelector);
   }
+
+  public boolean replaceInside(Selector lookFor, Selector inSelector, Selector replaceBy) {
+    return selectorsComparator.replace(lookFor, inSelector, replaceBy);
+  }
   
 }

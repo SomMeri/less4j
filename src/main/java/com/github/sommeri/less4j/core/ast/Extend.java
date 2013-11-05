@@ -25,6 +25,10 @@ public class Extend extends ASTCssNode {
     this.all = all;
   }
 
+  public Selector getParentAsSelector() {
+    return (Selector) getParent();
+  }
+  
   public boolean isAll() {
     return all;
   }
@@ -59,5 +63,5 @@ public class Extend extends ASTCssNode {
     result.configureParentToAllChilds();
     return result;
   }
-  
+
 }

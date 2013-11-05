@@ -91,4 +91,8 @@ public abstract class SelectorPart extends ASTCssNode {
     throw new BugHappened("Attempt to extend a name of unexpected selector part.", this);
   }
 
+  public Selector getParentAsSelector() {
+    return (Selector) getParent();
+  }
+
 }

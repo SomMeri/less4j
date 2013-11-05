@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j.core.compiler.selectors;
+package com.github.sommeri.less4j.core.compiler.selectorsbuggy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +12,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
+import com.github.sommeri.less4j.core.compiler.selectors.GeneralComparatorForExtend;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 
 public class ExtendsSolver {
@@ -122,8 +123,8 @@ public class ExtendsSolver {
 
     List<Extend> extendds = extending.getExtend();
     for (Extend extend : extendds) {
-//      if (comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector())) //FIXME: (!!!!!!) does not belong here, only for testing purposes
-//        return true;
+      if (comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector())) //FIXME: (!!!!!!) does not belong here, only for testing purposes
+        return true;
 
       if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget())) 
         return true;

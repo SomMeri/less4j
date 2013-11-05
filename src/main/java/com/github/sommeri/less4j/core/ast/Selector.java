@@ -175,4 +175,8 @@ public class Selector extends ASTCssNode implements Cloneable {
     this.extend.add(extend);
   }
 
+  public void setParts(List<SelectorPart> newParts) {
+    this.combinedParts = newParts;
+  }
+
 }

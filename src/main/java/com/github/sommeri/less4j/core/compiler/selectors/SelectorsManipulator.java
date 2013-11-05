@@ -107,7 +107,7 @@ public class SelectorsManipulator {
     return first;
   }
 
-  private void directlyJoinParts(SelectorPart first, SelectorPart second) {
+  public void directlyJoinParts(SelectorPart first, SelectorPart second) {
     if (second.hasElement()) {
       String secondName = second.hasElement() ? second.getElementName().getName() : "";
       if (first.hasSubsequent()) {

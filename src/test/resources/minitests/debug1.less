@@ -1,27 +1,21 @@
-a:first {
+a:first b:second c:third {
 	property: value;
 }
 
-negated:not(a:first) {
-	property: value;
-}
+:eb-FirstB :extend(:first b all) {}
+//eb-FirstB :extend(:first b all) {}
+//eb-SecondC :extend(:second c all) {}
 
-b:first:second {
-	property: value;
-}
-negated:not(b:first:second) {
-	property: value;
-}
+//eb-First :extend(a:first b:second all) {}
 
-:first:third  {
-	property: value;
-}
-negated:not(:first:third) {
-	property: value;
-}
+//eb-First :extend(:first all) {}
+//eb-A :extend(a all) {}
+//eb-AFirst :extend(a:first all) {}
+//eb-Second :extend(:second all) {}
+//eb-B :extend(b all) {}
+//eb-BSecond :extend(b:second all) {}
+//eb-Third :extend(:third all) {}
+//eb-C :extend(c all) {}
+//eb-CThird :extend(c:third all) {}
 
-eb-First :extend(:first all) {}
-eb-AFirst :extend(a:first all) {}
-eb-BFirst :extend(b:first all) {}
-eb-BFirstSecond :extend(b:first:second all) {}
-eb-AFirstSecond :extend(a:first:second all) {}
+//TODO: to iste s kombinatormi

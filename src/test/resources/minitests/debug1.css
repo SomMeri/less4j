@@ -1,19 +1,4 @@
-@media print {
-  .print {
-    declaration: value;
-  }
-}
-@media print and (min-width: 120px) {
-  .tablet,
-  .tabletExtending {
-    declaration: value;
-  }
-}
-@media screen {
-  .screen {
-    declaration: value;
-  }
-}
-.outside {
-  declaration: value;
+a:first b:second c:third,
+a:first beb-SecondC:third {
+  property: value;
 }

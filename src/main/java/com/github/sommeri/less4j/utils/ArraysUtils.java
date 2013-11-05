@@ -8,6 +8,10 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 
 public class ArraysUtils {
 
+  public static <T> T[] asArray(T... args) {
+    return args;
+  }
+
   public static <T> List<T> sameLengthSuffix(List<T> ofList, List<T> asThis) {
     if (asThis.size()>ofList.size())
       return null;
@@ -40,7 +44,10 @@ public class ArraysUtils {
 
   public static <T> List<T> safeSublist(List<T> values, int from, int to) {
     if (values.isEmpty())
-      return null;
+      return null; //FIXME: (!!) change to return empty? or remove?
+    
+    if (from>to)
+      return new ArrayList<T>();
     
     if (from>values.size())
       from=values.size();
@@ -103,6 +110,14 @@ public class ArraysUtils {
     List<T> result = new ArrayList<T>();
     for (T t : head) {
       result.add(t);
+    }
+    return result;
+  }
+
+  public static <T> List<T> joinAll(List<T>... lists) {
+    List<T> result = new ArrayList<T>();
+    for (List<T> t : lists) {
+      result.addAll(t);
     }
     return result;
   }

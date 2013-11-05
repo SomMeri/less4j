@@ -51,6 +51,22 @@ public class SelectorPartComparator implements ListMemberComparator<SelectorPart
     return simpleSelectorComparator.suffix((SimpleSelector) lookFor, (SimpleSelector) inside);
   }
 
+  public SelectorPart cutSuffix(SelectorPart lookFor, SelectorPart inside) {
+    validateSimpleSelector(lookFor);
+    validateSimpleSelector(inside);
+
+    SimpleSelector remainder = simpleSelectorComparator.cutSuffix((SimpleSelector) lookFor, (SimpleSelector) inside);
+    return remainder; 
+  }
+
+  public SelectorPart cutPrefix(SelectorPart lookFor, SelectorPart inside) {
+    validateSimpleSelector(lookFor);
+    validateSimpleSelector(inside);
+
+    SimpleSelector remainder = simpleSelectorComparator.cutPrefix((SimpleSelector) lookFor, (SimpleSelector) inside);
+    return remainder; 
+  }
+
   public boolean contains(SelectorPart lookFor, SelectorPart inside) {
     validateSimpleSelector(lookFor);
     validateSimpleSelector(inside);

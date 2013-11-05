@@ -1,0 +1,13 @@
+a:first b:second c:third {
+	property: value;
+}
+
+a:first b:second c:third d:fourth {
+	property: value;
+}
+
+eb-FirstB :extend(:first b all) {}
+eb-SecondC :extend(:second c all) {}
+:eb-FirstB :extend(:first b all) {}
+:eb-SecondC :extend(:second c all) {}
+	
