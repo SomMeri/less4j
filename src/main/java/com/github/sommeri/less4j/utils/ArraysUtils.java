@@ -65,6 +65,13 @@ public class ArraysUtils {
     return values.get(values.size() - 1);
   }
 
+  public static <T> T chopLast(List<T> values) {
+    if (values.isEmpty())
+      return null;
+    
+    return values.remove(values.size() - 1);
+  }
+
   public static <T> T first(List<T> values) {
     if (values.isEmpty())
       return null;

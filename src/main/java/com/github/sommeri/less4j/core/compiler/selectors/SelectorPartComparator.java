@@ -74,4 +74,11 @@ public class SelectorPartComparator implements ListMemberComparator<SelectorPart
     return simpleSelectorComparator.contains((SimpleSelector) lookFor, (SimpleSelector) inside);
   }
 
+  public SelectorPart[] splitOn(SelectorPart lookFor, SelectorPart inside) {
+    validateSimpleSelector(lookFor);
+    validateSimpleSelector(inside);
+
+    return simpleSelectorComparator.splitOn((SimpleSelector) lookFor, (SimpleSelector) inside);
+  }
+
 }

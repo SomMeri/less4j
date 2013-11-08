@@ -205,6 +205,10 @@ public class ListsComparator {
     public void setEquals(boolean isEquals) {
       this.isEquals = isEquals;
     }
+
+    public boolean firstIsLast() {
+      return first==last;
+    }
     
   }
 }

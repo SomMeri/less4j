@@ -1,0 +1,4 @@
+a:first b:second c:third d:fourth,
+beginningNormal2 c:third d:fourth {
+  property: value;
+}

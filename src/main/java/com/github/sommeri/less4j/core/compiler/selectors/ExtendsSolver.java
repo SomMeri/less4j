@@ -42,8 +42,14 @@ public class ExtendsSolver {
     for (RuleSet ruleSet : allRulesets) {
       List<Selector> selectors = new ArrayList<Selector>(ruleSet.getSelectors());
       for (Selector targetSelector : selectors) {
-        if (shouldExtend(extendingSelector, targetSelector) && canExtend(extendingSelector, alreadyExtended, ruleSet)) {
+        if (shouldExtendAsFull(extendingSelector, targetSelector) && canExtend(extendingSelector, alreadyExtended, ruleSet)) {
           doTheExtend(extendingSelector, alreadyExtended, ruleSet, targetSelector);
+        }
+        
+        //FIXME: (!!!!!) this should not be done this way, following is there only for test 
+        Selector shouldExtendAsAll = shouldExtendAsAll(extendingSelector, targetSelector);
+        if (shouldExtendAsAll!=null) {
+          doTheExtend(shouldExtendAsAll, alreadyExtended, ruleSet, targetSelector);
         }
       }
 
@@ -116,22 +122,31 @@ public class ExtendsSolver {
     return result;
   }
 
-  private boolean shouldExtend(Selector extending, Selector possibleTarget) {
+  private boolean shouldExtendAsFull(Selector extending, Selector possibleTarget) {
     if (possibleTarget == extending)
       return false;
 
     List<Extend> extendds = extending.getExtend();
     for (Extend extend : extendds) {
-//      if (comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector())) //FIXME: (!!!!!!) does not belong here, only for testing purposes
-//        return true;
-
       if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget())) 
-        return true;
-
-      if (extend.isAll() && comparator.contains(extend.getTarget(), possibleTarget)) //FIXME: (!!!!!!) does not belong here, only for testing purposes
         return true;
     }
     return false;
+  }
+
+  //FIXME: what if multiple extend keywords match?
+  private Selector shouldExtendAsAll(Selector extending, Selector possibleTarget) {
+    if (possibleTarget == extending)
+      return null;
+
+    List<Extend> extendds = extending.getExtend();
+    for (Extend extend : extendds) {
+      if (extend.isAll()) { //FIXME: (!!!!!!) does not belong here, only for testing purposes
+        Selector addSelector = comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector());      
+        return addSelector;
+      }
+    }
+    return null;
   }
 
   private void collectRulesets(ASTCssNode node) {

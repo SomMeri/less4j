@@ -1,8 +1,10 @@
 package com.github.sommeri.less4j.core.compiler.selectors;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -54,7 +56,6 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
   }
 
   /**
-   * FIXME (!!!!) test and clean up - ugly
    * Assumes there is common suffix, e.g. suffix(lookFor, inside) returns true; 
    */
   public SimpleSelector cutSuffix(SimpleSelector lookFor, SimpleSelector inside) {
@@ -88,7 +89,6 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
   }
 
   /**
-   * FIXME (!!!!) only part of the name should be cut, not the whole think!! the same with prefix math
    * Assumes there is common suffix, e.g. prefix(lookFor, inside) returns true; 
    */
   public SimpleSelector cutPrefix(SimpleSelector lookFor, SimpleSelector inside) {
@@ -147,6 +147,34 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
       //lookFor starts by a star or by element name - lookFor must me prefix
       return prefix(lookFor, inside);
     }
+  }
+
+  public SimpleSelector[] splitOn(SimpleSelector lookFor, SimpleSelector inside) {
+    if (hasNoElement(lookFor)) {
+      //FIXME: (!!!!) test na tento flow!!!
+      List<MatchMarker<ElementSubsequent>> matches = listsComparator.findMatches(lookFor.getSubsequent(), inside.getSubsequent(), elementSubsequentComparator);
+      //FIXME: (!!!!) what if there are moltiple matches? + move to list comparator
+      List<ElementSubsequent> tail = splitAfter(matches.get(0).getLast(), inside.getSubsequent());
+      removeMatch(inside, inside.getSubsequent(), matches.get(0));
+      SimpleSelector second = new SimpleSelector(inside.getUnderlyingStructure(), null, null, true);
+      second.setEmptyForm(true);
+      second.addSubsequent(tail);
+      return new SimpleSelector[] {inside, second};
+    } else {
+      //lookFor starts by a star or by element name - lookFor must me prefix
+      return new SimpleSelector[] {null, cutPrefix(lookFor, inside)};
+    }
+  }
+
+  private List<ElementSubsequent> splitAfter(ElementSubsequent element, List<ElementSubsequent> list) {
+    int indx = list.indexOf(element)+1;
+    if (indx==-1)
+      indx = list.size();
+    
+    List<ElementSubsequent> subList = list.subList(indx, list.size());
+    List<ElementSubsequent> result = new ArrayList<ElementSubsequent>(subList);
+    subList.clear();
+    return result;
   }
 
 }

@@ -1,4 +1,16 @@
 a:first b:second c:third,
-a:first beb-SecondC:third {
+a:eb-FirstB:second c:third,
+aeb-FirstB:second c:third,
+a:first beb-SecondC:third,
+eb-First c:third,
+aeb-First b:second c:third,
+eb-A:first b:second c:third,
+eb-AFirst b:second c:third,
+a:first beb-Second c:third,
+a:first eb-B:second c:third,
+a:first eb-BSecond c:third,
+a:first b:second ceb-Third,
+a:first b:second eb-C:third,
+a:first b:second eb-CThird {
   property: value;
 }
