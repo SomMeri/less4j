@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
-import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -66,6 +65,7 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
       MatchMarker<ElementSubsequent> match = listsComparator.suffixMatches(lfSubsequent, insideSubsequent, elementSubsequentComparator);
       return removeMatch(inside, insideSubsequent, match);
     } else {
+      //suffix consumed whole selector
       return null;
     }
   }

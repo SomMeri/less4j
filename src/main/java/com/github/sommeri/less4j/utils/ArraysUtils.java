@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.SelectorPart;
 
 public class ArraysUtils {
 
@@ -79,6 +80,34 @@ public class ArraysUtils {
     return values.get(0);
   }
 
+  public static <T> T chopFirst(List<T> values) {
+    if (values.isEmpty())
+      return null;
+    
+    return values.remove(0);
+  }
+
+  public static <T> List<T> chopUpTo(List<T> list, T exclusiveTo) {
+    int indx = list.indexOf(exclusiveTo);
+    if (indx == -1)
+      return new ArrayList<T>();
+
+    List<T> subList = list.subList(0, indx);
+    List<T> result = new ArrayList<T>(subList);
+    subList.clear();
+    return result;
+  }
+
+  public static <T> List<T> chopPrefix(List<T> list, int exclusiveTo) {
+    if (exclusiveTo > list.size())
+      exclusiveTo = list.size();
+
+    List<T> subList = list.subList(0, exclusiveTo);
+    List<T> result = new ArrayList<T>(subList);
+    subList.clear();
+    return result;
+  }
+
   public static <T> List<T> asNonNullList(T... a) {
     List<T> result = new ArrayList<T>();
     for (T t : a) {
@@ -127,6 +156,12 @@ public class ArraysUtils {
       result.addAll(t);
     }
     return result;
+  }
+
+  public static <T> void replace(SelectorPart lookFor, List<T> inside, List<T> replaceBy) {
+    int indx = inside.indexOf(lookFor);
+    inside.remove(lookFor);
+    inside.addAll(indx, replaceBy);
   }
 
 }

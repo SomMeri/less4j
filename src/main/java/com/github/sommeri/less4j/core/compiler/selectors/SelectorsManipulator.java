@@ -107,7 +107,7 @@ public class SelectorsManipulator {
     return first;
   }
 
-  public SelectorPart directlyJoinParts(SelectorPart first, SelectorPart second) {
+  public void directlyJoinParts(SelectorPart first, SelectorPart second) {
     if (second.hasElement()) {
       String secondName = second.hasElement() ? second.getElementName().getName() : "";
       if (first.hasSubsequent()) {
@@ -120,7 +120,6 @@ public class SelectorsManipulator {
 
     first.addSubsequent(second.getSubsequent());
     first.configureParentToAllChilds();
-    return first;
   }
 
   private Collection<Selector> replaceFirstAppender(Selector selector, List<Selector> previousSelectors) {

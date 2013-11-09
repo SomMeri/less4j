@@ -6,13 +6,13 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.ListsComparator;
 import com.github.sommeri.less4j.utils.ListsComparator.MatchMarker;
 
 public class SelectorsComparatorForExtend {
 
-  private SelectorsManipulator manipulator = new SelectorsManipulator();
   private SelectorsComparatorUtils utils = new SelectorsComparatorUtils();
   private ListsComparator listsComparator = new ListsComparator();
 
@@ -58,14 +58,12 @@ public class SelectorsComparatorForExtend {
   //FIXME (!!!) document less.js ignores leading and final combinators
   private Selector replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> replaceBy) {
     List<SelectorPart> inSelectorParts = inSelector.getParts();
-    List<SelectorPart> newInSelectorParts = new ArrayList<SelectorPart>();
+    SelectorPartsListBuilder builder = new SelectorPartsListBuilder();
 
     List<MatchMarker<SelectorPart>> matches = listsComparator.findMatches(lookForParts, inSelectorParts, selectorPartsComparator);
     if (matches.isEmpty() || replaceBy == null || replaceBy.isEmpty())
       return null;
 
-    //underlying
-    lookForParts = ArraysUtils.deeplyClonedList(lookForParts);
     replaceBy = ArraysUtils.deeplyClonedList(replaceBy);
 
     SelectorPart firstMatch = matches.get(0).getFirst();
@@ -73,92 +71,50 @@ public class SelectorsComparatorForExtend {
 
     if (firstMatch == lastMatch) {
       if (lookForParts.size() != 1)
-        throw new IllegalStateException("WTF");
+        throw new BugHappened("Impossible state happened.", lookForParts.isEmpty() ? null : lookForParts.get(0));
 
-      List<SelectorPart> replaceInside = replaceInside(lookForParts.get(0), lastMatch, replaceBy);
-      int indexOfLastMatch = inSelectorParts.indexOf(lastMatch);
-      inSelectorParts.remove(lastMatch);
-      replaceInside.remove(null); //FIXME (!!!) hack there may be more than that
-      inSelectorParts.addAll(indexOfLastMatch, replaceInside);
-
+      List<SelectorPart> replaceInside = replaceInsidePart(lookForParts.get(0), lastMatch, replaceBy);
+      ArraysUtils.replace(lastMatch, inSelectorParts, replaceInside);
       inSelector.configureParentToAllChilds();
+
       return inSelector;
     }
 
-    newInSelectorParts.addAll(chopUpTo(inSelectorParts, firstMatch));
-    chopPrefix(inSelectorParts, 1);
+    builder.moveUpTo(inSelectorParts, firstMatch);
+    ArraysUtils.chopFirst(inSelectorParts);
+
     SelectorPart firstRemainder = selectorPartsComparator.cutSuffix(lookForParts.get(0), firstMatch);
     if (firstRemainder != null) {
-      SelectorPart firstReplaceBy = replaceBy.remove(0);
-      manipulator.directlyJoinParts(firstRemainder, firstReplaceBy);
-      newInSelectorParts.add(firstRemainder);
+      builder.add(firstRemainder);
+      builder.directlyAttach(replaceBy);
+    } else {
+      builder.addAll(replaceBy);
     }
 
-    newInSelectorParts.addAll(replaceBy);
+    removeFromParent(ArraysUtils.chopUpTo(inSelectorParts, lastMatch));
 
-    //FIXME (!!!) extract to some ast manipulator - it is also in simple selector comparator
-    removeFromParent(chopUpTo(inSelectorParts, lastMatch));
+    SelectorPart lastRemainder = selectorPartsComparator.cutPrefix(ArraysUtils.last(lookForParts), lastMatch);
+    ArraysUtils.chopFirst(inSelectorParts);
+    builder.directlyAttachNonNull(lastRemainder);
+    builder.addAll(inSelectorParts);
 
-    SelectorPart lastRemainder = lastMatch == firstMatch ? null : selectorPartsComparator.cutPrefix(ArraysUtils.last(lookForParts), lastMatch);
-    //SelectorPart lastRemainder = selectorPartsComparator.cutPrefix(ArraysUtils.last(lookForParts), lastMatch);
-    chopPrefix(inSelectorParts, 1);
-    if (lastRemainder != null) {
-      SelectorPart attachToPart = ArraysUtils.last(newInSelectorParts);
-      manipulator.directlyJoinParts(attachToPart, lastRemainder);
-    }
-    newInSelectorParts.addAll(inSelectorParts);
-
-    inSelector.setParts(newInSelectorParts);
+    inSelector.setParts(builder.getParts());
     inSelector.configureParentToAllChilds();
 
     return inSelector;
   }
 
-//FIXME (!!!!) test and refactor
-  private List<SelectorPart> replaceInside(SelectorPart lookFor, SelectorPart inside, List<SelectorPart> replaceBy) {
+  private List<SelectorPart> replaceInsidePart(SelectorPart lookFor, SelectorPart inside, List<SelectorPart> replaceBy) {
     SelectorPart[] split = selectorPartsComparator.splitOn(lookFor, inside);
-    List<SelectorPart> result = new ArrayList<SelectorPart>();
-    SelectorPart previous = null;
-    for (int i = 0; i < split.length; i++) {
-      List<SelectorPart> replaceByClone = ArraysUtils.deeplyClonedList(replaceBy); 
-      if (split[i] != null) {
-        if (previous == null)
-          result.add(split[i]);
-        else
-          manipulator.directlyJoinParts(previous, split[i]);
-        
-        if (i != split.length - 1) {
-          manipulator.directlyJoinParts(split[i], replaceByClone.remove(0));
-        }
-      } 
-      
-      if (i != split.length - 1) {
-        result.addAll(replaceByClone); 
+    SelectorPartsListBuilder builder = new SelectorPartsListBuilder();
+    if (split.length > 0) {
+      builder.directlyAttachNonNull(split[0]);
+      for (int i = 1; i < split.length; i++) {
+        builder.directlyAttach(ArraysUtils.deeplyClonedList(replaceBy));
+        builder.directlyAttachNonNull(split[i]);
       }
-      previous = ArraysUtils.chopLast(replaceByClone);
     }
-    return result;
-  }
-
-  private List<SelectorPart> chopUpTo(List<SelectorPart> list, SelectorPart exclusiveTo) {
-    int indx = list.indexOf(exclusiveTo);
-    if (indx == -1)
-      return new ArrayList<SelectorPart>();
-
-    List<SelectorPart> subList = list.subList(0, indx);
-    List<SelectorPart> result = new ArrayList<SelectorPart>(subList);
-    subList.clear();
-    return result;
-  }
-
-  private List<SelectorPart> chopPrefix(List<SelectorPart> list, int exclusiveTo) {
-    if (exclusiveTo > list.size())
-      exclusiveTo = list.size();
-
-    List<SelectorPart> subList = list.subList(0, exclusiveTo);
-    List<SelectorPart> result = new ArrayList<SelectorPart>(subList);
-    subList.clear();
-    return result;
+    return builder.getParts();
   }
 
   private void removeFromParent(List<SelectorPart> removeThese) {
@@ -166,10 +122,6 @@ public class SelectorsComparatorForExtend {
       elementSubsequent.setParent(null);
     }
     removeThese.clear();
-  }
-
-  private List<SelectorPart> sublistCopy(List<SelectorPart> list, int first, int last) {
-    return (first > last) ? new ArrayList<SelectorPart>() : new ArrayList<SelectorPart>(list.subList(first, last));
   }
 
   private boolean containsEmbedded(List<SelectorPart> lookFor, List<SelectorPart> inSelectors) {
@@ -194,6 +146,65 @@ public class SelectorsComparatorForExtend {
       }
     }
     return false;
+  }
+
+}
+
+class SelectorPartsListBuilder {
+
+  private SelectorsManipulator manipulator = new SelectorsManipulator();
+  private List<SelectorPart> newInSelectorParts = new ArrayList<SelectorPart>();
+
+  public SelectorPartsListBuilder() {
+  }
+
+  public List<SelectorPart> getParts() {
+    return newInSelectorParts;
+  }
+
+  public void directlyAttachNonNull(SelectorPart part) {
+    if (part != null)
+      directlyAttach(part);
+  }
+
+  public void directlyAttach(SelectorPart part) {
+    if (newInSelectorParts.isEmpty()) {
+      add(part);
+    } else {
+      SelectorPart tail = ArraysUtils.last(newInSelectorParts);
+      manipulator.directlyJoinParts(tail, part);
+    }
+  }
+
+  public void directlyAttach(List<SelectorPart> list) {
+    if (!newInSelectorParts.isEmpty()) {
+      SelectorPart tail = ArraysUtils.last(newInSelectorParts);
+      SelectorPart firstReplaceBy = list.remove(0);
+      manipulator.directlyJoinParts(tail, firstReplaceBy);
+    }
+    addAll(list);
+  }
+
+  public void addAll(List<SelectorPart> list) {
+    newInSelectorParts.addAll(list);
+  }
+
+  public void addNonNull(SelectorPart part) {
+    if (part != null)
+      add(part);
+  }
+
+  public void add(SelectorPart part) {
+    newInSelectorParts.add(part);
+  }
+
+  public void moveUpTo(List<SelectorPart> inSelectorParts, SelectorPart firstMatch) {
+    newInSelectorParts.addAll(ArraysUtils.chopUpTo(inSelectorParts, firstMatch));
+  }
+
+  @Override
+  public String toString() {
+    return newInSelectorParts.toString();
   }
 
 }
