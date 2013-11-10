@@ -56,48 +56,49 @@ public class SelectorsComparatorForExtend {
 
   //FIXME: (!!!) test with combinator before and in the end
   //FIXME (!!!) document less.js ignores leading and final combinators
-  private Selector replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> replaceBy) {
+  private Selector replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy) {
     List<SelectorPart> inSelectorParts = inSelector.getParts();
     SelectorPartsListBuilder builder = new SelectorPartsListBuilder();
 
     List<MatchMarker<SelectorPart>> matches = listsComparator.findMatches(lookForParts, inSelectorParts, selectorPartsComparator);
-    if (matches.isEmpty() || replaceBy == null || replaceBy.isEmpty())
+    if (matches.isEmpty() || originalReplaceBy == null || originalReplaceBy.isEmpty())
       return null;
 
-    replaceBy = ArraysUtils.deeplyClonedList(replaceBy);
+    for (MatchMarker<SelectorPart> currentMatch : matches) {
+      SelectorPart firstMatch = currentMatch.getFirst();
+      SelectorPart lastMatch = currentMatch.getLast();
+      List<SelectorPart> replaceBy = ArraysUtils.deeplyClonedList(originalReplaceBy);
 
-    SelectorPart firstMatch = matches.get(0).getFirst();
-    SelectorPart lastMatch = matches.get(0).getLast();
+      if (firstMatch == lastMatch) {
+        if (lookForParts.size() != 1)
+          throw new BugHappened("Impossible state happened.", lookForParts.isEmpty() ? null : lookForParts.get(0));
 
-    if (firstMatch == lastMatch) {
-      if (lookForParts.size() != 1)
-        throw new BugHappened("Impossible state happened.", lookForParts.isEmpty() ? null : lookForParts.get(0));
+        List<SelectorPart> replaceInside = replaceInsidePart(lookForParts.get(0), lastMatch, replaceBy);
+        ArraysUtils.replace(lastMatch, inSelectorParts, replaceInside);
+        inSelector.configureParentToAllChilds();
 
-      List<SelectorPart> replaceInside = replaceInsidePart(lookForParts.get(0), lastMatch, replaceBy);
-      ArraysUtils.replace(lastMatch, inSelectorParts, replaceInside);
-      inSelector.configureParentToAllChilds();
+        return inSelector;
+      }
 
-      return inSelector;
+      builder.addUpTo(inSelectorParts, firstMatch);
+      ArraysUtils.chopFirst(inSelectorParts);
+
+      SelectorPart firstRemainder = selectorPartsComparator.cutSuffix(lookForParts.get(0), firstMatch);
+      if (firstRemainder != null) {
+        builder.add(firstRemainder);
+        builder.directlyAttach(replaceBy);
+      } else {
+        builder.addAll(replaceBy);
+      }
+
+      removeFromParent(ArraysUtils.chopUpTo(inSelectorParts, lastMatch));
+      ArraysUtils.chopFirst(inSelectorParts);
+
+      SelectorPart lastRemainder = selectorPartsComparator.cutPrefix(ArraysUtils.last(lookForParts), lastMatch);
+      builder.directlyAttachNonNull(lastRemainder);
+      builder.addAll(inSelectorParts);
+
     }
-
-    builder.moveUpTo(inSelectorParts, firstMatch);
-    ArraysUtils.chopFirst(inSelectorParts);
-
-    SelectorPart firstRemainder = selectorPartsComparator.cutSuffix(lookForParts.get(0), firstMatch);
-    if (firstRemainder != null) {
-      builder.add(firstRemainder);
-      builder.directlyAttach(replaceBy);
-    } else {
-      builder.addAll(replaceBy);
-    }
-
-    removeFromParent(ArraysUtils.chopUpTo(inSelectorParts, lastMatch));
-
-    SelectorPart lastRemainder = selectorPartsComparator.cutPrefix(ArraysUtils.last(lookForParts), lastMatch);
-    ArraysUtils.chopFirst(inSelectorParts);
-    builder.directlyAttachNonNull(lastRemainder);
-    builder.addAll(inSelectorParts);
-
     inSelector.setParts(builder.getParts());
     inSelector.configureParentToAllChilds();
 
@@ -198,7 +199,7 @@ class SelectorPartsListBuilder {
     newInSelectorParts.add(part);
   }
 
-  public void moveUpTo(List<SelectorPart> inSelectorParts, SelectorPart firstMatch) {
+  public void addUpTo(List<SelectorPart> inSelectorParts, SelectorPart firstMatch) {
     newInSelectorParts.addAll(ArraysUtils.chopUpTo(inSelectorParts, firstMatch));
   }
 
