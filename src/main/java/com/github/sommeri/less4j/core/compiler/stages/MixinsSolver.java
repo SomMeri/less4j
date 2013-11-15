@@ -38,7 +38,7 @@ class MixinsSolver {
 
     final IScope referencedMixinScope = mixinWorkingScope;
     // ... and I'm starting to see the point of closures ...
-    return InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new IFunction<MixinCompilationResult>() {
+    return InScopeSnapshotRunner.runInOriginalDataSnapshot(referencedMixinScope, new IFunction<MixinCompilationResult>() {
 
       @Override
       public MixinCompilationResult run() {
@@ -106,11 +106,12 @@ class MixinsSolver {
   }
 
   public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final IScope callerScope, List<FullMixinDefinition> mixins) {
+    
     final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     for (final FullMixinDefinition fullMixin : mixins) {
       final ReusableStructure mixin = fullMixin.getMixin();
       final IScope mixinScope = fullMixin.getScope();
-
+//FIXME: !!!!!!!!!!!!!!!!! nieco asi tuto
       // the following needs to run in snapshot because calculateMixinsWorkingScope modifies that scope
       InScopeSnapshotRunner.runInLocalDataSnapshot(mixinScope.getParent(), new ITask() {
 

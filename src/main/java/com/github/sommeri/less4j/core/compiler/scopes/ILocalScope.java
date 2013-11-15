@@ -41,7 +41,9 @@ public interface ILocalScope {
   public void closePlaceholder();
 
   // snapshots for temporary evalution that does not require tree change
-  public void createDataSnapshot();
+  public void createCurrentDataSnapshot();
+
+  public void createOriginalDataSnapshot();
 
   public void discardLastDataSnapshot();
 

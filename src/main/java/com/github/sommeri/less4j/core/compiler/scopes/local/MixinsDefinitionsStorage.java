@@ -152,8 +152,12 @@ public class MixinsDefinitionsStorage implements Cloneable {
     openPlaceholders.add(new Placeholder(this));
   }
 
+  public int countPlaceholders() {
+    return openPlaceholders.size();
+  }
+  
   public void closePlaceholder() {
-    openPlaceholders.pop();
+      openPlaceholders.pop();
   }
 
   public String placeholdersReport() {

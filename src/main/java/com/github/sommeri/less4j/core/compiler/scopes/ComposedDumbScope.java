@@ -124,8 +124,12 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     return localScope.getLocalData();
   }
 
-  public void createDataSnapshot() {
-    localScope.createDataSnapshot();
+  public void createCurrentDataSnapshot() {
+    localScope.createCurrentDataSnapshot();
+  }
+
+  public void createOriginalDataSnapshot() {
+    localScope.createOriginalDataSnapshot();
   }
 
   public void discardLastDataSnapshot() {

@@ -39,7 +39,7 @@ public class InScopeSnapshotRunner {
    * 
    */
   public void runInLocalDataSnapshot(ITask task) {
-    scope.createDataSnapshot();
+    scope.createCurrentDataSnapshot();
     try {
       task.run();
     } finally {
@@ -53,7 +53,53 @@ public class InScopeSnapshotRunner {
    * 
    */
   public <T> T runInLocalDataSnapshot(IFunction<T> task) {
-    scope.createDataSnapshot();
+    scope.createCurrentDataSnapshot();
+    try {
+      return task.run();
+    } finally {
+      scope.discardLastDataSnapshot();
+    }
+  }
+
+  /**
+   * Convenience method. See {@link #runInLocalDataSnapshot(ITask)}
+   * 
+   */
+  public static void runInOriginalDataSnapshot(IScope scope, ITask task) {
+    InScopeSnapshotRunner runner = new InScopeSnapshotRunner(scope);
+    runner.runInOriginalDataSnapshot(task);
+  }
+
+  /**
+   * Convenience method. See {@link #runInOriginalDataSnapshot(IFunction)}
+   * 
+   */                 
+  public static <T> T runInOriginalDataSnapshot(IScope scope, IFunction<T> task) {
+    InScopeSnapshotRunner runner = new InScopeSnapshotRunner(scope);
+    return runner.runInOriginalDataSnapshot(task);
+  }
+
+  /**
+   * Create local data snapshot on the scope and runs the task. Use this method to make sure
+   * that each local data snapshot is closed on proper place and regardless of thrown exceptions.
+   * 
+   */
+  public void runInOriginalDataSnapshot(ITask task) {
+    scope.createOriginalDataSnapshot();
+    try {
+      task.run();
+    } finally {
+      scope.discardLastDataSnapshot();
+    }
+  }
+
+  /**
+   * Create local data snapshot on the scope and runs the task. Use this method to make sure
+   * that each local data snapshot is closed on proper place and regardless of thrown exceptions.
+   * 
+   */
+  public <T> T runInOriginalDataSnapshot(IFunction<T> task) {
+    scope.createOriginalDataSnapshot();
     try {
       return task.run();
     } finally {

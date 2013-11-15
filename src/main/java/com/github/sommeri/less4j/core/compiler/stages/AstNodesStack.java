@@ -16,7 +16,7 @@ public class AstNodesStack {
   private Stack<HiddenTokenAwareTree> currentlyCompiling = new Stack<HiddenTokenAwareTree>();
   
   public void pop() {
-    currentlyCompiling.pop();
+      currentlyCompiling.pop();
   }
 
   public void push(ASTCssNode node) {

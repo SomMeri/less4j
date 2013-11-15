@@ -126,8 +126,12 @@ public class SaveableLocalScope implements ILocalScope {
     return getActiveLocalScope().hasTheSameLocalData(otherScope);
   }
 
-  public void createDataSnapshot() {
-    getActiveLocalScope().createDataSnapshot();
+  public void createCurrentDataSnapshot() {
+    getActiveLocalScope().createCurrentDataSnapshot();
+  }
+
+  public void createOriginalDataSnapshot() {
+    getActiveLocalScope().createOriginalDataSnapshot();
   }
 
   public void discardLastDataSnapshot() {

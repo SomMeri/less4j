@@ -143,9 +143,18 @@ public class LocalScope implements ILocalScope {
    * Do not call this method directly. Use {@link InScopeSnapshotRunner}
    * instead.
    */
-  public void createDataSnapshot() {
+  public void createCurrentDataSnapshot() {
     localDataSnapshots.push(localData);
     localData = localData.clone();
+  }
+
+  /**
+   * Do not call this method directly. Use {@link InScopeSnapshotRunner}
+   * instead.
+   */
+  public void createOriginalDataSnapshot() {
+    localDataSnapshots.push(localData);
+    localData = localDataSnapshots.firstElement().clone();
   }
 
   /**

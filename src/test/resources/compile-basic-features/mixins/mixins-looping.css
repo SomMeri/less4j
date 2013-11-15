@@ -17,3 +17,11 @@
   inner: inner;
   property: mixin;
 }
+selector {
+  scary: 1;
+  scary: 0;
+}
+selector {
+  variable: big;
+  variable: zero;
+}
