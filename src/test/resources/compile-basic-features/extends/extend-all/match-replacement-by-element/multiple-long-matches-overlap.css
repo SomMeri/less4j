@@ -2,3 +2,11 @@ a:pseudo a:pseudo a:pseudo a:pseudo,
 amultiplemultiplemultiple:pseudo {
   property: value;
 }
+.class .class .class .class .class,
+overlap overlap .class {
+  property: value;
+}
+#id #id #id #id #id #id #id #id #id #id #id,
+longoverlap longoverlap longoverlap #id #id {
+  property: value;
+}

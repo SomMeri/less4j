@@ -55,7 +55,6 @@ public class SelectorsComparatorForExtend {
   }
 
   //FIXME: (!!!) test with combinator before and in the end
-  //FIXME (!!!) document less.js ignores leading and final combinators
   private Selector replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy) {
     List<SelectorPart> inSelectorParts = inSelector.getParts();
     SelectorPartsListBuilder builder = new SelectorPartsListBuilder();
@@ -64,9 +63,25 @@ public class SelectorsComparatorForExtend {
     if (matches.isEmpty() || originalReplaceBy == null || originalReplaceBy.isEmpty())
       return null;
 
+    SelectorPart lastRemainder = null;
+    MatchMarker<SelectorPart> previousMatch = null;
     for (MatchMarker<SelectorPart> currentMatch : matches) {
       SelectorPart firstMatch = currentMatch.getFirst();
       SelectorPart lastMatch = currentMatch.getLast();
+      
+      if (!inSelectorParts.contains(firstMatch) && (previousMatch==null || lastRemainder==null ||  previousMatch.getLast()!=currentMatch.getFirst())) { //particularly ugly condition
+        previousMatch = currentMatch;
+        continue ;
+      }
+      boolean prefixNeeded = true;
+      
+      if (!inSelectorParts.contains(firstMatch) && lastRemainder!=null) { //particularly ugly condition
+      //FIXME: !!!!!!!!!!!!!!!!!!! ugly -I need this when it is partial match and need to skip out if it is full match
+        firstMatch = ArraysUtils.last(builder.getParts()); 
+        prefixNeeded = false;
+      }
+      
+      previousMatch = currentMatch;
       List<SelectorPart> replaceBy = ArraysUtils.deeplyClonedList(originalReplaceBy);
 
       if (firstMatch == lastMatch) {
@@ -75,30 +90,29 @@ public class SelectorsComparatorForExtend {
 
         List<SelectorPart> replaceInside = replaceInsidePart(lookForParts.get(0), lastMatch, replaceBy);
         ArraysUtils.replace(lastMatch, inSelectorParts, replaceInside);
-        inSelector.configureParentToAllChilds();
-
-        return inSelector;
-      }
-
-      builder.addUpTo(inSelectorParts, firstMatch);
-      ArraysUtils.chopFirst(inSelectorParts);
-
-      SelectorPart firstRemainder = selectorPartsComparator.cutSuffix(lookForParts.get(0), firstMatch);
-      if (firstRemainder != null) {
-        builder.add(firstRemainder);
-        builder.directlyAttach(replaceBy);
       } else {
-        builder.addAll(replaceBy);
+        if (prefixNeeded)
+          builder.addUpTo(inSelectorParts, firstMatch);
+        ArraysUtils.chopFirst(inSelectorParts); // now we are chopping firstMatch
+
+        SelectorPart firstRemainder = selectorPartsComparator.cutSuffix(lookForParts.get(0), firstMatch);
+        if (firstRemainder != null) {
+          if (prefixNeeded)
+            builder.add(firstRemainder);
+          builder.directlyAttach(replaceBy);
+        } else {
+          builder.addAll(replaceBy);
+        }
+
+        removeFromParent(ArraysUtils.chopUpTo(inSelectorParts, lastMatch));
+        ArraysUtils.chopFirst(inSelectorParts); // now we are chopping lastMatch
+
+        lastRemainder = selectorPartsComparator.cutPrefix(ArraysUtils.last(lookForParts), lastMatch);
+        builder.directlyAttachNonNull(lastRemainder);
       }
-
-      removeFromParent(ArraysUtils.chopUpTo(inSelectorParts, lastMatch));
-      ArraysUtils.chopFirst(inSelectorParts);
-
-      SelectorPart lastRemainder = selectorPartsComparator.cutPrefix(ArraysUtils.last(lookForParts), lastMatch);
-      builder.directlyAttachNonNull(lastRemainder);
-      builder.addAll(inSelectorParts);
-
     }
+
+    builder.addAll(inSelectorParts);
     inSelector.setParts(builder.getParts());
     inSelector.configureParentToAllChilds();
 
