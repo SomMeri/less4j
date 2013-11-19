@@ -36,10 +36,11 @@ public abstract class Pseudo extends ElementSubsequent {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder(getClass().getName());
-    builder.append(" [name=");
+    StringBuilder builder = new StringBuilder();
+    //builder.append(getClass().getName());
+    //builder.append(" [name=");
     builder.append(name);
-    builder.append("]");
+    //builder.append("]");
     return builder.toString();
   }
 

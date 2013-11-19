@@ -45,9 +45,9 @@ public class FixedNamePart extends InterpolableNamePart {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("FixedNamePart [name=");
+//    builder.append("FixedNamePart [name=");
     builder.append(name);
-    builder.append("]");
+//    builder.append("]");
     return builder.toString();
   }
   

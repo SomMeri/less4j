@@ -48,8 +48,10 @@ public class ExtendsSolver {
         
         //FIXME: (!!!!!) this should not be done this way, following is there only for test 
         Selector shouldExtendAsAll = shouldExtendAsAll(extendingSelector, targetSelector);
-        if (shouldExtendAsAll!=null) {
+        //System.out.println("shouldExtendAsAll: " + shouldExtendAsAll);
+        if (shouldExtendAsAll!=null && canExtend(extendingSelector, shouldExtendAsAll, alreadyExtended, ruleSet)) {
           doTheExtend(shouldExtendAsAll, alreadyExtended, ruleSet, targetSelector);
+          //performExtend(shouldExtendAsAll, ruleSet);
         }
       }
 
@@ -70,10 +72,14 @@ public class ExtendsSolver {
   }
 
   private boolean canExtend(Selector extendingSelector, AlreadyExtended alreadyExtended, RuleSet targetRuleSet) {
+    return canExtend(extendingSelector, extendingSelector, alreadyExtended, targetRuleSet);
+  }
+  
+  private boolean canExtend(Selector extendingSelector, Selector newSelector, AlreadyExtended alreadyExtended, RuleSet targetRuleSet) {
     if (alreadyExtended.alreadyExtended(extendingSelector, targetRuleSet))
       return false;
 
-    if (containsSelector(extendingSelector, targetRuleSet))
+    if (containsSelector(newSelector, targetRuleSet))
       return false;
 
     // selectors are able to extend only rulesets inside the same @media body.

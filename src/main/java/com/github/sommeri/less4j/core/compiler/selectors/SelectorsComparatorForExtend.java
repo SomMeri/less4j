@@ -75,8 +75,7 @@ public class SelectorsComparatorForExtend {
       }
       boolean prefixNeeded = true;
       
-      if (!inSelectorParts.contains(firstMatch) && lastRemainder!=null) { //particularly ugly condition
-      //FIXME: !!!!!!!!!!!!!!!!!!! ugly -I need this when it is partial match and need to skip out if it is full match
+      if (!inSelectorParts.contains(firstMatch) && lastRemainder!=null) { //particularly ugly code
         firstMatch = ArraysUtils.last(builder.getParts()); 
         prefixNeeded = false;
       }
