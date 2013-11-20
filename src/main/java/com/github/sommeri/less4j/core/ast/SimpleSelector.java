@@ -132,7 +132,11 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     if (isStar) {
       isStar=false;
     }
-    getElementName().extendName(extension);
+    if (hasElement()) {
+      getElementName().extendName(extension);
+    } else {
+      setElementName(new InterpolableName(getUnderlyingStructure(), new FixedNamePart(getUnderlyingStructure(), extension)));
+    }
   }
 
 }
