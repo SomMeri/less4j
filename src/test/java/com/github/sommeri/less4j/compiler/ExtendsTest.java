@@ -20,8 +20,8 @@ public class ExtendsTest extends BasicFeaturesTest {
   @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
     //FIXME (!!!!) bwuhuhuuuuuu enable combied tests
-    return createTestFileUtils().loadTestFiles(standardCases);
-    //return createTestFileUtils().loadTestFiles(standardCases, extendAllMatch);
+    //return createTestFileUtils().loadTestFiles(standardCases);
+    return createTestFileUtils().loadTestFiles(standardCases, extendAllMatch);
     //return createTestFileUtils().loadTestFiles(extendAllMatch);
   }
 

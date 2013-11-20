@@ -10,3 +10,11 @@ a:dddd:dddd:dddd:dddd:dddd:dddd,
 a:long-in-one:long-in-one:long-in-one {
   property: value;
 }
+.only-one,
+:single {
+  property: value;
+}
+.no-element.no-element.no-element,
+.three.three.three {
+  property: value;
+}

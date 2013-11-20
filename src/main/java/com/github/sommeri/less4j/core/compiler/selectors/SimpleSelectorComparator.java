@@ -6,6 +6,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.ListsComparator;
 import com.github.sommeri.less4j.utils.ListsComparator.ListMemberComparator;
@@ -28,10 +29,10 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
   public boolean equals(SimpleSelector first, SimpleSelector second) {
     if (!prefix(first, second))
       return false;
-    
+
     List<ElementSubsequent> firstSubsequent = first.getSubsequent();
     List<ElementSubsequent> secondSubsequent = second.getSubsequent();
-    return firstSubsequent.size()==secondSubsequent.size();
+    return firstSubsequent.size() == secondSubsequent.size();
   }
 
   @Override
@@ -72,19 +73,21 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
 
   private SimpleSelector removeMatch(SimpleSelector owner, List<ElementSubsequent> subsequentsList, MatchMarker<ElementSubsequent> match) {
     //match not found - this should not happen
-    if (match==null)
+    if (match == null)
       return owner;
-    //whole thing was eaten up - we know that subsequent elements are always compared in whole 
-    if (hasNoElement(owner) && match.getFirst()==subsequentsList.get(0) && match.getLast()==ArraysUtils.last(subsequentsList))
-      return null;
     //remove everything that follows first from subsequent list
     int indexOfFirst = subsequentsList.indexOf(match.getFirst());
-    int indexOfLast = subsequentsList.indexOf(match.getFirst());
-    List<ElementSubsequent> subList = subsequentsList.subList(indexOfFirst, indexOfLast+1);
+    int indexOfLast = subsequentsList.indexOf(match.getLast());
+    List<ElementSubsequent> subList = subsequentsList.subList(indexOfFirst, indexOfLast + 1);
     for (ElementSubsequent elementSubsequent : subList) {
       elementSubsequent.setParent(null);
     }
     subList.removeAll(subList);
+
+    //whole thing was eaten up - we know that subsequent elements are always compared in whole
+    //FIXME: !!!! this logic should not be here!!!! - remove it
+    if (hasNoElement(owner) && !owner.hasSubsequent())
+      return null;
     return owner;
   }
 
@@ -152,25 +155,41 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
   public SimpleSelector[] splitOn(SimpleSelector lookFor, SimpleSelector inside) {
     if (hasNoElement(lookFor)) {
       //FIXME: (!!!!) test na tento flow!!!
-      List<MatchMarker<ElementSubsequent>> matches = listsComparator.findMatches(lookFor.getSubsequent(), inside.getSubsequent(), elementSubsequentComparator);
-      //FIXME: (!!!!) what if there are moltiple matches? + move to list comparator
-      List<ElementSubsequent> tail = splitAfter(matches.get(0).getLast(), inside.getSubsequent());
-      removeMatch(inside, inside.getSubsequent(), matches.get(0));
-      SimpleSelector second = new SimpleSelector(inside.getUnderlyingStructure(), null, null, true);
-      second.setEmptyForm(true);
-      second.addSubsequent(tail);
-      return new SimpleSelector[] {inside, second};
+      //FIXME: (!!!!) move to list comparator -what did I meant by that?
+      List<ElementSubsequent> subsequents = inside.getSubsequent();
+      HiddenTokenAwareTree underlying = inside.getUnderlyingStructure();
+
+      List<MatchMarker<ElementSubsequent>> matches = listsComparator.findMatches(lookFor.getSubsequent(), subsequents, elementSubsequentComparator);
+      List<SimpleSelector> result = new ArrayList<SimpleSelector>();
+      result.add(inside);
+      for (MatchMarker<ElementSubsequent> current : matches) if (current.isIn(subsequents)) {
+          List<ElementSubsequent> tail = splitAfter(current.getLast(), subsequents);
+          removeMatch(inside, subsequents, current);
+          SimpleSelector second = createNoTagSelector(underlying, tail);
+          result.add(second);
+          subsequents = second.getSubsequent();
+        }
+
+      return result.toArray(new SimpleSelector[0]);
     } else {
       //lookFor starts by a star or by element name - lookFor must me prefix
-      return new SimpleSelector[] {null, cutPrefix(lookFor, inside)};
+      return new SimpleSelector[] { null, cutPrefix(lookFor, inside) };
     }
   }
 
+  private SimpleSelector createNoTagSelector(HiddenTokenAwareTree underlying, List<ElementSubsequent> tail) {
+    SimpleSelector second = new SimpleSelector(underlying, null, null, true);
+    second.setEmptyForm(true);
+    second.addSubsequent(tail);
+    second.configureParentToAllChilds();
+    return second;
+  }
+
   private List<ElementSubsequent> splitAfter(ElementSubsequent element, List<ElementSubsequent> list) {
-    int indx = list.indexOf(element)+1;
-    if (indx==-1)
+    int indx = list.indexOf(element) + 1;
+    if (indx == -1)
       indx = list.size();
-    
+
     List<ElementSubsequent> subList = list.subList(indx, list.size());
     List<ElementSubsequent> result = new ArrayList<ElementSubsequent>(subList);
     subList.clear();

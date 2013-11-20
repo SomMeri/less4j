@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+
 public class ListsComparator {
 
   public <T> boolean equals(List<T> first, List<T> second, ListMemberComparator<T> comparator) {
@@ -208,6 +210,10 @@ public class ListsComparator {
 
     public boolean firstIsLast() {
       return first==last;
+    }
+
+    public boolean isIn(List<T> list) {
+      return list.contains(getFirst()) && list.contains(getLast());
     }
     
   }
