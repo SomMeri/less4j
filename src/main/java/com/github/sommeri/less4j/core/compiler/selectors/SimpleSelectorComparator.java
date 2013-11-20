@@ -7,7 +7,6 @@ import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
-import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.ListsComparator;
 import com.github.sommeri.less4j.utils.ListsComparator.ListMemberComparator;
 import com.github.sommeri.less4j.utils.ListsComparator.MatchMarker;
@@ -64,7 +63,9 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
       List<ElementSubsequent> lfSubsequent = lookFor.getSubsequent();
       List<ElementSubsequent> insideSubsequent = inside.getSubsequent();
       MatchMarker<ElementSubsequent> match = listsComparator.suffixMatches(lfSubsequent, insideSubsequent, elementSubsequentComparator);
-      return removeMatch(inside, insideSubsequent, match);
+      SimpleSelector result = removeMatch(inside, insideSubsequent, match);
+      //check if the whole thing was eaten up - we know that subsequent elements are always compared in whole
+      return isEmpty(result)? null : result;
     } else {
       //suffix consumed whole selector
       return null;
@@ -83,12 +84,11 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
       elementSubsequent.setParent(null);
     }
     subList.removeAll(subList);
-
-    //whole thing was eaten up - we know that subsequent elements are always compared in whole
-    //FIXME: !!!! this logic should not be here!!!! - remove it
-    if (hasNoElement(owner) && !owner.hasSubsequent())
-      return null;
     return owner;
+  }
+
+  private boolean isEmpty(SimpleSelector owner) {
+    return hasNoElement(owner) && !owner.hasSubsequent();
   }
 
   /**
@@ -103,7 +103,9 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
     List<ElementSubsequent> lfSubsequent = lookFor.getSubsequent();
     List<ElementSubsequent> insideSubsequent = inside.getSubsequent();
     MatchMarker<ElementSubsequent> match = listsComparator.prefixMatches(lfSubsequent, insideSubsequent, elementSubsequentComparator);
-    return removeMatch(inside, insideSubsequent, match);
+    SimpleSelector result = removeMatch(inside, insideSubsequent, match);
+    //check if the whole thing was eaten up - we know that subsequent elements are always compared in whole
+    return isEmpty(result)? null : result;
   }
 
   private boolean hasNoElement(SimpleSelector selector) {

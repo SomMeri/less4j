@@ -1,0 +1,76 @@
+:pseudo,
+:new-pseudo {
+  property: value;
+}
+:pseudo other:first,
+:new-pseudo other:first {
+  property: value;
+}
+:pseudo:last + other:first,
+:new-pseudo:last + other:first {
+  property: value;
+}
+beginning:pseudo other:first,
+beginning:new-pseudo other:first {
+  property: value;
+}
+beginning:pseudo:last + other:first,
+beginning:new-pseudo:last + other:first {
+  property: value;
+}
+first:first + :pseudo,
+first:first + :new-pseudo {
+  property: value;
+}
+first:first + end:pseudo,
+first:first + end:new-pseudo {
+  property: value;
+}
+first:first + end:first:pseudo,
+first:first + end:first:new-pseudo {
+  property: value;
+}
+first:first + :pseudo end:end,
+first:first + :new-pseudo end:end {
+  property: value;
+}
+first:first + :pseudo:last end:end,
+first:first + :new-pseudo:last end:end {
+  property: value;
+}
+first:first + middle:pseudo end:end,
+first:first + middle:new-pseudo end:end {
+  property: value;
+}
+first:first + middle:pseudo:last end:end,
+first:first + middle:new-pseudo:last end:end {
+  property: value;
+}
+first:first middle:first:pseudo + end:end,
+first:first middle:first:new-pseudo + end:end {
+  property: value;
+}
+element:match > other:end,
+:new-pseudo > other:end {
+  property: value;
+}
+element:match:last > other:end,
+:new-pseudo:last > other:end {
+  property: value;
+}
+beginning:end element:match,
+beginning:end :new-pseudo {
+  property: value;
+}
+beginning:end element:match:last,
+beginning:end :new-pseudo:last {
+  property: value;
+}
+beginning:end element:match other:end,
+beginning:end :new-pseudo other:end {
+  property: value;
+}
+beginning:end element:match:last other:end,
+beginning:end :new-pseudo:last other:end {
+  property: value;
+}

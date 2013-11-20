@@ -1,0 +1,76 @@
+:pseudo,
+:new-pseudo1:new-pseudo2:new-pseudo3 {
+  property: value;
+}
+:pseudo other:first,
+:new-pseudo1:new-pseudo2:new-pseudo3 other:first {
+  property: value;
+}
+:pseudo:last + other:first,
+:new-pseudo1:new-pseudo2:new-pseudo3:last + other:first {
+  property: value;
+}
+beginning:pseudo other:first,
+beginning:new-pseudo1:new-pseudo2:new-pseudo3 other:first {
+  property: value;
+}
+beginning:pseudo:last + other:first,
+beginning:new-pseudo1:new-pseudo2:new-pseudo3:last + other:first {
+  property: value;
+}
+first:first + :pseudo,
+first:first + :new-pseudo1:new-pseudo2:new-pseudo3 {
+  property: value;
+}
+first:first + end:pseudo,
+first:first + end:new-pseudo1:new-pseudo2:new-pseudo3 {
+  property: value;
+}
+first:first + end:first:pseudo,
+first:first + end:first:new-pseudo1:new-pseudo2:new-pseudo3 {
+  property: value;
+}
+first:first + :pseudo end:end,
+first:first + :new-pseudo1:new-pseudo2:new-pseudo3 end:end {
+  property: value;
+}
+first:first + :pseudo:last end:end,
+first:first + :new-pseudo1:new-pseudo2:new-pseudo3:last end:end {
+  property: value;
+}
+first:first + middle:pseudo end:end,
+first:first + middle:new-pseudo1:new-pseudo2:new-pseudo3 end:end {
+  property: value;
+}
+first:first + middle:pseudo:last end:end,
+first:first + middle:new-pseudo1:new-pseudo2:new-pseudo3:last end:end {
+  property: value;
+}
+first:first middle:first:pseudo + end:end,
+first:first middle:first:new-pseudo1:new-pseudo2:new-pseudo3 + end:end {
+  property: value;
+}
+element:match > other:end,
+:new-pseudo1:new-pseudo2:new-pseudo3 > other:end {
+  property: value;
+}
+element:match:last > other:end,
+:new-pseudo1:new-pseudo2:new-pseudo3:last > other:end {
+  property: value;
+}
+beginning:end element:match,
+beginning:end :new-pseudo1:new-pseudo2:new-pseudo3 {
+  property: value;
+}
+beginning:end element:match:last,
+beginning:end :new-pseudo1:new-pseudo2:new-pseudo3:last {
+  property: value;
+}
+beginning:end element:match other:end,
+beginning:end :new-pseudo1:new-pseudo2:new-pseudo3 other:end {
+  property: value;
+}
+beginning:end element:match:last other:end,
+beginning:end :new-pseudo1:new-pseudo2:new-pseudo3:last other:end {
+  property: value;
+}

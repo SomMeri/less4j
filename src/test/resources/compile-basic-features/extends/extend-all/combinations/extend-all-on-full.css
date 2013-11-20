@@ -1,0 +1,6 @@
+ruleset:last,
+ruleset:nth-child(2n),
+full:first,
+full:nth-child(3n) {
+  property: value;
+}

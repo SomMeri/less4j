@@ -1,0 +1,72 @@
+:pseudo {
+	property: value;
+}
+//total beginning
+:pseudo other:first {
+	property: value;
+}
+:pseudo:last + other:first {
+	property: value;
+}
+//partial beginning
+beginning:pseudo other:first {
+	property: value;
+}
+beginning:pseudo:last + other:first {
+	property: value;
+}
+//total end
+first:first + :pseudo {
+	property: value;
+} 
+first:first + end:pseudo {
+	property: value;
+} 
+first:first + end:first:pseudo {
+	property: value;
+} 
+//beginning in the middle
+first:first + :pseudo end:end {
+	property: value;
+} 
+first:first + :pseudo:last end:end {
+	property: value;
+} 
+first:first + middle:pseudo end:end {
+	property: value;
+} 
+first:first + middle:pseudo:last end:end {
+	property: value;
+} 
+//end in the middle
+first:first middle:first:pseudo + end:end {
+	property: value;
+} 
+
+:new-pseudo:extend(:pseudo all) {}
+
+element:match > other:end {
+	property: value;
+}
+
+element:match:last > other:end {
+	property: value;
+}
+
+beginning:end element:match {
+	property: value;
+}
+
+beginning:end element:match:last {
+	property: value;
+}
+
+beginning:end element:match other:end {
+	property: value;
+}
+
+beginning:end element:match:last other:end {
+	property: value;
+}
+
+:new-pseudo:extend(element:match all) {}

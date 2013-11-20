@@ -1,9 +1,0 @@
-a:first b:second c:third d:fourth,
-beginningShort1:first b:second c:third d:fourth,
-beginningShort2 b:second c:third d:fourth,
-beginningNormal1:second c:third d:fourth,
-beginningNormal2 c:third d:fourth,
-beginningLong1:third d:fourth,
-beginningLong2 d:fourth {
-  property: value;
-}

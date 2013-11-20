@@ -1,0 +1,7 @@
+ruleset:last {
+  property: value;
+}
+
+full:first:extend(ruleset:last) {}
+:nth-child(2n):extend(:last all) {}
+:nth-child(3n):extend(:first all) {}
