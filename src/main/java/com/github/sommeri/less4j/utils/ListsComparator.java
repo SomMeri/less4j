@@ -132,14 +132,6 @@ public class ListsComparator {
     return result;
   }
 
-  private <T> boolean containsInList(T lookFor, List<T> inParts, ListMemberComparator<T> comparator) {
-    for (T inPart : inParts) {
-      if (comparator.contains(lookFor, inPart))
-        return true;
-    }
-    return false;
-  }
-
   private <T> List<MatchMarker<T>> collectMatches(T lookFor, List<T> inParts, ListMemberComparator<T> comparator, List<MatchMarker<T>> result) {
     for (T inPart : inParts) {
       if (comparator.contains(lookFor, inPart))

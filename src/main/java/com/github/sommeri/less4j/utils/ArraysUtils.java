@@ -45,7 +45,7 @@ public class ArraysUtils {
 
   public static <T> List<T> safeSublist(List<T> values, int from, int to) {
     if (values.isEmpty())
-      return null; //FIXME: (!!) change to return empty? or remove?
+      return null; 
     
     if (from>to)
       return new ArrayList<T>();

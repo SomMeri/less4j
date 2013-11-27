@@ -12,7 +12,6 @@ import com.github.sommeri.less4j.utils.ListsComparator;
 import com.github.sommeri.less4j.utils.ListsComparator.ListMemberComparator;
 import com.github.sommeri.less4j.utils.ListsComparator.MatchMarker;
 
-//FIXME: (!!!!) this whole class mostly ignores leading combinators - need special logic for them
 public class SimpleSelectorComparator implements ListMemberComparator<SimpleSelector> {
 
   private final SelectorsComparatorUtils utils;
@@ -156,7 +155,7 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
   }
 
   private boolean combinatorsEqual(SelectorCombinator cmb1, SelectorCombinator cmb2) {
-    //FIXME: (!!!) this is here to solve special case, leading combinators must be rethingg
+    //FIXME: this is here to solve special case, leading combinators must be re-thinked
     // the problem is that 
     /* 
      * h1 {} has empty leading combinator
@@ -184,7 +183,6 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
   public SimpleSelector[] splitOn(SimpleSelector lookFor, SimpleSelector inside) {
     if (hasNoElement(lookFor)) {
       //FIXME: (!!!!) test na tento flow!!!
-      //FIXME: (!!!!) move to list comparator -what did I meant by that?
       List<ElementSubsequent> subsequents = inside.getSubsequent();
       HiddenTokenAwareTree underlying = inside.getUnderlyingStructure();
 

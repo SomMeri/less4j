@@ -54,7 +54,6 @@ public class SelectorsComparatorForExtend {
     return contains;
   }
 
-  //FIXME: (!!!) test with combinator before and in the end
   private Selector replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy) {
     List<SelectorPart> inSelectorParts = inSelector.getParts();
     SelectorPartsListBuilder builder = new SelectorPartsListBuilder();
