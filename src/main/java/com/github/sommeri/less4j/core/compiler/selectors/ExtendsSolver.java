@@ -1,11 +1,10 @@
 package com.github.sommeri.less4j.core.compiler.selectors;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -21,8 +20,8 @@ public class ExtendsSolver {
 
   private List<RuleSet> allRulesets = new ArrayList<RuleSet>();
   private List<Selector> inlineExtends = new ArrayList<Selector>();
-
-  private Map<Selector, List<Selector>> allSelectorExtends = new HashMap<Selector, List<Selector>>();
+  
+  private PerformedExtendsDB performedExtends = new PerformedExtendsDB();
 
   public void solveExtends(ASTCssNode node) {
     collectRulesets(node);
@@ -36,49 +35,36 @@ public class ExtendsSolver {
   }
 
   private void solveInlineExtends(Selector extendingSelector) {
-    AlreadyExtended alreadyExtended = new AlreadyExtended();
-    alreadyExtended.markAsAlreadyExtended(extendingSelector, (RuleSet) extendingSelector.getParent());
-
     for (RuleSet ruleSet : allRulesets) {
       List<Selector> selectors = new ArrayList<Selector>(ruleSet.getSelectors());
       for (Selector targetSelector : selectors) {
-        if (shouldExtendAsFull(extendingSelector, targetSelector) && canExtend(extendingSelector, alreadyExtended, ruleSet)) {
-          doTheExtend(extendingSelector, alreadyExtended, ruleSet, targetSelector);
-        }
-        
-        //FIXME: (!!!!!) this should not be done this way, following is there only for test 
-        Selector shouldExtendAsAll = shouldExtendAsAll(extendingSelector, targetSelector);
-        //System.out.println("shouldExtendAsAll: " + shouldExtendAsAll);
-        if (shouldExtendAsAll!=null && canExtend(extendingSelector, shouldExtendAsAll, alreadyExtended, ruleSet)) {
-          doTheExtend(shouldExtendAsAll, alreadyExtended, ruleSet, targetSelector);
-          //performExtend(shouldExtendAsAll, ruleSet);
+        Selector newSelector = constructNewSelector(extendingSelector, targetSelector);
+        if (newSelector!=null && canExtend(extendingSelector, newSelector, ruleSet)) {
+          doTheExtend(extendingSelector, newSelector, ruleSet, targetSelector);
         }
       }
 
     }
   }
 
-  private void doTheExtend(Selector extendingSelector, AlreadyExtended alreadyExtended, RuleSet ruleSet, Selector targetSelector) {
-    performExtend(extendingSelector, ruleSet);
-    addToThoseWhoExtended(extendingSelector, targetSelector);
-    alreadyExtended.markAsAlreadyExtended(extendingSelector, ruleSet);
+  private void doTheExtend(Selector extendingSelector, Selector newSelector, RuleSet ruleSet, Selector targetSelector) {
+    addSelector(ruleSet, newSelector);
+    
+    performedExtends.register(extendingSelector, targetSelector);
 
-    List<Selector> thoseWhoExtendedExtending = new ArrayList<Selector>(getThoseWhoExtended(extendingSelector));
+    Collection<Selector> thoseWhoExtendedExtending = performedExtends.getPreviousExtending(extendingSelector);
     for (Selector extendedExtending : thoseWhoExtendedExtending) {
-      if (canExtend(extendedExtending, alreadyExtended, ruleSet)) {
-        doTheExtend(extendedExtending, alreadyExtended, ruleSet, targetSelector);
+      if (canExtend(extendedExtending, ruleSet)) {
+        doTheExtend(extendedExtending, extendedExtending.clone(), ruleSet, targetSelector);
       }
     }
   }
 
-  private boolean canExtend(Selector extendingSelector, AlreadyExtended alreadyExtended, RuleSet targetRuleSet) {
-    return canExtend(extendingSelector, extendingSelector, alreadyExtended, targetRuleSet);
+  private boolean canExtend(Selector extendingSelector, RuleSet targetRuleSet) {
+    return canExtend(extendingSelector, extendingSelector, targetRuleSet);
   }
   
-  private boolean canExtend(Selector extendingSelector, Selector newSelector, AlreadyExtended alreadyExtended, RuleSet targetRuleSet) {
-    if (alreadyExtended.alreadyExtended(extendingSelector, targetRuleSet))
-      return false;
-
+  private boolean canExtend(Selector extendingSelector, Selector newSelector, RuleSet targetRuleSet) {
     if (containsSelector(newSelector, targetRuleSet))
       return false;
 
@@ -107,49 +93,24 @@ public class ExtendsSolver {
     return manipulator.findParentOfType(extendingSelector, ASTCssNodeType.STYLE_SHEET, ASTCssNodeType.MEDIA);
   }
 
-  private void performExtend(Selector extendingSelector, RuleSet ruleSet) {
-    Selector selectorClone = extendingSelector.clone();
-    selectorClone.setParent(ruleSet);
-    ruleSet.addSelector(selectorClone);
+  private void addSelector(RuleSet ruleSet, Selector selector) {
+    selector.setParent(ruleSet);
+    ruleSet.addSelector(selector);
   }
 
-  private void addToThoseWhoExtended(Selector extendingSelector, Selector targetSelector) {
-    List<Selector> tied = getThoseWhoExtended(targetSelector);
-    tied.add(extendingSelector);
-  }
-
-  private List<Selector> getThoseWhoExtended(Selector selector) {
-    List<Selector> result = allSelectorExtends.get(selector);
-    if (result == null) {
-      result = new ArrayList<Selector>();
-      allSelectorExtends.put(selector, result);
-    }
-
-    return result;
-  }
-
-  private boolean shouldExtendAsFull(Selector extending, Selector possibleTarget) {
-    if (possibleTarget == extending)
-      return false;
-
-    List<Extend> extendds = extending.getExtend();
-    for (Extend extend : extendds) {
-      if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget())) 
-        return true;
-    }
-    return false;
-  }
-
-  //FIXME: what if multiple extend keywords match?
-  private Selector shouldExtendAsAll(Selector extending, Selector possibleTarget) {
+  private Selector constructNewSelector(Selector extending, Selector possibleTarget) {
     if (possibleTarget == extending)
       return null;
 
-    List<Extend> extendds = extending.getExtend();
-    for (Extend extend : extendds) {
-      if (extend.isAll()) { //FIXME: (!!!!!!) does not belong here, only for testing purposes
-        Selector addSelector = comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector());      
-        return addSelector;
+    List<Extend> allExtends = extending.getExtend();
+    for (Extend extend : allExtends) {
+      if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget())) 
+        return extending.clone();
+      
+      if (extend.isAll()) {
+        Selector addSelector = comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector());
+        if (addSelector!=null)
+          return addSelector;
       }
     }
     return null;
@@ -182,27 +143,23 @@ public class ExtendsSolver {
 
 }
 
-class AlreadyExtended {
-
-  private Map<Selector, Set<RuleSet>> alreadyExtended = new HashMap<Selector, Set<RuleSet>>();
-
-  public void markAsAlreadyExtended(Selector selector, RuleSet ruleset) {
-    Set<RuleSet> set = getSet(selector);
-    set.add(ruleset);
-  }
-
-  public boolean alreadyExtended(Selector selector, RuleSet ruleSet) {
-    Set<RuleSet> set = getSet(selector);
-    return set.contains(ruleSet);
-  }
-
-  private Set<RuleSet> getSet(Selector selector) {
-    Set<RuleSet> result = alreadyExtended.get(selector);
+class PerformedExtendsDB {
+  
+  private Map<Selector, List<Selector>> allSelectorExtends = new HashMap<Selector, List<Selector>>();
+  
+  protected List<Selector> getPreviousExtending(Selector selector) {
+    List<Selector> result = allSelectorExtends.get(selector);
     if (result == null) {
-      result = new HashSet<RuleSet>();
-      alreadyExtended.put(selector, result);
+      result = new ArrayList<Selector>();
+      allSelectorExtends.put(selector, result);
     }
 
     return result;
   }
+
+  protected void register(Selector extendingSelector, Selector targetSelector) {
+    List<Selector> tied = getPreviousExtending(targetSelector);
+    tied.add(extendingSelector);
+  }
+
 }

@@ -117,10 +117,6 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
     return owner;
   }
 
-  private boolean isEmptyPrefix(SimpleSelector owner) {//FIXME !!!!! this method must go
-    return hasNoElement(owner) && !owner.hasSubsequent();
-  }
-
   private boolean isEmpty(SimpleSelector owner) {
     return !AstLogic.hasNonSpaceCombinator(owner) && hasNoElement(owner) && !owner.hasSubsequent();
   }

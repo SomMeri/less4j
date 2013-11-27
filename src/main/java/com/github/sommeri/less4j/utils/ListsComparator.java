@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.sommeri.less4j.core.ast.ElementSubsequent;
-
 public class ListsComparator {
 
   public <T> boolean equals(List<T> first, List<T> second, ListMemberComparator<T> comparator) {
@@ -101,37 +99,36 @@ public class ListsComparator {
     return null;
   }
 
-  public <T> boolean contains(List<T> lookFor, List<T> inSelector, ListMemberComparator<T> comparator) {
-    return !findMatches(lookFor, inSelector, comparator).isEmpty();
+  public <T> boolean contains(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {
+    return !findMatches(lookFor, inList, comparator).isEmpty();
   }
 
-  //FIXME: rename inSelector to inList
-  public <T> List<MatchMarker<T>> findMatches(List<T> lookFor, List<T> inSelector, ListMemberComparator<T> comparator) {
-    return collectMatches(lookFor, inSelector, comparator, new ArrayList<MatchMarker<T>>());
+  public <T> List<MatchMarker<T>> findMatches(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {
+    return collectMatches(lookFor, inList, comparator, new ArrayList<MatchMarker<T>>());
   }
 
-  public <T> List<MatchMarker<T>> collectMatches(List<T> lookFor, List<T> inSelector, ListMemberComparator<T> comparator, List<MatchMarker<T>> result) {
-    if (lookFor.isEmpty() || lookFor.size() > inSelector.size())
+  public <T> List<MatchMarker<T>> collectMatches(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator, List<MatchMarker<T>> result) {
+    if (lookFor.isEmpty() || lookFor.size() > inList.size())
       return result;
 
     if (lookFor.size() == 1) {
-      return collectMatches(ArraysUtils.first(lookFor), inSelector, comparator, result);
+      return collectMatches(ArraysUtils.first(lookFor), inList, comparator, result);
     }
 
     T firstLookFor = ArraysUtils.first(lookFor);
-    T firstInSelector = ArraysUtils.first(inSelector);
+    T firstInList = ArraysUtils.first(inList);
 
     List<T> remainderLookFor = ArraysUtils.sublistWithoutFirst(lookFor);
-    List<T> remainderInSelector = ArraysUtils.sublistWithoutFirst(inSelector);
+    List<T> remainderInList = ArraysUtils.sublistWithoutFirst(inList);
 
-    boolean firstIsSuffix = comparator.suffix(firstLookFor, firstInSelector);
-    T prefixEnd = prefixEnd(remainderLookFor, remainderInSelector, comparator);
+    boolean firstIsSuffix = comparator.suffix(firstLookFor, firstInList);
+    T prefixEnd = prefixEnd(remainderLookFor, remainderInList, comparator);
     boolean remainderIsPrefix = prefixEnd != null;
     if (firstIsSuffix && remainderIsPrefix) {
-      result.add(new MatchMarker<T>(firstInSelector, prefixEnd, false));
+      result.add(new MatchMarker<T>(firstInList, prefixEnd, false));
     }
 
-    collectMatches(lookFor, remainderInSelector, comparator, result);
+    collectMatches(lookFor, remainderInList, comparator, result);
     return result;
   }
 
