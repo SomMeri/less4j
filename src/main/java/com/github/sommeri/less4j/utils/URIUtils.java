@@ -23,11 +23,20 @@ public class URIUtils {
     if (i != -1) {
       path = path.substring(0, i + 1);
     }
+
+    URL parentUrl = null;
     try {
-      return new URL(url, path + url.getQuery());
+
+        // compute parent URL
+        URL rootParentUrl = new URL(url, "");
+
+        // add query string to parent URL
+        parentUrl = new URL(rootParentUrl.toString() + url.getQuery());
     } catch (MalformedURLException ex) {
-      throw new RuntimeException(ex);
+        throw new RuntimeException(ex);
     }
+
+    return parentUrl;
   }
 
   public static String relativize(File from, File to) {
@@ -185,13 +194,20 @@ public class URIUtils {
       return null;
     
     String newPath = changeSuffix(uri.getPath(), dottedSuffix);
+    URI newUri = null;
+
     try {
-      URI result = new URI(uri.getScheme(),uri.getUserInfo(), uri.getHost(), uri.getPort(), newPath, null, null);
-      return result;
-    } catch (URISyntaxException ex) {
-      //TODO do something more reasonable, maybe return null?
-      throw new IllegalStateException(ex);
+
+      if(uri.toString().lastIndexOf(".") > -1) {
+          newUri = new URI(uri.toString().substring(0, (uri.toString().lastIndexOf(".") + 1)) + dottedSuffix);
+      } else {
+          newUri = new URI(uri.toString() + dottedSuffix);
+      }
+    } catch (URISyntaxException exception) {
+        throw new IllegalStateException(exception);
     }
+
+    return newUri;
   }
 
   public static String changeSuffix(String filename, String dottedSuffix) {
