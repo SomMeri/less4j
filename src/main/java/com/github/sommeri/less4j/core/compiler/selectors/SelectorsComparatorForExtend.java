@@ -45,7 +45,7 @@ public class SelectorsComparatorForExtend {
 
     Selector result = new Selector(inSelector.getUnderlyingStructure(), inSelectorParts);
     replaceInList(lookForParts, result, replaceBy.getParts());
-    //replaceEmbedded(lookForParts, result); //FIXME: (!!!!) replace in embedded || ;
+    //replaceEmbedded(lookForParts, result); //FIXME: (!!!!) replace in embedded ||https://github.com/less/less.js/issues/1680
     return result;
   }
 

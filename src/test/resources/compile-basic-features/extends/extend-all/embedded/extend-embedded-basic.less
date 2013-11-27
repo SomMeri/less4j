@@ -1,0 +1,29 @@
+a:not(tag1) {
+	property: value;
+}
+
+tag1:not(tag1) {
+	property: value;
+}
+
+a:not(tag1:last) {
+	property: value;
+}
+
+tag1:first:not(tag1:last) {
+	property: value;
+}
+
+replacement1:first:extend(tag1 all) {}
+
+tag2:last:not(tag2:last) {
+	property: value;
+}
+
+replacement2:first:extend(tag2:last all) {}
+
+tag3:extend(:first:pseudo:last) {
+	property: value;
+}
+
+:replacement3:first:extend(:pseudo all) {}

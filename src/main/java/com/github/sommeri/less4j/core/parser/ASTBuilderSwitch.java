@@ -63,7 +63,9 @@ import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
+import com.github.sommeri.less4j.core.ast.SelectorCombinator.Combinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
+import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
@@ -80,6 +82,7 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.ast.Viewport;
+import com.github.sommeri.less4j.core.compiler.stages.AstLogic;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -101,6 +104,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
 
+  private final static String EXTEND_ALL_KEYWORD = "all"; 
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
@@ -442,9 +446,22 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public Extend handleExtendedSelector(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     Selector selector = (Selector) switchOn(children.get(0));
-    if (children.size()==1)
+    SelectorPart lastPart = selector.getLastPart();
+    if (lastPart==null || !(lastPart instanceof SimpleSelector))
       return new Extend(token, selector);
-    // I simply assume that grammar is correct and the other child is "all"
+    
+    SimpleSelector possibleAll = (SimpleSelector)lastPart;
+    if (possibleAll.hasSubsequent() || !possibleAll.hasElement())
+      return new Extend(token, selector);
+    
+    if (!EXTEND_ALL_KEYWORD.equals(possibleAll.getElementName().getName()))
+      return new Extend(token, selector);
+    
+    if (AstLogic.hasNonSpaceCombinator(possibleAll)) {
+      possibleAll.setElementName(null);
+    } else {
+      selector.getParts().remove(possibleAll);
+    }
     return new Extend(token, selector, true);
   }
 

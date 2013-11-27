@@ -10,11 +10,15 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 //FIXME (!!!) add tests for values lists for attributes - e.g. error handling
 //FIXME !!!! documentation: element will attach itself to previous
 //FIXME !!!! documentation: no partial class name match - not even for all
+//FIXME !!!! documentation - extend-combinators.less differences
 public class ExtendsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/extends/extend-full/";
   private static final String combinations = "src/test/resources/compile-basic-features/extends/combinations/";
   private static final String misc = "src/test/resources/compile-basic-features/extends/";
+  private static final String extendAllCombinator = "src/test/resources/compile-basic-features/extends/extend-all/combinators/";
+  private static final String extendAll = "src/test/resources/compile-basic-features/extends/extend-all/";
+  private static final String extendAllEmbedded = "src/test/resources/compile-basic-features/extends/extend-all/embedded/";
   private static final String extendAllMatch1 = "src/test/resources/compile-basic-features/extends/extend-all/match-replacement-by-element/";
   private static final String extendAllMatch2 = "src/test/resources/compile-basic-features/extends/extend-all/match-replacement-by-x/";
   private static final String extendAllMultiple = "src/test/resources/compile-basic-features/extends/extend-all/multiple-matches/";
@@ -25,10 +29,12 @@ public class ExtendsTest extends BasicFeaturesTest {
 
   @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
-    //FIXME  !!!! bwuhuhuuuuuu enable combied tests
+    //FIXME  !!!!  enable combined tests
     //return createTestFileUtils().loadTestFiles(standardCases);
     //return createTestFileUtils().loadTestFiles(standardCases, extendAllMatch);
-    return createTestFileUtils().loadTestFiles(misc, extendAllMatch1, extendAllMatch2, extendAllMultiple);
+    //return createTestFileUtils().loadTestFiles(extendAllCombinator);
+    
+    return createTestFileUtils().loadTestFiles(standardCases, extendAllCombinator, extendAll, misc, extendAllMatch1, extendAllMatch2, extendAllMultiple);
   }
 
   protected void assertSourceMapValid(CompilationResult actual) {

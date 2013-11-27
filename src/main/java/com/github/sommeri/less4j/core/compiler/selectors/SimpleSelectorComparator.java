@@ -6,6 +6,7 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
+import com.github.sommeri.less4j.core.compiler.stages.AstLogic;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ListsComparator;
 import com.github.sommeri.less4j.utils.ListsComparator.ListMemberComparator;
@@ -36,6 +37,12 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
 
   @Override
   public boolean prefix(SimpleSelector lookFor, SimpleSelector inside) {
+    if (!combinatorsEqual(lookFor.getLeadingCombinator(), inside.getLeadingCombinator()))
+      return false;
+
+    if (!lookFor.hasSubsequent() && !lookFor.hasElement())
+      return true;
+
     if (!simpleSelectorsElementsEqual(lookFor, inside))
       return false;
 
@@ -46,30 +53,53 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
 
   @Override
   public boolean suffix(SimpleSelector lookFor, SimpleSelector inside) {
-    if (hasNoElement(lookFor)) {
-      return listsComparator.suffix(lookFor.getSubsequent(), inside.getSubsequent(), elementSubsequentComparator);
-    } else {
-      //lookFor starts by a star or by element name - whole selector must match
+    //combinator element subsequent
+    boolean hasCombinator = AstLogic.hasNonSpaceCombinator(lookFor);
+    boolean hasElement = !hasNoElement(lookFor);
+
+    // lookFor starts with a combinator - whole selector must match
+    if (hasCombinator) {
       return equals(lookFor, inside);
     }
+    // lookFor starts with an element - element and subsequents must match
+    if (hasElement) {
+      if (!simpleSelectorsElementsEqual(lookFor, inside) || lookFor.getSubsequent().size() != inside.getSubsequent().size()) {
+        return false;
+      }
+    }
+    //compare subsequents
+    if (!lookFor.hasSubsequent())
+      return true;
+    
+    return listsComparator.suffix(lookFor.getSubsequent(), inside.getSubsequent(), elementSubsequentComparator);
   }
 
   /**
    * Assumes there is common suffix, e.g. suffix(lookFor, inside) returns true; 
    */
-  public SimpleSelector cutSuffix(SimpleSelector lookFor, SimpleSelector inside) {
-    if (hasNoElement(lookFor)) {
-      //find matches 
-      List<ElementSubsequent> lfSubsequent = lookFor.getSubsequent();
-      List<ElementSubsequent> insideSubsequent = inside.getSubsequent();
-      MatchMarker<ElementSubsequent> match = listsComparator.suffixMatches(lfSubsequent, insideSubsequent, elementSubsequentComparator);
-      SimpleSelector result = removeMatch(inside, insideSubsequent, match);
-      //check if the whole thing was eaten up - we know that subsequent elements are always compared in whole
-      return isEmpty(result)? null : result;
-    } else {
-      //suffix consumed whole selector
+  public SimpleSelector cutSuffix(SimpleSelector cutOff, SimpleSelector inside) {
+    boolean hasCombinator = AstLogic.hasNonSpaceCombinator(cutOff);
+    boolean hasElement = !hasNoElement(cutOff);
+
+    // lookFor starts with a combinator - whole selector is to be eaten
+    if (hasCombinator) {
       return null;
     }
+    // lookFor starts with an element - element and subsequents are to be eaten, combinator is there to stay
+    SelectorCombinator combinator = inside.hasLeadingCombinator() ? inside.getLeadingCombinator().clone() : null;
+    if (hasElement) {
+      SimpleSelector result = createNoElementSelector(inside.getUnderlyingStructure(), combinator);
+      return result;
+
+    }
+    // only some subsequents are to be eaten
+    //find matches 
+    List<ElementSubsequent> lfSubsequent = cutOff.getSubsequent();
+    List<ElementSubsequent> insideSubsequent = inside.getSubsequent();
+    MatchMarker<ElementSubsequent> match = listsComparator.suffixMatches(lfSubsequent, insideSubsequent, elementSubsequentComparator);
+    SimpleSelector result = removeMatch(inside, insideSubsequent, match);
+    //check if the whole thing was eaten up - we know that subsequent elements are always compared in whole
+    return isEmpty(result) ? null : result;
   }
 
   private SimpleSelector removeMatch(SimpleSelector owner, List<ElementSubsequent> subsequentsList, MatchMarker<ElementSubsequent> match) {
@@ -87,25 +117,29 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
     return owner;
   }
 
-  private boolean isEmpty(SimpleSelector owner) {
+  private boolean isEmptyPrefix(SimpleSelector owner) {//FIXME !!!!! this method must go
     return hasNoElement(owner) && !owner.hasSubsequent();
+  }
+
+  private boolean isEmpty(SimpleSelector owner) {
+    return !AstLogic.hasNonSpaceCombinator(owner) && hasNoElement(owner) && !owner.hasSubsequent();
   }
 
   /**
    * Assumes there is common suffix, e.g. prefix(lookFor, inside) returns true; 
    */
-  public SimpleSelector cutPrefix(SimpleSelector lookFor, SimpleSelector inside) {
+  public SimpleSelector cutPrefix(SimpleSelector cutOff, SimpleSelector inside) {
     inside.setStar(true);
     inside.setEmptyForm(true);
     if (inside.hasElement())
       inside.getElementName().setParent(null);
     inside.setElementName(null);
-    List<ElementSubsequent> lfSubsequent = lookFor.getSubsequent();
+    List<ElementSubsequent> lfSubsequent = cutOff.getSubsequent();
     List<ElementSubsequent> insideSubsequent = inside.getSubsequent();
     MatchMarker<ElementSubsequent> match = listsComparator.prefixMatches(lfSubsequent, insideSubsequent, elementSubsequentComparator);
     SimpleSelector result = removeMatch(inside, insideSubsequent, match);
     //check if the whole thing was eaten up - we know that subsequent elements are always compared in whole
-    return isEmpty(result)? null : result;
+    return isEmpty(result) ? null : result;
   }
 
   private boolean hasNoElement(SimpleSelector selector) {
@@ -117,9 +151,6 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
       return false;
 
     if (first.isEmptyForm() != second.isEmptyForm())
-      return false;
-
-    if (!combinatorsEqual(first.getLeadingCombinator(), second.getLeadingCombinator()))
       return false;
 
     if (!utils.interpolableNamesEqual(first.getElementName(), second.getElementName()))
@@ -164,10 +195,11 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
       List<MatchMarker<ElementSubsequent>> matches = listsComparator.findMatches(lookFor.getSubsequent(), subsequents, elementSubsequentComparator);
       List<SimpleSelector> result = new ArrayList<SimpleSelector>();
       result.add(inside);
-      for (MatchMarker<ElementSubsequent> current : matches) if (current.isIn(subsequents)) {
+      for (MatchMarker<ElementSubsequent> current : matches)
+        if (current.isIn(subsequents)) {
           List<ElementSubsequent> tail = splitAfter(current.getLast(), subsequents);
           removeMatch(inside, subsequents, current);
-          SimpleSelector second = createNoTagSelector(underlying, tail);
+          SimpleSelector second = createNoElementSelector(underlying, tail);
           result.add(second);
           subsequents = second.getSubsequent();
         }
@@ -179,11 +211,23 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
     }
   }
 
-  private SimpleSelector createNoTagSelector(HiddenTokenAwareTree underlying, List<ElementSubsequent> tail) {
-    SimpleSelector second = new SimpleSelector(underlying, null, null, true);
-    second.setEmptyForm(true);
+  private SimpleSelector createNoElementSelector(HiddenTokenAwareTree underlying, SelectorCombinator combinator) {
+    SimpleSelector second = createEmptySelector(underlying);
+    second.setLeadingCombinator(combinator);
+    second.configureParentToAllChilds();
+    return second;
+  }
+
+  private SimpleSelector createNoElementSelector(HiddenTokenAwareTree underlying, List<ElementSubsequent> tail) {
+    SimpleSelector second = createEmptySelector(underlying);
     second.addSubsequent(tail);
     second.configureParentToAllChilds();
+    return second;
+  }
+
+  private SimpleSelector createEmptySelector(HiddenTokenAwareTree underlying) {
+    SimpleSelector second = new SimpleSelector(underlying, null, null, true);
+    second.setEmptyForm(true);
     return second;
   }
 

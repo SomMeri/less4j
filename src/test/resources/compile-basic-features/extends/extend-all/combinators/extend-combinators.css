@@ -1,0 +1,39 @@
+h1 > pre + h,
+full1,
+all1 {
+  property: value;
+}
+h1 pre + h,
+full2,
+all2 {
+  property: value;
+}
+h1 ~ pre h,
+full3,
+all3 {
+  property: value;
+}
+.a1 > .b1 + .c1,
+.a1 > .keepCombinator + .c1 {
+  property: value;
+}
+.a2 > .b2 + .c2,
+.a2 > keepCombinator + .c2 {
+  property: value;
+}
+.a3 > .b3 + .c3,
+.a3 > keepCombinator {
+  property: value;
+}
+.first .second .third .fourth,
+.first middle .fourth {
+  property: value;
+}
+.first + .second + .third + .fourth,
+.first leadingCombinator + .fourth {
+  property: value;
+}
+.first > .second > .third > .fourth,
+.first > tailCombinator.fourth {
+  property: value;
+}

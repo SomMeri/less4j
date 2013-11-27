@@ -1,0 +1,52 @@
+h1 > pre + h {
+  property: value;
+}
+h1 pre + h {
+  property: value;
+}
+h1 ~ pre h {
+  property: value;
+}
+
+full1:extend(h1 > pre + h) {}
+all1:extend(h1 > pre + h all) {}
+full2:extend(h1 pre + h) {}
+all2:extend(h1 pre + h all) {}
+full3:extend(h1 ~ pre h) {}
+all3:extend(h1 ~ pre h all) {}
+
+.a1 > .b1 + .c1 {
+  property: value;
+}
+.keepCombinator:extend(.b1 all) {}
+
+.a2 > .b2 + .c2 {
+  property: value;
+}
+keepCombinator:extend(.b2 all) {}
+
+.a3 > .b3 + .c3 {
+  property: value;
+}
+keepCombinator:extend(.b3 +.c3 all) {}
+
+.first .second .third .fourth {
+  property: value;
+}
+middle:extend(.second .third all) {}
+
+//IMPORTANT: this one is handled differently then in less.js
+//   less.js: .first + leadingCombinator + .fourth {
+//   less4j:  .first leadingCombinator + .fourth
+.first + .second + .third + .fourth {
+  property: value;
+}
+leadingCombinator:extend(+ .second + .third all) {}
+
+//IMPORTANT: this one is handled differently then in less.js
+//   less.js: .first > tailCombinator > .fourth 
+//   less4j:  .first > tailCombinator.fourth
+.first > .second > .third > .fourth {
+  property: value;
+}
+tailCombinator:extend(.second > .third > all) {}

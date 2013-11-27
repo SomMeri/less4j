@@ -39,7 +39,7 @@ public class ParsersSemanticPredicates {
 
     return "all".equals(all.getText().toLowerCase());
   }
-  
+
   public boolean insideNth(TokenStream input) {
     return isNthPseudoClass(input.LT(-1));
   }

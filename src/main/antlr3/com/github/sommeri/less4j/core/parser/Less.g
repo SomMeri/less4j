@@ -491,19 +491,25 @@ finally { leaveRule(); }
 // if this is changed, chances are the selector must be changed too
 // Less keyword-pseudoclass "extend" takes selector as an argument. The selector can be optionally
 // followed by keyword all. The grammar is ambiguous as a result and its predictability suffers.  
+//extendedSelector 
+//@init {enterRule(retval, RULE_SELECTOR);}
+//    : ( { !predicates.matchingAllRparent(input)}?=>(
+//            ((combinator)=>a+=combinator | ) 
+//            (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax)
+//        )
+//      )+
+//      (  { predicates.matchingAllRparent(input)}?=>b+=IDENT
+//         |
+//      )
+//    -> ^(EXTENDED_SELECTOR ^(SELECTOR $a* ) $b*) 
+//    ;
+//finally { leaveRule(); }
+
 extendedSelector 
-@init {enterRule(retval, RULE_SELECTOR);}
-    : ( { !predicates.matchingAllRparent(input)}?=>(
-            ((combinator)=>a+=combinator | ) 
-            (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax)
-        )
-      )+
-      (  { predicates.matchingAllRparent(input)}?=>b+=IDENT
-         |
-      )
-    -> ^(EXTENDED_SELECTOR ^(SELECTOR $a* ) $b*) 
+    : a+=selector
+    -> ^(EXTENDED_SELECTOR $a*) 
     ;
-finally { leaveRule(); }
+
 
 //TODO clean up, this version is just a proof of concept
 escapedSelectorOldSyntax: LPAREN VALUE_ESCAPE RPAREN-> ^(ESCAPED_SELECTOR VALUE_ESCAPE);
