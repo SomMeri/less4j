@@ -1,0 +1,9 @@
+html {
+  font-weight: 300;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+@supports not (-webkit-font-smoothing: subpixel-antialiased) {
+  html {
+    font-weight: 400;
+  }
+}
