@@ -39,7 +39,7 @@ tokens {
   RULESET;
   NESTED_APPENDER;
   SELECTOR;
-  EXTENDED_SELECTOR;
+  EXTEND_TARGET_SELECTOR;
   SIMPLE_SELECTOR;
   ESCAPED_SELECTOR;
   EXPRESSION;
@@ -52,6 +52,7 @@ tokens {
   ELEMENT_NAME;
   CSS_CLASS;
   NTH;
+  EXTEND_IN_DECLARATION;
   PSEUDO;
   ATTRIBUTE;
   ID_SELECTOR;
@@ -457,6 +458,7 @@ general_body
                | (mixinReferenceWithSemi)=>a+=mixinReferenceWithSemi
                | (namespaceReferenceWithSemi)=>a+=namespaceReferenceWithSemi
                | (reusableStructure)=>a+=reusableStructure
+               | a+=extendInDeclarationWithSemi
                | a+=pageMarginBox 
                | a+=variabledeclaration
                | a+=media_in_general_body
@@ -505,9 +507,9 @@ finally { leaveRule(); }
 //    ;
 //finally { leaveRule(); }
 
-extendedSelector 
+extendTargetSelector 
     : a+=selector
-    -> ^(EXTENDED_SELECTOR $a*) 
+    -> ^(EXTEND_TARGET_SELECTOR $a*) 
     ;
 
 
@@ -579,11 +581,16 @@ attrib
       -> ^(ATTRIBUTE $a* $b*)
 ;
 
+extendInDeclarationWithSemi
+  : MEANINGFULL_WHITESPACE? APPENDER MEANINGFULL_WHITESPACE? a+=pseudo
+  -> ^(EXTEND_IN_DECLARATION $a*)
+  ;
+  
 pseudo
     : (c+=COLON c+=COLON? a=IDENT (
         (LPAREN)=>(
           { predicates.insideNth(input)}?=> LPAREN (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) RPAREN
-          | { predicates.insideExtend(input)}?=> LPAREN (b4=extendedSelector) RPAREN
+          | { predicates.insideExtend(input)}?=> LPAREN (b4=extendTargetSelector) RPAREN
           | LPAREN b5=pseudoparameters RPAREN 
         )
         |)

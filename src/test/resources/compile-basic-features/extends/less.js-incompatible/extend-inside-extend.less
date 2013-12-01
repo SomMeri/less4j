@@ -4,4 +4,5 @@
 .selector:extend(.aha) {  
   color: blue;
 }
+//less.js would ignore this extend, we only ignore nested extends
 .topLevel:extend(.selector:extend(.aha)) {} // this should not be recognized 

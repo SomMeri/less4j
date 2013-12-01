@@ -1,0 +1,38 @@
+h1 {
+  border: 1px solid blue;
+}
+h2 {
+  border: 1px solid blue;
+}
+h3 {
+  border: 1px solid blue;
+}
+.a {
+  &:extend(h1);
+  color: black;
+}
+
+.b {
+  &:extend(h1);
+  color: black;
+}
+.c,.d+e,f {
+  &:extend(h1);
+  color: black;
+}
+.outer {
+  &:extend(h1);
+  .inner {
+    &:extend(h2);
+  }
+}
+.otherextend1:extend(h2) {}
+.outer1 {
+  .inner1 {
+    &:extend(.otherextend1);
+    &:extend(.otherextend2);
+    &:extend(outer inner);
+  }
+}
+.otherextend2:extend(h3) {}
+

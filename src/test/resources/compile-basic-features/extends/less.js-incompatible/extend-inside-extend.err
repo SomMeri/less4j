@@ -1,0 +1,2 @@
+Warnings produced by compilation of testCase
+WARNING 8:18 Target selector of extend contains nested extend. Nested extend will be ignored. The behaviour of less.js and less4j differ on this type of input.

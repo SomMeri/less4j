@@ -47,11 +47,9 @@ public class LessToCssCompiler {
 
     evaluateExpressions(less);
     freeNestedRulesetsAndMedia(less);
-    
     solveExtends(less);
     
     finalMediaMergingAndBubbling(less);
-    
     removeUselessLessElements(less);
     //normalizeUrlsAndImportsInImportedFiles(less);
 

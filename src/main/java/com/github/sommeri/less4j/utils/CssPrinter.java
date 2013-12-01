@@ -281,7 +281,7 @@ public class CssPrinter {
     case INDIRECT_VARIABLE:
     case VARIABLE_DECLARATION:
       throw new NotACssException(node);
-
+      
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getSourceColumn());
     }

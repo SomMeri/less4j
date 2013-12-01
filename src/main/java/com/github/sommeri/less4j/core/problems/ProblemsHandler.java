@@ -19,6 +19,7 @@ import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
+import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.Variable;
@@ -131,6 +132,10 @@ public class ProblemsHandler {
 
   public void warnEscapeFunctionArgument(Expression errorNode) {
     collector.addWarning(new CompilationWarning(errorNode, "Escape function argument should be a string."));
+  }
+
+  public void warnExtendInsideExtend(Selector errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "Target selector of extend contains nested extend. Nested extend will be ignored. The behaviour of less.js and less4j differ on this type of input."));
   }
 
   public void warnEFunctionArgument(Expression errorNode) {

@@ -12,6 +12,7 @@ import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class ExtendsSolver {
 
@@ -121,7 +122,7 @@ public class ExtendsSolver {
     case RULE_SET: {
       RuleSet ruleset = (RuleSet) node;
       allRulesets.add(ruleset);
-      collectAllSelectors(ruleset);
+      collectExtendingSelectors(ruleset);
       break;
     }
     default:
@@ -133,12 +134,35 @@ public class ExtendsSolver {
     }
   }
 
-  private void collectAllSelectors(RuleSet ruleset) {
+  private void collectExtendingSelectors(RuleSet ruleset) {
+    List<Extend> directExtends = collectDirectExtendDeclarations(ruleset);
     for (Selector selector : ruleset.getSelectors()) {
+      addClones(selector, directExtends);
       if (selector.isExtending()) {
         inlineExtends.add(selector);
       }
     }
+  }
+
+  private void addClones(Selector selector, List<Extend> newExtends) {
+    List<Extend> clones = ArraysUtils.deeplyClonedList(newExtends);
+    selector.addExtends(clones);
+    for (Extend extend : clones) {
+      extend.setParent(selector);
+    }
+  }
+
+  private List<Extend> collectDirectExtendDeclarations(RuleSet ruleset) {
+    List<Extend> result = new ArrayList<Extend>();
+    List<ASTCssNode> members = new ArrayList<ASTCssNode>(ruleset.getBody().getMembers());
+    for (ASTCssNode node : members) {
+      if (node.getType()==ASTCssNodeType.EXTEND) {
+        Extend extend = (Extend) node;
+        manipulator.removeFromBody(extend);
+        result.add(extend);
+      }
+    }
+    return result;
   }
 
 }

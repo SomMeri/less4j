@@ -442,9 +442,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return builder.buildSelector();
   }
 
-  public Extend handleExtendedSelector(HiddenTokenAwareTree token) {
+  public Extend handleExtendTargetSelector(HiddenTokenAwareTree token) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     Selector selector = (Selector) switchOn(children.get(0));
+    if (selector.isExtending()) {
+      problemsHandler.warnExtendInsideExtend(selector);
+    }
+    
     SelectorPart lastPart = selector.getLastPart();
     if (lastPart==null || !(lastPart instanceof SimpleSelector))
       return new Extend(token, selector);
@@ -1076,6 +1080,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     return new NamedExpression(token, nameToken.getText(), value);
 
+  }
+
+  @Override
+  public Extend handleExtendInDeclaration(HiddenTokenAwareTree token) {
+    HiddenTokenAwareTree child = token.getChild(0);
+    Pseudo extendAsPseudo = handlePseudo(child);
+    //FIXME !!!!!!!! validate that it is extend
+    //FIXME !!!!!!!! validate that it is pseudoclass
+    
+    PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
+    return (Extend) asPseudoclass.getParameter();
   }
 
 }

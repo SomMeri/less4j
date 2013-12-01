@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -173,6 +174,10 @@ public class Selector extends ASTCssNode implements Cloneable {
 
   public void addExtend(Extend extend) {
     this.extend.add(extend);
+  }
+
+  public void addExtends(Collection<Extend> newExtends) {
+    this.extend.addAll(newExtends);
   }
 
   public void setParts(List<SelectorPart> newParts) {
