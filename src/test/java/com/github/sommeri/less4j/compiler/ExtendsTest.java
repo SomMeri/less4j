@@ -31,12 +31,7 @@ public class ExtendsTest extends BasicFeaturesTest {
 
   @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
-    //FIXME  !!!!  enable combined tests
-    //return createTestFileUtils().loadTestFiles(standardCases);
-    //return createTestFileUtils().loadTestFiles(standardCases, extendAllMatch);
-    //return createTestFileUtils().loadTestFiles(extendAllCombinator);
-    
-    return createTestFileUtils().loadTestFiles(standardCases, lessJsIncompatible, extendFull, extendAllCombinator, extendAll, misc, extendAllMatch1, extendAllMatch2, extendAllMultiple);
+    return createTestFileUtils().loadTestFiles(standardCases, extendAllEmbedded, lessJsIncompatible, extendFull, extendAllCombinator, extendAll, misc, extendAllMatch1, extendAllMatch2, extendAllMultiple);
   }
 
   protected void assertSourceMapValid(CompilationResult actual) {

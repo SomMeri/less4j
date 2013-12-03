@@ -26,6 +26,7 @@ public class ParsersSemanticPredicates {
   }
 
   private static String EXTEND_PSEUDOCLASS = "extend";
+  private static String NOT_PSEUDOCLASS = "not";
   
   public boolean matchingAllRparent(TokenStream input) {
     Token all = input.LT(1);
@@ -66,6 +67,19 @@ public class ParsersSemanticPredicates {
     return EXTEND_PSEUDOCLASS.equals(text.toLowerCase());
   }
 
+  public boolean insideNot(TokenStream input) {
+    return insideNot(input.LT(-1));
+  }
+
+  private boolean insideNot(Token a) {
+    if (a == null)
+      return false;
+    String text = a.getText();
+    if (text == null)
+      return false;
+    return NOT_PSEUDOCLASS.equals(text.toLowerCase());
+  }
+  
   /**
    * Basically, this is an ugly hack. The parser grammar is unable to tell the difference 
    * between "identifier (expression)" and "identifier(expression)". They differ only 

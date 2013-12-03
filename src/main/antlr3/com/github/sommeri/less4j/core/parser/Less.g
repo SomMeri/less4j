@@ -591,10 +591,11 @@ pseudo
         (LPAREN)=>(
           { predicates.insideNth(input)}?=> LPAREN (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) RPAREN
           | { predicates.insideExtend(input)}?=> LPAREN (b4=extendTargetSelector) RPAREN
-          | LPAREN b5=pseudoparameters RPAREN 
+          | { predicates.insideNot(input)}?=> LPAREN (b5=selector) RPAREN
+          | LPAREN b6=pseudoparameters RPAREN 
         )
         |)
-      ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3* $b4* $b5*)
+      ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3* $b4* $b5* $b6*)
     ;
     
 pseudoparameters:

@@ -1,1 +1,24 @@
-https://github.com/less/less.js/issues/1680
+a:not(tag1),
+a:not(replacement1:first) {
+  property: value;
+}
+tag1:not(tag1),
+replacement1:first:not(replacement1:first) {
+  property: value;
+}
+a:not(tag1:last),
+a:not(replacement1:first:last) {
+  property: value;
+}
+tag1:first:not(tag1:last),
+replacement1:first:first:not(replacement1:first:last) {
+  property: value;
+}
+tag2:last:not(tag2:last),
+replacement2:first:not(replacement2:first) {
+  property: value;
+}
+tag3:not(:first:pseudo:last),
+tag3:not(:first:replacement3:first:last) {
+  property: value;
+}

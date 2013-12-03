@@ -193,7 +193,6 @@ public class URIUtils {
     if (uri==null)
       return null;
     
-    String newPath = changeSuffix(uri.getPath(), dottedSuffix);
     URI newUri = null;
 
     try {

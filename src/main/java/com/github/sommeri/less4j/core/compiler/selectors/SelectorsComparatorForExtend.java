@@ -45,7 +45,7 @@ public class SelectorsComparatorForExtend {
 
     Selector result = new Selector(inSelector.getUnderlyingStructure(), inSelectorParts);
     replaceInList(lookForParts, result, replaceBy.getParts());
-    //replaceEmbedded(lookForParts, result); //FIXME: (!!!!) replace in embedded ||https://github.com/less/less.js/issues/1680
+    replaceEmbedded(lookForParts, result, replaceBy.getParts()); 
     return result;
   }
 
@@ -54,14 +54,20 @@ public class SelectorsComparatorForExtend {
     return contains;
   }
 
-  private Selector replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy) {
+  private void replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy) {
+    replaceInList(lookForParts, inSelector, originalReplaceBy, false);
+  }
+  private void replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy, boolean hackLog) {
     List<SelectorPart> inSelectorParts = inSelector.getParts();
     SelectorPartsListBuilder builder = new SelectorPartsListBuilder();
 
     List<MatchMarker<SelectorPart>> matches = listsComparator.findMatches(lookForParts, inSelectorParts, selectorPartsComparator);
     if (matches.isEmpty() || originalReplaceBy == null || originalReplaceBy.isEmpty())
-      return null;
+      return ;
 
+    if (hackLog)
+      System.out.println("something will happen");
+    
     SelectorPart lastRemainder = null;
     MatchMarker<SelectorPart> previousMatch = null;
     for (MatchMarker<SelectorPart> currentMatch : matches) {
@@ -113,8 +119,6 @@ public class SelectorsComparatorForExtend {
     builder.addAll(inSelectorParts);
     inSelector.setParts(builder.getParts());
     inSelector.configureParentToAllChilds();
-
-    return inSelector;
   }
 
   private List<SelectorPart> replaceInsidePart(SelectorPart lookFor, SelectorPart inside, List<SelectorPart> replaceBy) {
@@ -147,18 +151,36 @@ public class SelectorsComparatorForExtend {
 
   private boolean containsEmbedded(List<SelectorPart> lookFor, ASTCssNode inside) {
     for (ASTCssNode kid : inside.getChilds()) {
+      if (containsEmbedded(lookFor, kid))
+        return true;
+
       switch (kid.getType()) {
       case SELECTOR:
         Selector kidSelector = (Selector) kid;
         if (containsInList(lookFor, kidSelector.getParts()))
           return true;
-        break;
+
       default:
-        if (containsEmbedded(lookFor, kid))
-          return true;
+        break;
       }
     }
     return false;
+  }
+
+  private void replaceEmbedded(List<SelectorPart> lookFor, ASTCssNode inside, List<SelectorPart> originalReplaceBy) {
+    for (ASTCssNode kid : inside.getChilds()) {
+      replaceEmbedded(lookFor, kid, originalReplaceBy);
+      System.out.println(kid);
+      switch (kid.getType()) {
+      case SELECTOR:
+        Selector kidSelector = (Selector) kid;
+        System.out.println(" - replacing in embedded - ");
+        replaceInList(lookFor, kidSelector, originalReplaceBy, true);
+      default:
+        break;
+      }
+      
+    }
   }
 
 }

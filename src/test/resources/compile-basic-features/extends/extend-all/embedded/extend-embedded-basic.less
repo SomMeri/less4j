@@ -22,7 +22,7 @@ tag2:last:not(tag2:last) {
 
 replacement2:first:extend(tag2:last all) {}
 
-tag3:extend(:first:pseudo:last) {
+tag3:not(:first:pseudo:last) {
 	property: value;
 }
 
