@@ -55,9 +55,6 @@ public class SelectorsComparatorForExtend {
   }
 
   private void replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy) {
-    replaceInList(lookForParts, inSelector, originalReplaceBy, false);
-  }
-  private void replaceInList(List<SelectorPart> lookForParts, Selector inSelector, List<SelectorPart> originalReplaceBy, boolean hackLog) {
     List<SelectorPart> inSelectorParts = inSelector.getParts();
     SelectorPartsListBuilder builder = new SelectorPartsListBuilder();
 
@@ -65,9 +62,6 @@ public class SelectorsComparatorForExtend {
     if (matches.isEmpty() || originalReplaceBy == null || originalReplaceBy.isEmpty())
       return ;
 
-    if (hackLog)
-      System.out.println("something will happen");
-    
     SelectorPart lastRemainder = null;
     MatchMarker<SelectorPart> previousMatch = null;
     for (MatchMarker<SelectorPart> currentMatch : matches) {
@@ -170,12 +164,10 @@ public class SelectorsComparatorForExtend {
   private void replaceEmbedded(List<SelectorPart> lookFor, ASTCssNode inside, List<SelectorPart> originalReplaceBy) {
     for (ASTCssNode kid : inside.getChilds()) {
       replaceEmbedded(lookFor, kid, originalReplaceBy);
-      System.out.println(kid);
       switch (kid.getType()) {
       case SELECTOR:
         Selector kidSelector = (Selector) kid;
-        System.out.println(" - replacing in embedded - ");
-        replaceInList(lookFor, kidSelector, originalReplaceBy, true);
+        replaceInList(lookFor, kidSelector, originalReplaceBy);
       default:
         break;
       }
