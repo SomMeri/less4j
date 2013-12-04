@@ -1,17 +1,31 @@
-// https://github.com/less/less.js/issues/1581
-.box {
-	margin: 0 auto 25px;
-	border: 1px solid;
-	padding: 15px;
-	border-radius: 6px;
+// FAILS - OPEN in less.js https://github.com/less/less.js/issues/1554.foo {
+    property: value;
+
+    &.bar {
+        property: value;
+    }
+
+    &.baz {
+        &:extend(&.bar);
+        property: value;
+    }
+
+}
+// FAILS - https://github.com/less/less.js/issues/1227
+.button {
+  color: black;
+  &:hover {
+    color: white;
+  }
+}
+.submit {
+   &:extend(.button);
+   &:hover:extend(.button:hover) {}
 }
 
-.important { 
-	&:extend (.box all);
-	background: #ffe5e5;
-	border-color: red;
+// FAILS - OPEN in less.js https://github.com/less/less.js/issues/1487
+.class, .other { property: value }
+.class {
+    .class, .other { property: value }
 }
-
-.success { 
-	&:extend (.important all);
-}
+.extension { &:extend(.class all); }

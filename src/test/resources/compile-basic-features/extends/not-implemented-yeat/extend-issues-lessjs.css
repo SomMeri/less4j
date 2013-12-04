@@ -1,0 +1,31 @@
+.foo {
+  property: value;
+}
+.foo.bar,
+.foo.baz {
+  property: value;
+}
+.foo.baz {
+  property: value;
+}
+.button,
+.submit {
+  color: black;
+}
+.button:hover,
+.submit:hover {
+  color: white;
+}
+.class,
+.other,
+.extension {
+  property: value;
+}
+.class .class,
+.class .other,
+.class .extension,
+.extension .class,
+.extension .other,
+.extension .extension {
+  property: value;
+}

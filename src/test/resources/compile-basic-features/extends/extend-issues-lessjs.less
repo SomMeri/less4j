@@ -1,0 +1,40 @@
+// https://github.com/less/less.js/issues/1207
+.badError:extend(.error all) { }
+.large {
+    .error {
+        font-size: 200%;
+    }
+}
+
+// https://github.com/less/less.js/issues/1581
+.box{
+    margin: 0 auto 25px;
+    border: 1px solid;
+    padding: 15px;
+    border-radius: 6px;
+
+    }
+
+    .important{
+    &:extend(.box all);
+        background: #ffe5e5;
+        border-color: red;
+    }
+    .success{
+    &:extend(.important all);
+    }
+    
+// https://github.com/less/less.js/issues/1404
+.header {
+     .header-nav {
+        background: red;
+        &:before {
+            background: blue;
+        }
+    }
+}
+.footer {
+    .footer-nav {
+        &:extend( .header .header-nav all );
+    }
+}
