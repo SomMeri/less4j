@@ -88,6 +88,10 @@ public abstract class SelectorPart extends ASTCssNode {
   }
 
   public void extendName(String secondName) {
+    extendName(secondName, getUnderlyingStructure());
+  }
+
+  public void extendName(String extension, HiddenTokenAwareTree underlyingStructureOfExtension) {
     throw new BugHappened("Attempt to extend a name of unexpected selector part.", this);
   }
 

@@ -128,14 +128,14 @@ public class SimpleSelector extends SelectorPart implements Cloneable {
     return builder.toString();
   }
 
-  public void extendName(String extension) {
+  public void extendName(String extension, HiddenTokenAwareTree underlyingStructureOfExtension) {
     if (isStar) {
       isStar=false;
     }
     if (hasElement()) {
       getElementName().extendName(extension);
     } else {
-      setElementName(new InterpolableName(getUnderlyingStructure(), new FixedNamePart(getUnderlyingStructure(), extension)));
+      setElementName(new InterpolableName(underlyingStructureOfExtension, new FixedNamePart(getUnderlyingStructure(), extension)));
     }
   }
 

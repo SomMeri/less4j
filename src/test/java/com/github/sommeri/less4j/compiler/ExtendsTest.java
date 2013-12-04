@@ -34,8 +34,4 @@ public class ExtendsTest extends BasicFeaturesTest {
     return createTestFileUtils().loadTestFiles(standardCases, extendAllEmbedded, lessJsIncompatible, extendFull, extendAllCombinator, extendAll, misc, extendAllMatch1, extendAllMatch2, extendAllMultiple);
   }
 
-  protected void assertSourceMapValid(CompilationResult actual) {
-    //FIXME !!!! enable source map test again!
-  }
-
 }

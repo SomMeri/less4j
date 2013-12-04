@@ -43,7 +43,7 @@ public class SelectorsComparatorForExtend {
     List<SelectorPart> lookForParts = lookFor.getParts();
     List<SelectorPart> inSelectorParts = ArraysUtils.deeplyClonedList(inSelector.getParts());
 
-    Selector result = new Selector(inSelector.getUnderlyingStructure(), inSelectorParts);
+    Selector result = new Selector(replaceBy.getUnderlyingStructure(), inSelectorParts);
     replaceInList(lookForParts, result, replaceBy.getParts());
     replaceEmbedded(lookForParts, result, replaceBy.getParts()); 
     return result;

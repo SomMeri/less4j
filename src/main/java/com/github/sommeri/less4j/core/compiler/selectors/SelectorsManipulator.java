@@ -114,7 +114,7 @@ public class SelectorsManipulator {
         ElementSubsequent subsequent = first.getLastSubsequent();
         subsequent.extendName(secondName);
       } else {
-        first.extendName(secondName);
+        first.extendName(secondName, second.getUnderlyingStructure());
       }
     }
 
