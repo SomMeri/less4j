@@ -5,18 +5,16 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.LessCompiler.CompilationResult;
-
 //FIXME (!!!) add tests for values lists for attributes - e.g. error handling
-//FIXME !!!! documentation: element will attach itself to previous
-//FIXME !!!! documentation: no partial class name match - not even for all
+//FIXME !!!! less.js documentation: element will attach itself to previous
+//FIXME !!!! less.js documentation: no partial class name match - not even for all
 //FIXME !!!! documentation - extend-combinators.less differences
 public class ExtendsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/extends/";
   private static final String lessJsIncompatible = "src/test/resources/compile-basic-features/extends/less.js-incompatible/";
   private static final String extendFull = "src/test/resources/compile-basic-features/extends/extend-full/";
-  private static final String combinations = "src/test/resources/compile-basic-features/extends/combinations/";
+  //private static final String combinations = "src/test/resources/compile-basic-features/extends/combinations/";
   private static final String misc = "src/test/resources/compile-basic-features/extends/";
   private static final String extendAllCombinator = "src/test/resources/compile-basic-features/extends/extend-all/combinators/";
   private static final String extendAll = "src/test/resources/compile-basic-features/extends/extend-all/";
