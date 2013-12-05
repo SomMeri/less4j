@@ -1,13 +1,6 @@
-.header {
-     .header-nav {
-        background: red;
-        &:before {
-            background: blue;
-        }
-    }
+.button:hover {
+  color: white;
 }
-.footer {
-    .footer-nav {
-        &:extend( .header .header-nav all );
-    }
+.submit {
+  &:hover:extend(.button:hover) {}
 }

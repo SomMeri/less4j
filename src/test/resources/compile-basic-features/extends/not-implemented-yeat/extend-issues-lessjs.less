@@ -11,17 +11,6 @@
     }
 
 }
-// FAILS - https://github.com/less/less.js/issues/1227
-.button {
-  color: black;
-  &:hover {
-    color: white;
-  }
-}
-.submit {
-   &:extend(.button);
-   &:hover:extend(.button:hover) {}
-}
 
 // FAILS - OPEN in less.js https://github.com/less/less.js/issues/1487
 .class, .other { property: value }

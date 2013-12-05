@@ -23,3 +23,11 @@
 .footer .footer-nav:before {
   background: blue;
 }
+.button,
+.submit {
+  color: black;
+}
+.button:hover,
+.submit:hover {
+  color: white;
+}

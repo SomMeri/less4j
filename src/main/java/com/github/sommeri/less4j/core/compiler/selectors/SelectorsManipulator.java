@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
@@ -57,13 +58,15 @@ public class SelectorsManipulator {
   }
 
   public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, Selector second) {
-    return indirectJoinNoClone(first, combinator, second.getParts());
+    return indirectJoinNoClone(first, combinator, second.getParts(), second.getExtend());
   }
 
-  public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, List<SelectorPart> second) {
+  public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, List<SelectorPart> second, List<Extend> extend) {
+    first.addExtends(extend);
+    
     if (second.isEmpty())
       return first;
-    
+
     if (combinator != null) {
       second.get(0).setLeadingCombinator(combinator);
     }
@@ -83,11 +86,12 @@ public class SelectorsManipulator {
 
     Selector first = firstI.clone();
     List<SelectorPart> secondParts = ArraysUtils.deeplyClonedList(secondI.getParts());
+    List<Extend> secondExtends = ArraysUtils.deeplyClonedList(secondI.getExtend());
     SelectorPart secondHead = secondParts.get(0);
 
     if (secondHead.isAppender())
-      return indirectJoinNoClone(first, secondHead.getLeadingCombinator(), secondParts);
-    
+      return indirectJoinNoClone(first, secondHead.getLeadingCombinator(), secondParts, secondExtends);
+
     /*
      * FIXME: test on old whether survives if first is not simple selector. (say, if:
      * (~"escaped") {
@@ -100,11 +104,8 @@ public class SelectorsManipulator {
     directlyJoinParts(attachToHead, secondHead);
 
     secondParts.remove(0);
-    if (!secondParts.isEmpty()) {
-      return indirectJoinNoClone(first, secondParts.get(0).getLeadingCombinator(), secondParts);
-    }
-
-    return first;
+    SelectorCombinator leadingCombinator = secondParts.isEmpty() ? null : secondParts.get(0).getLeadingCombinator();
+    return indirectJoinNoClone(first, leadingCombinator, secondParts, secondExtends);
   }
 
   public void directlyJoinParts(SelectorPart first, SelectorPart second) {
@@ -133,7 +134,7 @@ public class SelectorsManipulator {
     if (appender == null)
       throw new BugHappened("This is very weird error and should not happen.", selector);
 
-    Selector  afterAppender = splitOn(selector, appender);
+    Selector afterAppender = splitOn(selector, appender);
     List<Selector> partialResults = joinAll(selector, previousSelectors, appender.getLeadingCombinator(), appender.isDirectlyAfter());
     return joinAll(partialResults, afterAppender, null, appender.isDirectlyBefore());
   }
@@ -146,7 +147,7 @@ public class SelectorsManipulator {
     //    heeej: hoou;
     //  }
     //}
-    boolean directJoin = isDirect(leadingCombinator, appenderDirectlyPlaced, null); 
+    boolean directJoin = isDirect(leadingCombinator, appenderDirectlyPlaced, null);
     if (directJoin)
       return directJoinAll(first, seconds);
     else
@@ -164,7 +165,7 @@ public class SelectorsManipulator {
   private Selector chopOffHead(Selector selector) {
     if (!selector.isCombined())
       return null;
-    
+
     selector.removeHead();
     return selector;
   }
@@ -204,7 +205,7 @@ public class SelectorsManipulator {
     List<SelectorPart> parts = selector.getParts();
     int indexOfAppender = parts.indexOf(appender);
     List<SelectorPart> appenderAndAfter = parts.subList(indexOfAppender, parts.size());
-    
+
     //remove appender
     appenderAndAfter.remove(0);
     appender.setParent(null);
@@ -215,7 +216,7 @@ public class SelectorsManipulator {
       result = new Selector(selector.getUnderlyingStructure(), new ArrayList<SelectorPart>(appenderAndAfter));
       result.configureParentToAllChilds();
     }
-    
+
     //leave only before appender parts in original selector
     appenderAndAfter.clear();
     return result;

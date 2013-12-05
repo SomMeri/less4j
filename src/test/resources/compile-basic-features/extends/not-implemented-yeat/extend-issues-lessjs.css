@@ -8,14 +8,6 @@
 .foo.baz {
   property: value;
 }
-.button,
-.submit {
-  color: black;
-}
-.button:hover,
-.submit:hover {
-  color: white;
-}
 .class,
 .other,
 .extension {
