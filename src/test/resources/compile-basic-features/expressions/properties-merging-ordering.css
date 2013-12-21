@@ -1,0 +1,23 @@
+pre:focus {
+  margin: 1;
+  margin: 2, 0 3, 4;
+  unrelated: value;
+}
+pre:focus {
+  unrelated-1: value;
+  margin: 0 1, 2, 3, 1, 2, 3;
+  unrelated-2: value;
+  margin: 1;
+  unrelated-3: value;
+}
+pre:focus {
+  unrelated-1: value;
+  unrelated-in-mixin-1: value;
+  margin: 1, 2, 3, 1, 2, 3;
+  unrelated-in-mixin-2: value;
+  unrelated-in-mixin-3: value;
+  unrelated-2: value;
+  margin: 2;
+  unrelated-3: value;
+  unrelated-4: value;
+}

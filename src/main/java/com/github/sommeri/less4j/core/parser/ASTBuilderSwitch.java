@@ -213,16 +213,23 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new Declaration(token, name);
 
     HiddenTokenAwareTree expressionToken = iterator.next();
+    boolean isMerging = false;
+    if (expressionToken.getType() == LessLexer.PLUS) {
+      expressionToken = iterator.next();
+      isMerging = true;
+    }
+
     if (expressionToken.getType() == LessLexer.IMPORTANT_SYM)
-      return new Declaration(token, name, null, true);
+      return new Declaration(token, name, null, true, isMerging);
+
 
     Expression expression = (Expression) switchOn(expressionToken);
     if (!iterator.hasNext())
-      return new Declaration(token, name, expression);
+      return new Declaration(token, name, expression, isMerging);
 
     HiddenTokenAwareTree importantToken = iterator.next();
     if (importantToken.getType() == LessLexer.IMPORTANT_SYM)
-      return new Declaration(token, name, expression, true);
+      return new Declaration(token, name, expression, true, isMerging);
 
     throw new BugHappened(GRAMMAR_MISMATCH, token);
   }

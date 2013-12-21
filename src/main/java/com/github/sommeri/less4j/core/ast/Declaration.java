@@ -11,20 +11,22 @@ public class Declaration extends ASTCssNode {
   private String name;
   private Expression expression;
   private boolean important;
+  private boolean merging;
 
   public Declaration(HiddenTokenAwareTree token, String name) {
-    this(token, name, null, false);
+    this(token, name, null, false, false);
   }
 
-  public Declaration(HiddenTokenAwareTree token, String name, Expression expression) {
-    this(token, name, expression, false);
+  public Declaration(HiddenTokenAwareTree token, String name, Expression expression, boolean merging) {
+    this(token, name, expression, false, merging);
   }
 
-  public Declaration(HiddenTokenAwareTree token, String name, Expression expression, boolean important) {
+  public Declaration(HiddenTokenAwareTree token, String name, Expression expression, boolean important, boolean merging) {
     super(token);
     this.name = name;
     this.expression = expression;
     this.important = important;
+    this.merging = merging;
   }
 
   public String getName() {
@@ -39,6 +41,10 @@ public class Declaration extends ASTCssNode {
     return important;
   }
   
+  public boolean isMerging() {
+    return merging;
+  }
+  
   public void setName(String name) {
     this.name = name;
   }
@@ -49,6 +55,10 @@ public class Declaration extends ASTCssNode {
 
   public void setImportant(boolean important) {
     this.important = important;
+  }
+
+  public void setMerging(boolean merging) {
+    this.merging = merging;
   }
 
   @Override

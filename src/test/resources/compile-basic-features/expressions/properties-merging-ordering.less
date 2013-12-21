@@ -1,0 +1,40 @@
+.mixin() {
+  unrelated-in-mixin-1: value;
+  margin+: 1;
+  margin+: 2;
+  unrelated-in-mixin-2: value;
+  margin+: 3;
+  unrelated-in-mixin-3: value;
+}
+pre:focus {
+  margin: 1;
+  margin+: 2;
+  unrelated: value;
+  margin+: 0 3;
+  margin+: 4;
+}
+
+pre:focus {
+  unrelated-1: value;
+  margin+: 0 1;
+  margin+: 2;
+  margin+: 3;
+  unrelated-2: value;
+  margin: 1;
+  margin+: 1;
+  margin+: 2;
+  margin+: 3;
+  unrelated-3: value;
+}
+
+pre:focus {
+  unrelated-1: value;
+  .mixin();
+  unrelated-2: value;
+  margin: 2;
+  margin+: 1;
+  margin+: 2;
+  unrelated-3: value;
+  margin+: 3;
+  unrelated-4: value;
+}

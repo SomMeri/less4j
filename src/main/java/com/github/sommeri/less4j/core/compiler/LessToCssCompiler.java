@@ -22,6 +22,7 @@ import com.github.sommeri.less4j.core.compiler.selectors.UselessLessElementsRemo
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.InitialScopeExtractor;
 import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
+import com.github.sommeri.less4j.core.compiler.stages.PropertiesMerger;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
 import com.github.sommeri.less4j.core.compiler.stages.UnNestingAndBubbling;
@@ -51,6 +52,7 @@ public class LessToCssCompiler {
     
     finalMediaMergingAndBubbling(less);
     removeUselessLessElements(less);
+    mergeMergingProperties(less);
     //normalizeUrlsAndImportsInImportedFiles(less);
 
     //final clean up  
@@ -64,6 +66,11 @@ public class LessToCssCompiler {
     validateFinalCss(less);
 
     return less;
+  }
+
+  private void mergeMergingProperties(StyleSheet less) {
+    PropertiesMerger propertiesMerger = new PropertiesMerger();
+    propertiesMerger.propertiesMerger(less);
   }
 
   private void solveExtends(StyleSheet less) {

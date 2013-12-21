@@ -405,8 +405,8 @@ unaryOperator
     ;
     
 property
-    : STAR IDENT // support for star prefix - more correct and strict solution would require them to directly follow 
-    | IDENT // normal property
+    : STAR IDENT // support for star prefix browser hack - more correct and strict solution would require them to directly follow 
+    | IDENT ( | PLUS ) // normal property| merged property
     ;
     
 //we need to put comma into the tree so we can collect comments to it

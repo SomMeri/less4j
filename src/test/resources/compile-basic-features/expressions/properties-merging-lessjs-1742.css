@@ -1,0 +1,4 @@
+.b {
+  transform: rotateY(20deg), rotateX(30deg);
+  background: blue, red;
+}
