@@ -725,7 +725,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public InterpolatedMediaExpression handleInterpolatedMediaExpression(HiddenTokenAwareTree token) {
-    return new InterpolatedMediaExpression(token, (Variable) switchOn(token.getChild(0)));
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    Expression expression = (Variable) switchOn(children.next());
+    while (children.hasNext()) {
+      Variable variable = (Variable) switchOn(children.next());
+      expression = new ComposedExpression(token, expression, new ExpressionOperator(token, com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator.EMPTY_OPERATOR), variable);
+    }
+    return new InterpolatedMediaExpression(token, expression);
   }
 
   private MediumModifier toMediumModifier(HiddenTokenAwareTree token) {

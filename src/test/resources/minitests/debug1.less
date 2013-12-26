@@ -1,22 +1,21 @@
-a:first b:second c:third {
-	property: value;
-}
+@thinScreen: ~"(max-width: 800px)";
+@shortScreen: ~"(max-height: 600px)"; 
 
-//tests on attachment sides
-:eb-FirstB :extend(:first b all) {}
-eb-FirstB :extend(:first b all) {}
-eb-SecondC :extend(:second c all) {}
+@media @thinScreen {  .Container { margin-bottom: 80px; } }
+@media @shortScreen {  .Container { margin-bottom: 20px; } }
+@media @thinScreen, @shortScreen { .Container { padding: 20px; } }
 
-eb-First :extend(a:first b:second all) {}
+// Match both @thinScreen AND @shortScreen 
+@tinyScreen: @thinScreen ~" and " @shortScreen;
+@media @tinyScreen { .Container { padding: 5px; } }
 
-eb-First :extend(:first all) {}
-eb-A :extend(a all) {}
-eb-AFirst :extend(a:first all) {}
-eb-Second :extend(:second all) {}
-eb-B :extend(b all) {}
-eb-BSecond :extend(b:second all) {}
-eb-Third :extend(:third all) {}
-eb-C :extend(c all) {}
-eb-CThird :extend(c:third all) {}
 
-//TODO: to iste s kombinatormi
+@media @thinScreen and @shortScreen { .Container { padding: 5px; } }
+//less.js fails on following
+//@media @thinScreen ~"and" @shortScreen { .Container { padding: 5px; } }
+
+@media only screen and @thinScreen { }
+//less.js fails on following
+//@media ~"only screen and" @thinScreen { }
+@only: ~"only screen and ";
+@media @only @thinScreen {};

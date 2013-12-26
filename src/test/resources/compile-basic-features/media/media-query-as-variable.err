@@ -1,2 +1,0 @@
-Warnings produced by compilation of testCase
-WARNING 18:8 Usage of less4j only feature - input is incompatible with less.js. Variable can not be used to replace only part of media query, it must contain the whole query.

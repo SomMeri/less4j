@@ -272,7 +272,7 @@ supportsCondition:
     ;
 
 simpleSupportsCondition:   
-     (supportsQuery)=> q+=supportsQuery -> ^(SUPPORTS_TSIMPLE_CONDITION $q) //( declaration ) 
+     (supportsQuery)=> q+=supportsQuery -> ^(SUPPORTS_SIMPLE_CONDITION $q) //( declaration ) 
      | IDENT q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT $q) // not condition
      | LPAREN q+=supportsCondition RPAREN -> ^(SUPPORTS_SIMPLE_CONDITION LPAREN $q RPAREN) //nested condition
     ;
@@ -298,7 +298,7 @@ cssMediaExpression
     ;
 
 interpolatedMediaExpression
-    : variablereference -> ^(INTERPOLATED_MEDIA_EXPRESSION variablereference)
+    : variablereference+ -> ^(INTERPOLATED_MEDIA_EXPRESSION variablereference+)
     ;
     
 mediaFeature

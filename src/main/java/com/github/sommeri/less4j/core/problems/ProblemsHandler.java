@@ -32,10 +32,6 @@ public class ProblemsHandler {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
 
-  public void lessjsDoesNotSupportPartiallyInterpolatedMediaQueries(MediaQuery mediaQuery) {
-    collector.addWarning(new CompilationWarning(mediaQuery, "Usage of less4j only feature - input is incompatible with less.js. Variable can not be used to replace only part of media query, it must contain the whole query."));
-  }
-
   public void wrongMemberInCssBody(ASTCssNode member, Body node) {
     ASTCssNode parent = node.getParent()==null? node : node.getParent();
     ASTCssNodeType parentType = node.getParent()==null? ASTCssNodeType.STYLE_SHEET : node.getParent().getType(); 

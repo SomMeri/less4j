@@ -8,3 +8,8 @@
     color: #00ff00;
   }
 }
+@media only screen and (max-width: 800px) {
+  a {
+    v: v;
+  }
+}

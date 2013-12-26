@@ -5,3 +5,6 @@
 @media @variable { h1 {color:#ff0000} }
 
 @media @mobile and @highdensity { h1 {color:#00ff00} }
+@thinScreen: ~"(max-width: 800px)";
+@only: ~"only screen and ";
+@media @only @thinScreen {a{ v:v;}}
