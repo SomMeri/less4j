@@ -8,20 +8,21 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class Declaration extends ASTCssNode {
 
-  private String name;
+  //private String name;
+  private InterpolableName name;
   private Expression expression;
   private boolean important;
   private boolean merging;
 
-  public Declaration(HiddenTokenAwareTree token, String name) {
+  public Declaration(HiddenTokenAwareTree token, InterpolableName name) {
     this(token, name, null, false, false);
   }
 
-  public Declaration(HiddenTokenAwareTree token, String name, Expression expression, boolean merging) {
+  public Declaration(HiddenTokenAwareTree token, InterpolableName name, Expression expression, boolean merging) {
     this(token, name, expression, false, merging);
   }
 
-  public Declaration(HiddenTokenAwareTree token, String name, Expression expression, boolean important, boolean merging) {
+  public Declaration(HiddenTokenAwareTree token, InterpolableName name, Expression expression, boolean important, boolean merging) {
     super(token);
     this.name = name;
     this.expression = expression;
@@ -29,8 +30,8 @@ public class Declaration extends ASTCssNode {
     this.merging = merging;
   }
 
-  public String getName() {
-    return name;
+  public String getNameAsString() {
+    return name.getName();
   }
 
   public Expression getExpression() {
@@ -45,7 +46,7 @@ public class Declaration extends ASTCssNode {
     return merging;
   }
   
-  public void setName(String name) {
+  public void setName(InterpolableName name) {
     this.name = name;
   }
 
@@ -69,15 +70,15 @@ public class Declaration extends ASTCssNode {
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
-    return ArraysUtils.asNonNullList(expression);
+    return ArraysUtils.asNonNullList(expression, name);
   }
 
   public boolean isFontDeclaration() {
-    return getName()!=null? getName().toLowerCase().equals("font") : false;
+    return getNameAsString()!=null? getNameAsString().toLowerCase().equals("font") : false;
   }
 
   public boolean isFilterDeclaration() {
-    return getName()!=null? getName().toLowerCase().endsWith("filter") : false;
+    return getNameAsString()!=null? getNameAsString().toLowerCase().endsWith("filter") : false;
   }
   
   @Override
@@ -88,6 +89,7 @@ public class Declaration extends ASTCssNode {
   @Override
   public Declaration clone() {
     Declaration result = (Declaration) super.clone();
+    result.name = name==null?null:name.clone();
     result.expression = expression==null?null:expression.clone();
     result.configureParentToAllChilds();
     return result;

@@ -14,6 +14,12 @@ import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 
+/**
+ * Preconditions: 
+ * 1.) properties names must be interpolated,
+ * 2.) rulesets bodies must be fully solved.   
+ *
+ */
 public class PropertiesMerger {
 
   private Map<String, Declaration> mergingProperties = new HashMap<String, Declaration>();
@@ -71,7 +77,7 @@ public class PropertiesMerger {
     if (declaration.getExpression() == null)
       return;
 
-    String cssPropertyName = declaration.getName();
+    String cssPropertyName = declaration.getNameAsString();
     if (mergingProperties.containsKey(cssPropertyName)) {
       Declaration previousDeclaration = mergingProperties.get(cssPropertyName);
       Expression previousExpression = previousDeclaration.getExpression();

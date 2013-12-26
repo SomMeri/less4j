@@ -595,7 +595,7 @@ public class CssPrinter {
   }
 
   public boolean appendDeclaration(Declaration declaration) {
-    cssOnly.appendIgnoreNull(declaration.getName());
+    cssOnly.appendIgnoreNull(declaration.getNameAsString());
     cssOnly.append(":").ensureSeparator();
     if (declaration.getExpression() != null)
       append(declaration.getExpression());

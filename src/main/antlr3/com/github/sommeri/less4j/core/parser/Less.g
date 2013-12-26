@@ -89,6 +89,7 @@ tokens {
   NAMED_EXPRESSION;
   SEMI_SPLIT_MIXIN_REFERENCE_ARGUMENTS;
   SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS;
+  INTERPOLABLE_NAME;
 }
 
 @lexer::header {
@@ -271,9 +272,9 @@ supportsCondition:
     ;
 
 simpleSupportsCondition:   
-     q+=supportsQuery -> ^(SUPPORTS_SIMPLE_CONDITION $q)
-     | IDENT q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT $q)
-     | LPAREN q+=supportsCondition RPAREN -> ^(SUPPORTS_SIMPLE_CONDITION LPAREN $q RPAREN)
+     (supportsQuery)=> q+=supportsQuery -> ^(SUPPORTS_TSIMPLE_CONDITION $q) //( declaration ) 
+     | IDENT q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT $q) // not condition
+     | LPAREN q+=supportsCondition RPAREN -> ^(SUPPORTS_SIMPLE_CONDITION LPAREN $q RPAREN) //nested condition
     ;
     
 supportsQuery: LPAREN q+=declaration RPAREN -> ^(SUPPORTS_QUERY LPAREN $q RPAREN);
@@ -405,10 +406,25 @@ unaryOperator
     ;
     
 property
-    : STAR IDENT // support for star prefix browser hack - more correct and strict solution would require them to directly follow 
-    | IDENT ( | PLUS ) // normal property| merged property
+    : // support for star prefix browser hack - more correct and strict solution would require them to directly follow
+      // normal property| merged property 
+      (a+=STAR)? b+=propertyNamePart ({predicates.directlyFollows(input)}?=>b+=propertyNamePart)* ( | c+=PLUS )
+      ->  ^(INTERPOLABLE_NAME $a* $b*) $c*
     ;
     
+propertyNamePart
+    :  IDENT | INTERPOLATED_VARIABLE;
+/*
+elementName
+    :  propertyNamePart ({predicates.directlyFollows(input)}?=>propertyNamePart)*;
+
+elementName
+    :  a+=elementNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=elementNamePart)* -> ^(ELEMENT_NAME $a*);
+    
+elementNamePart
+    : STAR | IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
+
+*/    
 //we need to put comma into the tree so we can collect comments to it
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet

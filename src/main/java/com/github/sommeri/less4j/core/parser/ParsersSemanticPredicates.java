@@ -162,6 +162,10 @@ public class ParsersSemanticPredicates {
     return previous.getType() == LessLexer.MINUS || previous.getType() == LessLexer.PLUS || previous.getType() == LessLexer.STAR || previous.getType() == LessLexer.SOLIDUS;
   }
 
+  public boolean directlyFollows(TokenStream input) {
+    return directlyFollows(input.LT(-1), input.LT(1));
+  }
+
   public boolean directlyFollows(Token first, Token second) {
     if (!(first instanceof CommonToken) || !(second instanceof CommonToken))
       return false;

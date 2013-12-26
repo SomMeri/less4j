@@ -29,6 +29,8 @@ import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.utils.CssPrinter;
+import com.github.sommeri.less4j.utils.InStringCssPrinter;
 import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
 
 public class ReferencesSolver {
@@ -124,7 +126,7 @@ public class ReferencesSolver {
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
         MixinReference mixinReference = (MixinReference) kid;
-        
+
         List<FullMixinDefinition> foundMixins = findReferencedMixins(mixinReference, mixinReferenceScope);
         GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(mixinReference, mixinReferenceScope, foundMixins);
 
@@ -191,7 +193,7 @@ public class ReferencesSolver {
     case VARIABLE_NAME_PART: {
       VariableNamePart part = (VariableNamePart) node;
       Expression value = expressionEvaluator.evaluate(part.getVariable());
-      FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure());
+      FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure(), part);
       part.getParent().replaceMember(part, interpolateFixedNamePart(fixedName, expressionEvaluator));
       return true;
     }
@@ -200,12 +202,22 @@ public class ReferencesSolver {
     return false;
   }
 
-  private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent) {
-    QuotesKeepingInStringCssPrinter printer = new QuotesKeepingInStringCssPrinter();
+  private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent, VariableNamePart part) {
+    CssPrinter printer = shouldKeepQuotes(part) ? new QuotesKeepingInStringCssPrinter() : new InStringCssPrinter();
     printer.append(value);
     // property based alternative would be nice, but does not seem to be needed
     FixedNamePart fixedName = new FixedNamePart(parent, printer.toString());
     return fixedName;
+  }
+
+  //I'm not really sure about this way of distinguising between quotes keeping and non-quotes keeping, but it can be refactored any time 
+  private boolean shouldKeepQuotes(VariableNamePart part) {
+    if (part.getParent()==null || part.getParent().getParent()==null)
+      return true;
+    
+    // owning interpolable name parent
+    ASTCssNode parent = part.getParent().getParent();
+    return parent.getType()!=ASTCssNodeType.DECLARATION;
   }
 
   private SimpleSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {

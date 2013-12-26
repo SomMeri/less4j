@@ -1,0 +1,12 @@
+.mixin(@value) {
+  name-@{value}: value;
+}
+pre:focus {
+  .mixin(10);
+  .mixin((10+5));
+  .mixin(test);
+  .mixin(~"escaped");
+  .mixin("doubleQuotes");
+  .mixin('singleQuotes');
+  .mixin(a b c d);
+}
