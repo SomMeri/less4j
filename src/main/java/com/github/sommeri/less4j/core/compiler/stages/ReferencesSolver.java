@@ -23,14 +23,13 @@ import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.IteratedScope;
-import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.CssPrinter;
-import com.github.sommeri.less4j.utils.InStringCssPrinter;
 import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
 
 public class ReferencesSolver {
@@ -203,21 +202,11 @@ public class ReferencesSolver {
   }
 
   private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent, VariableNamePart part) {
-    CssPrinter printer = shouldKeepQuotes(part) ? new QuotesKeepingInStringCssPrinter() : new InStringCssPrinter();
+    CssPrinter printer = new QuotesKeepingInStringCssPrinter();
     printer.append(value);
     // property based alternative would be nice, but does not seem to be needed
     FixedNamePart fixedName = new FixedNamePart(parent, printer.toString());
     return fixedName;
-  }
-
-  //I'm not really sure about this way of distinguising between quotes keeping and non-quotes keeping, but it can be refactored any time 
-  private boolean shouldKeepQuotes(VariableNamePart part) {
-    if (part.getParent()==null || part.getParent().getParent()==null)
-      return true;
-    
-    // owning interpolable name parent
-    ASTCssNode parent = part.getParent().getParent();
-    return parent.getType()!=ASTCssNodeType.DECLARATION;
   }
 
   private SimpleSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {

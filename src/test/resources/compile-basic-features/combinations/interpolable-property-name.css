@@ -3,7 +3,7 @@ pre:focus {
   name-15: value;
   name-test: value;
   name-escaped: value;
-  name-doubleQuotes: value;
-  name-singleQuotes: value;
+  name-"doubleQuotes": value;
+  name-'singleQuotes': value;
   name-a b c d: value;
 }
