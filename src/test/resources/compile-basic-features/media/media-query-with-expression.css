@@ -1,0 +1,15 @@
+@media screen and (device-aspect-ratio: 16/9) {
+  a {
+    v: v;
+  }
+}
+@media (max-width: 9px) {
+  a {
+    v: v;
+  }
+}
+@media screen and (max-width: 76em) {
+  a {
+    width: 4.75em;
+  }
+}
