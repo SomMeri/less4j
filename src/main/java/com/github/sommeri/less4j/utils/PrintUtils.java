@@ -5,6 +5,8 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
+import javax.xml.bind.DatatypeConverter;
+
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.parser.LessParser;
@@ -46,6 +48,19 @@ public class PrintUtils {
     encode = encode.replaceAll("%40", "@").replaceAll("%26", "&").replaceAll("%2B", "+");
     encode = encode.replaceAll("%27", "'").replaceAll("%7E", "~").replaceAll("%21", "!");
     encode = encode.replace("%24", "$"); //replaceAll crash on this
+    return encode;
+  }
+
+  /**
+   * Port of javascript encodeURIComponent.
+   * 
+   * Converts into utf-8 except following characters * - _ . ! ~ * ' ( )
+   */
+  public static String toUtf8AsUri(String value) { // 
+    String encode = toUtf8(value);
+    encode = encode.replaceAll("\\+", "%20").replaceAll("%2D", "_").replaceAll("%2E", ".");
+    encode = encode.replaceAll("%21", "!").replaceAll("%7E", "~").replaceAll("%2A", "*");
+    encode = encode.replaceAll("%27", "'").replaceAll("%28", "(").replaceAll("%29", ")");
     return encode;
   }
 
@@ -145,6 +160,10 @@ public class PrintUtils {
 
   public static String toLocation(ASTCssNode node) {
     return node.getSourceLine() + ":" + node.getSourceColumn();
+  }
+
+  public static String base64Encode(byte[] data) {
+    return DatatypeConverter.printBase64Binary(data);
   }
 
 }

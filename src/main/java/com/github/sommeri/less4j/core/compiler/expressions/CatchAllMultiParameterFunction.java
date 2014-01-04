@@ -33,9 +33,9 @@ abstract class CatchAllMultiParameterFunction extends AbstractMultiParameterFunc
       }
     }
 
-    return evaluate(parameters, problemsHandler, call.getUnderlyingStructure());
+    return evaluate(parameters, problemsHandler, call, call.getUnderlyingStructure());
   }
 
-  protected abstract Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token);
+  protected abstract Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token);
 
 }

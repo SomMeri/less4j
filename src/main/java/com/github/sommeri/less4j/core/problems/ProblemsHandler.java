@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
@@ -69,11 +69,15 @@ public class ProblemsHandler {
     collector.addWarning(new CompilationWarning(urlExpression, "Attempt to import less file with an unknown compiled file location. Import statement left unchanged."));
   }
 
-  public void errorImportedFileCanNotBeRead(Import node, String filename) {
+  public void errorFileReferenceNoBaseDirectory(ASTCssNode node, String path) {
+    collector.addError(new CompilationError(node, "Attempt to reference file with an unknown compiled file location. Relative path: " + path));
+  }
+
+  public void errorFileCanNotBeRead(ASTCssNode node, String filename) {
     collector.addError(new CompilationError(node, "The file " + filename + " can not be read."));
   }
 
-  public void errorImportedFileNotFound(Import node, String filename) {
+  public void errorFileNotFound(ASTCssNode node, String filename) {
     collector.addError(new CompilationError(node, "The file " + filename + " does not exist."));
   }
 
@@ -237,6 +241,10 @@ public class ProblemsHandler {
 
   public void divisionByZero(NumberExpression errorNode) {
     collector.addWarning(new CompilationWarning(errorNode, "Division by zero."));
+  }
+
+  public void warnIE8UnsafeDataUri(FunctionExpression errorNode, String filename, int fileSizeInKB, int dataUriMaxKb) {
+    collector.addWarning(new CompilationWarning(errorNode, "Skipped data-uri embedding of " + filename + " because its size ("+fileSizeInKB+"dKB) exceeds IE8-safe "+dataUriMaxKb+"dKB!"));
   }
 
   public boolean hasErrors() {

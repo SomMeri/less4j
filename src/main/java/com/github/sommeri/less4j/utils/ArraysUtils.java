@@ -1,5 +1,10 @@
 package com.github.sommeri.less4j.utils;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -162,6 +167,24 @@ public class ArraysUtils {
     int indx = inside.indexOf(lookFor);
     inside.remove(lookFor);
     inside.addAll(indx, replaceBy);
+  }
+
+  public static boolean isUtf8(byte[] input) {
+    return isEncodedAs(input, "UTF-8");
+  }
+
+  public static boolean isUsAscii(byte[] input) {
+    return isEncodedAs(input, "US-ASCII");
+  }
+
+  public static boolean isEncodedAs(byte[] input, String encoding) {
+    CharsetDecoder decoder = Charset.forName(encoding).newDecoder().onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT);
+    try {
+      decoder.decode(ByteBuffer.wrap(input));
+    } catch (CharacterCodingException e) {
+      return false;
+    }
+    return true;
   }
 
 }

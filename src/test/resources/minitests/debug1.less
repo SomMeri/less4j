@@ -1,14 +1,18 @@
-//check
-@media screen and (device-aspect-ratio: 16/9) { a{v:v}}
-
-//https://github.com/less/less.js/issues/654
-@sizeDefaultDesktop:10px;
-@media (max-width: @sizeDefaultDesktop - 1) {
-    a{v:v}
+#data-uri {
+//  css: data-uri('text/css;base64', 'data/css.css');
+//  css-1: data-uri('text/css', 'data/css.css');
+  uri: data-uri('image/jpeg;base64', 'data/image.jpg');
 }
 
-@defaultColumnWidth: 4.75em;
-@media screen and (max-width: (@defaultColumnWidth * 16) ) {
-    a {width: @defaultColumnWidth;}
+#data-uri-guess {
+  uri: data-uri('data/image.jpg');
 }
 
+#data-uri-ascii {
+  uri-1: data-uri('text/html', 'data/page.html');
+  uri-2: data-uri('data/page.html');
+}
+
+#data-uri-toobig {
+  uri: data-uri('data/data-uri-fail.png');
+}

@@ -117,7 +117,7 @@ public class ColorFunctions extends BuiltInFunctionsPack {
 class RGB extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2), token);
   }
 
@@ -150,7 +150,7 @@ class RGB extends AbstractColorFunction {
 class RGBA extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2),
         (NumberExpression) parameters.get(3), token);
   }
@@ -184,7 +184,7 @@ class RGBA extends AbstractColorFunction {
 class HSL extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2), token);
   }
 
@@ -217,7 +217,7 @@ class HSL extends AbstractColorFunction {
 class HSLA extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2),
         (NumberExpression) parameters.get(3), token);
   }
@@ -251,7 +251,7 @@ class HSLA extends AbstractColorFunction {
 class HSV extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2), token);
   }
 
@@ -284,7 +284,7 @@ class HSV extends AbstractColorFunction {
 class HSVA extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((NumberExpression) parameters.get(0), (NumberExpression) parameters.get(1), (NumberExpression) parameters.get(2), 
 	(NumberExpression) parameters.get(3), token);
   }
@@ -318,7 +318,7 @@ class HSVA extends AbstractColorFunction {
 class ARGB extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> parameters, ProblemsHandler problemHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return new AnonymousExpression(token, ((ColorExpression) parameters.get(0)).toARGB());
   }
 
@@ -482,7 +482,7 @@ class Luma extends AbstractColorOperationFunction {
 abstract class AbstractColorOperationFunction extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((ColorExpression) splitParameters.get(0), problemsHandler, token);
   }
 
@@ -668,7 +668,7 @@ class Spin extends AbstractColorHSLAmountFunction {
 class Mix extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     ColorExpression color1 = (ColorExpression) splitParameters.get(0);
     ColorExpression color2 = (ColorExpression) splitParameters.get(1);
     NumberExpression weight = splitParameters.size() > 2 ? (NumberExpression) splitParameters.get(2) : null;
@@ -959,7 +959,7 @@ abstract class AbstractSimpleColorBlendFunction extends AbstractColorBlendFuncti
 abstract class AbstractColorBlendFunction extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((ColorExpression)splitParameters.get(0), (ColorExpression)splitParameters.get(1), problemsHandler, token);
   }
 
@@ -1117,7 +1117,7 @@ class HSLAValue {
 abstract class AbstractColorAmountFunction extends AbstractColorFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     ColorExpression color = (ColorExpression) splitParameters.get(0);
     NumberExpression amount = (NumberExpression) splitParameters.get(1);
 

@@ -1,16 +1,13 @@
-a:first b:second c:third,
-a:eb-FirstB:second c:third,
-aeb-FirstB:second c:third,
-a:first beb-SecondC:third,
-eb-First c:third,
-aeb-First b:second c:third,
-eb-A:first b:second c:third,
-eb-AFirst b:second c:third,
-a:first beb-Second c:third,
-a:first eb-B:second c:third,
-a:first eb-BSecond c:third,
-a:first b:second ceb-Third,
-a:first b:second eb-C:third,
-a:first b:second eb-CThird {
-  property: value;
+#data-uri {
+  uri: url('data:image/jpeg;base64,bm90IGFjdHVhbGx5IGEganBlZyBmaWxlCg==');
+}
+#data-uri-guess {
+  uri: url('data:image/jpeg;base64,bm90IGFjdHVhbGx5IGEganBlZyBmaWxlCg==');
+}
+#data-uri-ascii {
+  uri-1: url('data:text/html,%3Ch1%3EThis%20page%20is%20100%25%20Awesome.%3C%2Fh1%3E%0A');
+  uri-2: url('data:text/html,%3Ch1%3EThis%20page%20is%20100%25%20Awesome.%3C%2Fh1%3E%0A');
+}
+#data-uri-toobig {
+  uri: url('data/data-uri-fail.png');
 }

@@ -1,0 +1,17 @@
+#css-uri {
+  css: url("data:text/css;base64,LmRlbW86YWZ0ZXIgeyBjb2xvcjogYmx1ZTsgY29udGVudDogJ1VudXN1YWwgd2F5IG9mIGRvaW5nIHRoaW5ncy4gRG91YmxlIHF1b3RlOiAiJzsgfQ0K");
+  css-1: url("data:text/css,.demo%3Aafter%20%7B%20color%3A%20blue%3B%20content%3A%20'Unusual%20way%20of%20doing%20things.%20Double%20quote%3A%20%22'%3B%20%7D%0D%0A");
+}
+#data-uri {
+  uri: url("data:image/jpeg;base64,bm90IGFjdHVhbGx5IGEganBlZyBmaWxlCg==");
+}
+#data-uri-guess {
+  uri: url("data:image/jpeg;base64,bm90IGFjdHVhbGx5IGEganBlZyBmaWxlCg==");
+}
+#data-uri-ascii {
+  uri-1: url("data:text/html,%3Ch1%3EThis%20page%20is%20100%25%20Awesome.%3C%2Fh1%3E%0A");
+  uri-2: url("data:text/html,%3Ch1%3EThis%20page%20is%20100%25%20Awesome.%3C%2Fh1%3E%0A");
+}
+#data-uri-toobig {
+  uri: url('../data/data-uri-fail.png');
+}

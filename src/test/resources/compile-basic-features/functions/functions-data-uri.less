@@ -1,0 +1,21 @@
+#css-uri {
+  css: data-uri('text/css;base64', '../data/css.css');
+  css-1: data-uri('text/css', '../data/css.css');
+}
+
+#data-uri {
+  uri: data-uri('image/jpeg;base64', '../data/image.jpg');
+}
+
+#data-uri-guess {
+  uri: data-uri('../data/image.jpg');
+}
+
+#data-uri-ascii {
+  uri-1: data-uri('text/html', '../data/page.html');
+  uri-2: data-uri('../data/page.html');
+}
+
+#data-uri-toobig {
+  uri: data-uri('../data/data-uri-fail.png');
+}

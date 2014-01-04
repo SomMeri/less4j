@@ -72,10 +72,10 @@ public class SimpleImportsSolver {
     try {
       importedSource = source.relativeSource(filename);
     } catch (FileNotFound ex) {
-      problemsHandler.errorImportedFileNotFound(node, filename);
+      problemsHandler.errorFileNotFound(node, filename);
       return;
     } catch (CannotReadFile e) {
-      problemsHandler.errorImportedFileCanNotBeRead(node, filename);
+      problemsHandler.errorFileCanNotBeRead(node, filename);
       return;
     } catch (StringSourceException ex) {
       // imports are relative to current file and we do not know its location
@@ -94,10 +94,10 @@ public class SimpleImportsSolver {
     try {
       importedContent = importedSource.getContent();
     } catch (FileNotFound e) {
-      problemsHandler.errorImportedFileNotFound(node, filename);
+      problemsHandler.errorFileNotFound(node, filename);
       return;
     } catch (CannotReadFile e) {
-      problemsHandler.errorImportedFileCanNotBeRead(node, filename);
+      problemsHandler.errorFileCanNotBeRead(node, filename);
       return;
     }
 

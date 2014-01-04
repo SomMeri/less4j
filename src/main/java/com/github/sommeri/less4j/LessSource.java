@@ -24,6 +24,8 @@ public abstract class LessSource {
 
   public abstract String getContent() throws FileNotFound, CannotReadFile;
 
+  public abstract byte[] getBytes() throws FileNotFound, CannotReadFile;
+
   /**
    * @return less source location uri or <code>null</code>. If non-null, last path part must be equal to whatever {@link #getName()} returns.
    * 
@@ -120,6 +122,23 @@ public abstract class LessSource {
         Reader input = new InputStreamReader(connection.getInputStream());
         String content = IOUtils.toString(input).replace("\r\n", "\n");
         setLastModified(connection.getLastModified());
+        input.close();
+        return content;
+      } catch (FileNotFoundException ex) {
+        throw new FileNotFound();
+      } catch (IOException ex) {
+        throw new CannotReadFile();
+      }
+
+    }
+
+    @Override
+    public byte[] getBytes() throws FileNotFound, CannotReadFile {
+      try {
+        URLConnection connection = getInputURL().openConnection();
+        Reader input = new InputStreamReader(connection.getInputStream());
+        setLastModified(connection.getLastModified());
+        byte[] content = IOUtils.toByteArray(input);
         input.close();
         return content;
       } catch (FileNotFoundException ex) {
@@ -230,6 +249,21 @@ public abstract class LessSource {
     }
 
     @Override
+    public byte[] getBytes() throws FileNotFound, CannotReadFile {
+      try {
+        FileReader input = new FileReader(inputFile);
+        byte[] content = IOUtils.toByteArray(input);
+        setLastModified(inputFile.lastModified());
+        input.close();
+        return content;
+      } catch (FileNotFoundException ex) {
+        throw new FileNotFound();
+      } catch (IOException ex) {
+        throw new CannotReadFile();
+      }
+    }
+
+    @Override
     public FileSource relativeSource(String filename) {
       return new FileSource(this, filename);
     }
@@ -313,6 +347,11 @@ public abstract class LessSource {
     @Override
     public String getContent() {
       return content;
+    }
+
+    @Override
+    public byte[] getBytes() {
+      return content!=null?content.getBytes():null;
     }
 
     @Override

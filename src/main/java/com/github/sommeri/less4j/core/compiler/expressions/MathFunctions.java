@@ -377,7 +377,7 @@ abstract class AbtractMultiParameterMathFunction extends CatchAllMultiParameterF
 class Mod extends AbtractMultiParameterMathFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     NumberExpression a = (NumberExpression) splitParameters.get(0);
     NumberExpression b = (NumberExpression) splitParameters.get(1);
     return new NumberExpression(token, a.getValueAsDouble() % b.getValueAsDouble(), a.getSuffix(), null, a.getDimension());
@@ -422,7 +422,7 @@ class Pow extends AbstractTwoValueMathFunction {
 abstract class AbstractTwoValueMathFunction extends AbtractMultiParameterMathFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     return evaluate((NumberExpression)splitParameters.get(0), (NumberExpression)splitParameters.get(1), problemsHandler, token);
   }
 
@@ -448,7 +448,7 @@ abstract class AbstractTwoValueMathFunction extends AbtractMultiParameterMathFun
 class Round extends AbtractMultiParameterMathFunction {
 
   @Override
-  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree parentToken) {
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree parentToken) {
     NumberExpression parameter = (NumberExpression) splitParameters.get(0);
     Double oValue = parameter.getValueAsDouble();
     String suffix = parameter.getSuffix();
