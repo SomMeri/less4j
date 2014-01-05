@@ -6,19 +6,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
+/**
+ * Port of node.js mime package into java. It detects file mimetype from filename suffix. File content 
+ * is ignored. 
+ */
 public class NodeMime {
 
+  private static final String MIMETYPES_NODE_TYPES = "/mimetypes/node.types";
+  private static final String MIMETYPES_MIME_TYPES = "/mimetypes/mime.types";
   private static final String FALLBACK_SUFFIX = "bin";
   private Map<String, String> typeDatabase = null;
 
   public NodeMime() {
   }
 
-  //FIXME !!!!!!!!!!! test with dot at the end
   public String lookupMime(String path) {
     if (path==null)
       return defaultType();
@@ -41,8 +45,8 @@ public class NodeMime {
   private Map<String, String> getTypeDatabase() {
     if (typeDatabase == null) {
       typeDatabase = new HashMap<String, String>();
-      load("/mimetypes/mime.types");
-      load("/mimetypes/node.types");
+      load(MIMETYPES_MIME_TYPES);
+      load(MIMETYPES_NODE_TYPES);
     }
     return typeDatabase;
   }
@@ -68,7 +72,6 @@ public class NodeMime {
   }
 
   private void loadLine(String line) {
-    //    line = line.replaceAll("\\s+", " ");
     String[] split = line.split("\\s+");
     String mimetype = split[0];
     for (int i = 1; i < split.length; i++) {
@@ -76,22 +79,6 @@ public class NodeMime {
       typeDatabase.put(suffix, mimetype);
     }
 
-  }
-
-  public static String getVersion() {
-    String path = "/version.prop";
-
-    InputStream stream = path.getClass().getResourceAsStream(path);
-    if (stream == null)
-      return "UNKNOWN";
-    Properties props = new Properties();
-    try {
-      props.load(stream);
-      stream.close();
-      return (String) props.get("version");
-    } catch (IOException e) {
-      return "UNKNOWN";
-    }
   }
 
   public boolean isText(String mimetype) {

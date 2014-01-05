@@ -234,13 +234,6 @@ class Extract extends CatchAllMultiParameterFunction {
 
 }
 
-//FIXME !!!!!!!! document: test us-acsii and utf-8 are special
-//FIXME !!!!!!!! document: test one or two parameters
-//FIXME !!!!!!!! document: test toUtf8AsUri on special characters
-//FIXME !!!!!!!! document: test on too big
-
-//FIXME !!!!!!!! document: error on file does not exists
-
 class DataUri extends CatchAllMultiParameterFunction {
 
   private NodeMime mime = new NodeMime();
@@ -253,6 +246,7 @@ class DataUri extends CatchAllMultiParameterFunction {
     if (splitParameters.size() == 1) {
       CssString filenameArg = (CssString) splitParameters.get(0);
       filename = filenameArg.getValue();
+      
       mimetype = guessMimetype(filename);
     } else {
       CssString mimetypeArg = (CssString) splitParameters.get(0);
