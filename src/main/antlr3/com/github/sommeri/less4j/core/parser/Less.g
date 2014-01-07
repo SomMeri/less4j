@@ -413,7 +413,7 @@ property
     ;
     
 propertyNamePart
-    :  IDENT | INTERPOLATED_VARIABLE;
+    :  IDENT | NUMBER | MINUS | INTERPOLATED_VARIABLE;
 /*
 elementName
     :  propertyNamePart ({predicates.directlyFollows(input)}?=>propertyNamePart)*;

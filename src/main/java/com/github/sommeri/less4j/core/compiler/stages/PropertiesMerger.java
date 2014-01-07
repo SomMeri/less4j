@@ -77,17 +77,23 @@ public class PropertiesMerger {
     if (declaration.getExpression() == null)
       return;
 
-    String cssPropertyName = declaration.getNameAsString();
-    if (mergingProperties.containsKey(cssPropertyName)) {
-      Declaration previousDeclaration = mergingProperties.get(cssPropertyName);
+    String key = toMergingPropertiesKey(declaration);
+    if (mergingProperties.containsKey(key)) {
+      Declaration previousDeclaration = mergingProperties.get(key);
       Expression previousExpression = previousDeclaration.getExpression();
       Expression composedExpression = new ComposedExpression(declaration.getUnderlyingStructure(), previousExpression, new ExpressionOperator(declaration.getUnderlyingStructure(), Operator.COMMA), declaration.getExpression());
       previousDeclaration.setExpression(composedExpression);
       composedExpression.setParent(previousDeclaration);
       manipulator.removeFromBody(declaration);
     } else {
-      mergingProperties.put(cssPropertyName, declaration);
+      mergingProperties.put(key, declaration);
     }
+  }
+
+  private String toMergingPropertiesKey(Declaration declaration) {
+    String cssPropertyName = declaration.getNameAsString();
+    boolean important = declaration.isImportant();
+    return cssPropertyName + " " + important;
   }
 
   private void enteringBody(Body node) {
