@@ -11,7 +11,7 @@ ERROR 32:25 The variable "@a" was not declared.
 ERROR 32:25 The operator '>' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var > ...)`. The operator is located at position 32:28.
 ERROR 45:3 Could not find mixin named ".doesNotExists".
 ERROR 49:25 Could not find mixin named ".doesNotExists".
-ERROR 56:3 No mixin named ".mixinWithPattern" has the right number of parameters.
+ERROR 56:3 No mixin named ".mixinWithPattern" has matching patterns.
 ERROR 19:11 Cannot negate non number.
 ERROR 22:12 Can't subtract or divide a color from a number
 ERROR 23:11 Can't subtract or divide a color from a number

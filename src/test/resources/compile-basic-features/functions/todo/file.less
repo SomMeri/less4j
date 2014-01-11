@@ -1,0 +1,7 @@
+guard-default-expr-not {
+    .m(@x, @y) {two: parameters;}
+    .m(@x) when (default())  {not-default-2: @x;}
+
+    .m(2);
+}
+MUST PASS TOO

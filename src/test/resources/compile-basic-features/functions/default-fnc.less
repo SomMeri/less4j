@@ -1,0 +1,19 @@
+@variable: 1;
+
+.onlyDefaultExists() when (default()) {
+  first: first;
+}
+.localDefaultWins() when (default()) {
+  first: first;
+}
+.localDefaultWins() when (@variable=1) {
+  second: second;
+}
+
+* {
+  .localDefaultWins() when (default()) {
+    local: local;
+  }
+  .localDefaultWins();
+  .onlyDefaultExists();
+}

@@ -70,6 +70,10 @@ public class ExpressionEvaluator {
     functions.add(new MiscFunctions(problemsHandler));
     functions.add(new TypeFunctions(problemsHandler));
   }
+  
+  protected void addFunctionsPack(FunctionsPackage pack){
+    functions.add(pack);
+  }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
     if (allArguments.isEmpty())

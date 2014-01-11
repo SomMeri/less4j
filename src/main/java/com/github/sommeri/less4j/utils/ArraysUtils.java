@@ -6,16 +6,38 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
 
 public class ArraysUtils {
 
+  public interface Filter<T> {
+    public boolean accept(T t);
+  }
+
   public static <T> T[] asArray(T... args) {
     return args;
+  }
+
+  public static <T> Set<T> asSet(T... args) {
+    return new HashSet<T>(Arrays.asList(args));
+  }
+
+  public static <T> int count(Collection<T> collection, Filter<T> filter) {
+    int result = 0;
+    for (T t : collection) {
+      if (filter.accept(t))
+        result++;
+    }
+    return result;
   }
 
   public static <T> List<T> sameLengthSuffix(List<T> ofList, List<T> asThis) {

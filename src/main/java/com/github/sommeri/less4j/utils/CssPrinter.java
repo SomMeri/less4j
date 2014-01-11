@@ -18,6 +18,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
@@ -168,6 +169,9 @@ public class CssPrinter {
 
     case STRING_EXPRESSION:
       return appendCssString((CssString) node); // TODOsm: source map
+
+    case EMPTY_EXPRESSION:
+      return appendEmptyExpression((EmptyExpression) node); // TODOsm: source map
 
     case NUMBER:
       return appendNumberExpression((NumberExpression) node); // TODOsm: source map
@@ -786,6 +790,10 @@ public class CssPrinter {
     return true;
   }
 
+  public boolean appendEmptyExpression(EmptyExpression node){
+    return true;
+  }
+  
   public boolean appendEscapedValue(EscapedValue escaped) {
     cssOnly.append(escaped.getValue());
 

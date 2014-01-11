@@ -183,15 +183,23 @@ public class ProblemsHandler {
     return new CompilationError(reference.getFinalName(), "Could not find mixin named \"" + name.asString() + "\".");
   }
 
-  public void unmatchedMixin(MixinReference reference) {
-    collector.addError(createUnmatchedMixin(reference));
+  public void noMixinHasRightParametersCountError(MixinReference reference) {
+    collector.addError(createNoMixinHasRightParametersCountError(reference));
   }
 
-  private CompilationError createUnmatchedMixin(MixinReference reference) {
-    return createUnmatchedMixin(reference.getFinalName(), reference);
+  public void patternsInMatchingMixinsDoNotMatch(MixinReference reference) {
+    collector.addError(createPatternsInMatchingMixinsDoNotMatch(reference.getFinalName(), reference)); 
   }
 
-  private CompilationError createUnmatchedMixin(ReusableStructureName name, MixinReference reference) {
+  private CompilationError createPatternsInMatchingMixinsDoNotMatch(ReusableStructureName name, MixinReference reference) {
+    return new CompilationError(reference.getFinalName(), "No mixin named \"" + name.asString() + "\" has matching patterns.");
+  }
+
+  private CompilationError createNoMixinHasRightParametersCountError(MixinReference reference) {
+    return createNoMixinHasRightParametersCountError(reference.getFinalName(), reference);
+  }
+
+  private CompilationError createNoMixinHasRightParametersCountError(ReusableStructureName name, MixinReference reference) {
     return new CompilationError(reference.getFinalName(), "No mixin named \"" + name.asString() + "\" has the right number of parameters.");
   }
 

@@ -148,10 +148,11 @@ public class ReferencesSolver {
       return new ArrayList<FullMixinDefinition>();
     }
 
-    List<FullMixinDefinition> mixins = (new MixinsReferenceMatcher(scope, problemsHandler)).filter(mixinReference, sameNameMixins);
+    MixinsReferenceMatcher matcher = new MixinsReferenceMatcher(scope, problemsHandler);
+    List<FullMixinDefinition> mixins = matcher.filterByParametersNumber(mixinReference, sameNameMixins);
     if (mixins.isEmpty())
-      problemsHandler.unmatchedMixin(mixinReference);
-
+      problemsHandler.noMixinHasRightParametersCountError(mixinReference);
+    
     return mixins;
   }
 

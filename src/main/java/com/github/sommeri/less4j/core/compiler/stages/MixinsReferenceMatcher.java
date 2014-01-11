@@ -23,11 +23,20 @@ public class MixinsReferenceMatcher {
     evaluator = new ExpressionEvaluator(scope, problemsHandler);
   }
 
-  public List<FullMixinDefinition> filter(MixinReference reference, List<FullMixinDefinition> mixins) {
+  public List<FullMixinDefinition> filterByParametersNumber(MixinReference reference, List<FullMixinDefinition> mixins) {
     int requiredNumber = reference.getNumberOfDeclaredParameters();
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixin : mixins) {
-      if (hasRightNumberOfParameters(mixin.getMixin(), requiredNumber) && patternsMatch(reference, mixin.getMixin()))
+      if (hasRightNumberOfParameters(mixin.getMixin(), requiredNumber))
+        result.add(mixin);
+    }
+    return result;
+  }
+
+  public List<FullMixinDefinition> filterByPatterns(MixinReference reference, List<FullMixinDefinition> mixins) {
+    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
+    for (FullMixinDefinition mixin : mixins) {
+      if (patternsMatch(reference, mixin.getMixin()))
         result.add(mixin);
     }
     return result;
