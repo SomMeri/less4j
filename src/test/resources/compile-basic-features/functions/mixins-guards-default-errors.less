@@ -1,0 +1,31 @@
+single-default {
+  .m(@x) when (default()) {property: 1;}
+  .m(@x) when (default()) and (@x = 1) {property: 3;}
+  
+  .m(2); //shoud NOT produce error
+}
+not-default-default {
+  .m(@x) when (default()) {property: 1;}
+  .m(@x) when not(default()) {property: 3;}
+  
+  .m(2); //shoud NOT produce error
+}
+multiple-default {
+  .m(@x) when (default()) {property: 1;}
+  .m(@x) when (default()) {property: 2;}
+  .m(@x) when (default()) and (@x = 1) {property: 3;}
+  
+  .m(1); //shoud produce error
+  .m(2); //shoud produce error
+}
+multiple-default-and-other-things {
+  .m(@x) {property: no guard;}
+  .m(1) when not(default()) {property: pattern;}
+  .m(@x) when not(default()) {property: not-default;}
+  .m(@x) when (default()) {property: 1;}
+  .m(@x) when (default()) {property: 2;}
+  .m(@x) when (default()) and (@x = 1) {property: 3;}
+  
+  .m(1); //shoud produce error
+  .m(2); //shoud produce error
+}

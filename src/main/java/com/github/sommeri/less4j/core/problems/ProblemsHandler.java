@@ -255,6 +255,11 @@ public class ProblemsHandler {
     collector.addWarning(new CompilationWarning(errorNode, "Skipped data-uri embedding of " + filename + " because its size ("+fileSizeInKB+"dKB) exceeds IE8-safe "+dataUriMaxKb+"dKB!"));
   }
 
+  public void ambiguousDefaultSet(MixinReference reference, List<ReusableStructure> possibleMixins) {
+    collector.addError(new CompilationError(reference, "Ambiguous use of `default()` found when matching reference " + reference.getFinalName() +". Possible default mixins are located at " + printer.toNodesPositions(possibleMixins)));
+    
+  }
+
   public boolean hasErrors() {
     return collector.hasErrors();
   }

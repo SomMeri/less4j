@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.utils;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
@@ -49,6 +50,19 @@ public class LessPrinter {
       result += reference.getFinalName() + " ("+ reference.getSourceLine()+":"+reference.getSourceColumn()+") ";
       if (iReference.hasNext())
         result +="-> ";
+    }
+    
+    return result;
+  }
+
+  public String toNodesPositions(List<? extends ASTCssNode> nodes) {
+    String result = "";
+    Iterator<? extends ASTCssNode> node = nodes.iterator();
+    while (node.hasNext()) {
+      ASTCssNode reference = node.next();
+      result += "("+ reference.getSourceLine()+":"+reference.getSourceColumn()+")";
+      if (node.hasNext())
+        result +=" -> ";
     }
     
     return result;

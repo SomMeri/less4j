@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ class MixinsSolver {
         List<FullMixinDefinition> allMixinsToImport = mixinsToImport(callerScope, referencedMixinScope, unmodifiedMixinsToImport);
         returnValues.addAllMixins(allMixinsToImport);
 
-        return new MixinCompilationResult(replacement, returnValues);
+        return new MixinCompilationResult(mixin, replacement, returnValues);
       }
 
     });
@@ -115,7 +116,7 @@ class MixinsSolver {
       return result;
 
     final List<MixinCompilationResult> compiledMixins = new ArrayList<MixinCompilationResult>();
-    
+
     for (final FullMixinDefinition fullMixin : mixins) {
       final ReusableStructure mixin = fullMixin.getMixin();
       final IScope mixinScope = fullMixin.getScope();
@@ -144,12 +145,10 @@ class MixinsSolver {
     }
 
     // update mixin replacements and update scope with imported variables and mixins
-    Set<DefaultFunctionUse> expectedUses = generateExpectedUses(compiledMixins, reference);
-    for (MixinCompilationResult compiled : compiledMixins) {
-      if (expectedUses.contains(compiled.getDefaultFunctionUse())) {
-        result.addMembers(compiled.getReplacement());
-        callerScope.addToPlaceholder(compiled.getReturnValues());
-      }
+    List<MixinCompilationResult> mixinsToBeUsed = chooseMixinsToBeUsed(compiledMixins, reference);
+    for (MixinCompilationResult compiled : mixinsToBeUsed) {
+      result.addMembers(compiled.getReplacement());
+      callerScope.addToPlaceholder(compiled.getReturnValues());
     }
 
     callerScope.closePlaceholder();
@@ -159,23 +158,24 @@ class MixinsSolver {
     return result;
   }
 
-  private Set<DefaultFunctionUse> generateExpectedUses(List<MixinCompilationResult> compiledMixins, final MixinReference reference) {
+  private List<MixinCompilationResult> chooseMixinsToBeUsed(List<MixinCompilationResult> compiledMixins, final MixinReference reference) {
     // count how many mixins of each kind we encountered
     int normalMixinsCnt = ArraysUtils.count(compiledMixins, DefaultFunctionUse.DEFAULT_OBLIVIOUS.filter());
     int ifNotCnt = ArraysUtils.count(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT.filter());
     int ifDefaultCnt = ArraysUtils.count(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT.filter());
-    
+
     //there were multiple default() mixins 
     //that is wrong in any case - guards are supposed to be constructed in such a way that this is not possibles
     if (ifDefaultCnt > 1) {
-      System.out.println("WROOOOOOOOOOOOOOOOOOOOOOOONG defaultMixins = " + ifDefaultCnt);
-      System.out.println(reference);
-      return Collections.emptySet();
+      //report ambiguous error
+      List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
+      problemsHandler.ambiguousDefaultSet(reference, extractOriginalMixins(errorSet));
+      return Collections.emptyList();
     }
 
     //there is exactly one default() mixin and nothing else - that is ok, we are going to use that one
     if (ifDefaultCnt == 1 && (normalMixinsCnt == 0 && ifNotCnt == 0)) {
-      return ArraysUtils.asSet(DefaultFunctionUse.ONLY_IF_DEFAULT);
+      return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
     }
 
     //If there are:
@@ -183,7 +183,7 @@ class MixinsSolver {
     // * or multiple not(default()) mixins,
     if (normalMixinsCnt > 0 || ifNotCnt > 1) {
       //then we are going to use only them and ignore defaults 
-      return ArraysUtils.asSet(DefaultFunctionUse.DEFAULT_OBLIVIOUS, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
+      return keepOnly(compiledMixins, DefaultFunctionUse.DEFAULT_OBLIVIOUS, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
     }
 
     //Now we have either:
@@ -193,19 +193,39 @@ class MixinsSolver {
 
     //if there are both of them, use only non(default())
     if (ifNotCnt == 1 && ifDefaultCnt == 1) {
-      return ArraysUtils.asSet(DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
+      return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
     }
     //if there is only default() one, use that one
     if (ifNotCnt == 0 && ifDefaultCnt == 1) {
-      return ArraysUtils.asSet(DefaultFunctionUse.ONLY_IF_DEFAULT);
+      return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
     }
     //if there is ony non(default()), then we can not use anything
     if (ifNotCnt == 1 && ifDefaultCnt == 0) {
-      return ArraysUtils.asSet();
+      return Collections.emptyList();
     }
     //if (nonDefaultMixins==0 && defaultMixins==0) {
     //no mixin to choose from - it does not matter what we return
-    return ArraysUtils.asSet();
+    return Collections.emptyList();
+  }
+
+  private List<ReusableStructure> extractOriginalMixins(List<MixinCompilationResult> compiledMixins) {
+    List<ReusableStructure> result = new ArrayList<ReusableStructure>();
+    for (MixinCompilationResult compiled : compiledMixins) {
+      result.add(compiled.getMixin());
+    }
+    return result;
+  }
+
+  private List<MixinCompilationResult> keepOnly(List<MixinCompilationResult> compiledMixins, DefaultFunctionUse... kind) {
+    Set<DefaultFunctionUse> expectedUses = ArraysUtils.asSet(kind);
+    Iterator<MixinCompilationResult> iterator = compiledMixins.iterator();
+    while (iterator.hasNext()) {
+      MixinCompilationResult compiled = iterator.next();
+      if (!expectedUses.contains(compiled.getDefaultFunctionUse())) {
+        iterator.remove();
+      }
+    }
+    return compiledMixins;
   }
 
   /**
@@ -262,11 +282,13 @@ class MixinsSolver {
 
 class MixinCompilationResult {
 
+  private ReusableStructure mixin;
   private List<ASTCssNode> replacement;
   private IScope returnValues;
   private DefaultFunctionUse defaultFunctionUse;
 
-  public MixinCompilationResult(List<ASTCssNode> replacement, IScope returnValues) {
+  public MixinCompilationResult(ReusableStructure mixin, List<ASTCssNode> replacement, IScope returnValues) {
+    this.mixin = mixin;
     this.replacement = replacement;
     this.returnValues = returnValues;
   }
@@ -295,9 +317,17 @@ class MixinCompilationResult {
     this.returnValues = returnValues;
   }
 
+  public ReusableStructure getMixin() {
+    return mixin;
+  }
+
+  public void setMixin(ReusableStructure mixin) {
+    this.mixin = mixin;
+  }
+
   @Override
   protected MixinCompilationResult clone() {
-    return new MixinCompilationResult(ArraysUtils.deeplyClonedList(replacement), returnValues);
+    return new MixinCompilationResult(mixin.clone(), ArraysUtils.deeplyClonedList(replacement), returnValues);
   }
 
 }

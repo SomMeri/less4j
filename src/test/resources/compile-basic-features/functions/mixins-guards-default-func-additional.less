@@ -1,0 +1,32 @@
+multiple-arguments-with-default {
+    .m(@x, @y) {two: parameters;}
+    .m(@x) when (default())  {default: @x;}
+
+    .m(2);
+}
+maybe-debatable {
+    .m(@x) when (default())     {default: @x}
+    .m(@x) when not(default())  {not-default: @x}
+
+    .m(2);
+}
+not-ambiguos-1 {
+    .m(@x) when not(default())  {not-default-1: @x}
+    .m(@x) when not(default())  {not-default-2: @x}
+
+    .m(2);
+}
+not-ambiguos-2 {
+    .m(@x)                      {case:     1}
+    .m(@x) when (default())     {default: @x}
+    .m(@x) when not(default())  {not-default: @x}
+
+    .m(2);
+}
+not-ambiguos-3 {
+    .m(@x)                      {case:     1}
+    .m(@x) when not(default())  {not-default-1: @x}
+    .m(@x) when not(default())  {not-default-2: @x}
+
+    .m(2);
+}

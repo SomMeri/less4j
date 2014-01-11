@@ -1,0 +1,19 @@
+multiple-arguments-with-default {
+  default: 2;
+}
+maybe-debatable {
+  not-default: 2;
+}
+not-ambiguos-1 {
+  not-default-1: 2;
+  not-default-2: 2;
+}
+not-ambiguos-2 {
+  case: 1;
+  not-default: 2;
+}
+not-ambiguos-3 {
+  case: 1;
+  not-default-1: 2;
+  not-default-2: 2;
+}
