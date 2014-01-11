@@ -150,9 +150,14 @@ public class ReferencesSolver {
 
     MixinsReferenceMatcher matcher = new MixinsReferenceMatcher(scope, problemsHandler);
     List<FullMixinDefinition> mixins = matcher.filterByParametersNumber(mixinReference, sameNameMixins);
-    if (mixins.isEmpty())
+    if (mixins.isEmpty()) {
       problemsHandler.noMixinHasRightParametersCountError(mixinReference);
-    
+      return mixins;
+    }
+    mixins = matcher.filterByPatterns(mixinReference, mixins);
+    if (mixins.isEmpty())
+      problemsHandler.patternsInMatchingMixinsDoNotMatch(mixinReference);
+
     return mixins;
   }
 

@@ -19,7 +19,7 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
  * from the master branch.
  * 
  */
-//@Ignore
+@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
