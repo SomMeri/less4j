@@ -14,7 +14,7 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.expressions.GuardsAndPatternsValidator;
+import com.github.sommeri.less4j.core.compiler.expressions.GuardsValidator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
@@ -22,6 +22,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.IFun
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.view.ScopeView;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.ArraysUtils.Filter;
@@ -115,6 +116,7 @@ class MixinsSolver {
     if (mixins.isEmpty())
       return result;
 
+    //candidate mixins with information about their default() function use are stored here
     final List<MixinCompilationResult> compiledMixins = new ArrayList<MixinCompilationResult>();
 
     for (final FullMixinDefinition fullMixin : mixins) {
@@ -129,23 +131,29 @@ class MixinsSolver {
           IScope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
           IScope mixinWorkingScope = calculateMixinsWorkingScope(callerScope, mixinArguments, mixinScope);
 
-          GuardsAndPatternsValidator guardsValidator = new GuardsAndPatternsValidator(mixinWorkingScope, problemsHandler);
+          GuardsValidator guardsValidator = new GuardsValidator(mixinWorkingScope, problemsHandler);
           boolean ifDefaultGuardValue = guardsValidator.guardsSatisfied(mixin, true);
           boolean ifNotDefaultGuardValue = guardsValidator.guardsSatisfied(mixin, false);
 
           // if none of them is true, then we do not need mixin no matter what
           if (ifDefaultGuardValue || ifNotDefaultGuardValue) {
+            //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
+            //used and create snapshot operation is cheap now. It should be done later on.
             ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler);
             MixinCompilationResult compiled = resolveMixinReference(callerScope, fullMixin, mixinWorkingScope, expressionEvaluator);
+            //mark the mixin according to its default() function use 
             compiled.setDefaultFunctionUse(toDefaultFunctionUse(ifDefaultGuardValue, ifNotDefaultGuardValue));
+            //store the mixin as candidate
             compiledMixins.add(compiled);
           }
         }
       });
     }
 
-    // update mixin replacements and update scope with imported variables and mixins
+    // filter out mixins we do not want to use  
     List<MixinCompilationResult> mixinsToBeUsed = chooseMixinsToBeUsed(compiledMixins, reference);
+    
+    // update mixin replacements and update scope with imported variables and mixins
     for (MixinCompilationResult compiled : mixinsToBeUsed) {
       result.addMembers(compiled.getReplacement());
       callerScope.addToPlaceholder(compiled.getReturnValues());
@@ -163,6 +171,10 @@ class MixinsSolver {
     int normalMixinsCnt = ArraysUtils.count(compiledMixins, DefaultFunctionUse.DEFAULT_OBLIVIOUS.filter());
     int ifNotCnt = ArraysUtils.count(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT.filter());
     int ifDefaultCnt = ArraysUtils.count(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT.filter());
+    
+    //sanity check - could be removed - keeping only for debugging purposes
+    if (normalMixinsCnt+ifNotCnt+ifDefaultCnt!=compiledMixins.size())
+      throw new BugHappened("Unexpected mixin type in compiled mixins list.", reference);
 
     //there were multiple default() mixins 
     //that is wrong in any case - guards are supposed to be constructed in such a way that this is not possibles
@@ -170,15 +182,16 @@ class MixinsSolver {
       //report ambiguous error
       List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
       problemsHandler.ambiguousDefaultSet(reference, extractOriginalMixins(errorSet));
+      //no mixins are going to be used
       return Collections.emptyList();
     }
 
     //there is exactly one default() mixin and nothing else - that is ok, we are going to use that one
-    if (ifDefaultCnt == 1 && (normalMixinsCnt == 0 && ifNotCnt == 0)) {
-      return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
+    if (ifDefaultCnt == 1 && normalMixinsCnt == 0 && ifNotCnt == 0) {
+      return compiledMixins; 
     }
 
-    //If there are:
+    //If there is:
     // * at least one mixin whose guards do not use default(),
     // * or multiple not(default()) mixins,
     if (normalMixinsCnt > 0 || ifNotCnt > 1) {
@@ -186,36 +199,31 @@ class MixinsSolver {
       return keepOnly(compiledMixins, DefaultFunctionUse.DEFAULT_OBLIVIOUS, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
     }
 
-    //Now we have either:
-    // * maximum one default() mixin 
-    // * maximum one non(default()) mixins
-    // * zero normal mixins
+    //Now:
+    //* if there is default mixin, then there is something else with it too.
+    //* there are no normal mixins and there is maximum one not(default()) mixin
+    
+    //Therefore, we have either:
+    // * exactly one default() mixin and one non(default()) mixin
+    // * exactly one non(default()) mixins
+    // * nothing
 
     //if there are both of them, use only non(default())
     if (ifNotCnt == 1 && ifDefaultCnt == 1) {
       return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
     }
-    //if there is only default() one, use that one
-    if (ifNotCnt == 0 && ifDefaultCnt == 1) {
-      return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
-    }
-    //if there is ony non(default()), then we can not use anything
-    if (ifNotCnt == 1 && ifDefaultCnt == 0) {
-      return Collections.emptyList();
-    }
-    //if (nonDefaultMixins==0 && defaultMixins==0) {
-    //no mixin to choose from - it does not matter what we return
+    //if there is only non(default()), then we can not use it
     return Collections.emptyList();
   }
 
-  private List<ReusableStructure> extractOriginalMixins(List<MixinCompilationResult> compiledMixins) {
-    List<ReusableStructure> result = new ArrayList<ReusableStructure>();
-    for (MixinCompilationResult compiled : compiledMixins) {
-      result.add(compiled.getMixin());
-    }
-    return result;
-  }
+  /**
+   * Removes all comiled mixins from compiledMixins list with wrong use of default function. 
+   * Warning: Modifies the compiledMixins list.
 
+   * @param compiledMixins - list of compiled mixins - will be modified. 
+   * @param kind - types of mixins that are going to stay.
+   * @return compiledMixins - for convenience
+   */
   private List<MixinCompilationResult> keepOnly(List<MixinCompilationResult> compiledMixins, DefaultFunctionUse... kind) {
     Set<DefaultFunctionUse> expectedUses = ArraysUtils.asSet(kind);
     Iterator<MixinCompilationResult> iterator = compiledMixins.iterator();
@@ -226,6 +234,14 @@ class MixinsSolver {
       }
     }
     return compiledMixins;
+  }
+
+  private List<ReusableStructure> extractOriginalMixins(List<MixinCompilationResult> compiledMixins) {
+    List<ReusableStructure> result = new ArrayList<ReusableStructure>();
+    for (MixinCompilationResult compiled : compiledMixins) {
+      result.add(compiled.getMixin());
+    }
+    return result;
   }
 
   /**
