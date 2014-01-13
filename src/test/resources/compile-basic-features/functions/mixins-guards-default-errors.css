@@ -4,3 +4,12 @@ single-default {
 not-default-default {
   property: 3;
 }
+multiple-not-default-and-other-things-1 {
+  property: no guard;
+  not-default-1: 2;
+  not-default-2: 2;
+}
+multiple-not-default-and-other-things-2 {
+  not-default-1: 1;
+  not-default-2: 1;
+}

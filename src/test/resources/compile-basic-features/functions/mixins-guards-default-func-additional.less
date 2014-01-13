@@ -4,15 +4,9 @@ multiple-arguments-with-default {
 
     .m(2);
 }
-maybe-debatable {
+not-ambiguos-1 {
     .m(@x) when (default())     {default: @x}
     .m(@x) when not(default())  {not-default: @x}
-
-    .m(2);
-}
-not-ambiguos-1 {
-    .m(@x) when not(default())  {not-default-1: @x}
-    .m(@x) when not(default())  {not-default-2: @x}
 
     .m(2);
 }

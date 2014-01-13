@@ -179,9 +179,15 @@ class MixinsSolver {
     //there were multiple default() mixins 
     //that is wrong in any case - guards are supposed to be constructed in such a way that this is not possibles
     if (ifDefaultCnt > 1) {
-      //report ambiguous error
       List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
       problemsHandler.ambiguousDefaultSet(reference, extractOriginalMixins(errorSet));
+      //no mixins are going to be used
+      return Collections.emptyList();
+    }
+    //there are only not(default()) mixins - that is considered to be ambiuous too
+    if (ifDefaultCnt == 0 && normalMixinsCnt==0 && ifNotCnt > 1) {
+      List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
+      problemsHandler.ambiguousNotDefaultSet(reference, extractOriginalMixins(errorSet));
       //no mixins are going to be used
       return Collections.emptyList();
     }

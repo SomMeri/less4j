@@ -257,7 +257,10 @@ public class ProblemsHandler {
 
   public void ambiguousDefaultSet(MixinReference reference, List<ReusableStructure> possibleMixins) {
     collector.addError(new CompilationError(reference, "Ambiguous use of `default()` found when matching reference " + reference.getFinalName() +". Possible default mixins are located at " + printer.toNodesPositions(possibleMixins)));
-    
+  }
+
+  public void ambiguousNotDefaultSet(MixinReference reference, List<ReusableStructure> possibleMixins) {
+    collector.addError(new CompilationError(reference, "Ambiguous use of negated `default()` found when matching reference " + reference.getFinalName() +". Possible negated default mixins are located at " + printer.toNodesPositions(possibleMixins)));
   }
 
   public boolean hasErrors() {
