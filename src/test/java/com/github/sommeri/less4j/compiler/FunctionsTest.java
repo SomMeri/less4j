@@ -5,9 +5,6 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-//FIXME: !!!!!!!!!!! default-shoud-pass-lessjs-incompatible.less
-//FIXME: !!!!!!!!!!! file.less
-//FIXME: !!!!!!!!!!! less.js issue 1800
 public class FunctionsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/functions/";
