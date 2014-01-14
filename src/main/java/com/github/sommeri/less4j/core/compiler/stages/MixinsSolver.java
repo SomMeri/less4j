@@ -184,7 +184,7 @@ class MixinsSolver {
       //no mixins are going to be used
       return Collections.emptyList();
     }
-    //there are only not(default()) mixins - that is considered to be ambiuous too
+    //there are  multiple not(default()) mixins and nothing else - that is considered to be ambiuous too
     if (ifDefaultCnt == 0 && normalMixinsCnt==0 && ifNotCnt > 1) {
       List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
       problemsHandler.ambiguousNotDefaultSet(reference, extractOriginalMixins(errorSet));

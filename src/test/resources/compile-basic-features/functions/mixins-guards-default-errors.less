@@ -29,6 +29,11 @@ multiple-default-and-other-things {
   .m(1); //shoud produce error
   .m(2); //shoud produce error
 }
+only-one-not-default {
+    .m(@x) when not(default())  {not-default-2: @x}
+
+    .m(2);
+}
 multiple-not-default {
     .m(@x) when not(default())  {not-default-1: @x}
     .m(@x) when not(default())  {not-default-2: @x}
