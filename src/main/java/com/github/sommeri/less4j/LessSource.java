@@ -14,6 +14,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.github.sommeri.less4j.utils.URIUtils;
@@ -251,10 +252,8 @@ public abstract class LessSource {
     @Override
     public byte[] getBytes() throws FileNotFound, CannotReadFile {
       try {
-        FileReader input = new FileReader(inputFile);
-        byte[] content = IOUtils.toByteArray(input);
+        byte[] content =  FileUtils.readFileToByteArray(inputFile);
         setLastModified(inputFile.lastModified());
-        input.close();
         return content;
       } catch (FileNotFoundException ex) {
         throw new FileNotFound();
