@@ -266,7 +266,8 @@ class DataUri extends CatchAllMultiParameterFunction {
       // IE8 cannot handle a data-uri larger than 32KB. If this is exceeded
       // and the --ieCompat flag is enabled, return a normal url() instead.
       int fileSizeInKB = data.length/1024;
-      System.out.println("*****************************TRAVIS: " + data.length);
+      System.out.println("*****************************TRAVIS: dl:" + data.length);
+      System.out.println("*****************************TRAVIS: fileSizeInKB" + fileSizeInKB);
       if (fileSizeInKB >=DATA_URI_MAX_KB) {
         problemsHandler.warnIE8UnsafeDataUri(functionCall, filename, fileSizeInKB, DATA_URI_MAX_KB);
         FunctionExpression result = new FunctionExpression(token, "url", functionCall.getParameter().clone());
