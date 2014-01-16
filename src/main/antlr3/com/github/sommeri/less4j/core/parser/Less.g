@@ -429,7 +429,7 @@ elementNamePart
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet
 @init {enterRule(retval, RULE_RULESET);}
-    : (a+=selector ( a+=selectorSeparator a+=selector)*)?
+    : ((a+=selector ( a+=selectorSeparator a+=selector)*) | )? 
        b=general_body
      -> ^(RULESET $a* $b)
     ;

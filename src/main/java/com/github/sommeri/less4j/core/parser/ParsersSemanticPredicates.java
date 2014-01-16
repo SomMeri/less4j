@@ -143,8 +143,9 @@ public class ParsersSemanticPredicates {
     if (isArithmeticOperator(previous))
       return false;
 
-    //there must be a whitespace in order to have an empty separator
-    if (directlyFollows(previous, first))
+    //if it is followed by arithmetic operator, then there must be a whitespace in order to have an empty separator
+    //it is because we need to distinuish between 10 +5 (list) and 15+5 (math)
+    if (directlyFollows(previous, first) && isOperator(first))
       return false;
 
     //easy case: "10 + -23"  => plus is the operation
@@ -156,6 +157,10 @@ public class ParsersSemanticPredicates {
       return false;
 
     return true;
+  }
+
+  private boolean isOperator(CommonToken previous) {
+    return isArithmeticOperator(previous)|| previous.getType() == LessLexer.COMMA;
   }
 
   private boolean isArithmeticOperator(CommonToken previous) {
