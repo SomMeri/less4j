@@ -12,8 +12,9 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   private List<Selector> selectors = new ArrayList<Selector>();
+  private List<Guard> guards = new ArrayList<Guard>();
   private GeneralBody body;
-
+  
   public RuleSet(HiddenTokenAwareTree token) {
     super(token);
   }
@@ -93,6 +94,7 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
     List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)body);
+    result.addAll(0, guards);
     result.addAll(0, selectors);
     return result;
   }
@@ -103,6 +105,21 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
 
   public void addSelector(Selector selector) {
     this.selectors.add(selector);
+  }
+
+  public void addGuards(List<Guard> guards) {
+    this.guards.addAll(guards);
+  }
+
+  public void addGuards(Guard guard) {
+    this.guards.add(guard);
+  }
+
+  public void removeGuards() {
+    for (Guard guard : guards) {
+      guard.setParent(null);
+    }
+    guards.clear();
   }
 
   public void replaceSelector(Selector oldSelector, Selector newSelector) {
@@ -125,12 +142,17 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
     RuleSet result = (RuleSet) super.clone();
     result.body = body==null?null:body.clone();
     result.selectors = ArraysUtils.deeplyClonedList(selectors);
+    result.guards = ArraysUtils.deeplyClonedList(guards);
     result.configureParentToAllChilds();
     return result;
   }
 
   public ASTCssNodeType getType() {
     return ASTCssNodeType.RULE_SET;
+  }
+
+  public List<Guard> getGuards() {
+    return guards;
   }
 
 }

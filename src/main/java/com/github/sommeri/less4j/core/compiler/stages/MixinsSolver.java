@@ -14,7 +14,7 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.expressions.GuardsValidator;
+import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
@@ -131,7 +131,7 @@ class MixinsSolver {
           IScope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
           IScope mixinWorkingScope = calculateMixinsWorkingScope(callerScope, mixinArguments, mixinScope);
 
-          GuardsValidator guardsValidator = new GuardsValidator(mixinWorkingScope, problemsHandler);
+          MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler);
           boolean ifDefaultGuardValue = guardsValidator.guardsSatisfied(mixin, true);
           boolean ifNotDefaultGuardValue = guardsValidator.guardsSatisfied(mixin, false);
 

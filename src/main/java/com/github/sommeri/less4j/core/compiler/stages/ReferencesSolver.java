@@ -17,6 +17,7 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
@@ -94,22 +95,40 @@ public class ReferencesSolver {
   }
 
   private void solveNonMixinReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
+    ExpressionEvaluator cssGuardsValidator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler);
     for (ASTCssNode kid : childs) {
-      if (!isMixinReference(kid)) {
-        if (AstLogic.hasOwnScope(kid)) {
-          IteratedScope scope = iteratedScope.getNextChild();
-          doSolveReferences(kid, scope);
+      if (isMixinReference(kid))
+        continue;
+
+      if (isRuleset(kid)) {
+        RuleSet ruleSet = (RuleSet) kid;
+        if (cssGuardsValidator.guardsSatisfied(ruleSet)) {
+          ruleSet.removeGuards();
         } else {
-          boolean finishedNode = solveIfVariableReference(kid, iteratedScope.getScope());
-          if (!finishedNode)
-            unsafeDoSolveReferences(kid, iteratedScope);
+          manipulator.removeFromClosestBody(ruleSet);
+          //skip child scope
+          iteratedScope.getNextChild();
+          continue ;
         }
+      }
+
+      if (AstLogic.hasOwnScope(kid)) {
+        IteratedScope scope = iteratedScope.getNextChild();
+        doSolveReferences(kid, scope);
+      } else {
+        boolean finishedNode = solveIfVariableReference(kid, iteratedScope.getScope());
+        if (!finishedNode)
+          unsafeDoSolveReferences(kid, iteratedScope);
       }
     }
   }
 
   private boolean isMixinReference(ASTCssNode kid) {
     return kid.getType() == ASTCssNodeType.MIXIN_REFERENCE;
+  }
+
+  private boolean isRuleset(ASTCssNode kid) {
+    return kid.getType() == ASTCssNodeType.RULE_SET;
   }
 
   private void replaceMixinReferences(Map<MixinReference, GeneralBody> solvedMixinReferences) {

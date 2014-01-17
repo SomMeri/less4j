@@ -1,3 +1,12 @@
+.onTop > .direct + .guarded:true {
+  guarded-true: outer available;
+}
+.onTop > .direct + .guarded:true nested {
+  guarded-true: inner available;
+}
+.outer + .true[type=2] {
+  used-local-scope: correctly;
+}
 .true no argument mixin[type=2] {
   used-local-scope: correctly;
 }

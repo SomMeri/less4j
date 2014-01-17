@@ -103,7 +103,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
 
-  private final static String EXTEND_ALL_KEYWORD = "all"; 
+  private final static String EXTEND_ALL_KEYWORD = "all";
+
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
@@ -248,6 +249,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     RuleSet ruleSet = new RuleSet(token);
 
     List<Selector> selectors = new ArrayList<Selector>();
+    List<Guard> guards = new ArrayList<Guard>();
     List<HiddenTokenAwareTree> children = token.getChildren();
 
     ASTCssNode previousKid = null;
@@ -261,6 +263,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         GeneralBody body = handleGeneralBody(kid);
         ruleSet.setBody(body);
         previousKid = body;
+      } else if (kid.getType() == LessLexer.GUARD) {
+        guards.add(handleGuard(kid));
       } else if (kid.getType() == LessLexer.COMMA) {
         if (previousKid != null)
           previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
@@ -268,6 +272,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
 
     ruleSet.addSelectors(selectors);
+    ruleSet.addGuards(guards);
     return ruleSet;
   }
 
@@ -449,18 +454,18 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (selector.isExtending()) {
       problemsHandler.warnExtendInsideExtend(selector);
     }
-    
+
     SelectorPart lastPart = selector.getLastPart();
-    if (lastPart==null || !(lastPart instanceof SimpleSelector))
+    if (lastPart == null || !(lastPart instanceof SimpleSelector))
       return new Extend(token, selector);
-    
-    SimpleSelector possibleAll = (SimpleSelector)lastPart;
+
+    SimpleSelector possibleAll = (SimpleSelector) lastPart;
     if (possibleAll.hasSubsequent() || !possibleAll.hasElement())
       return new Extend(token, selector);
-    
+
     if (!EXTEND_ALL_KEYWORD.equals(possibleAll.getElementName().getName()))
       return new Extend(token, selector);
-    
+
     if (AstLogic.hasNonSpaceCombinator(possibleAll)) {
       possibleAll.setElementName(null);
     } else {
@@ -819,7 +824,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
 
     addSubsequent(result, kid);
-    while (iterator.hasNext())  {
+    while (iterator.hasNext()) {
       kid = iterator.next();
       addSubsequent(result, kid);
     }
@@ -871,16 +876,15 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return result;
   }
 
-  
   public SupportsCondition handleSupportsCondition(HiddenTokenAwareTree token) {
     token.pushHiddenToKids();
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     if (token.getChildCount() == 1)
       return (SupportsCondition) switchOn(children.next());
-    
+
     SupportsLogicalCondition result = new SupportsLogicalCondition(token, (SupportsCondition) switchOn(children.next()));
     while (children.hasNext()) {
-      SupportsLogicalOperator logicalOperator =  toSupportsLogicalOperator(children.next());
+      SupportsLogicalOperator logicalOperator = toSupportsLogicalOperator(children.next());
       if (!children.hasNext())
         throw new BugHappened(GRAMMAR_MISMATCH, token);
       SupportsCondition condition = (SupportsCondition) switchOn(children.next());
@@ -892,7 +896,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private SupportsLogicalOperator toSupportsLogicalOperator(HiddenTokenAwareTree token) {
     String text = token.getText();
     Map<String, Operator> operatorsBySymbol = SupportsLogicalOperator.Operator.getSymbolsMap();
-    if (text==null || !operatorsBySymbol.containsKey(text.toLowerCase())) {
+    if (text == null || !operatorsBySymbol.containsKey(text.toLowerCase())) {
       SupportsLogicalOperator result = new SupportsLogicalOperator(token, null);
       problemsHandler.errWrongSupportsLogicalOperator(result, token.getText());
       return result;
@@ -906,29 +910,29 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     token.pushHiddenToKids();
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     HiddenTokenAwareTree first = children.next();
-    if (first.getType()==LessLexer.LPAREN) {
+    if (first.getType() == LessLexer.LPAREN) {
       SyntaxOnlyElement openingParentheses = toSyntaxOnlyElement(first);
-      SupportsCondition condition = (SupportsCondition)switchOn(children.next());
+      SupportsCondition condition = (SupportsCondition) switchOn(children.next());
       SyntaxOnlyElement closingParentheses = toSyntaxOnlyElement(children.next());
-      
+
       SupportsConditionInParentheses result = new SupportsConditionInParentheses(token, openingParentheses, condition, closingParentheses);
       return result;
-    } else if (first.getType()==LessLexer.IDENT) {
+    } else if (first.getType() == LessLexer.IDENT) {
       //TODO: warning on wrong operator (anything that is not 'not')
       SyntaxOnlyElement negation = toSyntaxOnlyElement(first);
-      SupportsCondition condition = (SupportsCondition)switchOn(children.next());
+      SupportsCondition condition = (SupportsCondition) switchOn(children.next());
 
       SupportsConditionNegation result = new SupportsConditionNegation(token, negation, condition);
       return result;
-    } 
-    
+    }
+
     return (SupportsCondition) switchOn(first);
   }
-  
+
   public SupportsCondition handleSupportsQuery(HiddenTokenAwareTree token) {
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     SyntaxOnlyElement openingParentheses = toSyntaxOnlyElement(children.next());
-    Declaration declaration = (Declaration)switchOn(children.next());
+    Declaration declaration = (Declaration) switchOn(children.next());
     SyntaxOnlyElement closingParentheses = toSyntaxOnlyElement(children.next());
     SupportsQuery result = new SupportsQuery(token, openingParentheses, closingParentheses, declaration);
     return result;
@@ -1095,7 +1099,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Pseudo extendAsPseudo = handlePseudo(child);
     //FIXME !!!!!!!! validate that it is extend
     //FIXME !!!!!!!! validate that it is pseudoclass
-    
+
     PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
     return (Extend) asPseudoclass.getParameter();
   }

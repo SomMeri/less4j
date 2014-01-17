@@ -1,0 +1,18 @@
+.false no argument global[type=1] {
+  used-local-scope: incorrectly;
+}
+.it .depends global[type=1] {
+  used-scope: global;
+}
+.false with argument global[type=1] {
+  used-argument-scope: incorrectly;
+}
+.outer2.outer1 .true no argument mixin[type=2] {
+  used-local-scope: correctly;
+}
+.outer2.outer1 .it .depends mixin[type=2] {
+  used-scope: mixin;
+}
+.local-in-caller .caller mixin[type=2] {
+  used-scope: correctly;
+}

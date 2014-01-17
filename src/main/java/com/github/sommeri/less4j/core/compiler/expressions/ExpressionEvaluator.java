@@ -16,6 +16,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
@@ -206,7 +207,7 @@ public class ExpressionEvaluator {
       return input;
 
     default:
-      throw new BugHappened("Unknown expression type", input);
+      throw new BugHappened("Unknown expression type "+input.getType(), input);
     }
   }
 
@@ -330,6 +331,10 @@ public class ExpressionEvaluator {
 
   public boolean guardsSatisfied(ReusableStructure mixin) {
     return evaluate(mixin.getGuards());
+  }
+
+  public boolean guardsSatisfied(RuleSet ruleSet) {
+    return evaluate(ruleSet.getGuards());
   }
 
   public boolean evaluate(List<Guard> guards) {

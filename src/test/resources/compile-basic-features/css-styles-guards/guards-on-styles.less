@@ -1,4 +1,25 @@
 @usedScope: global;
+//style guards placed on top
+.onTop > .direct + .guarded:true when (@usedScope=global){
+  guarded-true: outer available;
+  nested { guarded-true: inner available;}
+}
+.onTop > .direct + .guarded:false when (@usedScope=wrong){
+  guarded-false: outer available;
+  nested { guarded-false: inner available;}
+}
+
+//style guards nested in something - using local scope variables
+.outer {
+  + .false[type=1] when (@usedScope=global){
+    used-local-scope: incorrectly;
+  }
+  + .true[type=2] when (@usedScope=local){
+    used-local-scope: correctly;
+  }
+  @usedScope: local; 
+}
+
 //define mixin to bring guarded css into whatever
 .mixin() {
   .false no argument global[type=1] when (@usedScope=global){

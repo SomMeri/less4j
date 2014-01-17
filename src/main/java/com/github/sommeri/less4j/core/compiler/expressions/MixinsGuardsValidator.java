@@ -4,12 +4,12 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-public class GuardsValidator {
+public class MixinsGuardsValidator {
   
   private final DefaultPoweredExpressionEvaluator  ifDefaultExpressionEvaluator;
   private final DefaultPoweredExpressionEvaluator  ifNotDefaultExpressionEvaluator;
 
-  public GuardsValidator(IScope scope, ProblemsHandler problemsHandler) {
+  public MixinsGuardsValidator(IScope scope, ProblemsHandler problemsHandler) {
     ifDefaultExpressionEvaluator = new DefaultPoweredExpressionEvaluator(scope, problemsHandler, true);
     ifNotDefaultExpressionEvaluator = new DefaultPoweredExpressionEvaluator(scope, problemsHandler, false);
   }
