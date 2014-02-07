@@ -1,65 +1,13 @@
-@usedScope: global;
-//define mixin to bring guarded css into whatever
-.mixin() {
-  .false no argument global[type=1] when (@usedScope=global){
-    used-local-scope: incorrectly;
-  }
-  .true no argument mixin[type=2] when (@usedScope=mixin){
-    used-local-scope: correctly;
-  }
-  .false no argument local::pseudo when (@usedScope=local){
-    used-local-scope: incorrectly;
-  }
-  @usedScope: mixin; 
-}
+.apples(@width: 100px) { .bananas() { width: @width; } }
 
-.mixin() {
-  .it .depends global[type=1] when (@usedScope=global){
-    used-scope: global;
-  }
-  .it .depends mixin[type=2] when (@usedScope=mixin){
-    used-scope: mixin;
-  }
-  .it .depends local::pseudo when (@usedScope=local){
-    used-scope: local;
+#namespace {
+  .apples(50px);
+  .apples(700px);
+  .bananas() {
+    height: 22;
   }
 }
 
-.mixin(@usedScope: argument) {
-  .false with argument global[type=1] when (@usedScope=global){
-    used-argument-scope: incorrectly;
-  }
-  .true with argument argument[type=2] when (@usedScope=argument){
-    used-argument-scope: correctly;
-  }
-  .false with argument local::pseudo when (@usedScope=local){
-    used-argument-scope: incorrectly;
-  }
-   
+#test {
+  #namespace > .bananas();
 }
-
-//call mixin on top
-.mixin();
-
-//call mixin in nested ruleset
-.outer1 {
-	.outer2& {
-	  .mixin();
-	}
-}
-
-//call mixin but redefine variable in caller
-.caller() {
-  .caller global[type=1] when (@caller=global){
-    used-scope: incorrectly;
-  }
-  .caller mixin[type=2] when (@caller=caller){
-    used-scope: correctly;
-  }
-}
-.local-in-caller {
-  .caller();
-  @caller: caller;
-}
-
-//as namespace

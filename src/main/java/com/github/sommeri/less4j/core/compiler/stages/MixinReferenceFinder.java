@@ -117,7 +117,7 @@ public class MixinReferenceFinder {
         // try to compile it. 
         if (!semiCompiledNodes.contains(bodyClone)) {
           parentSolver.unsafeDoSolveReferences(bodyClone, scope);
-        }
+        } 
 
         List<FullMixinDefinition> found = findInMatchingNamespace(scope, nameChain, reference);
         result.addAll(found);

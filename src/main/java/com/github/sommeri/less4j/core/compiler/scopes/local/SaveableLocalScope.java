@@ -98,16 +98,20 @@ public class SaveableLocalScope implements ILocalScope {
     getActiveLocalScope().registerMixin(mixin, mixinsBodyScope);
   }
 
-  public void createPlaceholder() {
-    getActiveLocalScope().createPlaceholder();
+  public DataPlaceholder createDataPlaceholder() {
+    return getActiveLocalScope().createDataPlaceholder();
   }
 
-  public void addToPlaceholder(IScope otherScope) {
-    getActiveLocalScope().addToPlaceholder(otherScope);
+  public void addToDataPlaceholder(IScope otherScope) {
+    getActiveLocalScope().addToDataPlaceholder(otherScope);
   }
 
-  public void closePlaceholder() {
-    getActiveLocalScope().closePlaceholder();
+  public void addToDataPlaceholder(DataPlaceholder placeholder, IScope otherScope) {
+    getActiveLocalScope().addToDataPlaceholder(placeholder, otherScope);
+  }
+
+  public void closeDataPlaceholder() {
+    getActiveLocalScope().closeDataPlaceholder();
   }
 
   public void add(IScope otherSope) {

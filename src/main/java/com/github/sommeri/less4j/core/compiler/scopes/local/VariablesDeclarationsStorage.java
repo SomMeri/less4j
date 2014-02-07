@@ -66,14 +66,37 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
   }
 
   public void addToPlaceholder(VariablesDeclarationsStorage otherStorage) {
+    StoragePlaceholder<Expression> placeholder = getFirstUnusedPlaceholder();
+    addToPlaceholder(placeholder, otherStorage, true);
+  }
+
+  private void addToPlaceholder(StoragePlaceholder<Expression> placeholder, VariablesDeclarationsStorage otherStorage, boolean localScopeProtection) {
     Map<String, Expression> otherVariables = otherStorage.variables;
     for (Entry<String, Expression> entry : otherVariables.entrySet()) {
       String name = entry.getKey();
       Expression value = entry.getValue();
       
-      if (storedBeforeUnusedPlaceholder(name) && !contains(name))
+      //FIXME: !!!!!!!!!!!!! revise - is the second part of the condition needed?
+      if (storedUnderPlaceholder(name, placeholder) && (!localScopeProtection || !contains(name))) //local scope protection
         store(name, value);
     }
+  }
+
+  public void replacePlaceholder(StoragePlaceholder<Expression> placeholder, VariablesDeclarationsStorage otherStorage) {
+    // add variables if it not overwritten yet into that placeholder
+    addToPlaceholder(placeholder,  otherStorage, false);
+    // raise  placeholders ids if higher
+    //FIXME: !!!!!!!!!!!!!!!!!!!! maybe copy those placeholders? 
+    int position = placeholder.getPosition();
+    for (StoragePlaceholder<Expression> storagePlaceholder : otherStorage.getPlaceholders()) {
+      storagePlaceholder.setPosition(storagePlaceholder.getPosition()+position);
+    }
+    for (StoragePlaceholder<Expression> thisPlaceholder : this.getPlaceholders()) {
+      if (thisPlaceholder.getPosition()>position)
+        placeholder.setPosition(thisPlaceholder.getPosition()+otherStorage.getPlaceholders().size());
+    }
+    getPlaceholders().addAll(getPlaceholders().indexOf(placeholder), otherStorage.getPlaceholders());
+    getPlaceholders().remove(placeholder);
   }
 
   public VariablesDeclarationsStorage clone() {
@@ -88,6 +111,5 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
     result.append("Variables: ").append(variables);
     return result.toString();
   }
-  
-  
+
 }

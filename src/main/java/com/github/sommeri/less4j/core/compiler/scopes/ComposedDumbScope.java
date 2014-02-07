@@ -71,16 +71,20 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     localScope.registerMixin(mixin, mixinsBodyScope);
   }
 
-  public void createPlaceholder() {
-    localScope.createPlaceholder();
+  public DataPlaceholder createDataPlaceholder() {
+    return localScope.createDataPlaceholder();
   }
 
-  public void addToPlaceholder(IScope otherScope) {
-    localScope.addToPlaceholder(otherScope);
+  public void addToDataPlaceholder(IScope otherScope) {
+    localScope.addToDataPlaceholder(otherScope);
   }
 
-  public void closePlaceholder() {
-    localScope.closePlaceholder();
+  public void addToDataPlaceholder(DataPlaceholder placeholder, IScope otherScope) {
+    localScope.addToDataPlaceholder(placeholder, otherScope);
+  }
+
+  public void closeDataPlaceholder() {
+    localScope.closeDataPlaceholder();
   }
 
   public void addAllMixins(List<FullMixinDefinition> mixins) {

@@ -156,10 +156,10 @@ class MixinsSolver {
     // update mixin replacements and update scope with imported variables and mixins
     for (MixinCompilationResult compiled : mixinsToBeUsed) {
       result.addMembers(compiled.getReplacement());
-      callerScope.addToPlaceholder(compiled.getReturnValues());
+      callerScope.addToDataPlaceholder(compiled.getReturnValues());
     }
 
-    callerScope.closePlaceholder();
+    callerScope.closeDataPlaceholder();
     resolveImportance(reference, result);
     shiftComments(reference, result);
 

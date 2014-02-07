@@ -8,12 +8,15 @@ import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
 
 public class ArraysUtils {
@@ -152,10 +155,36 @@ public class ArraysUtils {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends ASTCssNode> List<T> deeplyClonedList(List<T> list) {
+  public static <T extends PubliclyCloneable> List<T> deeplyClonedList(List<T> list) {
     List<T> result = new ArrayList<T>();
     for (T t : list) {
       result.add((T)t.clone());
+    }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends PubliclyCloneable> LinkedList<T> deeplyClonedLinkedList(LinkedList<T> list) {
+    LinkedList<T> result = new LinkedList<T>();
+    for (T t : list) {
+      result.add((T)t.clone());
+    }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <M, T extends PubliclyCloneable> Map<M, T> deeplyClonedMap(Map<M, T> map) {
+    Map<M, T> result = new HashMap<M, T>();
+    for (Entry<M, T> t : map.entrySet()) {
+      result.put(t.getKey(), (T)(t.getValue().clone()));
+    }
+    return result;
+  }
+
+  public static <M, T extends PubliclyCloneable> Map<M, List<T>> deeplyClonedListInMap(Map<M, List<T>> map) {
+    Map<M, List<T>> result = new HashMap<M, List<T>>();
+    for (Entry<M, List<T>> t : map.entrySet()) {
+      result.put(t.getKey(), deeplyClonedList(t.getValue()));
     }
     return result;
   }

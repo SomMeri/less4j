@@ -1,17 +1,23 @@
 package com.github.sommeri.less4j.core.compiler.scopes.local;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class StorageWithPlaceholders<T> implements Cloneable {
 
+  //FIXME: !!!!!!!!!! maybe remove this?
   private int registeredPlaceholders = 0;
   private int usedPlaceholders = 0;
   private Map<String, Integer> placeholdersWhenModified = new HashMap<String, Integer>();
+  private List<StoragePlaceholder<T>> placeholders = new ArrayList<StorageWithPlaceholders.StoragePlaceholder<T>>();
 
-  public void createPlaceholder() {
+  public StoragePlaceholder<T> createPlaceholder() {
     registeredPlaceholders += 1;
+    StoragePlaceholder<T> placeholder = new StoragePlaceholder<T>(this, registeredPlaceholders);
+    placeholders.add(placeholder);
+    return placeholder;
   }
 
   public void closePlaceholder() {
@@ -23,8 +29,8 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
     return position == null ? -1 : position;
   }
 
-  protected int getUsedPlaceholders() {
-    return usedPlaceholders;
+  protected StoragePlaceholder<T> getFirstUnusedPlaceholder() {
+    return placeholders.get(usedPlaceholders);
   }
 
   public void store(String name, T value) {
@@ -37,12 +43,16 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
     doStore(name, value);
   }
 
+  protected List<StoragePlaceholder<T>> getPlaceholders() {
+    return placeholders;
+  }
+
   protected abstract void doStore(String name, T value);
 
   protected abstract void doStore(String name, List<T> value);
 
-  protected boolean storedBeforeUnusedPlaceholder(String name) {
-    return getPosition(name) <= getUsedPlaceholders();
+  protected boolean storedUnderPlaceholder(String name, StoragePlaceholder<T> placeholder) {
+    return getPosition(name) <= placeholder.getPosition(); // - maybe normally count the position in the list?
   }
 
   public String placeholdersReport() {
@@ -58,5 +68,27 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
     } catch (CloneNotSupportedException e) {
       throw new IllegalStateException("Impossible state.");
     }
+  }
+
+  //FIXME: !!!!!!!!!!!!!!!!!!! update owners clone!!!!!!!!!!
+  public static class StoragePlaceholder<T> {
+    
+    private final StorageWithPlaceholders<T> owner;
+    private int position;
+
+    public StoragePlaceholder(StorageWithPlaceholders<T> owner, int position) {
+      super();
+      this.owner = owner;
+      this.position = position;
+    }
+
+    protected int getPosition() {
+      return position;
+    }
+
+    protected void setPosition(int position) {
+      this.position = position;
+    }
+    
   }
 }

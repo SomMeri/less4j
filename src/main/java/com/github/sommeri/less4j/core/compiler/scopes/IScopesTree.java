@@ -16,5 +16,5 @@ public interface IScopesTree {
   public void setParent(IScope parent);
 
   public int getTreeSize();
-
+  
 }

@@ -15,6 +15,7 @@ public class ScopeFactory {
   public static final String SCOPE = "#scope#";
   public static final String BODY_OWNER = "#body-owner#";
   public static final String DUMMY = "#dummy#";
+  public static final String PLACEHOLDER = "#placeholder#";
 
   public static IScope createDefaultScope(ASTCssNode owner) {
     return new BasicScope(new LocalScope(owner, new ArrayList<String>(), DEFAULT), new ScopesTree());
@@ -24,6 +25,11 @@ public class ScopeFactory {
     return createScope(owner, parent, SCOPE);
   }
 
+  public static PlaceholderScope createPlaceholderScope(ASTCssNode owner, IScope parent) {
+    PlaceholderScope result = new PlaceholderScope(parent, new LocalScope(owner, new ArrayList<String>(), PLACEHOLDER), new ScopesTree());
+    return result;
+  }
+  
   public static IScope createBodyOwnerScope(ASTCssNode owner, IScope parent) {
     return createScope(owner, parent, BODY_OWNER);
   }
@@ -68,4 +74,5 @@ public class ScopeFactory {
     
     return result;
   }
+
 }

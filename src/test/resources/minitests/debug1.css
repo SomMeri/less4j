@@ -1,21 +1,5 @@
-.true no argument mixin[type=2] {
-  used-local-scope: correctly;
-}
-.it .depends global[type=1] {
-  used-scope: global;
-}
-.true with argument argument[type=2] {
-  used-argument-scope: correctly;
-}
-.outer2.outer1 .true no argument mixin[type=2] {
-  used-local-scope: correctly;
-}
-.outer2.outer1 .it .depends global[type=1] {
-  used-scope: global;
-}
-.outer2.outer1 .true with argument argument[type=2] {
-  used-argument-scope: correctly;
-}
-.local-in-caller .caller mixin[type=2] {
-  used-scope: correctly;
+#test {
+  width: 50px;
+  width: 700px;
+  height: 22;
 }

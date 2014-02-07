@@ -41,4 +41,6 @@ public interface IScope extends ILocalScope, IScopesTree {
   public IScopesTree getSurroundingScopes();
 
   public ILocalScope getLocalScope();
+
+
 }

@@ -6,8 +6,9 @@ import java.util.List;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.PubliclyCloneable;
 
-public abstract class ASTCssNode implements Cloneable {
+public abstract class ASTCssNode implements PubliclyCloneable {
 
   private ASTCssNode parent;
   //I'm using underlying structure as identified in cycle detector. If it stops to be identifying,

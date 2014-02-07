@@ -494,15 +494,16 @@ class NullScope extends BasicScope {
   }
 
   @Override
-  public void createPlaceholder() {
+  public DataPlaceholder createDataPlaceholder() {
+    return null;
   }
 
   @Override
-  public void addToPlaceholder(IScope otherScope) {
+  public void addToDataPlaceholder(IScope otherScope) {
   }
 
   @Override
-  public void closePlaceholder() {
+  public void closeDataPlaceholder() {
  }
 
   @Override
