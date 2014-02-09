@@ -37,6 +37,9 @@ public interface IScope extends ILocalScope, IScopesTree {
 
   public Expression getLocalValue(String name);
 
+  // smart setters 
+  public void setParentKeepConsistency(IScope parent);
+
   // internals access 
   public IScopesTree getSurroundingScopes();
 

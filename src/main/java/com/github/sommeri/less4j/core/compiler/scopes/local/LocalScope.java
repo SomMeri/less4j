@@ -121,7 +121,7 @@ public class LocalScope implements ILocalScope {
   public void addToDataPlaceholder(DataPlaceholder placeholder, IScope otherScope) {
     getLocalVariables().replacePlaceholder(placeholder.getVariablesPlaceholder(), otherScope.getLocalVariables());
     //FIXME: !!!!!!!!!!! add to mixins
-    //getLocalMixins().addToPlaceholder(placeholder.getMixinsPlaceholder(), otherScope.getLocalMixins());
+    getLocalMixins().replacePlaceholder(placeholder.getMixinsPlaceholder(), otherScope.getLocalMixins());
   }
 
   public void closeDataPlaceholder() {

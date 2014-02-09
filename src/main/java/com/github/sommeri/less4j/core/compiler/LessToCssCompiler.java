@@ -46,9 +46,10 @@ public class LessToCssCompiler {
   }
 
   public ASTCssNode compileToCss(StyleSheet less, LessSource source, Configuration options) {
-    resolveImports(less, source);
-    resolveReferences(less, source);
-
+    //resolveImports(less, source);
+    //resolveReferences(less, source);
+    resolveImportsAndReferences(less, source);
+    
     evaluateExpressions(less);
     freeNestedRulesetsAndMedia(less);
     solveExtends(less);
@@ -117,13 +118,13 @@ public class LessToCssCompiler {
   }
 
   private void resolveImports(StyleSheet less, LessSource source) {
-    //    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
-    //    importsSolver.solveImports(less, source);
+    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
+    importsSolver.solveImports(less, source);
   }
 
   private void resolveReferences(StyleSheet less, LessSource source) {
-        SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
-        importsSolver.solveImports(less, source);
+    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
+    importsSolver.solveImports(less, source);
 
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
     IScope scope = scopeBuilder.extractScope(less);
@@ -133,7 +134,7 @@ public class LessToCssCompiler {
     // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
   }
 
-  private void resolveReferencesNew(StyleSheet less, LessSource source) {
+  private void resolveImportsAndReferences(StyleSheet less, LessSource source) {
     ExperimentalImportsSolver importsSolver = new ExperimentalImportsSolver(problemsHandler);
     //importsSolver.solveImports(less, source);
 
@@ -141,19 +142,27 @@ public class LessToCssCompiler {
     IScope scope = scopeBuilder.extractScope(less);
 
     // FIXME: !!!!!!!!!!!!!!! iterate deeper
-    //BETTER IDEA -import and then run scope run again 
     List<PlaceholderScope> importsPlaceholders = scopeBuilder.getImportsPlaceholders();
-    for (PlaceholderScope placeholder : importsPlaceholders) {
-      StyleSheet importedAst = importsSolver.importEncountered((Import) placeholder.getOwner(), source);
-      InitialScopeExtractor importedAstScopeBuilder = new InitialScopeExtractor();
-      IScope addThisIntoScopeTree = importedAstScopeBuilder.extractScope(importedAst);
-      
-      placeholder.replaceSelf(addThisIntoScopeTree);
-    }
+    solveNestedImports(source, importsSolver, importsPlaceholders);
 
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);
     // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
+  }
+
+  private void solveNestedImports(LessSource source, ExperimentalImportsSolver importsSolver, List<PlaceholderScope> importsPlaceholders) {
+    for (PlaceholderScope placeholder : importsPlaceholders) {
+      ASTCssNode importedAst = importsSolver.importEncountered((Import) placeholder.getOwner(), source);
+      if (importedAst != null) {
+        InitialScopeExtractor importedAstScopeBuilder = new InitialScopeExtractor();
+        IScope addThisIntoScopeTree = importedAstScopeBuilder.extractScope(importedAst);
+
+        placeholder.replaceSelf(addThisIntoScopeTree);
+        solveNestedImports(source, importsSolver, importedAstScopeBuilder.getImportsPlaceholders());
+      } else {
+        placeholder.removeSelf();
+      }
+    }
   }
 
   private void removeUselessLessElements(StyleSheet node) {

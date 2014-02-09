@@ -1,13 +1,1 @@
-.apples(@width: 100px) { .bananas() { width: @width; } }
-
-#namespace {
-  .apples(50px);
-  .apples(700px);
-  .bananas() {
-    height: 22;
-  }
-}
-
-#test {
-  #namespace > .bananas();
-}
+@import-multiple "import/chained-import-1.less" screen and (max-width: 400px);

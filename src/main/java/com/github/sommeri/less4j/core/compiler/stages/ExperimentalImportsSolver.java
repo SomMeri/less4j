@@ -50,7 +50,7 @@ public class ExperimentalImportsSolver {
   }
 
 //FIXME !!!!!!!!! change back to no returns
-  public StyleSheet importEncountered(Import node, LessSource source) {
+  public ASTCssNode importEncountered(Import node, LessSource source) {
     String filename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler);
     if (filename == null) {
       problemsHandler.errorWrongImport(node.getUrlExpression());
@@ -114,6 +114,10 @@ public class ExperimentalImportsSolver {
       media.setBody(new GeneralBody(underlyingStructure, importedAst.getMembers()));
       media.configureParentToAllChilds();
       astManipulator.replaceInBody(node, media);
+      
+      StyleSheet result = new StyleSheet(media.getUnderlyingStructure());
+      result.addMember(media);
+      return result;
     } else {
       astManipulator.replaceInBody(node, importedAst.getChilds());
     }

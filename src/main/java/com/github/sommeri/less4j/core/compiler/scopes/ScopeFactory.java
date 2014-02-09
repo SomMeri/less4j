@@ -44,7 +44,7 @@ public class ScopeFactory {
 
   private static IScope createScope(ASTCssNode owner, IScope parent, String type) {
     BasicScope result = new BasicScope(new LocalScope(owner, new ArrayList<String>(), type), new ScopesTree());
-    result.setParent(parent);
+    result.setParentKeepConsistency(parent);
     return result;
   }
 

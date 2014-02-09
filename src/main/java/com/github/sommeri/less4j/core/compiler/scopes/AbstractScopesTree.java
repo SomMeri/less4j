@@ -17,5 +17,4 @@ public abstract class AbstractScopesTree implements IScopesTree {
     return result;
   }
 
-
 }

@@ -77,15 +77,22 @@ public class BasicScope extends ComposedDumbScope implements IScope {
     return this;
   }
 
-  public void setParent(IScope parent) {
+  //FIXME!!!!!!!!!!!!!! rename to setParentKeepConsistency and put to scope
+  public void setParentKeepConsistency(IScope parent) {
     if (getSurroundingScopes().hasParent()) {
       getParent().getChilds().remove(this);
     }
 
-    getSurroundingScopes().setParent(parent);
+    setParent(parent);
 
     if (parent != null)
       parent.addChild(this);
+  }
+
+  //FIXME!!!!!!!!!!!!!! rename to setParent
+  @Override
+  public void setParent(IScope parent) {
+    getSurroundingScopes().setParent(parent);
   }
 
   @Override

@@ -51,7 +51,7 @@ public class InitialScopeExtractor {
       buildScope(kid);
 
       if (kid.getType() == ASTCssNodeType.IMPORT) {
-       // importsPlaceholders.add(createPlaceholderScope((Import) kid)); //FIXME+++++++++++++++++: should be part of changes temporary closed 
+        importsPlaceholders.add(createPlaceholderScope(kid));  
       } else if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
         currentScope.registerVariable((VariableDeclaration) kid);
         manipulator.removeFromBody(kid);

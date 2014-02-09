@@ -14,9 +14,9 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
   private List<StoragePlaceholder<T>> placeholders = new ArrayList<StorageWithPlaceholders.StoragePlaceholder<T>>();
 
   public StoragePlaceholder<T> createPlaceholder() {
-    registeredPlaceholders += 1;
     StoragePlaceholder<T> placeholder = new StoragePlaceholder<T>(this, registeredPlaceholders);
     placeholders.add(placeholder);
+    registeredPlaceholders += 1;
     return placeholder;
   }
 

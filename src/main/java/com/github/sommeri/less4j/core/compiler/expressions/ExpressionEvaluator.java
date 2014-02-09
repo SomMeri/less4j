@@ -445,9 +445,9 @@ class NullScope extends BasicScope {
   public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
   }
 
-  @Override
-  public void setParent(IScope parent) {
-  }
+//  @Override
+//  public void setParent(IScope parent) {
+//  }
 
   @Override
   public void removedFromAst() {
