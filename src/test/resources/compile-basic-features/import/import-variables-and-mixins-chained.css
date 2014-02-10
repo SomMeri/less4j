@@ -1,0 +1,12 @@
+:before {
+  first-content: @variable value is "top level";
+  content: @variable value is "top level";
+  last-content: @variable value is "top level";
+  content: mixin in space;
+}
+:after {
+  first-content: @variable value is "top level";
+  content: @variable value is "top level";
+  last-content: @variable value is "top level";
+  content: mixin in space;
+}

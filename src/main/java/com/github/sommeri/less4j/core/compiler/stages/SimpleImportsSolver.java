@@ -49,11 +49,11 @@ public class SimpleImportsSolver {
     }
   }
 
-  private void importEncountered(Import node, LessSource source) {
+  public ASTCssNode importEncountered(Import node, LessSource source) {
     String filename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler);
     if (filename == null) {
       problemsHandler.errorWrongImport(node.getUrlExpression());
-      return;
+      return null;
     }
     String urlParams = "";
     int paramsIndx = filename.lastIndexOf("?");
@@ -65,7 +65,7 @@ public class SimpleImportsSolver {
     // css file imports should be left as they are
     // FIXME ! they should be relativized
     if (isCssFile(filename))
-      return;
+      return null; 
 
     filename = addLessSuffixIfNeeded(filename, urlParams);
     LessSource importedSource;
@@ -73,20 +73,20 @@ public class SimpleImportsSolver {
       importedSource = source.relativeSource(filename);
     } catch (FileNotFound ex) {
       problemsHandler.errorFileNotFound(node, filename);
-      return;
+      return null;
     } catch (CannotReadFile e) {
       problemsHandler.errorFileCanNotBeRead(node, filename);
-      return;
+      return null;
     } catch (StringSourceException ex) {
       // imports are relative to current file and we do not know its location
       problemsHandler.warnLessImportNoBaseDirectory(node.getUrlExpression());
-      return;
+      return null;
     }
 
     // import once should not import a file that was already imported
     if (isImportOnce(node) && alreadyVisited(importedSource)) {
       astManipulator.removeFromBody(node);
-      return;
+      return null;
     }
     importedSources.add(importedSource);
 
@@ -95,27 +95,35 @@ public class SimpleImportsSolver {
       importedContent = importedSource.getContent();
     } catch (FileNotFound e) {
       problemsHandler.errorFileNotFound(node, filename);
-      return;
+      return null;
     } catch (CannotReadFile e) {
       problemsHandler.errorFileCanNotBeRead(node, filename);
-      return;
+      return null;
     }
 
     // parse imported file
     StyleSheet importedAst = parseContent(node, importedContent, importedSource);
-    solveImports(importedAst, importedSource);
 
     // add media queries if needed
     if (node.hasMediums()) {
       HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
+      StyleSheet result = new StyleSheet(underlyingStructure);
       Media media = new Media(underlyingStructure);
+      result.addMember(media);
+      media.setParent(result);
       media.setMediums(node.getMediums());
-      media.setBody(new GeneralBody(underlyingStructure, importedAst.getMembers()));
+      GeneralBody mediaBody = new GeneralBody(underlyingStructure, importedAst.getMembers());
+      media.setBody(mediaBody);
       media.configureParentToAllChilds();
+      mediaBody.configureParentToAllChilds();
       astManipulator.replaceInBody(node, media);
+      
+      return result;
     } else {
       astManipulator.replaceInBody(node, importedAst.getChilds());
     }
+    
+    return importedAst;
   }
 
   private boolean isImportOnce(Import node) {
