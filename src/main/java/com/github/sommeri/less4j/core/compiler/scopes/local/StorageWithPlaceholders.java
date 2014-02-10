@@ -5,18 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.sommeri.less4j.utils.ArraysUtils;
+
 public abstract class StorageWithPlaceholders<T> implements Cloneable {
 
-  //FIXME: !!!!!!!!!! maybe remove this?
-  private int registeredPlaceholders = 0;
   private int usedPlaceholders = 0;
-  private Map<String, Integer> placeholdersWhenModified = new HashMap<String, Integer>();
+  protected Map<String, StoragePlaceholder<T>> placeholdersWhenModified = new HashMap<String, StoragePlaceholder<T>>();
   private List<StoragePlaceholder<T>> placeholders = new ArrayList<StorageWithPlaceholders.StoragePlaceholder<T>>();
 
   public StoragePlaceholder<T> createPlaceholder() {
     StoragePlaceholder<T> placeholder = new StoragePlaceholder<T>();
     placeholders.add(placeholder);
-    registeredPlaceholders += 1;
     return placeholder;
   }
 
@@ -25,8 +24,11 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
   }
 
   private int getPosition(String name) {
-    Integer position = placeholdersWhenModified.get(name);
-    return position == null ? -1 : position;
+    StoragePlaceholder<T> previousPlaceholder = placeholdersWhenModified.get(name);
+    if (previousPlaceholder==null)
+      return 0;
+    
+    return placeholders.indexOf(previousPlaceholder)+1;
   }
 
   protected int getPosition(StoragePlaceholder<T> placeholder) {
@@ -38,12 +40,12 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
   }
 
   public void store(String name, T value) {
-    placeholdersWhenModified.put(name, registeredPlaceholders);
+    placeholdersWhenModified.put(name, ArraysUtils.last(placeholders));
     doStore(name, value);
   }
 
   public void store(String name, List<T> value) {
-    placeholdersWhenModified.put(name, registeredPlaceholders);
+    placeholdersWhenModified.put(name, ArraysUtils.last(placeholders));
     doStore(name, value);
   }
 
@@ -60,14 +62,14 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
   }
 
   public String placeholdersReport() {
-    return "registered: " + registeredPlaceholders + " used: " + usedPlaceholders;
+    return "registered: " + placeholders.size() + " used: " + usedPlaceholders;
   }
 
   public StorageWithPlaceholders<T> clone() {
     try {
       @SuppressWarnings("unchecked")
       StorageWithPlaceholders<T> clone = (StorageWithPlaceholders<T>) super.clone();
-      clone.placeholdersWhenModified = new HashMap<String, Integer>(placeholdersWhenModified);
+      clone.placeholdersWhenModified = new HashMap<String, StoragePlaceholder<T>>(placeholdersWhenModified);
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new IllegalStateException("Impossible state.");

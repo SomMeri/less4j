@@ -11,24 +11,22 @@ import java.util.Map.Entry;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.PubliclyCloneable;
 
-//FIXME!!!!!!!!!!!!!!!!!!!!: move to utils or such class
 public class CoolStorage<M, T> implements Cloneable {
 
   private LinkedList<Level<M, T>> levels = new LinkedList<Level<M, T>>();
   private LinkedList<Placeholder<M, T>> placeholders = new LinkedList<Placeholder<M, T>>();
 
-  public void store(M key, T thing) {
+  public void add(M key, T thing) {
     Level<M, T> lastLevel = getLastLevel();
-    lastLevel.store(key, thing);
+    lastLevel.add(key, thing);
   }
 
-  public void store(M key, List<T> thing) {
+  public void add(M key, List<T> thing) {
     Level<M, T> lastLevel = getLastLevel();
-    lastLevel.store(key, thing);
+    lastLevel.add(key, thing);
   }
 
-  //FIXME: !!!!!!!!!!! rename to add
-  public void store(CoolStorage<M, T> otherStorage) {
+  public void add(CoolStorage<M, T> otherStorage) {
     levels.addAll(otherStorage.levels);
     placeholders.addAll(otherStorage.placeholders);
   }
@@ -75,7 +73,7 @@ public class CoolStorage<M, T> implements Cloneable {
 
   private void addDataOnly(Placeholder<M, T> placeholder, CoolStorage<M, T> otherStorage) {
     for (Level<M, T> level : otherStorage.levels) {
-      placeholder.level.storeAll(level);
+      placeholder.level.addAll(level);
     }
   }
 
@@ -86,15 +84,8 @@ public class CoolStorage<M, T> implements Cloneable {
   //REPLACE whatever was stored in placeholder
   public void replacePlaceholder(Placeholder<M, T> placeholder, CoolStorage<M, T> otherStorage) {
     //replace in data
-    replace(levels, placeholder.level, otherStorage.levels);
-    replace(placeholders, placeholder, otherStorage.placeholders);
-  }
-
-  //FIXME:!!!!!!!!!!!!! move to utils
-  private <Q> void replace(List<Q> ownerList, Q oldElement, LinkedList<Q> newElements) {
-    int level = ownerList.indexOf(oldElement);
-    ownerList.remove(level);
-    ownerList.addAll(level, newElements);
+    ArraysUtils.replace(levels, placeholder.level, otherStorage.levels);
+    ArraysUtils.replace(placeholders, placeholder, otherStorage.placeholders);
   }
 
   private Level<M, T> getLastLevel() {
@@ -133,17 +124,17 @@ public class CoolStorage<M, T> implements Cloneable {
 
     private Map<M, List<T>> storage = new HashMap<M, List<T>>();
 
-    public void store(M key, T thing) {
+    public void add(M key, T thing) {
       getStoredList(key).add(thing);
     }
 
-    public void store(M key, List<T> things) {
+    public void add(M key, List<T> things) {
       getStoredList(key).addAll(things);
     }
 
-    public void storeAll(Level<M, T> otherLevel) {
+    public void addAll(Level<M, T> otherLevel) {
       for (Entry<M, List<T>> entry : otherLevel.storage.entrySet()) {
-        store(entry.getKey(), entry.getValue());
+        add(entry.getKey(), entry.getValue());
       }
     }
 

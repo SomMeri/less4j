@@ -237,4 +237,10 @@ public class ArraysUtils {
     return true;
   }
 
+  public static <Q> void replace(List<Q> inList, Q oldElement, LinkedList<Q> newElements) {
+    int level = inList.indexOf(oldElement);
+    inList.remove(level);
+    inList.addAll(level, newElements);
+  }
+
 }

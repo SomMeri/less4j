@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expression> {
 
@@ -76,7 +77,6 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
       String name = entry.getKey();
       Expression value = entry.getValue();
       
-      //FIXME: !!!!!!!!!!!!! revise - is the second part of the condition needed?
       if (storedUnderPlaceholder(name, placeholder) && (!localScopeProtection || !contains(name))) //local scope protection
         store(name, value);
     }
@@ -86,8 +86,21 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
     // add variables if it not overwritten yet into that placeholder
     addToPlaceholder(placeholder,  otherStorage, false);
     // raise  placeholders ids if higher
-    getPlaceholders().addAll(getPosition(placeholder), otherStorage.getPlaceholders());
+    int placeholdersPosition = getPosition(placeholder);
+    StoragePlaceholder<Expression> previousPlaceholder = ArraysUtils.last(otherStorage.getPlaceholders());
+    if (previousPlaceholder==null && placeholdersPosition>0)
+      previousPlaceholder = getPlaceholders().get(placeholdersPosition-1);
+    getPlaceholders().addAll(placeholdersPosition, otherStorage.getPlaceholders());
     getPlaceholders().remove(placeholder);
+    
+    Map<String, StoragePlaceholder<Expression>> newPlaceholdersWhenModified = new HashMap<String, StoragePlaceholder<Expression>>();
+    for (Entry<String, StoragePlaceholder<Expression>> entry : placeholdersWhenModified.entrySet()) {
+      StoragePlaceholder<Expression> value = entry.getValue();
+      if (value==placeholder)
+        value=previousPlaceholder;
+      newPlaceholdersWhenModified.put(entry.getKey(), value);
+    }
+    placeholdersWhenModified = newPlaceholdersWhenModified;
   }
 
   public VariablesDeclarationsStorage clone() {

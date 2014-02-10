@@ -17,12 +17,12 @@ public class MixinsDefinitionsStorage implements Cloneable {
   public void store(FullMixinDefinition mixin) {
     List<ReusableStructureName> names = mixin.getMixin().getNames();
     for (ReusableStructureName name : names) {
-      coolStorage.store(name.asString(), mixin);
+      coolStorage.add(name.asString(), mixin);
     }
   }
 
   public void store(String name, List<FullMixinDefinition> value) {
-    coolStorage.store(name, value);
+    coolStorage.add(name, value);
   }
 
   public void storeAll(List<FullMixinDefinition> mixins) {
@@ -32,7 +32,7 @@ public class MixinsDefinitionsStorage implements Cloneable {
   }
 
   public void storeAll(MixinsDefinitionsStorage otherStorage) {
-    coolStorage.store(otherStorage.coolStorage);
+    coolStorage.add(otherStorage.coolStorage);
   }
 
   public List<FullMixinDefinition> getMixins(List<String> nameChain, ReusableStructureName name) {
@@ -70,7 +70,7 @@ public class MixinsDefinitionsStorage implements Cloneable {
   }
 
   public void addAll(MixinsDefinitionsStorage source) {
-    coolStorage.store(source.coolStorage);
+    coolStorage.add(source.coolStorage);
   }
 
   public MixinsPlaceholder createPlaceholder() {
