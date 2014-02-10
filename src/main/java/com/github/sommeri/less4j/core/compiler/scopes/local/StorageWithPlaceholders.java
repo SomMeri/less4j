@@ -14,7 +14,7 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
   private List<StoragePlaceholder<T>> placeholders = new ArrayList<StorageWithPlaceholders.StoragePlaceholder<T>>();
 
   public StoragePlaceholder<T> createPlaceholder() {
-    StoragePlaceholder<T> placeholder = new StoragePlaceholder<T>(this, registeredPlaceholders);
+    StoragePlaceholder<T> placeholder = new StoragePlaceholder<T>();
     placeholders.add(placeholder);
     registeredPlaceholders += 1;
     return placeholder;
@@ -29,6 +29,10 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
     return position == null ? -1 : position;
   }
 
+  protected int getPosition(StoragePlaceholder<T> placeholder) {
+    return placeholders.indexOf(placeholder);
+  }
+  
   protected StoragePlaceholder<T> getFirstUnusedPlaceholder() {
     return placeholders.get(usedPlaceholders);
   }
@@ -52,7 +56,7 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
   protected abstract void doStore(String name, List<T> value);
 
   protected boolean storedUnderPlaceholder(String name, StoragePlaceholder<T> placeholder) {
-    return getPosition(name) <= placeholder.getPosition(); // - maybe normally count the position in the list?
+    return getPosition(name) <= getPosition(placeholder); // - maybe normally count the position in the list?
   }
 
   public String placeholdersReport() {
@@ -70,25 +74,11 @@ public abstract class StorageWithPlaceholders<T> implements Cloneable {
     }
   }
 
-  //FIXME: !!!!!!!!!!!!!!!!!!! update owners clone!!!!!!!!!!
   public static class StoragePlaceholder<T> {
     
-    private final StorageWithPlaceholders<T> owner;
-    private int position;
-
-    public StoragePlaceholder(StorageWithPlaceholders<T> owner, int position) {
+    public StoragePlaceholder() {
       super();
-      this.owner = owner;
-      this.position = position;
     }
 
-    protected int getPosition() {
-      return position;
-    }
-
-    protected void setPosition(int position) {
-      this.position = position;
-    }
-    
   }
 }

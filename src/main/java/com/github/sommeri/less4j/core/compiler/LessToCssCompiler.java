@@ -45,8 +45,6 @@ public class LessToCssCompiler {
   }
 
   public ASTCssNode compileToCss(StyleSheet less, LessSource source, Configuration options) {
-    //resolveImports(less, source);
-    //resolveReferences(less, source);
     resolveImportsAndReferences(less, source);
     
     evaluateExpressions(less);
@@ -118,7 +116,6 @@ public class LessToCssCompiler {
 
   private void resolveImportsAndReferences(StyleSheet less, LessSource source) {
     SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
-    //importsSolver.solveImports(less, source);
 
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
     IScope scope = scopeBuilder.extractScope(less);

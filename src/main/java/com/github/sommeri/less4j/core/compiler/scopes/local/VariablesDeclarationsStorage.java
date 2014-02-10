@@ -86,16 +86,7 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
     // add variables if it not overwritten yet into that placeholder
     addToPlaceholder(placeholder,  otherStorage, false);
     // raise  placeholders ids if higher
-    //FIXME: !!!!!!!!!!!!!!!!!!!! maybe copy those placeholders? 
-    int position = placeholder.getPosition();
-    for (StoragePlaceholder<Expression> storagePlaceholder : otherStorage.getPlaceholders()) {
-      storagePlaceholder.setPosition(storagePlaceholder.getPosition()+position);
-    }
-    for (StoragePlaceholder<Expression> thisPlaceholder : this.getPlaceholders()) {
-      if (thisPlaceholder.getPosition()>position)
-        placeholder.setPosition(thisPlaceholder.getPosition()+otherStorage.getPlaceholders().size());
-    }
-    getPlaceholders().addAll(getPlaceholders().indexOf(placeholder), otherStorage.getPlaceholders());
+    getPlaceholders().addAll(getPosition(placeholder), otherStorage.getPlaceholders());
     getPlaceholders().remove(placeholder);
   }
 

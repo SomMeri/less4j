@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
-import java.util.List;
 
 public class PlaceholderScope extends BasicScope {
 
@@ -24,18 +23,6 @@ public class PlaceholderScope extends BasicScope {
 
   public void removeSelf() {
     removedFromAst(); //FIXME!!!!!!!!!!!!!!!!: maybe really remove? 
-  }
-
-  //FIXME!!!!!!!!!!!!!!!!: move to basic scope?
-  private void replaceChild(IScope parent, IScope child, List<IScope> replacements) {
-    List<IScope> inList = parent.getChilds();
-    int indexOf = inList.indexOf(child);
-    inList.remove(indexOf);
-    inList.addAll(indexOf, replacements);
-
-    for (IScope kid : replacements) {
-      kid.setParent(parent);
-    }
   }
 
 }

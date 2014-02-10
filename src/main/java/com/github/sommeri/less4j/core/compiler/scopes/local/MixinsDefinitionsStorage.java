@@ -6,7 +6,6 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.local.CoolStorage.Placeholder;
-import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage.MixinsPlaceholder;
 
 public class MixinsDefinitionsStorage implements Cloneable {
 
@@ -18,12 +17,12 @@ public class MixinsDefinitionsStorage implements Cloneable {
   public void store(FullMixinDefinition mixin) {
     List<ReusableStructureName> names = mixin.getMixin().getNames();
     for (ReusableStructureName name : names) {
-      doStore(name.asString(), mixin);
+      coolStorage.store(name.asString(), mixin);
     }
   }
 
   public void store(String name, List<FullMixinDefinition> value) {
-    doStore(name, value);
+    coolStorage.store(name, value);
   }
 
   public void storeAll(List<FullMixinDefinition> mixins) {
@@ -60,25 +59,6 @@ public class MixinsDefinitionsStorage implements Cloneable {
 
   public List<FullMixinDefinition> getAllMixins() {
     return coolStorage.getAllValues();
-  }
-
-  //FIXME: !!!!!!!!!!!! remove
-  protected void doStore(String name, FullMixinDefinition mixin) {
-    coolStorage.store(name, mixin);
-  }
-
-  //FIXME: !!!!!!!!!!!! remove
-  protected void doStore(String name, List<FullMixinDefinition> mixins) {
-    coolStorage.store(name, mixins);
-  }
-
-  public boolean contains(ReusableStructureName name) {
-    return contains(name.asString());
-  }
-
-  //FIXME: !!!!!!!!!!!! is this needed?
-  public boolean contains(String name) {
-    return coolStorage.contains(name);
   }
 
   public void addToPlaceholder(MixinsDefinitionsStorage otherStorage) {
@@ -123,7 +103,6 @@ public class MixinsDefinitionsStorage implements Cloneable {
 
   public static class MixinsPlaceholder {
 
-    @SuppressWarnings("unused")
     private final Placeholder<String, FullMixinDefinition> coolPlaceholder;
 
     public MixinsPlaceholder(Placeholder<String, FullMixinDefinition> coolPlaceholder) {

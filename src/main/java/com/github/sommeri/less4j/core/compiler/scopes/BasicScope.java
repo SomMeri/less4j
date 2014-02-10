@@ -77,7 +77,6 @@ public class BasicScope extends ComposedDumbScope implements IScope {
     return this;
   }
 
-  //FIXME!!!!!!!!!!!!!! rename to setParentKeepConsistency and put to scope
   public void setParentKeepConsistency(IScope parent) {
     if (getSurroundingScopes().hasParent()) {
       getParent().getChilds().remove(this);
@@ -89,10 +88,20 @@ public class BasicScope extends ComposedDumbScope implements IScope {
       parent.addChild(this);
   }
 
-  //FIXME!!!!!!!!!!!!!! rename to setParent
   @Override
   public void setParent(IScope parent) {
     getSurroundingScopes().setParent(parent);
+  }
+
+  public void replaceChild(IScope parent, IScope child, List<IScope> replacements) {
+    List<IScope> inList = parent.getChilds();
+    int indexOf = inList.indexOf(child);
+    inList.remove(indexOf);
+    inList.addAll(indexOf, replacements);
+
+    for (IScope kid : replacements) {
+      kid.setParent(parent);
+    }
   }
 
   @Override
