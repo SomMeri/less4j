@@ -79,8 +79,8 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     localScope.addToDataPlaceholder(otherScope);
   }
 
-  public void addToDataPlaceholder(DataPlaceholder placeholder, IScope otherScope) {
-    localScope.addToDataPlaceholder(placeholder, otherScope);
+  public void replacePlaceholder(DataPlaceholder placeholder, IScope otherScope) {
+    localScope.replacePlaceholder(placeholder, otherScope);
   }
 
   public void closeDataPlaceholder() {

@@ -11,10 +11,10 @@ import java.util.Map.Entry;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.PubliclyCloneable;
 
-public class CoolStorage<M, T> implements Cloneable {
+public class KeyListStorage<M, T> implements Cloneable {
 
   private LinkedList<Level<M, T>> levels = new LinkedList<Level<M, T>>();
-  private LinkedList<Placeholder<M, T>> placeholders = new LinkedList<Placeholder<M, T>>();
+  private LinkedList<ListPlaceholder<M, T>> placeholders = new LinkedList<ListPlaceholder<M, T>>();
 
   public void add(M key, T thing) {
     Level<M, T> lastLevel = getLastLevel();
@@ -26,7 +26,7 @@ public class CoolStorage<M, T> implements Cloneable {
     lastLevel.add(key, thing);
   }
 
-  public void add(CoolStorage<M, T> otherStorage) {
+  public void add(KeyListStorage<M, T> otherStorage) {
     levels.addAll(otherStorage.levels);
     placeholders.addAll(otherStorage.placeholders);
   }
@@ -51,27 +51,27 @@ public class CoolStorage<M, T> implements Cloneable {
   public List<T> getAllValues() {
     LinkedList<T> result = new LinkedList<T>();
     for (Level<M, T> level : levels) {
-      result.addAll(level.geAllValues());
+      result.addAll(level.getAllValues());
     }
 
     return result;
   }
 
-  public Placeholder<M, T> createPlaceholder() {
+  public ListPlaceholder<M, T> createPlaceholder() {
     Level<M, T> addLevel = addLevel();
-    Placeholder<M, T> placeholder = new Placeholder<M, T>(addLevel);
+    ListPlaceholder<M, T> placeholder = new ListPlaceholder<M, T>(addLevel);
     placeholders.add(placeholder);
     // add level that will be on top of placeholder
     addLevel(); 
     return placeholder;
   }
 
-  public void addDataToFirstPlaceholder(CoolStorage<M, T> otherStorage) { // used to be called addToPlaceholder
-    Placeholder<M, T> placeholder = placeholders.peekFirst();
+  public void addDataToFirstPlaceholder(KeyListStorage<M, T> otherStorage) { // used to be called addToPlaceholder
+    ListPlaceholder<M, T> placeholder = placeholders.peekFirst();
     addDataOnly(placeholder, otherStorage);
   }
 
-  private void addDataOnly(Placeholder<M, T> placeholder, CoolStorage<M, T> otherStorage) {
+  private void addDataOnly(ListPlaceholder<M, T> placeholder, KeyListStorage<M, T> otherStorage) {
     for (Level<M, T> level : otherStorage.levels) {
       placeholder.level.addAll(level);
     }
@@ -82,7 +82,7 @@ public class CoolStorage<M, T> implements Cloneable {
   }
 
   //REPLACE whatever was stored in placeholder
-  public void replacePlaceholder(Placeholder<M, T> placeholder, CoolStorage<M, T> otherStorage) {
+  public void replacePlaceholder(ListPlaceholder<M, T> placeholder, KeyListStorage<M, T> otherStorage) {
     //replace in data
     ArraysUtils.replace(levels, placeholder.level, otherStorage.levels);
     ArraysUtils.replace(placeholders, placeholder, otherStorage.placeholders);
@@ -103,16 +103,16 @@ public class CoolStorage<M, T> implements Cloneable {
   }
 
   @Override
-  public CoolStorage<M, T> clone() {
+  public KeyListStorage<M, T> clone() {
     try {
       @SuppressWarnings("unchecked")
-      CoolStorage<M, T> clone = (CoolStorage<M, T>) super.clone();
+      KeyListStorage<M, T> clone = (KeyListStorage<M, T>) super.clone();
       clone.levels = ArraysUtils.deeplyClonedLinkedList(levels);
-      clone.placeholders = new LinkedList<Placeholder<M, T>>();
-      for (Placeholder<M, T> placeholder : placeholders) {
+      clone.placeholders = new LinkedList<ListPlaceholder<M, T>>();
+      for (ListPlaceholder<M, T> placeholder : placeholders) {
         int index = levels.indexOf(placeholder.level);
         Level<M, T> levelClone = clone.levels.get(index);
-        clone.placeholders.add(new Placeholder<M, T>(levelClone));
+        clone.placeholders.add(new ListPlaceholder<M, T>(levelClone));
       }
       return clone;
     } catch (CloneNotSupportedException e) {
@@ -155,7 +155,7 @@ public class CoolStorage<M, T> implements Cloneable {
       return storage.containsKey(key) ? storage.get(key) : new ArrayList<T>();
     }
 
-    public Collection<T> geAllValues() {
+    public Collection<T> getAllValues() {
       List<T> result = new ArrayList<T>();
       for (List<T> list : storage.values()) {
         result.addAll(list);
@@ -178,10 +178,10 @@ public class CoolStorage<M, T> implements Cloneable {
 
   }
 
-  public static class Placeholder<M, T> {
+  public static class ListPlaceholder<M, T> {
     private final Level<M, T> level;
 
-    public Placeholder(Level<M, T> level) {
+    public ListPlaceholder(Level<M, T> level) {
       super();
       this.level = level;
     }

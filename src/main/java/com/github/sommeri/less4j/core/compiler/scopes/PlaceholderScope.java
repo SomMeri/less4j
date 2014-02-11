@@ -18,7 +18,7 @@ public class PlaceholderScope extends BasicScope {
   public void replaceSelf(IScope by) {
     IScope parent = getParent();
     replaceChild(parent, this, by.getChilds());
-    parent.addToDataPlaceholder(placeholder, by);
+    parent.replacePlaceholder(placeholder, by);
   }
 
   public void removeSelf() {

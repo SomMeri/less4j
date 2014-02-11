@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.local.CoolStorage.Placeholder;
+import com.github.sommeri.less4j.core.compiler.scopes.local.KeyListStorage.ListPlaceholder;
 
 public class MixinsDefinitionsStorage implements Cloneable {
 
-  private CoolStorage<String, FullMixinDefinition> coolStorage = new CoolStorage<String, FullMixinDefinition>();
+  private KeyListStorage<String, FullMixinDefinition> coolStorage = new KeyListStorage<String, FullMixinDefinition>();
 
   public MixinsDefinitionsStorage() {
   }
@@ -74,7 +74,7 @@ public class MixinsDefinitionsStorage implements Cloneable {
   }
 
   public MixinsPlaceholder createPlaceholder() {
-    Placeholder<String, FullMixinDefinition> coolPlaceholder = coolStorage.createPlaceholder();
+    ListPlaceholder<String, FullMixinDefinition> coolPlaceholder = coolStorage.createPlaceholder();
     return new MixinsPlaceholder(coolPlaceholder);
   }
 
@@ -103,9 +103,9 @@ public class MixinsDefinitionsStorage implements Cloneable {
 
   public static class MixinsPlaceholder {
 
-    private final Placeholder<String, FullMixinDefinition> coolPlaceholder;
+    private final ListPlaceholder<String, FullMixinDefinition> coolPlaceholder;
 
-    public MixinsPlaceholder(Placeholder<String, FullMixinDefinition> coolPlaceholder) {
+    public MixinsPlaceholder(ListPlaceholder<String, FullMixinDefinition> coolPlaceholder) {
       this.coolPlaceholder = coolPlaceholder;
     }
     

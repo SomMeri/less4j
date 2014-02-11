@@ -12,8 +12,8 @@ import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScopeData;
 import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage;
 import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage.MixinsPlaceholder;
-import com.github.sommeri.less4j.core.compiler.scopes.local.StorageWithPlaceholders.StoragePlaceholder;
 import com.github.sommeri.less4j.core.compiler.scopes.local.VariablesDeclarationsStorage;
+import com.github.sommeri.less4j.core.compiler.scopes.local.VariablesDeclarationsStorage.VariablesPlaceholder;
 
 public interface ILocalScope {
 
@@ -40,7 +40,7 @@ public interface ILocalScope {
 
   public void addToDataPlaceholder(IScope otherScope);
 
-  public void addToDataPlaceholder(DataPlaceholder placeholder, IScope otherScope);
+  public void replacePlaceholder(DataPlaceholder placeholder, IScope otherScope);
 
   public void closeDataPlaceholder();
 
@@ -92,15 +92,15 @@ public interface ILocalScope {
 
   public static final class DataPlaceholder {
 
-    private StoragePlaceholder<Expression> variablesPlaceholder;
+    private VariablesPlaceholder variablesPlaceholder;
     private MixinsPlaceholder mixinsPlaceholder;
 
-    public DataPlaceholder(StoragePlaceholder<Expression> variablesPlaceholder, MixinsPlaceholder mixinsPlaceholder) {
+    public DataPlaceholder(VariablesPlaceholder variablesPlaceholder, MixinsPlaceholder mixinsPlaceholder) {
       this.variablesPlaceholder = variablesPlaceholder;
       this.mixinsPlaceholder = mixinsPlaceholder;
     }
 
-    public StoragePlaceholder<Expression> getVariablesPlaceholder() {
+    public VariablesPlaceholder getVariablesPlaceholder() {
       return variablesPlaceholder;
     }
 

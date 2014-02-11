@@ -1,24 +1,22 @@
 package com.github.sommeri.less4j.core.compiler.scopes.local;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
-import com.github.sommeri.less4j.utils.ArraysUtils;
+import com.github.sommeri.less4j.core.compiler.scopes.local.KeyValueStorage.ValuePlaceholder;
 
-public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expression> {
+public class VariablesDeclarationsStorage implements Cloneable {
 
-  private Map<String, Expression> variables = new HashMap<String, Expression>();
+  private KeyValueStorage<String, Expression> coolStorage = new KeyValueStorage<String, Expression>();
 
   public VariablesDeclarationsStorage() {
   }
 
   public Expression getValue(String name) {
-    return variables.get(name);
+    return coolStorage.getValue(name);
   }
 
   public void store(AbstractVariableDeclaration node) {
@@ -26,23 +24,15 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
   }
 
   public void storeAll(VariablesDeclarationsStorage otherStorage) {
-    for (Entry<String, Expression> entry : otherStorage.variables.entrySet()) {
-      store(entry.getKey(), entry.getValue());
-    }
+    coolStorage.add(otherStorage.coolStorage);
   }
 
   public void store(AbstractVariableDeclaration node, Expression replacementValue) {
     store(node.getVariable().getName(), replacementValue);
   }
 
-  @Override
-  protected void doStore(String name, Expression replacementValue) {
-    variables.put(name, replacementValue);
-  }
-
-  @Override
-  protected void doStore(String name, List<Expression> value) {
-    throw new IllegalStateException("not implemented method");
+  public void store(String name, Expression replacementValue) {
+    coolStorage.add(name, replacementValue);
   }
 
   public void storeIfNotPresent(String name, Expression replacementValue) {
@@ -50,8 +40,12 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
       store(name, replacementValue);
   }
 
+  public void closePlaceholder() {
+    coolStorage.closeFirstPlaceholder();
+  }
+
   public void addFilteredVariables(ExpressionFilter filter, VariablesDeclarationsStorage variablesSource) {
-    for (Entry<String, Expression> entry : variablesSource.variables.entrySet()) {
+    for (Entry<String, Expression> entry : variablesSource.coolStorage.getAllEntries()) {
       String name = entry.getKey();
       Expression value = entry.getValue();
       store(name, filter.apply(value));
@@ -59,61 +53,55 @@ public class VariablesDeclarationsStorage extends StorageWithPlaceholders<Expres
   }
 
   protected boolean contains(String name) {
-    return variables.containsKey(name);
+    return coolStorage.contains(name);
   }
 
   public int size() {
-    return variables.size();
+    return coolStorage.size();
   }
 
+  public VariablesPlaceholder createPlaceholder() {
+    return new VariablesPlaceholder(coolStorage.createPlaceholder());
+  }
+
+  //FIXME: !!!!!!!!!! rename to add to first placeholder
   public void addToPlaceholder(VariablesDeclarationsStorage otherStorage) {
-    StoragePlaceholder<Expression> placeholder = getFirstUnusedPlaceholder();
-    addToPlaceholder(placeholder, otherStorage, true);
-  }
-
-  private void addToPlaceholder(StoragePlaceholder<Expression> placeholder, VariablesDeclarationsStorage otherStorage, boolean localScopeProtection) {
-    Map<String, Expression> otherVariables = otherStorage.variables;
-    for (Entry<String, Expression> entry : otherVariables.entrySet()) {
-      String name = entry.getKey();
-      Expression value = entry.getValue();
-      
-      if (storedUnderPlaceholder(name, placeholder) && (!localScopeProtection || !contains(name))) //local scope protection
-        store(name, value);
+    Set<Entry<String, Expression>> otherVariables = otherStorage.coolStorage.getAllEntries();
+    for (Entry<String, Expression> entry : otherVariables) {
+      if (!contains(entry.getKey()))
+        coolStorage.addToFirstPlaceholder(entry.getKey(), entry.getValue());
     }
   }
 
-  public void replacePlaceholder(StoragePlaceholder<Expression> placeholder, VariablesDeclarationsStorage otherStorage) {
-    // add variables if it not overwritten yet into that placeholder
-    addToPlaceholder(placeholder,  otherStorage, false);
-    // raise  placeholders ids if higher
-    int placeholdersPosition = getPosition(placeholder);
-    StoragePlaceholder<Expression> previousPlaceholder = ArraysUtils.last(otherStorage.getPlaceholders());
-    if (previousPlaceholder==null && placeholdersPosition>0)
-      previousPlaceholder = getPlaceholders().get(placeholdersPosition-1);
-    getPlaceholders().addAll(placeholdersPosition, otherStorage.getPlaceholders());
-    getPlaceholders().remove(placeholder);
-    
-    Map<String, StoragePlaceholder<Expression>> newPlaceholdersWhenModified = new HashMap<String, StoragePlaceholder<Expression>>();
-    for (Entry<String, StoragePlaceholder<Expression>> entry : placeholdersWhenModified.entrySet()) {
-      StoragePlaceholder<Expression> value = entry.getValue();
-      if (value==placeholder)
-        value=previousPlaceholder;
-      newPlaceholdersWhenModified.put(entry.getKey(), value);
-    }
-    placeholdersWhenModified = newPlaceholdersWhenModified;
+  public void replacePlaceholder(VariablesPlaceholder placeholder, VariablesDeclarationsStorage otherStorage) {
+    coolStorage.replacePlaceholder(placeholder.coolPlaceholder, otherStorage.coolStorage);
   }
 
   public VariablesDeclarationsStorage clone() {
-    VariablesDeclarationsStorage clone = (VariablesDeclarationsStorage) super.clone();
-    clone.variables = new HashMap<String, Expression>(variables);
-    return clone;
+    try {
+      VariablesDeclarationsStorage clone = (VariablesDeclarationsStorage) super.clone();
+      clone.coolStorage = coolStorage.clone();
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new IllegalStateException("Impossible state.");
+    }
   }
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");;
-    result.append("Variables: ").append(variables);
+    StringBuilder result = new StringBuilder(getClass().getSimpleName()).append("\n");
+    result.append("Variables: ").append(coolStorage);
     return result.toString();
+  }
+
+  public static class VariablesPlaceholder {
+
+    private final ValuePlaceholder<String, Expression> coolPlaceholder;
+
+    public VariablesPlaceholder(ValuePlaceholder<String, Expression> coolPlaceholder) {
+      this.coolPlaceholder = coolPlaceholder;
+    }
+
   }
 
 }

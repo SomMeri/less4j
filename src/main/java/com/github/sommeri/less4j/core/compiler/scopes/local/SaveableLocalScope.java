@@ -106,8 +106,8 @@ public class SaveableLocalScope implements ILocalScope {
     getActiveLocalScope().addToDataPlaceholder(otherScope);
   }
 
-  public void addToDataPlaceholder(DataPlaceholder placeholder, IScope otherScope) {
-    getActiveLocalScope().addToDataPlaceholder(placeholder, otherScope);
+  public void replacePlaceholder(DataPlaceholder placeholder, IScope otherScope) {
+    getActiveLocalScope().replacePlaceholder(placeholder, otherScope);
   }
 
   public void closeDataPlaceholder() {

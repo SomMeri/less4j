@@ -16,7 +16,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage.MixinsPlaceholder;
-import com.github.sommeri.less4j.core.compiler.scopes.local.StorageWithPlaceholders.StoragePlaceholder;
+import com.github.sommeri.less4j.core.compiler.scopes.local.VariablesDeclarationsStorage.VariablesPlaceholder;
 
 public class LocalScope implements ILocalScope {
 
@@ -108,7 +108,7 @@ public class LocalScope implements ILocalScope {
   }
 
   public DataPlaceholder createDataPlaceholder() {
-    StoragePlaceholder<Expression> variablesPlaceholder = getLocalVariables().createPlaceholder();
+    VariablesPlaceholder variablesPlaceholder = getLocalVariables().createPlaceholder();
     MixinsPlaceholder mixinsPlaceholder = getLocalMixins().createPlaceholder();
     return new DataPlaceholder(variablesPlaceholder, mixinsPlaceholder);
   }
@@ -118,7 +118,7 @@ public class LocalScope implements ILocalScope {
     getLocalMixins().addToPlaceholder(otherScope.getLocalMixins());
   }
 
-  public void addToDataPlaceholder(DataPlaceholder placeholder, IScope otherScope) {
+  public void replacePlaceholder(DataPlaceholder placeholder, IScope otherScope) {
     getLocalVariables().replacePlaceholder(placeholder.getVariablesPlaceholder(), otherScope.getLocalVariables());
     getLocalMixins().replacePlaceholder(placeholder.getMixinsPlaceholder(), otherScope.getLocalMixins());
   }
