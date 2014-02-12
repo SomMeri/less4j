@@ -116,12 +116,11 @@ public class LessToCssCompiler {
   }
 
   private void resolveImportsAndReferences(StyleSheet less, LessSource source) {
-    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
-
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
     IScope scope = scopeBuilder.extractScope(less);
-
     List<PlaceholderScope> importsPlaceholders = scopeBuilder.getImportsPlaceholders();
+
+    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
     solveNestedImports(importsSolver, importsPlaceholders);
 
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
@@ -132,7 +131,12 @@ public class LessToCssCompiler {
   private void solveNestedImports(SimpleImportsSolver importsSolver, List<PlaceholderScope> importsPlaceholders) {
     List<PlaceholderScope> nextLevelOfImports = new ArrayList<PlaceholderScope>();
     for (PlaceholderScope placeholder : importsPlaceholders) {
-      ASTCssNode importedAst = importsSolver.importEncountered((Import) placeholder.getOwner(), placeholder.getOwner().getSource());
+      Import encounteredImport = (Import) placeholder.getOwner();
+      ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
+      referencesSolver.solveReferences(encounteredImport, placeholder.getParent());
+
+      
+      ASTCssNode importedAst = importsSolver.importEncountered(encounteredImport, placeholder.getOwner().getSource());
       if (importedAst != null) {
         InitialScopeExtractor importedAstScopeBuilder = new InitialScopeExtractor();
         IScope addThisIntoScopeTree = importedAstScopeBuilder.extractScope(importedAst);

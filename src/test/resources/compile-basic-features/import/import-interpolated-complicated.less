@@ -1,0 +1,14 @@
+@filename: "chained-reference-import-";
+@filename2: "chained-reference-import-";
+@import-multiple "import/@{filename}1.less";
+.mainMixin {
+  color: green;
+}
+.see-global {
+  @import-multiple "import/@{filename}2.less";
+}
+.redefined {
+  @import-multiple "import/@{filename}import-2.less";
+  @filename: "chained-reference-";
+}
+@definitelyLast: 3;

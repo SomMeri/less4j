@@ -1,0 +1,12 @@
+.first {
+  color: value;
+}
+.mainMixin {
+  color: value;
+}
+.see-global .second {
+  color: value;
+}
+.second {
+  color: value;
+}

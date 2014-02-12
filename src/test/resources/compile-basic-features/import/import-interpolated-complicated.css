@@ -1,0 +1,21 @@
+chained-import-1 {
+  content: chained-referenced-import-1;
+}
+importedSelector {
+  color: green;
+  content: "imported mixin @variable" 3;
+  content: "imported mixin @definitelyLast" 3;
+}
+.mainMixin {
+  color: green;
+}
+.see-global importedSelector {
+  color: green;
+  content: "imported mixin @variable" 3;
+  content: "imported mixin @definitelyLast" 1;
+}
+.redefined importedSelector {
+  color: green;
+  content: "imported mixin @variable" 3;
+  content: "imported mixin @definitelyLast" 1;
+}

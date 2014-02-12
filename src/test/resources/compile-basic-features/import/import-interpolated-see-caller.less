@@ -1,0 +1,12 @@
+@variable: defined;
+.mixin() {
+  see: before;
+}
+
+@fileToImport: "import/chain-see-caller.less";
+@import "@{fileToImport}";
+
+@variable: defined;
+.mixin() {
+  see: after;
+}
