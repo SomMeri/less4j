@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.compiler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -129,6 +130,7 @@ public class LessToCssCompiler {
   }
 
   private void solveNestedImports(SimpleImportsSolver importsSolver, List<PlaceholderScope> importsPlaceholders) {
+    List<PlaceholderScope> nextLevelOfImports = new ArrayList<PlaceholderScope>();
     for (PlaceholderScope placeholder : importsPlaceholders) {
       ASTCssNode importedAst = importsSolver.importEncountered((Import) placeholder.getOwner(), placeholder.getOwner().getSource());
       if (importedAst != null) {
@@ -136,12 +138,14 @@ public class LessToCssCompiler {
         IScope addThisIntoScopeTree = importedAstScopeBuilder.extractScope(importedAst);
 
         placeholder.replaceSelf(addThisIntoScopeTree);
-        List<PlaceholderScope> ip = importedAstScopeBuilder.getImportsPlaceholders();
-        solveNestedImports(importsSolver, ip);
+        nextLevelOfImports.addAll(importedAstScopeBuilder.getImportsPlaceholders());
       } else {
         placeholder.removeSelf();
       }
     }
+    
+    if (!nextLevelOfImports.isEmpty())
+      solveNestedImports(importsSolver, nextLevelOfImports);
   }
 
   private void removeUselessLessElements(StyleSheet node) {

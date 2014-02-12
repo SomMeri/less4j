@@ -120,7 +120,6 @@ public class InitialScopeExtractor {
       throw new BugHappened("No parent scope available.", owner);
     } 
 
-    //FIXME !!!!!!!!!!! return  cleaner datastructure and rename
     return ScopeFactory.createPlaceholderScope(owner, currentScope);
   }
 

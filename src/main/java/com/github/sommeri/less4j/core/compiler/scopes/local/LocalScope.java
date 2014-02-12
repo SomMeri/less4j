@@ -114,7 +114,7 @@ public class LocalScope implements ILocalScope {
   }
 
   public void addToDataPlaceholder(IScope otherScope) {
-    getLocalVariables().addToPlaceholder(otherScope.getLocalVariables());
+    getLocalVariables().addToFirstPlaceholderIfNotPresent(otherScope.getLocalVariables());
     getLocalMixins().addToPlaceholder(otherScope.getLocalMixins());
   }
 

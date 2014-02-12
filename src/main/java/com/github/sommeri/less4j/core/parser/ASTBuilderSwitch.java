@@ -1097,10 +1097,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public Extend handleExtendInDeclaration(HiddenTokenAwareTree token) {
     HiddenTokenAwareTree child = token.getChild(0);
     Pseudo extendAsPseudo = handlePseudo(child);
-    //FIXME !!!!!!!! validate that it is extend
-    //FIXME !!!!!!!! validate that it is pseudoclass
+
+    if (!(extendAsPseudo instanceof PseudoClass))
+      throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
 
     PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
+    if (!(asPseudoclass.getParameter() instanceof Extend))
+      throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
+    
     return (Extend) asPseudoclass.getParameter();
   }
 

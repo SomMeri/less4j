@@ -64,8 +64,7 @@ public class VariablesDeclarationsStorage implements Cloneable {
     return new VariablesPlaceholder(coolStorage.createPlaceholder());
   }
 
-  //FIXME: !!!!!!!!!! rename to add to first placeholder
-  public void addToPlaceholder(VariablesDeclarationsStorage otherStorage) {
+  public void addToFirstPlaceholderIfNotPresent(VariablesDeclarationsStorage otherStorage) {
     Set<Entry<String, Expression>> otherVariables = otherStorage.coolStorage.getAllEntries();
     for (Entry<String, Expression> entry : otherVariables) {
       if (!contains(entry.getKey()))

@@ -1,5 +1,8 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
+import java.util.Collections;
+import java.util.List;
+
 
 public class PlaceholderScope extends BasicScope {
 
@@ -22,7 +25,8 @@ public class PlaceholderScope extends BasicScope {
   }
 
   public void removeSelf() {
-    removedFromAst(); //FIXME!!!!!!!!!!!!!!!!: maybe really remove? 
+    List<IScope> nothing = Collections.emptyList();
+    replaceChild(getParent(), this, nothing);  
   }
 
 }

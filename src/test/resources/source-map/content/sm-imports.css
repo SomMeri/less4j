@@ -1,9 +1,9 @@
 .chained-import-1 {
   content: chained-import-1;
 }
-.chained-import-2 {
-  content: chained-import-2;
-}
 .maintitle {
   color: green;
+}
+.chained-import-2 {
+  content: chained-import-2;
 }
