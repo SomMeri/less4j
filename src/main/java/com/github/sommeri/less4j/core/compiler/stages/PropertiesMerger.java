@@ -11,7 +11,6 @@ import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 
 /**
@@ -81,7 +80,7 @@ public class PropertiesMerger {
     if (mergingProperties.containsKey(key)) {
       Declaration previousDeclaration = mergingProperties.get(key);
       Expression previousExpression = previousDeclaration.getExpression();
-      Expression composedExpression = new ComposedExpression(declaration.getUnderlyingStructure(), previousExpression, new ExpressionOperator(declaration.getUnderlyingStructure(), Operator.COMMA), declaration.getExpression());
+      Expression composedExpression = new ComposedExpression(declaration.getUnderlyingStructure(), previousExpression, new ExpressionOperator(declaration.getUnderlyingStructure(), declaration.getMergeOperator()), declaration.getExpression());
       previousDeclaration.setExpression(composedExpression);
       composedExpression.setParent(previousDeclaration);
       manipulator.removeFromBody(declaration);

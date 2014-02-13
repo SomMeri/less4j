@@ -408,7 +408,7 @@ unaryOperator
 property
     : // support for star prefix browser hack - more correct and strict solution would require them to directly follow
       // normal property| merged property 
-      (a+=STAR)? b+=propertyNamePart ({predicates.directlyFollows(input)}?=>b+=propertyNamePart)* ( | c+=PLUS )
+      (a+=STAR)? b+=propertyNamePart ({predicates.directlyFollows(input)}?=>b+=propertyNamePart)* ( | c+=PLUS ( | c+=UNDERSCORE))
       ->  ^(INTERPOLABLE_NAME $a* $b*) $c*
     ;
     
@@ -914,14 +914,14 @@ fragment UNICODE : '\\' HEXCHAR
                                 
 fragment ESCAPE : UNICODE | '\\' ~('\r'|'\n'|'\f'|HEXCHAR) ;
 
-fragment NMSTART : '_'
+fragment NMSTART :  UNDERSCORE
                         | 'a'..'z'
                         | 'A'..'Z'
                         | NONASCII
                         | ESCAPE
                         ;
 
-fragment NMCHAR : '_'
+fragment NMCHAR : UNDERSCORE
                         | 'a'..'z'
                         | 'A'..'Z'
                         | '0'..'9'
@@ -1207,6 +1207,7 @@ COMMA : ',' ;
 HASH_SYMBOL: '#';
 DOT : '.' ;
 DOT3 : '...' ;
+UNDERSCORE: '_';
 //TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
 fragment APPENDER_FRAGMENT: '&';
 fragment MEANINGFULL_WHITESPACE: ;

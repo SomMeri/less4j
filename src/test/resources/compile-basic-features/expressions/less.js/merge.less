@@ -13,10 +13,6 @@
 .fifth-transform() {
   transform+: scale(2,4) !important;
 }
-//added be less4j
-.sixth-transform() {
-  transform+: scale(3,3) !important;
-}
 .first-background() {
   background+: url(data://img1.png);
 }
@@ -44,13 +40,6 @@
   .first-transform();
   .fifth-transform();
 }
-//added by less4j
-.test4-b {
-  // Wont merge values from sources that merked as !important, for backwards compatibility with css
-  .first-transform();
-  .fifth-transform();
-  .sixth-transform();
-}
 .test5 {
   // Wont merge values from mixins that merked as !important, for backwards compatibility with css 
   .first-transform();
@@ -67,4 +56,23 @@
     transform+:  t2;
     background+: b2, b3;
     transform+:  t3;
+}
+
+.test-spaced {
+    transform+_:  t1;
+    background+_: b1;
+    transform+_:  t2;
+    background+_: b2, b3;
+    transform+_:  t3;
+}
+
+.test-interleaved-with-spaced {
+    transform+_:  t1s;
+    transform+:   t2;
+    background+:  b1;
+    transform+_:  t3s;
+    transform+:   t4 t5s;
+    background+_: b2s, b3;
+    transform+_:  t6s;
+    background+:  b4;
 }
