@@ -24,7 +24,7 @@ import com.github.sommeri.less4j.core.parser.ASTBuilder;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-public class SimpleImportsSolver {
+public class SingleImportsSolver {
 
   private final ProblemsHandler problemsHandler;
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
@@ -32,7 +32,7 @@ public class SimpleImportsSolver {
 
   private Set<LessSource> importedSources = new HashSet<LessSource>();
 
-  public SimpleImportsSolver(ProblemsHandler problemsHandler) {
+  public SingleImportsSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
   }
 

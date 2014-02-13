@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -14,20 +13,17 @@ import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
-import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
-import com.github.sommeri.less4j.core.compiler.scopes.PlaceholderScope;
 import com.github.sommeri.less4j.core.compiler.selectors.ExtendsSolver;
 import com.github.sommeri.less4j.core.compiler.selectors.UselessLessElementsRemover;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
-import com.github.sommeri.less4j.core.compiler.stages.InitialScopeExtractor;
+import com.github.sommeri.less4j.core.compiler.stages.ImportsAndScopeSolver;
 import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
 import com.github.sommeri.less4j.core.compiler.stages.PropertiesMerger;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
-import com.github.sommeri.less4j.core.compiler.stages.SimpleImportsSolver;
 import com.github.sommeri.less4j.core.compiler.stages.UnNestingAndBubbling;
 import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -116,40 +112,12 @@ public class LessToCssCompiler {
   }
 
   private void resolveImportsAndReferences(StyleSheet less, LessSource source) {
-    InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
-    IScope scope = scopeBuilder.extractScope(less);
-    List<PlaceholderScope> importsPlaceholders = scopeBuilder.getImportsPlaceholders();
-
-    SimpleImportsSolver importsSolver = new SimpleImportsSolver(problemsHandler);
-    solveNestedImports(importsSolver, importsPlaceholders);
+    ImportsAndScopeSolver solver = new ImportsAndScopeSolver(problemsHandler);
+    IScope scope = solver.buildImportsAndScope(less, source);
 
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
     referencesSolver.solveReferences(less, scope);
     // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
-  }
-
-  private void solveNestedImports(SimpleImportsSolver importsSolver, List<PlaceholderScope> importsPlaceholders) {
-    List<PlaceholderScope> nextLevelOfImports = new ArrayList<PlaceholderScope>();
-    for (PlaceholderScope placeholder : importsPlaceholders) {
-      Import encounteredImport = (Import) placeholder.getOwner();
-      ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
-      referencesSolver.solveReferences(encounteredImport, placeholder.getParent());
-
-      
-      ASTCssNode importedAst = importsSolver.importEncountered(encounteredImport, placeholder.getOwner().getSource());
-      if (importedAst != null) {
-        InitialScopeExtractor importedAstScopeBuilder = new InitialScopeExtractor();
-        IScope addThisIntoScopeTree = importedAstScopeBuilder.extractScope(importedAst);
-
-        placeholder.replaceSelf(addThisIntoScopeTree);
-        nextLevelOfImports.addAll(importedAstScopeBuilder.getImportsPlaceholders());
-      } else {
-        placeholder.removeSelf();
-      }
-    }
-    
-    if (!nextLevelOfImports.isEmpty())
-      solveNestedImports(importsSolver, nextLevelOfImports);
   }
 
   private void removeUselessLessElements(StyleSheet node) {
