@@ -1,0 +1,45 @@
+@directory: "import/";
+.mixinFactory(@flag) {
+	.mixin() {
+	  .selector {
+	   flag: @flag;
+      } 
+	}
+}
+// block
+@first: first;
+@second: first;
+@third: first;
+@fourth: first;
+@fifth: first;
+@sixth: first;
+.mixinFactory(first);
+
+// block
+@import url(@{directory}flagged-varmix-second.less);
+
+// block
+@third: third;
+@fourth: third;
+@fifth: third;
+@sixth: third;
+.mixinFactory(third);
+
+// block
+@import url(@{directory}flagged-varmix-fourth.less);
+// block
+@import url(@{directory}flagged-varmix-fifth.less);
+// block
+@sixth: sixth;
+.mixinFactory(sixth);
+
+//using them all
+.mixin();
+.variables {
+    first: @first;
+    second: @second;
+    third: @third;
+    fourth: @fourth;
+    fifth: @fifth;
+    sixth: @sixth;
+}

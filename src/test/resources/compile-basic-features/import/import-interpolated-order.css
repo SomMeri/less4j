@@ -1,0 +1,26 @@
+.selector {
+  flag: first;
+}
+.selector {
+  flag: second;
+}
+.selector {
+  flag: third;
+}
+.selector {
+  flag: fourth;
+}
+.selector {
+  flag: fifth;
+}
+.selector {
+  flag: sixth;
+}
+.variables {
+  first: first;
+  second: second;
+  third: third;
+  fourth: fourth;
+  fifth: fifth;
+  sixth: sixth;
+}
