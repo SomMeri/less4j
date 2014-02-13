@@ -937,7 +937,7 @@ fragment UNKNOWN_DIMENSION : NMSTART NMCHAR* ;
 // I added those characters that appear in less.js css test case.
 fragment URL : (
                               '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'|'='|':'|';'|','|'\r'|'\n'|'\t'|' '|'+'|'?'
-                            | NMCHAR
+                            | NMCHAR | '@{'NAME'}'
                           )*
                         ;
 
@@ -1374,16 +1374,6 @@ DOMAIN : ((D O M A I N '(' ((WS)=>WS)? URL WS? ')')
       | D (O (M (A (I (N)?)?)?)?)? { $type=IDENT; } //I have to do this, because lexer never hoists syntactic predicates
     ;
     
-//DOMAIN: (D O M A I N
-//        '('
-//            ((WS)=>WS)? URL WS?
-//        ')') => (D O M A I N
-//        '('
-//            ((WS)=>WS)? URL WS?
-//        ')')
-//        | D O M A I N { $type=IDENT; }
-//    ;
-
 // -------------
 // Whitespace. Though the W3 standard shows a Yacc/Lex style parser and lexer
 // that process the whitespace within the parser, ANTLR does not
