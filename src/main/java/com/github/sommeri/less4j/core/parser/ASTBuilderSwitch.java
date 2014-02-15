@@ -104,7 +104,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   private final static String EXTEND_ALL_KEYWORD = "all";
-  
+
   private final static String IMPORT_OPTION_REFERENCE = "reference";
   private final static String IMPORT_OPTION_INLINE = "inline";
   private final static String IMPORT_OPTION_LESS = "less";
@@ -1105,6 +1105,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       String text = token.getText();
       if (IMPORT_OPTION_INLINE.equals(text)) {
         node.setInline(true);
+      } else if (IMPORT_OPTION_ONCE.equals(text)) {
+        node.setMultiplicity(Import.ImportMultiplicity.IMPORT_ONCE);
+      } else if (IMPORT_OPTION_MULTIPLE.equals(text)) {
+        node.setMultiplicity(Import.ImportMultiplicity.IMPORT_MULTIPLE);
       } else {
         problemsHandler.unknownImportOption(node, text);
       }
@@ -1131,7 +1135,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
     if (!(asPseudoclass.getParameter() instanceof Extend))
       throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
-    
+
     return (Extend) asPseudoclass.getParameter();
   }
 
