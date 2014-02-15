@@ -1,1 +1,12 @@
-@import-multiple "import/chained-import-1.less" screen and (max-width: 400px);
+.wrong(@width) when (default()) {
+  color: white;
+}
+.wrong(@width) when (default()) {
+  color: red;
+}
+.wrong(@width) when (@width=10) { //this mixin is active too, but it does not matter. The error is thrown anyway.
+  color: red;
+}
+.selector-1 {
+  .wrong(10); //ERROR: two default functions active at the same time
+}

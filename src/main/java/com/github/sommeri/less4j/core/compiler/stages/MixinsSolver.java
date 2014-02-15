@@ -176,50 +176,21 @@ class MixinsSolver {
     if (normalMixinsCnt+ifNotCnt+ifDefaultCnt!=compiledMixins.size())
       throw new BugHappened("Unexpected mixin type in compiled mixins list.", reference);
 
-    //there were multiple default() mixins 
-    //that is wrong in any case - guards are supposed to be constructed in such a way that this is not possibles
-    if (ifDefaultCnt > 1) {
-      List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
+    // We know now that default() value is false. We do not care whether there was some potentional ambiguity or not and return anything that is not default. 
+    if (normalMixinsCnt > 0) {
+      return keepOnly(compiledMixins, DefaultFunctionUse.DEFAULT_OBLIVIOUS, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);  
+    }
+    
+    //there are multiple mixins using default() function and nothing else - that is ambiguous (period). 
+    if (ifDefaultCnt+ifNotCnt > 1) {
+      List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT,DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
       problemsHandler.ambiguousDefaultSet(reference, extractOriginalMixins(errorSet));
       //no mixins are going to be used
       return Collections.emptyList();
     }
-    //there are  multiple not(default()) mixins and nothing else - that is considered to be ambiuous too
-    if (ifDefaultCnt == 0 && normalMixinsCnt==0 && ifNotCnt > 1) {
-      List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
-      problemsHandler.ambiguousNotDefaultSet(reference, extractOriginalMixins(errorSet));
-      //no mixins are going to be used
-      return Collections.emptyList();
-    }
 
-    //there is exactly one default() mixin and nothing else - that is ok, we are going to use that one
-    if (ifDefaultCnt == 1 && normalMixinsCnt == 0 && ifNotCnt == 0) {
-      return compiledMixins; 
-    }
-
-    //If there is:
-    // * at least one mixin whose guards do not use default(),
-    // * or multiple not(default()) mixins,
-    if (normalMixinsCnt > 0 || ifNotCnt > 1) {
-      //then we are going to use only them and ignore defaults 
-      return keepOnly(compiledMixins, DefaultFunctionUse.DEFAULT_OBLIVIOUS, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
-    }
-
-    //Now:
-    //* if there is default mixin, then there is something else with it too.
-    //* there are no normal mixins and there is maximum one not(default()) mixin
-    
-    //Therefore, we have either:
-    // * exactly one default() mixin and one non(default()) mixin
-    // * exactly one non(default()) mixins
-    // * nothing
-
-    //if there are both of them, use only non(default())
-    if (ifNotCnt == 1 && ifDefaultCnt == 1) {
-      return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_NOT_DEFAULT);
-    }
-    //if there is only non(default()), then we can not use it
-    return Collections.emptyList();
+    //now we know that default function returns true
+    return keepOnly(compiledMixins, DefaultFunctionUse.ONLY_IF_DEFAULT);
   }
 
   /**
