@@ -1,2 +1,5 @@
+Warnings produced by compilation of testCase
+WARNING 2:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
 Errors produced by compilation of testCase
 ERROR 1:1 The file somewhere/this-file-does-not-exists.less does not exist.
+ERROR 2:1 The file somewhere/this-file-does-not-exists-old-syntax.less does not exist.

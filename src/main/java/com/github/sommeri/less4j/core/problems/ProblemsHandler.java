@@ -131,6 +131,14 @@ public class ProblemsHandler {
     collector.addError(new CompilationError(cycle.get(0), "Cyclic references among mixins: " + printer.toMixinReferencesString(cycle)));
   }
 
+  public void deprecatedImportOnce(Import errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "`@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible."));
+  }
+
+  public void deprecatedImportMultiple(Import errorNode) {
+    collector.addWarning(new CompilationWarning(errorNode, "`@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible."));
+  }
+
   public void deprecatedSyntaxEscapedSelector(EscapedSelector errorNode) {
     collector.addWarning(new CompilationWarning(errorNode, "Selector fragment (~" + errorNode.getQuoteType() + errorNode.getValue() + errorNode.getQuoteType() + ") uses deprecated (~\"escaped-selector\") syntax. Use selector interpolation @{variableName} instead."));
   }

@@ -1,7 +1,7 @@
 Warnings produced by compilation of testCase
 WARNING 4:9 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
 WARNING 5:9 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
-WARNING 6:14 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
-WARNING 7:14 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
-WARNING 8:18 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
-WARNING 9:18 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+WARNING 6:16 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+WARNING 7:16 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+WARNING 8:20 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+WARNING 9:20 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.

@@ -1,10 +1,10 @@
 @variable: "import/imports-dependence-1";
-@import-multiple "@{variable}.less";
+@import (multiple) "@{variable}.less";
 .mainMixin {
   color: @another;
 }
 .see-global {
-  @import-multiple "@{variable}.less";
+  @import (multiple) "@{variable}.less";
 }
-@import-multiple "@{variable}.less";
+@import (multiple) "@{variable}.less";
 @definitelyLast: 3;

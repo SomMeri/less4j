@@ -1,0 +1,11 @@
+Warnings produced by compilation of testCase
+WARNING 11:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+WARNING 12:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+WARNING 13:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+WARNING 14:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+WARNING 15:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+WARNING 17:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+WARNING 18:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+WARNING 19:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+WARNING 20:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+WARNING 21:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.

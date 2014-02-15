@@ -1,0 +1,3 @@
+Warnings produced by compilation of testCase
+WARNING 1:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+WARNING 2:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.

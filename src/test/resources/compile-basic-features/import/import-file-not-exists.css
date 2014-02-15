@@ -1,4 +1,5 @@
 @import url(somewhere/this-file-does-not-exists.less);
+@import url(somewhere/this-file-does-not-exists-old-syntax.less);
 .class {
   padding: 2 2 2 2;
 }

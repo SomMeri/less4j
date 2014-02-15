@@ -1072,9 +1072,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       break;
     case LessLexer.IMPORT_ONCE_SYM:
       result.setMultiplicity(Import.ImportMultiplicity.IMPORT_ONCE);
+      problemsHandler.deprecatedImportOnce(result);
       break;
     case LessLexer.IMPORT_MULTIPLE_SYM:
       result.setMultiplicity(Import.ImportMultiplicity.IMPORT_MULTIPLE);
+      problemsHandler.deprecatedImportMultiple(result);
       break;
     default:
       throw new BugHappened(GRAMMAR_MISMATCH, token);
