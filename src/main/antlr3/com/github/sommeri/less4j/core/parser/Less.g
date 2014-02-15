@@ -386,17 +386,12 @@ topLevelOperator
     | ( -> EMPTY_SEPARATOR)
     ;
     
-//combinator
-//    : GREATER
-//    | PLUS
-//    | TILDE
-//    | ( -> EMPTY_COMBINATOR)
-//    ;
-
 combinator
     : GREATER
     | PLUS
     | TILDE
+    | HAT
+    | CAT
     | ({predicates.onEmptyCombinator(input)}?)=> -> EMPTY_COMBINATOR
     ;
     
@@ -1184,6 +1179,8 @@ SUFFIXMATCH : '$=' ;
 SUBSTRINGMATCH : '*=' ;
 
 
+HAT : '^' ;
+CAT : '^^' ;
 TILDE : '~' ;
 GREATER : '>' ;
 GREATER_OR_EQUAL : '>=' ;

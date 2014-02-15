@@ -31,6 +31,10 @@ public class ConversionUtils {
       return SelectorCombinator.Combinator.GENERAL_SIBLING;
     case LessLexer.EMPTY_COMBINATOR:
       return SelectorCombinator.Combinator.DESCENDANT;
+    case LessLexer.HAT:
+      return SelectorCombinator.Combinator.HAT;
+    case LessLexer.CAT:
+      return SelectorCombinator.Combinator.CAT;
     default:
       return null;
     }

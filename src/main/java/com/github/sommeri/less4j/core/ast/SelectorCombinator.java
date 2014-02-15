@@ -39,7 +39,7 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
   }
 
   public enum Combinator {
-    ADJACENT_SIBLING("+"), CHILD(">"), DESCENDANT("' '"), GENERAL_SIBLING("~");
+    ADJACENT_SIBLING("+"), CHILD(">"), DESCENDANT("' '"), GENERAL_SIBLING("~"), HAT("^"), CAT("^^");
     
     private final String symbol;
 

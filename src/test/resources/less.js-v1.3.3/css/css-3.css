@@ -94,3 +94,7 @@ p::before {
 @viewport {
   font-size: 10px;
 }
+.shadow ^ .dom,
+body ^^ .shadow {
+  display: done;
+}

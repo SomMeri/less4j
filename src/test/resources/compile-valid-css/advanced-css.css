@@ -1,0 +1,4 @@
+.shadow ^ .dom,
+body ^^ .shadow {
+  display: done;
+}
