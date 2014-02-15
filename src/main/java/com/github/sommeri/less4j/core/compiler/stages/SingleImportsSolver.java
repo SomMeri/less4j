@@ -15,7 +15,8 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Import;
-import com.github.sommeri.less4j.core.ast.Import.ImportKind;
+import com.github.sommeri.less4j.core.ast.InlineContent;
+import com.github.sommeri.less4j.core.ast.Import.ImportMultiplicity;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.TypesConversionUtils;
@@ -101,6 +102,17 @@ public class SingleImportsSolver {
       return null;
     }
 
+    if (node.isInline()) {
+      HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
+      StyleSheet result = new StyleSheet(underlyingStructure);
+      InlineContent content = new InlineContent(underlyingStructure, importedContent);
+      result.addMember(content);
+      result.configureParentToAllChilds();
+      
+      astManipulator.replaceInBody(node, content);
+      return result;
+    }
+    
     // parse imported file
     StyleSheet importedAst = parseContent(node, importedContent, importedSource);
 
@@ -127,7 +139,7 @@ public class SingleImportsSolver {
   }
 
   private boolean isImportOnce(Import node) {
-    return node.getKind() == ImportKind.IMPORT_ONCE;
+    return node.getMultiplicity() == ImportMultiplicity.IMPORT_ONCE;
   }
 
   private boolean alreadyVisited(LessSource importedSource) {

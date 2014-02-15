@@ -64,6 +64,7 @@ tokens {
   MEDIUM_DECLARATION;
   MEDIA_EXPRESSION;
   INTERPOLATED_MEDIA_EXPRESSION;
+  IMPORT_OPTIONS;
   MEDIA_QUERY;
   MEDIUM_TYPE;
   BODY;
@@ -204,10 +205,14 @@ finally { leaveRule(); }
 //
 imports
 @init {enterRule(retval, RULE_IMPORTS);}
-    : (IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM)^ (term) (mediaQuery (COMMA mediaQuery)*)? SEMI!
+    : (IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM)^ (importoptions)? term (mediaQuery (COMMA mediaQuery)*)? SEMI!
     ;
 finally { leaveRule(); }
 
+importoptions:
+  LPAREN a+=IDENT+ RPAREN
+  -> ^(IMPORT_OPTIONS $a*)
+  ;
 // ---------
 // Media. Introduce a set of rules that are to be used if the consumer indicates
 // it belongs to the signified medium.

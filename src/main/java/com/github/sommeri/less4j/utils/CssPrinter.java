@@ -30,6 +30,7 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.InlineContent;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
@@ -278,6 +279,9 @@ public class CssPrinter {
     case SUPPORTS_LOGICAL_OPERATOR:
       return appendSupportsLogicalOperator((SupportsLogicalOperator) node); // TODOsm: source map
 
+    case INLINE_CONTENT:
+      return appendInlineContent((InlineContent) node); // TODOsm: source map
+
     case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
@@ -289,6 +293,12 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getSourceColumn());
     }
+  }
+
+  //TODO: what about source maps?
+  private boolean appendInlineContent(InlineContent node) {
+    cssOnly.appendAsIs(node.getValue());
+    return false;
   }
 
   private boolean appendSyntaxOnlyElement(SyntaxOnlyElement node) {

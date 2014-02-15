@@ -104,6 +104,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   private final static String EXTEND_ALL_KEYWORD = "all";
+  
+  private final static String IMPORT_OPTION_REFERENCE = "reference";
+  private final static String IMPORT_OPTION_INLINE = "inline";
+  private final static String IMPORT_OPTION_LESS = "less";
+  private final static String IMPORT_OPTION_CSS = "css";
+  private final static String IMPORT_OPTION_ONCE = "once";
+  private final static String IMPORT_OPTION_MULTIPLE = "multiple";
 
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
@@ -1060,20 +1067,25 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Import result = new Import(token);
     switch (token.getType()) {
     case LessLexer.IMPORT_SYM:
-      result.setKind(Import.ImportKind.IMPORT);
+      result.setMultiplicity(Import.ImportMultiplicity.IMPORT);
       break;
     case LessLexer.IMPORT_ONCE_SYM:
-      result.setKind(Import.ImportKind.IMPORT_ONCE);
+      result.setMultiplicity(Import.ImportMultiplicity.IMPORT_ONCE);
       break;
     case LessLexer.IMPORT_MULTIPLE_SYM:
-      result.setKind(Import.ImportKind.IMPORT_MULTIPLE);
+      result.setMultiplicity(Import.ImportMultiplicity.IMPORT_MULTIPLE);
       break;
     default:
       throw new BugHappened(GRAMMAR_MISMATCH, token);
     }
-
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
-    result.setUrlExpression(handleTerm(children.next()));
+    HiddenTokenAwareTree nextChild = children.next();
+    if (nextChild.getType() == LessLexer.IMPORT_OPTIONS) {
+      configureImportOptions(result, nextChild.getChildren());
+      nextChild = children.next();
+    }
+
+    result.setUrlExpression(handleTerm(nextChild));
     while (children.hasNext()) {
       HiddenTokenAwareTree kid = children.next();
       if (kid.getType() == LessLexer.COMMA) {
@@ -1086,6 +1098,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
 
     return result;
+  }
+
+  private void configureImportOptions(Import node, List<HiddenTokenAwareTree> options) {
+    for (HiddenTokenAwareTree token : options) {
+      String text = token.getText();
+      if (IMPORT_OPTION_INLINE.equals(text)) {
+        node.setInline(true);
+      } else {
+        problemsHandler.unknownImportOption(node, text);
+      }
+    }
   }
 
   public NamedExpression handleNamedExpression(HiddenTokenAwareTree token) {

@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
@@ -57,6 +58,10 @@ public class ProblemsHandler {
 
   public void warnMerginMediaQueryWithMedium(MediaQuery mediaQuery) {
     collector.addWarning(new CompilationWarning(mediaQuery, "Attempt to merge media query with a medium. Merge removed medium from inner media query, because the result CSS would be invalid otherwise."));
+  }
+
+  public void unknownImportOption(Import node, String text) {
+    collector.addError(new CompilationError(node, "Unknown import option \"" + text));
   }
 
   public void warnInconsistentSupportsLogicalConditionOperators(SupportsLogicalOperator faulty, SupportsLogicalOperator masterOperator) {

@@ -1,0 +1,14 @@
+first {
+  first: first;	
+}
+@variable: main;
+@import (inline) "import/namespaces-and-mixins.less";
+
+.mixin() {
+	location: main;
+}
+@fromImporter: value;
+div {
+  .mixin();
+  variable: @variable;
+}
