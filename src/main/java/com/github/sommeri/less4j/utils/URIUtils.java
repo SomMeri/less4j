@@ -242,4 +242,16 @@ public class URIUtils {
     return new LessSource.FileSource(changeSuffix(source.getInputFile(), dottedSuffix));
   }
 
+  public static boolean isQuotedUrl(String url) {
+    int length = url.length();
+    if (length<2)
+      return false;
+    
+    char first = url.charAt(0);
+    char last = url.charAt(length-1);
+    if (first!=last)
+      return false;
+    
+    return first=='\'' || first=='"';
+  }
 }

@@ -22,6 +22,7 @@ import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.PrintUtils;
+import com.github.sommeri.less4j.utils.URIUtils;
 
 public class TermBuilder {
 
@@ -235,7 +236,11 @@ public class TermBuilder {
       return new CssString(token, "", "");
 
     String string = text.substring(function.length()+1, text.length() - 1);
-    return new CssString(token, string, "");
+    if (!URIUtils.isQuotedUrl(string))
+      return new CssString(token, string, "");
+    
+    String quote = String.valueOf(string.charAt(0));
+    return new CssString(token, string.substring(1, string.length()-1), quote);
   }
 
   private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {

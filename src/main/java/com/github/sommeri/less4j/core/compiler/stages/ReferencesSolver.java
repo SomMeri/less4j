@@ -111,6 +111,10 @@ public class ReferencesSolver {
           continue ;
         }
       }
+      
+      if (AstLogic.isQuotelessUrlFunction(kid)) {
+        continue ;
+      }
 
       if (AstLogic.hasOwnScope(kid)) {
         IteratedScope scope = iteratedScope.getNextChild();

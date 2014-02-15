@@ -1,0 +1,4 @@
+@variable: "file";
+@import url(@{variable}.css); // this should NOT be interpolated
+@import url("@{variable}.css");
+@import url('@{variable}.css');
