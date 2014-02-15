@@ -35,6 +35,7 @@ import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
@@ -1109,6 +1110,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         node.setMultiplicity(Import.ImportMultiplicity.IMPORT_ONCE);
       } else if (IMPORT_OPTION_MULTIPLE.equals(text)) {
         node.setMultiplicity(Import.ImportMultiplicity.IMPORT_MULTIPLE);
+      } else if (IMPORT_OPTION_LESS.equals(text)) {
+        node.setContentKind(ImportContent.LESS);
+      } else if (IMPORT_OPTION_CSS.equals(text)) {
+        node.setContentKind(ImportContent.CSS);
       } else {
         problemsHandler.unknownImportOption(node, text);
       }

@@ -15,6 +15,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.InlineContent;
 import com.github.sommeri.less4j.core.ast.Import.ImportMultiplicity;
 import com.github.sommeri.less4j.core.ast.Media;
@@ -25,7 +26,7 @@ import com.github.sommeri.less4j.core.parser.ASTBuilder;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-public class SingleImportsSolver {
+public class SingleImportSolver {
 
   private final ProblemsHandler problemsHandler;
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
@@ -33,7 +34,7 @@ public class SingleImportsSolver {
 
   private Set<LessSource> importedSources = new HashSet<LessSource>();
 
-  public SingleImportsSolver(ProblemsHandler problemsHandler) {
+  public SingleImportSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
   }
 
@@ -65,7 +66,7 @@ public class SingleImportsSolver {
 
     // css file imports should be left as they are
     // FIXME ! they should be relativized
-    if (isCssFile(filename))
+    if (treatAsCss(node, filename))
       return null; 
 
     filename = addLessSuffixIfNeeded(filename, urlParams);
@@ -166,6 +167,11 @@ public class SingleImportsSolver {
       return filename;
 
     return filename + ".less" + urlParams;
+  }
+
+  private boolean treatAsCss(Import node, String filename) {
+    ImportContent contentKind = node.getContentKind();
+    return contentKind==ImportContent.CSS || (contentKind==ImportContent.SUFFIX_BASED && isCssFile(filename));
   }
 
   private boolean isCssFile(String filename) {

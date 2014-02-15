@@ -1,0 +1,8 @@
+@import "file.less";
+@import "import/namespaces-and-mixins.less";
+.ruleset {
+  content: something;
+}
+#outer {
+  content: something;
+}

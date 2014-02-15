@@ -15,14 +15,14 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 public class ImportsAndScopeSolver {
 
   private final ProblemsHandler problemsHandler;
-  private SingleImportsSolver importsSolver;
+  private SingleImportSolver importsSolver;
 
   public ImportsAndScopeSolver(ProblemsHandler problemsHandler) {
     this.problemsHandler = problemsHandler;
   }
 
   public IScope buildImportsAndScope(StyleSheet less, LessSource source) {
-    importsSolver = new SingleImportsSolver(problemsHandler);
+    importsSolver = new SingleImportSolver(problemsHandler);
 
     InitialScopeExtractor scopeBuilder = new InitialScopeExtractor();
     IScope scope = scopeBuilder.extractScope(less);

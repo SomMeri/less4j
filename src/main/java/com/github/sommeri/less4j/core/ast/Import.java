@@ -10,6 +10,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 public class Import extends ASTCssNode {
   
   private ImportMultiplicity multiplicity = ImportMultiplicity.IMPORT;
+  private ImportContent contentKind = ImportContent.SUFFIX_BASED;
   private boolean isInline = false;
   private Expression urlExpression;
   private List<MediaQuery> mediums = new ArrayList<MediaQuery>();
@@ -24,6 +25,14 @@ public class Import extends ASTCssNode {
 
   public void setInline(boolean isInline) {
     this.isInline = isInline;
+  }
+
+  public ImportContent getContentKind() {
+    return contentKind;
+  }
+
+  public void setContentKind(ImportContent contentKind) {
+    this.contentKind = contentKind;
   }
 
   public ImportMultiplicity getMultiplicity() {
@@ -82,6 +91,10 @@ public class Import extends ASTCssNode {
   
   public enum ImportMultiplicity {
     IMPORT, IMPORT_ONCE, IMPORT_MULTIPLE
+  }
+
+  public enum ImportContent {
+    LESS, CSS, SUFFIX_BASED
   }
 
 }
