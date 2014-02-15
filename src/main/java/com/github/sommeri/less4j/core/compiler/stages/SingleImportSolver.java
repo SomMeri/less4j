@@ -114,8 +114,17 @@ public class SingleImportSolver {
       return result;
     }
     
+    StyleSheet importedAst = buildImportedAst(node, importedSource, importedContent);
+    if (node.isReferenceOnly()) {
+      astManipulator.setTreeSilentness(importedAst, true);
+    }
+    astManipulator.replaceInBody(node, importedAst.getChilds());
+    return importedAst;
+  }
+
+  private StyleSheet buildImportedAst(Import node, LessSource source, String content) {
     // parse imported file
-    StyleSheet importedAst = parseContent(node, importedContent, importedSource);
+    StyleSheet importedAst = parseContent(node, content, source);
 
     // add media queries if needed
     if (node.hasMediums()) {
@@ -129,12 +138,8 @@ public class SingleImportSolver {
       media.setBody(mediaBody);
       media.configureParentToAllChilds();
       mediaBody.configureParentToAllChilds();
-      astManipulator.replaceInBody(node, media);
-      
       return result;
-    } else {
-      astManipulator.replaceInBody(node, importedAst.getChilds());
-    }
+    } 
     
     return importedAst;
   }

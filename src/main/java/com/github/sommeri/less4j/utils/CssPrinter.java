@@ -109,7 +109,7 @@ public class CssPrinter {
   public boolean append(ASTCssNode node) {
     // opening comments should not be docked directly in front of following
     // thing
-    if (node == null)
+    if (node == null || node.isSilent())
       return false;
 
     appendComments(node.getOpeningComments(), true);

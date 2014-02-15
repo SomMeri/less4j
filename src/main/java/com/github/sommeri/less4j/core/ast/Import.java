@@ -12,11 +12,20 @@ public class Import extends ASTCssNode {
   private ImportMultiplicity multiplicity = ImportMultiplicity.IMPORT;
   private ImportContent contentKind = ImportContent.SUFFIX_BASED;
   private boolean isInline = false;
+  private boolean isReferenceOnly = false;
   private Expression urlExpression;
   private List<MediaQuery> mediums = new ArrayList<MediaQuery>();
 
   public Import(HiddenTokenAwareTree underlyingStructure) {
     super(underlyingStructure);
+  }
+
+  public boolean isReferenceOnly() {
+    return isReferenceOnly;
+  }
+
+  public void setReferenceOnly(boolean isReferenceOnly) {
+    this.isReferenceOnly = isReferenceOnly;
   }
 
   public boolean isInline() {

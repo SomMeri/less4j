@@ -1,0 +1,12 @@
+@import (reference) "import/import-as-reference.less";
+.importer {
+  .returnedMixin() {
+    returned: mixin;
+  }
+}
+
+div {
+  #namespace > .returnedMixin();
+  referenced: mixin;
+  variable: @variable;
+}

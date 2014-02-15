@@ -188,4 +188,11 @@ public class ASTManipulator {
     to.configureParentToAllChilds();
   }
 
+  public void setTreeSilentness(ASTCssNode node,boolean isSilent) {
+    node.setSilent(isSilent);
+    for (ASTCssNode kid : node.getChilds()) {
+      setTreeSilentness(kid, isSilent);
+    }
+  }
+
 }

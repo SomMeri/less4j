@@ -1116,6 +1116,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         node.setContentKind(ImportContent.LESS);
       } else if (IMPORT_OPTION_CSS.equals(text)) {
         node.setContentKind(ImportContent.CSS);
+      } else if (IMPORT_OPTION_REFERENCE.equals(text)) {
+        node.setReferenceOnly(true);
       } else {
         problemsHandler.unknownImportOption(node, text);
       }

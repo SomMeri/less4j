@@ -11,6 +11,7 @@ import com.github.sommeri.less4j.utils.PubliclyCloneable;
 public abstract class ASTCssNode implements PubliclyCloneable {
 
   private ASTCssNode parent;
+  private boolean isSilent = false;
   //I'm using underlying structure as identified in cycle detector. If it stops to be identifying,
   //cycle detector must be modified. !
   private HiddenTokenAwareTree underlyingStructure;
@@ -22,6 +23,14 @@ public abstract class ASTCssNode implements PubliclyCloneable {
     this.underlyingStructure = underlyingStructure;
     if (underlyingStructure == null)
       throw new IllegalArgumentException("Underlying can not be null. It is used for error reporting, so place there the closest token possible.");
+  }
+
+  public boolean isSilent() {
+    return isSilent;
+  }
+
+  public void setSilent(boolean isSilent) {
+    this.isSilent = isSilent;
   }
 
   /**
