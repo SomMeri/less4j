@@ -48,6 +48,10 @@ public abstract class ASTCssNode implements PubliclyCloneable {
     return parent;
   }
 
+  public boolean hasParent() {
+    return getParent()!=null;
+  }
+
   /**
    * WARNING: it is up to the programmer to keep parent and childs getters and
    * setters consistent. Members of this hierarchy are not responsible for that.

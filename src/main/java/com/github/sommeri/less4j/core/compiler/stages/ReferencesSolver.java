@@ -16,7 +16,6 @@ import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
-import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
@@ -192,33 +191,33 @@ public class ReferencesSolver {
     switch (node.getType()) {
     case VARIABLE: {
       Expression replacement = expressionEvaluator.evaluate((Variable) node);
-      replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case INDIRECT_VARIABLE: {
       Expression replacement = expressionEvaluator.evaluate((IndirectVariable) node);
-      replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case STRING_EXPRESSION: {
       Expression replacement = expressionEvaluator.evaluate((CssString) node);
-      replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case ESCAPED_VALUE: {
       Expression replacement = expressionEvaluator.evaluate((EscapedValue) node);
-      replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case ESCAPED_SELECTOR: {
       SimpleSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator);
-      replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case FIXED_NAME_PART: {
       FixedNamePart part = (FixedNamePart) node;
       FixedNamePart replacement = interpolateFixedNamePart(part, expressionEvaluator);
-      replaceMemberAndSynchronizeSilentness(part, replacement);
+      manipulator.replaceMemberAndSynchronizeSilentness(part, replacement);
       return true;
     }
     case VARIABLE_NAME_PART: {
@@ -226,22 +225,12 @@ public class ReferencesSolver {
       Expression value = expressionEvaluator.evaluate(part.getVariable());
       FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure(), part);
       FixedNamePart replacement = interpolateFixedNamePart(fixedName, expressionEvaluator);
-      replaceMemberAndSynchronizeSilentness(part, replacement);
+      manipulator.replaceMemberAndSynchronizeSilentness(part, replacement);
       return true;
     }
     default: // nothing
     }
     return false;
-  }
-
-  private void replaceMemberAndSynchronizeSilentness(InterpolableNamePart part, FixedNamePart replacement) {
-    part.getParent().replaceMember(part, replacement);
-    manipulator.setTreeSilentness(replacement, part.isSilent());
-  }
-
-  private void replaceAndSynchronizeSilentness(ASTCssNode node, ASTCssNode replacement) {
-    manipulator.setTreeSilentness(replacement, node.isSilent());
-    manipulator.replace(node, replacement);
   }
 
   private FixedNamePart toFixedName(Expression value, HiddenTokenAwareTree parent, VariableNamePart part) {

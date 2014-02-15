@@ -12,6 +12,8 @@ import org.apache.commons.beanutils.PropertyUtils;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.FixedNamePart;
+import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
@@ -28,6 +30,18 @@ public class ASTManipulator {
         return candidate;
     }
     return candidate;
+  }
+  
+  public void replaceMemberAndSynchronizeSilentness(InterpolableNamePart oldMember, FixedNamePart newMember) {
+    if (oldMember.hasParent())
+      oldMember.getParent().replaceMember(oldMember, newMember);
+    
+    setTreeSilentness(newMember, oldMember.isSilent());
+  }
+
+  public void replaceAndSynchronizeSilentness(ASTCssNode oldChild, ASTCssNode newChild) {
+    setTreeSilentness(newChild, oldChild.isSilent());
+    replace(oldChild, newChild);
   }
   
   public void replace(ASTCssNode oldChild, ASTCssNode newChild) {
