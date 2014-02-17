@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -860,6 +861,7 @@ public class CssPrinter {
   }
 
   public void appendSelectors(List<Selector> selectors) {
+    selectors = filterSilent(selectors);
     // follow less.js formatting in special case - only one empty selector
     if (selectors.size() == 1 && isEmptySelector(selectors.get(0))) {
       cssOnly.append(" ");
@@ -873,6 +875,15 @@ public class CssPrinter {
       if (iterator.hasNext())
         cssOnly.append(",").newLine();
     }
+  }
+
+  private <T  extends ASTCssNode> List<T> filterSilent(List<T> nodes) {
+    List<T> result = new ArrayList<T>();
+    for (T t : nodes) {
+      if (!t.isSilent())
+        result.add(t);
+    }
+    return result;
   }
 
   private boolean isEmptySelector(Selector selector) {

@@ -1,7 +1,3 @@
-/*
-  The media statement above is invalid (no selector)
-  We should ban invalid media queries with properties and no selector?
-*/
 .visible {
   color: red;
 }
@@ -48,8 +44,7 @@
 }
 .y {
   pulled-in: yes;
-}
-/* comment pulled in */
+} /* comment pulled in */
 .visible {
   extend: test;
 }

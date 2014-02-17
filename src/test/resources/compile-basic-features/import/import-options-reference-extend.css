@@ -1,0 +1,9 @@
+.mainExtendingReference {
+  imported-as: reference;
+}
+.mainRuleset {
+  main: ruleset;
+}
+.mainExtendingReference {
+  main-extending: in main;
+}

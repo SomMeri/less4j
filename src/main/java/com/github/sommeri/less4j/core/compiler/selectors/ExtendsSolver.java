@@ -97,6 +97,19 @@ public class ExtendsSolver {
   private void addSelector(RuleSet ruleSet, Selector selector) {
     selector.setParent(ruleSet);
     ruleSet.addSelector(selector);
+    setVisibility(ruleSet, selector);
+  }
+
+  private void setVisibility(RuleSet ruleSet, Selector newSelector) {
+    if (newSelector.isSilent() || !ruleSet.isSilent())
+      return ;
+    ruleSet.setSilent(false);
+
+    List<? extends ASTCssNode> childs = ruleSet.getChilds();
+    childs.removeAll(ruleSet.getSelectors());
+    for (ASTCssNode kid : childs) {
+      manipulator.setTreeSilentness(kid, false);
+    }
   }
 
   private Selector constructNewSelector(Selector extending, Selector possibleTarget) {
@@ -106,15 +119,20 @@ public class ExtendsSolver {
     List<Extend> allExtends = extending.getExtend();
     for (Extend extend : allExtends) {
       if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget())) 
-        return extending.clone();
+        return setNewSelectorVisibility(extend, extending.clone());
       
       if (extend.isAll()) {
         Selector addSelector = comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector());
         if (addSelector!=null)
-          return addSelector;
+          return setNewSelectorVisibility(extend, addSelector);
       }
     }
     return null;
+  }
+
+  private Selector setNewSelectorVisibility(Extend extend, Selector newSelector) {
+    manipulator.setTreeSilentness(newSelector, extend.isSilent());
+    return newSelector;
   }
 
   private void collectRulesets(ASTCssNode node) {
