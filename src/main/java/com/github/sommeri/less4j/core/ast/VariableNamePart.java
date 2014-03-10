@@ -43,7 +43,10 @@ public class VariableNamePart extends InterpolableNamePart {
   }
 
   public VariableNamePart clone() {
-    return (VariableNamePart) super.clone();
+    VariableNamePart result = (VariableNamePart) super.clone();
+    result.variable = variable==null?null:variable.clone();
+    result.configureParentToAllChilds();
+    return result;
   }
 
 }

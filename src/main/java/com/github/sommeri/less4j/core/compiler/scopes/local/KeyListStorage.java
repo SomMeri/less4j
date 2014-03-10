@@ -26,6 +26,10 @@ public class KeyListStorage<M, T> implements Cloneable {
     lastLevel.add(key, thing);
   }
 
+  public void add(ListPlaceholder<M, T> placeholder, M key, List<T> thing) {
+    placeholder.level.add(key, thing);
+  }
+
   public void add(KeyListStorage<M, T> otherStorage) {
     levels.addAll(otherStorage.levels);
     placeholders.addAll(otherStorage.placeholders);

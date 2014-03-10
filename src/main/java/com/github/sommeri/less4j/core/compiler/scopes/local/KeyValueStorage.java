@@ -134,6 +134,7 @@ public class KeyValueStorage<M, T> implements Cloneable {
   public String toString() {
     return levels.toString();
   }
+  
   private static class Level<M, T> implements PubliclyCloneable {
 
     private Map<M, T> storage = new HashMap<M, T>();
@@ -165,7 +166,6 @@ public class KeyValueStorage<M, T> implements Cloneable {
       try {
         @SuppressWarnings("unchecked")
         Level<M, T> clone = (Level<M, T>) super.clone();
-        //should I creat also new lists? old versoin have not done that
         clone.storage = new HashMap<M, T>(storage);
         return clone;
       } catch (CloneNotSupportedException e) {

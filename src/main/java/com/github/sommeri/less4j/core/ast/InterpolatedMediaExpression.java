@@ -39,7 +39,10 @@ public class InterpolatedMediaExpression extends MediaExpression {
   }
 
   public InterpolatedMediaExpression clone() {
-    return (InterpolatedMediaExpression) super.clone();
+    InterpolatedMediaExpression result = (InterpolatedMediaExpression) super.clone();
+    result.expression = expression==null?null:expression.clone();
+    result.configureParentToAllChilds();
+    return result;
   }
 
 }

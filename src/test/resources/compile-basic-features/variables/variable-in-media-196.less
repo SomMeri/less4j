@@ -1,0 +1,11 @@
+@breakpoint-three: ~"screen";
+
+.inMedia() {
+  @media @breakpoint-three {
+    padding: 1rem;
+  }
+}
+
+.message--alert {
+  .inMedia();
+}
