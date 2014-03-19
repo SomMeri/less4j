@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage;
-
 public interface LessCompiler {
 
   public CompilationResult compile(String lessContent) throws Less4jException;
@@ -33,7 +31,7 @@ public interface LessCompiler {
 
     private LessSource cssResultLocation;
     private boolean linkSourceMap = true;
-    private List<FunctionsPackage> functionPackages = new ArrayList<FunctionsPackage>(); 
+    private List<LessFunction> functionPackages = new ArrayList<LessFunction>(); 
 
     /**
      * This is needed in for source map.
@@ -59,15 +57,15 @@ public interface LessCompiler {
       this.linkSourceMap = linkSourceMap;
     }
 
-    public List<FunctionsPackage> getFunctionPackages() {
+    public List<LessFunction> getCustomFunctions() {
       return functionPackages;
     }
 
-    public void addFunctionPackages(List<FunctionsPackage> functionPackages) {
+    public void addCustomFunctions(List<LessFunction> functionPackages) {
       this.functionPackages.addAll(functionPackages);
     }
 
-    public void addFunctionPackages(FunctionsPackage functionPackage) {
+    public void addCustomFunction(LessFunction functionPackage) {
       this.functionPackages.add(functionPackage);
     }
 

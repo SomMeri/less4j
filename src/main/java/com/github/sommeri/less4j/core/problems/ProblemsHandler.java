@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.problems;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.LessProblems;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
@@ -24,12 +25,11 @@ import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage.FunctionProblems;
 import com.github.sommeri.less4j.utils.LessPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
 //TODO: this could benefit from some kind of dependency injection framework.
-public class ProblemsHandler implements FunctionProblems {
+public class ProblemsHandler implements LessProblems {
 
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
@@ -291,6 +291,17 @@ public class ProblemsHandler implements FunctionProblems {
 
   public void addErrors(List<Problem> errors) {
     collector.addErrors(errors);
+  }
+
+  @Override
+  public void addError(ASTCssNode errorNode, String description) {
+    collector.addError(new CompilationError(errorNode, description));
+    
+  }
+
+  @Override
+  public void addWarning(ASTCssNode weirdNode, String description) {
+    collector.addWarning(new CompilationWarning(weirdNode, description));
   }
 
 }

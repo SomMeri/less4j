@@ -17,7 +17,6 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
-import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
@@ -31,6 +30,7 @@ import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
+import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
@@ -67,11 +67,7 @@ public class ExpressionEvaluator {
     arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
     
-    for (FunctionsPackage function : configuration.getFunctionPackages()) {
-      function.setProblemsHandler(problemsHandler);
-      functions.add(function);
-    }
-    
+    functions.add(new CustomFunctions(problemsHandler, configuration.getCustomFunctions()));
     functions.add(new MathFunctions(problemsHandler));
     functions.add(new StringFunctions(problemsHandler));
     functions.add(new ColorFunctions(problemsHandler));
