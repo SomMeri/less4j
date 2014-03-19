@@ -115,7 +115,7 @@ public class SingleImportSolver {
     }
     
     StyleSheet importedAst = buildImportedAst(node, importedSource, importedContent);
-    if (node.isReferenceOnly()) {
+    if (node.isReferenceOnly() || node.isSilent()) {
       astManipulator.setTreeSilentness(importedAst, true);
     }
     astManipulator.replaceInBody(node, importedAst.getChilds());
