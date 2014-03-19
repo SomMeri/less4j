@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.CssString;
@@ -39,12 +40,14 @@ public class ReferencesSolver {
   private ASTManipulator manipulator = new ASTManipulator();
   private final MixinsSolver mixinsSolver;
   private final ProblemsHandler problemsHandler;
+  private final Configuration configuration;
   private final AstNodesStack semiCompiledNodes = new AstNodesStack();
   private StringInterpolator stringInterpolator = new StringInterpolator();
 
-  public ReferencesSolver(ProblemsHandler problemsHandler) {
+  public ReferencesSolver(ProblemsHandler problemsHandler, Configuration configuration) {
     this.problemsHandler = problemsHandler;
-    this.mixinsSolver = new MixinsSolver(this, semiCompiledNodes, problemsHandler);
+    this.configuration = configuration;
+    this.mixinsSolver = new MixinsSolver(this, semiCompiledNodes, problemsHandler, configuration);
   }
 
   public void solveReferences(final ASTCssNode node, final IScope scope) {
@@ -95,7 +98,7 @@ public class ReferencesSolver {
   }
 
   private void solveNonMixinReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
-    ExpressionEvaluator cssGuardsValidator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler);
+    ExpressionEvaluator cssGuardsValidator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler, configuration);
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid))
         continue;
@@ -173,7 +176,7 @@ public class ReferencesSolver {
       return new ArrayList<FullMixinDefinition>();
     }
 
-    MixinsReferenceMatcher matcher = new MixinsReferenceMatcher(scope, problemsHandler);
+    MixinsReferenceMatcher matcher = new MixinsReferenceMatcher(scope, problemsHandler, configuration);
     List<FullMixinDefinition> mixins = matcher.filterByParametersNumber(mixinReference, sameNameMixins);
     if (mixins.isEmpty()) {
       problemsHandler.noMixinHasRightParametersCountError(mixinReference);
@@ -187,7 +190,7 @@ public class ReferencesSolver {
   }
 
   private boolean solveIfVariableReference(ASTCssNode node, IScope scope) {
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler);
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
     switch (node.getType()) {
     case VARIABLE: {
       Expression replacement = expressionEvaluator.evaluate((Variable) node);

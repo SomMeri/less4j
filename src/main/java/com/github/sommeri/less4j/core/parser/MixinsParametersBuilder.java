@@ -17,7 +17,7 @@ public class MixinsParametersBuilder {
 
   private final ASTBuilderSwitch parentBuilder;
   @SuppressWarnings("unused")
-  private ProblemsHandler problemsHandler = new ProblemsHandler();
+  private ProblemsHandler problemsHandler;
 
   public MixinsParametersBuilder(ASTBuilderSwitch astBuilderSwitch, ProblemsHandler problemsHandler) {
     this.parentBuilder = astBuilderSwitch;

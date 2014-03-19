@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
@@ -55,16 +56,22 @@ public class ExpressionEvaluator {
   private List<FunctionsPackage> functions = new ArrayList<FunctionsPackage>();
   private StringInterpolator stringInterpolator = new StringInterpolator();
 
-  public ExpressionEvaluator(ProblemsHandler problemsHandler) {
-    this(new NullScope(), problemsHandler);
+  public ExpressionEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
+    this(new NullScope(), problemsHandler, configuration);
   }
 
-  public ExpressionEvaluator(IScope scope, ProblemsHandler problemsHandler) {
+  public ExpressionEvaluator(IScope scope, ProblemsHandler problemsHandler, Configuration configuration) {
     super();
     this.scope = scope == null ? new NullScope() : scope;
     this.problemsHandler = problemsHandler;
     arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
+    
+    for (FunctionsPackage function : configuration.getFunctionPackages()) {
+      function.setProblemsHandler(problemsHandler);
+      functions.add(function);
+    }
+    
     functions.add(new MathFunctions(problemsHandler));
     functions.add(new StringFunctions(problemsHandler));
     functions.add(new ColorFunctions(problemsHandler));

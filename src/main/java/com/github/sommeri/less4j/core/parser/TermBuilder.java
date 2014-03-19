@@ -27,7 +27,7 @@ import com.github.sommeri.less4j.utils.URIUtils;
 public class TermBuilder {
 
   private final ASTBuilderSwitch parentBuilder;
-  private ProblemsHandler problemsHandler = new ProblemsHandler();
+  private ProblemsHandler problemsHandler;
 
   public TermBuilder(ASTBuilderSwitch astBuilderSwitch, ProblemsHandler problemsHandler) {
     this.parentBuilder = astBuilderSwitch;

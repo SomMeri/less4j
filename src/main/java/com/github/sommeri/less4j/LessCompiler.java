@@ -2,8 +2,11 @@ package com.github.sommeri.less4j;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage;
 
 public interface LessCompiler {
 
@@ -30,6 +33,7 @@ public interface LessCompiler {
 
     private LessSource cssResultLocation;
     private boolean linkSourceMap = true;
+    private List<FunctionsPackage> functionPackages = new ArrayList<FunctionsPackage>(); 
 
     /**
      * This is needed in for source map.
@@ -53,6 +57,18 @@ public interface LessCompiler {
 
     public void setLinkSourceMap(boolean linkSourceMap) {
       this.linkSourceMap = linkSourceMap;
+    }
+
+    public List<FunctionsPackage> getFunctionPackages() {
+      return functionPackages;
+    }
+
+    public void addFunctionPackages(List<FunctionsPackage> functionPackages) {
+      this.functionPackages.addAll(functionPackages);
+    }
+
+    public void addFunctionPackages(FunctionsPackage functionPackage) {
+      this.functionPackages.add(functionPackage);
     }
 
   }

@@ -24,11 +24,12 @@ import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.compiler.expressions.FunctionsPackage.FunctionProblems;
 import com.github.sommeri.less4j.utils.LessPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
 //TODO: this could benefit from some kind of dependency injection framework.
-public class ProblemsHandler {
+public class ProblemsHandler implements FunctionProblems {
 
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();

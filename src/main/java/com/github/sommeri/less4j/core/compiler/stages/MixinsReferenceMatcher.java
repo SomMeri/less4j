@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.compiler.stages;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
@@ -19,8 +20,8 @@ public class MixinsReferenceMatcher {
   private ExpressionEvaluator evaluator;
   private ExpressionComparator comparator = new PatternsComparator();
 
-  public MixinsReferenceMatcher(IScope scope, ProblemsHandler problemsHandler) {
-    evaluator = new ExpressionEvaluator(scope, problemsHandler);
+  public MixinsReferenceMatcher(IScope scope, ProblemsHandler problemsHandler, Configuration configuration) {
+    evaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
   }
 
   public List<FullMixinDefinition> filterByParametersNumber(MixinReference reference, List<FullMixinDefinition> mixins) {

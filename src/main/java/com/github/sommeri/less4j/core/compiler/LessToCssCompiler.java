@@ -35,10 +35,12 @@ import com.github.sommeri.less4j.utils.URIUtils;
 public class LessToCssCompiler {
 
   private ProblemsHandler problemsHandler;
+  private Configuration configuration;
 
-  public LessToCssCompiler(ProblemsHandler problemsHandler) {
+  public LessToCssCompiler(ProblemsHandler problemsHandler, Configuration configuration) {
     super();
     this.problemsHandler = problemsHandler;
+    this.configuration = configuration;
   }
 
   public ASTCssNode compileToCss(StyleSheet less, LessSource source, Configuration options) {
@@ -112,10 +114,10 @@ public class LessToCssCompiler {
   }
 
   private void resolveImportsAndReferences(StyleSheet less, LessSource source) {
-    ImportsAndScopeSolver solver = new ImportsAndScopeSolver(problemsHandler);
+    ImportsAndScopeSolver solver = new ImportsAndScopeSolver(problemsHandler, configuration);
     IScope scope = solver.buildImportsAndScope(less, source);
 
-    ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler);
+    ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler, configuration);
     referencesSolver.solveReferences(less, scope);
     // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
   }
@@ -127,7 +129,7 @@ public class LessToCssCompiler {
 
   @SuppressWarnings("unused")
   private void normalizeUrlsAndImportsInImportedFiles(StyleSheet node) {
-    UrlsAndImportsNormalizer normalizer = new UrlsAndImportsNormalizer(problemsHandler);
+    UrlsAndImportsNormalizer normalizer = new UrlsAndImportsNormalizer(problemsHandler, configuration);
     normalizer.normalizeUrlsAndImports(node);
   }
 
@@ -180,7 +182,7 @@ public class LessToCssCompiler {
   private void evaluateExpressions(ASTCssNode node) {
     ASTManipulator manipulator = new ASTManipulator();
     //variables are not supposed to be there now
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler);
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler, configuration);
 
     if (node instanceof Expression) {
       Expression value = expressionEvaluator.evaluate((Expression) node);

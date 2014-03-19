@@ -3,8 +3,10 @@ package com.github.sommeri.less4j.core.compiler.expressions;
 import java.util.List;
 import java.util.Map;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public abstract class BuiltInFunctionsPack implements FunctionsPackage {
@@ -33,6 +35,12 @@ public abstract class BuiltInFunctionsPack implements FunctionsPackage {
 
   private String normalizeName(FunctionExpression input) {
     return input.getName().toLowerCase();
+  }
+
+  @Override
+  public void setProblemsHandler(FunctionProblems problemsHandler) {
+    throw new BugHappened("This should not be called on built-in functions.", (ASTCssNode) null);
+    
   }
 
 }

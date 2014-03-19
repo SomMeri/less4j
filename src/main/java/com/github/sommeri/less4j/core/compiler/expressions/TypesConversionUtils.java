@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
@@ -35,8 +36,8 @@ public class TypesConversionUtils {
     }
   }
 
-  public String extractFilename(Expression urlInput, ProblemsHandler problemsHandler) {
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler);
+  public String extractFilename(Expression urlInput, ProblemsHandler problemsHandler, Configuration configuration) {
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler, configuration);
     Expression urlExpression = expressionEvaluator.evaluate(urlInput);
 
     if (urlExpression.getType() != ASTCssNodeType.FUNCTION)

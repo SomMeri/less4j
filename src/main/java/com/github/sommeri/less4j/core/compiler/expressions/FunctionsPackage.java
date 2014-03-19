@@ -7,8 +7,13 @@ import com.github.sommeri.less4j.core.ast.FunctionExpression;
 
 public interface FunctionsPackage {
 
-  public abstract boolean canEvaluate(FunctionExpression input, List<Expression> parameters);
+  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters);
 
-  public abstract Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter);
+  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter);
 
+  public void setProblemsHandler(FunctionProblems problemsHandler);
+
+  public interface FunctionProblems {
+    
+  }
 }

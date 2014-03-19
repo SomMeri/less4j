@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource.CannotReadFile;
 import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.LessSource.StringSourceException;
@@ -29,13 +30,15 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 public class SingleImportSolver {
 
   private final ProblemsHandler problemsHandler;
+  private final Configuration configuration;
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
   private ASTManipulator astManipulator = new ASTManipulator();
 
   private Set<LessSource> importedSources = new HashSet<LessSource>();
 
-  public SingleImportSolver(ProblemsHandler problemsHandler) {
+  public SingleImportSolver(ProblemsHandler problemsHandler, Configuration configuration) {
     this.problemsHandler = problemsHandler;
+    this.configuration = configuration;
   }
 
   public void solveImports(StyleSheet node, LessSource source) {
@@ -52,7 +55,7 @@ public class SingleImportSolver {
   }
 
   public ASTCssNode importEncountered(Import node, LessSource source) {
-    String filename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler);
+    String filename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler, configuration);
     if (filename == null) {
       problemsHandler.errorWrongImport(node.getUrlExpression());
       return null;

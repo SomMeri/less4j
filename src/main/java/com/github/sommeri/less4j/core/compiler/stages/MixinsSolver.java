@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.BodyOwner;
@@ -32,11 +33,13 @@ class MixinsSolver {
   private final ProblemsHandler problemsHandler;
   private final ReferencesSolver parentSolver;
   private final AstNodesStack semiCompiledNodes;
+  private final Configuration configuration;
 
-  public MixinsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler) {
+  public MixinsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = parentSolver;
     this.semiCompiledNodes = semiCompiledNodes;
     this.problemsHandler = problemsHandler;
+    this.configuration = configuration;
   }
 
   private MixinCompilationResult resolveMixinReference(final IScope callerScope, final FullMixinDefinition referencedMixin, final IScope mixinWorkingScope, final ExpressionEvaluator expressionEvaluator) {
@@ -107,7 +110,7 @@ class MixinsSolver {
   }
 
   private IScope buildMixinsArguments(MixinReference reference, IScope referenceScope, FullMixinDefinition mixin) {
-    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new ExpressionEvaluator(referenceScope, problemsHandler), problemsHandler);
+    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new ExpressionEvaluator(referenceScope, problemsHandler, configuration), problemsHandler);
     return builder.build();
   }
 
@@ -131,7 +134,7 @@ class MixinsSolver {
           IScope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
           IScope mixinWorkingScope = calculateMixinsWorkingScope(callerScope, mixinArguments, mixinScope);
 
-          MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler);
+          MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
           boolean ifDefaultGuardValue = guardsValidator.guardsSatisfied(mixin, true);
           boolean ifNotDefaultGuardValue = guardsValidator.guardsSatisfied(mixin, false);
 
@@ -139,7 +142,7 @@ class MixinsSolver {
           if (ifDefaultGuardValue || ifNotDefaultGuardValue) {
             //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
             //used and create snapshot operation is cheap now. It should be done later on.
-            ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler);
+            ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler, configuration);
             MixinCompilationResult compiled = resolveMixinReference(callerScope, fullMixin, mixinWorkingScope, expressionEvaluator);
             //mark the mixin according to its default() function use 
             compiled.setDefaultFunctionUse(toDefaultFunctionUse(ifDefaultGuardValue, ifNotDefaultGuardValue));

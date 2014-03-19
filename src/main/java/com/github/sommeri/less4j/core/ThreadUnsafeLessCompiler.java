@@ -60,14 +60,17 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(LessSource source) throws Less4jException {
-    return compile(source, null);
+    return compile(source, new Configuration());
   }
 
   @Override
   public CompilationResult compile(LessSource source, Configuration options) throws Less4jException {
+    if (options==null)
+      options = new Configuration();
+      
     problemsHandler = new ProblemsHandler();
     astBuilder = new ASTBuilder(problemsHandler);
-    compiler = new LessToCssCompiler(problemsHandler);
+    compiler = new LessToCssCompiler(problemsHandler, options);
     CompilationResult compilationResult = doCompile(source, options);
     if (problemsHandler.hasErrors()) {
       throw new Less4jException(problemsHandler.getErrors(), compilationResult);
@@ -76,9 +79,6 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private CompilationResult doCompile(LessSource source, Configuration options) throws Less4jException {
-    if (options==null)
-      options = new Configuration();
-      
     ANTLRParser.ParseResult result = toAntlrTree(source);
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
