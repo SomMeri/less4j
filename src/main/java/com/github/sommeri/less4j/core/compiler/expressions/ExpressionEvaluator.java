@@ -279,7 +279,7 @@ public class ExpressionEvaluator {
 
   public Expression evaluate(FunctionExpression input) {
     Expression evaluatedParameter = evaluate(input.getParameter());
-    List<Expression> splitParameters = evaluatedParameter.splitByComma();
+    List<Expression> splitParameters = (evaluatedParameter.getType()==ASTCssNodeType.EMPTY_EXPRESSION)?new ArrayList<Expression>() : evaluatedParameter.splitByComma();
     
     if (!input.isCssOnlyFunction()) { 
       for (FunctionsPackage pack : functions) {

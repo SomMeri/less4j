@@ -19,7 +19,7 @@ public interface LessProblems {
   public void addError(ASTCssNode errorNode, String description);
 
   /**
-   * Warn user. Warning are available to user, but css is generated as usually.
+   * Warn user. Warnings are available to user, but css is generated as usually.
    * 
    * @param weirdNode - ast node that caused the problem. It is used to generate line number and column 
    *     number preceding error description.

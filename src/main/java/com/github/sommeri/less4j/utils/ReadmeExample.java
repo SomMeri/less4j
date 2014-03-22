@@ -3,17 +3,23 @@ package com.github.sommeri.less4j.utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.LessFunction;
+import com.github.sommeri.less4j.LessProblems;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.LessSource.StringSource;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
+import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 
 public class ReadmeExample {
   
@@ -23,6 +29,7 @@ public class ReadmeExample {
     customCssLocationExample2();
     guessedCssLocationExample1();
     guessedCssLocationExample2();
+    customFunctionExample();
   }
 
   private static void basicFileExample() throws Less4jException {
@@ -97,6 +104,22 @@ public class ReadmeExample {
     System.out.println(compilationResult.getSourceMap());
   }
 
+  private static void customFunctionExample() throws Less4jException {
+    File inputLessFile = createFile("sampleInput.less", 
+    "div {\n" +
+    "    property: constant();\n" +
+    "}");
+
+    Configuration configuration = new Configuration();
+    configuration.addCustomFunction(new ConstantFunction());
+
+    LessCompiler compiler = new DefaultLessCompiler();
+    CompilationResult compilationResult = compiler.compile(inputLessFile, configuration);
+
+    System.out.println(compilationResult.getCss());
+    deleteFile(inputLessFile);
+  }
+
   private static void deleteFile(File inputLessFile) {
     try {
       FileUtils.forceDelete(inputLessFile);
@@ -119,4 +142,18 @@ public class ReadmeExample {
   private static String format(Problem warning) {
     return "WARNING " + warning.getLine() +":" + warning.getCharacter()+ " " + warning.getMessage();
   }
+}
+
+class ConstantFunction implements LessFunction {
+
+  @Override
+  public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
+    return input.getName().equals("constant") && parameters.isEmpty();
+  }
+
+  @Override
+  public Expression evaluate(FunctionExpression input, List<Expression> parameters, Expression evaluatedParameter, LessProblems problems) {
+    return new IdentifierExpression(input.getUnderlyingStructure(), "fixed");
+  }
+  
 }

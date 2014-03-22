@@ -43,7 +43,7 @@ class NoParametersTestFnc implements LessFunction {
 
   @Override
   public boolean canEvaluate(FunctionExpression input, List<Expression> parameters) {
-    return input.getName().equals("worksWithNone");
+    return input.getName().equals("worksWithNone") && parameters.isEmpty();
   }
 
   @Override
