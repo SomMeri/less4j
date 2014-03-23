@@ -120,6 +120,8 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EXTEND_TARGET_SELECTOR", "target selector of extend");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EXTEND_IN_DECLARATION", "extend declaration");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INTERPOLABLE_NAME", "interpolable name");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EMBEDDED_SCRIPT", "embedded script ~`...`");
+    
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";

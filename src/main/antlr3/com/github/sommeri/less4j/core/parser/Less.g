@@ -794,6 +794,7 @@ term
     ) | (a+=unsigned_value_term
         | a+=hexColor
         | a+=escapedValue
+        | a+=embeddedScript
         | a+=special_function))
     -> ^(TERM $a*)
     ;
@@ -805,6 +806,8 @@ term_only_function
     ;    
 
 escapedValue: VALUE_ESCAPE -> ^(ESCAPED_VALUE VALUE_ESCAPE);
+
+embeddedScript: EMBEDDED_SCRIPT;
     
 expr_in_parentheses
     : LPAREN expr RPAREN -> ^(EXPRESSION_PARENTHESES LPAREN expr RPAREN );
@@ -1256,6 +1259,12 @@ VALUE_ESCAPE : '~' '\'' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                         | { $type = INVALID; }
                     )
                 ;   
+
+EMBEDDED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+                    (
+                          '`'
+                        | { $type = INVALID; }
+                    );   
                 
 // -------------
 // Identifier. Identifier tokens pick up properties names and values
