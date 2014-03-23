@@ -96,6 +96,12 @@ public class TermBuilder {
     case LessLexer.UNICODE_RANGE:
       return buildFromUnicodeRange(token, offsetChild);
 
+    case LessLexer.ESCAPED_SCRIPT:
+      return buildFromEscapedScript(token, offsetChild);
+
+    case LessLexer.EMBEDDED_SCRIPT:
+      return buildFromEmbeddedScript(token, offsetChild);
+
     default:
       throw new BugHappened("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
 
@@ -205,7 +211,19 @@ public class TermBuilder {
   public CssString createCssString(HiddenTokenAwareTree token, String quotedText) {
     return new CssString(token, quotedText.substring(1, quotedText.length() - 1), quotedText.substring(0, 1));
   }
+  
+  private Expression buildFromEscapedScript(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
+    String text = first.getText();
+    text = text.substring(2, text.length() - 1);
+    return new FunctionExpression(token, "~`", new CssString(token, text, ""));
+  }
 
+  private Expression buildFromEmbeddedScript(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
+    String text = first.getText();
+    text = text.substring(1, text.length() - 1);
+    return new FunctionExpression(token, "`", new CssString(token, text, ""));
+  }
+  
   private Expression buildFromIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
     String text = first.getText();
     if (NamedColorExpression.isColorName(text))
@@ -221,7 +239,7 @@ public class TermBuilder {
   private FunctionExpression buildFromSpecialFunction(HiddenTokenAwareTree token, String function, HiddenTokenAwareTree first) {
     return new FunctionExpression(token, function, extractUrlParameter(token, function, normalizeNewLineSymbols(first.getText())));
   }
-
+  
   // some places (e.g. only url) allow new lines in them. Less.js tend to
   // translate them into
   private String normalizeNewLineSymbols(String text) {

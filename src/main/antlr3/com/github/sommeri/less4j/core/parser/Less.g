@@ -205,7 +205,7 @@ finally { leaveRule(); }
 //
 imports
 @init {enterRule(retval, RULE_IMPORTS);}
-    : (IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM)^ (importoptions)? term (mediaQuery (COMMA mediaQuery)*)? SEMI!
+    : (IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM)^ (((importoptions) => importoptions)|) term (mediaQuery (COMMA mediaQuery)*)? SEMI!
     ;
 finally { leaveRule(); }
 
@@ -1260,17 +1260,18 @@ VALUE_ESCAPE : '~' '\'' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                     )
                 ;   
 
-EMBEDDED_SCRIPT : '`' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+EMBEDDED_SCRIPT : '`' ( ESCAPED_SYMBOL | ~('\f'|'\\'|'`') )*
                     (
                           '`'
                         | { $type = INVALID; }
                     );   
 
-ESCAPED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+ESCAPED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\f'|'\\'|'`') )*
                     (
                           '`'
                         | { $type = INVALID; }
                     );   
+                    
                 
 // -------------
 // Identifier. Identifier tokens pick up properties names and values
