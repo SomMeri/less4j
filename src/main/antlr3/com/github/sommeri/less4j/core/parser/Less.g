@@ -807,7 +807,7 @@ term_only_function
 
 escapedValue: VALUE_ESCAPE -> ^(ESCAPED_VALUE VALUE_ESCAPE);
 
-embeddedScript: EMBEDDED_SCRIPT;
+embeddedScript: EMBEDDED_SCRIPT | ESCAPED_SCRIPT;
     
 expr_in_parentheses
     : LPAREN expr RPAREN -> ^(EXPRESSION_PARENTHESES LPAREN expr RPAREN );
@@ -1260,7 +1260,13 @@ VALUE_ESCAPE : '~' '\'' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                     )
                 ;   
 
-EMBEDDED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+EMBEDDED_SCRIPT : '`' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
+                    (
+                          '`'
+                        | { $type = INVALID; }
+                    );   
+
+ESCAPED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\n'|'\r'|'\f'|'\\'|'\'') )*
                     (
                           '`'
                         | { $type = INVALID; }
