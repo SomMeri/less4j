@@ -72,6 +72,7 @@ public class ExpressionEvaluator {
     functions.add(new StringFunctions(problemsHandler));
     functions.add(new ColorFunctions(problemsHandler));
     functions.add(new MiscFunctions(problemsHandler));
+    functions.add(new EmbeddedScriptFunctions(problemsHandler));
     functions.add(new TypeFunctions(problemsHandler));
   }
   
