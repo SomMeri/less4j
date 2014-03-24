@@ -1,0 +1,14 @@
+Errors produced by compilation of testCase
+ERROR 17:11 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 2:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 3:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 4:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 5:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 6:12 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 7:14 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 8:16 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 13:10 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 14:14 Escaped script ~`...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 22:12 Escaped script ~`...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 27:10 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ERROR 28:11 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
