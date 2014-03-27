@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.sommeri.less4j.EmbeddedScripting;
+import com.github.sommeri.less4j.EmbeddedScriptGenerator;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
-import com.github.sommeri.less4j.LessStringsEvaluator;
+import com.github.sommeri.less4j.EmbeddedLessGenerator;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
@@ -59,7 +59,7 @@ public class ExpressionEvaluator {
   private List<FunctionsPackage> functions = new ArrayList<FunctionsPackage>();
   private StringInterpolator stringInterpolator;
   private StringInterpolator embeddedScriptInterpolator;
-  private EmbeddedScripting embeddedScripting;
+  private EmbeddedScriptGenerator embeddedScripting;
 
   public ExpressionEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
     this(new NullScope(), problemsHandler, configuration);
@@ -71,7 +71,7 @@ public class ExpressionEvaluator {
     this.problemsHandler = problemsHandler;
     arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
-    embeddedScripting = configuration.getEmbeddedScripting() == null ? new LessStringsEvaluator() : configuration.getEmbeddedScripting();
+    embeddedScripting = configuration.getEmbeddedScripting() == null ? new EmbeddedLessGenerator() : configuration.getEmbeddedScripting();
     stringInterpolator = new StringInterpolator(problemsHandler);
     embeddedScriptInterpolator = new StringInterpolator(embeddedScripting, problemsHandler);
     

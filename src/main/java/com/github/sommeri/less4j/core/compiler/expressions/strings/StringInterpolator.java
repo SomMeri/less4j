@@ -2,8 +2,8 @@ package com.github.sommeri.less4j.core.compiler.expressions.strings;
 
 import java.util.regex.Pattern;
 
-import com.github.sommeri.less4j.EmbeddedScripting;
-import com.github.sommeri.less4j.LessStringsEvaluator;
+import com.github.sommeri.less4j.EmbeddedScriptGenerator;
+import com.github.sommeri.less4j.EmbeddedLessGenerator;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
@@ -13,14 +13,14 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 public class StringInterpolator extends AbstractStringReplacer<ExpressionEvaluator> {
 
   private static final Pattern STR_INTERPOLATION = Pattern.compile("@\\{([^\\{\\}@])*\\}");
-  private final EmbeddedScripting embeddedScriptEvaluator;
+  private final EmbeddedScriptGenerator embeddedScriptEvaluator;
   private final ProblemsHandler problemsHandler;
 
   public StringInterpolator(ProblemsHandler problemsHandler) {
-    this(new LessStringsEvaluator(), problemsHandler);
+    this(new EmbeddedLessGenerator(), problemsHandler);
   }
 
-  public StringInterpolator(EmbeddedScripting embeddedScriptEvaluator, ProblemsHandler problemsHandler) {
+  public StringInterpolator(EmbeddedScriptGenerator embeddedScriptEvaluator, ProblemsHandler problemsHandler) {
     this.embeddedScriptEvaluator = embeddedScriptEvaluator;
     this.problemsHandler = problemsHandler;
   }
