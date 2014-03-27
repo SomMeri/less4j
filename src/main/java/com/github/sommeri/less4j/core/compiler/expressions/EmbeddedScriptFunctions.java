@@ -6,7 +6,9 @@ import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -48,20 +50,19 @@ class ScriptFunction implements Function {
       problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
 
     Expression parameter = parameters.get(0);
-    if (!(parameter instanceof CssString)) {
-      problemsHandler.wrongArgumentTypeToFunction(parameter, name+"...`", parameter.getType(),ASTCssNodeType.STRING_EXPRESSION);
+    if (!(parameter instanceof EmbeddedScript)) {
+      problemsHandler.wrongArgumentTypeToFunction(parameter, name+"...`", parameter.getType(),ASTCssNodeType.EMBEDDED_SCRIPT);
+      return new FaultyExpression(call);
     }
     
     warn(call, problemsHandler);
     
-    CssString parameterAsStr = (CssString) parameter;
+    EmbeddedScript parameterAsStr = (EmbeddedScript) parameter;
     String value = name+parameterAsStr.getValue()+"`"; 
     return new CssString(call.getUnderlyingStructure(), value, "");
   }
 
   private void warn(FunctionExpression call, ProblemsHandler problemsHandler) {
-//  ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EMBEDDED_SCRIPT", "embedded script `...`");
-//  ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("ESCAPED_SCRIPT", "escaped script ~`...`");
     problemsHandler.warnScriptingNotSupported(call, errorName);
     
   }

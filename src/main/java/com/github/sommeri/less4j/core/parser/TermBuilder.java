@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -215,13 +216,13 @@ public class TermBuilder {
   private Expression buildFromEscapedScript(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     String text = first.getText();
     text = text.substring(2, text.length() - 1);
-    return new FunctionExpression(token, "~`", new CssString(token, text, ""));
+    return new FunctionExpression(token, "~`", new EmbeddedScript(token, text));
   }
 
   private Expression buildFromEmbeddedScript(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     String text = first.getText();
     text = text.substring(1, text.length() - 1);
-    return new FunctionExpression(token, "`", new CssString(token, text, ""));
+    return new FunctionExpression(token, "`", new EmbeddedScript(token, text));
   }
   
   private Expression buildFromIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {

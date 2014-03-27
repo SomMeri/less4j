@@ -10,6 +10,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -42,11 +43,12 @@ public class ReferencesSolver {
   private final ProblemsHandler problemsHandler;
   private final Configuration configuration;
   private final AstNodesStack semiCompiledNodes = new AstNodesStack();
-  private StringInterpolator stringInterpolator = new StringInterpolator();
+  private final StringInterpolator stringInterpolator;
 
   public ReferencesSolver(ProblemsHandler problemsHandler, Configuration configuration) {
     this.problemsHandler = problemsHandler;
     this.configuration = configuration;
+    this.stringInterpolator = new StringInterpolator(problemsHandler);
     this.mixinsSolver = new MixinsSolver(this, semiCompiledNodes, problemsHandler, configuration);
   }
 
@@ -209,6 +211,11 @@ public class ReferencesSolver {
     }
     case ESCAPED_VALUE: {
       Expression replacement = expressionEvaluator.evaluate((EscapedValue) node);
+      manipulator.replaceAndSynchronizeSilentness(node, replacement);
+      return true;
+    }
+    case EMBEDDED_SCRIPT: {
+      Expression replacement = expressionEvaluator.evaluate((EmbeddedScript) node);
       manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }

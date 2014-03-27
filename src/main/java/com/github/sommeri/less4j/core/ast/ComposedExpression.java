@@ -50,22 +50,30 @@ public class ComposedExpression extends Expression {
     this.right = right;
   }
 
-  @Override
-  public List<Expression> splitByComma() {
-    return doSplitByComma();
+  public List<Expression> splitList() {
+    LinkedList<Expression> byComma = doSplitByListOperator(Operator.COMMA);
+    if (byComma.size()==1)
+      return doSplitByListOperator(Operator.EMPTY_OPERATOR);
+    
+    return byComma;
   }
 
-  private LinkedList<Expression> doSplitByComma() {
+  @Override
+  public List<Expression> splitByComma() {
+    return doSplitByListOperator(Operator.COMMA);
+  }
+
+  private LinkedList<Expression> doSplitByListOperator(Operator splitOper) {
     LinkedList<Expression> result = new LinkedList<Expression>();
     if (operator.getOperator()!=Operator.COMMA && operator.getOperator()!=Operator.EMPTY_OPERATOR) {
       result.add(this);
       return result;
     }
 
-    LinkedList<Expression> left = splitByComma(getLeft());
-    LinkedList<Expression> right = splitByComma(getRight());
+    LinkedList<Expression> left = splitByComma(getLeft(), splitOper);
+    LinkedList<Expression> right = splitByComma(getRight(), splitOper);
     
-    if (operator.getOperator()!=Operator.EMPTY_OPERATOR) {
+    if (operator.getOperator()==splitOper) {
       result.addAll(left);
       result.addAll(right);
       return result;
@@ -80,10 +88,10 @@ public class ComposedExpression extends Expression {
     return result;
   }
 
-  private LinkedList<Expression> splitByComma(Expression expression) {
+  private LinkedList<Expression> splitByComma(Expression expression, Operator splitOper) {
     if (expression.getType()==ASTCssNodeType.COMPOSED_EXPRESSION) {
       ComposedExpression composed = (ComposedExpression) expression;
-      return composed.doSplitByComma();
+      return composed.doSplitByListOperator(splitOper);
     } else {
       LinkedList<Expression> result = new LinkedList<Expression>();
       result.add(expression);

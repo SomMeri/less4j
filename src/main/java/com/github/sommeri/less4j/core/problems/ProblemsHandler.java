@@ -124,7 +124,7 @@ public class ProblemsHandler implements LessProblems {
     collector.addError(new CompilationError(param, "Wrong argument type to function '" + function + "', expected " + PrintUtils.toTypeNames(expected) + " saw " + PrintUtils.toTypeName(received) + "."));
   }
 
-  public void warnScriptingNotSupported(FunctionExpression call, String errorName) {
+  public void warnScriptingNotSupported(ASTCssNode call, String errorName) {
     collector.addError(new CompilationError(call, errorName + "are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS."));
   }
 

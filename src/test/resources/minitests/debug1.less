@@ -1,3 +1,5 @@
-.eval {
-    escaped: ~``;
+.escape-interpol {
+    @world: "world";
+    width: ~'"hello" + " " + @{world}';
+	width: ~`"hello" + " " + @{world}`;
 }

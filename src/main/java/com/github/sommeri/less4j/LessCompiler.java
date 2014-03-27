@@ -31,7 +31,8 @@ public interface LessCompiler {
 
     private LessSource cssResultLocation;
     private boolean linkSourceMap = true;
-    private List<LessFunction> functionPackages = new ArrayList<LessFunction>(); 
+    private List<LessFunction> functionPackages = new ArrayList<LessFunction>();
+    private EmbeddedScripting embeddedScripting; 
 
     /**
      * This is needed in for source map.
@@ -67,6 +68,14 @@ public interface LessCompiler {
 
     public void addCustomFunction(LessFunction functionPackage) {
       this.functionPackages.add(functionPackage);
+    }
+
+    public EmbeddedScripting getEmbeddedScripting() {
+      return embeddedScripting;
+    }
+
+    public void setEmbeddedScripting(EmbeddedScripting embeddedScripting) {
+      this.embeddedScripting = embeddedScripting;
     }
 
   }

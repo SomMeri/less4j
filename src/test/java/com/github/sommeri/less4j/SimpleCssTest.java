@@ -23,8 +23,8 @@ import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-  //private static final String inputLess = "src/test/resources/minitests/debug1.less";
-  private static final String inputLess = "src/test/resources/minitests/javascript.less";
+  private static final String inputLess = "src/test/resources/minitests/debug1.less";
+  //private static final String inputLess = "src/test/resources/minitests/javascript.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
   private static final String mapdata = "src/test/resources/minitests/debug1.mapdata";
 

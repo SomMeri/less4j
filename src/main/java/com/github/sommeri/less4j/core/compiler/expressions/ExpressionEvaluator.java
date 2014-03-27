@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.EmbeddedScripting;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.LessStringsEvaluator;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
@@ -14,6 +16,7 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
@@ -54,7 +57,9 @@ public class ExpressionEvaluator {
   private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
   private List<FunctionsPackage> functions = new ArrayList<FunctionsPackage>();
-  private StringInterpolator stringInterpolator = new StringInterpolator();
+  private StringInterpolator stringInterpolator;
+  private StringInterpolator embeddedScriptInterpolator;
+  private EmbeddedScripting embeddedScripting;
 
   public ExpressionEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
     this(new NullScope(), problemsHandler, configuration);
@@ -66,6 +71,9 @@ public class ExpressionEvaluator {
     this.problemsHandler = problemsHandler;
     arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
+    embeddedScripting = configuration.getEmbeddedScripting() == null ? new LessStringsEvaluator() : configuration.getEmbeddedScripting();
+    stringInterpolator = new StringInterpolator(problemsHandler);
+    embeddedScriptInterpolator = new StringInterpolator(embeddedScripting, problemsHandler);
     
     functions.add(new CustomFunctions(problemsHandler, configuration.getCustomFunctions()));
     functions.add(new MathFunctions(problemsHandler));
@@ -126,6 +134,11 @@ public class ExpressionEvaluator {
   public Expression evaluate(EscapedValue input) {
     String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
     return new EscapedValue(input.getUnderlyingStructure(), value);
+  }
+
+  public Expression evaluate(EmbeddedScript input) {
+    String value = embeddedScriptInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
+    return new EmbeddedScript(input.getUnderlyingStructure(), value);
   }
 
   public Expression evaluate(Variable input) {
@@ -200,6 +213,9 @@ public class ExpressionEvaluator {
 
     case ESCAPED_VALUE:
       return evaluate((EscapedValue) input);
+
+    case EMBEDDED_SCRIPT:
+      return evaluate((EmbeddedScript) input);
 
     //the value is already there, nothing to evaluate
     case IDENTIFIER_EXPRESSION:

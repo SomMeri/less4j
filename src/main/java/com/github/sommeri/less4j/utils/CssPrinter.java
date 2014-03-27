@@ -19,6 +19,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.ExpressionOperator;
@@ -228,6 +229,9 @@ public class CssPrinter {
 
     case ESCAPED_VALUE:
       return appendEscapedValue((EscapedValue) node); // TODOsm: source map
+
+    case EMBEDDED_SCRIPT:
+      return appendEmbeddedScript((EmbeddedScript) node); // TODOsm: source map
 
     case KEYFRAMES:
       return appendKeyframes((Keyframes) node); // TODOsm: source map
@@ -806,6 +810,12 @@ public class CssPrinter {
   }
   
   public boolean appendEscapedValue(EscapedValue escaped) {
+    cssOnly.append(escaped.getValue());
+
+    return true;
+  }
+
+  public boolean appendEmbeddedScript(EmbeddedScript escaped) {
     cssOnly.append(escaped.getValue());
 
     return true;
