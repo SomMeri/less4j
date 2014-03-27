@@ -71,7 +71,7 @@ public class ExpressionEvaluator {
     this.problemsHandler = problemsHandler;
     arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
-    embeddedScripting = configuration.getEmbeddedScripting() == null ? new EmbeddedLessGenerator() : configuration.getEmbeddedScripting();
+    embeddedScripting = configuration.getEmbeddedScriptGenerator() == null ? new EmbeddedLessGenerator() : configuration.getEmbeddedScriptGenerator();
     stringInterpolator = new StringInterpolator(problemsHandler);
     embeddedScriptInterpolator = new StringInterpolator(embeddedScripting, problemsHandler);
     
