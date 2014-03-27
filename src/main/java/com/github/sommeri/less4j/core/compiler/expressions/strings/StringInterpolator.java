@@ -42,7 +42,7 @@ public class StringInterpolator extends AbstractStringReplacer<ExpressionEvaluat
       return matchRange.getFullMatch();
     }
 
-    return embeddedScriptEvaluator.toScriptExpression(value, problemsHandler);
+    return embeddedScriptEvaluator.toScript(value, problemsHandler);
   }
 
 }

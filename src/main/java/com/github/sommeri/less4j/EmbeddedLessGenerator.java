@@ -10,7 +10,7 @@ public class EmbeddedLessGenerator implements EmbeddedScriptGenerator {
   }
 
   @Override
-  public String toScriptExpression(Expression value, LessProblems problemsHandler) {
+  public String toScript(Expression value, LessProblems problemsHandler) {
     InStringCssPrinter builder = new InStringCssPrinter();
     builder.append(value);
     String replacement = builder.toString();

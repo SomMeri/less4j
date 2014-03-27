@@ -4,6 +4,6 @@ import com.github.sommeri.less4j.core.ast.Expression;
 
 public interface EmbeddedScriptGenerator {
 
-  String toScriptExpression(Expression value, LessProblems problemsHandler);
+  String toScript(Expression value, LessProblems problemsHandler);
 
 }
