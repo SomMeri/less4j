@@ -3,7 +3,7 @@ package com.github.sommeri.less4j.core.compiler.expressions;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
@@ -23,7 +23,7 @@ class ArithmeticCalculator {
     NumberExpression first = (NumberExpression) firstNumber;
     NumberExpression second = (NumberExpression) secondNumber;
 
-    ExpressionOperator operator = originalExpression.getOperator();
+    BinaryExpressionOperator operator = originalExpression.getOperator();
     switch (operator.getOperator()) {
     case SOLIDUS:
       return divide(first, second, originalExpression);
@@ -33,10 +33,6 @@ class ArithmeticCalculator {
       return subtract(first, second, originalExpression);
     case PLUS:
       return add(first, second, originalExpression);
-
-    case COMMA:
-    case EMPTY_OPERATOR:
-      throw new BugHappened("Not an arithmetic operator.", operator);
 
     default:
       throw new BugHappened("Unknown operator.", operator);
@@ -110,15 +106,8 @@ class ArithmeticCalculator {
     return new NumberExpression(parentToken, resultVal, suffix, null, dimension);
   }
 
-  public boolean accepts(ExpressionOperator operator, Expression first, Expression second) {
-    if (!acceptedOperand(first, second))
-      return false;
-    
-    return acceptedOperator(operator);
-  }
-
-  private boolean acceptedOperator(ExpressionOperator operator) {
-    return operator.getOperator() != ExpressionOperator.Operator.COMMA && operator.getOperator() != ExpressionOperator.Operator.EMPTY_OPERATOR;
+  public boolean accepts(BinaryExpressionOperator operator, Expression first, Expression second) {
+    return acceptedOperand(first, second);
   }
 
   private boolean acceptedOperand(Expression first, Expression second) {

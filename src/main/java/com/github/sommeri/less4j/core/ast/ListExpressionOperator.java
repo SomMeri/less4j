@@ -6,15 +6,15 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-public class ExpressionOperator extends ASTCssNode {
+public class ListExpressionOperator extends ASTCssNode {
 
   private Operator operator;
   
-  public ExpressionOperator(HiddenTokenAwareTree underlyingStructure) {
+  public ListExpressionOperator(HiddenTokenAwareTree underlyingStructure) {
     this(underlyingStructure, Operator.EMPTY_OPERATOR);
   }
 
-  public ExpressionOperator(HiddenTokenAwareTree underlyingStructure, Operator operator) {
+  public ListExpressionOperator(HiddenTokenAwareTree underlyingStructure, Operator operator) {
     super(underlyingStructure);
     this.operator = operator;
   }
@@ -34,7 +34,7 @@ public class ExpressionOperator extends ASTCssNode {
   }
 
   public enum Operator {
-    SOLIDUS("/"), COMMA(","), STAR("*"), EMPTY_OPERATOR("' '"), MINUS("-"), PLUS("+");
+    COMMA(","), EMPTY_OPERATOR("' '");
     
     private final String symbol;
 
@@ -49,7 +49,7 @@ public class ExpressionOperator extends ASTCssNode {
 
   @Override
   public ASTCssNodeType getType() {
-    return ASTCssNodeType.EXPRESSION_OPERATOR;
+    return ASTCssNodeType.LIST_EXPRESSION_OPERATOR;
   }
 
   @Override
@@ -58,7 +58,7 @@ public class ExpressionOperator extends ASTCssNode {
   }
   
   @Override
-  public ExpressionOperator clone() {
-    return (ExpressionOperator) super.clone();
+  public ListExpressionOperator clone() {
+    return (ListExpressionOperator) super.clone();
   }
 }

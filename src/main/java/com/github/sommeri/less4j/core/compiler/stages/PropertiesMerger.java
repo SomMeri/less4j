@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.ListExpression;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.RuleSet;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 /**
  * Preconditions: 
@@ -75,18 +78,37 @@ public class PropertiesMerger {
   private void addToPrevious(Declaration declaration) {
     if (declaration.getExpression() == null)
       return;
-
     String key = toMergingPropertiesKey(declaration);
     if (mergingProperties.containsKey(key)) {
       Declaration previousDeclaration = mergingProperties.get(key);
       Expression previousExpression = previousDeclaration.getExpression();
-      Expression composedExpression = new ComposedExpression(declaration.getUnderlyingStructure(), previousExpression, new ExpressionOperator(declaration.getUnderlyingStructure(), declaration.getMergeOperator()), declaration.getExpression());
-      previousDeclaration.setExpression(composedExpression);
-      composedExpression.setParent(previousDeclaration);
+      
+      ListExpressionOperator.Operator mergeOperator = declaration.getMergeOperator();
+      Expression mergedExpression = mergeWithPrevious(declaration.getUnderlyingStructure(), previousExpression, mergeOperator, declaration.getExpression());
+      
+      previousDeclaration.setExpression(mergedExpression);
+      mergedExpression.setParent(previousDeclaration);
       manipulator.removeFromBody(declaration);
     } else {
       mergingProperties.put(key, declaration);
     }
+  }
+
+  private Expression mergeWithPrevious(HiddenTokenAwareTree underlying, Expression previousExpression, Operator mergeOperator, Expression expression) {
+    if (previousExpression.getType()==ASTCssNodeType.LIST_EXPRESSION) {
+      ListExpression list = (ListExpression) previousExpression;
+      if (list.getOperator().getOperator()==mergeOperator) {
+        list.addExpression(expression);
+        return list;
+      }
+    }
+   
+    List<Expression> expressions = new ArrayList<Expression>();
+    expressions.add(previousExpression);
+    expressions.add(expression);
+    ListExpression result = new ListExpression(underlying, expressions, new ListExpressionOperator(underlying, mergeOperator));
+    result.configureParentToAllChilds();
+    return result;
   }
 
   private String toMergingPropertiesKey(Declaration declaration) {

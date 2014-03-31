@@ -2,7 +2,7 @@ package com.github.sommeri.less4j.core.ast;
 
 import java.util.List;
 
-import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -13,7 +13,7 @@ public class Declaration extends ASTCssNode {
   private InterpolableName name;
   private Expression expression;
   private boolean important;
-  private Operator mergeOperator;
+  private ListExpressionOperator.Operator mergeOperator;
 
   public Declaration(HiddenTokenAwareTree token, InterpolableName name) {
     this(token, name, null, false, null);
@@ -59,7 +59,7 @@ public class Declaration extends ASTCssNode {
     this.important = important;
   }
 
-  public Operator getMergeOperator() {
+  public ListExpressionOperator.Operator getMergeOperator() {
     return mergeOperator;
   }
 

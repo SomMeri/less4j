@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +10,11 @@ import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.LessSource.StringSourceException;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.parser.ConversionUtils;
@@ -183,27 +182,13 @@ class Extract extends CatchAllMultiParameterFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
-    List<Expression> values = collect((ComposedExpression) splitParameters.get(0));
+    List<Expression> values = collect((ListExpression) splitParameters.get(0));
     NumberExpression index = (NumberExpression) splitParameters.get(1);
     return values.get(index.getValueAsDouble().intValue() - 1);
   }
 
-  private List<Expression> collect(ComposedExpression values) {
-    List<Expression> result = new ArrayList<Expression>();
-    Expression left = values.getLeft();
-    Expression right = values.getRight();
-
-    if (left.getType() == ASTCssNodeType.COMPOSED_EXPRESSION) {
-      result.addAll(collect((ComposedExpression) left));
-    } else {
-      result.add(left);
-    }
-    if (right.getType() == ASTCssNodeType.COMPOSED_EXPRESSION) {
-      result.addAll(collect((ComposedExpression) right));
-    } else {
-      result.add(right);
-    }
-    return result;
+  private List<Expression> collect(ListExpression values) {
+    return values.getExpressions();
   }
 
   @Override
@@ -220,7 +205,7 @@ class Extract extends CatchAllMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COMPOSED_EXPRESSION);
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.LIST_EXPRESSION);
     case 1:
       return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }

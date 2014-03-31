@@ -23,7 +23,7 @@ import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
@@ -41,6 +41,8 @@ import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
+import com.github.sommeri.less4j.core.ast.ListExpression;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
@@ -149,15 +151,65 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       head.setUnderlyingStructure(token);
       return head;
     }
+    
+    if (null!=toListExpressionOperator(children.get(1))) 
+      return createListExpression(token, children);
 
-    return createExpression(token, children);
+    return createBinaryExpression(token, children);
   }
 
-  private Expression createExpression(HiddenTokenAwareTree parent, LinkedList<HiddenTokenAwareTree> members) {
+  private Expression createListExpression(HiddenTokenAwareTree parent, LinkedList<HiddenTokenAwareTree> members) {
+    Iterator<HiddenTokenAwareTree> iterator = members.iterator();
+    // this must represent a term. Otherwise we are doomed anyway.
+    Expression head = (Expression) switchOn(iterator.next());
+    List<Expression> spaceSeparatedExpressions = new ArrayList<Expression>();
+    spaceSeparatedExpressions.add(head);
+    ListExpressionOperator space=null;
+    
+    List<Expression> commaSeparatedExpressions = new ArrayList<Expression>();
+    ListExpressionOperator comma=null;
+
+    while (iterator.hasNext()) {
+      HiddenTokenAwareTree operatorToken = iterator.next();
+      operatorToken.pushHiddenToSiblings();
+      ListExpressionOperator operator = createListOperator(operatorToken);
+      if (operator==null) {
+        System.out.println(operatorToken);
+        System.out.println("");
+      }
+      if (operator.getOperator()==ListExpressionOperator.Operator.EMPTY_OPERATOR) {
+        space = operator;
+      } else {
+        comma = operator;
+        if (!spaceSeparatedExpressions.isEmpty())
+          commaSeparatedExpressions.add(maybeList(spaceSeparatedExpressions, space));
+        spaceSeparatedExpressions = new ArrayList<Expression>();
+      }
+      if (iterator.hasNext())
+        spaceSeparatedExpressions.add((Expression) switchOn(iterator.next()));
+    }
+    if (!spaceSeparatedExpressions.isEmpty())
+      commaSeparatedExpressions.add(maybeList(spaceSeparatedExpressions, space));
+    return maybeList(commaSeparatedExpressions, comma);
+  }
+
+  private Expression maybeList(List<Expression> expressions, ListExpressionOperator operator) {
+    if (expressions.isEmpty())
+      return null;
+    
+    Expression first = expressions.get(0);
+    if (expressions.size()==1) {
+      return first;
+    }
+    
+    return new ListExpression(first.getUnderlyingStructure(), expressions, operator);
+  }
+
+  private Expression createBinaryExpression(HiddenTokenAwareTree parent, LinkedList<HiddenTokenAwareTree> members) {
     // this must represent a term. Otherwise we are doomed anyway.
     Expression head = (Expression) switchOn(members.removeFirst());
     while (!members.isEmpty()) {
-      ExpressionOperator operator = readExpressionOperator(members);
+      BinaryExpressionOperator operator = createBinaryOperator(members.removeFirst());
       if (members.isEmpty())
         return new ComposedExpression(parent, head, operator, null);
 
@@ -167,37 +219,52 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return head;
   }
 
-  public ExpressionOperator readExpressionOperator(LinkedList<HiddenTokenAwareTree> members) {
-    HiddenTokenAwareTree token = members.removeFirst();
-    ExpressionOperator operator = new ExpressionOperator(token, toExpressionOperator(token));
+  public BinaryExpressionOperator createBinaryOperator(HiddenTokenAwareTree token) {
+    BinaryExpressionOperator operator = new BinaryExpressionOperator(token, toExpressionOperator(token));
     return operator;
   }
 
-  private ExpressionOperator.Operator toExpressionOperator(HiddenTokenAwareTree token) {
+  private BinaryExpressionOperator.Operator toExpressionOperator(HiddenTokenAwareTree token) {
     switch (token.getType()) {
     case LessLexer.SOLIDUS:
-      return ExpressionOperator.Operator.SOLIDUS;
-
-    case LessLexer.COMMA:
-      return ExpressionOperator.Operator.COMMA;
+      return BinaryExpressionOperator.Operator.SOLIDUS;
 
     case LessLexer.STAR:
-      return ExpressionOperator.Operator.STAR;
+      return BinaryExpressionOperator.Operator.STAR;
 
     case LessLexer.MINUS:
-      return ExpressionOperator.Operator.MINUS;
+      return BinaryExpressionOperator.Operator.MINUS;
 
     case LessLexer.PLUS:
-      return ExpressionOperator.Operator.PLUS;
-
-    case LessLexer.EMPTY_SEPARATOR:
-      return ExpressionOperator.Operator.EMPTY_OPERATOR;
+      return BinaryExpressionOperator.Operator.PLUS;
 
     default:
       break;
     }
 
     throw new BugHappened(GRAMMAR_MISMATCH, token);
+  }
+
+  public ListExpressionOperator createListOperator(HiddenTokenAwareTree token) {
+    ListExpressionOperator.Operator operator = toListExpressionOperator(token);
+    if (operator==null)
+      return null;
+    
+    ListExpressionOperator result = new ListExpressionOperator(token, operator);
+    return result;
+  }
+
+  private ListExpressionOperator.Operator toListExpressionOperator(HiddenTokenAwareTree token) {
+    switch (token.getType()) {
+    case LessLexer.COMMA:
+      return ListExpressionOperator.Operator.COMMA;
+
+    case LessLexer.EMPTY_SEPARATOR:
+      return ListExpressionOperator.Operator.EMPTY_OPERATOR;
+
+    default:
+      return null;
+    }
   }
 
   public Variable handleVariable(HiddenTokenAwareTree token) {
@@ -217,13 +284,13 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return new Declaration(token, name);
 
     HiddenTokenAwareTree expressionToken = iterator.next();
-    ExpressionOperator.Operator mergeOperator = null;
+    ListExpressionOperator.Operator mergeOperator = null;
     if (expressionToken.getType() == LessLexer.PLUS) {
       expressionToken = iterator.next();
-      mergeOperator = ExpressionOperator.Operator.COMMA;
+      mergeOperator = ListExpressionOperator.Operator.COMMA;
       if (expressionToken.getType() == LessLexer.UNDERSCORE) {
         expressionToken = iterator.next();
-        mergeOperator = ExpressionOperator.Operator.EMPTY_OPERATOR;
+        mergeOperator = ListExpressionOperator.Operator.EMPTY_OPERATOR;
       }
     }
 
@@ -743,12 +810,14 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public InterpolatedMediaExpression handleInterpolatedMediaExpression(HiddenTokenAwareTree token) {
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
-    Expression expression = (Variable) switchOn(children.next());
+    List<Expression> expressions = new ArrayList<Expression>();
+        
     while (children.hasNext()) {
-      Variable variable = (Variable) switchOn(children.next());
-      expression = new ComposedExpression(token, expression, new ExpressionOperator(token, com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator.EMPTY_OPERATOR), variable);
+      Variable expression = (Variable) switchOn(children.next());
+      expressions.add(expression);
     }
-    return new InterpolatedMediaExpression(token, expression);
+    ListExpression list = new ListExpression(token, expressions, new ListExpressionOperator(token, ListExpressionOperator.Operator.EMPTY_OPERATOR));
+    return new InterpolatedMediaExpression(token, list);
   }
 
   private MediumModifier toMediumModifier(HiddenTokenAwareTree token) {

@@ -9,6 +9,7 @@ import com.github.sommeri.less4j.core.NotACssException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AnonymousExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
@@ -22,7 +23,7 @@ import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
@@ -37,6 +38,8 @@ import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.Keyframes;
 import com.github.sommeri.less4j.core.ast.KeyframesName;
+import com.github.sommeri.less4j.core.ast.ListExpression;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
 import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
@@ -167,8 +170,14 @@ public class CssPrinter {
     case COMPOSED_EXPRESSION:
       return appendComposedExpression((ComposedExpression) node); // TODOsm: source map
 
-    case EXPRESSION_OPERATOR:
-      return appendExpressionOperator((ExpressionOperator) node); // TODOsm: source map
+    case BINARY_EXPRESSION_OPERATOR:
+      return appendBinaryExpressionOperator((BinaryExpressionOperator) node); // TODOsm: source map
+
+    case LIST_EXPRESSION:
+      return appendListExpression((ListExpression) node); // TODOsm: source map
+
+    case LIST_EXPRESSION_OPERATOR:
+      return appendListExpressionOperator((ListExpressionOperator) node); // TODOsm: source map
 
     case STRING_EXPRESSION:
       return appendCssString((CssString) node); // TODOsm: source map
@@ -772,8 +781,21 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendExpressionOperator(ExpressionOperator operator) {
-    ExpressionOperator.Operator realOperator = operator.getOperator();
+  public boolean appendListExpression(ListExpression expression) {
+    Iterator<Expression> iterator = expression.getExpressions().iterator();
+    if (!iterator.hasNext())
+      return false;
+    
+    append(iterator.next());
+    while (iterator.hasNext()) {
+      append(expression.getOperator());
+      append(iterator.next());
+    }
+    return true;
+  }
+
+  public boolean appendExpressionOperator(ListExpressionOperator operator) {
+    ListExpressionOperator.Operator realOperator = operator.getOperator();
     switch (realOperator) {
     case COMMA:
       cssOnly.append(realOperator.getSymbol()).ensureSeparator();
@@ -783,6 +805,16 @@ public class CssPrinter {
       cssOnly.ensureSeparator();
       break;
 
+    default:
+      cssOnly.append(realOperator.getSymbol());
+    }
+
+    return true;
+  }
+
+  public boolean appendBinaryExpressionOperator(BinaryExpressionOperator operator) {
+    BinaryExpressionOperator.Operator realOperator = operator.getOperator();
+    switch (realOperator) {
     // TODO this is a huge hack which goes around
     // "we do not parse fonts and less.js does" lack of feature
     // left here intentionally, so we can have correct unit test and can come
@@ -798,6 +830,24 @@ public class CssPrinter {
     return true;
   }
 
+  public boolean appendListExpressionOperator(ListExpressionOperator operator) {
+    ListExpressionOperator.Operator realOperator = operator.getOperator();
+    switch (realOperator) {
+    case COMMA:
+      cssOnly.append(realOperator.getSymbol()).ensureSeparator();
+      break;
+
+    case EMPTY_OPERATOR:
+      cssOnly.ensureSeparator();
+      break;
+
+    default:
+      cssOnly.append(realOperator.getSymbol());
+    }
+
+    return true;
+  }
+  
   public boolean appendCssString(CssString expression) {
     String quoteType = expression.getQuoteType();
     cssOnly.append(quoteType).append(expression.getValue()).append(quoteType);

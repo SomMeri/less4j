@@ -3,15 +3,15 @@ package com.github.sommeri.less4j.core.compiler.expressions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.EmbeddedLessGenerator;
 import com.github.sommeri.less4j.EmbeddedScriptGenerator;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
-import com.github.sommeri.less4j.EmbeddedLessGenerator;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
@@ -19,14 +19,14 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
+import com.github.sommeri.less4j.core.ast.ListExpression;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
@@ -53,7 +53,6 @@ public class ExpressionEvaluator {
   private final IScope scope;
   private final ProblemsHandler problemsHandler;
   private ArithmeticCalculator arithmeticCalculator;
-  private ListCalculator listCalculator = new ListCalculator();
   private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
   private List<FunctionsPackage> functions = new ArrayList<FunctionsPackage>();
@@ -91,14 +90,8 @@ public class ExpressionEvaluator {
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
     if (allArguments.isEmpty())
       return new IdentifierExpression(parent.getUnderlyingStructure(), "");
-
-    Iterator<Expression> iterator = allArguments.iterator();
-    Expression result = iterator.next();
-    while (iterator.hasNext()) {
-      result = new ComposedExpression(parent.getUnderlyingStructure(), result, new ExpressionOperator(parent.getUnderlyingStructure()), iterator.next());
-    }
-
-    return result;
+    
+    return new ListExpression(parent.getUnderlyingStructure(), allArguments, new ListExpressionOperator(parent.getUnderlyingStructure()));
   }
 
   public List<Expression> evaluateAll(List<Expression> expressions) {
@@ -192,6 +185,9 @@ public class ExpressionEvaluator {
 
     case COMPOSED_EXPRESSION:
       return evaluate((ComposedExpression) input);
+
+    case LIST_EXPRESSION:
+      return evaluate((ListExpression) input);
 
     case INDIRECT_VARIABLE:
       return evaluate((IndirectVariable) input);
@@ -342,11 +338,16 @@ public class ExpressionEvaluator {
     if (colorsCalculator.accepts(input.getOperator(), leftValue, rightValue))
       return colorsCalculator.evalute(input, leftValue, rightValue);
 
-    if (listCalculator.accepts(input.getOperator()))
-      return listCalculator.evalute(input, leftValue, rightValue);
-
     problemsHandler.cannotEvaluate(input);
     return new FaultyExpression(input);
+  }
+
+  public Expression evaluate(ListExpression input) {
+    List<Expression> evaluated = new ArrayList<Expression>();
+    for (Expression expression : input.getExpressions()) {
+      evaluated.add(evaluate(expression));
+    }
+    return new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone());
   }
 
   public boolean guardsSatisfied(ReusableStructure mixin) {

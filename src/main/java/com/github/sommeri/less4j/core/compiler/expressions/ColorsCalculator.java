@@ -5,7 +5,7 @@ import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.ColorExpression.ColorWithAlphaExpression;
 import com.github.sommeri.less4j.core.ast.ComposedExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.ExpressionOperator;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -37,7 +37,7 @@ class ColorsCalculator {
     double blue2 = calcBlue(second);
     double alpha2 = calcAlpha(second);
 
-    ExpressionOperator operator = originalExpression.getOperator();
+    BinaryExpressionOperator operator = originalExpression.getOperator();
     switch (operator.getOperator()) {
     case SOLIDUS:
       return divide(first, red1, green1, blue1, alpha1,  red2, green2, blue2, alpha2, originalExpression.getUnderlyingStructure());
@@ -47,10 +47,6 @@ class ColorsCalculator {
       return subtract(first, red1, green1, blue1, alpha1, red2, green2, blue2, alpha2, originalExpression.getUnderlyingStructure());
     case PLUS:
       return add(red1, green1, blue1, alpha1, red2, green2, blue2, alpha2, originalExpression.getUnderlyingStructure());
-
-    case COMMA:
-    case EMPTY_OPERATOR:
-      throw new BugHappened("Not a color operator.", operator);
 
     default:
       throw new BugHappened("Unknown operator.", operator);
@@ -106,15 +102,8 @@ class ColorsCalculator {
     return new ColorExpression(parentToken, round(red), round(green), round(blue));
   }
 
-  public boolean accepts(ExpressionOperator operator, Expression first, Expression second) {
-    if (!acceptedOperand(first, second))
-      return false;
-    
-    return acceptedOperator(operator);
-  }
-
-  private boolean acceptedOperator(ExpressionOperator operator) {
-    return operator.getOperator() != ExpressionOperator.Operator.COMMA && operator.getOperator() != ExpressionOperator.Operator.EMPTY_OPERATOR;
+  public boolean accepts(BinaryExpressionOperator operator, Expression first, Expression second) {
+    return acceptedOperand(first, second);
   }
 
   private boolean acceptedOperand(Expression first, Expression second) {

@@ -6,11 +6,11 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
-public class ComparisonExpressionOperator extends ASTCssNode {
+public class BinaryExpressionOperator extends ASTCssNode {
 
   private Operator operator;
   
-  public ComparisonExpressionOperator(HiddenTokenAwareTree underlyingStructure, Operator operator) {
+  public BinaryExpressionOperator(HiddenTokenAwareTree underlyingStructure, Operator operator) {
     super(underlyingStructure);
     this.operator = operator;
   }
@@ -30,9 +30,10 @@ public class ComparisonExpressionOperator extends ASTCssNode {
   }
 
   public enum Operator {
-    GREATER(">"), GREATER_OR_EQUAL(">="), OPEQ("="), LOWER_OR_EQUAL("<="), LOWER("<");
+    SOLIDUS("/"), STAR("*"), MINUS("-"), PLUS("+");
     
     private final String symbol;
+
     private Operator(String symbol) {
       this.symbol = symbol;
     }
@@ -40,7 +41,6 @@ public class ComparisonExpressionOperator extends ASTCssNode {
     public String getSymbol() {
       return symbol;
     }
-    
   }
 
   @Override
@@ -54,7 +54,7 @@ public class ComparisonExpressionOperator extends ASTCssNode {
   }
   
   @Override
-  public ComparisonExpressionOperator clone() {
-    return (ComparisonExpressionOperator) super.clone();
+  public BinaryExpressionOperator clone() {
+    return (BinaryExpressionOperator) super.clone();
   }
 }
