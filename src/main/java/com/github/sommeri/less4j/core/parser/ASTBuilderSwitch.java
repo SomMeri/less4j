@@ -16,7 +16,7 @@ import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Document;
@@ -211,10 +211,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     while (!members.isEmpty()) {
       BinaryExpressionOperator operator = createBinaryOperator(members.removeFirst());
       if (members.isEmpty())
-        return new ComposedExpression(parent, head, operator, null);
+        return new BinaryExpression(parent, head, operator, null);
 
       Expression next = (Expression) switchOn(members.removeFirst());
-      head = new ComposedExpression(parent, head, operator, next);
+      head = new BinaryExpression(parent, head, operator, next);
     }
     return head;
   }

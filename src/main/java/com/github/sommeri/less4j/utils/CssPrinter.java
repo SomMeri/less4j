@@ -14,7 +14,7 @@ import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.Comment;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
@@ -167,8 +167,8 @@ public class CssPrinter {
     case NAMED_EXPRESSION:
       return appendNamedExpression((NamedExpression) node); // TODOsm: source map
 
-    case COMPOSED_EXPRESSION:
-      return appendComposedExpression((ComposedExpression) node); // TODOsm: source map
+    case BINARY_EXPRESSION:
+      return appendComposedExpression((BinaryExpression) node); // TODOsm: source map
 
     case BINARY_EXPRESSION_OPERATOR:
       return appendBinaryExpressionOperator((BinaryExpressionOperator) node); // TODOsm: source map
@@ -773,7 +773,7 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendComposedExpression(ComposedExpression expression) {
+  public boolean appendComposedExpression(BinaryExpression expression) {
     append(expression.getLeft());
     append(expression.getOperator());
     append(expression.getRight());

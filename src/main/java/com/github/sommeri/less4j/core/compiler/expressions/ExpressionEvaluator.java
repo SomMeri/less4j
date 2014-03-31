@@ -14,7 +14,7 @@ import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
@@ -183,8 +183,8 @@ public class ExpressionEvaluator {
     case FUNCTION:
       return evaluate((FunctionExpression) input);
 
-    case COMPOSED_EXPRESSION:
-      return evaluate((ComposedExpression) input);
+    case BINARY_EXPRESSION:
+      return evaluate((BinaryExpression) input);
 
     case LIST_EXPRESSION:
       return evaluate((ListExpression) input);
@@ -326,7 +326,7 @@ public class ExpressionEvaluator {
     return new FaultyExpression(input);
   }
 
-  public Expression evaluate(ComposedExpression input) {
+  public Expression evaluate(BinaryExpression input) {
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
     if (leftValue.isFaulty() || rightValue.isFaulty())
@@ -393,10 +393,10 @@ public class ExpressionEvaluator {
   }
 
   public boolean isRatioExpression(Expression expression) {
-    if (!(expression instanceof ComposedExpression))
+    if (!(expression instanceof BinaryExpression))
       return false;
 
-    ComposedExpression composed = (ComposedExpression) expression;
+    BinaryExpression composed = (BinaryExpression) expression;
     if (composed.getOperator().getOperator() != Operator.SOLIDUS) {
       return false;
     }

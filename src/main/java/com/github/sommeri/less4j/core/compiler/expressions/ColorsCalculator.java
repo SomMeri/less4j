@@ -3,7 +3,7 @@ package com.github.sommeri.less4j.core.compiler.expressions;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.ColorExpression.ColorWithAlphaExpression;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
@@ -26,7 +26,7 @@ class ColorsCalculator {
     this.problemsHandler = problemsHandler;
   }
 
-  public Expression evalute(ComposedExpression originalExpression, Expression first, Expression second) {
+  public Expression evalute(BinaryExpression originalExpression, Expression first, Expression second) {
     double red1 = calcRed(first);
     double green1 = calcGreen(first);
     double blue1 = calcBlue(first);

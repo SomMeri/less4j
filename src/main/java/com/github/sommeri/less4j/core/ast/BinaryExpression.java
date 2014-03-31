@@ -6,13 +6,13 @@ import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class ComposedExpression extends Expression {
+public class BinaryExpression extends Expression {
 
   private Expression left;
   private BinaryExpressionOperator operator;
   private Expression right;
 
-  public ComposedExpression(HiddenTokenAwareTree token, Expression left, BinaryExpressionOperator operator, Expression right) {
+  public BinaryExpression(HiddenTokenAwareTree token, Expression left, BinaryExpressionOperator operator, Expression right) {
     super(token);
     this.left = left;
     this.operator = operator;
@@ -21,7 +21,7 @@ public class ComposedExpression extends Expression {
 
   @Override
   public ASTCssNodeType getType() {
-    return ASTCssNodeType.COMPOSED_EXPRESSION;
+    return ASTCssNodeType.BINARY_EXPRESSION;
   }
   
   public BinaryExpressionOperator getOperator() {
@@ -60,8 +60,8 @@ public class ComposedExpression extends Expression {
   }
 
   @Override
-  public ComposedExpression clone() {
-    ComposedExpression result = (ComposedExpression) super.clone();
+  public BinaryExpression clone() {
+    BinaryExpression result = (BinaryExpression) super.clone();
     result.left = left==null?null:left.clone();
     result.operator = operator==null?null:operator.clone();
     result.right = right==null?null:right.clone();

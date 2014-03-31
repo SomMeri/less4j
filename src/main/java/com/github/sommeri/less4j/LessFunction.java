@@ -2,7 +2,7 @@ package com.github.sommeri.less4j;
 
 import java.util.List;
 
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 
@@ -27,7 +27,7 @@ public interface LessFunction {
    * 
    * The <code>evaluatedParameter</code> contains function arguments as parsed into a single abstract 
    * syntax tree node. A function called with multiple arguments would be sent an instance of 
-   * {@link ComposedExpression} with  arguments bundled in as childs. 
+   * {@link BinaryExpression} with  arguments bundled in as childs. 
    * 
    * The <code>evaluatedParameter</code> contains list of function arguments. It is convenience argument 
    * and contains <code>evaluatedParameter</code> expression split by commas.

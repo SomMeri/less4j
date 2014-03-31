@@ -1,7 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.ComposedExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
@@ -19,7 +19,7 @@ class ArithmeticCalculator {
     this.problemsHandler = problemsHandler;
   }
 
-  public Expression evalute(ComposedExpression originalExpression, Expression firstNumber, Expression secondNumber) {
+  public Expression evalute(BinaryExpression originalExpression, Expression firstNumber, Expression secondNumber) {
     NumberExpression first = (NumberExpression) firstNumber;
     NumberExpression second = (NumberExpression) secondNumber;
 
@@ -40,7 +40,7 @@ class ArithmeticCalculator {
 
   }
 
-  private Expression subtract(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression subtract(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
     return subtractNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
@@ -52,7 +52,7 @@ class ArithmeticCalculator {
     return createResultNumber(parentToken, resultVal, first, second);
   }
 
-  private Expression multiply(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression multiply(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
     return multiplyNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
@@ -64,7 +64,7 @@ class ArithmeticCalculator {
     return createResultNumber(parentToken, resultVal, first, second);
   }
 
-  private Expression divide(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression divide(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
     return divideNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
@@ -76,7 +76,7 @@ class ArithmeticCalculator {
     return createResultNumber(parentToken, resultVal, first, second);
   }
 
-  private Expression add(NumberExpression first, NumberExpression second, ComposedExpression originalExpression) {
+  private Expression add(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
     return addNumbers(first, second, originalExpression.getUnderlyingStructure());
   }
 
