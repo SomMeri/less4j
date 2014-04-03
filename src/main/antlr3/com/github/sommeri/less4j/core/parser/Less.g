@@ -184,8 +184,7 @@ tokens {
 //
 styleSheet
 @init {enterRule(retval, RULE_STYLESHEET);}
-    : ( a+=charSet* //the original ? was replaced by *, because it is possible (even if it makes no sense) and less.js is able to handle such situation
-        (a+=top_level_element)*
+    : ( (a+=top_level_element)*
         EOF ) -> ^(STYLE_SHEET ($a)*)
     ;
 finally { leaveRule(); }
@@ -196,7 +195,7 @@ finally { leaveRule(); }
 // https://developer.mozilla.org/en/CSS/@charset
 charSet
 @init {enterRule(retval, RULE_CHARSET);}
-    : CHARSET_SYM STRING SEMI -> ^(CHARSET_DECLARATION STRING)
+    : {predicates.isCharset(input.LT(1))}? AT_NAME STRING SEMI -> ^(CHARSET_DECLARATION AT_NAME STRING)
     ;
 finally { leaveRule(); }
 
@@ -240,11 +239,15 @@ finally { leaveRule(); }
 
 keyframes
 @init {enterRule(retval, RULE_KEYFRAME);}
-    : {predicates.isKeyframes(input.LT(1))}? (AT_NAME (name+=IDENT (name+=COMMA name+=IDENT )*)?)
+    : {predicates.isKeyframes(input.LT(1))}? (AT_NAME (firstname+=keyframesname (commas+=COMMA names+=keyframesname )*)?)
       body+=general_body
-    -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $name*) $body )
+    -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $firstname* ($commas $names)*) $body )
     ;
 finally { leaveRule(); }
+
+keyframesname
+    : IDENT | variablereference
+    ;
 
 document
 @init {enterRule(retval, RULE_DOCUMENT);}
@@ -324,6 +327,7 @@ top_level_element
     | imports
     | document
     | supports
+    | charSet
     ;
 
 variabledeclaration
@@ -1293,7 +1297,6 @@ IMPORT_MULTIPLE_SYM : '@' I M P O R T  MINUS M U L T I P L E;
 PAGE_SYM : '@' P A G E ;
 MEDIA_SYM : '@' M E D I A ;
 FONT_FACE_SYM : '@' F O N T MINUS F A C E ;
-CHARSET_SYM : '@charset ' ;
 
 AT_NAME : '@' NAME ;
 INDIRECT_VARIABLE : '@' '@' NAME ;

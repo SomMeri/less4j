@@ -26,13 +26,14 @@ public class SourceMapBuilder {
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
   }
 
-  public void append(String str, HiddenTokenAwareTree sourceToken) {
+  public SourceMapBuilder append(String str, HiddenTokenAwareTree sourceToken) {
     //indentation must be handled before measuring symbol start position
     FilePosition outputStartPosition = beforeSymbolPosition();
     cssBuilder.append(str);
     FilePosition outputEndPosition = afterSymbolPosition();
     
     createMapping(str, sourceToken, outputStartPosition, outputEndPosition);
+    return this;
   }
 
   public void appendIgnoreNull(String str, HiddenTokenAwareTree sourceToken) {
@@ -93,6 +94,10 @@ public class SourceMapBuilder {
 
   protected ExtendedStringBuilder getCssBuilder() {
     return cssBuilder;
+  }
+
+  public void ensureSeparator() {
+    cssBuilder.ensureSeparator();
   }
 
 }

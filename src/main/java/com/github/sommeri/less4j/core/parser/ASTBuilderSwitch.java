@@ -13,17 +13,17 @@ import org.antlr.runtime.CommonToken;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
-import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
@@ -135,7 +135,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Expression handleTerm(HiddenTokenAwareTree token) {
-    return termBuilder.buildFromTerm(token);
+    return termBuilder.buildFromChildTerm(token);
   }
 
   public Expression handleExpression(HiddenTokenAwareTree token) {
@@ -321,7 +321,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (children.isEmpty())
       throw new BugHappened(GRAMMAR_MISMATCH, token);
 
-    return new CharsetDeclaration(token, children.get(0).getText());
+    HiddenTokenAwareTree charset = children.get(1);
+    return new CharsetDeclaration(token, termBuilder.createCssString(charset, charset.getText()));
   }
 
   public RuleSet handleRuleSet(HiddenTokenAwareTree token) {
@@ -425,7 +426,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Expression handleMixinPattern(HiddenTokenAwareTree token) {
-    return termBuilder.buildFromTerm(token.getChild(0));
+    return termBuilder.buildFromChildTerm(token.getChild(0));
   }
 
   public Guard handleGuard(HiddenTokenAwareTree token) {
@@ -649,7 +650,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Expression first = null;
     Expression second = null;
     if (hasChildren(token.getChild(0))) {
-      first = termBuilder.buildFromTerm(token.getChild(0));
+      first = termBuilder.buildFromChildTerm(token.getChild(0));
       String sign = "";
       if (first.getType() == ASTCssNodeType.SIGNED_EXPRESSION) {
         SignedExpression negated = (SignedExpression) first;
@@ -673,7 +674,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     }
 
     if (token.getChild(1) != null && hasChildren(token.getChild(1))) {
-      second = termBuilder.buildFromTerm(token.getChild(1));
+      second = termBuilder.buildFromChildTerm(token.getChild(1));
     }
 
     return new Nth(token, (NumberExpression) first, (NumberExpression) second);
@@ -1043,7 +1044,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       } else {
         ASTCssNode urlMatchFunction = switchOn(token);
         if (urlMatchFunction.getType() == ASTCssNodeType.FUNCTION)
-          result.add((FunctionExpression) termBuilder.buildFromTerm(token));
+          result.add((FunctionExpression) termBuilder.buildFromChildTerm(token));
         else
           throw new BugHappened(GRAMMAR_MISMATCH, token);
       }
@@ -1085,8 +1086,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       HiddenTokenAwareTree token = iterator.next();
       if (token.getType() == LessLexer.COMMA) {
         token.pushHiddenToSiblings();
-      } else if (token.getType() == LessLexer.IDENT) {
-        result.add(new KeyframesName(token, token.getText()));
+      } else if (token.getType() == LessLexer.IDENT || token.getType() == LessLexer.AT_NAME || token.getType()==LessLexer.INDIRECT_VARIABLE) {
+        result.add(new KeyframesName(token.commentsLessClone(), termBuilder.buildFromTerm(token)));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);
       }

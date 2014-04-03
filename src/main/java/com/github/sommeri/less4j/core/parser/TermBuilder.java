@@ -36,11 +36,19 @@ public class TermBuilder {
   }
 
   public Expression buildFromTerm(HiddenTokenAwareTree token) {
-    return buildFromTerm(token, 0);
+    return buildFromTerm(token, token, 0);
   }
 
-  public Expression buildFromTerm(HiddenTokenAwareTree token, int offsetChildIndx) {
+  public Expression buildFromChildTerm(HiddenTokenAwareTree token) {
+    return buildFromChildTerm(token, 0);
+  }
+
+  private Expression buildFromChildTerm(HiddenTokenAwareTree token, int offsetChildIndx) {
     HiddenTokenAwareTree offsetChild = token.getChildren().get(offsetChildIndx);
+    return buildFromTerm(token, offsetChild, offsetChildIndx);
+  }
+
+  private Expression buildFromTerm(HiddenTokenAwareTree token, HiddenTokenAwareTree offsetChild, int offsetChildIndx) {
     switch (offsetChild.getType()) {
     case LessLexer.IDENT:
       return buildFromIdentifier(token, offsetChild);
@@ -53,7 +61,7 @@ public class TermBuilder {
 
     case LessLexer.PLUS:
     case LessLexer.MINUS:
-      return negate(buildFromTerm(token, offsetChildIndx + 1), offsetChild);
+      return negate(buildFromChildTerm(token, offsetChildIndx + 1), offsetChild);
 
     case LessLexer.NUMBER:
     case LessLexer.PERCENTAGE:
@@ -86,7 +94,7 @@ public class TermBuilder {
       return buildFromIndirectVariable(token, offsetChild);
 
     case LessLexer.TERM:
-      return buildFromTerm(offsetChild);
+      return buildFromChildTerm(offsetChild);
 
     case LessLexer.EXPRESSION_PARENTHESES:
       return buildFromParentheses(offsetChild);
@@ -117,12 +125,12 @@ public class TermBuilder {
   private Expression buildFromColorHash(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     String text = first.getText();
     ColorExpression parsedColor = ConversionUtils.parseColor(token, text);
-    if (parsedColor==null) {
+    if (parsedColor == null) {
       FaultyExpression faultyExpression = new FaultyExpression(token);
       problemsHandler.notAColor(faultyExpression, text);
       return faultyExpression;
     }
-    
+
     return parsedColor;
   }
 
@@ -212,7 +220,7 @@ public class TermBuilder {
   public CssString createCssString(HiddenTokenAwareTree token, String quotedText) {
     return new CssString(token, quotedText.substring(1, quotedText.length() - 1), quotedText.substring(0, 1));
   }
-  
+
   private Expression buildFromEscapedScript(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {
     String text = first.getText();
     text = text.substring(2, text.length() - 1);
@@ -224,7 +232,7 @@ public class TermBuilder {
     text = text.substring(1, text.length() - 1);
     return new FunctionExpression(token, "`", new EmbeddedScript(token, text));
   }
-  
+
   private Expression buildFromIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
     String text = first.getText();
     if (NamedColorExpression.isColorName(text))
@@ -240,7 +248,7 @@ public class TermBuilder {
   private FunctionExpression buildFromSpecialFunction(HiddenTokenAwareTree token, String function, HiddenTokenAwareTree first) {
     return new FunctionExpression(token, function, extractUrlParameter(token, function, normalizeNewLineSymbols(first.getText())));
   }
-  
+
   // some places (e.g. only url) allow new lines in them. Less.js tend to
   // translate them into
   private String normalizeNewLineSymbols(String text) {
@@ -251,26 +259,26 @@ public class TermBuilder {
     if (text == null)
       return null;
 
-    if (text.length() <= function.length()+2)
+    if (text.length() <= function.length() + 2)
       return new CssString(token, "", "");
 
-    String string = text.substring(function.length()+1, text.length() - 1);
+    String string = text.substring(function.length() + 1, text.length() - 1);
     if (!URIUtils.isQuotedUrl(string))
       return new CssString(token, string, "");
-    
+
     String quote = String.valueOf(string.charAt(0));
-    return new CssString(token, string.substring(1, string.length()-1), quote);
+    return new CssString(token, string.substring(1, string.length() - 1), quote);
   }
 
   private FunctionExpression buildFromNormalFunction(HiddenTokenAwareTree token, HiddenTokenAwareTree actual) {
     List<HiddenTokenAwareTree> children = actual.getChildren();
     String name = buildFunctionName(children.get(0));
-    
+
     if (children.size() == 1) {
       /* No arguments to the function */
       return new FunctionExpression(token, name, new EmptyExpression(token));
     }
-    
+
     HiddenTokenAwareTree parameterNode = children.get(1);
 
     Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
@@ -282,7 +290,7 @@ public class TermBuilder {
     for (HiddenTokenAwareTree kid : token.getChildren()) {
       result += kid.getText();
     }
-    
+
     return result;
   }
 

@@ -11,7 +11,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 import com.github.sommeri.less4j.LessSource;
 
-public class HiddenTokenAwareTree extends CommonTree {
+public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
 
   private final LessSource source;
   private List<CommonToken> preceding = new LinkedList<CommonToken>();
@@ -266,6 +266,19 @@ public class HiddenTokenAwareTree extends CommonTree {
 
   public boolean isReal() {
     return tokenAsCommon!=null && tokenAsCommon.getTokenIndex()!=-1;
+  }
+
+  public HiddenTokenAwareTree commentsLessClone() {
+    try {
+      HiddenTokenAwareTree clone = (HiddenTokenAwareTree) super.clone();
+      clone.preceding = new LinkedList<CommonToken>();
+      clone.orphans = new LinkedList<CommonToken>();
+      clone.following = new LinkedList<CommonToken>();
+      
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new IllegalStateException();
+    }
   }
 
 }

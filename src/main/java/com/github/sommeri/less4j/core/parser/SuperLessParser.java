@@ -25,7 +25,6 @@ public abstract class SuperLessParser extends Parser {
   //TODO: write about this to error handling post, it would be cool if I could do this declaratively in grammar 
   public static final Map<String, String> ALTERNATIVE_NAMES_FOR_ERROR_REPORTING = new HashMap<String, String>();
   static {
-    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("CHARSET_SYM", "@charset");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("STRING", "string");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("SEMI", ";");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IMPORT_SYM", "@import");

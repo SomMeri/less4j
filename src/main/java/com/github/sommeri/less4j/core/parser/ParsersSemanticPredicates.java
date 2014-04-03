@@ -14,6 +14,7 @@ public class ParsersSemanticPredicates {
   private static final String DOCUMENT = "document";
   private static final String VIEWPORT = "viewport";
   private static final String SUPPORTS = "supports";
+  private static final String CHARSET = "charset";
   
   private static final Set<String> PAGE_MARGIN_BOXES = new HashSet<String>(Arrays.asList(new String[] { "@top-left-corner", "@top-left", "@top-center", "@top-right", "@top-right-corner", "@bottom-left-corner", "@bottom-left", "@bottom-center", "@bottom-right", "@bottom-right-corner", "@left-top", "@left-middle", "@left-bottom", "@right-top", "@right-middle", "@right-bottom" }));
 
@@ -210,6 +211,9 @@ public class ParsersSemanticPredicates {
     return !directlyFollows(first, second);
   }
 
+  public boolean isCharset(Token token) {
+    return isVendorPrefixedAtName(token, CHARSET);
+  }
   public boolean isKeyframes(Token token) {
     return isVendorPrefixedAtName(token, KEYFRAMES);
   }
@@ -250,4 +254,5 @@ public class ParsersSemanticPredicates {
   public boolean truthy() {
     return true;
   }
+
 }

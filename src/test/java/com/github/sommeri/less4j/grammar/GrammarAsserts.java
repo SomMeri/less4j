@@ -136,7 +136,7 @@ class CountNodesAction implements TreeVisitorAction {
   }
 
   private boolean isDummy(Token token) {
-    return token.getType()<LessLexer.CHARSET_SYM;
+    return token.getType()<LessLexer.AT_NAME;
   }
 
   private boolean isOnChannel(CommonToken token) {

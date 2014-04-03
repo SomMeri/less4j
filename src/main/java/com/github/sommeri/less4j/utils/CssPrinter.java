@@ -9,12 +9,12 @@ import com.github.sommeri.less4j.core.NotACssException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AnonymousExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.Comment;
-import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
@@ -159,7 +159,7 @@ public class CssPrinter {
       return appendIdSelector((IdSelector) node); 
 
     case CHARSET_DECLARATION:
-      return appendCharsetDeclaration((CharsetDeclaration) node); // TODOsm: source map
+      return appendCharsetDeclaration((CharsetDeclaration) node); 
 
     case FONT_FACE:
       return appendFontFace((FontFace) node); // TODOsm: source map
@@ -363,7 +363,7 @@ public class CssPrinter {
   }
 
   private boolean appendKeyframesName(KeyframesName node) {
-    cssOnly.append(node.getName());
+    append(node.getName());
     return true;
   }
 
@@ -512,8 +512,8 @@ public class CssPrinter {
   }
 
   public boolean appendCharsetDeclaration(CharsetDeclaration node) {
-    cssOnly.append("@charset").ensureSeparator();
-    cssOnly.append(node.getCharset());
+    cssAndSM.append("@charset", node.getUnderlyingStructure()).ensureSeparator();
+    append(node.getCharset());
     cssOnly.append(";");
 
     return true;
