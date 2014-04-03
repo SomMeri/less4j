@@ -91,7 +91,7 @@ public class ExpressionEvaluator {
     if (allArguments.isEmpty())
       return new IdentifierExpression(parent.getUnderlyingStructure(), "");
     
-    return new ListExpression(parent.getUnderlyingStructure(), allArguments, new ListExpressionOperator(parent.getUnderlyingStructure()));
+    return new ListExpression(parent.getUnderlyingStructure(), allArguments, new ListExpressionOperator(parent.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR));
   }
 
   public List<Expression> evaluateAll(List<Expression> expressions) {

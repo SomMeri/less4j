@@ -10,10 +10,6 @@ public class ListExpressionOperator extends ASTCssNode {
 
   private Operator operator;
   
-  public ListExpressionOperator(HiddenTokenAwareTree underlyingStructure) {
-    this(underlyingStructure, Operator.EMPTY_OPERATOR);
-  }
-
   public ListExpressionOperator(HiddenTokenAwareTree underlyingStructure, Operator operator) {
     super(underlyingStructure);
     this.operator = operator;

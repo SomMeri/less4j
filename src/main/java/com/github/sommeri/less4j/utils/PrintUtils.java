@@ -32,6 +32,10 @@ public class PrintUtils {
     return FORMATTER.format(value);
   }
 
+  public static String formatNumber(Number value) {
+    return FORMATTER.format(value);
+  }
+
   public static String toName(int tokenType) {
     if (tokenType == -1)
       return "EOF";
