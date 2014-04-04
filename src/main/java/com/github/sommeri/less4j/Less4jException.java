@@ -44,7 +44,7 @@ public class Less4jException extends Exception {
     ProblemsPrinter problemsPrinter = new ProblemsPrinter();
     
     StringBuilder builder = new StringBuilder("Could not compile less. ");
-    builder.append(errors.size()).append(" error(s) occured:\n");
+    builder.append(errors.size()).append(" error(s) occurred:\n");
     
     List<Problem> visibleErrors = ArraysUtils.safeSublist(errors, 0, SHOW_ERRORS);
     String visibleErrorsStr = problemsPrinter.printErrors(visibleErrors);
