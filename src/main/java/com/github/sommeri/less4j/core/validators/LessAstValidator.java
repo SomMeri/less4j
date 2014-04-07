@@ -12,7 +12,6 @@ import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
-import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
@@ -40,7 +39,6 @@ public class LessAstValidator {
     }
     case MIXIN_REFERENCE: {
       checkInterpolatedNamespaceName((MixinReference) node);
-      checkExtendedNamespaceName((MixinReference) node);
       checkInterpolatedMixinName((MixinReference) node);
       break;
     }
@@ -119,16 +117,6 @@ public class LessAstValidator {
     if (reference.hasInterpolatedNameChain()) {
       problemsHandler.interpolatedNamespaceReferenceSelector(reference);
       manipulator.removeFromClosestBody(reference);
-    }
-  }
-
-  private void checkExtendedNamespaceName(MixinReference reference) {
-    for (ReusableStructureName name : reference.getNameChain()) {
-      if (name.hasMultipleParts()) {
-        problemsHandler.extendedNamespaceReferenceSelector(reference);
-        manipulator.removeFromClosestBody(reference);
-        return;
-      }
     }
   }
 

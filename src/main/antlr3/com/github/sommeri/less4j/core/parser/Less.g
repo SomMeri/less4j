@@ -631,9 +631,14 @@ pseudoparameters:
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
 
+//original
+//referenceSeparator:
+//       GREATER
+//       | {!predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> -> EMPTY_COMBINATOR;
+
 referenceSeparator:
        GREATER
-       | {!predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> -> EMPTY_COMBINATOR;
+       | -> EMPTY_COMBINATOR;
  
 namespaceReference
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
@@ -675,8 +680,11 @@ mixinReferenceArguments
     | expr (COMMA! variabledeclarationNoSemi (COMMA! variabledeclarationNoSemi)*)?
     ;
 
+//reusableStructureName
+//    : a+=cssClassOrId ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> a+=cssClassOrId)* -> ^(REUSABLE_STRUCTURE_NAME $a*);
+
 reusableStructureName
-    : a+=cssClassOrId ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> a+=cssClassOrId)* -> ^(REUSABLE_STRUCTURE_NAME $a*);
+    : a+=cssClassOrId -> ^(REUSABLE_STRUCTURE_NAME $a*);
     
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 

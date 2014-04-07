@@ -1,6 +1,9 @@
 .beginning .middle .end {
-  property: value;
+  property1: value1;
 }
 .beginning > .middle > .end {
-  property: value;
+  property2: value2;
+}
+#error-1 {
+  property2: value2;
 }

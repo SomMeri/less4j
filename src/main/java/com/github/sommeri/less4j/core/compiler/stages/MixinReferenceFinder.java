@@ -73,11 +73,10 @@ public class MixinReferenceFinder {
     /*
      * Detecting following kind of cycle:
      * 
-     * .simpleCase {
-     *   .simpleCase();
-     * }
+     * .simpleCase { .simpleCase(); }
      * 
-     * Note: the detection feels too hackish, but works and hotfix is needed (bootstrap).    
+     * Note: the detection feels too hackish, but works and hotfix is needed
+     * (bootstrap).
      */
     return mixin.getMixin().isAlsoRuleset() && semiCompiledNodes.contains(mixin.getMixin());
   }
@@ -88,17 +87,34 @@ public class MixinReferenceFinder {
     if (nameChain.isEmpty()) {
       foundNamespace = true;
     } else {
-      String firstName = nameChain.get(0);
-      List<String> theRest = nameChain.subList(1, nameChain.size());
+      for (int prefix = 1; prefix <= nameChain.size(); prefix++) {
+        String name = toName(nameChain.subList(0, prefix));
+        List<String> theRest = prefix==nameChain.size()? new ArrayList<String>(): nameChain.subList(prefix, nameChain.size());
 
-      for (FullMixinDefinition fullMixin : scope.getMixinsByName(firstName)) {
-        List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
-        result.addAll(foundInNamespaces);
+        for (FullMixinDefinition fullMixin : scope.getMixinsByName(name)) {
+          List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
+          result.addAll(foundInNamespaces);
+        }
       }
+//      String firstName = nameChain.get(0);
+//      List<String> theRest = nameChain.subList(1, nameChain.size());
+//
+//      for (FullMixinDefinition fullMixin : scope.getMixinsByName(firstName)) {
+//        List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
+//        result.addAll(foundInNamespaces);
+//      }
     }
 
     result.addAll(getNearestLocalMixins(scope, nameChain, reference.getFinalName()));
     return result;
+  }
+
+  private String toName(List<String> list) {
+    StringBuilder builder = new StringBuilder();
+    for (String string : list) {
+      builder.append(string);
+    }
+    return builder.toString();
   }
 
   private List<FullMixinDefinition> buildAndFind(FullMixinDefinition fullMixin, final List<String> nameChain, final MixinReference reference) {
@@ -113,11 +129,11 @@ public class MixinReferenceFinder {
 
       @Override
       public void run() {
-        // Referenced namespace attempts to import its own mixins. Do not 
-        // try to compile it. 
+        // Referenced namespace attempts to import its own mixins. Do not
+        // try to compile it.
         if (!semiCompiledNodes.contains(bodyClone)) {
           parentSolver.unsafeDoSolveReferences(bodyClone, scope);
-        } 
+        }
 
         List<FullMixinDefinition> found = findInMatchingNamespace(scope, nameChain, reference);
         result.addAll(found);

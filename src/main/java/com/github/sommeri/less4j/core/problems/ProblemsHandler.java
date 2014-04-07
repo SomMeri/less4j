@@ -99,10 +99,6 @@ public class ProblemsHandler implements LessProblems {
     collector.addError(new CompilationError(reference.getFinalName(), "Interpolation is not allowed inside mixin references."));
   }
 
-  public void extendedNamespaceReferenceSelector(MixinReference reference) {
-    collector.addError(new CompilationError(reference, "Structures with extended names can not be used as namespaces."));
-  }
-
   public void interpolatedNamespaceReferenceSelector(MixinReference reference) {
     collector.addError(new CompilationError(reference, "Interpolation is not allowed inside namespace references."));
   }

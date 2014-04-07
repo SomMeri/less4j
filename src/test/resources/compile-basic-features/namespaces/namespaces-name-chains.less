@@ -20,12 +20,20 @@
   property4: value4;
 }
 
+.class.child {
+  property5: value5;
+}
+
 #use-place-less {
   .class > .child();
 }
 
 #use-place-space {
   .class .child();
+}
+
+#use-place-nothing {
+  .class.child();
 }
 
 .namespace {
@@ -35,6 +43,15 @@
   .class + .child {
     in-namespace-2: value2;
   }
+  .class.child {
+  	in-namespace-3: value3;
+  }
+}
+
+.namespace.class {
+  .child {
+  	in-namespace-4: value4;
+  }
 }
 
 #use-place-namespace-less {
@@ -43,4 +60,8 @@
 
 #use-place-namespace-space {
   .namespace .class .child();
+}
+
+#use-place-namespace-nothing {
+  .namespace.class.child();
 }

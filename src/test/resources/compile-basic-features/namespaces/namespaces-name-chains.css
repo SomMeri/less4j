@@ -13,12 +13,16 @@
 .class ~ .child {
   property4: value4;
 }
+.class.child {
+  property5: value5;
+}
 #use-place-less {
   property0: value0;
   property1: value1;
   property2: value2;
   property3: value3;
   property4: value4;
+  property5: value5;
 }
 #use-place-space {
   property0: value0;
@@ -26,6 +30,15 @@
   property2: value2;
   property3: value3;
   property4: value4;
+  property5: value5;
+}
+#use-place-nothing {
+  property0: value0;
+  property1: value1;
+  property2: value2;
+  property3: value3;
+  property4: value4;
+  property5: value5;
 }
 .namespace .class > .child {
   in-namespace-1: value1;
@@ -33,11 +46,27 @@
 .namespace .class + .child {
   in-namespace-2: value2;
 }
+.namespace .class.child {
+  in-namespace-3: value3;
+}
+.namespace.class .child {
+  in-namespace-4: value4;
+}
 #use-place-namespace-less {
   in-namespace-1: value1;
   in-namespace-2: value2;
+  in-namespace-3: value3;
+  in-namespace-4: value4;
 }
 #use-place-namespace-space {
   in-namespace-1: value1;
   in-namespace-2: value2;
+  in-namespace-3: value3;
+  in-namespace-4: value4;
+}
+#use-place-namespace-nothing {
+  in-namespace-1: value1;
+  in-namespace-2: value2;
+  in-namespace-3: value3;
+  in-namespace-4: value4;
 }
