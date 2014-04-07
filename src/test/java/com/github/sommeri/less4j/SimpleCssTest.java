@@ -31,7 +31,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   //private static final String inputLess = "src/test/resources/minitests/bootstrap-debug.less";
   //private static final String inputLess = "src/test/resources/minitests/bootstrap-debug-2.less";
 //  private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.2//bootstrap-3.0.2-zaloha//less//bootstrap.less";
-  private static final String printTo = "c://data//meri//less4java//workspace-juno-sr2//less4j-release-tests-working-dir//testTwitterBootstrap_3_0_0//less4j-compiled.css";
+//  private static final String printTo = "c://data//meri//less4java//workspace-juno-sr2//less4j-release-tests-working-dir//testTwitterBootstrap_3_0_0//less4j-compiled.css";
+  private static final String printTo = null;
   
 //  private static final String inputLess = "c://data//meri//less4java//slow-recursion//recursion//style.less"; 
 //  private static final String printTo = null;
