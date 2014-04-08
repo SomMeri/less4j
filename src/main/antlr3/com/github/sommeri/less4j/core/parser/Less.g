@@ -631,11 +631,6 @@ pseudoparameters:
                       | (b+=PLUS | b+=MINUS)? b+=NUMBER)
       -> ^(NTH ^(TERM $a*) ^(TERM $b*));
 
-//original
-//referenceSeparator:
-//       GREATER
-//       | {!predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> -> EMPTY_COMBINATOR;
-
 referenceSeparator:
        GREATER
        | -> EMPTY_COMBINATOR;
@@ -679,9 +674,6 @@ mixinReferenceArguments
     | variabledeclarationNoSemi (COMMA! variabledeclarationNoSemi)*
     | expr (COMMA! variabledeclarationNoSemi (COMMA! variabledeclarationNoSemi)*)?
     ;
-
-//reusableStructureName
-//    : a+=cssClassOrId ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=> a+=cssClassOrId)* -> ^(REUSABLE_STRUCTURE_NAME $a*);
 
 reusableStructureName
     : a+=cssClassOrId -> ^(REUSABLE_STRUCTURE_NAME $a*);
@@ -779,9 +771,13 @@ mathOperatorLowPrior
     | MINUS
     ;
 
+detachedRuleset
+    : general_body
+    ;
+    
 expr 
 @init {enterRule(retval, RULE_EXPRESSION);}
-    : a=mathExprHighPrior (b+=operator c+=mathExprHighPrior)* -> ^(EXPRESSION $a ($b $c)*)
+    : (dr+=detachedRuleset | a+=mathExprHighPrior (b+=operator c+=mathExprHighPrior)*) -> ^(EXPRESSION $dr* $a* ($b $c)*)
     ;
 finally { leaveRule(); }
 

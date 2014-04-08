@@ -1,15 +1,6 @@
-@usedScope: global;
-.mixin() {
-  @usedScope: mixin; 
-  .global when (@usedScope=global) {
-    guard-used-scope: global;
-    declaration-used-scope: @usedScope;
-  }
-  .mixin when (@usedScope=mixin) {
-    guard-used-scope: mixin;
-    declaration-used-scope: @usedScope;
-  }
-  @usedScope: mixin; 
-}
+@property: color;
 
-.mixin();
+.widget {
+  @{property}: #0ee;
+  background-@{property}: #999;
+}
