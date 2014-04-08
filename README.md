@@ -87,6 +87,14 @@ private static String format(Problem warning) {
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
 
+### Plugins and Customizations
+Less4j can be customized in three different ways:
+* custom `LessSouce` implementation can be used to read sheets from unsupported places (database, other directories),
+* [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) are new functions written in java and available inside less files,
+* [embedded scripts](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language#embedded-and-escaped-scripts) is code written directly inside less files and compiled by any JVM compatible compiler.     
+
+**Featured plugin**: [less4-javascript](https://github.com/SomMeri/less4j-javascript) plugin which adds embedded/escaped JavaScript support to less4j. 
+
 ## License
 Less4j is distributed under following licences, pick whichever you like:
 * [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt),
