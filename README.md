@@ -89,9 +89,9 @@ private static String format(Problem warning) {
 
 ### Plugins and Customizations
 Less4j can be customized in three different ways:
-* custom `LessSouce` implementation can be used to 
+* custom [less source](https://github.com/SomMeri/less4j/issues/181#issuecomment-31613570) implementation can be used to 
  * read sheets from unsupported places (database, other directories),
- * set import file sources by code,
+ * set import file sources or search path by code,
  * generate less files on the fly,
  * ... .
 * [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) are new functions written in java and available inside less files,
