@@ -121,6 +121,7 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INTERPOLABLE_NAME", "interpolable name");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EMBEDDED_SCRIPT", "embedded script `...`");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("ESCAPED_SCRIPT", "escaped script ~`...`");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DETACHED_RULESET_REFERENCE", "detached ruleset");
     
   }
 
@@ -146,6 +147,10 @@ public abstract class SuperLessParser extends Parser {
   protected static final String RULE_SUPPORTS = "supports";
   protected static final String RULE_DOCUMENT = "document";
   protected static final String RULE_PAGE_MARGIN_BOX = "page margin box";
+  protected static final String RULE_DETACHED_RULESET_REFERENCE = "detached ruleset reference";
+  protected static final String RULE_DETACHED_RULESET = "detached ruleset";
+  
+  
   
 
   protected List<Problem> errors = new ArrayList<Problem>();

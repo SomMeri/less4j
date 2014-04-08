@@ -1,6 +1,10 @@
 @property: color;
 
-.widget {
-  @{property}: #0ee;
-  background-@{property}: #999;
+.widget(@detached) {
+	@detached();
+}
+
+ruleset {
+	@detached: { property: value; }
+	.widget(@detached);
 }

@@ -70,6 +70,7 @@ tokens {
   BODY;
   MIXIN_REFERENCE;
   NAMESPACE_REFERENCE;
+  DETACHED_RULESET_REFERENCE;
   REUSABLE_STRUCTURE;
   MIXIN_PATTERN;
   GUARD_CONDITION;
@@ -481,9 +482,10 @@ general_body
                | (mixinReferenceWithSemi)=>a+=mixinReferenceWithSemi
                | (namespaceReferenceWithSemi)=>a+=namespaceReferenceWithSemi
                | (reusableStructure)=>a+=reusableStructure
+               | (detachedRulesetReference)=>a+=detachedRulesetReference
+               | (variabledeclaration)=>a+=variabledeclaration
                | a+=extendInDeclarationWithSemi
                | a+=pageMarginBox 
-               | a+=variabledeclaration
                | a+=media_in_general_body
                | a+=viewport
                | a+=keyframes
@@ -498,6 +500,7 @@ general_body
                 | (declaration RBRACE)=>a+=declaration rbrace+=RBRACE               
                 | (mixinReference RBRACE)=>a+=mixinReference rbrace+=RBRACE
                 | (namespaceReference RBRACE)=>a+=namespaceReference rbrace+=RBRACE
+            //    | (detachedRulesetCallNoSemi RBRACE)=>a+=detachedRulesetCallNoSemi rbrace+=RBRACE
              )
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
      -> ^(BODY LBRACE $a* $rbrace*); 
@@ -772,9 +775,18 @@ mathOperatorLowPrior
     ;
 
 detachedRuleset
+@init {enterRule(retval, RULE_DETACHED_RULESET);}
     : general_body
     ;
-    
+finally { leaveRule(); }
+
+detachedRulesetReference
+@init {enterRule(retval, RULE_DETACHED_RULESET_REFERENCE);}
+    : a=AT_NAME (LPAREN RPAREN)? SEMI
+    -> ^(DETACHED_RULESET_REFERENCE $a)
+    ;
+finally { leaveRule(); }
+
 expr 
 @init {enterRule(retval, RULE_EXPRESSION);}
     : (dr+=detachedRuleset | a+=mathExprHighPrior (b+=operator c+=mathExprHighPrior)*) -> ^(EXPRESSION $dr* $a* ($b $c)*)
