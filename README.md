@@ -95,7 +95,7 @@ Less4j can be customized in three different ways:
  * generate less files on the fly,
  * ... .
 * [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) are new functions written in java and available inside less files,
-* [embedded scripts](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language#embedded-and-escaped-scripts) is code written directly inside less files and compiled by any JVM compatible compiler.     
+* [embedded script](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language#embedded-and-escaped-scripts) is code written directly inside less files and compiled by any JVM compatible compiler.     
 
 **Featured plugin**: [less4-javascript](https://github.com/SomMeri/less4j-javascript) plugin which adds embedded/escaped JavaScript support to less4j. 
 
