@@ -1,0 +1,155 @@
+@one-rule: { background: red; };
+@ruleset: { .selector { background: green; } };
+@ruleset-second: { .selector { size: 2; } };
+@media: { @media (min-width: 1200) { .selector { padding: 0; }} };
+
+@empty: {};
+ 
+//call on top
+@ruleset();
+@empty();
+@media();
+
+//call from ruleset
+.call-with-parentheses {
+	@empty();
+    @one-rule(); 
+    @ruleset();
+    @media();
+}
+
+//call from media
+@media screen {
+    @empty();
+    @one-rule(); 
+    @ruleset();
+    @media();
+}
+
+//mixin arguments
+.mixin-with-arguments-enclosure {
+	.mixin(@parameter) {
+  		@parameter();
+	}
+
+	.custom-mixin-argument {
+		.mixin({custom: custom;});
+	}
+}
+
+//scope - see caller
+.see-caller {
+	@detached-ruleset: {
+	  caller-variable: @variable;
+  	 .mixin();
+	};
+
+	use-place {
+  		@detached-ruleset();
+
+  		//define variable and mixin
+  		@variable: value;
+  		.mixin() {
+    			position: caller;
+  		}
+	}
+}
+
+//scope - local win
+.see-caller {
+	@detached-ruleset: {
+	  caller-variable: @variable;
+  	 .mixin();
+	};
+
+	@variable: declaration;
+	.mixin() {
+		variable: declaration;
+	}
+
+	use-place {
+  		@detached-ruleset();
+
+  		//define variable and mixin
+  		@variable: value;
+  		.mixin() {
+    			position: caller;
+  		}
+	}
+}
+//scope - called mixin sees things from detached
+.see-caller-caller {
+	@detached-ruleset: {
+	  @variable: in detached;
+  	 .mixin();
+     .in-detached() {
+            sees: me;
+     }
+	};
+
+	use-place {
+  		@detached-ruleset();
+
+  		//define variable and mixin
+  		.mixin() {
+    			position: @variable;
+            	.in-detached();
+  		}
+	}
+}
+
+//detached with mixin
+@with-mixin-default: {
+  .mixin(@parameter: default) {
+    property: @parameter;
+  }
+  .default {
+  	.mixin();
+  }
+  .custom {
+  	.mixin(custom);
+  }
+};
+@with-mixin-default();
+
+@global-default: global default;
+@with-mixin-global-default: {
+  .mixin(@parameter: @global-default) {
+    property: @parameter;
+  }
+  .default {
+  	.mixin();
+  }
+  .custom {
+  	.mixin(custom);
+  }
+};
+@with-mixin-global-default();
+
+@with-mixin-caller-default: {
+	.mixin(@parameter: @caller-default) {
+	  property: @parameter;
+	}
+	.default {
+		.mixin();
+	}
+	.custom {
+		.mixin(custom);
+	}
+};
+.caller {
+	@caller-default: caller;
+	@with-mixin-caller-default();
+}
+//unlock mixin see things defined in his scope first
+@with-mixin-unlocking: {
+	.mixin() {
+	  value: @value;
+	}
+	@value: in detached;
+};
+.caller {
+	@value: caller;
+	@with-mixin-unlocking();
+	.mixin();
+}

@@ -1,0 +1,8 @@
+@detached-ruleset1: { property: 1; };
+@detached-ruleset2: { property: 2; };
+@list: @detached-ruleset1 @detached-ruleset2;
+
+selector {
+  @set: extract(@list, 2);
+  @set();
+}
