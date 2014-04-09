@@ -1,0 +1,36 @@
+@a: {
+  b: 1;
+};
+//less.js detached-ruleset-1.less
+.call-without-parentheses {
+	@a; 
+}
+
+//less.js detached-ruleset-2.less
+.detached-as-property-value {
+	a: @a(); 
+}
+
+//less.js detached-ruleset-3.less
+.brings-property-on-top {}
+@a(); 
+
+//less.js detached-ruleset-4.less
+.warning-for-default(@a: {
+  b: 1;
+}) {
+  @a(); //warning shall be enough for this one
+}
+
+//less.js detached-ruleset-5.less
+.mixin-variable-does-not-exists(@b) {
+  @a();
+}
+.mixin-variable-does-not-exists({color: red;});
+
+//less.js detached-ruleset-6.less
+.variable-declaration-symbol-missing {
+  b: {
+    color: red;
+  };
+}
