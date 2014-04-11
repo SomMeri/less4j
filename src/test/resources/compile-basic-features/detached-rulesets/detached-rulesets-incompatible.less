@@ -1,0 +1,11 @@
+.mixin(@parameter: {default: default;}) {
+  @parameter();
+}
+
+.default-mixin-argument {
+	.mixin();
+}
+
+.custom-mixin-argument {
+	.mixin({custom: custom;});
+}

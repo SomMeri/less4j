@@ -1,0 +1,12 @@
+.css3merge(@prop; @rest...){
+    -webkit-@{prop}+: @rest;
+       -moz-@{prop}+: @rest;
+        -ms-@{prop}+: @rest;
+            @{prop}+: @rest;
+}
+
+.test {
+    .css3merge(p, 1);
+    .css3merge(p, 2);
+    .css3merge(p, 3);
+}
