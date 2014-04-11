@@ -120,7 +120,13 @@ public abstract class TokenTypeSwitch<T> {
 
     if (type == LessLexer.MIXIN_REFERENCE)
       return handleMixinReference(token);
+    
+    if (type == LessLexer.DETACHED_RULESET_REFERENCE) 
+      return handleDetachedRulesetReference(token);
 
+    if (type == LessLexer.DETACHED_RULESET) 
+      return handleDetachedRuleset(token);
+    
     if (type == LessLexer.NAMESPACE_REFERENCE)
       return handleNamespaceReference(token);
 
@@ -226,6 +232,10 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleReusableStructureDeclaration(HiddenTokenAwareTree token);
 
   public abstract T handleMixinReference(HiddenTokenAwareTree token);
+  
+  public abstract T handleDetachedRulesetReference(HiddenTokenAwareTree token);
+
+  public abstract T handleDetachedRuleset(HiddenTokenAwareTree token);
 
   public abstract T handleNamespaceReference(HiddenTokenAwareTree token);
 

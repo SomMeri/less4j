@@ -52,8 +52,7 @@ public class ListExpression extends Expression {
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
-    ArrayList<ASTCssNode> result = new ArrayList<ASTCssNode>();
-    result.add(operator);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)operator);
     result.addAll(expressions);
     return result;
   }

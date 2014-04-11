@@ -1,10 +1,8 @@
-@property: color;
-
 .widget(@detached) {
 	@detached();
 }
 
 ruleset {
-	@detached: { property: value; }
+	@detached: { property: value; };
 	.widget(@detached);
 }

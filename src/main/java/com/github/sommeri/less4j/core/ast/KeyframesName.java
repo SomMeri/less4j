@@ -1,10 +1,10 @@
 package com.github.sommeri.less4j.core.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class KeyframesName extends ASTCssNode {
 
@@ -26,8 +26,7 @@ public class KeyframesName extends ASTCssNode {
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
-    ArrayList<ASTCssNode> result = new ArrayList<ASTCssNode>();
-    result.add(name);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)name);
     return result;
   }
 

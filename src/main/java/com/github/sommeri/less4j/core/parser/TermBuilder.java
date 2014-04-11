@@ -298,10 +298,10 @@ public class TermBuilder {
     return buildFromVariable(null, variableToken);
   }
 
-  private Variable buildFromVariable(HiddenTokenAwareTree expressionToken, HiddenTokenAwareTree variableToken) {
-    if (expressionToken != null) {
-      expressionToken.addFollowing(variableToken.getFollowing());
-      return new Variable(expressionToken, variableToken.getText());
+  private Variable buildFromVariable(HiddenTokenAwareTree realOwner, HiddenTokenAwareTree variableToken) {
+    if (realOwner != null) {
+      realOwner.addFollowing(variableToken.getFollowing());
+      return new Variable(realOwner, variableToken.getText());
     }
     return new Variable(variableToken, variableToken.getText());
   }

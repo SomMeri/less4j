@@ -214,6 +214,7 @@ public class ExpressionEvaluator {
       return evaluate((EmbeddedScript) input);
 
     //the value is already there, nothing to evaluate
+    case DETACHED_RULESET:
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:

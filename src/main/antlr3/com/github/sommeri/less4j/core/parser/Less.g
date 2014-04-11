@@ -71,6 +71,7 @@ tokens {
   MIXIN_REFERENCE;
   NAMESPACE_REFERENCE;
   DETACHED_RULESET_REFERENCE;
+  DETACHED_RULESET;
   REUSABLE_STRUCTURE;
   MIXIN_PATTERN;
   GUARD_CONDITION;
@@ -777,6 +778,7 @@ mathOperatorLowPrior
 detachedRuleset
 @init {enterRule(retval, RULE_DETACHED_RULESET);}
     : general_body
+    -> ^(DETACHED_RULESET general_body)
     ;
 finally { leaveRule(); }
 
@@ -789,7 +791,7 @@ finally { leaveRule(); }
 
 expr 
 @init {enterRule(retval, RULE_EXPRESSION);}
-    : (dr+=detachedRuleset | a+=mathExprHighPrior (b+=operator c+=mathExprHighPrior)*) -> ^(EXPRESSION $dr* $a* ($b $c)*)
+    : (dr+=detachedRuleset | (a+=mathExprHighPrior (b+=operator c+=mathExprHighPrior)*)) -> ^(EXPRESSION $dr* $a* ($b $c)*)
     ;
 finally { leaveRule(); }
 

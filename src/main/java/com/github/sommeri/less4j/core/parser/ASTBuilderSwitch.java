@@ -20,6 +20,8 @@ import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
+import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
@@ -423,10 +425,18 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     reference.setUnderlyingStructure(token);
     reference.addNames(nameChain);
     return reference;
-  }
+  }  
 
   public Expression handleMixinPattern(HiddenTokenAwareTree token) {
-    return termBuilder.buildFromChildTerm(token.getChild(0));
+    return termBuilder.buildFromTerm(token.getChild(0));
+  }
+
+  public DetachedRulesetReference handleDetachedRulesetReference(HiddenTokenAwareTree token) {
+    return new DetachedRulesetReference(token, termBuilder.buildFromVariable(token.getChild(0)));
+  }
+
+  public DetachedRuleset handleDetachedRuleset(HiddenTokenAwareTree token) {
+    return new DetachedRuleset(token, handleGeneralBody(token.getChild(0)));
   }
 
   public Guard handleGuard(HiddenTokenAwareTree token) {
