@@ -69,3 +69,6 @@
 .caller {
   value: in detached;
 }
+.selector-indirect {
+  color: #aabbcc;
+}

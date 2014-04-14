@@ -84,11 +84,11 @@ public class ReferencesSolver {
       if (!childs.isEmpty()) {
         IScope scope = iteratedScope.getScope();
 
-        // solve all mixin references and store solutions
-        Map<MixinReference, GeneralBody> solvedMixinReferences = solveMixinReferences(childs, scope);
+        // solve all detached ruleset/mixin references and store solutions
+        Map<MixinReference, GeneralBody> solvedMixinReferences = solveCalls(childs, scope);
 
-        // solve whatever is not a mixin reference
-        solveNonMixinReferences(childs, iteratedScope);
+        // solve whatever is not a mixin/detached ruleset reference
+        solveNonCalligReferences(childs, iteratedScope);
 
         // replace mixin references by their solutions - we need to do it in the end
         // the scope and ast would get out of sync otherwise
@@ -99,7 +99,7 @@ public class ReferencesSolver {
     }
   }
 
-  private void solveNonMixinReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
+  private void solveNonCalligReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
     ExpressionEvaluator cssGuardsValidator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler, configuration);
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid))
@@ -136,6 +136,10 @@ public class ReferencesSolver {
     return kid.getType() == ASTCssNodeType.MIXIN_REFERENCE;
   }
 
+  private boolean isDetachedRulesetReference(ASTCssNode kid) {
+    return kid.getType() == ASTCssNodeType.DETACHED_RULESET_REFERENCE;
+  }
+
   private boolean isRuleset(ASTCssNode kid) {
     return kid.getType() == ASTCssNodeType.RULE_SET;
   }
@@ -150,7 +154,7 @@ public class ReferencesSolver {
     }
   }
 
-  private Map<MixinReference, GeneralBody> solveMixinReferences(List<ASTCssNode> childs, IScope mixinReferenceScope) {
+  private Map<MixinReference, GeneralBody> solveCalls(List<ASTCssNode> childs, IScope mixinReferenceScope) {
     Map<MixinReference, GeneralBody> solvedMixinReferences = new HashMap<MixinReference, GeneralBody>();
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {

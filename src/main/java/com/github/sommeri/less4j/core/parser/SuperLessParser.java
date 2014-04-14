@@ -121,7 +121,8 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("INTERPOLABLE_NAME", "interpolable name");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EMBEDDED_SCRIPT", "embedded script `...`");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("ESCAPED_SCRIPT", "escaped script ~`...`");
-    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DETACHED_RULESET_REFERENCE", "detached ruleset");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DETACHED_RULESET", "detached ruleset");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DETACHED_RULESET_REFERENCE", "detached ruleset call");
     
   }
 

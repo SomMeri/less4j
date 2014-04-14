@@ -141,6 +141,7 @@
 	@caller-default: caller;
 	@with-mixin-caller-default();
 }
+
 //unlock mixin see things defined in his scope first
 @with-mixin-unlocking: {
 	.mixin() {
@@ -152,4 +153,14 @@
 	@value: caller;
 	@with-mixin-unlocking();
 	.mixin();
+}
+
+//detached returned from mixin
+.return-detached() {
+  @color: #aabbcc;
+  @detached: {color: @color;}
+}
+.selector-indirect {
+  .return-detached();
+  @detached();
 }

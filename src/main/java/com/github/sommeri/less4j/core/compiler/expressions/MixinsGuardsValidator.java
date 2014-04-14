@@ -31,4 +31,28 @@ public class MixinsGuardsValidator {
 
   }
 
+  public GuardValue evaluateGuards(ReusableStructure mixin) {
+    boolean ifDefaultGuardValue = guardsSatisfied(mixin, true);
+    boolean ifNotDefaultGuardValue = guardsSatisfied(mixin, false);
+    return toDefaultFunctionUse(ifDefaultGuardValue, ifNotDefaultGuardValue);
+  }
+
+  /**
+   * Re-implementing less.js heuristic. If guards value does not depend on default value, then less.js
+   * assumes the default was not used. It does not check whether the default function was really used, so
+   * this: not(default()), (default()) can be used multiple times.
+   */
+  private GuardValue toDefaultFunctionUse(boolean ifDefaultGuardValue, boolean ifNotDefaultGuardValue) {
+    if (ifDefaultGuardValue && ifNotDefaultGuardValue) {//default was NOT used
+      return GuardValue.USE;
+    } else if (!ifDefaultGuardValue && !ifNotDefaultGuardValue) {//default was NOT used
+      return GuardValue.DO_NOT_USE;
+    } else if (ifDefaultGuardValue) {//default is required
+      return GuardValue.USE_IF_DEFAULT;
+    } else {//if (must not be default)
+      return GuardValue.USE_IF_NOT_DEFAULT;
+    }//
+  }
+
+ 
 }

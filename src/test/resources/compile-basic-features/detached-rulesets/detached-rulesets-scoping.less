@@ -1,0 +1,27 @@
+.whoReallyCalls(@detached) {
+  @detached();
+}
+
+.modifyScope(@detached) {
+  .whoReallyCalls(@detached);
+  @color: green;
+}
+
+.selector-direct {
+  .modifyScope(@detached);
+  @detached: { color: @color; };
+}
+
+.modifyScope-indirect(@detached) {
+  .mixin();
+  .whoReallyCalls(@detached);
+  .mixin() {
+    @color: red;
+  }
+}
+
+.selector-indirect {
+  .modifyScope-indirect(@detached);
+  @detached: { color: @color; };
+}
+
