@@ -39,7 +39,8 @@ class MixinsSolver {
     this.defaultGuardHelper = new DefaultGuardHelper(problemsHandler);
   }
 
-  private MixinCompilationResult resolveMixinReference(final IScope callerScope, final FullMixinDefinition referencedMixin, final IScope mixinWorkingScope, final ExpressionEvaluator expressionEvaluator) {
+  private MixinCompilationResult resolveMixinReference(final IScope callerScope, final FullMixinDefinition referencedMixin, final IScope mixinWorkingScope) {
+    final ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler, configuration);
     final ReusableStructure mixin = referencedMixin.getMixin();
 
     final IScope referencedMixinScope = mixinWorkingScope;
@@ -134,12 +135,10 @@ class MixinsSolver {
           MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
           GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
 
-          // if none of them is true, then we do not need mixin no matter what
           if (guardValue!=GuardValue.DO_NOT_USE) {
             //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
             //used and create snapshot operation is cheap now. It should be done later on.
-            ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler, configuration);
-            MixinCompilationResult compiled = resolveMixinReference(callerScope, fullMixin, mixinWorkingScope, expressionEvaluator);
+            MixinCompilationResult compiled = resolveMixinReference(callerScope, fullMixin, mixinWorkingScope);
             //mark the mixin according to its default() function use 
             compiled.setGuardValue(guardValue);
             //store the mixin as candidate
