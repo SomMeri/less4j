@@ -104,7 +104,7 @@ public class URIUtils {
 
     // First get all the common elements. Store them as a string,
     // and also count how many of them there are.
-    StringBuffer common = new StringBuffer();
+    StringBuilder common = new StringBuilder();
 
     int commonIndex = 0;
     while (commonIndex < target.length && commonIndex < base.length && target[commonIndex].equals(base[commonIndex])) {
@@ -141,7 +141,7 @@ public class URIUtils {
       baseIsFile = false;
     }
 
-    StringBuffer relative = new StringBuffer();
+    StringBuilder relative = new StringBuilder();
 
     if (base.length != commonIndex) {
       int numDirsUp = baseIsFile ? base.length - commonIndex - 1 : base.length - commonIndex;
