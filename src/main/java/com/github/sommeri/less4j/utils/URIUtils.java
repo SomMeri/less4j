@@ -18,13 +18,8 @@ public class URIUtils {
   public static final String URI_FILE_SEPARATOR = "/";
 
   public static URL toParentURL(URL url) {
-    String path = url.getPath();
-    int i = path.lastIndexOf(URI_FILE_SEPARATOR);
-    if (i != -1) {
-      path = path.substring(0, i + 1);
-    }
 
-    URL parentUrl = null;
+    URL parentUrl;
     try {
 
         // compute parent URL
