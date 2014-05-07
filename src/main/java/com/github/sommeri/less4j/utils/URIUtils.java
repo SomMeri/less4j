@@ -158,10 +158,10 @@ public class URIUtils {
     String result = RelativeFilenameUtils.normalizeNoEndSeparator(path);
 
     // Undo the changes to the separators made by normalization
-    if (separator.equals("/")) {
+    if ("/".equals(separator)) {
       result = FilenameUtils.separatorsToUnix(result);
 
-    } else if (separator.equals("\\")) {
+    } else if ("\\".equals(separator)) {
       result = FilenameUtils.separatorsToWindows(result);
     } else {
       throw new IllegalArgumentException("Unrecognised dir separator '" + separator + "'");
