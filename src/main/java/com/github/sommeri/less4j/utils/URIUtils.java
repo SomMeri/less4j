@@ -188,14 +188,16 @@ public class URIUtils {
     if (uri==null)
       return null;
     
-    URI newUri = null;
+    URI newUri;
 
     try {
 
-      if(uri.toString().lastIndexOf(".") > -1) {
-          newUri = new URI(uri.toString().substring(0, (uri.toString().lastIndexOf(".") + 1)) + dottedSuffix);
+        String uriAsString = uri.toString();
+        int lastIndexOfDot = uriAsString.lastIndexOf('.');
+        if(lastIndexOfDot > -1) {
+          newUri = new URI(uriAsString.substring(0, (lastIndexOfDot + 1)) + dottedSuffix);
       } else {
-          newUri = new URI(uri.toString() + dottedSuffix);
+          newUri = new URI(uriAsString + dottedSuffix);
       }
     } catch (URISyntaxException exception) {
         throw new IllegalStateException(exception);
