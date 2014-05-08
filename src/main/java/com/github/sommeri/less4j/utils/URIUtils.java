@@ -18,15 +18,18 @@ public class URIUtils {
   public static final String URI_FILE_SEPARATOR = "/";
 
   public static URL toParentURL(URL url) {
-
     URL parentUrl;
     try {
-
         // compute parent URL
         URL rootParentUrl = new URL(url, "");
 
         // add query string to parent URL
-        parentUrl = new URL(rootParentUrl.toString() + url.getQuery());
+        String query = url.getQuery();
+        if (query == null || query.isEmpty()) {
+            parentUrl = new URL(rootParentUrl.toString());
+        } else {
+            parentUrl = new URL(rootParentUrl.toString() + query);
+        }
     } catch (MalformedURLException ex) {
         throw new RuntimeException(ex);
     }
