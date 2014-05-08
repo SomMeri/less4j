@@ -1,10 +1,13 @@
 package com.github.sommeri.less4j.core.compiler;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -30,6 +33,7 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.ArraysUtils;
+import com.github.sommeri.less4j.utils.CssPrinter;
 import com.github.sommeri.less4j.utils.URIUtils;
 
 public class LessToCssCompiler {
@@ -85,7 +89,8 @@ public class LessToCssCompiler {
 
   private void handleSourceMapLink(StyleSheet less, Configuration options, LessSource source) {
     String cssResultLocation = getCssResultLocationName(options, source);
-    if (!options.shouldLinkSourceMap() || cssResultLocation == null)
+    LessCompiler.SourceMapConfiguration sourceMapConfiguration = options.getSourceMapConfiguration();
+    if (!sourceMapConfiguration.shouldLinkSourceMap() || cssResultLocation == null)
       return;
 
     List<Comment> comments = less.getTrailingComments();
@@ -94,13 +99,33 @@ public class LessToCssCompiler {
     if (!comments.isEmpty())
       ArraysUtils.last(comments).setHasNewLine(true);
 
-    //compose linking comment
-    String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
-    String commentTest = "/*# sourceMappingURL=" + url + " */";
-    Comment linkComment = new Comment(less.getUnderlyingStructure(), commentTest, true);
+    String commentText;
+    String encodingCharset = sourceMapConfiguration.getEncodingCharset();
+    if (sourceMapConfiguration.isInline()) {
+      CssPrinter builder = new CssPrinter(source, options.getCssResultLocation());
+      builder.append(less);
+      String sourceMap = builder.toSourceMap();
+      String encodedSourceMap = urlEncode(sourceMap, encodingCharset);
+      commentText = "/*# sourceMappingURL=data:application/json;" + encodedSourceMap + " */";
+    } else {
+      //compose linking comment
+      String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
+      String encodedUrl = urlEncode(url, encodingCharset);
+      commentText = "/*# sourceMappingURL=" + encodedUrl + " */";
+    }
+
+    Comment linkComment = new Comment(less.getUnderlyingStructure(), commentText, true);
 
     //add linking comment
     comments.add(linkComment);
+  }
+
+  private String urlEncode(String toEncode, String encodingCharset) {
+      try {
+          return URLEncoder.encode(toEncode, encodingCharset);
+      } catch (UnsupportedEncodingException uex) {
+          throw new RuntimeException(uex);
+      }
   }
 
   private String getCssResultLocationName(Configuration options, LessSource source) {
