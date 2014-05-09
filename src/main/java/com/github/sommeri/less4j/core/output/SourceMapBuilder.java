@@ -82,7 +82,10 @@ public class SourceMapBuilder {
   
   public String toSourceMap() {
     // map file is assumed to have the same location as generated css 
-    String name = cssDestination.getName()==null? "" : cssDestination.getName();
+    String name = "";
+    if (cssDestination != null && cssDestination.getName() != null) {
+      name = cssDestination.getName();
+    }
     try {
       StringBuilder sb = new StringBuilder();
       generator.appendTo(sb, name);
