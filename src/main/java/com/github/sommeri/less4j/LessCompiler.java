@@ -94,6 +94,8 @@ public interface LessCompiler {
     private boolean linkSourceMap = true;
     private boolean inline = false;
     private String encodingCharset = "UTF-8";
+    private String basePath;
+    private String customUrl;
 
     public boolean shouldLinkSourceMap() {
       return linkSourceMap;
@@ -120,6 +122,25 @@ public interface LessCompiler {
     public SourceMapConfiguration setEncodingCharset(String encodingCharset) {
       this.encodingCharset = encodingCharset;
       return this;
+    }
+
+    public String getBasePath() {
+      return basePath;
+    }
+
+    public void setBasePath(String basePath) {
+      this.basePath = basePath;
+    }
+
+    public String getCustomUrl() {
+      return customUrl;
+    }
+
+    public void setCustomUrl(String customUrl) {
+      if (customUrl != null) {
+        setInline(false);
+      }
+      this.customUrl = customUrl;
     }
   }
 

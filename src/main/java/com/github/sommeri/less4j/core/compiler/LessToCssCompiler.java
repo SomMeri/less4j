@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
@@ -35,6 +36,8 @@ import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.CssPrinter;
 import com.github.sommeri.less4j.utils.URIUtils;
+
+import javax.xml.bind.DatatypeConverter;
 
 public class LessToCssCompiler {
 
@@ -105,8 +108,9 @@ public class LessToCssCompiler {
       CssPrinter builder = new CssPrinter(source, options.getCssResultLocation());
       builder.append(less);
       String sourceMap = builder.toSourceMap();
-      String encodedSourceMap = urlEncode(sourceMap, encodingCharset);
-      commentText = "/*# sourceMappingURL=data:application/json;" + encodedSourceMap + " */";
+      String processedSourceMap = processSourceMap(sourceMap, sourceMapConfiguration);
+      String encodedSourceMap = base64Encode(processedSourceMap, encodingCharset);
+      commentText = "/*# sourceMappingURL=data:application/json;base64," + encodedSourceMap + " */";
     } else {
       //compose linking comment
       String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
@@ -120,12 +124,28 @@ public class LessToCssCompiler {
     comments.add(linkComment);
   }
 
+  private String processSourceMap(String sourceMap, LessCompiler.SourceMapConfiguration sourceMapConfiguration) {
+    String basePath = sourceMapConfiguration.getBasePath();
+    if (basePath != null) {
+      sourceMap = sourceMap.replaceAll(Pattern.quote(basePath), "");
+    }
+    return sourceMap;
+  }
+
+  private String base64Encode(String toEncode, String encodingCharset) {
+    try {
+      return DatatypeConverter.printBase64Binary(toEncode.getBytes(encodingCharset));
+    } catch (UnsupportedEncodingException uex) {
+      throw new RuntimeException(uex);
+    }
+  }
+
   private String urlEncode(String toEncode, String encodingCharset) {
-      try {
-          return URLEncoder.encode(toEncode, encodingCharset);
-      } catch (UnsupportedEncodingException uex) {
-          throw new RuntimeException(uex);
-      }
+    try {
+      return URLEncoder.encode(toEncode, encodingCharset);
+    } catch (UnsupportedEncodingException uex) {
+      throw new RuntimeException(uex);
+    }
   }
 
   private String getCssResultLocationName(Configuration options, LessSource source) {
