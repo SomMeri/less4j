@@ -51,16 +51,22 @@ public class URIUtils {
     if (to == null)
       return "";
 
-    if (to.getURI() == null)
+    URI toURI = to.getURI();
+    if (toURI == null)
       return to.getName() == null ? "" : to.getName();
 
-    if (from == null || from.getURI() == null)
-      return to.getURI().toString();
+    String toURIAsString = toURI.toString();
 
-    String fromURI = from.getURI().toString();
-    String toURI = to.getURI().toString();
+    if (from == null)
+      return toURIAsString;
 
-    return getRelativePath(fromURI, toURI, URIUtils.URI_FILE_SEPARATOR);
+    URI fromURI = from.getURI();
+    if (fromURI == null)
+      return toURIAsString;
+
+    String fromURIAsString = fromURI.toString();
+
+    return getRelativePath(fromURIAsString, toURIAsString, URIUtils.URI_FILE_SEPARATOR);
   }
 
   public static String convertUriToPlatformSeparator(String relative) {
