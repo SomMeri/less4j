@@ -105,7 +105,7 @@ public class LessToCssCompiler {
     String commentText;
     String encodingCharset = sourceMapConfiguration.getEncodingCharset();
     if (sourceMapConfiguration.isInline()) {
-      CssPrinter builder = new CssPrinter(source, options.getCssResultLocation());
+      CssPrinter builder = new CssPrinter(source, options.getCssResultLocation(), options);
       builder.append(less);
       String sourceMap = builder.toSourceMap();
       String processedSourceMap = processSourceMap(sourceMap, sourceMapConfiguration);

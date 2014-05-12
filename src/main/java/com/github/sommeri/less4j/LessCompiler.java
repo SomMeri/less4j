@@ -95,7 +95,7 @@ public interface LessCompiler {
     private boolean inline = false;
     private String encodingCharset = "UTF-8";
     private String basePath;
-    private String customUrl;
+    private boolean relativizePaths = true;
 
     public boolean shouldLinkSourceMap() {
       return linkSourceMap;
@@ -132,15 +132,13 @@ public interface LessCompiler {
       this.basePath = basePath;
     }
 
-    public String getCustomUrl() {
-      return customUrl;
+    public boolean isRelativizePaths() {
+      return relativizePaths;
     }
 
-    public void setCustomUrl(String customUrl) {
-      if (customUrl != null) {
-        setInline(false);
-      }
-      this.customUrl = customUrl;
+    public SourceMapConfiguration setRelativizePaths(boolean relativizePaths) {
+      this.relativizePaths = relativizePaths;
+      return this;
     }
   }
 

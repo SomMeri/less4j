@@ -112,7 +112,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       cssDestination = new LessSource.StringSource("", guessedCssName, guessedURI);
     }
     
-    CssPrinter builder = new CssPrinter(lessSource, cssDestination);
+    CssPrinter builder = new CssPrinter(lessSource, cssDestination, options);
     builder.append(cssStyleSheet);
     String css = builder.toCss();
     String sourceMap = builder.toSourceMap();
