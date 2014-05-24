@@ -119,6 +119,10 @@ public class ColorExpression extends Expression {
     return new Color((int) Math.round(this.red), (int) Math.round(this.green), (int) Math.round(this.blue));
   }
 
+  public boolean hasAlpha() {
+    return false;
+  }
+
   public static class ColorWithAlphaExpression extends ColorExpression {
 
     /**
@@ -172,5 +176,9 @@ public class ColorExpression extends Expression {
       return new Color((int) Math.round(this.red), (int) Math.round(this.green), (int) Math.round(this.blue), Math.round(this.alpha * 255));
     }
 
+    public boolean hasAlpha() {
+      return true;
+    }
   }
+
 }
