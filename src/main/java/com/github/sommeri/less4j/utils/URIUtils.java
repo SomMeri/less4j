@@ -18,20 +18,18 @@ public class URIUtils {
   public static final String URI_FILE_SEPARATOR = "/";
 
   public static URL toParentURL(URL url) {
-    String path = url.getPath();
-    int i = path.lastIndexOf(URI_FILE_SEPARATOR);
-    if (i != -1) {
-      path = path.substring(0, i + 1);
-    }
-
-    URL parentUrl = null;
+    URL parentUrl;
     try {
-
         // compute parent URL
         URL rootParentUrl = new URL(url, "");
 
         // add query string to parent URL
-        parentUrl = new URL(rootParentUrl.toString() + url.getQuery());
+        String query = url.getQuery();
+        if (query == null || query.isEmpty()) {
+            parentUrl = new URL(rootParentUrl.toString());
+        } else {
+            parentUrl = new URL(rootParentUrl.toString() + query);
+        }
     } catch (MalformedURLException ex) {
         throw new RuntimeException(ex);
     }
@@ -109,7 +107,7 @@ public class URIUtils {
 
     // First get all the common elements. Store them as a string,
     // and also count how many of them there are.
-    StringBuffer common = new StringBuffer();
+    StringBuilder common = new StringBuilder();
 
     int commonIndex = 0;
     while (commonIndex < target.length && commonIndex < base.length && target[commonIndex].equals(base[commonIndex])) {
@@ -146,7 +144,7 @@ public class URIUtils {
       baseIsFile = false;
     }
 
-    StringBuffer relative = new StringBuffer();
+    StringBuilder relative = new StringBuilder();
 
     if (base.length != commonIndex) {
       int numDirsUp = baseIsFile ? base.length - commonIndex - 1 : base.length - commonIndex;
@@ -163,10 +161,10 @@ public class URIUtils {
     String result = RelativeFilenameUtils.normalizeNoEndSeparator(path);
 
     // Undo the changes to the separators made by normalization
-    if (separator.equals("/")) {
+    if ("/".equals(separator)) {
       result = FilenameUtils.separatorsToUnix(result);
 
-    } else if (separator.equals("\\")) {
+    } else if ("\\".equals(separator)) {
       result = FilenameUtils.separatorsToWindows(result);
     } else {
       throw new IllegalArgumentException("Unrecognised dir separator '" + separator + "'");
@@ -193,14 +191,16 @@ public class URIUtils {
     if (uri==null)
       return null;
     
-    URI newUri = null;
+    URI newUri;
 
     try {
 
-      if(uri.toString().lastIndexOf(".") > -1) {
-          newUri = new URI(uri.toString().substring(0, (uri.toString().lastIndexOf(".") + 1)) + dottedSuffix);
+        String uriAsString = uri.toString();
+        int lastIndexOfDot = uriAsString.lastIndexOf('.');
+        if(lastIndexOfDot > -1) {
+          newUri = new URI(uriAsString.substring(0, (lastIndexOfDot + 1)) + dottedSuffix);
       } else {
-          newUri = new URI(uri.toString() + dottedSuffix);
+          newUri = new URI(uriAsString + dottedSuffix);
       }
     } catch (URISyntaxException exception) {
         throw new IllegalStateException(exception);
