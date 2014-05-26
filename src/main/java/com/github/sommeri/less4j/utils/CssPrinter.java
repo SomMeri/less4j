@@ -102,6 +102,7 @@ public class CssPrinter {
   }
 
   public CssPrinter(CssPrinter configureFromPrinter) {
+    this.options = configureFromPrinter.options;
     this.lessSource = configureFromPrinter.lessSource;
     this.cssDestination = configureFromPrinter.cssDestination;
     this.cssOnly = new ExtendedStringBuilder(configureFromPrinter.cssOnly);
