@@ -184,8 +184,13 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.IMPORT_SYM | type == LessLexer.IMPORT_ONCE_SYM |type == LessLexer.IMPORT_MULTIPLE_SYM)
       return handleImport(token);
 
+    if (type == LessLexer.UNKNOWN_AT_RULE) 
+      return handleUnknownAtRule(token);
+
     throw new BugHappened("Unexpected token type: " + type +"("+PrintUtils.toName(type)+ ") for " + token.getText(), token);
   }
+
+  public abstract T handleUnknownAtRule(HiddenTokenAwareTree token);
 
   public abstract T handleSupports(HiddenTokenAwareTree token);
   

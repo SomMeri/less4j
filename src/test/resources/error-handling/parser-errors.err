@@ -1,4 +1,4 @@
 Errors produced by compilation of testCase
-ERROR 1:10 no viable alternative at input ':' in stylesheet (which started at 1:1)
+ERROR 1:10 no viable alternative at input ':' in unknown ruleset (which started at 1:1)
 ERROR 1:12 extraneous input '2' expecting 'identifier' in selectors (which started at 1:10)
 ERROR 0:0 no viable alternative at input '<EOF>' in ruleset (which started at 1:10)

@@ -1,0 +1,61 @@
+//no body
+@top-level-one-name-no-body something;
+@top-level-many-names-no-body something, else, and, also;
+
+//only body
+@top-level-with-body {
+  value: value;
+  another: 1;
+}
+
+@top-level-with-body {
+  h1 {
+    something: something;
+  }
+}
+
+//both name and body
+@top-level-one-name-with-body something {
+  value: value;
+  another: 1;
+}
+
+@top-level-many-names-with-body something, else, and, also {
+  h1 {
+    something: something;
+  }
+}
+
+//inside another ruleset
+.ruleset {
+  //no body
+  @nested-one-name-no-body something;
+  @nested-many-names-no-body something, else, and, also;
+
+  //only body
+  @nested-with-body {
+    value: value;
+    another: 1;
+  }
+
+  @nested-with-body {
+    h1 {
+      something: something;
+    }
+  }
+  
+  //both name and body
+  @nested-one-name-with-body something {
+    value: value;
+    another: 1;
+  }
+
+  @nested-many-names-with-body something, else, and, also {
+    div {
+      h1 {
+        something: something;
+      }
+	}
+  }
+    
+}

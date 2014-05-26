@@ -93,6 +93,8 @@ tokens {
   SEMI_SPLIT_MIXIN_REFERENCE_ARGUMENTS;
   SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS;
   INTERPOLABLE_NAME;
+  UNKNOWN_AT_RULE;
+  UNKNOWN_AT_RULE_NAMES_SET;
 }
 
 @lexer::header {
@@ -289,6 +291,23 @@ simpleSupportsCondition:
     
 supportsQuery: LPAREN q+=declaration RPAREN -> ^(SUPPORTS_QUERY LPAREN $q RPAREN);
 
+unknownAtRule
+@init {enterRule(retval, RULE_UNKNOWN_AT_RULE);}
+//    : {predicates.isUnknownAtRule(input.LT(1))}? AT_NAME (IDENT | variablereference)* (
+    : AT_NAME names+=unknownAtRuleNamesSet? ( body+=general_body | semi+=SEMI )
+    -> ^(UNKNOWN_AT_RULE AT_NAME ^(UNKNOWN_AT_RULE_NAMES_SET $names*) $body* $semi*)
+    ;
+finally { leaveRule(); }
+
+unknownAtRuleNamesSet
+    : (IDENT | variablereference) (COMMA (IDENT | variablereference))*
+    ;
+/*unknownBodylessAtRule:
+@init {enterRule(retval, UNKNOWN_BODYLESS_AT_RULE);}
+    : AT_NAME (IDENT | variablereference)*
+    ;
+finally { leaveRule(); }*/
+
 // ---------
 // Medium. The name of a medim that are particulare set of rules applies to.
 //
@@ -330,6 +349,7 @@ top_level_element
     | document
     | supports
     | charSet
+    | unknownAtRule
     ;
 
 variabledeclaration
@@ -495,6 +515,7 @@ general_body
                | a+=page
                | a+=fontface
                | a+=imports
+               | a+=unknownAtRule
                | SEMI
              )*
              (  rbrace+=RBRACE

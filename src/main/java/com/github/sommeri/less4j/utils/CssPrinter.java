@@ -74,17 +74,19 @@ import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.SupportsQuery;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
+import com.github.sommeri.less4j.core.ast.UnknownAtRule;
 import com.github.sommeri.less4j.core.ast.Viewport;
 import com.github.sommeri.less4j.core.output.ExtendedStringBuilder;
 import com.github.sommeri.less4j.core.output.SourceMapBuilder;
 //SelectorCombinator
 //EscapedSelector
+
 public class CssPrinter {
 
   private static final String ERROR = "!#error#!";
   protected ExtendedStringBuilder cssOnly = new ExtendedStringBuilder();
   protected SourceMapBuilder cssAndSM = new SourceMapBuilder(cssOnly, null);
-  
+
   private LessSource lessSource;
   private LessSource cssDestination;
 
@@ -156,10 +158,10 @@ public class CssPrinter {
       return appendSelectorAttribute((SelectorAttribute) node); // TODOsm: source map
 
     case ID_SELECTOR:
-      return appendIdSelector((IdSelector) node); 
+      return appendIdSelector((IdSelector) node);
 
     case CHARSET_DECLARATION:
-      return appendCharsetDeclaration((CharsetDeclaration) node); 
+      return appendCharsetDeclaration((CharsetDeclaration) node);
 
     case FONT_FACE:
       return appendFontFace((FontFace) node); // TODOsm: source map
@@ -248,6 +250,9 @@ public class CssPrinter {
     case KEYFRAMES_NAME:
       return appendKeyframesName((KeyframesName) node); // TODOsm: source map
 
+    case UNKNOWN_AT_RULE:
+      return appendUnknownAtRule((UnknownAtRule) node); // TODOsm: source map
+
     case DOCUMENT:
       return appendDocument((Document) node); // TODOsm: source map
 
@@ -305,10 +310,25 @@ public class CssPrinter {
     case INDIRECT_VARIABLE:
     case VARIABLE_DECLARATION:
       throw new NotACssException(node);
-      
+
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getSourceColumn());
     }
+  }
+
+  public boolean appendCommaSeparated(List<? extends ASTCssNode> values) {
+    boolean result = false;
+    Iterator<? extends ASTCssNode> names = values.iterator();
+    if (names.hasNext()) {
+      result |= append(names.next());
+    }
+    while (names.hasNext()) {
+      cssOnly.append(",").ensureSeparator();
+      append(names.next());
+      result = true;
+    }
+
+    return result;
   }
 
   //TODO: what about source maps?
@@ -330,7 +350,7 @@ public class CssPrinter {
   private boolean appendImport(Import node) {
     cssOnly.append("@import").ensureSeparator();
     append(node.getUrlExpression());
-    appendMediums(node.getMediums());
+    appendCommaSeparated(node.getMediums());
     cssOnly.append(";");
 
     return true;
@@ -372,16 +392,18 @@ public class CssPrinter {
   private boolean appendKeyframes(Keyframes node) {
     cssOnly.append(node.getDialect()).ensureSeparator();
 
-    Iterator<KeyframesName> names = node.getNames().iterator();
-    if (names.hasNext()) {
-      append(names.next());
-    }
-    while (names.hasNext()) {
-      cssOnly.append(",").ensureSeparator();
-      append(names.next());
-    }
+    appendCommaSeparated(node.getNames());
+    append(node.getBody());
+    return true;
+  }
+
+  private boolean appendUnknownAtRule(UnknownAtRule node) {
+    cssOnly.append(node.getName()).ensureSeparator();
+
+    appendCommaSeparated(node.getNames());
 
     append(node.getBody());
+    append(node.getSemicolon());
     return true;
   }
 
@@ -440,15 +462,7 @@ public class CssPrinter {
   private boolean appendDocument(Document node) {
     cssOnly.append(node.getDialect()).ensureSeparator();
 
-    Iterator<FunctionExpression> urlMatchFunctions = node.getUrlMatchFunctions().iterator();
-    if (urlMatchFunctions.hasNext()) {
-      append(urlMatchFunctions.next());
-    }
-    while (urlMatchFunctions.hasNext()) {
-      cssOnly.append(",").ensureSeparator();
-      append(urlMatchFunctions.next());
-    }
-
+    appendCommaSeparated(node.getUrlMatchFunctions());
     append(node.getBody());
     return true;
   }
@@ -648,7 +662,7 @@ public class CssPrinter {
 
   private boolean appendMedia(Media node) {
     cssOnly.append("@media");
-    appendMediums(node.getMediums());
+    appendCommaSeparated(node.getMediums());
     appendBodySortDeclarations(node.getBody());
 
     return true;
@@ -682,19 +696,6 @@ public class CssPrinter {
 
     // this is sort of hack, bypass the usual append method
     appendComments(node.getTrailingComments(), false);
-  }
-
-  private void appendMediums(List<MediaQuery> mediums) {
-    if (mediums == null || mediums.isEmpty())
-      return;
-
-    boolean needComma = false;
-    for (MediaQuery mediaQuery : mediums) {
-      if (needComma)
-        cssOnly.append(",").ensureSeparator();
-      append(mediaQuery);
-      needComma = true;
-    }
   }
 
   public boolean appendMediaQuery(MediaQuery mediaQuery) {
@@ -787,7 +788,7 @@ public class CssPrinter {
     Iterator<Expression> iterator = expression.getExpressions().iterator();
     if (!iterator.hasNext())
       return false;
-    
+
     append(iterator.next());
     while (iterator.hasNext()) {
       append(expression.getOperator());
@@ -849,7 +850,7 @@ public class CssPrinter {
 
     return true;
   }
-  
+
   public boolean appendCssString(CssString expression) {
     String quoteType = expression.getQuoteType();
     cssOnly.append(quoteType).append(expression.getValue()).append(quoteType);
@@ -857,10 +858,10 @@ public class CssPrinter {
     return true;
   }
 
-  public boolean appendEmptyExpression(EmptyExpression node){
+  public boolean appendEmptyExpression(EmptyExpression node) {
     return true;
   }
-  
+
   public boolean appendEscapedValue(EscapedValue escaped) {
     cssOnly.append(escaped.getValue());
 
@@ -939,7 +940,7 @@ public class CssPrinter {
     }
   }
 
-  private <T  extends ASTCssNode> List<T> filterSilent(List<T> nodes) {
+  private <T extends ASTCssNode> List<T> filterSilent(List<T> nodes) {
     List<T> result = new ArrayList<T>();
     for (T t : nodes) {
       if (!t.isSilent())

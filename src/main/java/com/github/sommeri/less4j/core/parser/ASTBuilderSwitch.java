@@ -82,6 +82,7 @@ import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator.Operator;
 import com.github.sommeri.less4j.core.ast.SupportsQuery;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
+import com.github.sommeri.less4j.core.ast.UnknownAtRule;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
@@ -1226,6 +1227,52 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
 
     return (Extend) asPseudoclass.getParameter();
+  }
+
+  @Override
+  public UnknownAtRule handleUnknownAtRule(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    UnknownAtRule result = new UnknownAtRule(token, children.next().getText());
+    while (children.hasNext()) {
+      HiddenTokenAwareTree next = children.next();
+      switch (next.getType()) {
+      case LessLexer.UNKNOWN_AT_RULE_NAMES_SET:
+        result.addNames(handleUnknownAtRuleDeclaration(next));
+        break;
+
+      case LessLexer.BODY:
+        result.setBody(handleGeneralBody(next));
+        break;
+
+      case LessLexer.SEMI:
+        result.setSemicolon(toSyntaxOnlyElement(next));
+        break;
+
+      default:
+        throw new BugHappened(GRAMMAR_MISMATCH, next);
+      }
+      
+    }
+    problemsHandler.warnUnknowAtRule(result);
+    return result;
+  }
+
+  private List<Expression> handleUnknownAtRuleDeclaration(HiddenTokenAwareTree declaration) {
+    List<Expression> result = new ArrayList<Expression>();
+    Iterator<HiddenTokenAwareTree> iterator = declaration.getChildren().iterator();
+    while (iterator.hasNext()) {
+      HiddenTokenAwareTree token = iterator.next();
+      if (token.getType() == LessLexer.COMMA) {
+        token.pushHiddenToSiblings();
+      } else if (token.getType() == LessLexer.IDENT || token.getType() == LessLexer.AT_NAME || token.getType()==LessLexer.INDIRECT_VARIABLE) {
+        result.add(termBuilder.buildFromTerm(token));
+      } else {
+        throw new BugHappened(GRAMMAR_MISMATCH, token);
+      }
+
+    }
+
+    return result;
   }
 
 }
