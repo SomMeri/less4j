@@ -300,7 +300,7 @@ unknownAtRule
 finally { leaveRule(); }
 
 unknownAtRuleNamesSet
-    : (IDENT | variablereference) (COMMA (IDENT | variablereference))*
+    : (mathExprHighPrior) (COMMA (mathExprHighPrior))*
     ;
 /*unknownBodylessAtRule:
 @init {enterRule(retval, UNKNOWN_BODYLESS_AT_RULE);}
