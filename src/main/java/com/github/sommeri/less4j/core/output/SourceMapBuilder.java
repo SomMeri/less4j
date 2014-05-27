@@ -34,7 +34,7 @@ public class SourceMapBuilder {
     FilePosition outputStartPosition = beforeSymbolPosition();
     cssBuilder.append(str);
     FilePosition outputEndPosition = afterSymbolPosition();
-    
+
     createMapping(str, sourceToken, outputStartPosition, outputEndPosition);
     return this;
   }
@@ -43,7 +43,7 @@ public class SourceMapBuilder {
     FilePosition outputStartPosition = beforeSymbolPosition();
     cssBuilder.append(str);
     FilePosition outputEndPosition = afterSymbolPosition();
-    
+
     createMapping(str, sourceToken, outputStartPosition, outputEndPosition);
   }
 
@@ -66,7 +66,7 @@ public class SourceMapBuilder {
   private FilePosition currentPosition() {
     return new FilePosition(cssBuilder.getLine(), cssBuilder.getColumn());
   }
-  
+
   public void append(SourceMapBuilder other) {
     FilePosition offset = afterSymbolPosition();
     cssBuilder.appendAsIs(other.cssBuilder.toString());
@@ -75,7 +75,7 @@ public class SourceMapBuilder {
   }
 
   private FilePosition toFilePosition(HiddenTokenAwareTree underlyingStructure) {
-    FilePosition result = new FilePosition(underlyingStructure.getLine()-1, underlyingStructure.getCharPositionInLine());
+    FilePosition result = new FilePosition(underlyingStructure.getLine() - 1, underlyingStructure.getCharPositionInLine());
     return result;
   }
 
@@ -84,10 +84,10 @@ public class SourceMapBuilder {
     if (configuration.isRelativizePaths()) {
       return URIUtils.relativizeSourceURIs(cssDestination, source);
     } else {
-      return source.getURI().toString();
+      return source.getURI() == null ? null : source.getURI().toString();
     }
   }
-  
+
   public String toSourceMap() {
     // map file is assumed to have the same location as generated css 
     String name = "";
