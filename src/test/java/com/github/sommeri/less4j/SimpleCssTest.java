@@ -1,17 +1,22 @@
 package com.github.sommeri.less4j;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -75,9 +80,29 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
+//  protected CompilationResult supercompile(File lessFile, File cssOutput) throws Less4jException {
+//    LessCompiler compiler = getCompiler();
+//    Configuration configuration = createConfiguration(cssOutput);
+//    configuration.setCssResultLocation((LessSource)null);
+//    CompilationResult actual=null;
+//    try {
+//      String content = "value {\n aaa:vvvv;\n }";//IOUtils.toString(new FileReader(lessFile));
+//      String fullPath = "path/to/filename.less";
+//      String filename = "filename.less";
+//      LessSource.StringSource lessSource = new LessSource.StringSource(content, filename, new URI(fullPath));
+//      actual = compiler.compile(lessSource, configuration);
+//      System.out.println(actual.getSourceMap());
+//    } catch (Throwable e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
+//    return actual;
+//  }
+
   @Override
   protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
     CompilationResult result = super.compile(lessFile, cssOutput);
+    System.out.println(result.getSourceMap());
     if (printTo != null) {
       try {
         FileUtils.writeStringToFile(new File(printTo), result.getCss());

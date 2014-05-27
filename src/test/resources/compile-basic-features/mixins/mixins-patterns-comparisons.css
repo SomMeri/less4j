@@ -20,8 +20,10 @@
 }
 #tryString1 {
   declare: 'value';
+  declare: "value";
 }
 #tryString2 {
+  declare: 'value';
   declare: "value";
 }
 #tryIdentifier {

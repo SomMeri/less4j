@@ -47,7 +47,8 @@ public abstract class ExpressionComparator {
   private boolean equalString(CssString pattern, Expression expression) {
     if (expression instanceof CssString) {
       CssString string = (CssString) expression;
-      return equals(pattern.getValue(), string.getValue()) && equals(pattern.getQuoteType(), string.getQuoteType());
+      //ignore quote type when comparing strings
+      return equals(pattern.getValue(), string.getValue());
     }
 
     return false;

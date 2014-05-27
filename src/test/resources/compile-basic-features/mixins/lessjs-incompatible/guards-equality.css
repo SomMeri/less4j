@@ -19,9 +19,11 @@
 #tryString1 {
   catch: all;
   declare: 'value';
+  declare: "value";
 }
 #tryString2 {
   catch: all;
+  declare: 'value';
   declare: "value";
 }
 #tryIdentifier {

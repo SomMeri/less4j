@@ -5,6 +5,10 @@
 //  something2: e(`1+2`); TODO javascript is not implemented yet
 }
 
+#e-empty {
+  empty-string: e('') e("") ;
+  empty-escape: e(~'') e(~"") ;
+}
 #e-NonString {
   e1: e(~"abcdefghijklmnopqrstuvxyz ABCDEFGHIJKLMNOPQRSTUVXYZ09");
   e2: e(~"~!@#$^&*()_+}{|:> <.,';][p/\"");

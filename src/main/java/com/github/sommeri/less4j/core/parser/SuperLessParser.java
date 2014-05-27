@@ -123,7 +123,9 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("ESCAPED_SCRIPT", "escaped script ~`...`");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DETACHED_RULESET", "detached ruleset");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DETACHED_RULESET_REFERENCE", "detached ruleset call");
-    
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNKNOWN_AT_RULE", "unknown at-rule");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNKNOWN_AT_RULE_NAMES_SET", "unknown at-rule");
+
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";
@@ -150,6 +152,7 @@ public abstract class SuperLessParser extends Parser {
   protected static final String RULE_PAGE_MARGIN_BOX = "page margin box";
   protected static final String RULE_DETACHED_RULESET_REFERENCE = "detached ruleset reference";
   protected static final String RULE_DETACHED_RULESET = "detached ruleset";
+  protected static final String RULE_UNKNOWN_AT_RULE = "unknown ruleset";
   
   
   

@@ -24,6 +24,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
+import com.github.sommeri.less4j.core.ast.UnknownAtRule;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.utils.LessPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
@@ -303,6 +304,10 @@ public class ProblemsHandler implements LessProblems {
   @Override
   public void addWarning(ASTCssNode weirdNode, String description) {
     collector.addWarning(new CompilationWarning(weirdNode, description));
+  }
+
+  public void warnUnknowAtRule(UnknownAtRule unknown) {
+    collector.addWarning(new CompilationWarning(unknown, "Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too."));
   }
 
 }

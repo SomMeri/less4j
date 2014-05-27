@@ -31,23 +31,23 @@ public class SupportedCSSBodyMembers {
 
     switch (ownerType) {
     case VIEWPORT:
-      return createSet(ASTCssNodeType.DECLARATION);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE);
 
     case RULE_SET:
-      return createSet(ASTCssNodeType.DECLARATION);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE);
 
     case PAGE:
-      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.PAGE_MARGIN_BOX);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE, ASTCssNodeType.PAGE_MARGIN_BOX);
 
     case PAGE_MARGIN_BOX:
-      return createSet(ASTCssNodeType.DECLARATION);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE);
 
     case MEDIA:
     case DOCUMENT:
       return topLevelElements();
 
     case KEYFRAMES:
-      return createSet(ASTCssNodeType.RULE_SET);
+      return createSet(ASTCssNodeType.RULE_SET, ASTCssNodeType.UNKNOWN_AT_RULE);
 
     default:
       return allNodeTypes();

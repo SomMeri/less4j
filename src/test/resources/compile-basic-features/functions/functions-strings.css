@@ -3,6 +3,10 @@
   content2: this is something {};
   something1: 1+2;;
 }
+#e-empty {
+  empty-string: ;
+  empty-escape: ;
+}
 #e-NonString {
   e1: abcdefghijklmnopqrstuvxyz ABCDEFGHIJKLMNOPQRSTUVXYZ09;
   e2: ~!@#$^&*()_+}{|:> <.,';][p/\";

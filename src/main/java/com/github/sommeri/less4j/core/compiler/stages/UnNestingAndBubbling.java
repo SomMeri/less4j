@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.BodyOwner;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.Page;
@@ -14,7 +15,7 @@ import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class UnNestingAndBubbling {
-  
+
   private final ASTManipulator astManipulator = new ASTManipulator();
   private final ASTManipulator manipulator = new ASTManipulator();
 
@@ -44,6 +45,11 @@ public class UnNestingAndBubbling {
       }
       default:
         //nothing is needed
+        if (kid instanceof BodyOwner<?>) {
+          BodyOwner<?> bodyOwner = (BodyOwner<?>) kid;
+          if (bodyOwner.getBody() != null)
+            unnestRulesetAndMedia(bodyOwner.getBody());
+        }
       }
     }
 
@@ -65,31 +71,39 @@ public class UnNestingAndBubbling {
         manipulator.removeFromBody(nestedSet);
         nestedNodes.collect(nestedSet);
         nestedNodes.pushSelectors(nestedSet);
-        
+
         collectChildRuleSets(kid, nestedNodes);
 
         nestedNodes.popSelectors();
       }
-      break;
+        break;
       case MEDIA: {
         List<Selector> outerSelectors = ArraysUtils.deeplyClonedList(nestedNodes.currentSelectors());
 
         Media media = (Media) kid;
         manipulator.removeFromBody(media);
         nestedNodes.collect(media);
-        
+
         putMediaBodyIntoRuleset(media, outerSelectors);
-        
+
         unnestRulesetAndMedia(media.getBody());
-        
+
       }
-      break;
+        break;
 
       default:
-        collectChildRuleSets(kid, nestedNodes);
+        //unless explicitly set, do not pass take rulessets out of body owners
+        if (!(kid instanceof BodyOwner<?>)) {
+          collectChildRuleSets(kid, nestedNodes);
+        } else {
+          BodyOwner<?> bodyOwner = (BodyOwner<?>) kid;
+          if (bodyOwner.getBody() != null)
+            unnestRulesetAndMedia(bodyOwner.getBody());
+        }
+
         break;
       }
-      
+
     }
   }
 

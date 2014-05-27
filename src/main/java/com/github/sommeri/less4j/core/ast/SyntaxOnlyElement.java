@@ -55,4 +55,8 @@ public class SyntaxOnlyElement extends ASTCssNode {
     return new SyntaxOnlyElement(underlyingStructure, "}");
   }
 
+  public static SyntaxOnlyElement semicolon(HiddenTokenAwareTree underlyingStructure) {
+    return new SyntaxOnlyElement(underlyingStructure, ";");
+  }
+
 }
