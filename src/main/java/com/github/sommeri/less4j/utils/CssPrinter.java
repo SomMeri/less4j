@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.NotACssException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -85,26 +86,33 @@ public class CssPrinter {
 
   private static final String ERROR = "!#error#!";
   protected ExtendedStringBuilder cssOnly = new ExtendedStringBuilder();
-  protected SourceMapBuilder cssAndSM = new SourceMapBuilder(cssOnly, null);
+  protected SourceMapBuilder cssAndSM;
 
   private LessSource lessSource;
   private LessSource cssDestination;
+  private LessCompiler.Configuration options;
 
   public CssPrinter() {
     super();
   }
 
-  public CssPrinter(LessSource lessSource, LessSource cssDestination) {
+  public CssPrinter(LessSource lessSource, LessSource cssDestination, LessCompiler.Configuration options) {
     this.lessSource = lessSource;
     this.cssDestination = cssDestination;
-    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination);
+    this.options = options;
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, getSourceMapConfiguration(options));
   }
 
   public CssPrinter(CssPrinter configureFromPrinter) {
+    this.options = configureFromPrinter.options;
     this.lessSource = configureFromPrinter.lessSource;
     this.cssDestination = configureFromPrinter.cssDestination;
     this.cssOnly = new ExtendedStringBuilder(configureFromPrinter.cssOnly);
-    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination);
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, getSourceMapConfiguration(options));
+  }
+
+  private LessCompiler.SourceMapConfiguration getSourceMapConfiguration(LessCompiler.Configuration options) {
+    return options != null ? options.getSourceMapConfiguration() : new LessCompiler.SourceMapConfiguration();
   }
 
   /**

@@ -27,10 +27,10 @@ public interface LessCompiler {
   /**
    * WARNING: experimental API 
    */
-  public class Configuration {
+  public static class Configuration {
 
     private LessSource cssResultLocation;
-    private boolean linkSourceMap = true;
+    private SourceMapConfiguration sourceMapConfiguration = new SourceMapConfiguration();
     private List<LessFunction> functionPackages = new ArrayList<LessFunction>();
     private EmbeddedScriptGenerator embeddedScriptGenerator; 
 
@@ -50,12 +50,19 @@ public interface LessCompiler {
       this.cssResultLocation = cssResultLocation == null ? null : new LessSource.FileSource(cssResultLocation);
     }
 
+   /**
+    * @deprecated Use getSourceMapConfiguration().shouldLinkSourceMap() instead
+    */
+    @Deprecated
     public boolean shouldLinkSourceMap() {
-      return linkSourceMap;
+      return sourceMapConfiguration.shouldLinkSourceMap();
     }
 
+    /**
+     * @deprecated Use getSourceMapConfiguration().setLinkSourceMap(boolean) instead
+     */
     public void setLinkSourceMap(boolean linkSourceMap) {
-      this.linkSourceMap = linkSourceMap;
+      sourceMapConfiguration.setLinkSourceMap(linkSourceMap);
     }
 
     public List<LessFunction> getCustomFunctions() {
@@ -78,9 +85,55 @@ public interface LessCompiler {
       this.embeddedScriptGenerator = embeddedScripting;
     }
 
+    public SourceMapConfiguration getSourceMapConfiguration() {
+      return sourceMapConfiguration;
+    }
   }
 
-  public class CompilationResult {
+  public static class SourceMapConfiguration {
+    private boolean linkSourceMap = true;
+    private boolean inline = false;
+    private String encodingCharset = "UTF-8";
+    private boolean relativizePaths = true;
+
+    public boolean shouldLinkSourceMap() {
+      return linkSourceMap;
+    }
+
+    public SourceMapConfiguration setLinkSourceMap(boolean linkSourceMap) {
+      this.linkSourceMap = linkSourceMap;
+      return this;
+    }
+
+    public boolean isInline() {
+      return inline;
+    }
+
+    public SourceMapConfiguration setInline(boolean inline) {
+      this.inline = inline;
+      return this;
+    }
+
+    public String getEncodingCharset() {
+      return encodingCharset;
+    }
+
+    public SourceMapConfiguration setEncodingCharset(String encodingCharset) {
+      this.encodingCharset = encodingCharset;
+      return this;
+    }
+
+    public boolean isRelativizePaths() {
+      return relativizePaths;
+    }
+
+    public SourceMapConfiguration setRelativizePaths(boolean relativizePaths) {
+      this.relativizePaths = relativizePaths;
+      return this;
+    }
+  }
+
+  public static class CompilationResult {
 
     private final String css;
     private final String sourceMap;

@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.output;
 
 import java.io.IOException;
 
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.URIUtils;
@@ -17,12 +18,14 @@ public class SourceMapBuilder {
 
   private final ExtendedStringBuilder cssBuilder;
   private final SourceMapGenerator generator;
+  private final LessCompiler.SourceMapConfiguration configuration;
 
   private LessSource cssDestination;
 
-  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource cssDestination) {
+  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource cssDestination, LessCompiler.SourceMapConfiguration configuration) {
     this.cssBuilder = cssBuilder;
     this.cssDestination = cssDestination;
+    this.configuration = configuration;
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
   }
 
@@ -77,12 +80,20 @@ public class SourceMapBuilder {
   }
 
   private String toSourceName(HiddenTokenAwareTree underlyingStructure) {
-    return URIUtils.relativizeSourceURIs(cssDestination, underlyingStructure.getSource());
+    LessSource source = underlyingStructure.getSource();
+    if (configuration.isRelativizePaths()) {
+      return URIUtils.relativizeSourceURIs(cssDestination, source);
+    } else {
+      return source.getURI().toString();
+    }
   }
   
   public String toSourceMap() {
     // map file is assumed to have the same location as generated css 
-    String name = cssDestination.getName()==null? "" : cssDestination.getName();
+    String name = "";
+    if (cssDestination != null && cssDestination.getName() != null) {
+      name = cssDestination.getName();
+    }
     try {
       StringBuilder sb = new StringBuilder();
       generator.appendTo(sb, name);
