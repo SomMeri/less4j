@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
@@ -108,8 +107,7 @@ public class LessToCssCompiler {
       CssPrinter builder = new CssPrinter(source, options.getCssResultLocation(), options);
       builder.append(less);
       String sourceMap = builder.toSourceMap();
-      String processedSourceMap = processSourceMap(sourceMap, sourceMapConfiguration);
-      String encodedSourceMap = base64Encode(processedSourceMap, encodingCharset);
+      String encodedSourceMap = base64Encode(sourceMap, encodingCharset);
       commentText = "/*# sourceMappingURL=data:application/json;base64," + encodedSourceMap + " */";
     } else {
       //compose linking comment
@@ -122,14 +120,6 @@ public class LessToCssCompiler {
 
     //add linking comment
     comments.add(linkComment);
-  }
-
-  private String processSourceMap(String sourceMap, LessCompiler.SourceMapConfiguration sourceMapConfiguration) {
-    String basePath = sourceMapConfiguration.getBasePath();
-    if (basePath != null) {
-      sourceMap = sourceMap.replaceAll(Pattern.quote(basePath), "");
-    }
-    return sourceMap;
   }
 
   private String base64Encode(String toEncode, String encodingCharset) {
