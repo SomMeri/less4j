@@ -91,6 +91,7 @@ public class PrintUtils {
   public static String base64Encode(String toEncode, String encodingCharset, ProblemsHandler problemsHandler, ASTCssNode nodeForErrorReport) {
     try {
       return DatatypeConverter.printBase64Binary(toEncode.getBytes(encodingCharset));
+//      return toEncode;
     } catch (UnsupportedEncodingException uex) {
       problemsHandler.errUnknownEncodingCharsetSourceMap(nodeForErrorReport, encodingCharset);
       return null;

@@ -50,7 +50,7 @@ public abstract class AbstractFileBasedTest {
     try {
       CompilationResult actual = compile(lessFile, cssOutput);
       //System.out.println(actual.getSourceMap());
-      assertCorrectWarnings(actual);
+      assertCorrectCssAnsWarnings(actual);
       assertSourceMapValid(actual);
     } catch (Less4jException ex) {
       printErrors(ex);
@@ -97,7 +97,7 @@ public abstract class AbstractFileBasedTest {
     assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
   }
 
-  private void assertCorrectWarnings(CompilationResult actual) {
+  private void assertCorrectCssAnsWarnings(CompilationResult actual) {
     //validate css
     String expectedCss = canonize(expectedCss());
     String actualCss = canonize(actual.getCss());
