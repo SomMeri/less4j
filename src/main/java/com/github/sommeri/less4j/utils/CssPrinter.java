@@ -519,9 +519,11 @@ public class CssPrinter {
     cssOnly.ensureSeparator();
 
     for (Comment comment : comments) {
-      cssOnly.append(comment.getComment());
+      String text = comment.getComment();
+      if (text!=null)
+        cssOnly.append(text);
       if (comment.hasNewLine())
-        cssOnly.newLine();
+        cssOnly.ensureNewLine();
     }
 
     if (ensureSeparator)

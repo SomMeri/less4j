@@ -85,7 +85,7 @@ public abstract class AbstractFileBasedTest {
   protected Configuration createConfiguration(File cssOutput) {
     Configuration configuration = new Configuration();
     configuration.setCssResultLocation(new LessSource.FileSource(cssOutput));
-    configuration.setLinkSourceMap(false);
+    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
     return configuration;
   }
 

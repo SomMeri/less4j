@@ -81,6 +81,10 @@ public abstract class ASTCssNode implements PubliclyCloneable {
     this.trailingComments.addAll(comments);
   }
 
+  public void addTrailingComment(Comment comment) {
+    this.trailingComments.add(comment);
+  }
+
   @NotAstProperty
   public List<Comment> getOpeningComments() {
     return openingComments;

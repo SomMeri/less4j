@@ -135,7 +135,8 @@ public class ReferencesSolver {
   private boolean isMixinReference(ASTCssNode kid) {
     return kid.getType() == ASTCssNodeType.MIXIN_REFERENCE;
   }
-
+  
+  @SuppressWarnings("unused")
   private boolean isDetachedRulesetReference(ASTCssNode kid) {
     return kid.getType() == ASTCssNodeType.DETACHED_RULESET_REFERENCE;
   }

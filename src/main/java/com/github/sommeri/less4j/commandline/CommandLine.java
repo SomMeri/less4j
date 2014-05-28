@@ -163,7 +163,7 @@ public class CommandLine {
   private CompilationResult compile(File lessFile, File cssFile, boolean generateSourceMap) throws Less4jException {
     Configuration configuration = new Configuration();
     configuration.setCssResultLocation(cssFile);
-    configuration.setLinkSourceMap(generateSourceMap && cssFile != null);
+    configuration.getSourceMapConfiguration().setLinkSourceMap(generateSourceMap && cssFile != null);
 
     DefaultLessCompiler compiler = new DefaultLessCompiler();
     return compiler.compile(lessFile, configuration);

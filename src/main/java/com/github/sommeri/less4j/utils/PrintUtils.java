@@ -10,6 +10,7 @@ import javax.xml.bind.DatatypeConverter;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.parser.LessParser;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class PrintUtils {
 
@@ -74,6 +75,26 @@ public class PrintUtils {
     encode = encode.replaceAll("%28", "(").replaceAll("%29", ")");
     encode = encode.replaceAll("%27", "'").replaceAll("%7E", "~").replaceAll("%21", "!");
     return encode;
+  }
+
+  public static String urlEncode(String toEncode, String encodingCharset, ProblemsHandler problemsHandler, ASTCssNode nodeForErrorReport) {
+    if (toEncode==null || encodingCharset==null)
+      return null;
+    try {
+      return URLEncoder.encode(toEncode, encodingCharset);
+    } catch (UnsupportedEncodingException uex) {
+      problemsHandler.errUnknownEncodingCharsetSourceMap(nodeForErrorReport, encodingCharset);
+      return null;
+    }
+  }
+
+  public static String base64Encode(String toEncode, String encodingCharset, ProblemsHandler problemsHandler, ASTCssNode nodeForErrorReport) {
+    try {
+      return DatatypeConverter.printBase64Binary(toEncode.getBytes(encodingCharset));
+    } catch (UnsupportedEncodingException uex) {
+      problemsHandler.errUnknownEncodingCharsetSourceMap(nodeForErrorReport, encodingCharset);
+      return null;
+    }
   }
 
   public static String toUtf8(String value) {

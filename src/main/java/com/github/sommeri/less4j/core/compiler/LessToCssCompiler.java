@@ -1,7 +1,5 @@
 package com.github.sommeri.less4j.core.compiler;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -34,9 +32,8 @@ import com.github.sommeri.less4j.core.validators.CssAstValidator;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.CssPrinter;
+import com.github.sommeri.less4j.utils.PrintUtils;
 import com.github.sommeri.less4j.utils.URIUtils;
-
-import javax.xml.bind.DatatypeConverter;
 
 public class LessToCssCompiler {
 
@@ -92,14 +89,15 @@ public class LessToCssCompiler {
   private void handleSourceMapLink(StyleSheet less, Configuration options, LessSource source) {
     String cssResultLocation = getCssResultLocationName(options, source);
     LessCompiler.SourceMapConfiguration sourceMapConfiguration = options.getSourceMapConfiguration();
-    if (!sourceMapConfiguration.shouldLinkSourceMap() || cssResultLocation == null)
+    if (!sourceMapConfiguration.shouldLinkSourceMap() && !sourceMapConfiguration.isInline())
       return;
+    
+    if (sourceMapConfiguration.shouldLinkSourceMap() && cssResultLocation==null) {
+      problemsHandler.warnSourceMapLinkWithoutCssResultLocation(less);
+      return ; 
+    }
 
-    List<Comment> comments = less.getTrailingComments();
-
-    // add new line to last comment
-    if (!comments.isEmpty())
-      ArraysUtils.last(comments).setHasNewLine(true);
+    addNewLine(less);
 
     String commentText;
     String encodingCharset = sourceMapConfiguration.getEncodingCharset();
@@ -107,34 +105,28 @@ public class LessToCssCompiler {
       CssPrinter builder = new CssPrinter(source, options.getCssResultLocation(), options);
       builder.append(less);
       String sourceMap = builder.toSourceMap();
-      String encodedSourceMap = base64Encode(sourceMap, encodingCharset);
+      String encodedSourceMap = PrintUtils.base64Encode(sourceMap, encodingCharset, problemsHandler, less);
       commentText = "/*# sourceMappingURL=data:application/json;base64," + encodedSourceMap + " */";
     } else {
       //compose linking comment
       String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
-      String encodedUrl = urlEncode(url, encodingCharset);
+      String encodedUrl = PrintUtils.urlEncode(url, encodingCharset, problemsHandler, less);
       commentText = "/*# sourceMappingURL=" + encodedUrl + " */";
     }
 
     Comment linkComment = new Comment(less.getUnderlyingStructure(), commentText, true);
 
     //add linking comment
-    comments.add(linkComment);
+    less.addTrailingComment(linkComment);
   }
 
-  private String base64Encode(String toEncode, String encodingCharset) {
-    try {
-      return DatatypeConverter.printBase64Binary(toEncode.getBytes(encodingCharset));
-    } catch (UnsupportedEncodingException uex) {
-      throw new RuntimeException(uex);
-    }
-  }
-
-  private String urlEncode(String toEncode, String encodingCharset) {
-    try {
-      return URLEncoder.encode(toEncode, encodingCharset);
-    } catch (UnsupportedEncodingException uex) {
-      throw new RuntimeException(uex);
+  private void addNewLine(StyleSheet less) {
+    Comment last = ArraysUtils.last(less.getTrailingComments());
+    if (last!=null) {
+      last.setHasNewLine(true);
+    } else {
+      //Last comment is not necessary attached to the stylesheet, ensure new line anyway
+      less.addTrailingComment(new Comment(less.getUnderlyingStructure(), null, true));
     }
   }
 
