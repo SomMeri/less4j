@@ -100,6 +100,9 @@ public interface LessCompiler {
       return linkSourceMap;
     }
 
+    /**
+     * If set to <code>false</code>, generated css does not contain link to source map file. 
+     */
     public SourceMapConfiguration setLinkSourceMap(boolean linkSourceMap) {
       this.linkSourceMap = linkSourceMap;
       return this;
@@ -109,6 +112,9 @@ public interface LessCompiler {
       return inline;
     }
 
+    /**
+     * If set to <code>true</code>, whole source map is encoded and embedded into generated css. It is <code>false</code> by default.
+     */
     public SourceMapConfiguration setInline(boolean inline) {
       this.inline = inline;
       return this;
@@ -118,6 +124,9 @@ public interface LessCompiler {
       return encodingCharset;
     }
 
+    /**
+     * Source map and source map link encoding charset.
+     */
     public SourceMapConfiguration setEncodingCharset(String encodingCharset) {
       this.encodingCharset = encodingCharset;
       return this;
@@ -127,6 +136,12 @@ public interface LessCompiler {
       return relativizePaths;
     }
 
+    /**
+     * If set to false, final source map contains unmodified (absolute) paths to 
+     * original less files. If set to true, generated map contains relative paths. Note that 
+     * "correct" source map should contain relative paths. Use this option only if 
+     * you need some kind of post processing on generated map.
+     */
     public SourceMapConfiguration setRelativizePaths(boolean relativizePaths) {
       this.relativizePaths = relativizePaths;
       return this;
