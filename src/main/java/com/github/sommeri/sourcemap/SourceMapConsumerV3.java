@@ -47,6 +47,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
   private String sourceRoot;
   
   private String[] sources;
+  private String[] sourcesContent;
   private String[] names;
   private int lineCount;
   // Slots in the lines list will be null if the line does not have any entries.
@@ -121,6 +122,11 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
       String lineMap = sourceMapRoot.getString("mappings");
 
       sources = getJavaStringArray(sourceMapRoot.getJSONArray("sources"));
+      if (sourceMapRoot.has("sourcesContent")) {
+        sourcesContent = getJavaStringArray(sourceMapRoot.getJSONArray("sourcesContent"));
+      } else {
+        sourcesContent= new String[sources.length];
+      }
       names = getJavaStringArray(sourceMapRoot.getJSONArray("names"));
 
       lines = new ArrayList<ArrayList<Entry>>(lineCount);
@@ -333,6 +339,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     private void validateEntry(Entry entry) {
       Preconditions.checkState(line < lineCount);
       Preconditions.checkState(entry.getSourceFileId() == UNMAPPED || entry.getSourceFileId() < sources.length);
+      Preconditions.checkState(entry.getSourceFileId() == UNMAPPED || entry.getSourceFileId() < sourcesContent.length);
       Preconditions.checkState(entry.getNameId() == UNMAPPED || entry.getNameId() < names.length);
     }
 
@@ -657,12 +664,13 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
   }
 
   public static interface EntryVisitor {
-    void visit(String sourceName, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition);
+    void visit(String sourceName, String sourceContent, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition);
   }
 
   public void visitMappings(EntryVisitor visitor) {
     boolean pending = false;
     String sourceName = null;
+    String sourceContent = null;
     String symbolName = null;
     FilePosition sourceStartPosition = null;
     FilePosition startPosition = null;
@@ -676,13 +684,14 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
           Entry entry = line.get(j);
           if (pending) {
             FilePosition endPosition = new FilePosition(i, entry.getGeneratedColumn());
-            visitor.visit(sourceName, symbolName, sourceStartPosition, startPosition, endPosition);
+            visitor.visit(sourceName, sourceContent, symbolName, sourceStartPosition, startPosition, endPosition);
             pending = false;
           }
 
           if (entry.getSourceFileId() != UNMAPPED) {
             pending = true;
             sourceName = sources[entry.getSourceFileId()];
+            sourceContent = sourcesContent[entry.getSourceFileId()];
             symbolName = (entry.getNameId() != UNMAPPED) ? names[entry.getNameId()] : null;
             sourceStartPosition = new FilePosition(entry.getSourceLine(), entry.getSourceColumn());
             startPosition = new FilePosition(i, entry.getGeneratedColumn());
@@ -693,7 +702,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     //TODO: (closure report) (source map separation) I added this to because last mapping was never visited 
     if (pending) {
       FilePosition endPosition = new FilePosition(startPosition.getLine(), startPosition.getColumn());
-      visitor.visit(sourceName, symbolName, sourceStartPosition, startPosition, endPosition);
+      visitor.visit(sourceName, sourceContent, symbolName, sourceStartPosition, startPosition, endPosition);
     }
 
     //TODO: source map (closure report) - investigate and maybe fill bug to closure - they generate additional mappings to mark ends which is weird.

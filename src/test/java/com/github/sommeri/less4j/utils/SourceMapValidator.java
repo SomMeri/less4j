@@ -163,7 +163,7 @@ public class SourceMapValidator {
     }
 
     @Override
-    public void visit(String sourceName, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition) {
+    public void visit(String sourceName, String sourceContent, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition) {
       if (symbolName != null)
         symbols.add(symbolName);
     }
@@ -183,7 +183,7 @@ public class SourceMapValidator {
     }
 
     @Override
-    public void visit(String sourceName, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition) {
+    public void visit(String sourceName, String sourceContent, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition) {
       MappedFile mappedFile = mappedFiles.get(sourceName);
       if (symbolName != null && !mapdata.isInterpolated(symbolName)) {
         String sourceSnippet = mappedFile.getSnippet(sourceStartPosition, symbolName.length());

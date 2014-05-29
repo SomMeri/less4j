@@ -21,6 +21,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,7 +38,6 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
 
   private static final int UNMAPPED = -1;
 
-
   /**
    * A pre-order traversal ordered list of mappings stored in this map.
    */
@@ -46,7 +46,9 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
   /**
    * A map of source names to source name index
    */
-  private LinkedHashMap<String, Integer> sourceFileMap = new LinkedHashMap<String, Integer>();
+  private LinkedHashMap<String, Integer> sourceFileKeyMap = new LinkedHashMap<String, Integer>();
+  private LinkedList<String> sourceFileNameMap = new LinkedList<String>();
+  private LinkedList<String> sourceFileContentMap = new LinkedList<String>();
 
   /**
    * A map of source names to source name index
@@ -56,7 +58,12 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
   /**
    * Cache of the last mappings source name.
    */
-  private String lastSourceFile = null;
+  private String lastSourceFileName = null;
+
+  /**
+   * Cache of the last mappings source content.
+   */
+  private String lastSourceFileContent = null;
 
   /**
    * Cache of the last mappings source name index.
@@ -81,7 +88,6 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
    */
   private FilePosition prefixPosition = new FilePosition(0, 0);
 
-
   /**
    * {@inheritDoc}
    */
@@ -89,9 +95,12 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
   public void reset() {
     mappings.clear();
     lastMapping = null;
-    sourceFileMap.clear();
+    sourceFileKeyMap.clear();
+    sourceFileNameMap.clear();
+    sourceFileContentMap.clear();
     originalNameMap.clear();
-    lastSourceFile = null;
+    lastSourceFileName = null;
+    lastSourceFileContent = null;
     lastSourceFileIndex = -1;
     offsetPosition = new FilePosition(0, 0);
     prefixPosition = new FilePosition(0, 0);
@@ -154,21 +163,17 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
    * @param endPosition The position on the ending line.
    */
   @Override
-  public void addMapping(
-      String sourceName, String symbolName,
-      FilePosition sourceStartPosition,
-      FilePosition startPosition, FilePosition endPosition) {
+  public void addMapping(String sourceName, String sourceContent, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition) {
 
     // Don't bother if there is not sufficient information to be useful.
-    if (sourceName == null || sourceStartPosition.getLine() < 0) {
+    if ((sourceName == null && sourceContent == null) || sourceStartPosition.getLine() < 0) {
       return;
     }
 
     FilePosition adjustedStart = startPosition;
     FilePosition adjustedEnd = endPosition;
 
-    if (offsetPosition.getLine() != 0
-        || offsetPosition.getColumn() != 0) {
+    if (offsetPosition.getLine() != 0 || offsetPosition.getColumn() != 0) {
       // If the mapping is found on the first line, we need to offset
       // its character position by the number of characters found on
       // the *last* line of the source file to which the code is
@@ -180,6 +185,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     // Create the new mapping.
     Mapping mapping = new Mapping();
     mapping.sourceFile = sourceName;
+    mapping.sourceContent = sourceContent;
     mapping.originalPosition = sourceStartPosition;
     mapping.originalName = symbolName;
     mapping.startPosition = adjustedStart;
@@ -191,10 +197,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
       int lastColumn = lastMapping.startPosition.getColumn();
       int nextLine = mapping.startPosition.getLine();
       int nextColumn = mapping.startPosition.getColumn();
-      Preconditions.checkState(nextLine > lastLine
-          || (nextLine == lastLine && nextColumn >= lastColumn),
-          "Incorrect source mappings order, previous : ("+lastLine+","+lastColumn+")\n"
-          + "new : ("+nextLine+","+nextColumn+")\nnode : %s");
+      Preconditions.checkState(nextLine > lastLine || (nextLine == lastLine && nextColumn >= lastColumn), "Incorrect source mappings order, previous : (" + lastLine + "," + lastColumn + ")\n" + "new : (" + nextLine + "," + nextColumn + ")\nnode : %s");
     }
 
     lastMapping = mapping;
@@ -209,7 +212,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
       offsetColumn = 0;
     }
 
-    FilePosition adjustedStart = new FilePosition(mapping.getLine() + offsetLine,  mapping.getColumn() + offsetColumn);
+    FilePosition adjustedStart = new FilePosition(mapping.getLine() + offsetLine, mapping.getColumn() + offsetColumn);
     return adjustedStart;
   }
 
@@ -231,29 +234,24 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
       adjustedMapping.originalName = mapping.originalName;
       adjustedMapping.startPosition = adjustPosition(mapping.startPosition, offset);
       adjustedMapping.endPosition = adjustPosition(mapping.endPosition, offset);
-      
+
       mappings.add(adjustedMapping);
     }
   }
-  
+
   class ConsumerEntryVisitor implements EntryVisitor {
 
     @Override
-    public void visit(
-        String sourceName, String symbolName,
-        FilePosition sourceStartPosition,
-        FilePosition startPosition, FilePosition endPosition) {
-      addMapping(sourceName, symbolName,
-          sourceStartPosition, startPosition, endPosition);
+    public void visit(String sourceName, String sourceContent, String symbolName, FilePosition sourceStartPosition, FilePosition startPosition, FilePosition endPosition) {
+      addMapping(sourceName, sourceContent, symbolName, sourceStartPosition, startPosition, endPosition);
     }
   }
 
-  public void mergeMapSection(int line, int column, String mapSectionContents)
-      throws SourceMapParseException {
-     setStartingPosition(line, column);
-     SourceMapConsumerV3 section = new SourceMapConsumerV3();
-     section.parse(mapSectionContents);
-     section.visitMappings(new ConsumerEntryVisitor());
+  public void mergeMapSection(int line, int column, String mapSectionContents) throws SourceMapParseException {
+    setStartingPosition(line, column);
+    SourceMapConsumerV3 section = new SourceMapConsumerV3();
+    section.parse(mapSectionContents);
+    section.visitMappings(new ConsumerEntryVisitor());
   }
 
   /**
@@ -306,7 +304,14 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     out.append("]");
     appendFieldEnd(out);
 
-    // Files names
+    // Files content
+    appendFieldStart(out, "sourcesContent");
+    out.append("[");
+    addSourceContentMap(out);
+    out.append("]");
+    appendFieldEnd(out);
+
+    // Synbols names
     appendFieldStart(out, "names");
     out.append("[");
     addSymbolNameMap(out);
@@ -320,7 +325,14 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
    * Writes the source name map to 'out'.
    */
   private void addSourceNameMap(Appendable out) throws IOException {
-    addNameMap(out, sourceFileMap);
+    addValuesList(out, sourceFileNameMap);
+  }
+
+  /**
+   * Writes the source content map to 'out'.
+   */
+  private void addSourceContentMap(Appendable out) throws IOException {
+    addValuesList(out, sourceFileContentMap);
   }
 
   /**
@@ -330,15 +342,25 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     addNameMap(out, originalNameMap);
   }
 
-  private void addNameMap(Appendable out, Map<String, Integer> map)
-      throws IOException {
+  private void addNameMap(Appendable out, Map<String, Integer> map) throws IOException {
     int i = 0;
     for (Entry<String, Integer> entry : map.entrySet()) {
       String key = entry.getKey();
       if (i != 0) {
         out.append(",");
       }
-      out.append(escapeString(key));
+      out.append(key == null ? null : escapeString(key));
+      i++;
+    }
+  }
+
+  private void addValuesList(Appendable out, List<String> list) throws IOException {
+    int i = 0;
+    for (String string : list) {
+      if (i != 0) {
+        out.append(",");
+      }
+      out.append(string == null ? null : escapeString(string));
       i++;
     }
   }
@@ -352,9 +374,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
 
   // Source map field helpers.
 
-  private static void appendFirstField(
-      Appendable out, String name, CharSequence value)
-      throws IOException {
+  private static void appendFirstField(Appendable out, String name, CharSequence value) throws IOException {
     out.append("\"");
     out.append(name);
     out.append("\"");
@@ -362,9 +382,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     out.append(value);
   }
 
-  private static void appendField(
-      Appendable out, String name, CharSequence value)
-      throws IOException {
+  private static void appendField(Appendable out, String name, CharSequence value) throws IOException {
     out.append(",\n");
     out.append("\"");
     out.append(name);
@@ -373,13 +391,11 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     out.append(value);
   }
 
-  private static void appendFieldStart(Appendable out, String name)
-      throws IOException {
+  private static void appendFieldStart(Appendable out, String name) throws IOException {
     appendField(out, name, "");
   }
 
-  private static void appendFieldEnd(Appendable out)
-     throws IOException {
+  private static void appendFieldEnd(Appendable out) throws IOException {
   }
 
   /**
@@ -409,6 +425,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
    * in the generated code.
    */
   static class Mapping {
+
     /**
      * A unique ID for this mapping for record keeping purposes.
      */
@@ -418,6 +435,11 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
      * The source file index.
      */
     String sourceFile;
+
+    /**
+     * The source file content.
+     */
+    String sourceContent;
 
     /**
      * The position of the code in the input source file. Both
@@ -458,8 +480,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
      * @throws IOException
      */
     @Override
-    public void visit(Mapping m, int line, int col, int nextLine, int nextCol)
-        throws IOException {
+    public void visit(Mapping m, int line, int col, int nextLine, int nextCol) throws IOException {
       if (m != null) {
         m.used = true;
       }
@@ -476,8 +497,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
      * @param endCol The ending column
      * @throws IOException
      */
-    void visit(Mapping m, int line, int col, int endLine, int endCol)
-        throws IOException;
+    void visit(Mapping m, int line, int col, int endLine, int endCol) throws IOException;
   }
 
   /**
@@ -538,8 +558,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
       int rawLine = p.getLine();
       int rawCol = p.getColumn();
       // Only the first line needs the character position adjusted.
-      return (rawLine != 0)
-          ? rawCol : rawCol + prefixPosition.getColumn();
+      return (rawLine != 0) ? rawCol : rawCol + prefixPosition.getColumn();
     }
 
     /**
@@ -572,8 +591,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     /**
      * Write any needed entries to complete the provided mapping.
      */
-    private void maybeVisitParent(MappingVisitor v, Mapping parent, Mapping m)
-        throws IOException {
+    private void maybeVisitParent(MappingVisitor v, Mapping parent, Mapping m) throws IOException {
       int nextLine = getAdjustedLine(m.startPosition);
       int nextCol = getAdjustedCol(m.startPosition);
       // If the previous value is null, no mapping exists.
@@ -587,9 +605,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
      * Write any entries needed between the current position the next position
      * and update the current position.
      */
-    private void visit(MappingVisitor v, Mapping m,
-        int nextLine, int nextCol)
-        throws IOException {
+    private void visit(MappingVisitor v, Mapping m, int nextLine, int nextCol) throws IOException {
       Preconditions.checkState(line <= nextLine);
       Preconditions.checkState(line < nextLine || col < nextCol);
 
@@ -616,9 +632,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
    * @throws IOException
    */
   @Override
-  public void appendIndexMapTo(
-      Appendable out, String name, List<SourceMapSection> sections)
-      throws IOException {
+  public void appendIndexMapTo(Appendable out, String name, List<SourceMapSection> sections) throws IOException {
     // Add the header fields.
     out.append("{\n");
     appendFirstField(out, "version", "3");
@@ -635,8 +649,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
         out.append(",\n");
       }
       out.append("{\n");
-      appendFirstField(out, "offset",
-          offsetValue(section.getLine(), section.getColumn()));
+      appendFirstField(out, "offset", offsetValue(section.getLine(), section.getColumn()));
       if (section.getSectionType() == SourceMapSection.SectionType.URL) {
         appendField(out, "url", escapeString(section.getSectionValue()));
       } else if (section.getSectionType() == SourceMapSection.SectionType.MAP) {
@@ -662,15 +675,21 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     return out;
   }
 
-  private int getSourceId(String sourceName) {
-    if (sourceName != lastSourceFile) {
-      lastSourceFile = sourceName;
-      Integer index = sourceFileMap.get(sourceName);
+  private int getSourceId(String sourceName, String sourceContent) {
+    if (sourceName != lastSourceFileName || sourceContent != lastSourceFileContent) {
+      //if it is different file then the one before
+      lastSourceFileName = sourceName;
+      lastSourceFileContent = sourceContent;
+
+      String key = sourceName != null ? sourceName : sourceContent;
+      Integer index = sourceFileKeyMap.get(key);
       if (index != null) {
         lastSourceFileIndex = index;
       } else {
-        lastSourceFileIndex = sourceFileMap.size();
-        sourceFileMap.put(sourceName, lastSourceFileIndex);
+        lastSourceFileIndex = sourceFileKeyMap.size();
+        sourceFileKeyMap.put(key, lastSourceFileIndex);
+        sourceFileNameMap.add(sourceName);
+        sourceFileContentMap.add(sourceContent);
       }
     }
     return lastSourceFileIndex;
@@ -709,8 +728,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
      * As each segment is visited write out the appropriate line mapping.
      */
     @Override
-    public void visit(Mapping m, int line, int col, int nextLine, int nextCol)
-      throws IOException {
+    public void visit(Mapping m, int line, int col, int nextLine, int nextCol) throws IOException {
 
       if (previousLine != line) {
         previousColumn = 0;
@@ -747,7 +765,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
       previousColumn = column;
       if (m != null) {
         // The relative source file id
-        int sourceId = getSourceId(m.sourceFile);
+        int sourceId = getSourceId(m.sourceFile, m.sourceContent);
         Base64VLQ.encode(out, sourceId - previousSourceFileId);
         previousSourceFileId = sourceId;
 

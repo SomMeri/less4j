@@ -4,5 +4,6 @@
 "lineCount":1,
 "mappings":"AAAAA,K,CAAMC;",
 "sources":["multi1.less"],
+"sourcesContent":[".test h4 {\n  declaration: multi1;\n}"],
 "names":[".test","h4"]
 }

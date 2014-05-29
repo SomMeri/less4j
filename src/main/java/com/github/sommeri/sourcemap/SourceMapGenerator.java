@@ -60,6 +60,8 @@ public interface SourceMapGenerator {
    * Adds a mapping for the given node.  Mappings must be added in order.
    * @param sourceName The file name to use in the generate source map
    *     to represent this source.
+   * @param sourceContent  TODO FIXME !!!!!!!!!!!!!!!!
+   * 
    * @param symbolName The symbol name associated with this position in the
    *     source map.
    * @param sourceStartPosition The starting position in the original source for
@@ -68,7 +70,7 @@ public interface SourceMapGenerator {
    * @param outputStartPosition The position on the starting line
    * @param outputEndPosition The position on the ending line.
    */
-  void addMapping(String sourceName, String symbolName,
+  void addMapping(String sourceName, String sourceContent, String symbolName,
            FilePosition sourceStartPosition,
            FilePosition outputStartPosition, FilePosition outputEndPosition);
 

@@ -4,7 +4,10 @@ import java.io.IOException;
 
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.LessSource.CannotReadFile;
+import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.URIUtils;
 import com.github.sommeri.sourcemap.FilePosition;
 import com.github.sommeri.sourcemap.SourceMapFormat;
@@ -47,10 +50,12 @@ public class SourceMapBuilder {
     createMapping(str, sourceToken, outputStartPosition, outputEndPosition);
   }
 
-  private void createMapping(String str, HiddenTokenAwareTree sourceToken, FilePosition outputStartPosition, FilePosition outputEndPosition) {
+  private void createMapping(String mappedSymbol, HiddenTokenAwareTree sourceToken, FilePosition outputStartPosition, FilePosition outputEndPosition) {
     FilePosition sourceStartPosition = toFilePosition(sourceToken);
     String sourceName = toSourceName(sourceToken);
-    generator.addMapping(sourceName, str, sourceStartPosition, outputStartPosition, outputEndPosition);
+    String sourceContent = toSourceContent(sourceToken);
+
+    generator.addMapping(sourceName, sourceContent, mappedSymbol, sourceStartPosition, outputStartPosition, outputEndPosition);
   }
 
   private FilePosition beforeSymbolPosition() {
@@ -85,6 +90,21 @@ public class SourceMapBuilder {
       return URIUtils.relativizeSourceURIs(cssDestination, source);
     } else {
       return source.getURI() == null ? null : source.getURI().toString();
+    }
+  }
+
+  private String toSourceContent(HiddenTokenAwareTree underlyingStructure) {
+    LessSource source = underlyingStructure.getSource();
+    if (true) { //FIXME !!!!!!!!!!!!!!!!! add configuration property
+      try {
+        return source.getContent();
+      } catch (FileNotFound e) {
+        throw new BugHappened("How did we compiled something we did not read?", underlyingStructure);
+      } catch (CannotReadFile e) {
+        throw new BugHappened("How did we compiled something we did not read?", underlyingStructure);
+      }
+    } else {
+      return null;
     }
   }
 
