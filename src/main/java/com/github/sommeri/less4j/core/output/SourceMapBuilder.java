@@ -53,7 +53,7 @@ public class SourceMapBuilder {
   private void createMapping(String mappedSymbol, HiddenTokenAwareTree sourceToken, FilePosition outputStartPosition, FilePosition outputEndPosition) {
     FilePosition sourceStartPosition = toFilePosition(sourceToken);
     String sourceName = toSourceName(sourceToken);
-    String sourceContent = toSourceContent(sourceToken);
+    String sourceContent = toSourceContent(sourceToken, sourceName);
 
     generator.addMapping(sourceName, sourceContent, mappedSymbol, sourceStartPosition, outputStartPosition, outputEndPosition);
   }
@@ -93,9 +93,9 @@ public class SourceMapBuilder {
     }
   }
 
-  private String toSourceContent(HiddenTokenAwareTree underlyingStructure) {
+  private String toSourceContent(HiddenTokenAwareTree underlyingStructure, String sourceName) {
     LessSource source = underlyingStructure.getSource();
-    if (true) { //FIXME !!!!!!!!!!!!!!!!! add configuration property
+    if (configuration.isIncludeSourcesContent() || sourceName==null) { 
       try {
         return source.getContent();
       } catch (FileNotFound e) {

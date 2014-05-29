@@ -95,6 +95,7 @@ public interface LessCompiler {
     private boolean inline = false;
     private String encodingCharset = "UTF-8";
     private boolean relativizePaths = true;
+    private boolean includeSourcesContent = false;
 
     public boolean shouldLinkSourceMap() {
       return linkSourceMap;
@@ -146,6 +147,15 @@ public interface LessCompiler {
       this.relativizePaths = relativizePaths;
       return this;
     }
+
+    public boolean isIncludeSourcesContent() {
+      return includeSourcesContent;
+    }
+
+    public void setIncludeSourcesContent(boolean includeSourcesContent) {
+      this.includeSourcesContent = includeSourcesContent;
+    }
+    
   }
 
   public static class CompilationResult {
