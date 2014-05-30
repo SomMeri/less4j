@@ -5,12 +5,10 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
@@ -29,11 +27,6 @@ import com.github.sommeri.less4j.core.compiler.stages.UnNestingAndBubbling;
 import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
-import com.github.sommeri.less4j.platform.Constants;
-import com.github.sommeri.less4j.utils.ArraysUtils;
-import com.github.sommeri.less4j.utils.CssPrinter;
-import com.github.sommeri.less4j.utils.PrintUtils;
-import com.github.sommeri.less4j.utils.URIUtils;
 
 public class LessToCssCompiler {
 
@@ -62,9 +55,6 @@ public class LessToCssCompiler {
     sortTopLevelElements(less);
     removeUselessCharsets(less);
 
-    //source map  
-    handleSourceMapLink(less, options, source);
-
     //final validation
     validateFinalCss(less);
 
@@ -84,60 +74,6 @@ public class LessToCssCompiler {
   private void freeNestedRulesetsAndMedia(StyleSheet less) {
     UnNestingAndBubbling nestingBubbling = new UnNestingAndBubbling();
     nestingBubbling.unnestRulesetAndMedia(less);
-  }
-
-  private void handleSourceMapLink(StyleSheet less, Configuration options, LessSource source) {
-    String cssResultLocation = getCssResultLocationName(options, source);
-    LessCompiler.SourceMapConfiguration sourceMapConfiguration = options.getSourceMapConfiguration();
-    if (!sourceMapConfiguration.shouldLinkSourceMap() && !sourceMapConfiguration.isInline())
-      return;
-    
-    if (sourceMapConfiguration.shouldLinkSourceMap() && cssResultLocation==null) {
-      problemsHandler.warnSourceMapLinkWithoutCssResultLocation(less);
-      return ; 
-    }
-
-    addNewLine(less);
-
-    String commentText;
-    String encodingCharset = sourceMapConfiguration.getEncodingCharset();
-    if (sourceMapConfiguration.isInline()) {
-      CssPrinter builder = new CssPrinter(source, options.getCssResultLocation(), options);
-      builder.append(less);
-      String sourceMap = builder.toSourceMap();
-      String encodedSourceMap = PrintUtils.base64Encode(sourceMap, encodingCharset, problemsHandler, less);
-      commentText = "/*# sourceMappingURL=data:application/json;base64," + encodedSourceMap + " */";
-    } else {
-      //compose linking comment
-      String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
-      String encodedUrl = PrintUtils.urlEncode(url, encodingCharset, problemsHandler, less);
-      commentText = "/*# sourceMappingURL=" + encodedUrl + " */";
-    }
-
-    Comment linkComment = new Comment(less.getUnderlyingStructure(), commentText, true);
-
-    //add linking comment
-    less.addTrailingComment(linkComment);
-  }
-
-  private void addNewLine(StyleSheet less) {
-    Comment last = ArraysUtils.last(less.getTrailingComments());
-    if (last!=null) {
-      last.setHasNewLine(true);
-    } else {
-      //Last comment is not necessary attached to the stylesheet, ensure new line anyway
-      less.addTrailingComment(new Comment(less.getUnderlyingStructure(), null, true));
-    }
-  }
-
-  private String getCssResultLocationName(Configuration options, LessSource source) {
-    LessSource location = options.getCssResultLocation();
-    String name = location == null ? null : location.getName();
-
-    if (name == null)
-      name = URIUtils.changeSuffix(source.getName(), Constants.CSS_SUFFIX);
-
-    return name;
   }
 
   private void resolveImportsAndReferences(StyleSheet less, LessSource source) {

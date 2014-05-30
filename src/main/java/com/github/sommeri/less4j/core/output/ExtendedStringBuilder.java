@@ -145,6 +145,10 @@ public class ExtendedStringBuilder {
     return builder.toString();
   }
 
+  public StringBuilder toStringBuilder() {
+    return builder;
+  }
+
   public ExtendedStringBuilder ensureNewLine() {
     if (!onNewLine)
       newLine();

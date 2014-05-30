@@ -1,16 +1,15 @@
 package com.github.sommeri.less4j.resources;
 
-import static org.junit.Assert.assertFalse;
+import static com.github.sommeri.less4j.resources.SourceMapLinkParser.assertDoesNotLinkSourceMap;
+import static com.github.sommeri.less4j.resources.SourceMapLinkParser.assertInlineSourceMap;
+import static com.github.sommeri.less4j.resources.SourceMapLinkParser.assertLinksSourceMap;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -38,7 +37,7 @@ public class SourceMapApiTest {
   public static final String FAKE_URL_RESULT_CSS = "dummy.html";
   public static final String FAKE_URL_RESULT_LINKED_MAP = "dummy.html.map";
   public static final URL FAKE_URL_RESULT_URL = toUrl();
-
+  
   private static URL toUrl() {
     try {
       return new URL(FAKE_URL_RESULT_LOCATION);
@@ -47,16 +46,17 @@ public class SourceMapApiTest {
     }
   }
 
-  public static final String ONE_IMPORT_LESS_PATH = "src/test/resources/source-map/api/file-import.less";
-  public static final File ONE_IMPORT_LESS_FILE = new File(ONE_IMPORT_LESS_PATH);
-  public static final String ONE_IMPORT_MAPDATA_UNKNOWN_CSS = "src/test/resources/source-map/api/file-import-unknown-css.mapdata";
-  public static final String ONE_IMPORT_MAPDATA_GUESSED_CSS = "src/test/resources/source-map/api/file-import-guessed-css.mapdata";
-  public static final String ONE_IMPORT_CSS_KNOWN_MAPDATA = "src/test/resources/source-map/api/file-import-css-location-known.mapdata";
-  public static final String ONE_IMPORT_URL_KNOWN_MAPDATA = "src/test/resources/source-map/api/file-import-url-location-known.mapdata";
+  private static final String ONE_IMPORT_LESS_PATH = "src/test/resources/source-map/api/file-import.less";
+  private static final File ONE_IMPORT_LESS_FILE = new File(ONE_IMPORT_LESS_PATH);
+  private static final String ONE_IMPORT_MAPDATA_GUESSED_CSS = "src/test/resources/source-map/api/file-import-guessed-css.mapdata";
+  private static final String ONE_IMPORT_MAPDATA_WITH_LESS = "src/test/resources/source-map/api/file-import-with-less.mapdata";
+  private static final String ONE_IMPORT_MAPDATA_NO_RELATIVIZATION = "src/test/resources/source-map/api/file-import-no-path-relativization.mapdata";
+  private static final String ONE_IMPORT_CSS_KNOWN_MAPDATA = "src/test/resources/source-map/api/file-import-css-location-known.mapdata";
+  private static final String ONE_IMPORT_URL_KNOWN_MAPDATA = "src/test/resources/source-map/api/file-import-url-location-known.mapdata";
 
   public static final Map<String, String> LESS_INPUT_CONTENTS = new HashMap<String, String>();
   static {
-    LESS_INPUT_CONTENTS.put("", NO_IMPORT_LESS_INPUT);
+    LESS_INPUT_CONTENTS.put(null, NO_IMPORT_LESS_INPUT);
   }
   
   @Test
@@ -80,6 +80,21 @@ public class SourceMapApiTest {
     assertNotNull(compilationResult.getCss());
     assertNotNull(compilationResult.getSourceMap());
     assertDoesNotLinkSourceMap(compilationResult.getCss());
+    
+    SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
+    validator.validateSourceMap(compilationResult, new File(NO_DATA_AVAILABLE_MAPDATA));
+  }
+
+  @Test
+  public void stringWithSourceMap() throws Less4jException {
+    LessCompiler compiler = new DefaultLessCompiler();
+    Configuration options = new Configuration();
+    options.getSourceMapConfiguration().setInline(true);
+    CompilationResult compilationResult = compiler.compile(NO_IMPORT_LESS_INPUT, options);
+    
+    assertNotNull(compilationResult.getCss());
+    assertNotNull(compilationResult.getSourceMap());
+    assertInlineSourceMap(compilationResult);
     
     SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
     validator.validateSourceMap(compilationResult, new File(NO_DATA_AVAILABLE_MAPDATA));
@@ -144,6 +159,52 @@ public class SourceMapApiTest {
   }
 
   @Test
+  public void fileDoNotRelativize() throws Less4jException {
+    LessCompiler compiler = new DefaultLessCompiler();
+    Configuration configuration = new Configuration(); 
+    configuration.getSourceMapConfiguration().setRelativizePaths(false);
+    CompilationResult compilationResult = compiler.compile(ONE_IMPORT_LESS_FILE, configuration);
+    
+    assertNotNull(compilationResult.getCss());
+    assertNotNull(compilationResult.getSourceMap());
+    assertLinksSourceMap(compilationResult.getCss(), toFullMapSuffix());
+    
+    SourceMapValidator validator = new SourceMapValidator("");
+    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_NO_RELATIVIZATION), URIUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.CSS_SUFFIX));
+  }
+
+  @Test
+  public void fileIncludeLessFiles() throws Less4jException {
+    LessCompiler compiler = new DefaultLessCompiler();
+    Configuration configuration = new Configuration(); 
+    configuration.getSourceMapConfiguration().setIncludeSourcesContent(true);
+    CompilationResult compilationResult = compiler.compile(ONE_IMPORT_LESS_FILE, configuration);
+    
+    assertNotNull(compilationResult.getCss());
+    assertNotNull(compilationResult.getSourceMap());
+    assertLinksSourceMap(compilationResult.getCss(), toFullMapSuffix());
+    
+    SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
+    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_WITH_LESS), URIUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.CSS_SUFFIX));
+  }
+
+  @Test
+  public void fileSelfContained() throws Less4jException {
+    LessCompiler compiler = new DefaultLessCompiler();
+    Configuration configuration = new Configuration(); 
+    configuration.getSourceMapConfiguration().setIncludeSourcesContent(true);
+    configuration.getSourceMapConfiguration().setInline(true);
+    CompilationResult compilationResult = compiler.compile(ONE_IMPORT_LESS_FILE, configuration);
+    
+    assertNotNull(compilationResult.getCss());
+    assertNotNull(compilationResult.getSourceMap());
+    assertInlineSourceMap(compilationResult);
+    
+    SourceMapValidator validator = new SourceMapValidator(LESS_INPUT_CONTENTS);
+    validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_MAPDATA_WITH_LESS), URIUtils.changeSuffix(ONE_IMPORT_LESS_FILE, Constants.CSS_SUFFIX));
+  }
+
+  @Test
   public void fileWithConfiguration() throws Less4jException {
     Configuration configuration = new Configuration();
     configuration.setCssResultLocation(new File(FAKE_CSS_RESULT_LOCATION));
@@ -175,26 +236,6 @@ public class SourceMapApiTest {
     validator.validateSourceMap(compilationResult, new File(ONE_IMPORT_URL_KNOWN_MAPDATA));
   }
   
-  private void assertDoesNotLinkSourceMap(String css) {
-    boolean matches = hasSourceMapLink(css);
-    assertFalse("Generated css should NOT contain source map link.", matches);
-  }
-
-  private void assertLinksSourceMap(String css, String mapName) {
-    assertTrue("Generated css should contain source map link.", hasSourceMapLink(css, ""));
-    assertTrue("Generated css links wrong source map. Should be " + mapName + "", hasSourceMapLink(css, mapName));
-  }
-
-  private boolean hasSourceMapLink(String css) {
-    return hasSourceMapLink(css, "");
-  }
-  
-  private boolean hasSourceMapLink(String css, String mapName) {
-    Pattern pattern = Pattern.compile("/\\*#\\s+sourceMappingURL="+mapName);
-    Matcher matcher = pattern.matcher(css);
-    return matcher.find();
-  }
-
   private String toFullMapSuffix() {
     return URIUtils.changeSuffix(ONE_IMPORT_LESS_FILE.getName(), Constants.FULL_SOURCE_MAP_SUFFIX);
   }

@@ -238,6 +238,9 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     return Arrays.asList(sources);
   }
 
+  public Collection<String> getOriginalSourcesContent() {
+    return Arrays.asList(sourcesContent);
+  }
   public String getFile() {
     return file;
   }
@@ -276,7 +279,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     int len = array.length();
     String[] result = new String[len];
     for (int i = 0; i < len; i++) {
-      result[i] = array.getString(i);
+      result[i] = array.isNull(i)? null : array.getString(i);
     }
     return result;
   }
@@ -708,4 +711,5 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
     //TODO: source map (closure report) - investigate and maybe fill bug to closure - they generate additional mappings to mark ends which is weird.
 
   }
+
 }

@@ -1,5 +1,6 @@
 {
-  "file":"",
+  "file":"file-import.css",
   "sources":["src/test/resources/source-map/api/file-import.less", "src/test/resources/source-map/api/import/imported.less"],
+  "sourcesContent":[null, null],
   "names":[".class", ".imported"]
 }

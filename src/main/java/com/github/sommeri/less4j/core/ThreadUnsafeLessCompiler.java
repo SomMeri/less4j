@@ -18,6 +18,7 @@ import com.github.sommeri.less4j.core.problems.GeneralProblem;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.CssPrinter;
+import com.github.sommeri.less4j.utils.PrintUtils;
 import com.github.sommeri.less4j.utils.URIUtils;
 
 public class ThreadUnsafeLessCompiler implements LessCompiler {
@@ -114,11 +115,67 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     
     CssPrinter builder = new CssPrinter(lessSource, cssDestination, options);
     builder.append(cssStyleSheet);
-    String css = builder.toCss();
+    StringBuilder css = builder.toCss();
     String sourceMap = builder.toSourceMap();
+    
+    handleSourceMapLink(cssStyleSheet, css, options, lessSource, sourceMap);
 
-    CompilationResult compilationResult = new CompilationResult(css, sourceMap, problemsHandler.getWarnings());
+    CompilationResult compilationResult = new CompilationResult(css.toString(), sourceMap, problemsHandler.getWarnings());
     return compilationResult;
+  }
+
+  private void handleSourceMapLink(ASTCssNode cssAst, StringBuilder css, Configuration options, LessSource source, String sourceMap) {
+    String cssResultLocation = getCssResultLocationName(options, source);
+    LessCompiler.SourceMapConfiguration sourceMapConfiguration = options.getSourceMapConfiguration();
+    if (!sourceMapConfiguration.shouldLinkSourceMap() && !sourceMapConfiguration.isInline())
+      return;
+    
+    if (!sourceMapConfiguration.isInline() && cssResultLocation==null) {
+      problemsHandler.warnSourceMapLinkWithoutCssResultLocation(cssAst);
+      return ; 
+    }
+
+    addNewLine(css);
+
+    String commentText;
+    String encodingCharset = sourceMapConfiguration.getEncodingCharset();
+    if (sourceMapConfiguration.isInline()) {
+      String encodedSourceMap = PrintUtils.base64Encode(sourceMap, encodingCharset, problemsHandler, cssAst);
+      commentText = "/*# sourceMappingURL=data:application/json;base64," + encodedSourceMap + " */";
+    } else {
+      //compose linking comment
+      String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
+      String encodedUrl = PrintUtils.urlEncode(url, encodingCharset, problemsHandler, cssAst);
+      commentText = "/*# sourceMappingURL=" + encodedUrl + " */";
+    }
+
+    css.append(commentText).append("\n");
+  }
+
+  private void addNewLine(StringBuilder css) {
+    if (css==null)
+      return ;
+    
+    int length = css.length();
+    if (length==0) {
+      css.append("\n");
+      return ;
+    }
+    String endingSymbol = css.substring(length-1);
+    if ("\n".equals(endingSymbol))
+      return ;
+      
+    css.append("\n");
+  }
+
+  private String getCssResultLocationName(Configuration options, LessSource source) {
+    LessSource location = options.getCssResultLocation();
+    String name = location == null ? null : location.getName();
+
+    if (name == null)
+      name = URIUtils.changeSuffix(source.getName(), Constants.CSS_SUFFIX);
+
+    return name;
   }
 
 }

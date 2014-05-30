@@ -369,7 +369,7 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
    * Escapes the given string for JSON.
    */
   private static String escapeString(String value) {
-    return Util.escapeString(value);
+    return SourceMapUtil.escapeString(value);
   }
 
   // Source map field helpers.

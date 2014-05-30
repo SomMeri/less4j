@@ -642,7 +642,7 @@ public class CssPrinter {
       miniPrinter.append(declaration);
       miniPrinter.cssOnly.ensureNewLine();
 
-      declarationsStrings.add(miniPrinter.toCss(), miniPrinter);
+      declarationsStrings.add(miniPrinter.toCss().toString(), miniPrinter);
     }
 
     return declarationsStrings;
@@ -1046,8 +1046,8 @@ public class CssPrinter {
     return cssOnly.toString();
   }
 
-  public String toCss() {
-    return cssOnly.toString();
+  public StringBuilder toCss() {
+    return cssOnly.toStringBuilder();
   }
 
   public String toSourceMap() {

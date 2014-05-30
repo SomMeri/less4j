@@ -49,11 +49,11 @@ public class URIUtils {
 
   public static String relativizeSourceURIs(LessSource from, LessSource to) {
     if (to == null)
-      return "";
+      return null;
 
     URI toURI = to.getURI();
     if (toURI == null)
-      return to.getName() == null ? "" : to.getName();
+      return to.getName();
 
     String toURIAsString = toURI.toString();
 

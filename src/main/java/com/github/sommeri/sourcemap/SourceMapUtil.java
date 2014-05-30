@@ -21,7 +21,7 @@ import java.nio.charset.CharsetEncoder;
 /**
  * @author johnlenz@google.com (John Lenz)
  */
-class Util {
+public class SourceMapUtil {
 
   private static final char[] HEX_CHARS
       = { '0', '1', '2', '3', '4', '5', '6', '7',
@@ -30,7 +30,7 @@ class Util {
   /**
    * Escapes the given string to a double quoted (") JavaScript/JSON string
    */
-  static String escapeString(String s) {
+  public static String escapeString(String s) {
     return escapeString(s, '"',  "\\\"", "\'", "\\\\", null);
   }
 

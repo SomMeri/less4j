@@ -32,6 +32,7 @@ public class SourceMapValidator {
   private static final String CALCULATED_SYMBOLS_PROPERTY = "calculatedNames";
   private static final String SYMBOLS_PROPERTY = "names";
   private static final String SOURCES_PROPERTY = "sources";
+  private static final String SOURCES_CEONTENT_PROPERTY = "sourcesContent";
   private static final String CSS_FILE_PROPERTY = "file";
   private static final String SOURCE_ROOT_PROPERTY = "sourceRoot";
   protected static final String ALL = "*all*";
@@ -39,8 +40,13 @@ public class SourceMapValidator {
   private Map<String, MappedFile> mappedFiles = new HashMap<String, MappedFile>();
   private MappedFile cssFile;
   private Map<String, String> contents = new HashMap<String, String>();
+  private String customRoot = null;
 
   public SourceMapValidator() {
+  }
+
+  public SourceMapValidator(String customRoot) {
+    this.customRoot = customRoot;
   }
 
   public SourceMapValidator(Map<String, String> contents) {
@@ -58,11 +64,18 @@ public class SourceMapValidator {
     Mapdata mapdata = checkAgainstMapdataFile(sourceMap, mapdataFile);
     loadMappedSourceFiles(sourceMap.getOriginalSources(), getSourceRoot(cssFileLocation));
 
+    validateSymbolMappings(sourceMap, mapdata);
+  }
+
+  private void validateSymbolMappings(SourceMapConsumerV3 sourceMap, Mapdata mapdata) {
     MappingEntryValidation mappingEntryValidation = new MappingEntryValidation(mapdata);
     sourceMap.visitMappings(mappingEntryValidation);
   }
 
   private String getSourceRoot(File cssFileLocation) {
+    if (customRoot!=null)
+      return customRoot;
+    
     if (cssFileLocation != null)
       return URIUtils.addPLatformSlashIfNeeded(cssFileLocation.getParentFile().getAbsolutePath());
 
@@ -85,6 +98,9 @@ public class SourceMapValidator {
     // validate mapdata file
     if (expectedMapdata.hasSources()) {
       CustomAssertions.assertEqualsAsSets(expectedMapdata.getSources(), sourceMap.getOriginalSources());
+    }
+    if (expectedMapdata.hasSourcesContent()) {
+      CustomAssertions.assertEqualsAsSets(expectedMapdata.getSourcesContent(), sourceMap.getOriginalSourcesContent());
     }
     if (expectedMapdata.hasSymbols()) {
       CustomAssertions.assertEqualsAsSets(expectedMapdata.getSymbols(), allSymbols(sourceMap));
@@ -114,12 +130,13 @@ public class SourceMapValidator {
       JSONObject mapdata = new JSONObject(tokener);
 
       List<String> expectedSources = JSONUtils.getStringList(mapdata, SOURCES_PROPERTY);
+      List<String> expectedSourcesContent = JSONUtils.getStringList(mapdata, SOURCES_CEONTENT_PROPERTY);
       List<String> expectedSymbols = JSONUtils.getStringList(mapdata, SYMBOLS_PROPERTY);
       List<String> interpolatedSymbols = JSONUtils.getStringList(mapdata, CALCULATED_SYMBOLS_PROPERTY);
       String file = JSONUtils.getString(mapdata, CSS_FILE_PROPERTY);
       String sourceRoot = JSONUtils.getString(mapdata, SOURCE_ROOT_PROPERTY);
 
-      return new Mapdata(expectedSources, expectedSymbols, interpolatedSymbols, file, sourceRoot);
+      return new Mapdata(expectedSources, expectedSourcesContent, expectedSymbols, interpolatedSymbols, file, sourceRoot);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
@@ -248,13 +265,15 @@ class MappedFile {
 class Mapdata {
 
   private List<String> sources = null;
+  private List<String> sourcesContent = null;
   private List<String> symbols = null;
   private List<String> interpolatedSymbols = null;
   private String file;
   private String sourceRoot;
 
-  public Mapdata(List<String> sources, List<String> symbols, List<String> interpolatedSymbols, String file, String sourceRoot) {
+  public Mapdata(List<String> sources, List<String> sourcesContent, List<String> symbols, List<String> interpolatedSymbols, String file, String sourceRoot) {
     this.sources = sources;
+    this.sourcesContent = sourcesContent;
     this.symbols = symbols;
     this.interpolatedSymbols = interpolatedSymbols;
     this.file = file;
@@ -268,8 +287,16 @@ class Mapdata {
     return sources != null;
   }
 
+  public boolean hasSourcesContent() {
+    return sourcesContent != null;
+  }
+
   public List<String> getSources() {
     return sources;
+  }
+
+  public Collection<String> getSourcesContent() {
+    return sourcesContent;
   }
 
   public List<String> getSymbols() {

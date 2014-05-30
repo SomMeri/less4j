@@ -1,5 +1,6 @@
 {
   "file":"does-not-exists.css",
   "sources":["file-import.less", "import/imported.less"],
+  "sourcesContent":[null],
   "names":[".class", ".imported"]
 }

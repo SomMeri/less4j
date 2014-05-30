@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j;
+package com.github.sommeri.less4j.resources;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ public class SourceMapBuilderTest {
     
     String map = generateMap(generator);
     assertEquals("{\n\"version\":3,\n\"file\":\"name\",\n\"lineCount\":4,\n\"mappings\":\"A;CACCA,I;CACAC,I;CACAC;\",\n\"sources\":[null],\n\"sourcesContent\":[\"content\"],\n\"names\":[\"ahoj\",\"nazdar\",\"hello\"]\n}\n", map);
-    System.out.println(map);
+    //System.out.println(map);
   }
 
   @Test
@@ -33,7 +33,7 @@ public class SourceMapBuilderTest {
     
     String map = generateMap(generator);
     assertEquals("{\n\"version\":3,\n\"file\":\"name\",\n\"lineCount\":4,\n\"mappings\":\"A;CACCA,I;CACAC,I;CCCAC;\",\n\"sources\":[null,null],\n\"sourcesContent\":[\"content\",\"different\"],\n\"names\":[\"ahoj\",\"nazdar\",\"hello\"]\n}\n", map);
-    System.out.println(map);
+    //System.out.println(map);
   }
 
   @Test
@@ -45,7 +45,7 @@ public class SourceMapBuilderTest {
     
     String map = generateMap(generator);
     assertEquals("{\n\"version\":3,\n\"file\":\"name\",\n\"lineCount\":4,\n\"mappings\":\"A;CACCA,I;CACAC,I;CCCAC;\",\n\"sources\":[\"file 1\",\"file 2\"],\n\"sourcesContent\":[\"ignore\",\"ignore\"],\n\"names\":[\"ahoj\",\"nazdar\",\"hello\"]\n}\n", map);
-    System.out.println(map);
+    //System.out.println(map);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class SourceMapBuilderTest {
     
     String map = generateMap(generator);
     assertEquals("{\n\"version\":3,\n\"file\":\"name\",\n\"lineCount\":4,\n\"mappings\":\"A;CACCA,I;CACAC,I;CCCAC;\",\n\"sources\":[\"file 1\",\"file 2\"],\n\"sourcesContent\":[null,null],\n\"names\":[\"ahoj\",\"nazdar\",\"hello\"]\n}\n", map);
-    System.out.println(map);
+    //System.out.println(map);
   }
 
   private String generateMap(SourceMapGenerator generator) {

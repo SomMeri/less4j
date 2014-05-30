@@ -99,7 +99,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 
   @Override
   protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
-    CompilationResult result = supercompile(lessFile, cssOutput);
+    CompilationResult result = super.compile(lessFile, cssOutput);
     //System.out.println(result.getSourceMap());
     if (printTo != null) {
       try {

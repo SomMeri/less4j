@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -46,26 +45,16 @@ public abstract class AbstractFileBasedTest {
   }
 
   @Test
-  public final void compileAndCompare() {
+  public void compileAndCompare() {
     try {
       CompilationResult actual = compile(lessFile, cssOutput);
       //System.out.println(actual.getSourceMap());
-      assertCorrectCssAnsWarnings(actual);
+      assertCorrectCssAndWarnings(actual);
       assertSourceMapValid(actual);
     } catch (Less4jException ex) {
       printErrors(ex);
       assertCorrectErrors(ex);
-    } catch (Throwable ex) {
-      if (ex instanceof ComparisonFailure) {
-        ComparisonFailure fail = (ComparisonFailure)ex;
-        throw fail;
-      }
-      if (ex instanceof AssertionError) {
-        AssertionError fail = (AssertionError)ex;
-        throw fail;
-      }
-      throw new RuntimeException(ex.getMessage(), ex);
-    }
+    } 
   }
 
   protected void assertSourceMapValid(CompilationResult actual) {
@@ -97,7 +86,7 @@ public abstract class AbstractFileBasedTest {
     assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
   }
 
-  private void assertCorrectCssAnsWarnings(CompilationResult actual) {
+  private void assertCorrectCssAndWarnings(CompilationResult actual) {
     //validate css
     String expectedCss = canonize(expectedCss());
     String actualCss = canonize(actual.getCss());
@@ -125,9 +114,13 @@ public abstract class AbstractFileBasedTest {
     return new ThreadUnsafeLessCompiler();
   }
 
-  private String expectedCss() {
+  protected String expectedCss() {
+    return readFile(cssOutput);
+  }
+
+  protected String readFile(File file) {
     try {
-      return IOUtils.toString(new FileReader(cssOutput));
+      return IOUtils.toString(new FileReader(file));
     } catch (Throwable ex) {
       throw new RuntimeException(ex.getMessage(), ex);
     }

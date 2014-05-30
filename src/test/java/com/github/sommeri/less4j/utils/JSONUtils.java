@@ -26,7 +26,7 @@ public class JSONUtils {
   public static List<String> toStringList(JSONArray jsonArray) throws JSONException {
     List<String> result = new ArrayList<String>();
     for (int i = 0; i < jsonArray.length(); i++) {
-      result.add(jsonArray.getString(i));
+      result.add(jsonArray.isNull(i) ? null : jsonArray.getString(i));
     }
     return result;
   }

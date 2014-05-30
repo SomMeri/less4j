@@ -1,0 +1,6 @@
+{
+  "file":"file-import.css",
+  "sources":["file-import.less", "import/imported.less"],
+  "sourcesContent":[".class { color: red; }\n\n@import-once \"import/imported.less\";",".imported {\n  content: ~\"imported\";\n}\n"],
+  "names":[".class", ".imported"]
+}

@@ -1,5 +1,6 @@
 {
   "file":"dummy.html",
-  "sources":[""],
+  "sources":[null],
+  "sourcesContent":[".class { color: red; }"],
   "names":[".class"]
 }
