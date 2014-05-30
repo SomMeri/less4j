@@ -152,6 +152,10 @@ public interface LessCompiler {
       return includeSourcesContent;
     }
 
+    /**
+     * If set to <code>true</code>, content of compiled (source) files is included inside source map. 
+     * Source map is independent of compiled less files locations.
+     */
     public void setIncludeSourcesContent(boolean includeSourcesContent) {
       this.includeSourcesContent = includeSourcesContent;
     }

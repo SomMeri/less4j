@@ -76,13 +76,14 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
+  @SuppressWarnings("unused")
   protected CompilationResult supercompile(File lessFile, File cssOutput) throws Less4jException {
     LessCompiler compiler = getCompiler();
     Configuration configuration = createConfiguration(cssOutput);
     configuration.setCssResultLocation((LessSource)null);
     CompilationResult actual=null;
     try {
-      String content = "value {\n aaa:vvvv;\n }";//IOUtils.toString(new FileReader(lessFile));
+      String content = ".class {\n  margin: 1 1 1 1;\n}";//IOUtils.toString(new FileReader(lessFile));
       String fullPath = "path/to/filename.less";
       String filename = "filename.less";
 //      LessSource.StringSource lessSource = new LessSource.StringSource(content, filename, new URI(fullPath));
