@@ -1,5 +1,15 @@
-.selector {
-  @detached: { extreme: simplicity; };
+//can mixin find detached ruleset in callers scope?
+.whoReallyCalls(@detached) {
   @detached();
+}
+
+.modifyScope(@detached) {
+  .whoReallyCalls(@detached);
+  @color: green;
+}
+
+.selector-direct {
+  .modifyScope(@detached);
+  @detached: { color: @color; };
 }
 

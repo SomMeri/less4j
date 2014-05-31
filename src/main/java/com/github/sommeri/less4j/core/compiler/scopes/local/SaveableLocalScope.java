@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
@@ -34,11 +34,11 @@ public class SaveableLocalScope implements ILocalScope {
     return originalLocalScope;
   }
   
-  public Expression getValue(Variable variable) {
+  public FullNodeDefinition getValue(Variable variable) {
     return getActiveLocalScope().getValue(variable);
   }
 
-  public Expression getValue(String name) {
+  public FullNodeDefinition getValue(String name) {
     return getActiveLocalScope().getValue(name);
   }
 
@@ -70,24 +70,20 @@ public class SaveableLocalScope implements ILocalScope {
     return getActiveLocalScope().getNames();
   }
 
-  public void registerVariable(AbstractVariableDeclaration declaration) {
-    getActiveLocalScope().registerVariable(declaration);
-  }
-
-  public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue) {
+  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
     getActiveLocalScope().registerVariable(node, replacementValue);
   }
   
-  public void registerVariableIfNotPresent(String name, Expression replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
     getActiveLocalScope().registerVariableIfNotPresent(name, replacementValue);
   }
 
-  public void registerVariable(String name, Expression replacementValue) {
+  public void registerVariable(String name, FullNodeDefinition replacementValue) {
     getActiveLocalScope().registerVariable(name, replacementValue);
   }
 
-  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
-    getActiveLocalScope().addFilteredVariables(filter, source);
+  public void addFilteredContent(LocalScopeFilter filter, ILocalScope source) {
+    getActiveLocalScope().addFilteredContent(filter, source);
   }
 
   public void addAllMixins(List<FullMixinDefinition> mixins) {

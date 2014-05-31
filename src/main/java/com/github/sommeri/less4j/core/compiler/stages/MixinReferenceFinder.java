@@ -78,7 +78,7 @@ public class MixinReferenceFinder {
      * Note: the detection feels too hackish, but works and hotfix is needed
      * (bootstrap).
      */
-    return mixin.getMixin().isAlsoRuleset() && semiCompiledNodes.contains(mixin.getMixin());
+    return mixin.getMixin().isAlsoRuleset() && semiCompiledNodes.contains(mixin.getMixin().getBody());
   }
 
   private List<FullMixinDefinition> findInMatchingNamespace(IScope scope, List<String> nameChain, MixinReference reference) {
@@ -96,13 +96,6 @@ public class MixinReferenceFinder {
           result.addAll(foundInNamespaces);
         }
       }
-//      String firstName = nameChain.get(0);
-//      List<String> theRest = nameChain.subList(1, nameChain.size());
-//
-//      for (FullMixinDefinition fullMixin : scope.getMixinsByName(firstName)) {
-//        List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
-//        result.addAll(foundInNamespaces);
-//      }
     }
 
     result.addAll(getNearestLocalMixins(scope, nameChain, reference.getFinalName()));

@@ -1,5 +1,82 @@
-@keyframes /* 1 */ sunrise {
-  h1 {
-    color: #ff00ff;
-  } 
+.selector {
+  background: green;
+}
+@media (min-width: 1200) {
+  .selector {
+    padding: 0;
+  }
+}
+.call-with-parentheses {
+  background: red;
+}
+.call-with-parentheses .selector {
+  background: green;
+}
+@media (min-width: 1200) {
+  .call-with-parentheses .selector {
+    padding: 0;
+  }
+}
+@media screen {
+  .selector {
+    background: green;
+  }
+}
+@media screen and (min-width: 1200) {
+  .selector {
+    padding: 0;
+  }
+}
+@media screen {
+  .outer {
+    background: red;
+  }
+  .outer .selector {
+    background: green;
+  }
+}
+@media screen and (min-width: 1200) {
+  .outer .selector {
+    padding: 0;
+  }
+}
+.mixin-with-arguments-enclosure .custom-mixin-argument {
+  custom: custom;
+}
+.see-caller use-place {
+  caller-variable: value;
+  property: default;
+  property: global default;
+}
+.see-caller-local-win use-place {
+  caller-variable: declaration;
+  variable: declaration;
+}
+.see-caller-caller use-place {
+  property: default;
+  property: global default;
+}
+.default {
+  property: default;
+}
+.custom {
+  property: custom;
+}
+.default {
+  property: global default;
+}
+.custom {
+  property: custom;
+}
+.caller .default {
+  property: caller;
+}
+.caller .custom {
+  property: custom;
+}
+.caller {
+  value: in detached;
+}
+.selector-indirect {
+  color: #aabbcc;
 }

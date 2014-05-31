@@ -1,0 +1,6 @@
+.caller .default {
+  property-mixin: caller;
+}
+.caller .custom {
+  property-mixin: custom;
+}

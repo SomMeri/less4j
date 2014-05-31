@@ -1,0 +1,26 @@
+.with-mixin-caller-default() {
+	.mixin(@parameter: @caller-default) {
+	  property-mixin: @parameter;
+	}
+	.default {
+		.mixin();
+	}
+	.custom {
+		.mixin(custom);
+	}
+}
+.with-mixin-caller-default-overwritten() {
+	@caller-default: overwritten;
+	.mixin(@parameter: @caller-default) {
+	  property-own: @parameter;
+	}
+	.default {
+	    @caller-default: not this one;
+	    .mixin();
+	}
+}
+.caller {
+	@caller-default: caller;
+	.with-mixin-caller-default();
+	.with-mixin-caller-default-overwritten();
+}

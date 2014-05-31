@@ -3,19 +3,20 @@ package com.github.sommeri.less4j.core.compiler.stages;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.BodyOwner;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class MixinCompilationResult {
 
-  private ReusableStructure mixin;
+  //FIXME!!!!!!!!!!!!!! rename class and following property
+  private ASTCssNode mixin;
   private List<ASTCssNode> replacement;
   private IScope returnValues;
   private GuardValue guardValue;
 
-  public MixinCompilationResult(ReusableStructure mixin, List<ASTCssNode> replacement, IScope returnValues) {
+  public MixinCompilationResult(ASTCssNode mixin, List<ASTCssNode> replacement, IScope returnValues) {
     this.mixin = mixin;
     this.replacement = replacement;
     this.returnValues = returnValues;
@@ -45,11 +46,11 @@ public class MixinCompilationResult {
     this.returnValues = returnValues;
   }
 
-  public ReusableStructure getMixin() {
+  public ASTCssNode getMixin() {
     return mixin;
   }
 
-  public void setMixin(ReusableStructure mixin) {
+  public void setMixin(ASTCssNode mixin) {
     this.mixin = mixin;
   }
 

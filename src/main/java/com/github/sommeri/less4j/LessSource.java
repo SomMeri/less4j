@@ -220,6 +220,9 @@ public abstract class LessSource {
 
     @Override
     public URI getURI() {
+      if (inputFile==null)
+        return null;
+      
       try {
         String path = inputFile.toString();
         path = URIUtils.convertPlatformSeparatorToUri(path);
@@ -231,7 +234,7 @@ public abstract class LessSource {
 
     @Override
     public String getName() {
-      return inputFile.getName();
+      return inputFile==null? null: inputFile.getName();
     }
 
     @Override

@@ -5,12 +5,12 @@ import java.util.Stack;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
@@ -74,27 +74,28 @@ public class LocalScope implements ILocalScope {
     getLocalVariables().store(declaration);
   }
 
-  public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue) {
+  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
     getLocalVariables().store(node, replacementValue);
   }
 
-  public void registerVariableIfNotPresent(String name, Expression replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
     getLocalVariables().storeIfNotPresent(name, replacementValue);
   }
 
-  public void registerVariable(String name, Expression replacementValue) {
+  public void registerVariable(String name, FullNodeDefinition replacementValue) {
     getLocalVariables().store(name, replacementValue);
   }
 
-  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
+  public void addFilteredContent(LocalScopeFilter filter, ILocalScope source) {
     getLocalVariables().addFilteredVariables(filter, source.getLocalVariables());
+    getLocalMixins().addFilteredMixins(filter, source.getAllMixins());
   }
 
-  public Expression getValue(Variable variable) {
+  public FullNodeDefinition getValue(Variable variable) {
     return getLocalVariables().getValue(variable.getName());
   }
 
-  public Expression getValue(String name) {
+  public FullNodeDefinition getValue(String name) {
     return getLocalVariables().getValue(name);
   }
 

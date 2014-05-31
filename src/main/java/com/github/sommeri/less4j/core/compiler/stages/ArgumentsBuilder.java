@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -20,7 +20,8 @@ class ArgumentsBuilder {
 
   // utils
   private final ProblemsHandler problemsHandler;
-  private final ExpressionEvaluator referenceEvaluator;
+  private final ScopedValuesEvaluator referenceValuesEvaluator;
+  private final ScopedValuesEvaluator defaultValuesEvaluator;
   private final String ALL_ARGUMENTS = ReferencesSolver.ALL_ARGUMENTS;
 
   // input
@@ -29,18 +30,19 @@ class ArgumentsBuilder {
   private MixinReference reference;
 
   // results
-  private List<Expression> allValues = new ArrayList<Expression>();
+  private List<FullNodeDefinition> allValues = new ArrayList<FullNodeDefinition>();
   private IScope argumentsScope;
 
-  public ArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, ExpressionEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
+  public ArgumentsBuilder(MixinReference reference, ReusableStructure mixin, ScopedValuesEvaluator referenceValuesEvaluator, ScopedValuesEvaluator defaultValuesEvaluator, ProblemsHandler problemsHandler) {
     super();
-    this.referenceEvaluator = referenceEvaluator;
+    this.referenceValuesEvaluator = referenceValuesEvaluator;
+    this.defaultValuesEvaluator = defaultValuesEvaluator;
     this.problemsHandler = problemsHandler;
     this.positionalParameters = reference.getPositionalParameters().iterator();
     this.reference = reference;
 
     argumentsScope = ScopeFactory.createDummyScope(reference, "#arguments-" + reference + "#");
-    mixin = pureMixin;
+    this.mixin = mixin;
   }
 
   public IScope build() {
@@ -55,7 +57,8 @@ class ArgumentsBuilder {
 
     }
 
-    Expression allArgumentsValue = referenceEvaluator.joinAll(allValues, reference);
+    FullNodeDefinition allArgumentsValue = referenceValuesEvaluator.joinFull(allValues, reference);
+    //FIXME!!!!!!!!!!!! scopeee if needed
     argumentsScope.registerVariableIfNotPresent(ALL_ARGUMENTS, allArgumentsValue);
     return argumentsScope;
   }
@@ -81,7 +84,7 @@ class ArgumentsBuilder {
   }
 
   private void fillFromNamed(ArgumentDeclaration declaration) {
-    Expression value = referenceEvaluator.evaluate(reference.getNamedParameter(declaration.getVariable()));
+    FullNodeDefinition value = referenceValuesEvaluator.toFullNodeDefinition(reference.getNamedParameter(declaration.getVariable()));
     allValues.add(value);
     argumentsScope.registerVariable(declaration, value);
   }
@@ -91,8 +94,9 @@ class ArgumentsBuilder {
   }
 
   private void fillFromDefault(ArgumentDeclaration declaration) {
-    allValues.add(declaration.getValue());
-    argumentsScope.registerVariable(declaration);
+    FullNodeDefinition value = defaultValuesEvaluator.toFullNodeDefinition(declaration.getValue());
+    allValues.add(value);
+    argumentsScope.registerVariable(declaration, value);
   }
 
   private boolean hasDefault(ArgumentDeclaration declaration) {
@@ -100,7 +104,7 @@ class ArgumentsBuilder {
   }
 
   private void fillFromPositional(ArgumentDeclaration declaration) {
-    Expression value = referenceEvaluator.evaluate(positionalParameters.next());
+    FullNodeDefinition value = referenceValuesEvaluator.toFullNodeDefinition(positionalParameters.next());
     allValues.add(value);
     argumentsScope.registerVariable(declaration, value);
   }
@@ -110,10 +114,11 @@ class ArgumentsBuilder {
   }
 
   private void addAsCollector(ArgumentDeclaration declaration) {
-    List<Expression> allArgumentsFrom = referenceEvaluator.evaluateAll(ArraysUtils.remaining(positionalParameters));
-    allValues.addAll(allArgumentsFrom);
-    Expression value = referenceEvaluator.joinAll(allArgumentsFrom, reference);
-    argumentsScope.registerVariable(declaration, value);
+    List<Expression> allArgumentsFrom = referenceValuesEvaluator.evaluateAll(ArraysUtils.remaining(positionalParameters));
+    Expression value = referenceValuesEvaluator.joinAll(allArgumentsFrom, reference);
+    allValues.addAll(referenceValuesEvaluator.toFullNodeDefinitions(allArgumentsFrom));
+    //FIXME!!!!!!!!!!!! scopeee if needed
+    argumentsScope.registerVariable(declaration, new FullNodeDefinition(value, null));
 
   }
 

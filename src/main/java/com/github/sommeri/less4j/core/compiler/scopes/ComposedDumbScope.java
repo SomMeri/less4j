@@ -4,11 +4,10 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScopeData;
 import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage;
 import com.github.sommeri.less4j.core.compiler.scopes.local.VariablesDeclarationsStorage;
@@ -47,24 +46,20 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     return localScope.hasTheSameLocalData(otherScope);
   }
 
-  public void registerVariable(AbstractVariableDeclaration declaration) {
-    localScope.registerVariable(declaration);
-  }
-
-  public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue) {
+  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
     localScope.registerVariable(node, replacementValue);
   }
 
-  public void registerVariableIfNotPresent(String name, Expression replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
     localScope.registerVariableIfNotPresent(name, replacementValue);
   }
 
-  public void registerVariable(String name, Expression replacementValue) {
+  public void registerVariable(String name, FullNodeDefinition replacementValue) {
     localScope.registerVariable(name, replacementValue);
   }
 
-  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
-    localScope.addFilteredVariables(filter, source);
+  public void addFilteredContent(LocalScopeFilter filter, ILocalScope source) {
+    localScope.addFilteredContent(filter, source);
   }
 
   public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
@@ -144,11 +139,11 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     return localScope.isBodyOwnerScope();
   }
 
-  public Expression getLocalValue(Variable variable) {
+  public FullNodeDefinition getLocalValue(Variable variable) {
     return localScope.getValue(variable);
   }
 
-  public Expression getLocalValue(String name) {
+  public FullNodeDefinition getLocalValue(String name) {
     return localScope.getValue(name);
   }
 

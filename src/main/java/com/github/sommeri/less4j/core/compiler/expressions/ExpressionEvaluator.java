@@ -11,10 +11,10 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
-import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
@@ -40,8 +40,9 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.BasicScope;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
-import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopesTree;
 import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScope;
 import com.github.sommeri.less4j.core.problems.BugHappened;
@@ -103,22 +104,6 @@ public class ExpressionEvaluator {
     return values;
   }
 
-  public IScope evaluateValues(IScope scope) {
-    IScope result = ScopeFactory.createDummyScope();
-    result.addFilteredVariables(toEvaluationFilter(), scope);
-    return result;
-  }
-
-  private ExpressionFilter toEvaluationFilter() {
-    return new ExpressionFilter() {
-      
-      @Override
-      public Expression apply(Expression input) {
-        return evaluate(input);
-      }
-    };
-  }
-
   public Expression evaluate(CssString input) {
     String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
     return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
@@ -140,42 +125,64 @@ public class ExpressionEvaluator {
       return new FaultyExpression(input);
     }
       
-    Expression value = scope.getValue(input);
-    if (value == null) {
+    FullNodeDefinition value = scope.getValue(input);
+    if (value == null || value.getNode()==null) {
       problemsHandler.undefinedVariable(input);
       return new FaultyExpression(input);
     }
+    if (!(value.getNode() instanceof Expression)) {
+      //FIXME !!!!!!!!!!!!!!!!! what to do here????
+      return input;
+    }
+    Expression expression = (Expression)value.getNode();
 
     cycleDetector.enteringVariableValue(input);
-    Expression result = evaluate(value);
+    Expression result = evaluate(expression);
     cycleDetector.leftVariableValue();
     return result;
   }
 
   public Expression evaluateIfPresent(Variable input) {
-    Expression value = scope.getValue(input);
+    FullNodeDefinition value = scope.getValue(input);
     if (value == null) {
       return null;
     }
 
-    return evaluate(value);
+    if (!(value.getNode() instanceof Expression)) {
+      //FIXME !!!!!!!!!!!!!!!!! what to do here????
+      return input;
+    }
+    Expression expression = (Expression)value.getNode();
+    return evaluate(expression);
   }
 
   public Expression evaluate(IndirectVariable input) {
-    Expression value = scope.getValue(input);
-    if (!(value instanceof CssString)) {
+    FullNodeDefinition value = scope.getValue(input);
+    if (!(value.getNode() instanceof Expression)) {
+      //FIXME !!!!!!!!!!!!!!!!! what to do here????
+      return input;
+    }
+    Expression expression = (Expression)value.getNode();
+    if (!(expression instanceof CssString)) {
       problemsHandler.nonStringIndirection(input);
       return new FaultyExpression(input);
     }
 
-    CssString realName = (CssString) value;
+    CssString realName = (CssString) expression;
     String realVariableName = "@" + realName.getValue();
+    //FIXME: !!!!!!!!!!!! bypassing cycle detector!!!!!! (test also less.js)
     value = scope.getValue(realVariableName);
     if (value == null) {
       problemsHandler.undefinedVariable(realVariableName, realName);
       return new FaultyExpression(realName.getUnderlyingStructure());
     }
-    return evaluate(value);
+    if (!(value.getNode() instanceof Expression)) {
+      //FIXME !!!!!!!!!!!!!!!!! what to do here????
+      return input;
+    }
+    //FIXME !!!!!!!!!!!!!!!!! reusing variable ugly
+    expression = (Expression)value.getNode();
+    return evaluate(expression);
   }
 
   public Expression evaluate(Expression input) {
@@ -442,34 +449,26 @@ class NullScope extends BasicScope {
   }
 
   @Override
-  public void registerVariable(AbstractVariableDeclaration declaration) {
+  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
   }
 
   @Override
-  public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
   }
 
   @Override
-  public void registerVariableIfNotPresent(String name, Expression replacementValue) {
-  }
-
-  @Override
-  public Expression getValue(Variable variable) {
+  public FullNodeDefinition getValue(Variable variable) {
     return null;
   }
 
   @Override
-  public Expression getValue(String name) {
+  public FullNodeDefinition getValue(String name) {
     return null;
   }
 
   @Override
   public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
   }
-
-//  @Override
-//  public void setParent(IScope parent) {
-//  }
 
   @Override
   public void removedFromAst() {
@@ -500,11 +499,11 @@ class NullScope extends BasicScope {
   }
 
   @Override
-  public void registerVariable(String name, Expression replacementValue) {
+  public void registerVariable(String name, FullNodeDefinition replacementValue) {
   }
 
   @Override
-  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
+  public void addFilteredContent(LocalScopeFilter filter, ILocalScope source) {
   }
 
   @Override

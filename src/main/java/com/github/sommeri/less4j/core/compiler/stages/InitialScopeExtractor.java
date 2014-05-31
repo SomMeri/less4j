@@ -1,14 +1,19 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
+import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
+import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.PlaceholderScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
@@ -25,6 +30,7 @@ public class InitialScopeExtractor {
   private ASTManipulator manipulator = new ASTManipulator();
 
   private IScope currentScope;
+  private Map<Expression, IScope> detachedRulesetsScopes = new HashMap<Expression, IScope>();
   private List<PlaceholderScope> importsPlaceholders;
 
   public InitialScopeExtractor() {
@@ -52,8 +58,17 @@ public class InitialScopeExtractor {
       if (kid.getType() == ASTCssNodeType.IMPORT) {
         importsPlaceholders.add(createPlaceholderScope(kid));  
       } else if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
-        currentScope.registerVariable((VariableDeclaration) kid);
+        VariableDeclaration variableDeclaration = (VariableDeclaration)kid;
+        Expression value = variableDeclaration.getValue();
+        currentScope.registerVariable(variableDeclaration, new FullNodeDefinition(value, detachedRulesetsScopes.get(value)));
         manipulator.removeFromBody(kid);
+      } else if (kid.getType() == ASTCssNodeType.DETACHED_RULESET) {
+        DetachedRuleset detached = (DetachedRuleset)kid;
+        IScope bodyScope = currentScope.childByOwners(detached, detached.getBody());
+        bodyScope.removedFromAst();
+        if (bodyScope.hasParent())
+          bodyScope.getParent().removedFromAst(); // remove also arguments scope from tree
+        detachedRulesetsScopes.put(detached, bodyScope);
       } else if (kid.getType() == ASTCssNodeType.REUSABLE_STRUCTURE) {
         ReusableStructure mixin = (ReusableStructure) kid;
         IScope bodyScope = currentScope.childByOwners(mixin, mixin.getBody());
@@ -69,6 +84,8 @@ public class InitialScopeExtractor {
           currentScope.registerMixin(ruleSet.convertToReusableStructure(), bodyScope);
         }
       } else if (kid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
+        currentScope.createDataPlaceholder();
+      } else if (kid.getType() == ASTCssNodeType.DETACHED_RULESET_REFERENCE) {
         currentScope.createDataPlaceholder();
       }
     }

@@ -1,9 +1,9 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
 
+//FIXME: !!!! TODO: add   @Override to the whole hierarchy and maybe clean up again
 public interface IScope extends ILocalScope, IScopesTree {
 
   // debug printing
@@ -28,14 +28,9 @@ public interface IScope extends ILocalScope, IScopesTree {
 
   public IScope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes);
 
-  // data access methods 
-  public Expression getValue(Variable variable);
+  public FullNodeDefinition getLocalValue(Variable variable);
 
-  public Expression getValue(String name);
-
-  public Expression getLocalValue(Variable variable);
-
-  public Expression getLocalValue(String name);
+  public FullNodeDefinition getLocalValue(String name);
 
   // smart setters 
   public void setParentKeepConsistency(IScope parent);
@@ -44,6 +39,5 @@ public interface IScope extends ILocalScope, IScopesTree {
   public IScopesTree getSurroundingScopes();
 
   public ILocalScope getLocalScope();
-
 
 }

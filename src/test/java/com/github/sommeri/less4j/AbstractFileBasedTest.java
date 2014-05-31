@@ -6,6 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.ComparisonFailure;
@@ -86,7 +88,7 @@ public abstract class AbstractFileBasedTest {
     Configuration configuration = new Configuration();
     configuration.setCssResultLocation(new LessSource.FileSource(cssOutput));
     configuration.setLinkSourceMap(false);
-    return configuration;
+    return configuration;//http://myhost:8080/lessSrc
   }
 
   private void assertCorrectErrors(Less4jException error) {

@@ -319,6 +319,7 @@ top_level_element
     : (mixinReferenceWithSemi)=>mixinReferenceWithSemi
     | (namespaceReferenceWithSemi)=>namespaceReferenceWithSemi
     | (reusableStructureName LPAREN)=>reusableStructure
+    | (detachedRulesetReference)=>detachedRulesetReference
     | (variabledeclaration)=>variabledeclaration
     | ruleSet
     | media_top_level

@@ -38,10 +38,51 @@ import org.junit.runners.Parameterized.Parameters;
   interpolation: "@{detached}";
 }
 
+//*** should this work? ****
+.mixin() {
+  @detached: { extreme: simplicity; };
+}
+.selector {
+  @detached();
+  .mixin();
+}
+//********************************************88 
+.mixin() {
+  @detached: { scope: @see-here; };
+}
+.selector {
+  @see-here: yes;
+  .nested {
+    .mixin();
+    @detached();
+  }
+}
+//************************************************************
+ .mixin() {
+  @detached: { scope-detached: @see-here; };
+  .nested() {
+    scope-mixin: @see-here; 
+  }
+}
+.definer-wrapper() {
+  @see-here: yes;
+  .mixin();
+}
+.selector {
+  .definer-wrapper();
+  @detached();
+  .nested();
+}
 
+ 
+//********************************************88
+ * test if it works from imported !!!!!!!!!!!!!!!!!!!!
+ * test if it works when variables opy detached forever !!!!!!!!!!!!!!!!!!!!
+ * test if it works from list correctly -- e.g. including various callers scopes
+ * test if @defaults works correctly -- e.g. including various callers scopes
 
  */
-@Ignore
+//@Ignore
 public class DetachedRulesetsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/detached-rulesets/";

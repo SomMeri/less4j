@@ -1,6 +1,10 @@
 package com.github.sommeri.less4j.core.ast;
 
-public interface BodyOwner<T extends Body> {
+import com.github.sommeri.less4j.utils.PubliclyCloneable;
+
+public interface BodyOwner<T extends Body> extends PubliclyCloneable {
+
+  public BodyOwner<T> clone();
 
   void setBody(T body);
   

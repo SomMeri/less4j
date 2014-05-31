@@ -1,29 +1,37 @@
 @one-rule: { background: red; };
 @ruleset: { .selector { background: green; } };
 @ruleset-second: { .selector { size: 2; } };
-@media: { @media (min-width: 1200) { .selector { padding: 0; }} };
+@media-var: { @media (min-width: 1200) { .selector { padding: 0; }} };
 
 @empty: {};
  
 //call on top
 @ruleset();
 @empty();
-@media();
+@media-var();
 
 //call from ruleset
 .call-with-parentheses {
 	@empty();
     @one-rule(); 
     @ruleset();
-    @media();
+    @media-var();
 }
 
 //call from media
 @media screen {
     @empty();
-    @one-rule(); 
     @ruleset();
-    @media();
+    @media-var();
+}
+
+.outer {
+	@media screen {
+    	@empty();
+    	@one-rule(); 
+    	@ruleset();
+    	@media-var();
+	}
 }
 
 //mixin arguments
@@ -56,7 +64,7 @@
 }
 
 //scope - local win
-.see-caller {
+.see-caller-local-win {
 	@detached-ruleset: {
 	  caller-variable: @variable;
   	 .mixin();
@@ -128,7 +136,7 @@
 
 @with-mixin-caller-default: {
 	.mixin(@parameter: @caller-default) {
-	  property: @parameter;
+	  property-in-caller: @parameter;
 	}
 	.default {
 		.mixin();
@@ -137,9 +145,19 @@
 		.mixin(custom);
 	}
 };
+@with-mixin-caller-default-overwritten: {
+	 @caller-default:overwritten;
+	.mixin(@parameter: @caller-default) {
+	  property-overwritten: @parameter;
+	}
+	.default {
+		.mixin();
+	}
+};
 .caller {
 	@caller-default: caller;
 	@with-mixin-caller-default();
+	@with-mixin-caller-default-overwritten();
 }
 
 //unlock mixin see things defined in his scope first
@@ -158,7 +176,7 @@
 //detached returned from mixin
 .return-detached() {
   @color: #aabbcc;
-  @detached: {color: @color;}
+  @detached: {color: @color;};
 }
 .selector-indirect {
   .return-detached();

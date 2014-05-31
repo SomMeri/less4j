@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
 
 public class BasicScope extends ComposedDumbScope implements IScope {
@@ -17,16 +16,16 @@ public class BasicScope extends ComposedDumbScope implements IScope {
     return getChilds().get(0);
   }
 
-  public Expression getValue(Variable variable) {
+  public FullNodeDefinition getValue(Variable variable) {
     return getValue(variable.getName());
   }
-  
-  public Expression getValue(String name) {
-    Expression value = getLocalValue(name);
-    
+
+  public FullNodeDefinition getValue(String name) {
+    FullNodeDefinition value = getLocalValue(name);
+
     if (value == null && hasParent())
       value = getParent().getValue(name);
-    
+
     return value;
   }
 
@@ -61,7 +60,6 @@ public class BasicScope extends ComposedDumbScope implements IScope {
 
     return getParent().seesLocalDataOf(otherScope);
   }
-
 
   public IScope getRootScope() {
     if (!hasParent())

@@ -4,11 +4,10 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
-import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScopeData;
 import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage;
 import com.github.sommeri.less4j.core.compiler.scopes.local.MixinsDefinitionsStorage.MixinsPlaceholder;
@@ -54,19 +53,17 @@ public interface ILocalScope {
   public ILocalScope cloneCurrentDataSnapshot();
 
   // variables
-  public void registerVariable(AbstractVariableDeclaration declaration);
+  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue);
 
-  public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue);
+  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue);
 
-  public void registerVariableIfNotPresent(String name, Expression replacementValue);
+  public void registerVariable(String name, FullNodeDefinition replacementValue);
+ 
+  public FullNodeDefinition getValue(Variable variable);
 
-  public void registerVariable(String name, Expression replacementValue);
+  public FullNodeDefinition getValue(String name);
 
-  public void addFilteredVariables(ExpressionFilter filter, IScope source);
-
-  public Expression getValue(Variable variable);
-
-  public Expression getValue(String name);
+  public void addFilteredContent(LocalScopeFilter filter, ILocalScope source);
 
   // mixins
   public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope);
@@ -109,4 +106,5 @@ public interface ILocalScope {
     }
     
   }
+
 }

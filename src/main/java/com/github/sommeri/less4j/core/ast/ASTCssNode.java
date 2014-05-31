@@ -15,6 +15,9 @@ public abstract class ASTCssNode implements PubliclyCloneable {
   //I'm using underlying structure as identified in cycle detector. If it stops to be identifying,
   //cycle detector must be modified. !
   private HiddenTokenAwareTree underlyingStructure;
+//  //A scope used
+//  private IScope primaryScope;
+//  //
   private List<Comment> openingComments = new ArrayList<Comment>();
   private List<Comment> orphanComments = new ArrayList<Comment>();
   private List<Comment> trailingComments = new ArrayList<Comment>();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
+import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.local.KeyListStorage.ListPlaceholder;
 
@@ -85,7 +86,13 @@ public class MixinsDefinitionsStorage implements Cloneable {
   public int size() {
     return coolStorage.getAllValues().size();
   }
-  
+
+  public void addFilteredMixins(LocalScopeFilter filter, List<FullMixinDefinition> allMixins) {
+    for (FullMixinDefinition mixin : allMixins) {
+      store(new FullMixinDefinition(mixin.getMixin(), filter.apply(mixin.getScope())));
+    }
+  }
+
   public MixinsDefinitionsStorage clone() {
     try {
       MixinsDefinitionsStorage clone = (MixinsDefinitionsStorage) super.clone();

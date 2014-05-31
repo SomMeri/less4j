@@ -4,3 +4,6 @@
 .selector-indirect {
   color: #ff0000;
 }
+.multiple-imports .selector {
+  scope: yes;
+}

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
@@ -68,8 +69,8 @@ public class DefaultGuardHelper {
     return compiledMixins;
   }
 
-  private List<ReusableStructure> extractOriginalMixins(List<MixinCompilationResult> compiledMixins) {
-    List<ReusableStructure> result = new ArrayList<ReusableStructure>();
+  private List<ASTCssNode> extractOriginalMixins(List<MixinCompilationResult> compiledMixins) {
+    List<ASTCssNode> result = new ArrayList<ASTCssNode>();
     for (MixinCompilationResult compiled : compiledMixins) {
       result.add(compiled.getMixin());
     }

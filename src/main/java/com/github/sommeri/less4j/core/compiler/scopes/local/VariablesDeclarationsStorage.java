@@ -4,38 +4,38 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
-import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
+import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
+import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.local.KeyValueStorage.ValuePlaceholder;
 
 public class VariablesDeclarationsStorage implements Cloneable {
 
-  private KeyValueStorage<String, Expression> coolStorage = new KeyValueStorage<String, Expression>();
+  private KeyValueStorage<String, FullNodeDefinition> coolStorage = new KeyValueStorage<String, FullNodeDefinition>();
 
   public VariablesDeclarationsStorage() {
   }
 
-  public Expression getValue(String name) {
+  public FullNodeDefinition getValue(String name) {
     return coolStorage.getValue(name);
   }
 
   public void store(AbstractVariableDeclaration node) {
-    store(node.getVariable().getName(), node.getValue());
+    store(node.getVariable().getName(), new FullNodeDefinition(node.getValue(), null));
   }
 
   public void storeAll(VariablesDeclarationsStorage otherStorage) {
     coolStorage.add(otherStorage.coolStorage);
   }
 
-  public void store(AbstractVariableDeclaration node, Expression replacementValue) {
+  public void store(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
     store(node.getVariable().getName(), replacementValue);
   }
 
-  public void store(String name, Expression replacementValue) {
+  public void store(String name, FullNodeDefinition replacementValue) {
     coolStorage.add(name, replacementValue);
   }
 
-  public void storeIfNotPresent(String name, Expression replacementValue) {
+  public void storeIfNotPresent(String name, FullNodeDefinition replacementValue) {
     if (!contains(name))
       store(name, replacementValue);
   }
@@ -44,11 +44,14 @@ public class VariablesDeclarationsStorage implements Cloneable {
     coolStorage.closeFirstPlaceholder();
   }
 
-  public void addFilteredVariables(ExpressionFilter filter, VariablesDeclarationsStorage variablesSource) {
-    for (Entry<String, Expression> entry : variablesSource.coolStorage.getAllEntries()) {
+  //FIXME !!!!!!!!!!!!!!!!!! enable and fix
+  public void addFilteredVariables(LocalScopeFilter filter, VariablesDeclarationsStorage source) {
+    for (Entry<String, FullNodeDefinition> entry : source.coolStorage.getAllEntries()) {
       String name = entry.getKey();
-      Expression value = entry.getValue();
-      store(name, filter.apply(value));
+      FullNodeDefinition value = entry.getValue();
+      FullNodeDefinition filteredValue = filter.apply(value);
+      
+      store(name, filteredValue);
     }
   }
 
@@ -65,10 +68,11 @@ public class VariablesDeclarationsStorage implements Cloneable {
   }
 
   public void addToFirstPlaceholderIfNotPresent(VariablesDeclarationsStorage otherStorage) {
-    Set<Entry<String, Expression>> otherVariables = otherStorage.coolStorage.getAllEntries();
-    for (Entry<String, Expression> entry : otherVariables) {
-      if (!contains(entry.getKey()))
+    Set<Entry<String, FullNodeDefinition>> otherVariables = otherStorage.coolStorage.getAllEntries();
+    for (Entry<String, FullNodeDefinition> entry : otherVariables) {
+      if (!contains(entry.getKey())) {
         coolStorage.addToFirstPlaceholder(entry.getKey(), entry.getValue());
+      }
     }
   }
 
@@ -95,9 +99,9 @@ public class VariablesDeclarationsStorage implements Cloneable {
 
   public static class VariablesPlaceholder {
 
-    private final ValuePlaceholder<String, Expression> coolPlaceholder;
+    private final ValuePlaceholder<String, FullNodeDefinition> coolPlaceholder;
 
-    public VariablesPlaceholder(ValuePlaceholder<String, Expression> coolPlaceholder) {
+    public VariablesPlaceholder(ValuePlaceholder<String, FullNodeDefinition> coolPlaceholder) {
       this.coolPlaceholder = coolPlaceholder;
     }
 
