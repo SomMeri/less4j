@@ -37,13 +37,11 @@ public class ImportsAndScopeSolver {
   }
 
   private void solveNestedImports(List<PlaceholderScope> importsPlaceholders) {
-    List<PlaceholderScope> nextLevelOfImports = new ArrayList<PlaceholderScope>();
     for (PlaceholderScope placeholder : importsPlaceholders) {
-      nextLevelOfImports.addAll(importIntoPlaceholder(placeholder));
+      List<PlaceholderScope> nextLevelOfImports = importIntoPlaceholder(placeholder);
+      if (!nextLevelOfImports.isEmpty())
+        solveNestedImports(nextLevelOfImports);
     }
-
-    if (!nextLevelOfImports.isEmpty())
-      solveNestedImports(nextLevelOfImports);
   }
 
   private List<PlaceholderScope> importIntoPlaceholder(PlaceholderScope placeholder) {

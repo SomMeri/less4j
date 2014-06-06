@@ -148,7 +148,8 @@ public class SingleImportSolver {
   }
 
   private boolean isImportOnce(Import node) {
-    return node.getMultiplicity() == ImportMultiplicity.IMPORT_ONCE;
+    return node.getMultiplicity() == ImportMultiplicity.IMPORT 
+            || node.getMultiplicity() == ImportMultiplicity.IMPORT_ONCE;
   }
 
   private boolean alreadyVisited(LessSource importedSource) {
