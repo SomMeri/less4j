@@ -1,17 +1,14 @@
-//.selector {
-//  @detached: { extreme: simplicity; };
-//  @detached();
-//}
-//value {
-//  aaa:vvvv;
-//  @bwahahaha test ;
-//}
-.deep {
-  @nested-many-names-with-body something, else, and, also {
-    div {
-      h1 {
-        something: something;
-      }
-	}
-  }
+.mixin() {
+  @imported: @lazy;
+  size: 1;
 }
+
+.indirect() {
+  .mixin();
+}
+
+.selector {
+  .indirect();
+  @lazy: 4;
+}
+
