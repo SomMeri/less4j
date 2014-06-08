@@ -3,39 +3,44 @@ package com.github.sommeri.less4j.core.compiler.scopes.local;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.local.KeyValueStorage.ValuePlaceholder;
 
 public class VariablesDeclarationsStorage implements Cloneable {
 
-  private KeyValueStorage<String, FullNodeDefinition> coolStorage = new KeyValueStorage<String, FullNodeDefinition>();
+  private KeyValueStorage<String, FullExpressionDefinition> coolStorage = new KeyValueStorage<String, FullExpressionDefinition>();
 
   public VariablesDeclarationsStorage() {
   }
 
-  public FullNodeDefinition getValue(String name) {
+  public FullExpressionDefinition getValue(String name) {
     return coolStorage.getValue(name);
   }
 
   public void store(AbstractVariableDeclaration node) {
-    store(node.getVariable().getName(), new FullNodeDefinition(node.getValue(), null));
+    store(node.getVariable().getName(), new FullExpressionDefinition(node.getValue(), null));
   }
 
   public void storeAll(VariablesDeclarationsStorage otherStorage) {
     coolStorage.add(otherStorage.coolStorage);
   }
 
-  public void store(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
+  public void store(AbstractVariableDeclaration node, FullExpressionDefinition replacementValue) {
     store(node.getVariable().getName(), replacementValue);
   }
 
-  public void store(String name, FullNodeDefinition replacementValue) {
+  public void store(String name, FullExpressionDefinition replacementValue) {
+    if (replacementValue.getNode().getType()==ASTCssNodeType.DETACHED_RULESET && replacementValue.getOwningScope()==null) {
+      System.out.println("wtf");
+      System.out.println("wtf");
+    }
     coolStorage.add(name, replacementValue);
   }
 
-  public void storeIfNotPresent(String name, FullNodeDefinition replacementValue) {
+  public void storeIfNotPresent(String name, FullExpressionDefinition replacementValue) {
     if (!contains(name))
       store(name, replacementValue);
   }
@@ -46,10 +51,10 @@ public class VariablesDeclarationsStorage implements Cloneable {
 
   //FIXME !!!!!!!!!!!!!!!!!! enable and fix
   public void addFilteredVariables(LocalScopeFilter filter, VariablesDeclarationsStorage source) {
-    for (Entry<String, FullNodeDefinition> entry : source.coolStorage.getAllEntries()) {
+    for (Entry<String, FullExpressionDefinition> entry : source.coolStorage.getAllEntries()) {
       String name = entry.getKey();
-      FullNodeDefinition value = entry.getValue();
-      FullNodeDefinition filteredValue = filter.apply(value);
+      FullExpressionDefinition value = entry.getValue();
+      FullExpressionDefinition filteredValue = filter.apply(value);
       
       store(name, filteredValue);
     }
@@ -68,8 +73,8 @@ public class VariablesDeclarationsStorage implements Cloneable {
   }
 
   public void addToFirstPlaceholderIfNotPresent(VariablesDeclarationsStorage otherStorage) {
-    Set<Entry<String, FullNodeDefinition>> otherVariables = otherStorage.coolStorage.getAllEntries();
-    for (Entry<String, FullNodeDefinition> entry : otherVariables) {
+    Set<Entry<String, FullExpressionDefinition>> otherVariables = otherStorage.coolStorage.getAllEntries();
+    for (Entry<String, FullExpressionDefinition> entry : otherVariables) {
       if (!contains(entry.getKey())) {
         coolStorage.addToFirstPlaceholder(entry.getKey(), entry.getValue());
       }
@@ -99,9 +104,9 @@ public class VariablesDeclarationsStorage implements Cloneable {
 
   public static class VariablesPlaceholder {
 
-    private final ValuePlaceholder<String, FullNodeDefinition> coolPlaceholder;
+    private final ValuePlaceholder<String, FullExpressionDefinition> coolPlaceholder;
 
-    public VariablesPlaceholder(ValuePlaceholder<String, FullNodeDefinition> coolPlaceholder) {
+    public VariablesPlaceholder(ValuePlaceholder<String, FullExpressionDefinition> coolPlaceholder) {
       this.coolPlaceholder = coolPlaceholder;
     }
 

@@ -1,15 +1,18 @@
-//can mixin find detached ruleset in callers scope?
-.whoReallyCalls(@detached) {
+@detached-ruleset1: { property: 1; };
+@detached-ruleset2: { property: @variable; };
+@list: @detached-ruleset1 @detached-ruleset2;
+
+.mixin(@list) {
+  @detached: extract(@list, 2);
   @detached();
 }
 
-.modifyScope(@detached) {
-  .whoReallyCalls(@detached);
-  @color: green;
+.indirect-mixin(@list) {
+  @variable: passing-through;
+  .mixin(@list);
 }
 
-.selector-direct {
-  .modifyScope(@detached);
-  @detached: { color: @color; };
+selector {
+  @variable: in-caller;
+  .indirect-mixin(@list)
 }
-

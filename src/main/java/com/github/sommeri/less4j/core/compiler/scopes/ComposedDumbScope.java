@@ -46,15 +46,15 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     return localScope.hasTheSameLocalData(otherScope);
   }
 
-  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
+  public void registerVariable(AbstractVariableDeclaration node, FullExpressionDefinition replacementValue) {
     localScope.registerVariable(node, replacementValue);
   }
 
-  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullExpressionDefinition replacementValue) {
     localScope.registerVariableIfNotPresent(name, replacementValue);
   }
 
-  public void registerVariable(String name, FullNodeDefinition replacementValue) {
+  public void registerVariable(String name, FullExpressionDefinition replacementValue) {
     localScope.registerVariable(name, replacementValue);
   }
 
@@ -139,11 +139,11 @@ public abstract class ComposedDumbScope implements ILocalScope, IScopesTree {
     return localScope.isBodyOwnerScope();
   }
 
-  public FullNodeDefinition getLocalValue(Variable variable) {
+  public FullExpressionDefinition getLocalValue(Variable variable) {
     return localScope.getValue(variable);
   }
 
-  public FullNodeDefinition getLocalValue(String name) {
+  public FullExpressionDefinition getLocalValue(String name) {
     return localScope.getValue(name);
   }
 

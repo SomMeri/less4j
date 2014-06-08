@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 
@@ -34,11 +34,11 @@ public class SaveableLocalScope implements ILocalScope {
     return originalLocalScope;
   }
   
-  public FullNodeDefinition getValue(Variable variable) {
+  public FullExpressionDefinition getValue(Variable variable) {
     return getActiveLocalScope().getValue(variable);
   }
 
-  public FullNodeDefinition getValue(String name) {
+  public FullExpressionDefinition getValue(String name) {
     return getActiveLocalScope().getValue(name);
   }
 
@@ -70,15 +70,15 @@ public class SaveableLocalScope implements ILocalScope {
     return getActiveLocalScope().getNames();
   }
 
-  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
+  public void registerVariable(AbstractVariableDeclaration node, FullExpressionDefinition replacementValue) {
     getActiveLocalScope().registerVariable(node, replacementValue);
   }
   
-  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullExpressionDefinition replacementValue) {
     getActiveLocalScope().registerVariableIfNotPresent(name, replacementValue);
   }
 
-  public void registerVariable(String name, FullNodeDefinition replacementValue) {
+  public void registerVariable(String name, FullExpressionDefinition replacementValue) {
     getActiveLocalScope().registerVariable(name, replacementValue);
   }
 

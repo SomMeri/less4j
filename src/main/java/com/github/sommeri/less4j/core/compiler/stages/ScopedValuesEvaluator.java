@@ -8,7 +8,7 @@ import com.github.sommeri.less4j.core.ast.BodyOwner;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -26,10 +26,10 @@ public class ScopedValuesEvaluator {
     this.scope = scope;
   }
 
-  public FullNodeDefinition toFullNodeDefinition(Expression value) {
+  public FullExpressionDefinition toFullNodeDefinition(Expression value) {
     Expression evaluated = evaluate(value);
     IScope scope = findBodyScope(evaluated);
-    return new FullNodeDefinition(evaluated, scope);
+    return new FullExpressionDefinition(evaluated, scope);
   }
 
   private IScope findBodyScope(Expression value) {
@@ -54,8 +54,8 @@ public class ScopedValuesEvaluator {
     return expressionEvaluator.joinAll(allArgumentsFrom, reference);
   }
 
-  public List<FullNodeDefinition> toFullNodeDefinitions(List<Expression> allArgumentsFrom) {
-    List<FullNodeDefinition> result = new ArrayList<FullNodeDefinition>();
+  public List<FullExpressionDefinition> toFullNodeDefinitions(List<Expression> allArgumentsFrom) {
+    List<FullExpressionDefinition> result = new ArrayList<FullExpressionDefinition>();
     for (Expression expression : allArgumentsFrom) {
       result.add(toFullNodeDefinition(expression));
     }
@@ -63,12 +63,12 @@ public class ScopedValuesEvaluator {
   }
 
   //FIXME:!!!!!!!!!!!!!!! scopeee what should this do?
-  public FullNodeDefinition joinFull(List<FullNodeDefinition> allValues, MixinReference reference) {
+  public FullExpressionDefinition joinFull(List<FullExpressionDefinition> allValues, MixinReference reference) {
     List<Expression> result = new ArrayList<Expression>();
-    for (FullNodeDefinition expression : allValues) {
+    for (FullExpressionDefinition expression : allValues) {
       result.add((Expression)expression.getNode());
     }
-    return new FullNodeDefinition(joinAll(result, reference), null);
+    return new FullExpressionDefinition(joinAll(result, reference), null);
   }
 
 }

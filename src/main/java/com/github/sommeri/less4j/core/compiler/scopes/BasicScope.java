@@ -16,12 +16,12 @@ public class BasicScope extends ComposedDumbScope implements IScope {
     return getChilds().get(0);
   }
 
-  public FullNodeDefinition getValue(Variable variable) {
+  public FullExpressionDefinition getValue(Variable variable) {
     return getValue(variable.getName());
   }
 
-  public FullNodeDefinition getValue(String name) {
-    FullNodeDefinition value = getLocalValue(name);
+  public FullExpressionDefinition getValue(String name) {
+    FullExpressionDefinition value = getLocalValue(name);
 
     if (value == null && hasParent())
       value = getParent().getValue(name);

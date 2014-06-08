@@ -25,9 +25,10 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
+import com.github.sommeri.less4j.core.compiler.expressions.DetachedRulesetsEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
@@ -76,10 +77,10 @@ public class ReferencesSolver {
   }
 
   private void unsafeDoSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
-    // The stack of nodes under compilation is necessary to prevent 
-    // cycling. The cycling is possible if two namespaces reference 
-    // each other and therefore each effectively requires compiled 
-    // version of itself 
+    // The stack of nodes under compilation is necessary to prevent
+    // cycling. The cycling is possible if two namespaces reference
+    // each other and therefore each effectively requires compiled
+    // version of itself
     semiCompiledNodes.push(node);
 
     try {
@@ -93,7 +94,8 @@ public class ReferencesSolver {
         // solve whatever is not a mixin/detached ruleset reference
         solveNonCalligReferences(childs, iteratedScope);
 
-        // replace mixin references by their solutions - we need to do it in the end
+        // replace mixin references by their solutions - we need to do it in the
+        // end
         // the scope and ast would get out of sync otherwise
         replaceMixinReferences(solvedMixinReferences);
       }
@@ -114,7 +116,7 @@ public class ReferencesSolver {
           ruleSet.removeGuards();
         } else {
           manipulator.removeFromClosestBody(ruleSet);
-          //skip child scope
+          // skip child scope
           iteratedScope.getNextChild();
           continue;
         }
@@ -171,23 +173,38 @@ public class ReferencesSolver {
       } else if (isDetachedRulesetReference(kid)) {
         DetachedRulesetReference detachedRulesetReference = (DetachedRulesetReference) kid;
 
-        FullNodeDefinition fullNodeDefinition = referenceScope.getValue(detachedRulesetReference.getVariable());
+        FullExpressionDefinition fullNodeDefinition = referenceScope.getValue(detachedRulesetReference.getVariable());
+
         if (fullNodeDefinition == null) {
           problemsHandler.detachedRulesetNotfound(detachedRulesetReference);
           solvedMixinReferences.put(kid, new GeneralBody(detachedRulesetReference.getUnderlyingStructure()));
         } else {
 
-          //FIXME !!!!!!!!!!!!!!!!! solve wrong type case
-          ASTCssNode node = fullNodeDefinition.getNode();
+          // FIXME !!!!!!!!!!!!!!!!! solve wrong type case
+          Expression node = fullNodeDefinition.getNode();
+
+          if (node.getType() != ASTCssNodeType.DETACHED_RULESET) {
+            System.out.println("ALLL RIGHT - going to do it again: " + node.getType());
+            DetachedRulesetsEvaluator evaluator = new DetachedRulesetsEvaluator(referenceScope, problemsHandler, configuration);
+            FullExpressionDefinition evaluated = evaluator.evaluate(detachedRulesetReference.getVariable());
+            fullNodeDefinition = evaluated;
+            node = evaluated.getNode();
+            System.out.println("new result: " + node.getType() + " " + evaluated.getOwningScope());
+          }
+
           if (node.getType() == ASTCssNodeType.DETACHED_RULESET) {
-            //FIXME !!!!!!!!!!!!!!!!! should I attach caller scope to primary scope? Probably yes
-            GeneralBody replacement = mixinsSolver.buildDetachedRulesetReplacement(detachedRulesetReference, referenceScope, (DetachedRuleset) node, fullNodeDefinition.getPrimaryScope());
+            // FIXME !!!!!!!!!!!!!!!!! should I attach caller scope to primary
+            // scope? Probably yes
+            GeneralBody replacement = mixinsSolver.buildDetachedRulesetReplacement(detachedRulesetReference, referenceScope, (DetachedRuleset) node, fullNodeDefinition.getOwningScope());
 
             AstLogic.validateLessBodyCompatibility(kid, replacement.getMembers(), problemsHandler);
             solvedMixinReferences.put(kid, replacement);
           } else {
-            //FIXME!!!!!!!!!!!!!!!!!!!!!!!!!
-            System.out.println("WROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOG: ");
+            // FIXME!!!!!!!!!!!!!!!!!!!!!!!!!
+            System.out.println("ALLL RIGHT - going to do it again: " + node.getType());
+            ExpressionEvaluator evaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
+            Expression evaluated = evaluator.evaluate(detachedRulesetReference.getVariable());
+            System.out.println("new result: " + evaluated.getType());
             (new ASTManipulator()).removeFromBody(kid);
           }
         }
@@ -201,7 +218,7 @@ public class ReferencesSolver {
     MixinReferenceFinder finder = new MixinReferenceFinder(this, semiCompiledNodes);
     List<FullMixinDefinition> sameNameMixins = finder.getNearestMixins(scope, mixinReference);
     if (sameNameMixins.isEmpty()) {
-      //error reporting
+      // error reporting
       if (!finder.foundNamespace())
         problemsHandler.undefinedNamespace(mixinReference);
 

@@ -13,7 +13,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.PlaceholderScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
@@ -60,7 +60,8 @@ public class InitialScopeExtractor {
       } else if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
         VariableDeclaration variableDeclaration = (VariableDeclaration)kid;
         Expression value = variableDeclaration.getValue();
-        currentScope.registerVariable(variableDeclaration, new FullNodeDefinition(value, detachedRulesetsScopes.get(value)));
+        FullExpressionDefinition fullExpression = new FullExpressionDefinition(value, detachedRulesetsScopes.get(value));
+        currentScope.registerVariable(variableDeclaration, fullExpression);
         manipulator.removeFromBody(kid);
       } else if (kid.getType() == ASTCssNodeType.DETACHED_RULESET) {
         DetachedRuleset detached = (DetachedRuleset)kid;

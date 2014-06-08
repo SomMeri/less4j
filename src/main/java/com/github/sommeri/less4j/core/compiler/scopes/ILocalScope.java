@@ -53,15 +53,15 @@ public interface ILocalScope {
   public ILocalScope cloneCurrentDataSnapshot();
 
   // variables
-  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue);
+  public void registerVariable(AbstractVariableDeclaration node, FullExpressionDefinition replacementValue);
 
-  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue);
+  public void registerVariableIfNotPresent(String name, FullExpressionDefinition replacementValue);
 
-  public void registerVariable(String name, FullNodeDefinition replacementValue);
+  public void registerVariable(String name, FullExpressionDefinition replacementValue);
  
-  public FullNodeDefinition getValue(Variable variable);
+  public FullExpressionDefinition getValue(Variable variable);
 
-  public FullNodeDefinition getValue(String name);
+  public FullExpressionDefinition getValue(String name);
 
   public void addFilteredContent(LocalScopeFilter filter, ILocalScope source);
 

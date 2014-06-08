@@ -28,9 +28,9 @@ public interface IScope extends ILocalScope, IScopesTree {
 
   public IScope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes);
 
-  public FullNodeDefinition getLocalValue(Variable variable);
+  public FullExpressionDefinition getLocalValue(Variable variable);
 
-  public FullNodeDefinition getLocalValue(String name);
+  public FullExpressionDefinition getLocalValue(String name);
 
   // smart setters 
   public void setParentKeepConsistency(IScope parent);

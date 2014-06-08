@@ -101,6 +101,9 @@ public class PrintUtils {
   }
 
   public static String toTypeName(ASTCssNodeType type) {
+    if (type==null)
+      return "???unspecified???";
+    
     switch (type) {
     case DECLARATION:
       return "declaration";

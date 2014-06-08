@@ -39,8 +39,8 @@ import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.BasicScope;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopesTree;
@@ -60,7 +60,7 @@ public class ExpressionEvaluator {
   private StringInterpolator stringInterpolator;
   private StringInterpolator embeddedScriptInterpolator;
   private EmbeddedScriptGenerator embeddedScripting;
-
+  
   public ExpressionEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
     this(new NullScope(), problemsHandler, configuration);
   }
@@ -125,7 +125,7 @@ public class ExpressionEvaluator {
       return new FaultyExpression(input);
     }
       
-    FullNodeDefinition value = scope.getValue(input);
+    FullExpressionDefinition value = scope.getValue(input);
     if (value == null || value.getNode()==null) {
       problemsHandler.undefinedVariable(input);
       return new FaultyExpression(input);
@@ -138,12 +138,13 @@ public class ExpressionEvaluator {
 
     cycleDetector.enteringVariableValue(input);
     Expression result = evaluate(expression);
+   // addToDeclarationScopes(result, );
     cycleDetector.leftVariableValue();
     return result;
   }
 
   public Expression evaluateIfPresent(Variable input) {
-    FullNodeDefinition value = scope.getValue(input);
+    FullExpressionDefinition value = scope.getValue(input);
     if (value == null) {
       return null;
     }
@@ -152,12 +153,13 @@ public class ExpressionEvaluator {
       //FIXME !!!!!!!!!!!!!!!!! what to do here????
       return input;
     }
+  //FIXME !!!!!!!!!!!!!!!!! add to declaration scopes
     Expression expression = (Expression)value.getNode();
     return evaluate(expression);
   }
 
   public Expression evaluate(IndirectVariable input) {
-    FullNodeDefinition value = scope.getValue(input);
+    FullExpressionDefinition value = scope.getValue(input);
     if (!(value.getNode() instanceof Expression)) {
       //FIXME !!!!!!!!!!!!!!!!! what to do here????
       return input;
@@ -167,6 +169,7 @@ public class ExpressionEvaluator {
       problemsHandler.nonStringIndirection(input);
       return new FaultyExpression(input);
     }
+    //FIXME !!!!!!!!!!!!!!!!! add to declaration scopes
 
     CssString realName = (CssString) expression;
     String realVariableName = "@" + realName.getValue();
@@ -186,6 +189,11 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(Expression input) {
+    //FIXME !!!!!!!!!!!!! does not belong here, hotfix for prototype experiment
+    if (input instanceof FullExpressionDefinition) {
+      FullExpressionDefinition ex = (FullExpressionDefinition) input;
+      input = ex.getNode();
+    }
     switch (input.getType()) {
     case FUNCTION:
       return evaluate((FunctionExpression) input);
@@ -220,8 +228,11 @@ public class ExpressionEvaluator {
     case EMBEDDED_SCRIPT:
       return evaluate((EmbeddedScript) input);
 
-    //the value is already there, nothing to evaluate
+      //FIXME: !!!!!!!!!!! now, this is probably wrong, just hotefixing prototype
     case DETACHED_RULESET:
+      return new FullExpressionDefinition(input, scope);
+
+    //the value is already there, nothing to evaluate -- TODO - probably bug, should create clone()
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:
@@ -313,6 +324,14 @@ public class ExpressionEvaluator {
     return unknownFunction.evaluate(splitParameters, problemsHandler, input, evaluatedParameter);
   }
 
+  public Expression evaluate(ListExpression input) {
+    List<Expression> evaluated = new ArrayList<Expression>();
+    for (Expression expression : input.getExpressions()) {
+      evaluated.add(evaluate(expression));
+    }
+    return new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone());
+  }
+
   public Expression evaluate(NamedExpression input) { 
     return new NamedExpression(input.getUnderlyingStructure(), input.getName(), evaluate(input.getExpression()));
   }
@@ -348,14 +367,6 @@ public class ExpressionEvaluator {
 
     problemsHandler.cannotEvaluate(input);
     return new FaultyExpression(input);
-  }
-
-  public Expression evaluate(ListExpression input) {
-    List<Expression> evaluated = new ArrayList<Expression>();
-    for (Expression expression : input.getExpressions()) {
-      evaluated.add(evaluate(expression));
-    }
-    return new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone());
   }
 
   public boolean guardsSatisfied(ReusableStructure mixin) {
@@ -449,20 +460,20 @@ class NullScope extends BasicScope {
   }
 
   @Override
-  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
+  public void registerVariable(AbstractVariableDeclaration node, FullExpressionDefinition replacementValue) {
   }
 
   @Override
-  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullExpressionDefinition replacementValue) {
   }
 
   @Override
-  public FullNodeDefinition getValue(Variable variable) {
+  public FullExpressionDefinition getValue(Variable variable) {
     return null;
   }
 
   @Override
-  public FullNodeDefinition getValue(String name) {
+  public FullExpressionDefinition getValue(String name) {
     return null;
   }
 
@@ -499,7 +510,7 @@ class NullScope extends BasicScope {
   }
 
   @Override
-  public void registerVariable(String name, FullNodeDefinition replacementValue) {
+  public void registerVariable(String name, FullExpressionDefinition replacementValue) {
   }
 
   @Override

@@ -19,7 +19,7 @@ import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.IFunction;
@@ -213,7 +213,7 @@ class MixinsSolver {
     }
 
     @Override
-    public FullNodeDefinition apply(FullNodeDefinition input) {
+    public FullExpressionDefinition apply(FullExpressionDefinition input) {
       if (input == null) {
         return null;
       }
@@ -223,7 +223,7 @@ class MixinsSolver {
         return input;
       }
       Expression expression = (Expression)input.getNode();
-      return new FullNodeDefinition(apply(expression), apply(input.getPrimaryScope())) ;
+      return new FullExpressionDefinition(apply(expression), apply(input.getOwningScope())) ;
     }
 
     //FIXME: !!!!!!!!!!!!!!!!!! clean up

@@ -145,4 +145,14 @@ public abstract class ASTCssNode implements PubliclyCloneable {
     }
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(this.getClass().getSimpleName()).append(" (");
+    builder.append(getSourceLine()).append(":").append(getSourceColumn());
+    builder.append(")");
+
+    return builder.toString();
+  }
+
 }

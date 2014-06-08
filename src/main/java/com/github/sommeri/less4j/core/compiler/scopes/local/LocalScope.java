@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.LocalScopeFilter;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
-import com.github.sommeri.less4j.core.compiler.scopes.FullNodeDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FullExpressionDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.ILocalScope;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
@@ -71,18 +71,18 @@ public class LocalScope implements ILocalScope {
   }
 
   public void registerVariable(AbstractVariableDeclaration declaration) {
-    getLocalVariables().store(declaration);
+    getLocalVariables().store(declaration); //FIXME: !!!!!!!!!! either removed or solve owner scope problem
   }
 
-  public void registerVariable(AbstractVariableDeclaration node, FullNodeDefinition replacementValue) {
+  public void registerVariable(AbstractVariableDeclaration node, FullExpressionDefinition replacementValue) {
     getLocalVariables().store(node, replacementValue);
   }
 
-  public void registerVariableIfNotPresent(String name, FullNodeDefinition replacementValue) {
+  public void registerVariableIfNotPresent(String name, FullExpressionDefinition replacementValue) {
     getLocalVariables().storeIfNotPresent(name, replacementValue);
   }
 
-  public void registerVariable(String name, FullNodeDefinition replacementValue) {
+  public void registerVariable(String name, FullExpressionDefinition replacementValue) {
     getLocalVariables().store(name, replacementValue);
   }
 
@@ -91,11 +91,11 @@ public class LocalScope implements ILocalScope {
     getLocalMixins().addFilteredMixins(filter, source.getAllMixins());
   }
 
-  public FullNodeDefinition getValue(Variable variable) {
+  public FullExpressionDefinition getValue(Variable variable) {
     return getLocalVariables().getValue(variable.getName());
   }
 
-  public FullNodeDefinition getValue(String name) {
+  public FullExpressionDefinition getValue(String name) {
     return getLocalVariables().getValue(name);
   }
 
