@@ -82,7 +82,7 @@ import org.junit.runners.Parameterized.Parameters;
  * test if @defaults works correctly -- e.g. including various callers scopes
 
  */
-@Ignore
+//@Ignore
 public class DetachedRulesetsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/detached-rulesets/";
