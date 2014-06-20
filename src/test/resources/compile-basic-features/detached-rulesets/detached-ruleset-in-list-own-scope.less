@@ -1,0 +1,28 @@
+#namespace {
+   @variable: in-unlocker;
+  .unlocker {
+    @detached-ruleset2: { property-2: @variable; };
+  }
+}
+#namespace > .unlocker();
+
+@detached-ruleset1: { property-1: @variable; };
+@list: @detached-ruleset1 @detached-ruleset2;
+
+.mixin(@list) {
+  @detached1: extract(@list, 1);
+  @detached1();
+  @detached2: extract(@list, 2);
+  @detached2();
+}
+
+.indirect-mixin(@list) {
+  @variable: passing-through;
+  .mixin(@list);
+}
+
+selector {
+  @variable: in-caller;
+  .indirect-mixin(@list)
+}
+

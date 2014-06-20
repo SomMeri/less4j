@@ -1,5 +1,3 @@
-@keyframes /* 1 */ sunrise {
-  h1 {
-    color: #ff00ff;
-  } 
+.wrap-selector {
+  visible-one: visible;
 }

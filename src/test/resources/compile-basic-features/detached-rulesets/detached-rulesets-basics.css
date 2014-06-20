@@ -18,14 +18,25 @@
   }
 }
 @media screen {
-  background: red;
-  
   .selector {
     background: green;
   }
 }
 @media screen and (min-width: 1200) {
   .selector {
+    padding: 0;
+  }
+}
+@media screen {
+  .outer {
+    background: red;
+  }
+  .outer .selector {
+    background: green;
+  }
+}
+@media screen and (min-width: 1200) {
+  .outer .selector {
     padding: 0;
   }
 }
@@ -37,7 +48,7 @@
   property: default;
   property: global default;
 }
-.see-caller use-place {
+.see-caller-local-win use-place {
   caller-variable: declaration;
   variable: declaration;
 }
@@ -57,14 +68,14 @@
 .custom {
   property: custom;
 }
-.caller {
-  property: caller;
-}
 .caller .default {
-  property: caller;
+  property-in-caller: caller;
 }
 .caller .custom {
-  property: custom;
+  property-in-caller: custom;
+}
+.caller .default {
+  property-overwritten: overwritten;
 }
 .caller {
   value: in detached;

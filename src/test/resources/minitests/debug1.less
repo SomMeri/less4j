@@ -1,14 +1,26 @@
-.mixin() {
-  @imported: @lazy;
-  size: 1;
+.wrap-mixin(@ruleset) {
+  @b: visible;
+  .wrap-selector {
+      @ruleset();
+      visible-one: @b;
+    }
 }
 
-.indirect() {
-  .mixin();
+.wrap-mixin({
+  @b: hidden and if you see this in the output its a bug;
+});
+
+.ruleset-mixin() {
+  @b-mixin: hidden and if you see this in the output its a bug;
 }
 
-.selector {
-  .indirect();
-  @lazy: 4;
+/* ******************************************************** */
+.wrap-mixin-mixin() {
+  @b-mixin: visible;
+  .wrap-selector {
+      .ruleset-mixin();
+      visible-one: @b-mixin;
+    }
 }
 
+.wrap-mixin-mixin();

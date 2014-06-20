@@ -1,3 +1,4 @@
+//can mixin find detached ruleset in callers scope?
 .whoReallyCalls(@detached) {
   @detached();
 }
@@ -25,3 +26,17 @@
   @detached: { color: @color; };
 }
 
+//does it sees through multiple imports?
+.multiple-imports {
+  .mixin() {
+    @detached: { scope: @see-here; };
+  }
+  .definer-wrapper() {
+    @see-here: yes;
+    .mixin();
+  }
+  .selector {
+    .definer-wrapper();
+    @detached();
+  }
+}

@@ -1,0 +1,2 @@
+Errors produced by compilation of testCase
+ERROR 3:2 Could not find detached ruleset for "@does-not-exists".
