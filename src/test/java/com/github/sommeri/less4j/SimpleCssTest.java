@@ -20,7 +20,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
  * from the master branch.
  * 
  */
-//@Ignore
+@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
@@ -90,7 +90,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
       LessSource.StringSource lessSource = new LessSource.StringSource(content);
       actual = compiler.compile(lessSource, configuration);
       
-      System.out.println(actual.getSourceMap());
+      //System.out.println(actual.getSourceMap());
     } catch (Throwable e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -109,8 +109,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
         throw new RuntimeException(e);
       }
     }
-    System.out.println("**************************************");
-    System.out.println(result.getCss());
+//    System.out.println("**************************************");
+//    System.out.println(result.getCss());
     return result;
   }
 
