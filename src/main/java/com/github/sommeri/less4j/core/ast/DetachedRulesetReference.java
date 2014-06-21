@@ -12,6 +12,7 @@ public class DetachedRulesetReference extends ASTCssNode {
   
   public DetachedRulesetReference(HiddenTokenAwareTree token, Variable variable) {
     super(token);
+    this.variable = variable;
   }
 
   public Variable getVariable() {

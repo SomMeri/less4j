@@ -20,13 +20,13 @@ public class BasicScope extends ComposedDumbScope implements IScope {
   public Expression getValue(Variable variable) {
     return getValue(variable.getName());
   }
-  
+
   public Expression getValue(String name) {
     Expression value = getLocalValue(name);
-    
+
     if (value == null && hasParent())
       value = getParent().getValue(name);
-    
+
     return value;
   }
 
@@ -61,7 +61,6 @@ public class BasicScope extends ComposedDumbScope implements IScope {
 
     return getParent().seesLocalDataOf(otherScope);
   }
-
 
   public IScope getRootScope() {
     if (!hasParent())
@@ -119,7 +118,13 @@ public class BasicScope extends ComposedDumbScope implements IScope {
 
   private String toSimpleName() {
     List<String> names = getNames();
-    return "" + getType() + names;
+    if (names!=null && !names.isEmpty())
+      return getType() + names;
+    
+    if (ScopeFactory.DEFAULT!=getType())
+      return getType() + "[" + getOwner().toString() + "]";
+    
+    return getType();
   }
 
   public String toLongString() {

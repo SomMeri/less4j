@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -18,6 +19,11 @@ public class ListExpression extends Expression {
     super(token);
     this.expressions = expressions;
     this.operator = operator;
+  }
+
+  public ListExpression(HiddenTokenAwareTree token, List<Expression> expressions, ListExpressionOperator operator, IScope scope) {
+    this(token, expressions, operator);
+    setScope(scope);
   }
 
   public ListExpressionOperator getOperator() {

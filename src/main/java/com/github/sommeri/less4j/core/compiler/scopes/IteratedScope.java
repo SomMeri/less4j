@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.compiler.scopes;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class IteratedScope {
 
@@ -24,6 +25,8 @@ public class IteratedScope {
     do {
       if (childsIterator.hasNext())
         child = childsIterator.next();
+      else 
+        throw new BugHappened("Child scope was expected but missing", getScope().getOwner());
     } while (!child.isPresentInAst());
     
     return new IteratedScope(child);
