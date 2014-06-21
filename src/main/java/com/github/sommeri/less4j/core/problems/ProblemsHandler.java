@@ -231,6 +231,7 @@ public class ProblemsHandler implements LessProblems {
     return new CompilationError(reference, "The namespace \"" + name + "\" was not declared.");
   }
 
+  @Deprecated
   public void nonStringIndirection(Expression errorNode) {
     collector.addError(createNonStringIndirection(errorNode));
   }

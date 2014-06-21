@@ -1,11 +1,10 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.StyleSheet;

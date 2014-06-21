@@ -3,3 +3,17 @@
     @name: 'var';
     name: @@name;
 }
+//issue 216: https://github.com/SomMeri/less4j/issues/216
+@label-grey : #333;
+
+.label-color(@color) {
+  @label-class:~"label-@{color}";
+  @badge-class:~"badge-@{color}";
+  @label-color:@@label-class;
+
+ .@{label-class}, .@{badge-class} {
+    background-color:@label-color !important;
+ }  
+}
+
+.label-color(~"grey");

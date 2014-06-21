@@ -11,10 +11,10 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
+import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
-import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
@@ -46,6 +46,8 @@ import com.github.sommeri.less4j.core.compiler.scopes.ScopesTree;
 import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScope;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.utils.CssPrinter;
+import com.github.sommeri.less4j.utils.InStringCssPrinter;
 
 public class ExpressionEvaluator {
 
@@ -73,7 +75,7 @@ public class ExpressionEvaluator {
     embeddedScripting = configuration.getEmbeddedScriptGenerator() == null ? new EmbeddedLessGenerator() : configuration.getEmbeddedScriptGenerator();
     stringInterpolator = new StringInterpolator(problemsHandler);
     embeddedScriptInterpolator = new StringInterpolator(embeddedScripting, problemsHandler);
-    
+
     functions.add(new CustomFunctions(problemsHandler, configuration.getCustomFunctions()));
     functions.add(new MathFunctions(problemsHandler));
     functions.add(new StringFunctions(problemsHandler));
@@ -82,15 +84,15 @@ public class ExpressionEvaluator {
     functions.add(new EmbeddedScriptFunctions(problemsHandler));
     functions.add(new TypeFunctions(problemsHandler));
   }
-  
-  protected void addFunctionsPack(FunctionsPackage pack){
+
+  protected void addFunctionsPack(FunctionsPackage pack) {
     functions.add(pack);
   }
 
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
     if (allArguments.isEmpty())
       return new IdentifierExpression(parent.getUnderlyingStructure(), "");
-    
+
     return new ListExpression(parent.getUnderlyingStructure(), allArguments, new ListExpressionOperator(parent.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR));
   }
 
@@ -111,7 +113,7 @@ public class ExpressionEvaluator {
 
   private ExpressionFilter toEvaluationFilter() {
     return new ExpressionFilter() {
-      
+
       @Override
       public Expression apply(Expression input) {
         return evaluate(input);
@@ -123,7 +125,7 @@ public class ExpressionEvaluator {
     String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
     return new CssString(input.getUnderlyingStructure(), value, input.getQuoteType());
   }
-  
+
   public Expression evaluate(EscapedValue input) {
     String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
     return new EscapedValue(input.getUnderlyingStructure(), value);
@@ -139,7 +141,7 @@ public class ExpressionEvaluator {
       problemsHandler.variablesCycle(cycleDetector.getCycleFor(input));
       return new FaultyExpression(input);
     }
-      
+
     Expression value = scope.getValue(input);
     if (value == null) {
       problemsHandler.undefinedVariable(input);
@@ -161,22 +163,64 @@ public class ExpressionEvaluator {
     return evaluate(value);
   }
 
-  public Expression evaluate(IndirectVariable input) {
-    Expression value = scope.getValue(input);
-    if (!(value instanceof CssString)) {
-      problemsHandler.nonStringIndirection(input);
-      return new FaultyExpression(input);
-    }
+  //  public Expression evaluate(IndirectVariable input) {
+  //    Expression value = evaluate(scope.getValue(input));
+  //    
+  //    if (!(value instanceof CssString)) {
+  //      problemsHandler.nonStringIndirection(input);
+  //      return new FaultyExpression(input);
+  //    }
+  //
+  //    CssString realName = (CssString) value;
+  //    String realVariableName = "@" + realName.getValue();
+  //    value = scope.getValue(realVariableName);
+  //    if (value == null) {
+  //      problemsHandler.undefinedVariable(realVariableName, realName);
+  //      return new FaultyExpression(realName.getUnderlyingStructure());
+  //    }
+  //    return evaluate(value);
+  //  }
 
-    CssString realName = (CssString) value;
-    String realVariableName = "@" + realName.getValue();
-    value = scope.getValue(realVariableName);
-    if (value == null) {
-      problemsHandler.undefinedVariable(realVariableName, realName);
-      return new FaultyExpression(realName.getUnderlyingStructure());
+//  public Expression evaluate(IndirectVariable input) {
+//    Expression value = evaluate(scope.getValue(input));
+//
+//    CssPrinter printer = new InStringCssPrinter();
+//    printer.append(value);
+//    String realName = printer.toString();
+//
+//    if (!(value instanceof CssString)) {
+//      problemsHandler.nonStringIndirection(input);
+//      return new FaultyExpression(input);
+//    }
+//
+//    CssString oldRealName = (CssString) value;
+//    if (!oldRealName.getValue().equals(realName))
+//      System.out.println(oldRealName.getValue() + " -> "  + realName);
+//    
+//    String oldRealVariableName = "@" + oldRealName.getValue();
+//    value = scope.getValue(oldRealVariableName);
+//    if (value == null) {
+//      problemsHandler.undefinedVariable(oldRealVariableName, oldRealName);
+//      return new FaultyExpression(oldRealName.getUnderlyingStructure());
+//    }
+//    return evaluate(value);
+//  }
+
+    public Expression evaluate(IndirectVariable input) {
+      Expression reference = evaluate(scope.getValue(input));
+      
+      CssPrinter printer = new InStringCssPrinter();
+      printer.append(reference);
+      String realName = printer.toString();
+      
+      String realVariableName = "@" + realName;
+      Expression value = scope.getValue(realVariableName);
+      if (value == null) {
+        problemsHandler.undefinedVariable(realVariableName, input);
+        return new FaultyExpression(input.getUnderlyingStructure());
+      }
+      return evaluate(value);
     }
-    return evaluate(value);
-  }
 
   public Expression evaluate(Expression input) {
     switch (input.getType()) {
@@ -203,7 +247,7 @@ public class ExpressionEvaluator {
 
     case NAMED_EXPRESSION:
       return evaluate((NamedExpression) input);
-      
+
     case STRING_EXPRESSION:
       return evaluate((CssString) input);
 
@@ -213,7 +257,7 @@ public class ExpressionEvaluator {
     case EMBEDDED_SCRIPT:
       return evaluate((EmbeddedScript) input);
 
-    //the value is already there, nothing to evaluate
+      //the value is already there, nothing to evaluate
     case DETACHED_RULESET:
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
@@ -224,7 +268,7 @@ public class ExpressionEvaluator {
       return input;
 
     default:
-      throw new BugHappened("Unknown expression type "+input.getType(), input);
+      throw new BugHappened("Unknown expression type " + input.getType(), input);
     }
   }
 
@@ -263,9 +307,9 @@ public class ExpressionEvaluator {
   }
 
   private boolean compareNumbers(NumberExpression leftE, NumberExpression rightE, ComparisonExpressionOperator operator) {
-    if (!canCompareDimensions(leftE.getDimension(), rightE.getDimension())) 
+    if (!canCompareDimensions(leftE.getDimension(), rightE.getDimension()))
       return false;
-    
+
     Double left = leftE.getValueAsDouble();
     Double right = rightE.getValueAsDouble();
 
@@ -293,20 +337,20 @@ public class ExpressionEvaluator {
 
   public Expression evaluate(FunctionExpression input) {
     Expression evaluatedParameter = evaluate(input.getParameter());
-    List<Expression> splitParameters = (evaluatedParameter.getType()==ASTCssNodeType.EMPTY_EXPRESSION)?new ArrayList<Expression>() : evaluatedParameter.splitByComma();
-    
-    if (!input.isCssOnlyFunction()) { 
+    List<Expression> splitParameters = (evaluatedParameter.getType() == ASTCssNodeType.EMPTY_EXPRESSION) ? new ArrayList<Expression>() : evaluatedParameter.splitByComma();
+
+    if (!input.isCssOnlyFunction()) {
       for (FunctionsPackage pack : functions) {
         if (pack.canEvaluate(input, splitParameters))
           return pack.evaluate(input, splitParameters, evaluatedParameter);
       }
     }
-    
+
     UnknownFunction unknownFunction = new UnknownFunction();
     return unknownFunction.evaluate(splitParameters, problemsHandler, input, evaluatedParameter);
   }
 
-  public Expression evaluate(NamedExpression input) { 
+  public Expression evaluate(NamedExpression input) {
     return new NamedExpression(input.getUnderlyingStructure(), input.getName(), evaluate(input.getExpression()));
   }
 
@@ -418,7 +462,7 @@ class NullScope extends BasicScope {
   private static final String NULL = "#null#";
 
   protected NullScope() {
-    super(new LocalScope(null, Arrays.asList(NULL), NULL), new ScopesTree()); 
+    super(new LocalScope(null, Arrays.asList(NULL), NULL), new ScopesTree());
   }
 
   @Override
@@ -467,9 +511,9 @@ class NullScope extends BasicScope {
   public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
   }
 
-//  @Override
-//  public void setParent(IScope parent) {
-//  }
+  //  @Override
+  //  public void setParent(IScope parent) {
+  //  }
 
   @Override
   public void removedFromAst() {
@@ -526,7 +570,7 @@ class NullScope extends BasicScope {
 
   @Override
   public void closeDataPlaceholder() {
- }
+  }
 
   @Override
   public List<FullMixinDefinition> getAllMixins() {

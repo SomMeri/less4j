@@ -1,26 +1,14 @@
-.wrap-mixin(@ruleset) {
-  @b: visible;
-  .wrap-selector {
-      @ruleset();
-      visible-one: @b;
+@label-grey : #333;
+
+.label-color(@color) {
+    @label-class:~"label-@{color}";
+    @badge-class:~"badge-@{color}";
+    @label-color:@@label-class;
+
+    .@{label-class}, .@{badge-class} {
+        background-color:@label-color !important;
     }
 }
 
-.wrap-mixin({
-  @b: hidden and if you see this in the output its a bug;
-});
+.label-color(~"grey");
 
-/* ******************************************************** */
-.ruleset-mixin() {
-  @b-mixin: hidden and if you see this in the output its a bug;
-}
-
-.wrap-mixin-mixin() {
-  @b-mixin: visible;
-  .wrap-selector {
-      .ruleset-mixin();
-      visible-one: @b-mixin;
-    }
-}
-
-.wrap-mixin-mixin();
