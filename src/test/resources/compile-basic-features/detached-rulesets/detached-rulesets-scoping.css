@@ -1,8 +1,8 @@
 .selector-direct {
-  color: #008000;
+  color: green;
 }
 .selector-indirect {
-  color: #ff0000;
+  color: red;
 }
 .multiple-imports .selector {
   scope: yes;

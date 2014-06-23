@@ -70,10 +70,9 @@ class MixinsSolver {
 
     });
   }
-  
+
   private BodyCompilationResult resolveReferencedBody(final IScope callerScope, final BodyOwner<?> mixin, final IScope mixinWorkingScope) {
     final ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(mixinWorkingScope, problemsHandler, configuration);
-
 
     final IScope referencedMixinScope = mixinWorkingScope;
     // ... and I'm starting to see the point of closures ...
@@ -85,18 +84,23 @@ class MixinsSolver {
         List<ASTCssNode> replacement = compileBody(mixin.getBody(), referencedMixinScope);
 
         // collect variables and mixins to be imported
+        //        IScope returnValues = expressionEvaluator.evaluateValues(referencedMixinScope);
+
+        // collect variables and mixins to be imported
         IScope returnValues = ScopeFactory.createDummyScope();
         returnValues.addFilteredVariables(new ImportedScopeFilter(expressionEvaluator, callerScope), referencedMixinScope);
+        List<FullMixinDefinition> unmodifiedMixinsToImport = referencedMixinScope.getAllMixins();
+        
+        List<FullMixinDefinition> allMixinsToImport = mixinsToImport(callerScope, referencedMixinScope, unmodifiedMixinsToImport);
+        returnValues.addAllMixins(allMixinsToImport);
 
         //FIXME: !!!!!!!!!! clean up
         return new BodyCompilationResult((ASTCssNode) mixin, replacement, returnValues);
-
 
       }
 
     });
   }
-
 
   private List<ASTCssNode> compileBody(Body body, IScope scopeSnapshot) {
     semiCompiledNodes.push(body.getParent());
@@ -108,7 +112,6 @@ class MixinsSolver {
       semiCompiledNodes.pop();
     }
   }
-
 
   private List<FullMixinDefinition> mixinsToImport(IScope referenceScope, IScope referencedMixinScope, List<FullMixinDefinition> unmodifiedMixinsToImport) {
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
@@ -168,7 +171,7 @@ class MixinsSolver {
           MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
           GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
 
-          if (guardValue!=GuardValue.DO_NOT_USE) {
+          if (guardValue != GuardValue.DO_NOT_USE) {
             //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
             //used and create snapshot operation is cheap now. It should be done later on.
             BodyCompilationResult compiled = resolveMixinReference(callerScope, fullMixin, mixinWorkingScope);
@@ -183,7 +186,7 @@ class MixinsSolver {
 
     // filter out mixins we do not want to use  
     List<BodyCompilationResult> mixinsToBeUsed = defaultGuardHelper.chooseMixinsToBeUsed(compiledMixins, reference);
-    
+
     // update mixin replacements and update scope with imported variables and mixins
     for (BodyCompilationResult compiled : mixinsToBeUsed) {
       result.addMembers(compiled.getReplacement());
@@ -232,7 +235,8 @@ class MixinsSolver {
     }
   }
 
-  @Deprecated //FIXME: !!! evaluate need for this
+  @Deprecated
+  //FIXME: !!! evaluate need for this
   private static IScope calculateMixinsWorkingScope(IScope callerScope, IScope arguments, IScope mixinScope) {
     // add arguments
     IScope mixinDeclarationScope = mixinScope.getParent();
@@ -261,11 +265,12 @@ class MixinsSolver {
     // locally defined mixin does not require any other action
     boolean isLocallyDefined = bodyScope.seesLocalDataOf(callerScope);
     IScope parent = callerScope.getParent();
-    while (isLocallyDefined && parent!=null) {
-      isLocallyDefined = bodyScope.seesLocalDataOf(parent);;
+    while (isLocallyDefined && parent != null) {
+      isLocallyDefined = bodyScope.seesLocalDataOf(parent);
+      ;
       parent = parent.getParent();
     }
-      
+
     if (isLocallyDefined) {
       return bodyScope;
     }
@@ -274,10 +279,10 @@ class MixinsSolver {
     IScope result = ScopeFactory.createJoinedScopesView(callerScope, bodyScope);
     return result;
   }
-  
+
   //FIXME !!!! refactor and clean, unify with references 
   class ImportedScopeFilter implements ExpressionFilter {
-    
+
     private final ExpressionEvaluator expressionEvaluator;
     private final IScope importTargetScope;
 
@@ -296,9 +301,9 @@ class MixinsSolver {
     }
 
     private IScope apply(IScope input) {
-      if (input==null)
+      if (input == null)
         return importTargetScope;
-      
+
       return constructImportedBodyScope(importTargetScope, input);
 
     }
@@ -311,8 +316,9 @@ class MixinsSolver {
       //FIXME !!!! unify with the above scope joiners 
       // locally defined mixin does not require any other action
       IScope parent = importTargetScope.getParent();
-      while (isLocalImport && parent!=null) {
-        isLocalImport = bodyToBeImportedScope.seesLocalDataOf(parent);;
+      while (isLocalImport && parent != null) {
+        isLocalImport = bodyToBeImportedScope.seesLocalDataOf(parent);
+        ;
         parent = parent.getParent();
       }
 
@@ -333,4 +339,3 @@ class MixinsSolver {
   }
 
 }
-
