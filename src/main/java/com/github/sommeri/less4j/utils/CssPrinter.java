@@ -617,7 +617,7 @@ public class CssPrinter {
 
     if (!isCompressing()) cssOnly.ensureSeparator();
     append(body.getOpeningCurlyBrace());
-    cssOnly.ensureNewLine().increaseIndentationLevel();
+    if (!isCompressing()) cssOnly.ensureNewLine().increaseIndentationLevel();
     Iterable<CssPrinter> declarationsBuilders = collectUniqueBodyMembersStrings(body);
     for (CssPrinter miniBuilder : declarationsBuilders) {
       append(miniBuilder);
@@ -641,7 +641,7 @@ public class CssPrinter {
       CssPrinter miniPrinter = new CssPrinter(this);
 
       miniPrinter.append(declaration);
-      miniPrinter.cssOnly.ensureNewLine();
+      if (!isCompressing()) miniPrinter.cssOnly.ensureNewLine();
 
       declarationsStrings.add(miniPrinter.toCss().toString(), miniPrinter);
     }
@@ -1042,7 +1042,7 @@ public class CssPrinter {
 
   private void appendAll(List<? extends ASTCssNode> all) {
     for (ASTCssNode kid : all) {
-      if (append(kid))
+      if (append(kid) && !isCompressing())
         cssOnly.ensureNewLine();
     }
   }

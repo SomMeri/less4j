@@ -1,10 +1,1 @@
-.commentsAndWhiteSpaceTest #withId{
-  color:#003366;
-  border:2px solid red;
-}
-.test{
-  background-color:10px;
-  background-image:-webkit-linear-gradient(top,5px 1px,10px 1%,10px 100%);
-  background-image:-o-linear-gradient(to bottom,5px 1px,10px 1%,10px 100%);
-  background-image:linear-gradient(to bottom,5px 1px,10px 1%,10px 100%);
-}
+.commentsAndWhiteSpaceTest #withId{color:#003366;border:2px solid red;} .test{background-color:10px;background-image:-webkit-linear-gradient(top,5px 1px,10px 1%,10px 100%);background-image:-o-linear-gradient(to bottom,5px 1px,10px 1%,10px 100%);background-image:linear-gradient(to bottom,5px 1px,10px 1%,10px 100%);}
