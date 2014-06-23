@@ -12,6 +12,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
@@ -206,6 +207,13 @@ public class ASTManipulator {
     node.setSilent(isSilent);
     for (ASTCssNode kid : node.getChilds()) {
       setTreeSilentness(kid, isSilent);
+    }
+  }
+
+  public void addOpeningComments(ASTCssNode newOwner, List<Comment> comments) {
+    newOwner.addOpeningComments(comments);
+    for (Comment comment : comments) {
+      comment.setParent(newOwner);
     }
   }
 

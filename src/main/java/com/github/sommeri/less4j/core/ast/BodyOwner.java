@@ -5,5 +5,5 @@ public interface BodyOwner<T extends Body> {
   void setBody(T body);
   
   T getBody();
-  
+
 }

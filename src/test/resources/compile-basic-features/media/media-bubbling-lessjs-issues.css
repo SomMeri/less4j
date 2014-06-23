@@ -9,8 +9,6 @@
     padding: 2 2 2 2;
   }
 }
-@media screen, (min-width: 117px) and (min-width: 117px) {
-}
 @media screen and (max-device-aspect-ratio: 1367/768), (min-width: 117px) and (min-width: 117px) and (max-device-aspect-ratio: 1367/768), screen and (max-device-aspect-ratio: 2000/768), (min-width: 117px) and (min-width: 117px) and (max-device-aspect-ratio: 2000/768) {
   * {
     color: red;

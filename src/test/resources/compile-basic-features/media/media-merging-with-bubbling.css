@@ -1,5 +1,3 @@
-@media screen, print {
-}
 @media screen and (max-device-aspect-ratio: 1367/768), print and (max-device-aspect-ratio: 1367/768) {
   h2 h1 {
     color: white;

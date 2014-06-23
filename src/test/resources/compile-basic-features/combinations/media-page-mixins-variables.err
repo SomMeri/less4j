@@ -1,2 +1,0 @@
-Warnings produced by compilation of testCase
-WARNING 12:3 Compilation resulted in incorrect CSS. The rule set ended up inside a body of @page located at 10:1.
