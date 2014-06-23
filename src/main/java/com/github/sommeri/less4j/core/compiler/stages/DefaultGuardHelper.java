@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
@@ -21,7 +22,7 @@ public class DefaultGuardHelper {
     this.problemsHandler = problemsHandler;
   }
 
-  public List<MixinCompilationResult> chooseMixinsToBeUsed(List<MixinCompilationResult> compiledMixins, final MixinReference reference) {
+  public List<BodyCompilationResult> chooseMixinsToBeUsed(List<BodyCompilationResult> compiledMixins, final MixinReference reference) {
     // count how many mixins of each kind we encountered
     int normalMixinsCnt = ArraysUtils.count(compiledMixins, GuardValue.USE.filter());
     int ifNotCnt = ArraysUtils.count(compiledMixins, GuardValue.USE_IF_NOT_DEFAULT.filter());
@@ -38,7 +39,7 @@ public class DefaultGuardHelper {
     
     //there are multiple mixins using default() function and nothing else - that is ambiguous (period). 
     if (ifDefaultCnt+ifNotCnt > 1) {
-      List<MixinCompilationResult> errorSet = keepOnly(compiledMixins, GuardValue.USE_IF_DEFAULT,GuardValue.USE_IF_NOT_DEFAULT);
+      List<BodyCompilationResult> errorSet = keepOnly(compiledMixins, GuardValue.USE_IF_DEFAULT,GuardValue.USE_IF_NOT_DEFAULT);
       problemsHandler.ambiguousDefaultSet(reference, extractOriginalMixins(errorSet));
       //no mixins are going to be used
       return Collections.emptyList();
@@ -56,11 +57,11 @@ public class DefaultGuardHelper {
    * @param kind - types of mixins that are going to stay.
    * @return compiledMixins - for convenience
    */
-  private List<MixinCompilationResult> keepOnly(List<MixinCompilationResult> compiledMixins, GuardValue... kind) {
+  private List<BodyCompilationResult> keepOnly(List<BodyCompilationResult> compiledMixins, GuardValue... kind) {
     Set<GuardValue> expectedUses = ArraysUtils.asSet(kind);
-    Iterator<MixinCompilationResult> iterator = compiledMixins.iterator();
+    Iterator<BodyCompilationResult> iterator = compiledMixins.iterator();
     while (iterator.hasNext()) {
-      MixinCompilationResult compiled = iterator.next();
+      BodyCompilationResult compiled = iterator.next();
       if (!expectedUses.contains(compiled.getGuardValue())) {
         iterator.remove();
       }
@@ -68,10 +69,10 @@ public class DefaultGuardHelper {
     return compiledMixins;
   }
 
-  private List<ReusableStructure> extractOriginalMixins(List<MixinCompilationResult> compiledMixins) {
-    List<ReusableStructure> result = new ArrayList<ReusableStructure>();
-    for (MixinCompilationResult compiled : compiledMixins) {
-      result.add(compiled.getMixin());
+  private List<ASTCssNode> extractOriginalMixins(List<BodyCompilationResult> compiledMixins) {
+    List<ASTCssNode> result = new ArrayList<ASTCssNode>();
+    for (BodyCompilationResult compiled : compiledMixins) {
+      result.add(compiled.getCompiledBodyOwner());
     }
     return result;
   }

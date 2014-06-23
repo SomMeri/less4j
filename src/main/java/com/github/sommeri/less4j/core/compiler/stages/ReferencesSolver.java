@@ -10,10 +10,13 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
+import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
@@ -85,14 +88,14 @@ public class ReferencesSolver {
         IScope scope = iteratedScope.getScope();
 
         // solve all detached ruleset/mixin references and store solutions
-        Map<MixinReference, GeneralBody> solvedMixinReferences = solveCalls(childs, scope);
+        Map<ASTCssNode, GeneralBody> solvedReferences = solveCalls(childs, scope);
 
         // solve whatever is not a mixin/detached ruleset reference
         solveNonCalligReferences(childs, iteratedScope);
 
         // replace mixin references by their solutions - we need to do it in the end
         // the scope and ast would get out of sync otherwise
-        replaceMixinReferences(solvedMixinReferences);
+        replaceMixinReferences(solvedReferences);
       }
     } finally {
       semiCompiledNodes.pop();
@@ -102,7 +105,7 @@ public class ReferencesSolver {
   private void solveNonCalligReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
     ExpressionEvaluator cssGuardsValidator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler, configuration);
     for (ASTCssNode kid : childs) {
-      if (isMixinReference(kid))
+      if (isMixinReference(kid) || isDetachedRulesetReference(kid))
         continue;
 
       if (isRuleset(kid)) {
@@ -113,12 +116,12 @@ public class ReferencesSolver {
           manipulator.removeFromClosestBody(ruleSet);
           //skip child scope
           iteratedScope.getNextChild();
-          continue ;
+          continue;
         }
       }
-      
+
       if (AstLogic.isQuotelessUrlFunction(kid)) {
-        continue ;
+        continue;
       }
 
       if (AstLogic.hasOwnScope(kid)) {
@@ -135,8 +138,7 @@ public class ReferencesSolver {
   private boolean isMixinReference(ASTCssNode kid) {
     return kid.getType() == ASTCssNodeType.MIXIN_REFERENCE;
   }
-  
-  @SuppressWarnings("unused")
+
   private boolean isDetachedRulesetReference(ASTCssNode kid) {
     return kid.getType() == ASTCssNodeType.DETACHED_RULESET_REFERENCE;
   }
@@ -145,30 +147,66 @@ public class ReferencesSolver {
     return kid.getType() == ASTCssNodeType.RULE_SET;
   }
 
-  private void replaceMixinReferences(Map<MixinReference, GeneralBody> solvedMixinReferences) {
-    for (Entry<MixinReference, GeneralBody> entry : solvedMixinReferences.entrySet()) {
-      MixinReference mixinReference = entry.getKey();
+  private void replaceMixinReferences(Map<ASTCssNode, GeneralBody> solvedReferences) {
+    for (Entry<ASTCssNode, GeneralBody> entry : solvedReferences.entrySet()) {
+      ASTCssNode mixinReference = entry.getKey();
       GeneralBody replacement = entry.getValue();
-      
+
       manipulator.setTreeSilentness(replacement, mixinReference.isSilent());
       manipulator.replaceInBody(mixinReference, replacement.getMembers());
     }
   }
 
-  private Map<MixinReference, GeneralBody> solveCalls(List<ASTCssNode> childs, IScope mixinReferenceScope) {
-    Map<MixinReference, GeneralBody> solvedMixinReferences = new HashMap<MixinReference, GeneralBody>();
+  private Map<ASTCssNode, GeneralBody> solveCalls(List<ASTCssNode> childs, IScope referenceScope) {
+    Map<ASTCssNode, GeneralBody> solvedMixinReferences = new HashMap<ASTCssNode, GeneralBody>();
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
-        MixinReference mixinReference = (MixinReference) kid;
+        MixinReference reference = (MixinReference) kid;
 
-        List<FullMixinDefinition> foundMixins = findReferencedMixins(mixinReference, mixinReferenceScope);
-        GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(mixinReference, mixinReferenceScope, foundMixins);
+        List<FullMixinDefinition> foundMixins = findReferencedMixins(reference, referenceScope);
+        GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(reference, referenceScope, foundMixins);
 
-        AstLogic.validateLessBodyCompatibility(mixinReference, replacement.getMembers(), problemsHandler);
-        solvedMixinReferences.put(mixinReference, replacement);
+        AstLogic.validateLessBodyCompatibility(reference, replacement.getMembers(), problemsHandler);
+        solvedMixinReferences.put(reference, replacement);
+      } else if (isDetachedRulesetReference(kid)) {
+        DetachedRulesetReference detachedRulesetReference = (DetachedRulesetReference) kid;
+        Expression fullNodeDefinition = referenceScope.getValue(detachedRulesetReference.getVariable());
+        
+        if (fullNodeDefinition == null) {
+          handleUnavailableDetachedRulesetReference(detachedRulesetReference, solvedMixinReferences);
+        } else {
+          ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
+          Expression evaluatedDetachedRuleset = expressionEvaluator.evaluate(fullNodeDefinition);
+          fullNodeDefinition = evaluatedDetachedRuleset;
+          if (evaluatedDetachedRuleset.getType() != ASTCssNodeType.DETACHED_RULESET) {
+            handleWrongDetachedRulesetReference(detachedRulesetReference, evaluatedDetachedRuleset, solvedMixinReferences);
+          } else {
+            DetachedRuleset detachedRuleset = (DetachedRuleset) evaluatedDetachedRuleset;
+            IScope scope = detachedRuleset.getScope();
+            GeneralBody replacement = mixinsSolver.buildDetachedRulesetReplacement(detachedRulesetReference, referenceScope, detachedRuleset, scope);
+            AstLogic.validateLessBodyCompatibility(kid, replacement.getMembers(), problemsHandler);
+            solvedMixinReferences.put(kid, replacement);
+          }
+        }
+
       }
+
     }
     return solvedMixinReferences;
+  }
+
+  private void handleUnavailableDetachedRulesetReference(DetachedRulesetReference detachedRulesetReference, Map<ASTCssNode, GeneralBody> solvedReferences) {
+    problemsHandler.detachedRulesetNotfound(detachedRulesetReference);
+    GeneralBody errorBody = new GeneralBody(detachedRulesetReference.getUnderlyingStructure());
+    errorBody.addMember(new FaultyNode(detachedRulesetReference));
+    solvedReferences.put(detachedRulesetReference, errorBody);
+  }
+
+  private void handleWrongDetachedRulesetReference(DetachedRulesetReference detachedRulesetReference, Expression value,  Map<ASTCssNode, GeneralBody> solvedReferences) {
+    problemsHandler.wrongDetachedRulesetReference(detachedRulesetReference, value);
+    GeneralBody errorBody = new GeneralBody(detachedRulesetReference.getUnderlyingStructure());
+    errorBody.addMember(new FaultyNode(detachedRulesetReference));
+    solvedReferences.put(detachedRulesetReference, errorBody);
   }
 
   protected List<FullMixinDefinition> findReferencedMixins(MixinReference mixinReference, IScope scope) {

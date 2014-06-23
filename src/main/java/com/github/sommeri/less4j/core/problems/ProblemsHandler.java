@@ -9,6 +9,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
+import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
@@ -199,6 +200,14 @@ public class ProblemsHandler implements LessProblems {
     return new CompilationError(reference.getFinalName(), "Could not find mixin named \"" + name.asString() + "\".");
   }
 
+  public void detachedRulesetNotfound(DetachedRulesetReference reference) {
+    addError(reference, "Could not find detached ruleset for \"" + reference.getVariable().getName() + "\".");
+  }
+
+  public void wrongDetachedRulesetReference(DetachedRulesetReference reference, Expression value) {
+    addError(reference, "Detached ruleset reference \"" + reference.getVariable().getName() + "\"  does not evaluate to detached ruleset. It resolved to expression defined at " + printer.toPosition(value));
+  }
+
   public void noMixinHasRightParametersCountError(MixinReference reference) {
     collector.addError(createNoMixinHasRightParametersCountError(reference));
   }
@@ -272,7 +281,7 @@ public class ProblemsHandler implements LessProblems {
     addWarning(errorNode, "Skipped data-uri embedding of " + filename + " because its size ("+fileSizeInKB+"dKB) exceeds IE8-safe "+dataUriMaxKb+"dKB!");
   }
 
-  public void ambiguousDefaultSet(MixinReference reference, List<ReusableStructure> possibleMixins) {
+  public void ambiguousDefaultSet(MixinReference reference, List<ASTCssNode> possibleMixins) {
     addError(reference, "Ambiguous use of `default()` found when matching reference " + reference.getFinalName() +". Matched mixins using default are located at " + printer.toNodesPositions(possibleMixins));
   }
 

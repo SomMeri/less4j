@@ -1,14 +1,7 @@
-@label-grey : #333;
+@detached: {
+  property: mixin;
+};
 
-.label-color(@color) {
-    @label-class:~"label-@{color}";
-    @badge-class:~"badge-@{color}";
-    @label-color:@@label-class;
-
-    .@{label-class}, .@{badge-class} {
-        background-color:@label-color !important;
-    }
+.img-responsive {
+  @detached();
 }
-
-.label-color(~"grey");
-

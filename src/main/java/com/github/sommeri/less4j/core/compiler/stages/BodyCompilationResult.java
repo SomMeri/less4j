@@ -3,20 +3,19 @@ package com.github.sommeri.less4j.core.compiler.stages;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class MixinCompilationResult {
+public class BodyCompilationResult {
 
-  private ReusableStructure mixin;
+  private ASTCssNode compiledBodyOwner;
   private List<ASTCssNode> replacement;
   private IScope returnValues;
   private GuardValue guardValue;
 
-  public MixinCompilationResult(ReusableStructure mixin, List<ASTCssNode> replacement, IScope returnValues) {
-    this.mixin = mixin;
+  public BodyCompilationResult(ASTCssNode compiledBodyOwner, List<ASTCssNode> replacement, IScope returnValues) {
+    this.compiledBodyOwner = compiledBodyOwner;
     this.replacement = replacement;
     this.returnValues = returnValues;
   }
@@ -45,17 +44,17 @@ public class MixinCompilationResult {
     this.returnValues = returnValues;
   }
 
-  public ReusableStructure getMixin() {
-    return mixin;
+  public ASTCssNode getCompiledBodyOwner() {
+    return compiledBodyOwner;
   }
 
-  public void setMixin(ReusableStructure mixin) {
-    this.mixin = mixin;
+  public void setCompiledBodyOwner(ASTCssNode compiledBodyOwner) {
+    this.compiledBodyOwner = compiledBodyOwner;
   }
 
   @Override
-  protected MixinCompilationResult clone() {
-    return new MixinCompilationResult(mixin.clone(), ArraysUtils.deeplyClonedList(replacement), returnValues);
+  protected BodyCompilationResult clone() {
+    return new BodyCompilationResult(compiledBodyOwner.clone(), ArraysUtils.deeplyClonedList(replacement), returnValues);
   }
 
 }

@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
+import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
@@ -50,7 +52,7 @@ public class InitialScopeExtractor {
       buildScope(kid);
 
       if (kid.getType() == ASTCssNodeType.IMPORT) {
-        importsPlaceholders.add(createPlaceholderScope(kid));  
+        importsPlaceholders.add(createPlaceholderScope(kid));
       } else if (kid.getType() == ASTCssNodeType.VARIABLE_DECLARATION) {
         currentScope.registerVariable((VariableDeclaration) kid);
         manipulator.removeFromBody(kid);
@@ -62,6 +64,13 @@ public class InitialScopeExtractor {
         if (bodyScope.hasParent())
           bodyScope.getParent().removedFromAst(); // remove also arguments scope from tree
         manipulator.removeFromBody(kid);
+      } else if (kid.getType() == ASTCssNodeType.DETACHED_RULESET) {
+        DetachedRuleset detached = (DetachedRuleset) kid;
+        IScope bodyScope = currentScope.childByOwners(detached, detached.getBody());
+        if (bodyScope.hasParent())
+          bodyScope.getParent().removedFromAst(); // remove also arguments scope from tree
+        bodyScope.removedFromAst();
+        detached.setScope(bodyScope); 
       } else if (kid.getType() == ASTCssNodeType.RULE_SET) {
         RuleSet ruleSet = (RuleSet) kid;
         if (ruleSet.isUsableAsReusableStructure()) {
@@ -70,6 +79,11 @@ public class InitialScopeExtractor {
         }
       } else if (kid.getType() == ASTCssNodeType.MIXIN_REFERENCE) {
         currentScope.createDataPlaceholder();
+      } else if (kid.getType() == ASTCssNodeType.DETACHED_RULESET_REFERENCE) {
+        currentScope.createDataPlaceholder();
+      } else if (AstLogic.isExpression(kid)) {
+        Expression value = (Expression) kid;
+        value.setScope(currentScope);
       }
     }
 
@@ -105,7 +119,7 @@ public class InitialScopeExtractor {
   private void increaseScope(ASTCssNode owner) {
     if (currentScope == null) {
       currentScope = ScopeFactory.createDefaultScope(owner);
-    } else if(AstLogic.isBodyOwner(owner)) {
+    } else if (AstLogic.isBodyOwner(owner)) {
       currentScope = ScopeFactory.createBodyOwnerScope(owner, currentScope);
     } else {
       currentScope = ScopeFactory.createScope(owner, currentScope);
@@ -118,7 +132,7 @@ public class InitialScopeExtractor {
   private PlaceholderScope createPlaceholderScope(ASTCssNode owner) {
     if (currentScope == null) {
       throw new BugHappened("No parent scope available.", owner);
-    } 
+    }
 
     return ScopeFactory.createPlaceholderScope(owner, currentScope);
   }

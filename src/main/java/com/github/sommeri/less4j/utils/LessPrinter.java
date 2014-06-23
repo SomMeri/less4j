@@ -41,6 +41,10 @@ public class LessPrinter {
     
     return result;
   }
+  
+  public String toPosition(ASTCssNode node) {
+    return node.getSourceLine()+":"+node.getSourceColumn();
+  }
 
   public String toMixinReferencesString(List<MixinReference> cycle) {
     String result = "";

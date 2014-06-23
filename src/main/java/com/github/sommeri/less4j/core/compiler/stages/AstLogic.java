@@ -76,4 +76,8 @@ public class AstLogic {
     return "".equals(stringParameter.getQuoteType());
   }
 
+  public static boolean isExpression(ASTCssNode kid) {
+    return kid instanceof Expression;
+  }
+
 }
