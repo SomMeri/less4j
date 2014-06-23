@@ -331,7 +331,8 @@ public class CssPrinter {
       result |= append(names.next());
     }
     while (names.hasNext()) {
-      cssOnly.append(",").ensureSeparator();
+      cssOnly.append(',');
+      if (!isCompressing()) cssOnly.ensureSeparator();
       append(names.next());
       result = true;
     }
@@ -359,7 +360,7 @@ public class CssPrinter {
     cssOnly.append("@import").ensureSeparator();
     append(node.getUrlExpression());
     appendCommaSeparated(node.getMediums());
-    cssOnly.append(";");
+    cssOnly.append(';');
 
     return true;
   }
@@ -513,7 +514,7 @@ public class CssPrinter {
   }
 
   protected void appendComments(List<Comment> comments, boolean ensureSeparator) {
-    if (comments == null || comments.isEmpty())
+    if (comments == null || comments.isEmpty() || isCompressing())
       return;
 
     cssOnly.ensureSeparator();
@@ -540,7 +541,7 @@ public class CssPrinter {
   public boolean appendCharsetDeclaration(CharsetDeclaration node) {
     cssAndSM.append("@charset", node.getUnderlyingStructure()).ensureSeparator();
     append(node.getCharset());
-    cssOnly.append(";");
+    cssOnly.append(';');
 
     return true;
   }
@@ -551,11 +552,11 @@ public class CssPrinter {
   }
 
   public boolean appendSelectorAttribute(SelectorAttribute node) {
-    cssOnly.append("[");
+    cssOnly.append('[');
     cssOnly.append(node.getName());
     append(node.getOperator());
     append(node.getValue());
-    cssOnly.append("]");
+    cssOnly.append(']');
 
     return true;
   }
@@ -573,21 +574,21 @@ public class CssPrinter {
   }
 
   public boolean appendPseudoClass(PseudoClass node) {
-    cssOnly.append(":");
+    cssOnly.append(':');
     cssOnly.append(node.getName());
     if (node.hasParameters()) {
-      cssOnly.append("(");
+      cssOnly.append('(');
       append(node.getParameter());
-      cssOnly.append(")");
+      cssOnly.append(')');
     }
 
     return true;
   }
 
   public boolean appendPseudoElement(PseudoElement node) {
-    cssOnly.append(":");
+    cssOnly.append(':');
     if (!node.isLevel12Form())
-      cssOnly.append(":");
+      cssOnly.append(':');
 
     cssOnly.append(node.getName());
 
@@ -614,7 +615,7 @@ public class CssPrinter {
     if (body.isEmpty())
       return false;
 
-    cssOnly.ensureSeparator();
+    if (!isCompressing()) cssOnly.ensureSeparator();
     append(body.getOpeningCurlyBrace());
     cssOnly.ensureNewLine().increaseIndentationLevel();
     Iterable<CssPrinter> declarationsBuilders = collectUniqueBodyMembersStrings(body);
@@ -650,7 +651,8 @@ public class CssPrinter {
 
   public boolean appendDeclaration(Declaration declaration) {
     cssOnly.appendIgnoreNull(declaration.getNameAsString());
-    cssOnly.append(":").ensureSeparator();
+    cssOnly.append(':');
+    if (!isCompressing()) cssOnly.ensureSeparator();
     if (declaration.getExpression() != null)
       append(declaration.getExpression());
 
@@ -758,13 +760,14 @@ public class CssPrinter {
   }
 
   public boolean appendMediaExpression(FixedMediaExpression expression) {
-    cssOnly.ensureSeparator().append("(");
+    cssOnly.ensureSeparator().append('(');
     append(expression.getFeature());
     if (expression.getExpression() != null) {
-      cssOnly.append(":").ensureSeparator();
+      cssOnly.append(':');
+      if (!isCompressing()) cssOnly.ensureSeparator();
       append(expression.getExpression());
     }
-    cssOnly.append(")");
+    cssOnly.append(')');
     return true;
   }
 
@@ -780,7 +783,7 @@ public class CssPrinter {
 
   public boolean appendNamedExpression(NamedExpression expression) {
     cssOnly.append(expression.getName());
-    cssOnly.append("=");
+    cssOnly.append('=');
     append(expression.getExpression());
 
     return true;
@@ -811,7 +814,8 @@ public class CssPrinter {
     ListExpressionOperator.Operator realOperator = operator.getOperator();
     switch (realOperator) {
     case COMMA:
-      cssOnly.append(realOperator.getSymbol()).ensureSeparator();
+      cssOnly.append(realOperator.getSymbol());
+      if (!isCompressing()) cssOnly.ensureSeparator();
       break;
 
     case EMPTY_OPERATOR:
@@ -833,7 +837,7 @@ public class CssPrinter {
     // left here intentionally, so we can have correct unit test and can come
     // back to it later
     case MINUS:
-      cssOnly.ensureSeparator().append("-");
+      cssOnly.ensureSeparator().append('-');
       break;
 
     default:
@@ -847,7 +851,8 @@ public class CssPrinter {
     ListExpressionOperator.Operator realOperator = operator.getOperator();
     switch (realOperator) {
     case COMMA:
-      cssOnly.append(realOperator.getSymbol()).ensureSeparator();
+      cssOnly.append(realOperator.getSymbol());
+      if (!isCompressing()) cssOnly.ensureSeparator();
       break;
 
     case EMPTY_OPERATOR:
@@ -910,9 +915,9 @@ public class CssPrinter {
 
   private boolean appendFunctionExpression(FunctionExpression node) {
     cssOnly.append(node.getName());
-    cssOnly.append("(");
+    cssOnly.append('(');
     append(node.getParameter());
-    cssOnly.append(")");
+    cssOnly.append(')');
 
     return true;
   }
@@ -923,9 +928,9 @@ public class CssPrinter {
     } else {
       if (node.hasExpliciteSign()) {
         if (0 < node.getValueAsDouble())
-          cssOnly.append("+");
+          cssOnly.append('+');
         else
-          cssOnly.append("-");
+          cssOnly.append('-');
       }
       cssOnly.append(PrintUtils.formatNumber(node.getValueAsDouble()) + node.getSuffix());
     }
@@ -937,7 +942,7 @@ public class CssPrinter {
     selectors = filterSilent(selectors);
     // follow less.js formatting in special case - only one empty selector
     if (selectors.size() == 1 && isEmptySelector(selectors.get(0))) {
-      cssOnly.append(" ");
+      cssOnly.append(' ');
     }
 
     Iterator<Selector> iterator = selectors.iterator();
@@ -946,7 +951,7 @@ public class CssPrinter {
       append(selector);
 
       if (iterator.hasNext())
-        cssOnly.append(",").newLine();
+        cssOnly.append(',').newLine();
     }
   }
 
@@ -1052,5 +1057,9 @@ public class CssPrinter {
 
   public String toSourceMap() {
     return cssAndSM.toSourceMap();
+  }
+
+  private boolean isCompressing() {
+    return options != null ? options.isCompressing() : false;
   }
 }

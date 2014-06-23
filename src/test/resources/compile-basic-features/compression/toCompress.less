@@ -1,0 +1,33 @@
+// one line comment
+/**
+ * multi line comment
+ */
+.commentsAndWhiteSpaceTest #withId {
+    // one line comment inside
+    color: #003366;
+
+    /** multi line comment inside */
+    border: 2px solid red;
+}
+
+.bg-light-border(@top, @bottom, @lightAngle) {
+  // TODO: adapt to newest version of syntax, supported by FF16, IE10 and Op12.5
+
+  background-color: @top; // Browsers without support, like IE 7-9
+
+  // old syntax
+  background-image: -webkit-linear-gradient(top, @lightAngle 1px, @top 1%, @bottom 100%); // Safari, Chrome
+
+  // new syntax
+  background-image: -o-linear-gradient(to bottom, @lightAngle 1px, @top 1%, @bottom 100%); // Opera 11.6
+  background-image: linear-gradient(to bottom, @lightAngle 1px, @top 1%, @bottom 100%); // IE 10, FF 16+
+}
+
+.test {
+  // one liner
+  .bg-light-border(10px, 10px, 5px);
+  /*
+   * multi line comment
+   */
+}
+
