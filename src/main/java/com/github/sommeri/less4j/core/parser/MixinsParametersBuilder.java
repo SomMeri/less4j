@@ -11,12 +11,12 @@ import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
+import com.github.sommeri.less4j.core.compiler.stages.AstLogic;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class MixinsParametersBuilder {
 
   private final ASTBuilderSwitch parentBuilder;
-  @SuppressWarnings("unused")
   private ProblemsHandler problemsHandler;
 
   public MixinsParametersBuilder(ASTBuilderSwitch astBuilderSwitch, ProblemsHandler problemsHandler) {
@@ -100,7 +100,7 @@ public class MixinsParametersBuilder {
         
         if (argument.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
           ArgumentDeclaration argumentDeclaration = (ArgumentDeclaration) argument;
-          declaration.addParameter(argumentDeclaration);
+          addParameter(declaration, argumentDeclaration);
 
           if (argumentDeclaration.getValue()!=null) {
             Iterator<Expression> expressions = argumentDeclaration.getValue().splitByComma().iterator();
@@ -115,14 +115,23 @@ public class MixinsParametersBuilder {
     }
   }
 
+  private void addParameter(ReusableStructure declaration, ASTCssNode parameter) {
+    if (parameter.getType()==ASTCssNodeType.ARGUMENT_DECLARATION) {
+      Expression value = ((ArgumentDeclaration) parameter).getValue();
+      if (AstLogic.isDetachedRuleset(value))
+        problemsHandler.warnDetachedRulesetAsMixinParamDefault(value);
+    }
+    declaration.addParameter(parameter);
+  }
+
   private void addParameters(ReusableStructure declaration, Iterator<Expression> expressions) {
     while (expressions.hasNext()) {
       Expression next = expressions.next();
       
       if (next.getType()==ASTCssNodeType.VARIABLE) {
-        declaration.addParameter(new ArgumentDeclaration((Variable)next, null));
+        addParameter(declaration, new ArgumentDeclaration((Variable)next, null));
       } else {
-        declaration.addParameter(next);
+        addParameter(declaration, next);
       }
     }
   }
@@ -131,7 +140,7 @@ public class MixinsParametersBuilder {
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
       if (kid.getType() != LessLexer.SEMI) {
-        declaration.addParameter(parentBuilder.switchOn(kid));
+        addParameter(declaration, parentBuilder.switchOn(kid));
       }
     }
   }

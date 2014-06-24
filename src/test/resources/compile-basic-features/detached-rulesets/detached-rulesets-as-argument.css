@@ -1,0 +1,6 @@
+.default-mixin-argument {
+  default: default;
+}
+.custom-mixin-argument {
+  custom: custom;
+}

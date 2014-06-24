@@ -1,26 +1,5 @@
-@my-ruleset: {
-    .my-selector {
-      @media (min-size:256) { //tv
-        background-color: black;
-      }
-    }
+.variable-declaration-symbol-missing {
+  b: {
+    color: red;
   };
-@media (orientation:portrait) {
-    @my-ruleset();
-    .wrap-media-mixin({
-      @media (min-size:256) { //tv
-        .triple-wrapped-mq {
-          triple: true;
-        }
-      }
-    });
-}
-.wrap-media-mixin(@ruleset) {
-  @media (max-size:1028) { //widescreen
-    @media (blah: 22) { //print
-      @ruleset();
-    }
-    @ruleset();
-  }
-  @ruleset();
 }

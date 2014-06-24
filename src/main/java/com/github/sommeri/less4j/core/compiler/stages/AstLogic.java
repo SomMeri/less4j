@@ -80,4 +80,8 @@ public class AstLogic {
     return kid instanceof Expression;
   }
 
+  public static boolean isDetachedRuleset(Expression value) {
+    return value!=null && value.getType()==ASTCssNodeType.DETACHED_RULESET;
+  }
+
 }

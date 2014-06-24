@@ -1,26 +1,2 @@
-@media (orientation: portrait) {
-}
-@media (orientation: portrait) and (min-size: 256) {
-  .my-selector {
-    background-color: black;
-  }
-}
-@media (orientation: portrait) and (max-size: 1028) {
-}
-@media (orientation: portrait) and (max-size: 1028) and (blah: 22) {
-}
-@media (orientation: portrait) and (max-size: 1028) and (blah: 22) and (min-size: 256) {
-  .triple-wrapped-mq {
-    triple: true;
-  }
-}
-@media (orientation: portrait) and (max-size: 1028) and (min-size: 256) {
-  .triple-wrapped-mq {
-    triple: true;
-  }
-}
-@media (orientation: portrait) and (min-size: 256) {
-  .triple-wrapped-mq {
-    triple: true;
-  }
-}
+
+/*# sourceMappingURL=data:application/json;base64,ewoidmVyc2lvbiI6MywKImZpbGUiOiJkZWJ1ZzEuY3NzIiwKImxpbmVDb3VudCI6MSwKIm1hcHBpbmdzIjoiOyIsCiJzb3VyY2VzIjpbXSwKInNvdXJjZXNDb250ZW50IjpbXSwKIm5hbWVzIjpbXQp9Cg== */

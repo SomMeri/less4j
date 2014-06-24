@@ -1,0 +1,21 @@
+@detached-ruleset1: { property-1: @variable; };
+.list-namespacer {
+  .listUnlocker {
+     @list: @detached-ruleset1 something-else;
+  } 
+}
+
+.mixin(@list) {
+  @detached1: extract(@list, 1);
+  @detached1();
+}
+
+.indirect-mixin(@list) {
+   @variable: in-passed-through-mixin;
+   .mixin(@list);
+}
+
+selector {
+  .list-namespacer > .listUnlocker();
+  .indirect-mixin(@list)
+}

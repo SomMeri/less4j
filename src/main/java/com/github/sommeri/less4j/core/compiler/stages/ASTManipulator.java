@@ -72,7 +72,7 @@ public class ASTManipulator {
   }
 
   private boolean isAstProperty(PropertyDescriptor descriptor) {
-    return !descriptor.getReadMethod().isAnnotationPresent(NotAstProperty.class);
+    return descriptor.getReadMethod()!=null && !descriptor.getReadMethod().isAnnotationPresent(NotAstProperty.class);
   }
 
   private boolean isList(Class<?> propertyType) {

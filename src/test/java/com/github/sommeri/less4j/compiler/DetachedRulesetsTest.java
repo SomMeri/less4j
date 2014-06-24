@@ -3,7 +3,6 @@ package com.github.sommeri.less4j.compiler;
 import java.io.File;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 //FIXME: call on variable with wrong datatype in
@@ -82,7 +81,6 @@ import org.junit.runners.Parameterized.Parameters;
  * test if @defaults works correctly -- e.g. including various callers scopes
 
  */
-@Ignore
 public class DetachedRulesetsTest extends BasicFeaturesTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/detached-rulesets/";

@@ -1,21 +1,21 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 import com.github.sommeri.less4j.EmbeddedLessGenerator;
 import com.github.sommeri.less4j.EmbeddedScriptGenerator;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
-import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -32,28 +32,27 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
-import com.github.sommeri.less4j.core.compiler.scopes.BasicScope;
-import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.compiler.scopes.NullScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
-import com.github.sommeri.less4j.core.compiler.scopes.ScopesTree;
-import com.github.sommeri.less4j.core.compiler.scopes.local.LocalScope;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.CssPrinter;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
 
-public class ExpressionEvaluator {
+//FIXME !!!!!!!!!!! rename back to ExpressionsEvaluator
+public class IScopeAwareExpressionsEvaluator {
 
   private VariableCycleDetector cycleDetector = new VariableCycleDetector();
-  private final IScope scope;
+  private final IScope lazyScope;
+  private final Stack<IScope> eagerScopes = new Stack<IScope>();
   private final ProblemsHandler problemsHandler;
+
   private ArithmeticCalculator arithmeticCalculator;
   private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
@@ -62,13 +61,13 @@ public class ExpressionEvaluator {
   private StringInterpolator embeddedScriptInterpolator;
   private EmbeddedScriptGenerator embeddedScripting;
 
-  public ExpressionEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
+  public IScopeAwareExpressionsEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
     this(new NullScope(), problemsHandler, configuration);
   }
 
-  public ExpressionEvaluator(IScope scope, ProblemsHandler problemsHandler, Configuration configuration) {
+  public IScopeAwareExpressionsEvaluator(IScope scope, ProblemsHandler problemsHandler, Configuration configuration) {
     super();
-    this.scope = scope == null ? new NullScope() : scope;
+    this.lazyScope = scope == null ? new NullScope() : scope;
     this.problemsHandler = problemsHandler;
     arithmeticCalculator = new ArithmeticCalculator(problemsHandler);
     colorsCalculator = new ColorsCalculator(problemsHandler);
@@ -142,85 +141,65 @@ public class ExpressionEvaluator {
       return new FaultyExpression(input);
     }
 
-    Expression value = scope.getValue(input);
-    if (value == null) {
+    Expression expression = lazyScope.getValue(input);
+    if (expression == null) {
       problemsHandler.undefinedVariable(input);
       return new FaultyExpression(input);
     }
+    //FIXME!!!!!!!!!!! while it is clear what should this here do once this is done, this case might 
+    //need some adjuctments while import is not fully solved   
+    if (expression.getType() == ASTCssNodeType.DETACHED_RULESET && expression.getScope() == null) {
+      throw new BugHappened("Scope information is missing", expression);
+    }
 
+    IScope originalScope = enteringExpression(expression);
     cycleDetector.enteringVariableValue(input);
-    Expression result = evaluate(value);
+    Expression result = evaluate(expression);
     cycleDetector.leftVariableValue();
+    leavingExpression(originalScope);
     return result;
   }
 
+  private void leavingExpression(IScope originalScope) {
+    if (originalScope != null) {
+      eagerScopes.pop();
+    }
+  }
+
+  private IScope enteringExpression(Expression value) {
+    IScope owningScope = value.getScope();
+    if (owningScope != null) {
+      eagerScopes.push(owningScope);
+    }
+    return owningScope;
+  }
+
+  //FIXME: !!!!!!!!!! try this on variable that depends on undefined
   public Expression evaluateIfPresent(Variable input) {
-    Expression value = scope.getValue(input);
+    Expression value = lazyScope.getValue(input);
     if (value == null) {
       return null;
     }
 
+    //FIXME !!!!!!!!!!!!!!!!! add to eager scopes
     return evaluate(value);
   }
 
-  //  public Expression evaluate(IndirectVariable input) {
-  //    Expression value = evaluate(scope.getValue(input));
-  //    
-  //    if (!(value instanceof CssString)) {
-  //      problemsHandler.nonStringIndirection(input);
-  //      return new FaultyExpression(input);
-  //    }
-  //
-  //    CssString realName = (CssString) value;
-  //    String realVariableName = "@" + realName.getValue();
-  //    value = scope.getValue(realVariableName);
-  //    if (value == null) {
-  //      problemsHandler.undefinedVariable(realVariableName, realName);
-  //      return new FaultyExpression(realName.getUnderlyingStructure());
-  //    }
-  //    return evaluate(value);
-  //  }
+  public Expression evaluate(IndirectVariable input) {
+    Expression reference = evaluate(lazyScope.getValue(input));
 
-//  public Expression evaluate(IndirectVariable input) {
-//    Expression value = evaluate(scope.getValue(input));
-//
-//    CssPrinter printer = new InStringCssPrinter();
-//    printer.append(value);
-//    String realName = printer.toString();
-//
-//    if (!(value instanceof CssString)) {
-//      problemsHandler.nonStringIndirection(input);
-//      return new FaultyExpression(input);
-//    }
-//
-//    CssString oldRealName = (CssString) value;
-//    if (!oldRealName.getValue().equals(realName))
-//      System.out.println(oldRealName.getValue() + " -> "  + realName);
-//    
-//    String oldRealVariableName = "@" + oldRealName.getValue();
-//    value = scope.getValue(oldRealVariableName);
-//    if (value == null) {
-//      problemsHandler.undefinedVariable(oldRealVariableName, oldRealName);
-//      return new FaultyExpression(oldRealName.getUnderlyingStructure());
-//    }
-//    return evaluate(value);
-//  }
+    CssPrinter printer = new InStringCssPrinter();
+    printer.append(reference);
+    String realName = printer.toString();
 
-    public Expression evaluate(IndirectVariable input) {
-      Expression reference = evaluate(scope.getValue(input));
-      
-      CssPrinter printer = new InStringCssPrinter();
-      printer.append(reference);
-      String realName = printer.toString();
-      
-      String realVariableName = "@" + realName;
-      Expression value = scope.getValue(realVariableName);
-      if (value == null) {
-        problemsHandler.undefinedVariable(realVariableName, input);
-        return new FaultyExpression(input.getUnderlyingStructure());
-      }
-      return evaluate(value);
+    String realVariableName = "@" + realName;
+    Expression value = lazyScope.getValue(realVariableName);
+    if (value == null) {
+      problemsHandler.undefinedVariable(realVariableName, input);
+      return new FaultyExpression(input.getUnderlyingStructure());
     }
+    return evaluate(value);
+  }
 
   public Expression evaluate(Expression input) {
     switch (input.getType()) {
@@ -257,15 +236,18 @@ public class ExpressionEvaluator {
     case EMBEDDED_SCRIPT:
       return evaluate((EmbeddedScript) input);
 
-      //the value is already there, nothing to evaluate
+      //FIXME: !!!!!!!!!!! now, this is probably wrong, just hotefixing prototype
     case DETACHED_RULESET:
+      return evaluate((DetachedRuleset) input);
+
+      //the value is already there, nothing to evaluate -- TODO - probably bug, should create clone()
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:
     case FAULTY_EXPRESSION:
     case UNICODE_RANGE_EXPRESSION:
     case EMPTY_EXPRESSION:
-      return input;
+      return input.clone();
 
     default:
       throw new BugHappened("Unknown expression type " + input.getType(), input);
@@ -336,18 +318,28 @@ public class ExpressionEvaluator {
   }
 
   public Expression evaluate(FunctionExpression input) {
-    Expression evaluatedParameter = evaluate(input.getParameter());
-    List<Expression> splitParameters = (evaluatedParameter.getType() == ASTCssNodeType.EMPTY_EXPRESSION) ? new ArrayList<Expression>() : evaluatedParameter.splitByComma();
-
-    if (!input.isCssOnlyFunction()) {
+    // FIXME: !!!!!!!!!!! input parameter has null scope <- use closes parental scope if the current scope is null
+    Expression evaluatedParameter = evaluate(input.getParameter()); 
+    List<Expression> splitParameters = (evaluatedParameter.getType()==ASTCssNodeType.EMPTY_EXPRESSION)?new ArrayList<Expression>() : evaluatedParameter.splitByComma();
+    
+    if (!input.isCssOnlyFunction()) { 
       for (FunctionsPackage pack : functions) {
         if (pack.canEvaluate(input, splitParameters))
           return pack.evaluate(input, splitParameters, evaluatedParameter);
       }
     }
-
-    UnknownFunction unknownFunction = new UnknownFunction();
+    
+    UnknownFunction unknownFunction = new UnknownFunction(); 
     return unknownFunction.evaluate(splitParameters, problemsHandler, input, evaluatedParameter);
+  }
+
+  public Expression evaluate(ListExpression input) {
+    List<Expression> evaluated = new ArrayList<Expression>();
+    for (Expression expression : input.getExpressions()) {
+      evaluated.add(evaluate(expression));
+    }
+    //FIXME !!!!!!!!!!! ensure scope in all kinds of expressions
+    return new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone(), input.getScope());
   }
 
   public Expression evaluate(NamedExpression input) {
@@ -385,14 +377,6 @@ public class ExpressionEvaluator {
 
     problemsHandler.cannotEvaluate(input);
     return new FaultyExpression(input);
-  }
-
-  public Expression evaluate(ListExpression input) {
-    List<Expression> evaluated = new ArrayList<Expression>();
-    for (Expression expression : input.getExpressions()) {
-      evaluated.add(evaluate(expression));
-    }
-    return new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone());
   }
 
   public boolean guardsSatisfied(ReusableStructure mixin) {
@@ -455,176 +439,34 @@ public class ExpressionEvaluator {
     return true;
   }
 
-}
+  public Expression evaluate(DetachedRuleset input) {
+    DetachedRuleset clone = input.clone();
 
-class NullScope extends BasicScope {
+    IScope owningScope = clone.getScope();
+    if (owningScope == null)
+      throw new BugHappened("Detached ruleset with unknown scope.", input);
 
-  private static final String NULL = "#null#";
-
-  protected NullScope() {
-    super(new LocalScope(null, Arrays.asList(NULL), NULL), new ScopesTree());
+    clone.setScope(composedScope(owningScope));
+    return clone;
   }
 
-  @Override
-  public IScope getParent() {
-    return this;
-  }
+  //FIXME !!!!!!! do something smarter, if they are local to each other they need special handling
+  //FIXME !!!!!!! make sure detached ruleset does not tie its own scope twice to itself
+  private IScope composedScope(IScope owningScope) {
+    //FIXME!!!!!!!!!!! nicer design, this whole method could be inside scope factory
+    Iterator<IScope> nextEager = eagerScopes.iterator();
+    if (!nextEager.hasNext())
+      return owningScope;
 
-  @Override
-  public List<IScope> getChilds() {
-    return Collections.emptyList();
-  }
+    IScope result = nextEager.next();
+    while (nextEager.hasNext()) {
+      //FIXME!!!!!!!!!!! chech whether joining needs to happen - e.g. whehter they see each other
+      IScope next = nextEager.next();
+      result = ScopeFactory.createJoinedScopesView(result, next);
+    }
+    result = ScopeFactory.createJoinedScopesView(result, owningScope);
 
-  @Override
-  public List<String> getNames() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public boolean hasParent() {
-    return false;
-  }
-
-  @Override
-  public void registerVariable(AbstractVariableDeclaration declaration) {
-  }
-
-  @Override
-  public void registerVariable(AbstractVariableDeclaration node, Expression replacementValue) {
-  }
-
-  @Override
-  public void registerVariableIfNotPresent(String name, Expression replacementValue) {
-  }
-
-  @Override
-  public Expression getValue(Variable variable) {
-    return null;
-  }
-
-  @Override
-  public Expression getValue(String name) {
-    return null;
-  }
-
-  @Override
-  public void registerMixin(ReusableStructure mixin, IScope mixinsBodyScope) {
-  }
-
-  //  @Override
-  //  public void setParent(IScope parent) {
-  //  }
-
-  @Override
-  public void removedFromAst() {
-  }
-
-  @Override
-  public boolean isPresentInAst() {
-    return false;
-  }
-
-  @Override
-  public IScope getRootScope() {
-    return this;
-  }
-
-  @Override
-  public IScope getChildOwnerOf(ASTCssNode body) {
-    return null;
-  }
-
-  @Override
-  public void addNames(List<String> names) {
-  }
-
-  @Override
-  public String toFullName() {
-    return toLongString();
-  }
-
-  @Override
-  public void registerVariable(String name, Expression replacementValue) {
-  }
-
-  @Override
-  public void addFilteredVariables(ExpressionFilter filter, IScope source) {
-  }
-
-  @Override
-  public void addAllMixins(List<FullMixinDefinition> mixins) {
-  }
-
-  @Override
-  public void add(IScope otherSope) {
-  }
-
-  @Override
-  public DataPlaceholder createDataPlaceholder() {
-    return null;
-  }
-
-  @Override
-  public void addToDataPlaceholder(IScope otherScope) {
-  }
-
-  @Override
-  public void closeDataPlaceholder() {
-  }
-
-  @Override
-  public List<FullMixinDefinition> getAllMixins() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<FullMixinDefinition> getMixinsByName(List<String> nameChain, ReusableStructureName name) {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<FullMixinDefinition> getMixinsByName(ReusableStructureName name) {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<FullMixinDefinition> getMixinsByName(String name) {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public IScope firstChild() {
-    return null;
-  }
-
-  @Override
-  public boolean isBodyOwnerScope() {
-    return false;
-  }
-
-  @Override
-  public IScope skipBodyOwner() {
-    return this;
-  }
-
-  @Override
-  public String toLongString() {
-    return NULL;
-  }
-
-  @Override
-  public boolean seesLocalDataOf(IScope otherScope) {
-    return false;
-  }
-
-  @Override
-  public IScope childByOwners(ASTCssNode headNode, ASTCssNode... restNodes) {
-    return this;
-  }
-
-  @Override
-  public int getTreeSize() {
-    return 1;
+    return result;
   }
 
 }

@@ -22,7 +22,7 @@ public class MixinsGuardsValidator {
     return ifNotDefaultExpressionEvaluator.guardsSatisfied(mixin);
   }
 
-  private class DefaultPoweredExpressionEvaluator extends ExpressionEvaluator {
+  private class DefaultPoweredExpressionEvaluator extends IScopeAwareExpressionsEvaluator {
     
     public DefaultPoweredExpressionEvaluator(IScope scope, ProblemsHandler problemsHandler, Configuration configuration, boolean assumeDefault) {
       super(scope, problemsHandler, configuration);

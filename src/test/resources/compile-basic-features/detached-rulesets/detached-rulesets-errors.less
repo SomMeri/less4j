@@ -6,11 +6,7 @@
 	@a; 
 }
 
-//less.js detached-ruleset-2.less
-.detached-as-property-value {
-	a: @a(); 
-}
-
+//less.js detached-ruleset-2.less - suboptimal
 //less.js detached-ruleset-3.less
 .brings-property-on-top {}
 @a(); 
@@ -24,7 +20,9 @@
 
 //less.js detached-ruleset-5.less
 .mixin-variable-does-not-exists(@b) {
-  @a();
+  .selector {
+    @a();
+  }
 }
 .mixin-variable-does-not-exists({color: red;});
 

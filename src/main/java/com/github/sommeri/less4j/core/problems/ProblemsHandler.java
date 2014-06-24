@@ -9,6 +9,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -325,6 +326,18 @@ public class ProblemsHandler implements LessProblems {
 
   public void errUnknownEncodingCharsetSourceMap(ASTCssNode nodeForErrorReport, String encodingCharset) {
     addError(nodeForErrorReport, "Source map link or data could not be created. Requested charset '" + encodingCharset+"' is not available.");
+  }
+
+  public void detachedRulesetCallWithoutParentheses(DetachedRulesetReference reference) {
+    addError(reference, "Detached ruleset call is missing parentheses.");
+  }
+
+  public void warnDetachedRulesetAsMixinParamDefault(Expression detached) {
+    addWarning(detached, "This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.");
+  }
+
+  public void wrongDetachedRulesetLocation(DetachedRuleset detachedRuleset) {
+    addError(detachedRuleset, "Detached ruleset is not allowed outside of variable declaration.");
   }
 
 }

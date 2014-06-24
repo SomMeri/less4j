@@ -7,8 +7,11 @@ import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.AbstractVariableDeclaration;
 import com.github.sommeri.less4j.core.ast.Body;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
@@ -58,6 +61,10 @@ public class LessAstValidator {
       checkForLogicalConditionConsistency((SupportsLogicalCondition) node);
       break;
     }
+    case DETACHED_RULESET: {
+      checkInapropriateLocation((DetachedRuleset) node);
+      break;
+    }
     default:
       //nothing is needed
     }
@@ -67,6 +74,22 @@ public class LessAstValidator {
       validate(kid);
     }
 
+  }
+
+  private void checkInapropriateLocation(DetachedRuleset detachedRuleset) {
+    ASTCssNode parent = detachedRuleset.getParent();
+    if (!isVariableDeclaration(parent) && !isMixinReference(parent)) {
+      manipulator.replace(detachedRuleset, new FaultyExpression(detachedRuleset));
+      problemsHandler.wrongDetachedRulesetLocation(detachedRuleset);
+    }
+  }
+
+  private boolean isMixinReference(ASTCssNode parent) {
+    return parent.getType() == ASTCssNodeType.MIXIN_REFERENCE;
+  }
+
+  private boolean isVariableDeclaration(ASTCssNode parent) {
+    return parent instanceof AbstractVariableDeclaration;
   }
 
   private void checkForLogicalConditionConsistency(SupportsLogicalCondition condition) {

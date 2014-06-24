@@ -433,7 +433,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public DetachedRulesetReference handleDetachedRulesetReference(HiddenTokenAwareTree token) {
-    return new DetachedRulesetReference(token, termBuilder.buildFromVariable(token.getChild(0)));
+    DetachedRulesetReference result = new DetachedRulesetReference(token, termBuilder.buildFromVariable(token.getChild(0)));
+    if (token.getChildCount()<3) {
+      problemsHandler.detachedRulesetCallWithoutParentheses(result);
+    } 
+    return result;
   }
 
   public DetachedRuleset handleDetachedRuleset(HiddenTokenAwareTree token) {

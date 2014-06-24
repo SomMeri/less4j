@@ -37,7 +37,7 @@ public class TypesConversionUtils {
   }
 
   public String extractFilename(Expression urlInput, ProblemsHandler problemsHandler, Configuration configuration) {
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler, configuration);
+    IScopeAwareExpressionsEvaluator expressionEvaluator = new IScopeAwareExpressionsEvaluator(problemsHandler, configuration);
     Expression urlExpression = expressionEvaluator.evaluate(urlInput);
 
     if (urlExpression.getType() != ASTCssNodeType.FUNCTION)

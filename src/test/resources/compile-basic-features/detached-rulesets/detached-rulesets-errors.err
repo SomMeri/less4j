@@ -1,1 +1,7 @@
-TODO
+Warnings produced by compilation of testCase
+WARNING 15:26 This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.
+WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of top level style sheet located at 1:1.
+Errors produced by compilation of testCase
+ERROR 6:2 Detached ruleset call is missing parentheses.
+ERROR 31:6 Detached ruleset is not allowed outside of variable declaration.
+ERROR 12:1 The reference brought declaration from 2:3 into top level style sheet which started at 1:1. Compilation produced an incorrect CSS.

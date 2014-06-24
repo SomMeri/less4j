@@ -1,0 +1,2 @@
+Warnings produced by compilation of testCase
+WARNING 1:20 This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.

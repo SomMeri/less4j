@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionComparator;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.IScopeAwareExpressionsEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
@@ -17,11 +17,11 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class MixinsReferenceMatcher {
 
-  private ExpressionEvaluator evaluator;
+  private IScopeAwareExpressionsEvaluator evaluator;
   private ExpressionComparator comparator = new PatternsComparator();
 
   public MixinsReferenceMatcher(IScope scope, ProblemsHandler problemsHandler, Configuration configuration) {
-    evaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
+    evaluator = new IScopeAwareExpressionsEvaluator(scope, problemsHandler, configuration);
   }
 
   public List<FullMixinDefinition> filterByParametersNumber(MixinReference reference, List<FullMixinDefinition> mixins) {

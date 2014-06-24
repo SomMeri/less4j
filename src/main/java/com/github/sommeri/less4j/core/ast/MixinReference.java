@@ -145,7 +145,8 @@ public class MixinReference extends ASTCssNode {
     result.configureParentToAllChilds();
     return result;
   }
-
+  
+  @NotAstProperty
   public List<Expression> getAllPositionalArgumentsFrom(int startIndx) {
     if (hasPositionalParameter(startIndx))
       return positionalParameters.subList(startIndx, positionalParameters.size());

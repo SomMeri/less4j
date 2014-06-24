@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.IScopeAwareExpressionsEvaluator;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -20,7 +20,7 @@ class ArgumentsBuilder {
 
   // utils
   private final ProblemsHandler problemsHandler;
-  private final ExpressionEvaluator referenceEvaluator;
+  private final IScopeAwareExpressionsEvaluator referenceEvaluator;
   private final String ALL_ARGUMENTS = ReferencesSolver.ALL_ARGUMENTS;
 
   // input
@@ -32,7 +32,7 @@ class ArgumentsBuilder {
   private List<Expression> allValues = new ArrayList<Expression>();
   private IScope argumentsScope;
 
-  public ArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, ExpressionEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
+  public ArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, IScopeAwareExpressionsEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
     super();
     this.referenceEvaluator = referenceEvaluator;
     this.problemsHandler = problemsHandler;

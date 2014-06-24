@@ -31,23 +31,23 @@ public class SupportedCSSBodyMembers {
 
     switch (ownerType) {
     case VIEWPORT:
-      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE, ASTCssNodeType.FAULTY_NODE);
 
     case RULE_SET:
-      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE, ASTCssNodeType.FAULTY_NODE);
 
     case PAGE:
-      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE, ASTCssNodeType.PAGE_MARGIN_BOX);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE, ASTCssNodeType.PAGE_MARGIN_BOX, ASTCssNodeType.FAULTY_NODE);
 
     case PAGE_MARGIN_BOX:
-      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE);
+      return createSet(ASTCssNodeType.DECLARATION, ASTCssNodeType.UNKNOWN_AT_RULE, ASTCssNodeType.FAULTY_NODE);
 
     case MEDIA:
     case DOCUMENT:
       return topLevelElements();
 
     case KEYFRAMES:
-      return createSet(ASTCssNodeType.RULE_SET, ASTCssNodeType.UNKNOWN_AT_RULE);
+      return createSet(ASTCssNodeType.RULE_SET, ASTCssNodeType.UNKNOWN_AT_RULE, ASTCssNodeType.FAULTY_NODE);
 
     default:
       return allNodeTypes();

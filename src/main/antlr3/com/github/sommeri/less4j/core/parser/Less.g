@@ -806,8 +806,8 @@ finally { leaveRule(); }
 
 detachedRulesetReference
 @init {enterRule(retval, RULE_DETACHED_RULESET_REFERENCE);}
-    : a=AT_NAME (LPAREN RPAREN)? SEMI
-    -> ^(DETACHED_RULESET_REFERENCE $a)
+    : a+=AT_NAME (a+=LPAREN? a+=RPAREN?) SEMI
+    -> ^(DETACHED_RULESET_REFERENCE $a*)
     ;
 finally { leaveRule(); }
 

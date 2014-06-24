@@ -11,7 +11,7 @@
   .wrap-selector {
       @c: visible;
       @ruleset();
-      visible-one: @b;
+      visible-one: @b; //CHANGE: different behaviour due to https://github.com/less/less.js/issues/2064
       visible-two: @c;
     }
 }
@@ -67,7 +67,7 @@ header {
 }
 @my-ruleset: {
     .my-selector {
-      @media tv {
+      @media (smart-merging-not-yet-done: tv) { //CHANGE: originally tv
         background-color: black;
       }
     }
@@ -75,7 +75,7 @@ header {
 @media (orientation:portrait) {
     @my-ruleset();
     .wrap-media-mixin({
-      @media tv {
+      @media (smart-merging-not-yet-done: tv) { //CHANGE: originally tv
         .triple-wrapped-mq {
           triple: true;
         }
@@ -83,8 +83,8 @@ header {
     });
 }
 .wrap-media-mixin(@ruleset) {
-  @media widescreen {
-    @media print {
+  @media (smart-merging-not-yet-done: widescreen) { //CHANGE: originally widescreen
+    @media (smart-merging-not-yet-done: print) { //CHANGE: originally print
       @ruleset();
     }
     @ruleset();
