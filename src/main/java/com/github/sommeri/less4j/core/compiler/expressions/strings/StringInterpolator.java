@@ -9,6 +9,7 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.IScopeAwareExpressionsEvaluator;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.utils.CssPrinter;
 
 public class StringInterpolator extends AbstractStringReplacer<IScopeAwareExpressionsEvaluator> {
 
@@ -42,7 +43,12 @@ public class StringInterpolator extends AbstractStringReplacer<IScopeAwareExpres
       return matchRange.getFullMatch();
     }
 
-    return embeddedScriptEvaluator.toScript(value, problemsHandler);
+    String result = embeddedScriptEvaluator.toScript(value, problemsHandler);
+    if (result==null) {
+      problemsHandler.stringInterpolationNotSupported(technicalUnderlying, value);
+      result = CssPrinter.ERROR;
+    }
+    return result;
   }
 
 }

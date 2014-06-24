@@ -19,6 +19,7 @@ import com.github.sommeri.less4j.core.ast.Comment;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
@@ -84,7 +85,7 @@ import com.github.sommeri.less4j.core.output.SourceMapBuilder;
 
 public class CssPrinter {
 
-  private static final String ERROR = "!#error#!";
+  public static final String ERROR = "!#error#!";
   protected ExtendedStringBuilder cssOnly = new ExtendedStringBuilder();
   protected SourceMapBuilder cssAndSM;
 
@@ -309,11 +310,13 @@ public class CssPrinter {
     case INLINE_CONTENT:
       return appendInlineContent((InlineContent) node); // TODOsm: source map
 
+    case DETACHED_RULESET:
+      return appendDetachedRuleset((DetachedRuleset) node);
+      
     case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
-    case DETACHED_RULESET:
     case DETACHED_RULESET_REFERENCE:
     case INDIRECT_VARIABLE:
     case VARIABLE_DECLARATION:
@@ -322,6 +325,10 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getSourceColumn());
     }
+  }
+
+  public boolean appendDetachedRuleset(DetachedRuleset node) {
+    throw new NotACssException(node);
   }
 
   public boolean appendCommaSeparated(List<? extends ASTCssNode> values) {

@@ -127,10 +127,10 @@ class Format extends AbstractFunction {
     
     Expression format = parameters.get(0);
     if (format.getType()==ASTCssNodeType.STRING_EXPRESSION) 
-      return evaluate((CssString) format, parameters.subList(1, parameters.size()), call.getUnderlyingStructure());
+      return evaluate((CssString) format, parameters.subList(1, parameters.size()), problemsHandler, call.getUnderlyingStructure());
 
     if (format.getType()==ASTCssNodeType.ESCAPED_VALUE) 
-      return evaluate((EscapedValue) format, parameters.subList(1, parameters.size()), call.getUnderlyingStructure());
+      return evaluate((EscapedValue) format, parameters.subList(1, parameters.size()), problemsHandler, call.getUnderlyingStructure());
 
     if (!format.isFaulty()) 
         problemsHandler.errFormatWrongFirstParameter(call.getParameter());
@@ -138,18 +138,18 @@ class Format extends AbstractFunction {
     return new FaultyExpression(call);
   }
 
-  private Expression evaluate(EscapedValue format, List<Expression> parameters, HiddenTokenAwareTree technicalUnderlying) {
-    String newValue = format(format.getValue(), parameters, technicalUnderlying);
+  private Expression evaluate(EscapedValue format, List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree technicalUnderlying) {
+    String newValue = format(format.getValue(), parameters, problemsHandler, technicalUnderlying);
     return new CssString(format.getUnderlyingStructure(), newValue, "\"");
   }
 
-  private Expression evaluate(CssString format, List<Expression> parameters, HiddenTokenAwareTree technicalUnderlying) {
-    String newValue = format(format.getValue(), parameters, technicalUnderlying);
+  private Expression evaluate(CssString format, List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree technicalUnderlying) {
+    String newValue = format(format.getValue(), parameters, problemsHandler, technicalUnderlying);
     return new CssString(format.getUnderlyingStructure(), newValue, "\"");
   }
 
-  private String format(String value, List<Expression> parameters, HiddenTokenAwareTree technicalUnderlying) {
-    StringFormatter formatter = new StringFormatter();
+  private String format(String value, List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree technicalUnderlying) {
+    StringFormatter formatter = new StringFormatter(problemsHandler);
     return formatter.replaceIn(value, parameters.iterator(), technicalUnderlying);
   }
 

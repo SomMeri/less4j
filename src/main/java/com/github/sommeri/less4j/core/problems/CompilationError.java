@@ -3,6 +3,8 @@ package com.github.sommeri.less4j.core.problems;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.AbstractProblem;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class CompilationError extends AbstractProblem {
   

@@ -1,2 +1,4 @@
 Errors produced by compilation of testCase
 ERROR 3:2 Could not find detached ruleset for "@does-not-exists".
+ERROR 8:3 Detached ruleset reference "@wrongDatatype"  does not evaluate to detached ruleset. It resolved to expression defined at 6:17
+ERROR 13:18 String interpolation does not requeted expression type. Requested expression was defined at 11:12

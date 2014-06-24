@@ -2,3 +2,14 @@
 .does-not-exists {
 	@does-not-exists();
 }
+//wrong datatype
+@wrongDatatype: "this is not ruleset";
+.wrong-datatype {
+  @wrongDatatype();
+}
+//attempt to interpolate
+@detached: { color: blue; };
+.selector {
+  interpolation: "@{detached}";
+}
+

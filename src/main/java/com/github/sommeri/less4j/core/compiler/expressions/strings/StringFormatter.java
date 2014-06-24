@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
@@ -15,6 +16,13 @@ import com.github.sommeri.less4j.utils.QuotesKeepingInStringCssPrinter;
 public class StringFormatter extends AbstractStringReplacer<Iterator<Expression>> {
 
   private static final Pattern PLACEHOLDER = Pattern.compile("%.");
+  @SuppressWarnings("unused")
+  private final ProblemsHandler problemsHandler;
+
+  public StringFormatter(ProblemsHandler problemsHandler) {
+    super();
+    this.problemsHandler = problemsHandler;
+  }
 
   @Override
   protected Pattern getPattern() {

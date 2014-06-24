@@ -83,3 +83,7 @@
 .selector-indirect {
   color: #aabbcc;
 }
+#mixin-called-from-detached-ruleset .wrap-selector {
+  two: visible;
+  abusing: less;
+}

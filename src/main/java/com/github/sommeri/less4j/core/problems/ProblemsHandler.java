@@ -13,6 +13,7 @@ import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
@@ -28,6 +29,7 @@ import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.UnknownAtRule;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.LessPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
@@ -311,6 +313,10 @@ public class ProblemsHandler implements LessProblems {
     collector.addError(new CompilationError(errorNode, description));
   }
 
+  public void addError(HiddenTokenAwareTree errorNode, String description) {
+    collector.addError(new CompilationError(new FaultyExpression(errorNode), description));
+  }
+
   @Override
   public void addWarning(ASTCssNode weirdNode, String description) {
     collector.addWarning(new CompilationWarning(weirdNode, description));
@@ -338,6 +344,10 @@ public class ProblemsHandler implements LessProblems {
 
   public void wrongDetachedRulesetLocation(DetachedRuleset detachedRuleset) {
     addError(detachedRuleset, "Detached ruleset is not allowed outside of variable declaration.");
+  }
+
+  public void stringInterpolationNotSupported(HiddenTokenAwareTree errorNode, Expression value) {
+    addError(errorNode, "String interpolation does not requeted expression type. Requested expression was defined at " + printer.toPosition(value));
   }
 
 }

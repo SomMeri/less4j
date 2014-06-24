@@ -13,6 +13,9 @@ public class EmbeddedLessGenerator implements EmbeddedScriptGenerator {
   public String toScript(Expression value, LessProblems problemsHandler) {
     InStringCssPrinter builder = new InStringCssPrinter();
     builder.append(value);
+    if (!builder.getUnprintableNodes().isEmpty())
+      return null;
+    
     String replacement = builder.toString();
     return replacement;
   }

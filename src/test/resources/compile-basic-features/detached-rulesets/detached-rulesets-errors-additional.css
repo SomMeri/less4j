@@ -1,3 +1,9 @@
 .does-not-exists {
   !#error#!
 }
+.wrong-datatype {
+  !#error#!
+}
+.selector {
+  interpolation: "!#error#!";
+}
