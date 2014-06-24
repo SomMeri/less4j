@@ -144,7 +144,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       commentText = "/*# sourceMappingURL=data:application/json;base64," + encodedSourceMap + " */";
     } else {
       //compose linking comment
-      String url = URIUtils.addSuffix(cssResultLocation, Constants.SOURCE_MAP_SUFFIX);
+      String url = sourceMapConfiguration.getSourceMapNameGenerator().generateUrl(cssResultLocation);
       String encodedUrl = PrintUtils.urlEncode(url, encodingCharset, problemsHandler, cssAst);
       commentText = "/*# sourceMappingURL=" + encodedUrl + " */";
     }
