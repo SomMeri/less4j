@@ -214,6 +214,7 @@
     }
   }
 }
+//combining unlocking of mixins and detached
 .combining-unlocking-of-mixins-and-detached {
   .mixin() {
     @detached: { scope-detached: @see-here; };
@@ -230,4 +231,26 @@
     @detached();
     .nested();
   }	
+}
+//variable references chain
+.variable-references-chain {
+  @zero: visible;
+  @detached-1: { scope-detached: @zero @one @two @three; };
+  .one {
+    @detached-2: @detached-1;
+    @one: visible;
+    .two {
+      @detached-3: @detached-2;
+      @two: visible;
+      .three {
+        @three: visible;
+        @detached-4: @detached-3;
+      }
+    }
+  }
+
+  .usePlace {
+    .one > .two > .three(); 
+    @detached-4();
+  }
 }

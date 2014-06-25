@@ -45,7 +45,6 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.CssPrinter;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
 
-//FIXME !!!!!!!!!!! rename back to ExpressionsEvaluator
 public class ExpressionsEvaluator {
 
   private VariableCycleDetector cycleDetector = new VariableCycleDetector();
