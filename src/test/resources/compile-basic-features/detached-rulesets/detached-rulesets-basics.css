@@ -87,3 +87,10 @@
   two: visible;
   abusing: less;
 }
+.unlocked-ruleset-sees-callers-scope .selector .nested {
+  scope: yes;
+}
+.combining-unlocking-of-mixins-and-detached .selector {
+  scope-detached: yes;
+  scope-mixin: yes;
+}

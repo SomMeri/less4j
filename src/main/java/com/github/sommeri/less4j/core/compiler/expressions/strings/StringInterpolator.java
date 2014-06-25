@@ -6,12 +6,12 @@ import com.github.sommeri.less4j.EmbeddedScriptGenerator;
 import com.github.sommeri.less4j.EmbeddedLessGenerator;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Variable;
-import com.github.sommeri.less4j.core.compiler.expressions.IScopeAwareExpressionsEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionsEvaluator;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.CssPrinter;
 
-public class StringInterpolator extends AbstractStringReplacer<IScopeAwareExpressionsEvaluator> {
+public class StringInterpolator extends AbstractStringReplacer<ExpressionsEvaluator> {
 
   private static final Pattern STR_INTERPOLATION = Pattern.compile("@\\{([^\\{\\}@])*\\}");
   private final EmbeddedScriptGenerator embeddedScriptEvaluator;
@@ -37,7 +37,7 @@ public class StringInterpolator extends AbstractStringReplacer<IScopeAwareExpres
   }
 
   @Override
-  protected String replacementValue(IScopeAwareExpressionsEvaluator expressionEvaluator, HiddenTokenAwareTree technicalUnderlying, MatchRange matchRange) {
+  protected String replacementValue(ExpressionsEvaluator expressionEvaluator, HiddenTokenAwareTree technicalUnderlying, MatchRange matchRange) {
     Expression value = expressionEvaluator.evaluateIfPresent(new Variable(technicalUnderlying, matchRange.getName()));
     if (value == null) {
       return matchRange.getFullMatch();

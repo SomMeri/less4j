@@ -7,3 +7,6 @@
 .selector {
   interpolation: "!#error#!";
 }
+.selector {
+  !#error#!
+}

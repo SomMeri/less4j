@@ -12,4 +12,11 @@
 .selector {
   interpolation: "@{detached}";
 }
-
+//calling before unlocking
+.calling-before-unlocking-mixin() {
+  @unlocked-detached: { extreme: simplicity; };
+}
+.selector {
+  @unlocked-detached();
+  .calling-before-unlocking-mixin();
+}

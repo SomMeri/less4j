@@ -201,3 +201,33 @@
     .mixin();
   });
 }
+//unlocked ruleset sees callers scope
+.unlocked-ruleset-sees-callers-scope {
+  .mixin() {
+    @detached: { scope: @see-here; };
+  }
+  .selector {
+    @see-here: yes;
+    .nested {
+      .mixin();
+      @detached();
+    }
+  }
+}
+.combining-unlocking-of-mixins-and-detached {
+  .mixin() {
+    @detached: { scope-detached: @see-here; };
+    .nested() {
+      scope-mixin: @see-here; 
+    }
+  }
+  .definer-wrapper() {
+    @see-here: yes;
+    .mixin();
+  }
+  .selector {
+    .definer-wrapper();
+    @detached();
+    .nested();
+  }	
+}

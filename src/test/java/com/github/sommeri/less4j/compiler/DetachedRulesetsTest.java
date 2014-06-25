@@ -5,50 +5,11 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-//FIXME: test order detached mixin imports who sees who and who overwrites who
+//TODO: test order detached mixin imports who sees who and who overwrites who
 /*
-//*** should this work? ****
-.mixin() {
-  @detached: { extreme: simplicity; };
-}
-.selector {
-  @detached();
-  .mixin();
-}
-//********************************************88 
-.mixin() {
-  @detached: { scope: @see-here; };
-}
-.selector {
-  @see-here: yes;
-  .nested {
-    .mixin();
-    @detached();
-  }
-}
-//************************************************************
- .mixin() {
-  @detached: { scope-detached: @see-here; };
-  .nested() {
-    scope-mixin: @see-here; 
-  }
-}
-.definer-wrapper() {
-  @see-here: yes;
-  .mixin();
-}
-.selector {
-  .definer-wrapper();
-  @detached();
-  .nested();
-}
-
- 
-//********************************************88
- * test if it works from imported !!!!!!!!!!!!!!!!!!!!
- * test if it works when variables copy detached forever !!!!!!!!!!!!!!!!!!!!
- * test if it works from list correctly -- e.g. including various callers scopes
- * test if @defaults works correctly -- e.g. including various callers scopes
+ * TODO: test if it works from imported !!!!!!!!!!!!!!!!!!!!
+ * TODO: test if it works when variables copy detached forever !!!!!!!!!!!!!!!!!!!!
+ * TODO: test if @defaults works correctly -- e.g. including various callers scopes
 
  */
 public class DetachedRulesetsTest extends BasicFeaturesTest {

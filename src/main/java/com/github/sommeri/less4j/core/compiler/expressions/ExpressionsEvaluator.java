@@ -46,7 +46,7 @@ import com.github.sommeri.less4j.utils.CssPrinter;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
 
 //FIXME !!!!!!!!!!! rename back to ExpressionsEvaluator
-public class IScopeAwareExpressionsEvaluator {
+public class ExpressionsEvaluator {
 
   private VariableCycleDetector cycleDetector = new VariableCycleDetector();
   private final IScope lazyScope;
@@ -61,11 +61,11 @@ public class IScopeAwareExpressionsEvaluator {
   private StringInterpolator embeddedScriptInterpolator;
   private EmbeddedScriptGenerator embeddedScripting;
 
-  public IScopeAwareExpressionsEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
+  public ExpressionsEvaluator(ProblemsHandler problemsHandler, Configuration configuration) {
     this(new NullScope(), problemsHandler, configuration);
   }
 
-  public IScopeAwareExpressionsEvaluator(IScope scope, ProblemsHandler problemsHandler, Configuration configuration) {
+  public ExpressionsEvaluator(IScope scope, ProblemsHandler problemsHandler, Configuration configuration) {
     super();
     this.lazyScope = scope == null ? new NullScope() : scope;
     this.problemsHandler = problemsHandler;

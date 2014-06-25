@@ -14,7 +14,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.compiler.expressions.IScopeAwareExpressionsEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionsEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
@@ -46,7 +46,7 @@ class MixinsSolver {
   //FIXME !!!!!!!! unify with done one
   @Deprecated
   private BodyCompilationResult resolveMixinReference(final IScope callerScope, final FullMixinDefinition referencedMixin, final IScope mixinWorkingScope) {
-    final IScopeAwareExpressionsEvaluator expressionEvaluator = new IScopeAwareExpressionsEvaluator(mixinWorkingScope, problemsHandler, configuration);
+    final ExpressionsEvaluator expressionEvaluator = new ExpressionsEvaluator(mixinWorkingScope, problemsHandler, configuration);
     final ReusableStructure mixin = referencedMixin.getMixin();
 
     final IScope referencedMixinScope = mixinWorkingScope;
@@ -72,7 +72,7 @@ class MixinsSolver {
   }
 
   private BodyCompilationResult resolveReferencedBody(final IScope callerScope, final BodyOwner<?> mixin, final IScope mixinWorkingScope) {
-    final IScopeAwareExpressionsEvaluator expressionEvaluator = new IScopeAwareExpressionsEvaluator(mixinWorkingScope, problemsHandler, configuration);
+    final ExpressionsEvaluator expressionEvaluator = new ExpressionsEvaluator(mixinWorkingScope, problemsHandler, configuration);
 
     final IScope referencedMixinScope = mixinWorkingScope;
     // ... and I'm starting to see the point of closures ...
@@ -144,7 +144,7 @@ class MixinsSolver {
   }
 
   private IScope buildMixinsArguments(MixinReference reference, IScope referenceScope, FullMixinDefinition mixin) {
-    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new IScopeAwareExpressionsEvaluator(referenceScope, problemsHandler, configuration), problemsHandler);
+    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new ExpressionsEvaluator(referenceScope, problemsHandler, configuration), problemsHandler);
     return builder.build();
   }
 
@@ -283,10 +283,10 @@ class MixinsSolver {
   //FIXME !!!! refactor and clean, unify with references 
   class ImportedScopeFilter implements ExpressionFilter {
 
-    private final IScopeAwareExpressionsEvaluator expressionEvaluator;
+    private final ExpressionsEvaluator expressionEvaluator;
     private final IScope importTargetScope;
 
-    public ImportedScopeFilter(IScopeAwareExpressionsEvaluator expressionEvaluator, IScope importTargetScope) {
+    public ImportedScopeFilter(ExpressionsEvaluator expressionEvaluator, IScope importTargetScope) {
       super();
       this.expressionEvaluator = expressionEvaluator;
       this.importTargetScope = importTargetScope;
