@@ -60,7 +60,7 @@ public interface SourceMapGenerator {
    * Adds a mapping for the given node.  Mappings must be added in order.
    * @param sourceName The file name to use in the generate source map
    *     to represent this source.
-   * @param sourceContent  TODO FIXME !!!!!!!!!!!!!!!!
+   * @param sourceContent  Content of the sourceName file. Parameter is optional, can be <code>null</code>.
    * 
    * @param symbolName The symbol name associated with this position in the
    *     source map.

@@ -182,7 +182,6 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
 
   public SimpleSelector[] splitOn(SimpleSelector lookFor, SimpleSelector inside) {
     if (hasNoElement(lookFor)) {
-      //FIXME: (!!!!) test na tento flow!!!
       List<ElementSubsequent> subsequents = inside.getSubsequent();
       HiddenTokenAwareTree underlying = inside.getUnderlyingStructure();
 

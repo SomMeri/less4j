@@ -135,6 +135,14 @@ public class ExpressionsEvaluator {
   }
 
   public Expression evaluate(Variable input) {
+    return evaluate(input, true);
+  }
+
+  public Expression evaluateIfPresent(Variable input) {
+    return evaluate(input, false);
+  }
+
+  private Expression evaluate(Variable input, boolean failOnUndefined) {
     if (cycleDetector.wouldCycle(input)) {
       problemsHandler.variablesCycle(cycleDetector.getCycleFor(input));
       return new FaultyExpression(input);
@@ -142,46 +150,15 @@ public class ExpressionsEvaluator {
 
     Expression expression = lazyScope.getValue(input);
     if (expression == null) {
-      problemsHandler.undefinedVariable(input);
-      return new FaultyExpression(input);
-    }
-    //FIXME!!!!!!!!!!! while it is clear what should this here do once this is done, this case might 
-    //need some adjuctments while import is not fully solved   
-    if (expression.getType() == ASTCssNodeType.DETACHED_RULESET && expression.getScope() == null) {
-      throw new BugHappened("Scope information is missing", expression);
+      return handleUndefinedVariable(input, failOnUndefined);
     }
 
-    IScope originalScope = enteringExpression(expression);
+    IScope originalScope = enteringScopeOf(expression);
     cycleDetector.enteringVariableValue(input);
     Expression result = evaluate(expression);
     cycleDetector.leftVariableValue();
-    leavingExpression(originalScope);
+    leavingScope(originalScope);
     return result;
-  }
-
-  private void leavingExpression(IScope originalScope) {
-    if (originalScope != null) {
-      eagerScopes.pop();
-    }
-  }
-
-  private IScope enteringExpression(Expression value) {
-    IScope owningScope = value.getScope();
-    if (owningScope != null) {
-      eagerScopes.push(owningScope);
-    }
-    return owningScope;
-  }
-
-  //FIXME: !!!!!!!!!! try this on variable that depends on undefined
-  public Expression evaluateIfPresent(Variable input) {
-    Expression value = lazyScope.getValue(input);
-    if (value == null) {
-      return null;
-    }
-
-    //FIXME !!!!!!!!!!!!!!!!! add to eager scopes
-    return evaluate(value);
   }
 
   public Expression evaluate(IndirectVariable input) {
@@ -191,13 +168,8 @@ public class ExpressionsEvaluator {
     printer.append(reference);
     String realName = printer.toString();
 
-    String realVariableName = "@" + realName;
-    Expression value = lazyScope.getValue(realVariableName);
-    if (value == null) {
-      problemsHandler.undefinedVariable(realVariableName, input);
-      return new FaultyExpression(input.getUnderlyingStructure());
-    }
-    return evaluate(value);
+    Variable realVariable = new Variable(input.getUnderlyingStructure(), "@" + realName);
+    return evaluate(realVariable);
   }
 
   public Expression evaluate(Expression input) {
@@ -318,17 +290,17 @@ public class ExpressionsEvaluator {
 
   public Expression evaluate(FunctionExpression input) {
     // FIXME: !!!!!!!!!!! input parameter has null scope <- use closes parental scope if the current scope is null
-    Expression evaluatedParameter = evaluate(input.getParameter()); 
-    List<Expression> splitParameters = (evaluatedParameter.getType()==ASTCssNodeType.EMPTY_EXPRESSION)?new ArrayList<Expression>() : evaluatedParameter.splitByComma();
-    
-    if (!input.isCssOnlyFunction()) { 
+    Expression evaluatedParameter = evaluate(input.getParameter());
+    List<Expression> splitParameters = (evaluatedParameter.getType() == ASTCssNodeType.EMPTY_EXPRESSION) ? new ArrayList<Expression>() : evaluatedParameter.splitByComma();
+
+    if (!input.isCssOnlyFunction()) {
       for (FunctionsPackage pack : functions) {
         if (pack.canEvaluate(input, splitParameters))
           return pack.evaluate(input, splitParameters, evaluatedParameter);
       }
     }
-    
-    UnknownFunction unknownFunction = new UnknownFunction(); 
+
+    UnknownFunction unknownFunction = new UnknownFunction();
     return unknownFunction.evaluate(splitParameters, problemsHandler, input, evaluatedParameter);
   }
 
@@ -466,6 +438,29 @@ public class ExpressionsEvaluator {
     result = ScopeFactory.createJoinedScopesView(result, owningScope);
 
     return result;
+  }
+
+  private void leavingScope(IScope originalScope) {
+    if (originalScope != null) {
+      eagerScopes.pop();
+    }
+  }
+
+  private IScope enteringScopeOf(Expression value) {
+    IScope owningScope = value.getScope();
+    if (owningScope != null) {
+      eagerScopes.push(owningScope);
+    }
+    return owningScope;
+  }
+
+  private Expression handleUndefinedVariable(Variable variable, boolean failOnUndefined) {
+    if (failOnUndefined) {
+      problemsHandler.undefinedVariable(variable);
+      return new FaultyExpression(variable);
+    } else {
+      return null;
+    }
   }
 
 }
