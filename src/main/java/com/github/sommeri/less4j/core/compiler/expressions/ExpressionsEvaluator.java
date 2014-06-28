@@ -168,8 +168,8 @@ public class ExpressionsEvaluator {
     printer.append(reference);
     String realName = printer.toString();
 
-    Variable realVariable = new Variable(input.getUnderlyingStructure(), "@" + realName);
-    return evaluate(realVariable);
+    Variable directVariable = new Variable(input.getUnderlyingStructure(), "@" + realName);
+    return evaluate(directVariable);
   }
 
   public Expression evaluate(Expression input) {
@@ -207,11 +207,9 @@ public class ExpressionsEvaluator {
     case EMBEDDED_SCRIPT:
       return evaluate((EmbeddedScript) input);
 
-      //FIXME: !!!!!!!!!!! now, this is probably wrong, just hotefixing prototype
     case DETACHED_RULESET:
       return evaluate((DetachedRuleset) input);
 
-      //the value is already there, nothing to evaluate -- TODO - probably bug, should create clone()
     case IDENTIFIER_EXPRESSION:
     case COLOR_EXPRESSION:
     case NUMBER:

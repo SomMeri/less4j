@@ -1,6 +1,12 @@
-.default-mixin-argument {
+#basic-case .default-mixin-argument {
   default: default;
 }
-.custom-mixin-argument {
+#basic-case .custom-mixin-argument {
   custom: custom;
+}
+#sees-caller-scope .default-mixin-argument {
+  from-default: sees;
+}
+#sees-caller-scope .custom-mixin-argument {
+  from-custom: sees;
 }

@@ -1,11 +1,33 @@
-.mixin(@parameter: {default: default;}) {
-  @parameter();
+#basic-case {
+  .mixin(@parameter: {default: default;}) {
+    @parameter();
+  }
+  
+  .default-mixin-argument {
+  	.mixin();
+  }
+  
+  .custom-mixin-argument {
+  	.mixin({custom: custom;});
+  }
 }
-
-.default-mixin-argument {
-	.mixin();
-}
-
-.custom-mixin-argument {
-	.mixin({custom: custom;});
+//sees-caller-scope
+#sees-caller-scope {
+  .mixin(@parameter: {.inCaller();}) {
+    @parameter();
+  }
+  
+  .default-mixin-argument {
+     .inCaller() {
+       from-default: sees;
+     }
+  	.mixin();
+  }
+  
+  .custom-mixin-argument {
+     .inCaller() {
+       from-custom: sees;
+     }
+	.mixin({.inCaller();});
+   }
 }
