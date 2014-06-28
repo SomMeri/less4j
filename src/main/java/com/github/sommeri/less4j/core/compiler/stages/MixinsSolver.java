@@ -318,7 +318,6 @@ class MixinsSolver {
       IScope parent = importTargetScope.getParent();
       while (isLocalImport && parent != null) {
         isLocalImport = bodyToBeImportedScope.seesLocalDataOf(parent);
-        ;
         parent = parent.getParent();
       }
 
