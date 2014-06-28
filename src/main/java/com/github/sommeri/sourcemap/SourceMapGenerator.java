@@ -101,7 +101,7 @@ public interface SourceMapGenerator {
    */
   void validate(boolean validate);
 
-  //TODO: (source map separation):  added following - implemented only for v3 and in ugly way
+  //SMS: (source map separation):  added following - implemented only for v3 and in ugly way
   void offsetAndAppend(SourceMapGenerator otherGenerator, FilePosition offset);
 
 }

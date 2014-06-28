@@ -307,12 +307,11 @@ public class ExpressionsEvaluator {
     for (Expression expression : input.getExpressions()) {
       evaluated.add(evaluate(expression));
     }
-    //FIXME !!!!!!!!!!! ensure scope in all kinds of expressions
     return new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone(), input.getScope());
   }
 
   public Expression evaluate(NamedExpression input) {
-    return new NamedExpression(input.getUnderlyingStructure(), input.getName(), evaluate(input.getExpression()));
+    return new NamedExpression(input.getUnderlyingStructure(), input.getName(), evaluate(input.getExpression()), input.getScope());
   }
 
   public Expression evaluate(SignedExpression input) {

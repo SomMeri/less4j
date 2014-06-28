@@ -7,7 +7,7 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 /** 
  * 
- * TODO: this assumes that two nodes have the same underlying structure if and only if they represent the same node in antlr ast.
+ * This assumes that two nodes have the same underlying structure if and only if they represent the same node in antlr ast.
  * It is not true generally, but works for namespace cycle detection purposes. It would be better, if we could clean 
  * that up somehow.
  */

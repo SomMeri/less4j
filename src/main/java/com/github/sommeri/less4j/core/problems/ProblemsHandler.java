@@ -243,15 +243,6 @@ public class ProblemsHandler implements LessProblems {
     return new CompilationError(reference, "The namespace \"" + name + "\" was not declared.");
   }
 
-  @Deprecated
-  public void nonStringIndirection(Expression errorNode) {
-    collector.addError(createNonStringIndirection(errorNode));
-  }
-
-  private CompilationError createNonStringIndirection(Expression errorNode) {
-    return new CompilationError(errorNode, "Variable indirection works only with string values.");
-  }
-
   public void nonNumberNegation(SignedExpression errorNode) {
     addError(errorNode, "Cannot negate non number.");
   }

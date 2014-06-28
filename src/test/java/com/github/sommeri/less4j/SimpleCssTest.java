@@ -92,7 +92,6 @@ public class SimpleCssTest extends AbstractFileBasedTest {
       
       //System.out.println(actual.getSourceMap());
     } catch (Throwable e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return actual;

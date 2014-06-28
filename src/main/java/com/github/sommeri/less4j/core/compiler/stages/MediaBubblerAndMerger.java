@@ -120,7 +120,6 @@ class BodiesStorage {
 
   private void store(Body body, BodyOwner<Body> parent) {
     originalBodies.add(body);
-    //TODO: this should be done in a clearer way
     originalBodiesParents.add(parent);
   }
 

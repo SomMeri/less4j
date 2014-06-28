@@ -42,7 +42,7 @@ import com.github.sommeri.sourcemap.Mapping.OriginalMapping.Builder;
 public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReversable {
   static final int UNMAPPED = -1;
 
-  //TODO: (source map separation):  added this
+  //SMS: (source map separation):  added this
   private String file;
   private String sourceRoot;
   
@@ -106,7 +106,7 @@ public class SourceMapConsumerV3 implements SourceMapConsumer, SourceMappingReve
 
       this.file = sourceMapRoot.getString("file");
       if (file.isEmpty()) {
-        //TODO: (source map separation):  commented this - I need more tolerant parser
+        //SMS: (source map separation):  commented this - I need more tolerant parser
         //throw new SourceMapParseException("File entry is missing or empty ");
       }
       if (sourceMapRoot.has("sourceRoot"))

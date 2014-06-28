@@ -49,7 +49,7 @@ public class SourceMapConsumerFactory {
    * @throws SourceMapParseException
    */
   public static SourceMapping parse(String contents, SourceMapSupplier supplier) throws SourceMapParseException {
-    //TODO: (source map separation):  Version 1 support removed because it requires google guava
+    //SMS: (source map separation):  Version 1 support removed because it requires google guava
     //    if (contents.startsWith("/** Begin line maps. **/")) {
     //      
     //      SourceMapConsumerV1 consumer =  new SourceMapConsumerV1();

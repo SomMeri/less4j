@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core.ast;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
+import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -21,6 +22,11 @@ public class NamedExpression extends IdentifierExpression {
     super(underlyingStructure);
   }
   
+  public NamedExpression(HiddenTokenAwareTree underlyingStructure, String name, Expression evaluate, IScope scope) {
+    this(underlyingStructure, name, evaluate);
+    setScope(scope);
+  }
+
   public Expression getExpression() {
     return expression;
   }
