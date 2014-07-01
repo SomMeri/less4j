@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -100,19 +101,30 @@ public abstract class LessSource {
   public static class URLSource extends AbstractHierarchicalSource {
 
     private URL inputURL;
+    private String charsetName;
 
     public URLSource(URL inputURL) {
+      this(inputURL, null);
+    }
+
+    public URLSource(URL inputURL, String charsetName) {
       super();
       this.inputURL = inputURL;
+      this.charsetName = charsetName;
     }
 
     public URLSource(URLSource parent, String filename) throws FileNotFound, CannotReadFile {
+      this(parent, filename, null);
+    }
+    
+    public URLSource(URLSource parent, String filename, String charsetName) throws FileNotFound, CannotReadFile {
       super(parent);
       try {
         this.inputURL = new URL(URIUtils.toParentURL(parent.inputURL), filename);
       } catch (MalformedURLException e) {
         throw new FileNotFound();
       }
+      this.charsetName = charsetName;
       parent.addImportedSource(this);
     }
 
@@ -120,7 +132,7 @@ public abstract class LessSource {
     public String getContent() throws FileNotFound, CannotReadFile {
       try {
         URLConnection connection = getInputURL().openConnection();
-        Reader input = new InputStreamReader(connection.getInputStream());
+        Reader input = charsetName != null ? new InputStreamReader(connection.getInputStream(), charsetName) : new InputStreamReader(connection.getInputStream());
         String content = IOUtils.toString(input).replace("\r\n", "\n");
         setLastModified(connection.getLastModified());
         input.close();
@@ -152,7 +164,7 @@ public abstract class LessSource {
 
     @Override
     public LessSource relativeSource(String filename) throws FileNotFound, CannotReadFile {
-      return new URLSource(this, filename);
+      return new URLSource(this, filename, charsetName);
     }
 
     public URL getInputURL() {
@@ -182,6 +194,7 @@ public abstract class LessSource {
       final int prime = 31;
       int result = 1;
       result = prime * result + ((inputURL == null) ? 0 : inputURL.hashCode());
+      result = prime * result + ((charsetName == null) ? 0 : charsetName.hashCode());
       return result;
     }
 
@@ -199,6 +212,11 @@ public abstract class LessSource {
           return false;
       } else if (!inputURL.equals(other.inputURL))
         return false;
+      if (charsetName == null) {
+        if (other.charsetName != null)
+          return false;
+      } else if (!charsetName.equals(other.charsetName))
+        return false;
       return true;
     }
 
@@ -207,14 +225,25 @@ public abstract class LessSource {
   public static class FileSource extends AbstractHierarchicalSource {
 
     private File inputFile;
+    private String charsetName;
 
     public FileSource(File inputFile) {
+      this(inputFile, null);
+    }
+    
+    public FileSource(File inputFile, String charsetName) {
       this.inputFile = inputFile;
+      this.charsetName = charsetName;
     }
 
     public FileSource(FileSource parent, String filename) {
+      this(parent, filename, null);
+    }
+    
+    public FileSource(FileSource parent, String filename, String charsetName) {
       super(parent);
       this.inputFile = new File(parent.inputFile.getParentFile(), filename);
+      this.charsetName = charsetName;
       parent.addImportedSource(this);
     }
 
@@ -237,11 +266,19 @@ public abstract class LessSource {
     @Override
     public String getContent() throws FileNotFound, CannotReadFile {
       try {
-        FileReader input = new FileReader(inputFile);
-        String content = IOUtils.toString(input).replace("\r\n", "\n");
-        setLastModified(inputFile.lastModified());
-        input.close();
-        return content;
+        Reader input;
+        if (charsetName != null) {
+          input = new InputStreamReader(new FileInputStream(inputFile), charsetName);
+        } else {
+          input = new FileReader(inputFile);
+        }
+        try {
+          String content = IOUtils.toString(input).replace("\r\n", "\n");
+          setLastModified(inputFile.lastModified());
+          return content;
+        } finally {
+          input.close();
+        }
       } catch (FileNotFoundException ex) {
         throw new FileNotFound();
       } catch (IOException ex) {
@@ -252,7 +289,7 @@ public abstract class LessSource {
     @Override
     public byte[] getBytes() throws FileNotFound, CannotReadFile {
       try {
-        byte[] content =  FileUtils.readFileToByteArray(inputFile);
+        byte[] content = FileUtils.readFileToByteArray(inputFile);
         setLastModified(inputFile.lastModified());
         return content;
       } catch (FileNotFoundException ex) {
@@ -281,6 +318,7 @@ public abstract class LessSource {
       int result = 1;
       File canonicalInputFile = getCanonicalFile();
       result = prime * result + ((canonicalInputFile == null) ? 0 : canonicalInputFile.hashCode());
+      result = prime * result + ((charsetName == null) ? 0 : charsetName.hashCode());
       return result;
     }
 
@@ -306,6 +344,11 @@ public abstract class LessSource {
         if (other.inputFile != null)
           return false;
       } else if (!absoluteInputFile.equals(other.inputFile.getAbsoluteFile()))
+        return false;
+      if (charsetName == null) {
+        if (other.charsetName != null)
+          return false;
+      } else if (!charsetName.equals(other.charsetName))
         return false;
       return true;
     }
