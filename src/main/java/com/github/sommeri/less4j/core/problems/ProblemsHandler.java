@@ -341,4 +341,9 @@ public class ProblemsHandler implements LessProblems {
     addError(errorNode, "String interpolation does not requeted expression type. Requested expression was defined at " + printer.toPosition(value));
   }
 
+  @Override
+  public String toString() {
+    return collector.toString();
+  }
+
 }

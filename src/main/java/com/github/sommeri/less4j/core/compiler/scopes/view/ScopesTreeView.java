@@ -40,11 +40,6 @@ public class ScopesTreeView extends AbstractScopesTree {
     throw new IllegalStateException("Scopes view does not accept new childs.");
   }
 
-//  @Override
-//  public void setParent(IScope parent) {
-//    throw new IllegalStateException("Scopes view does not accept new parents.");
-//  }
-
   @Override
   public void setParent(IScope parent) {
     throw new IllegalStateException("Scopes view does not accept new parents.");

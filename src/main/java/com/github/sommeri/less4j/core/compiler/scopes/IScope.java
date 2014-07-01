@@ -15,6 +15,8 @@ public interface IScope extends ILocalScope, IScopesTree {
 
   public boolean seesLocalDataOf(IScope otherScope);
 
+  public boolean seesAllDataOf(IScope otherScope);
+
   //smart util methods
   public IScope firstChild();
 

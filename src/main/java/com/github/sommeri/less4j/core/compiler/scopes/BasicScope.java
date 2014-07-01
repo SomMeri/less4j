@@ -62,6 +62,18 @@ public class BasicScope extends ComposedDumbScope implements IScope {
     return getParent().seesLocalDataOf(otherScope);
   }
 
+  //FIXME ! this method might be wasteful, we are looking for the same tree, so there should be no need to restart search from top for each parent  
+  public boolean seesAllDataOf(IScope otherScope) {
+    boolean isLocalImport = seesLocalDataOf(otherScope);
+    IScope parent = otherScope.getParent();
+    while (isLocalImport && parent != null) {
+      isLocalImport = seesLocalDataOf(parent);
+      parent = parent.getParent();
+    }
+
+    return isLocalImport;
+  }
+
   public IScope getRootScope() {
     if (!hasParent())
       return this;
