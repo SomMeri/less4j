@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -40,6 +39,7 @@ import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpo
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.NullScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
+import com.github.sommeri.less4j.core.compiler.stages.CallerCalleeScopeJoiner;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.CssPrinter;
@@ -51,6 +51,7 @@ public class ExpressionsEvaluator {
   private final IScope lazyScope;
   private final Stack<IScope> eagerScopes = new Stack<IScope>();
   private final ProblemsHandler problemsHandler;
+  private final CallerCalleeScopeJoiner scopesJoiner = new CallerCalleeScopeJoiner();
 
   private ArithmeticCalculator arithmeticCalculator;
   private ColorsCalculator colorsCalculator;
@@ -153,11 +154,11 @@ public class ExpressionsEvaluator {
       return handleUndefinedVariable(input, failOnUndefined);
     }
 
-    IScope originalScope = enteringScopeOf(expression);
+    IScope addedScope = enteringScopeOf(expression);
     cycleDetector.enteringVariableValue(input);
     Expression result = evaluate(expression);
     cycleDetector.leftVariableValue();
-    leavingScope(originalScope);
+    leavingScope(addedScope);
     return result;
   }
 
@@ -287,7 +288,6 @@ public class ExpressionsEvaluator {
   }
 
   public Expression evaluate(FunctionExpression input) {
-    // FIXME: !!!!!!!!!!! input parameter has null scope <- use closes parental scope if the current scope is null
     Expression evaluatedParameter = evaluate(input.getParameter());
     List<Expression> splitParameters = (evaluatedParameter.getType() == ASTCssNodeType.EMPTY_EXPRESSION) ? new ArrayList<Expression>() : evaluatedParameter.splitByComma();
 
@@ -418,36 +418,25 @@ public class ExpressionsEvaluator {
     return clone;
   }
 
-  //FIXME !!!!!!! do something smarter, if they are local to each other they need special handling
-  //FIXME !!!!!!! make sure detached ruleset does not tie its own scope twice to itself
   private IScope composedScope(IScope owningScope) {
-    //FIXME!!!!!!!!!!! nicer design, this whole method could be inside scope factory
-    Iterator<IScope> nextEager = eagerScopes.iterator();
-    if (!nextEager.hasNext())
-      return owningScope;
-
-    IScope result = nextEager.next();
-    while (nextEager.hasNext()) {
-      //FIXME!!!!!!!!!!! chech whether joining needs to happen - e.g. whehter they see each other
-      IScope next = nextEager.next();
-      result = ScopeFactory.createJoinedScopesView(result, next);
-    }
-    result = ScopeFactory.createJoinedScopesView(result, owningScope);
-
-    return result;
+    return scopesJoiner.createJoinedScopes(eagerScopes, owningScope);
   }
 
-  private void leavingScope(IScope originalScope) {
-    if (originalScope != null) {
+  private void leavingScope(IScope addedScope) {
+    if (addedScope != null) {
       eagerScopes.pop();
     }
   }
 
   private IScope enteringScopeOf(Expression value) {
     IScope owningScope = value.getScope();
-    if (owningScope != null) {
-      eagerScopes.push(owningScope);
-    }
+    if (owningScope==null)
+      return null;
+    
+    if (!eagerScopes.isEmpty() && eagerScopes.peek()==eagerScopes) 
+      return null;
+    
+    eagerScopes.push(owningScope);
     return owningScope;
   }
 

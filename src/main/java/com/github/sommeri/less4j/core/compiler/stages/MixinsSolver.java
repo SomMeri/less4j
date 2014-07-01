@@ -24,7 +24,6 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.IFunction;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
-import com.github.sommeri.less4j.core.compiler.scopes.ScopeManipulation;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 class MixinsSolver {
@@ -34,7 +33,7 @@ class MixinsSolver {
   private final AstNodesStack semiCompiledNodes;
   private final Configuration configuration;
   private final DefaultGuardHelper defaultGuardHelper;
-  private final ScopeManipulation scopeManipulation = new ScopeManipulation();
+  private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
 
   public MixinsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = parentSolver;
@@ -111,8 +110,10 @@ class MixinsSolver {
 
         @Override
         public void run() {
+          // add arguments
           IScope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
-          IScope mixinWorkingScope = scopeManipulation.calculateMixinsWorkingScope(callerScope, mixinArguments, mixinScope);
+          mixinScope.getParent().add(mixinArguments);
+          IScope mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, mixinScope);
 
           MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
           GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
@@ -147,8 +148,7 @@ class MixinsSolver {
   }
 
   public GeneralBody buildDetachedRulesetReplacement(DetachedRulesetReference reference, IScope callerScope, DetachedRuleset detachedRuleset, IScope detachedRulesetScope) {
-    //FIXME: !!!!!!!!!!!! this should run in detachedRulesetScope parent snapshot - check whether it is the case
-    IScope mixinWorkingScope = scopeManipulation.calculateBodyWorkingScope(callerScope, detachedRulesetScope);
+    IScope mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, detachedRulesetScope);
     BodyCompilationResult compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope);
     GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
 
@@ -181,12 +181,11 @@ class MixinsSolver {
     }
   }
 
-  //FIXME !!!! refactor and clean, unify with references 
   class ImportedScopeFilter implements ExpressionFilter {
 
     private final ExpressionsEvaluator expressionEvaluator;
     private final IScope importTargetScope;
-    private final ScopeManipulation scopeManipulation = new ScopeManipulation();
+    private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
 
     public ImportedScopeFilter(ExpressionsEvaluator expressionEvaluator, IScope importTargetScope) {
       super();
@@ -196,7 +195,6 @@ class MixinsSolver {
 
     public Expression apply(Expression input) {
       Expression result = expressionEvaluator.evaluate(input);
-      //FIXME: !!!!!!!! probably not necessary? expression evaluator should take care of this
       IScope newScope = apply(result.getScope());
       result.setScope(newScope);
       return result;
@@ -206,7 +204,7 @@ class MixinsSolver {
       if (input == null)
         return importTargetScope;
 
-      return scopeManipulation.constructImportedBodyScope(importTargetScope, input);
+      return scopeManipulation.joinIfIndependentAndPreserveContent(importTargetScope, input);
     }
 
   }
