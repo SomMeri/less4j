@@ -216,5 +216,4 @@ public class ExtendedStringBuilder {
     int lastNewLine = builder.lastIndexOf(Constants.NEW_LINE);
     return builder.length() - (lastNewLine+1);
   }
-
 }

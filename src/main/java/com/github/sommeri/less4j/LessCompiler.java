@@ -35,7 +35,8 @@ public interface LessCompiler {
     private LessSource cssResultLocation;
     private SourceMapConfiguration sourceMapConfiguration = new SourceMapConfiguration();
     private List<LessFunction> functionPackages = new ArrayList<LessFunction>();
-    private EmbeddedScriptGenerator embeddedScriptGenerator; 
+    private EmbeddedScriptGenerator embeddedScriptGenerator;
+    private boolean compressing = false;
 
     /**
      * This is needed in for source map.
@@ -90,6 +91,15 @@ public interface LessCompiler {
 
     public SourceMapConfiguration getSourceMapConfiguration() {
       return sourceMapConfiguration;
+    }
+
+    public Configuration setCompressing(boolean compressing) {
+      this.compressing = compressing;
+      return this;
+    }
+
+    public boolean isCompressing() {
+      return compressing;
     }
   }
 
