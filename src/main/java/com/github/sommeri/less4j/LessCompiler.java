@@ -1,5 +1,8 @@
 package com.github.sommeri.less4j;
 
+import com.github.sommeri.sourcemap.DefaultSourceMapUrlGenerator;
+import com.github.sommeri.sourcemap.SourceMapUrlGenerator;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -96,6 +99,7 @@ public interface LessCompiler {
     private String encodingCharset = "UTF-8";
     private boolean relativizePaths = true;
     private boolean includeSourcesContent = false;
+    private SourceMapUrlGenerator sourceMapNameGenerator = new DefaultSourceMapUrlGenerator();
 
     public boolean shouldLinkSourceMap() {
       return linkSourceMap;
@@ -160,7 +164,15 @@ public interface LessCompiler {
       this.includeSourcesContent = includeSourcesContent;
       return this;
     }
-    
+
+    public SourceMapUrlGenerator getSourceMapNameGenerator() {
+      return sourceMapNameGenerator;
+    }
+
+    public SourceMapConfiguration setSourceMapNameGenerator(SourceMapUrlGenerator sourceMapNameGenerator) {
+      this.sourceMapNameGenerator = sourceMapNameGenerator != null ? sourceMapNameGenerator : new DefaultSourceMapUrlGenerator();
+      return this;
+    }
   }
 
   public static class CompilationResult {
