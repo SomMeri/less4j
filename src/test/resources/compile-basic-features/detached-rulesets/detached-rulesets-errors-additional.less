@@ -20,3 +20,13 @@
   @unlocked-detached();
   .calling-before-unlocking-mixin();
 }
+//do not return variables
+.do-not-return-variables {
+  @detached-ruleset: { 
+    @color:blue; //variable will be returned
+  };
+  .caller {
+    @detached-ruleset();
+    color: @color; 
+  }
+}

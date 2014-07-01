@@ -10,3 +10,6 @@
 .selector {
   !#error#!
 }
+.do-not-return-variables .caller {
+  color: !#error#!;
+}

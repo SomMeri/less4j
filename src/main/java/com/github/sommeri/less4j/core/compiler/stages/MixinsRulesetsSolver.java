@@ -43,7 +43,7 @@ class MixinsRulesetsSolver {
     this.defaultGuardHelper = new DefaultGuardHelper(problemsHandler);
   }
 
-  private BodyCompilationResult resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope bodyWorkingScope, final ScopeProtection protectionLevel) {
+  private BodyCompilationResult resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope bodyWorkingScope, final ReturnMode returnMode) {
     final ExpressionsEvaluator expressionEvaluator = new ExpressionsEvaluator(bodyWorkingScope, problemsHandler, configuration);
 
     final IScope referencedMixinScope = bodyWorkingScope;
@@ -57,7 +57,9 @@ class MixinsRulesetsSolver {
 
         // collect variables and mixins to be imported
         IScope returnValues = ScopeFactory.createDummyScope();
-        returnValues.addFilteredVariables(new ImportedScopeFilter(expressionEvaluator, callerScope, protectionLevel), referencedMixinScope);
+        if (returnMode==ReturnMode.MIXINS_AND_VARIABLES) {
+          returnValues.addFilteredVariables(new ImportedScopeFilter(expressionEvaluator, callerScope), referencedMixinScope);
+        }
         List<FullMixinDefinition> unmodifiedMixinsToImport = referencedMixinScope.getAllMixins();
         
         List<FullMixinDefinition> allMixinsToImport = scopeManipulation.mixinsToImport(callerScope, referencedMixinScope, unmodifiedMixinsToImport);
@@ -121,7 +123,7 @@ class MixinsRulesetsSolver {
           if (guardValue != GuardValue.DO_NOT_USE) {
             //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
             //used and create snapshot operation is cheap now. It should be done later on.
-            BodyCompilationResult compiled = resolveCalledBody(callerScope, fullMixin.getMixin(), mixinWorkingScope, ScopeProtection.LOCAL_ONLY);
+            BodyCompilationResult compiled = resolveCalledBody(callerScope, fullMixin.getMixin(), mixinWorkingScope, ReturnMode.MIXINS_AND_VARIABLES);
             //mark the mixin according to its default() function use 
             compiled.setGuardValue(guardValue);
             //store the mixin as candidate
@@ -149,7 +151,7 @@ class MixinsRulesetsSolver {
 
   public GeneralBody buildDetachedRulesetReplacement(DetachedRulesetReference reference, IScope callerScope, DetachedRuleset detachedRuleset, IScope detachedRulesetScope) {
     IScope mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, detachedRulesetScope);
-    BodyCompilationResult compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope, ScopeProtection.FULL);
+    BodyCompilationResult compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope, ReturnMode.MIXINS);
     GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
 
     result.addMembers(compiled.getReplacement());
@@ -186,13 +188,11 @@ class MixinsRulesetsSolver {
     private final ExpressionsEvaluator expressionEvaluator;
     private final IScope importTargetScope;
     private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
-    private final ScopeProtection protectionLevel;
 
-    public ImportedScopeFilter(ExpressionsEvaluator expressionEvaluator, IScope importTargetScope, ScopeProtection protectionLevel) {
+    public ImportedScopeFilter(ExpressionsEvaluator expressionEvaluator, IScope importTargetScope) {
       super();
       this.expressionEvaluator = expressionEvaluator;
       this.importTargetScope = importTargetScope;
-      this.protectionLevel = protectionLevel;
     }
 
     public Expression apply(Expression input) {
@@ -211,10 +211,7 @@ class MixinsRulesetsSolver {
 
     @Override
     public boolean accepts(String name, Expression value) {
-      if (protectionLevel==ScopeProtection.LOCAL_ONLY)
-        return true;
-      
-      return false;//importTargetScope.getValue(name)==null;
+      return true;
     }
 
   }
