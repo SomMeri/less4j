@@ -26,7 +26,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITas
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
-class MixinsSolver {
+class MixinsRulesetsSolver {
 
   private final ProblemsHandler problemsHandler;
   private final ReferencesSolver parentSolver;
@@ -35,7 +35,7 @@ class MixinsSolver {
   private final DefaultGuardHelper defaultGuardHelper;
   private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
 
-  public MixinsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
+  public MixinsRulesetsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = parentSolver;
     this.semiCompiledNodes = semiCompiledNodes;
     this.problemsHandler = problemsHandler;
@@ -43,7 +43,7 @@ class MixinsSolver {
     this.defaultGuardHelper = new DefaultGuardHelper(problemsHandler);
   }
 
-  private BodyCompilationResult resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope bodyWorkingScope) {
+  private BodyCompilationResult resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope bodyWorkingScope, final ScopeProtection protectionLevel) {
     final ExpressionsEvaluator expressionEvaluator = new ExpressionsEvaluator(bodyWorkingScope, problemsHandler, configuration);
 
     final IScope referencedMixinScope = bodyWorkingScope;
@@ -57,7 +57,7 @@ class MixinsSolver {
 
         // collect variables and mixins to be imported
         IScope returnValues = ScopeFactory.createDummyScope();
-        returnValues.addFilteredVariables(new ImportedScopeFilter(expressionEvaluator, callerScope), referencedMixinScope);
+        returnValues.addFilteredVariables(new ImportedScopeFilter(expressionEvaluator, callerScope, protectionLevel), referencedMixinScope);
         List<FullMixinDefinition> unmodifiedMixinsToImport = referencedMixinScope.getAllMixins();
         
         List<FullMixinDefinition> allMixinsToImport = scopeManipulation.mixinsToImport(callerScope, referencedMixinScope, unmodifiedMixinsToImport);
@@ -121,7 +121,7 @@ class MixinsSolver {
           if (guardValue != GuardValue.DO_NOT_USE) {
             //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
             //used and create snapshot operation is cheap now. It should be done later on.
-            BodyCompilationResult compiled = resolveCalledBody(callerScope, fullMixin.getMixin(), mixinWorkingScope);
+            BodyCompilationResult compiled = resolveCalledBody(callerScope, fullMixin.getMixin(), mixinWorkingScope, ScopeProtection.LOCAL_ONLY);
             //mark the mixin according to its default() function use 
             compiled.setGuardValue(guardValue);
             //store the mixin as candidate
@@ -149,7 +149,7 @@ class MixinsSolver {
 
   public GeneralBody buildDetachedRulesetReplacement(DetachedRulesetReference reference, IScope callerScope, DetachedRuleset detachedRuleset, IScope detachedRulesetScope) {
     IScope mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, detachedRulesetScope);
-    BodyCompilationResult compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope);
+    BodyCompilationResult compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope, ScopeProtection.FULL);
     GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
 
     result.addMembers(compiled.getReplacement());
@@ -186,11 +186,13 @@ class MixinsSolver {
     private final ExpressionsEvaluator expressionEvaluator;
     private final IScope importTargetScope;
     private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
+    private final ScopeProtection protectionLevel;
 
-    public ImportedScopeFilter(ExpressionsEvaluator expressionEvaluator, IScope importTargetScope) {
+    public ImportedScopeFilter(ExpressionsEvaluator expressionEvaluator, IScope importTargetScope, ScopeProtection protectionLevel) {
       super();
       this.expressionEvaluator = expressionEvaluator;
       this.importTargetScope = importTargetScope;
+      this.protectionLevel = protectionLevel;
     }
 
     public Expression apply(Expression input) {
@@ -205,6 +207,14 @@ class MixinsSolver {
         return importTargetScope;
 
       return scopeManipulation.joinIfIndependentAndPreserveContent(importTargetScope, input);
+    }
+
+    @Override
+    public boolean accepts(String name, Expression value) {
+      if (protectionLevel==ScopeProtection.LOCAL_ONLY)
+        return true;
+      
+      return importTargetScope.getValue(name)==null;
     }
 
   }

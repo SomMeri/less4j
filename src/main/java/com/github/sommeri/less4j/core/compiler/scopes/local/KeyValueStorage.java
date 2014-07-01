@@ -50,6 +50,15 @@ public class KeyValueStorage<M, T> implements Cloneable {
     return null;
   }
 
+  public void remove(M key) {
+    Iterator<Level<M, T>> di = levels.descendingIterator();
+    while (di.hasNext()) {
+      Level<M, T> level = di.next();
+      if (level.contains(key))
+        level.remove(key);
+    }
+  }
+
   public Set<Entry<M, T>> getAllEntries() {
     Set<Entry<M, T>> result = new HashSet<Entry<M,T>>();
     Iterator<Level<M, T>> iterator = levels.descendingIterator();
@@ -149,6 +158,10 @@ public class KeyValueStorage<M, T> implements Cloneable {
 
     public T getValue(M key) {
       return storage.get(key);
+    }
+
+    public void remove(M key) {
+      storage.remove(key);
     }
 
     public boolean contains(M key) {

@@ -42,7 +42,7 @@ public class ReferencesSolver {
 
   public static final String ALL_ARGUMENTS = "@arguments";
   private ASTManipulator manipulator = new ASTManipulator();
-  private final MixinsSolver mixinsSolver;
+  private final MixinsRulesetsSolver mixinsSolver;
   private final ProblemsHandler problemsHandler;
   private final Configuration configuration;
   private final AstNodesStack semiCompiledNodes = new AstNodesStack();
@@ -52,7 +52,7 @@ public class ReferencesSolver {
     this.problemsHandler = problemsHandler;
     this.configuration = configuration;
     this.stringInterpolator = new StringInterpolator(problemsHandler);
-    this.mixinsSolver = new MixinsSolver(this, semiCompiledNodes, problemsHandler, configuration);
+    this.mixinsSolver = new MixinsRulesetsSolver(this, semiCompiledNodes, problemsHandler, configuration);
   }
 
   public void solveReferences(final ASTCssNode node, final IScope scope) {

@@ -117,6 +117,11 @@ public class ExpressionsEvaluator {
       public Expression apply(Expression input) {
         return evaluate(input);
       }
+
+      @Override
+      public boolean accepts(String name, Expression value) {
+        return true;
+      }
     };
   }
 

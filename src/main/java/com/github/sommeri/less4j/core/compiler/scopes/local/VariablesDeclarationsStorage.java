@@ -19,6 +19,10 @@ public class VariablesDeclarationsStorage implements Cloneable {
     return coolStorage.getValue(name);
   }
 
+  public void remove(String name) {
+    coolStorage.remove(name);
+  }
+
   public void store(AbstractVariableDeclaration node) {
     store(node.getVariable().getName(), node.getValue());
   }
@@ -48,7 +52,8 @@ public class VariablesDeclarationsStorage implements Cloneable {
     for (Entry<String, Expression> entry : variablesSource.coolStorage.getAllEntries()) {
       String name = entry.getKey();
       Expression value = entry.getValue();
-      store(name, filter.apply(value));
+      if (filter.accepts(name, value))
+        store(name, filter.apply(value));
     }
   }
 

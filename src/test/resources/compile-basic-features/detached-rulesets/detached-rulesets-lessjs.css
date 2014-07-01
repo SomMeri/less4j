@@ -2,7 +2,7 @@
   color: black;
   one: 1px;
   four: magic-frame;
-  visible-one: hidden and if you see this in the output its a bug;
+  visible-one: visible;
   visible-two: visible;
 }
 .wrap-selector {
