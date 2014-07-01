@@ -214,7 +214,7 @@ class MixinsRulesetsSolver {
       if (protectionLevel==ScopeProtection.LOCAL_ONLY)
         return true;
       
-      return importTargetScope.getValue(name)==null;
+      return false;//importTargetScope.getValue(name)==null;
     }
 
   }
