@@ -15,7 +15,7 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionsEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
@@ -44,7 +44,7 @@ class MixinsRulesetsSolver {
   }
 
   private BodyCompilationResult resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope bodyWorkingScope, final ReturnMode returnMode) {
-    final ExpressionsEvaluator expressionEvaluator = new ExpressionsEvaluator(bodyWorkingScope, problemsHandler, configuration);
+    final ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(bodyWorkingScope, problemsHandler, configuration);
 
     final IScope referencedMixinScope = bodyWorkingScope;
     // ... and I'm starting to see the point of closures ...
@@ -91,7 +91,7 @@ class MixinsRulesetsSolver {
   }
 
   private IScope buildMixinsArguments(MixinReference reference, IScope referenceScope, FullMixinDefinition mixin) {
-    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new ExpressionsEvaluator(referenceScope, problemsHandler, configuration), problemsHandler);
+    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new ExpressionEvaluator(referenceScope, problemsHandler, configuration), problemsHandler);
     return builder.build();
   }
 
@@ -185,11 +185,11 @@ class MixinsRulesetsSolver {
 
   class ImportedScopeFilter implements ExpressionFilter {
 
-    private final ExpressionsEvaluator expressionEvaluator;
+    private final ExpressionEvaluator expressionEvaluator;
     private final IScope importTargetScope;
     private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
 
-    public ImportedScopeFilter(ExpressionsEvaluator expressionEvaluator, IScope importTargetScope) {
+    public ImportedScopeFilter(ExpressionEvaluator expressionEvaluator, IScope importTargetScope) {
       super();
       this.expressionEvaluator = expressionEvaluator;
       this.importTargetScope = importTargetScope;

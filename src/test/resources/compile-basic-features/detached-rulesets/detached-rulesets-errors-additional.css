@@ -13,3 +13,6 @@
 .do-not-return-variables .caller {
   color: !#error#!;
 }
+.variable-references-chain .usePlace {
+  scope-detached: visible !#error#! !#error#! visible;
+}

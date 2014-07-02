@@ -95,5 +95,5 @@
   scope-mixin: yes;
 }
 .variable-references-chain .usePlace {
-  scope-detached: visible visible visible visible;
+  scope-detached: visible visible;
 }

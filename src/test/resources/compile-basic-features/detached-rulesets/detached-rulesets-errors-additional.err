@@ -4,3 +4,5 @@ ERROR 8:3 Detached ruleset reference "@wrongDatatype"  does not evaluate to deta
 ERROR 13:18 String interpolation does not requeted expression type. Requested expression was defined at 11:12
 ERROR 20:3 Could not find detached ruleset for "@unlocked-detached".
 ERROR 30:12 The variable "@color" was not declared.
+ERROR 36:40 The variable "@one" was not declared.
+ERROR 36:45 The variable "@two" was not declared.

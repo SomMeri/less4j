@@ -26,7 +26,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionsEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
@@ -103,7 +103,7 @@ public class ReferencesSolver {
   }
 
   private void solveNonCalligReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
-    ExpressionsEvaluator cssGuardsValidator = new ExpressionsEvaluator(iteratedScope.getScope(), problemsHandler, configuration);
+    ExpressionEvaluator cssGuardsValidator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler, configuration);
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid) || isDetachedRulesetReference(kid))
         continue;
@@ -175,7 +175,7 @@ public class ReferencesSolver {
         if (fullNodeDefinition == null) {
           handleUnavailableDetachedRulesetReference(detachedRulesetReference, solvedMixinReferences);
         } else {
-          ExpressionsEvaluator expressionEvaluator = new ExpressionsEvaluator(referenceScope, problemsHandler, configuration);
+          ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
           Expression evaluatedDetachedRuleset = expressionEvaluator.evaluate(fullNodeDefinition);
           fullNodeDefinition = evaluatedDetachedRuleset;
           if (evaluatedDetachedRuleset.getType() != ASTCssNodeType.DETACHED_RULESET) {
@@ -235,7 +235,7 @@ public class ReferencesSolver {
   }
 
   private boolean solveIfVariableReference(ASTCssNode node, IScope scope) {
-    ExpressionsEvaluator expressionEvaluator = new ExpressionsEvaluator(scope, problemsHandler, configuration);
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
     switch (node.getType()) {
     case VARIABLE: {
       Expression replacement = expressionEvaluator.evaluate((Variable) node);
@@ -294,14 +294,14 @@ public class ReferencesSolver {
     return fixedName;
   }
 
-  private SimpleSelector interpolateEscapedSelector(EscapedSelector input, ExpressionsEvaluator expressionEvaluator) {
+  private SimpleSelector interpolateEscapedSelector(EscapedSelector input, ExpressionEvaluator expressionEvaluator) {
     HiddenTokenAwareTree underlying = input.getUnderlyingStructure();
     String value = stringInterpolator.replaceIn(input.getValue(), expressionEvaluator, input.getUnderlyingStructure());
     InterpolableName interpolableName = new InterpolableName(underlying, new FixedNamePart(underlying, value));
     return new SimpleSelector(input.getUnderlyingStructure(), input.getLeadingCombinator(), interpolableName, false);
   }
 
-  private FixedNamePart interpolateFixedNamePart(FixedNamePart input, ExpressionsEvaluator expressionEvaluator) {
+  private FixedNamePart interpolateFixedNamePart(FixedNamePart input, ExpressionEvaluator expressionEvaluator) {
     String value = stringInterpolator.replaceIn(input.getName(), expressionEvaluator, input.getUnderlyingStructure());
     return new FixedNamePart(input.getUnderlyingStructure(), value);
   }
