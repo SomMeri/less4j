@@ -25,7 +25,7 @@ public class Arguments {
   @Parameter(names={"-sm", "--sourceMap"}, description="Generate source map.")
   private boolean sourceMap;
 
-  @Parameter(names={"-x", "--compress"}, description="Simple compression of css output.")
+  @Parameter(names={"-x", "--compress"}, description="Turn on css output compression.")
   private boolean compressing;
 
   @Parameter(names={"-o", "--outputDir"}, description="Specify the output directory. If not present, Less4j will place output files into current directory. This option is available only in multiple files mode.")
