@@ -26,6 +26,7 @@ public abstract class CommandLineTest {
   protected static final String inputDir = "src/test/resources/command-line/";
   protected static final String customOutputDir = "src/test/resources/command-line/output";
   private static final String EXPECTED_CSS = ".test h4 {\n  declaration: ##ID;\n}\n";
+  private static final String EXPECTED_COMPRESSED_CSS = ".test h4{declaration:one;}";
   private static final String SOURCE_MAP_LINK = "/*# sourceMappingURL=##FILENAME */\n";
   private static final String ERRORS_CSS = "";
   private static final String WARNINGS_CSS = "{\n  padding: 2 2 2 2;\n}\n";
@@ -104,6 +105,10 @@ public abstract class CommandLineTest {
 
   protected String correctCss(String id) {
     return EXPECTED_CSS.replace("##ID", id);
+  }
+  
+  protected String correctCompressedCss(String id) {
+    return EXPECTED_COMPRESSED_CSS.replace("##ID", id);
   }
 
   protected String correctCssWithSourceMap(String id, String filename) {

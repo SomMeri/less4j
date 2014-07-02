@@ -1,5 +1,14 @@
-.variable-declaration-symbol-missing {
-  b: {
-    color: red;
-  };
+@detached-1: { scope-detached: @one @two; };
+.one {
+  @one: visible;
+  .two {
+    @detached-3: @detached-1; //renaming ruleset second time
+    @two: visible;
+  }
 }
+
+.usePlace {
+  .one > .two(); 
+  @detached-3();
+}
+

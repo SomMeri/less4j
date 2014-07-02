@@ -96,4 +96,14 @@ public class SingleModeTest extends CommandLineTest {
     assertErrorsAsInFile(inputDir+"errorsandwarnings.err");
   }
 
+  @Test
+  public void compressCss() {
+    String lessFile = inputDir+"one.less";
+    String cssFile = inputDir+"oneNew.css";
+    fileUtils.removeFile(cssFile);
+    CommandLine.main(new String[] {lessFile, cssFile, "-x"});
+    fileUtils.assertFileContent(cssFile, correctCompressedCss("one"));
+    assertNoErrors();
+  }
+
 }
