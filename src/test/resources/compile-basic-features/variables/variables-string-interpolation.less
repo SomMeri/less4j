@@ -9,15 +9,15 @@
 #faultyChain {
   @bbb: "ccc";
   @aaa: "bbb";
-  text: "@{@{aaa}}";
-  text2: "@{@{aaa}} @{bbb}";
+  text: "@{@{aaa}}"; //might have to revert the result to: "@{bbb}"; https://github.com/SomMeri/less4j/issues/154
+  text2: "@{@{aaa}} @{bbb}"; //might have to revert the result to: "@{bbb} ccc"; https://github.com/SomMeri/less4j/issues/154
 }
 
 #trick {
   @ccc: "ddd";
   @bbb: "ccc";
   @aaa: "@{";
-  text: "@{aaa}bbb}";
+  text: "@{aaa}bbb}"; //might have to revert the result to: "@{bbb}"; https://github.com/SomMeri/less4j/issues/154
 }
 
 #variousQuoting {
@@ -62,4 +62,20 @@
 #useUnderdefinedMixin {
    @callerDefined: "DoNotForget";
   .underdefinedMixin();
+}
+
+//https://github.com/SomMeri/less4j/issues/154
+#reiteration {
+	@box-small: 10px;
+	@box-large: 100px;
+
+	.box(@suffix) {
+  		width: ~"@{box-@{suffix}}";
+  		weird: ~"@{box}-@{suffix}}";
+  		@box: ~"@{box";
+	}
+
+	div.small {
+  		.box(large);
+	}
 }

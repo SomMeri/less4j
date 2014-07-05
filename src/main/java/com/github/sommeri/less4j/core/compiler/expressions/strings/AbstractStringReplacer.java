@@ -14,6 +14,24 @@ public abstract class AbstractStringReplacer <ARG> {
   }
 
   public String replaceIn(String originalValue, ARG replacementArgument, HiddenTokenAwareTree technicalUnderlying) {
+    String replacedValue = replacementRound(originalValue, replacementArgument, technicalUnderlying);
+    while (shouldIterate() && !equals(replacedValue, originalValue)) {
+      originalValue = replacedValue;
+      replacedValue = replacementRound(replacedValue, replacementArgument, technicalUnderlying);
+    }
+    return replacedValue;
+  }
+
+  protected abstract boolean shouldIterate();
+
+  private boolean equals(String replacedValue, String originalValue) {
+    if (replacedValue==null)
+      return originalValue==null;
+
+    return replacedValue.equals(originalValue);
+  }
+
+  private String replacementRound(String originalValue, ARG replacementArgument, HiddenTokenAwareTree technicalUnderlying) {
     StringBuilder result = new StringBuilder();
     List<MatchRange> matches = findMatches(originalValue);
     int lastEnd = 0;

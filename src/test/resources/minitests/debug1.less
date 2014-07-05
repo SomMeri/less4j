@@ -1,20 +1,14 @@
-.box-shadow() {
-  box-shadow:         0 0 5px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
- 
-.box, .extended {
-  .box-shadow;
-  -moz-box-shadow:    0 0 5px rgba(0, 0, 0, 0.3);
+@box-small: 10px;
+@box-large: 100px;
+
+.box(@suffix)
+{
+  width: ~"@{box-@{suffix}}";
+  weird: ~"@{box}-@{suffix}}";
+  @box: ~"@{box";
 }
 
-.box {
-  color: blue;
-  & #id12 {
-    color: red;
-  }
-}
-@font-face {
-  font-family: 'MyWebFont';
-  src: url('webfont.eot'); 
+div.small
+{
+  .box(large);
 }

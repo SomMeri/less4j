@@ -51,4 +51,9 @@ public class StringInterpolator extends AbstractStringReplacer<ExpressionEvaluat
     return result;
   }
 
+  @Override
+  protected boolean shouldIterate() {
+    return true;
+  }
+
 }

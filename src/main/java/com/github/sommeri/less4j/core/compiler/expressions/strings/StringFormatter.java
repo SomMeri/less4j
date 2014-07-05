@@ -86,4 +86,9 @@ public class StringFormatter extends AbstractStringReplacer<Iterator<Expression>
 
     return new IdentifierExpression(replacement.getUnderlyingStructure(), "");
   }
+
+  @Override
+  protected boolean shouldIterate() {
+    return false;
+  }
 }

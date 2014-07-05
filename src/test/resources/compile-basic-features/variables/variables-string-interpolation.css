@@ -2,11 +2,11 @@
   text: "inner";
 }
 #faultyChain {
-  text: "@{bbb}";
-  text2: "@{bbb} ccc";
+  text: "ccc";
+  text2: "ccc ccc";
 }
 #trick {
-  text: "@{bbb}";
+  text: "ccc";
 }
 #variousQuoting {
   text1: "outer";
@@ -34,4 +34,8 @@
 }
 #useUnderdefinedMixin {
   text: 'Hi DoNotForget :-)';
+}
+#reiteration div.small {
+  width: 100px;
+  weird: 100px;
 }
