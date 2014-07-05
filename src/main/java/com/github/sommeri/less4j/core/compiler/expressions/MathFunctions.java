@@ -1,6 +1,8 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +11,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
@@ -18,6 +21,8 @@ public class MathFunctions extends BuiltInFunctionsPack {
 
   protected static final String PERCENTAGE = "percentage";
   protected static final String ROUND = "round";
+  protected static final String MIN = "min";
+  protected static final String MAX = "max";
   protected static final String FLOOR = "floor";
   protected static final String CEIL = "ceil";
   protected static final String SQRT = "sqrt";
@@ -49,6 +54,8 @@ public class MathFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(ASIN, new Asin());
     FUNCTIONS.put(ACOS, new Acos());
     FUNCTIONS.put(PI, new Pi());
+    FUNCTIONS.put(MIN, new Min());
+    FUNCTIONS.put(MAX, new Max());
   }
 
   public MathFunctions(ProblemsHandler problemsHandler) {
@@ -69,7 +76,7 @@ class Percentage extends AbstractFunction {
   @Override
   public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
     if (parameters.size()>1)
-      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
+      problemsHandler.wrongNumberOfArgumentsToFunctionMin(call.getParameter(), call.getName(), 1);
 
     Expression parameter = parameters.get(0);
     if (parameter.getType() == ASTCssNodeType.NUMBER) {
@@ -113,7 +120,7 @@ abstract class AbstractSingleValueMathFunction implements Function {
   @Override
   public final Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
     if (parameters.size()>1)
-      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
+      problemsHandler.wrongNumberOfArgumentsToFunctionMin(call.getParameter(), call.getName(), 1);
 
     Expression iParameter = parameters.get(0);
     if (iParameter.getType() != ASTCssNodeType.NUMBER) {
@@ -489,6 +496,77 @@ class Round extends AbtractMultiParameterMathFunction {
 
 }
 
+abstract class MinMax extends AbtractMultiParameterMathFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
+    Iterator<Expression> expanded = expandLists(splitParameters).iterator();
+    Expression next = expanded.next();
+    while (expanded.hasNext() && next.getType()!=ASTCssNodeType.NUMBER) {
+      next = expanded.next();
+    }
+    
+    if (next.getType()!=ASTCssNodeType.NUMBER) {
+      return new FunctionExpression(token, getName(), null);
+    }
+    
+    NumberExpression result = (NumberExpression) next;
+    while (expanded.hasNext()) {
+      next = expanded.next();
+      if (next.getType()==ASTCssNodeType.NUMBER) {
+        NumberExpression nextNum = (NumberExpression) next;
+        if (!canCompare(result, nextNum)) {
+          problemsHandler.errorIncompatibleTypesCompared(functionCall, result.getSuffix(), nextNum.getSuffix());
+          return new FaultyExpression(functionCall);
+        }
+        
+        result = compareCompatible(result, nextNum); 
+      }
+    }
+    
+    return result;
+  }
+
+  protected abstract NumberExpression compareCompatible(NumberExpression first, NumberExpression second);
+
+  private boolean canCompare(NumberExpression first, NumberExpression second) {
+    return first.getDimension() == second.getDimension() || first.getDimension()==Dimension.NUMBER || second.getDimension()==Dimension.NUMBER;
+  }
+
+  private List<Expression> expandLists(List<Expression> splitParameters) {
+    List<Expression> result = new ArrayList<Expression>();
+    for (Expression expression : splitParameters) {
+      if (expression instanceof ListExpression) {
+        ListExpression list = (ListExpression) expression;
+        result.addAll(expandLists(list.getExpressions()));
+      } else {
+        result.add(expression);
+      }
+    }
+    return result;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return Integer.MAX_VALUE;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+//    boolean isCorrect = validateParameterTypeDoNotReport(parameter, problemsHandler, ASTCssNodeType.LIST_EXPRESSION, ASTCssNodeType.NUMBER);
+//    if (isCorrect) {
+//      lklk
+//    }
+    return true;
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+}
+
 class Pi extends AbstractFunction {
 
   @Override
@@ -497,3 +575,38 @@ class Pi extends AbstractFunction {
   }
   
 }
+
+class Min extends MinMax {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.MIN;
+  }
+
+  protected NumberExpression compareCompatible(NumberExpression first, NumberExpression second) {
+    NumberExpression secondConverted = second.convertTo(first.getSuffix());
+    if (secondConverted.getValueAsDouble()<first.getValueAsDouble())
+      return second;
+    
+    return first;
+  }
+
+}
+
+class Max extends MinMax {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.MAX;
+  }
+
+  protected NumberExpression compareCompatible(NumberExpression first, NumberExpression second) {
+    NumberExpression secondConverted = second.convertTo(first.getSuffix());
+    if (secondConverted.getValueAsDouble()>first.getValueAsDouble())
+      return second;
+    
+    return first;
+  }
+
+}
+

@@ -47,7 +47,7 @@ class E extends AbstractFunction {
   @Override
   public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
     if (parameters.size()>1)
-      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
+      problemsHandler.wrongNumberOfArgumentsToFunctionMin(call.getParameter(), call.getName(), 1);
 
     Expression parameter = parameters.get(0);
     if (parameter.getType()==ASTCssNodeType.STRING_EXPRESSION) 
@@ -85,7 +85,7 @@ class Escape extends AbstractFunction {
   @Override
   public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
     if (parameters.size()>1)
-      problemsHandler.wrongNumberOfArgumentsToFunction(call.getParameter(), call.getName(), 1);
+      problemsHandler.wrongNumberOfArgumentsToFunctionMin(call.getParameter(), call.getName(), 1);
 
     Expression parameter = parameters.get(0);
     if (parameter.getType()==ASTCssNodeType.STRING_EXPRESSION) 

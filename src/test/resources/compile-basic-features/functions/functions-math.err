@@ -2,3 +2,8 @@ Warnings produced by compilation of testCase
 WARNING 2:24 function 'percentage' requires number as a parameter.
 WARNING 3:24 function 'percentage' requires number as a parameter.
 WARNING 11:14 function 'percentage' requires number as a parameter.
+Errors produced by compilation of testCase
+ERROR 225:16 Wrong number of arguments to function 'max', should be at least 1.
+ERROR 226:16 Can not compare '%' with 'mm'.
+ERROR 247:16 Wrong number of arguments to function 'min', should be at least 1.
+ERROR 248:16 Can not compare '%' with 'mm'.

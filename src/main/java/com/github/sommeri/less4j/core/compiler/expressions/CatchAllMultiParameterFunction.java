@@ -17,13 +17,18 @@ abstract class CatchAllMultiParameterFunction extends AbstractMultiParameterFunc
 
   @Override
   public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
-    if (parameters.size() < getMinParameters()) {
+    if (getMinParameters() == getMaxParameters() && parameters.size()!=getMinParameters()) {
       problemsHandler.wrongNumberOfArgumentsToFunction(call, getName(), getMinParameters());
       return new FaultyExpression(call);
     }
 
+    if (parameters.size() < getMinParameters()) {
+      problemsHandler.wrongNumberOfArgumentsToFunctionMin(call, getName(), getMinParameters());
+      return new FaultyExpression(call);
+    }
+
     if (parameters.size() > getMaxParameters()) {
-      problemsHandler.wrongNumberOfArgumentsToFunction(call, getName(), getMaxParameters());
+      problemsHandler.wrongNumberOfArgumentsToFunctionMax(call, getName(), getMaxParameters());
       return new FaultyExpression(call);
     }
 

@@ -203,3 +203,47 @@ documentation {
 //  unit-incorrect-first-2: unit(~"9s", ms);
 //  unit-incorrect-first-3: unit(#00ff00, ms);
 }
+
+#use-max {
+  max-0: max(3%);
+  max-1: max(3%, 8%);
+  max-3: max(1cm, 2mm);
+  max-4: max(200mm, 1cm);
+  max-5: max("junk", 1cm, 2mm);
+  max-6: max(2mm, 1cm, "junk");
+  max-7: max(3% 8%);
+  @list-comma: 1, 2, 3, 4;
+  @list-space: 5 6 7 8;
+  max-8: max(@list-comma);
+  max-9: max(@list-space);
+  max-10: max(@list-comma, @list-space);
+  @list-of-list: @list-comma, @list-space;
+  max-11: max(@list-of-list);
+  max-12: max(1, 2cm, 3mm);
+  max-13: max(5, 4cm, 3mm);
+  max-14: max("junk", "junk");
+  max-error-1: max(); 
+  max-error-2: max(3%, 2mm, 8%, 1cm); 
+}
+
+#use-min {
+  min-0: min(3%);
+  min-1: min(3%, 8%);
+  min-3: min(1cm, 2mm);
+  min-4: min(200mm, 1cm);
+  min-5: min("junk", 1cm, 2mm);
+  min-6: min(2mm, 1cm, "junk");
+  min-7: min(3% 8%);
+  @list-comma: 1, 2, 3, 4;
+  @list-space: 5 6 7 8;
+  min-8: min(@list-comma);
+  min-9: min(@list-space);
+  min-10: min(@list-comma, @list-space);
+  @list-of-list: @list-comma, @list-space;
+  min-11: min(@list-of-list);
+  min-12: min(1, 2cm, 3mm);
+  min-13: min(5, 4cm, 3mm);
+  min-14: min("junk", "junk");
+  min-error-1: min(); 
+  min-error-2: min(3%, 2mm, 8%, 1cm); 
+}

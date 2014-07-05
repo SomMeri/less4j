@@ -121,6 +121,14 @@ public class ProblemsHandler implements LessProblems {
     addError(param, "Wrong number of arguments to function '" + function + "', should be " + expectedArguments + ".");
   }
 
+  public void wrongNumberOfArgumentsToFunctionMin(Expression param, String function, int expectedArguments) {
+    addError(param, "Wrong number of arguments to function '" + function + "', should be at least " + expectedArguments + ".");
+  }
+
+  public void wrongNumberOfArgumentsToFunctionMax(Expression param, String function, int expectedArguments) {
+    addError(param, "Wrong number of arguments to function '" + function + "', should be at maximum " + expectedArguments + ".");
+  }
+
   public void wrongArgumentTypeToFunction(Expression param, String function, ASTCssNodeType received, ASTCssNodeType... expected) {
     addError(param, "Wrong argument type to function '" + function + "', expected " + PrintUtils.toTypeNames(expected) + " saw " + PrintUtils.toTypeName(received) + ".");
   }
@@ -339,6 +347,10 @@ public class ProblemsHandler implements LessProblems {
 
   public void stringInterpolationNotSupported(HiddenTokenAwareTree errorNode, Expression value) {
     addError(errorNode, "String interpolation does not requeted expression type. Requested expression was defined at " + printer.toPosition(value));
+  }
+
+  public void errorIncompatibleTypesCompared(FunctionExpression errorNode, String suffix1, String suffix2) {
+    addError(errorNode, "Can not compare '" + suffix1 +"' with '" + suffix2 + "'."); 
   }
 
   @Override
