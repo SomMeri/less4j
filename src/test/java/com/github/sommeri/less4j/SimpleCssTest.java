@@ -76,48 +76,48 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
-  @SuppressWarnings("unused")
-  protected CompilationResult supercompile(File lessFile, File cssOutput) throws Less4jException {
-    LessCompiler compiler = getCompiler();
-    Configuration configuration = createConfiguration(cssOutput);
-    configuration.setCssResultLocation((LessSource)null);
-    CompilationResult actual=null;
-    try {
-      String content = ".class {\n  margin: 1 1 1 1;\n}";//IOUtils.toString(new FileReader(lessFile));
-      String fullPath = "path/to/filename.less";
-      String filename = "filename.less";
-//      LessSource.StringSource lessSource = new LessSource.StringSource(content, filename, new URI(fullPath));
-      LessSource.StringSource lessSource = new LessSource.StringSource(content);
-      actual = compiler.compile(lessSource, configuration);
-      
-      //System.out.println(actual.getSourceMap());
-    } catch (Throwable e) {
-      e.printStackTrace();
-    }
-    return actual;
-  }
+//  @SuppressWarnings("unused")
+//  protected CompilationResult supercompile(File lessFile, File cssOutput) throws Less4jException {
+//    LessCompiler compiler = getCompiler();
+//    Configuration configuration = createConfiguration(cssOutput);
+//    configuration.setCssResultLocation((LessSource)null);
+//    CompilationResult actual=null;
+//    try {
+//      String content = ".class {\n  margin: 1 1 1 1;\n}";//IOUtils.toString(new FileReader(lessFile));
+//      String fullPath = "path/to/filename.less";
+//      String filename = "filename.less";
+////      LessSource.StringSource lessSource = new LessSource.StringSource(content, filename, new URI(fullPath));
+//      LessSource.StringSource lessSource = new LessSource.StringSource(content);
+//      actual = compiler.compile(lessSource, configuration);
+//      
+//      //System.out.println(actual.getSourceMap());
+//    } catch (Throwable e) {
+//      e.printStackTrace();
+//    }
+//    return actual;
+//  }
 
-  @Override
-  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
-    CompilationResult result = super.compile(lessFile, cssOutput);
-    //System.out.println(result.getSourceMap());
-    if (printTo != null) {
-      try {
-        FileUtils.writeStringToFile(new File(printTo), result.getCss());
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-//    System.out.println("**************************************");
-//    System.out.println(result.getCss());
-    return result;
-  }
-
+//  @Override
+//  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
+//    CompilationResult result = super.compile(lessFile, cssOutput);
+//    //System.out.println(result.getSourceMap());
+//    if (printTo != null) {
+//      try {
+//        FileUtils.writeStringToFile(new File(printTo), result.getCss());
+//      } catch (IOException e) {
+//        throw new RuntimeException(e);
+//      }
+//    }
+////    System.out.println("**************************************");
+////    System.out.println(result.getCss());
+//    return result;
+//  }
+//
   @Override
   protected Configuration createConfiguration(File cssOutput) {
     Configuration configuration = super.createConfiguration(cssOutput);
-    configuration.getSourceMapConfiguration().setInline(true);
-    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
+//    configuration.getSourceMapConfiguration().setInline(true);
+//    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
     return configuration;
   }
 

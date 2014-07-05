@@ -1,0 +1,15 @@
+// how should this behave? waiting for less.js 2093
+#silent() {
+  #namespace {
+    // namespace does not see variable defined in caller
+    namespace: @variable;   
+    .mixin() {
+      declaration: @variable;
+    }
+  }
+}
+
+#use-place-1 {
+  #silent > #namespace > .mixin();
+  @variable: in-caller;
+}

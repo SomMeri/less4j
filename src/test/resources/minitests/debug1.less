@@ -1,14 +1,11 @@
-@detached-1: { scope-detached: @one @two; };
-.one {
-  @one: visible;
-  .two {
-    @detached-3: @detached-1; //renaming ruleset second time
-    @two: visible;
+#namespace {
+   namespace: @variable;
+   .mixin() {
+    declaration: @variable;
   }
 }
 
-.usePlace {
-  .one > .two(); 
-  @detached-3();
+#use-place-1 {
+  #namespace > .mixin();
+  @variable: in-caller;
 }
-
