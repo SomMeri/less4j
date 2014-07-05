@@ -97,27 +97,18 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 //    return actual;
 //  }
 
-//  @Override
-//  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
-//    CompilationResult result = super.compile(lessFile, cssOutput);
-//    //System.out.println(result.getSourceMap());
-//    if (printTo != null) {
-//      try {
-//        FileUtils.writeStringToFile(new File(printTo), result.getCss());
-//      } catch (IOException e) {
-//        throw new RuntimeException(e);
-//      }
-//    }
-////    System.out.println("**************************************");
-////    System.out.println(result.getCss());
-//    return result;
-//  }
-//
+  @Override
+  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
+    CompilationResult result = super.compile(lessFile, cssOutput);
+    System.out.println(result.getSourceMap());
+    return result;
+  }
+
   @Override
   protected Configuration createConfiguration(File cssOutput) {
     Configuration configuration = super.createConfiguration(cssOutput);
-//    configuration.getSourceMapConfiguration().setInline(true);
-//    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
+    //configuration.getSourceMapConfiguration().setInline(true);
+    configuration.getSourceMapConfiguration().setLinkSourceMap(true);
     return configuration;
   }
 

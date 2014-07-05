@@ -137,25 +137,25 @@ public class CssPrinter {
   public boolean switchOnType(ASTCssNode node) {
     switch (node.getType()) {
     case RULE_SET:
-      return appendRuleset((RuleSet) node); // TODOsm: source map
+      return appendRuleset((RuleSet) node);
 
     case CSS_CLASS:
-      return appendCssClass((CssClass) node); // TODOsm: source map
+      return appendCssClass((CssClass) node);
 
     case PSEUDO_CLASS:
-      return appendPseudoClass((PseudoClass) node); // TODOsm: source map
+      return appendPseudoClass((PseudoClass) node);
 
     case PSEUDO_ELEMENT:
-      return appendPseudoElement((PseudoElement) node); // TODOsm: source map
+      return appendPseudoElement((PseudoElement) node);
 
     case NTH:
       return appendNth((Nth) node); // TODOsm: source map
 
     case SELECTOR:
-      return appendSelector((Selector) node); // TODOsm: source map
+      return appendSelector((Selector) node); 
 
     case SIMPLE_SELECTOR:
-      return appendSimpleSelector((SimpleSelector) node); // TODOsm: source map
+      return appendSimpleSelector((SimpleSelector) node);
 
     case SELECTOR_OPERATOR:
       return appendSelectorOperator((SelectorOperator) node); // TODOsm: source map
@@ -173,19 +173,19 @@ public class CssPrinter {
       return appendCharsetDeclaration((CharsetDeclaration) node);
 
     case FONT_FACE:
-      return appendFontFace((FontFace) node); // TODOsm: source map
+      return appendFontFace((FontFace) node);
 
     case NAMED_EXPRESSION:
       return appendNamedExpression((NamedExpression) node); // TODOsm: source map
 
     case BINARY_EXPRESSION:
-      return appendComposedExpression((BinaryExpression) node); // TODOsm: source map
+      return appendComposedExpression((BinaryExpression) node); 
 
     case BINARY_EXPRESSION_OPERATOR:
       return appendBinaryExpressionOperator((BinaryExpressionOperator) node); // TODOsm: source map
 
     case LIST_EXPRESSION:
-      return appendListExpression((ListExpression) node); // TODOsm: source map
+      return appendListExpression((ListExpression) node); 
 
     case LIST_EXPRESSION_OPERATOR:
       return appendListExpressionOperator((ListExpressionOperator) node); // TODOsm: source map
@@ -194,7 +194,7 @@ public class CssPrinter {
       return appendCssString((CssString) node); // TODOsm: source map
 
     case EMPTY_EXPRESSION:
-      return appendEmptyExpression((EmptyExpression) node); // TODOsm: source map
+      return appendEmptyExpression((EmptyExpression) node); 
 
     case NUMBER:
       return appendNumberExpression((NumberExpression) node); // TODOsm: source map
@@ -215,7 +215,7 @@ public class CssPrinter {
       return appendDeclaration((Declaration) node); // TODOsm: source map
 
     case MEDIA:
-      return appendMedia((Media) node); // TODOsm: source map
+      return appendMedia((Media) node); 
 
     case MEDIA_QUERY:
       return appendMediaQuery((MediaQuery) node); // TODOsm: source map
@@ -239,7 +239,7 @@ public class CssPrinter {
       return appendMediaExpressionFeature((MediaExpressionFeature) node); // TODOsm: source map
 
     case STYLE_SHEET:
-      return appendStyleSheet((StyleSheet) node); // TODOsm: source map
+      return appendStyleSheet((StyleSheet) node); 
 
     case FAULTY_EXPRESSION:
       return appendFaultyExpression((FaultyExpression) node); // TODOsm: source map
@@ -269,7 +269,7 @@ public class CssPrinter {
       return appendViewport((Viewport) node); // TODOsm: source map
 
     case GENERAL_BODY:
-      return appendBodyOptimizeDuplicates((GeneralBody) node); // TODOsm: source map
+      return appendBodyOptimizeDuplicates((GeneralBody) node); 
 
     case PAGE:
       return appendPage((Page) node); // TODOsm: source map
@@ -539,7 +539,7 @@ public class CssPrinter {
   }
 
   public boolean appendFontFace(FontFace node) {
-    cssOnly.append("@font-face").ensureSeparator();
+    cssAndSM.append("@font-face", node.getUnderlyingStructure()).ensureSeparator();
     append(node.getBody());
 
     return true;
@@ -581,8 +581,7 @@ public class CssPrinter {
   }
 
   public boolean appendPseudoClass(PseudoClass node) {
-    cssOnly.append(':');
-    cssOnly.append(node.getName());
+    cssAndSM.append(node.getFullName(), node.getUnderlyingStructure());
     if (node.hasParameters()) {
       cssOnly.append('(');
       append(node.getParameter());
@@ -593,12 +592,7 @@ public class CssPrinter {
   }
 
   public boolean appendPseudoElement(PseudoElement node) {
-    cssOnly.append(':');
-    if (!node.isLevel12Form())
-      cssOnly.append(':');
-
-    cssOnly.append(node.getName());
-
+    cssAndSM.append(node.getFullName(), node.getUnderlyingStructure());
     return true;
   }
 
@@ -914,6 +908,7 @@ public class CssPrinter {
       NamedColorExpression named = (NamedColorExpression) expression;
       cssOnly.append(named.getColorName());
     } else {
+//      cssAndSM.append(expression.getValue(), expression.getUnderlyingStructure());
       cssOnly.append(expression.getValue());
     }
 
@@ -1014,7 +1009,6 @@ public class CssPrinter {
   }
 
   private boolean appendCssClass(CssClass cssClass) {
-    //cssOnly.append(cssClass.getFullName());
     cssAndSM.append(cssClass.getFullName(), cssClass.getUnderlyingStructure());
     return true;
   }

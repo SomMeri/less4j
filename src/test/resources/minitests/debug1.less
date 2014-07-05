@@ -1,11 +1,20 @@
-#namespace {
-   namespace: @variable;
-   .mixin() {
-    declaration: @variable;
-  }
+.box-shadow() {
+  box-shadow:         0 0 5px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+ 
+.box, .extended {
+  .box-shadow;
+  -moz-box-shadow:    0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-#use-place-1 {
-  #namespace > .mixin();
-  @variable: in-caller;
+.box {
+  color: blue;
+  & #id12 {
+    color: red;
+  }
+}
+@font-face {
+  font-family: 'MyWebFont';
+  src: url('webfont.eot'); 
 }

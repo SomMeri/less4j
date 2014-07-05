@@ -20,6 +20,9 @@ public class PseudoElement extends Pseudo {
   }
 
   public String getFullName() {
+    if (isLevel12Form())
+      return ":"+getName();
+    
     return "::"+getName();
   }
 
