@@ -872,6 +872,7 @@ unsigned_value_term
     : STRING
     | IDENT
     | UNICODE_RANGE
+    | PERCENT
     ;
 
 special_function
@@ -1321,7 +1322,7 @@ ESCAPED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\f'|'\\'|'`') )*
 // Identifier. Identifier tokens pick up properties names and values
 //
 //
-IDENT : '-'? NMSTART NMCHAR* ;
+IDENT : '-'? NMSTART NMCHAR*;
 fragment UNICODE_RANGE_HEX: HEXCHAR | '?';
 UNICODE_RANGE: U PLUS UNICODE_RANGE_HEX+ (MINUS UNICODE_RANGE_HEX+)?;
 

@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
@@ -27,6 +28,7 @@ public class MiscFunctions extends BuiltInFunctionsPack {
 
   protected static final String COLOR = "color";
   protected static final String UNIT = "unit";
+  protected static final String GET_UNIT = "get-unit";
   protected static final String CONVERT = "convert";
   protected static final String EXTRACT = "extract";
   protected static final String DATA_URI = "data-uri";
@@ -35,6 +37,7 @@ public class MiscFunctions extends BuiltInFunctionsPack {
   static {
     FUNCTIONS.put(COLOR, new Color());
     FUNCTIONS.put(UNIT, new Unit());
+    FUNCTIONS.put(GET_UNIT, new GetUnit());
     FUNCTIONS.put(CONVERT, new Convert());
     FUNCTIONS.put(EXTRACT, new Extract());
     FUNCTIONS.put(DATA_URI, new DataUri());
@@ -136,6 +139,40 @@ class Unit extends CatchAllMultiParameterFunction {
   @Override
   protected String getName() {
     return MiscFunctions.UNIT;
+  }
+
+}
+
+class GetUnit extends CatchAllMultiParameterFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
+    NumberExpression dimension = (NumberExpression) splitParameters.get(0);
+    return new IdentifierExpression(token, dimension.getSuffix()); //not sure about the type
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 1;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    switch (position) {
+    case 0:
+      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    }
+    return false;
+  }
+
+  @Override
+  protected String getName() {
+    return MiscFunctions.GET_UNIT;
   }
 
 }

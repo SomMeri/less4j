@@ -51,6 +51,7 @@ public class TermBuilder {
   private Expression buildFromTerm(HiddenTokenAwareTree token, HiddenTokenAwareTree offsetChild, int offsetChildIndx) {
     switch (offsetChild.getType()) {
     case LessLexer.IDENT:
+    case LessLexer.PERCENT:
       return buildFromIdentifier(token, offsetChild);
 
     case LessLexer.STRING:
