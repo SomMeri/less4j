@@ -35,6 +35,7 @@ public class ColorFunctions extends BuiltInFunctionsPack {
   protected static final String BLUE = "blue";
   protected static final String ALPHA = "alpha";
   protected static final String LUMA = "luma";
+  protected static final String LUMINANCE = "luminance";
 
   protected static final String SATURATE = "saturate";
   protected static final String DESATURATE = "desaturate";
@@ -84,6 +85,7 @@ public class ColorFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(BLUE, new Blue());
     FUNCTIONS.put(ALPHA, new Alpha());
     FUNCTIONS.put(LUMA, new Luma());
+    FUNCTIONS.put(LUMINANCE, new Luminance());
 
     FUNCTIONS.put(SATURATE, new Saturate());
     FUNCTIONS.put(DESATURATE, new Desaturate());
@@ -515,14 +517,36 @@ class Luma extends AbstractColorOperationFunction {
 
   @Override
   protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
-    double luma = (Math.round((0.2126 * (color.getRed() / 255.0) + 0.7152 * (color.getGreen() / 255.0) + 0.0722 * (color.getBlue() / 255.0)) * color.getAlpha() * 100));
+    double r = color.getRed() / 255.0, g = color.getGreen() / 255.0, b = color.getBlue() / 255.0;
 
-    return new NumberExpression(token, Double.valueOf(luma), "%", null, Dimension.PERCENTAGE);
+    r = (r <= 0.03928) ? r / 12.92 : Math.pow(((r + 0.055) / 1.055), 2.4);
+    g = (g <= 0.03928) ? g / 12.92 : Math.pow(((g + 0.055) / 1.055), 2.4);
+    b = (b <= 0.03928) ? b / 12.92 : Math.pow(((b + 0.055) / 1.055), 2.4);
+
+    double luma =  0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+    return new NumberExpression(token, Double.valueOf(round8(luma * color.getAlpha() * 100)), "%", null, Dimension.PERCENTAGE);
   }
 
   @Override
   protected String getName() {
     return ColorFunctions.LUMA;
+  }
+
+}
+
+class Luminance extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    double luminance = ((0.2126 * (color.getRed() / 255.0) + 0.7152 * (color.getGreen() / 255.0) + 0.0722 * (color.getBlue() / 255.0)) * color.getAlpha() * 100);
+
+    return new NumberExpression(token, Double.valueOf(round8(luminance)), "%", null, Dimension.PERCENTAGE);
+  }
+
+  @Override
+  protected String getName() {
+    return ColorFunctions.LUMINANCE;
   }
 
 }
@@ -1029,6 +1053,11 @@ abstract class AbstractColorBlendFunction extends AbstractColorFunction {
 }
 
 abstract class AbstractColorFunction extends CatchAllMultiParameterFunction {
+  
+  static double round8(double value) {
+    double rounding = 100000000.0;
+    return Math.round(value*rounding)/rounding;
+  }
 
   static double clamp(double val) {
     return Math.min(1, Math.max(0, val));
