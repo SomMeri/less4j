@@ -182,3 +182,14 @@ documentation {
   min-error-1: !#error#!;
   min-error-2: !#error#!;
 }
+#use-length {
+  length: !#error#!;
+  length-1: 1;
+  length-2: 3;
+  length-3: 1;
+  length-4: 2;
+  length-5: 1;
+  length-6: 3;
+  length-7: 2;
+  length-8: 1;
+}

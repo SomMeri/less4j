@@ -1,14 +1,5 @@
-@box-small: 10px;
-@box-large: 100px;
-
-.box(@suffix)
-{
-  width: ~"@{box-@{suffix}}";
-  weird: ~"@{box}-@{suffix}}";
-  @box: ~"@{box";
-}
-
 div.small
 {
-  .box(large);
+  @indirectly: 1, 2, 3;
+  length-6: length(@indirectly);
 }

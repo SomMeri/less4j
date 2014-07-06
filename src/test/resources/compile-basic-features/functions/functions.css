@@ -122,4 +122,5 @@
 }
 #extract {
   result: 3 2 1 C B A;
+  length: 6;
 }

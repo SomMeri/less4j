@@ -68,7 +68,7 @@ public class AstLogic {
     if (!"url".equals(name == null ? null : name.toLowerCase()))
       return false;
     
-    Expression parameter = function.getParameter();
+    Expression parameter = function.getParameter().splitByComma().get(0);
     if (parameter.getType()!=ASTCssNodeType.STRING_EXPRESSION)
       return false;
     

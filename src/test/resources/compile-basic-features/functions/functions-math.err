@@ -7,3 +7,4 @@ ERROR 225:16 Wrong number of arguments to function 'max', should be at least 1.
 ERROR 226:16 Can not compare '%' with 'mm'.
 ERROR 247:16 Wrong number of arguments to function 'min', should be at least 1.
 ERROR 248:16 Can not compare '%' with 'mm'.
+ERROR 252:11 Wrong number of arguments to function 'length', should be at least 1.

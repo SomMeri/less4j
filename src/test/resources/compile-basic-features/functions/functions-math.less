@@ -247,3 +247,16 @@ documentation {
   min-error-1: min(); 
   min-error-2: min(3%, 2mm, 8%, 1cm); 
 }
+
+#use-length {
+  length: length();
+  length-1: length("one");
+  length-2: length(1 2 3);
+  length-3: length(1, 2, 3);
+  length-4: length(1 2, 3);
+  length-5: length(1, 2, 3 4 5 6);
+  @indirectly: 1, 2, 3;
+  length-6: length(@indirectly);
+  length-7: length("one" "two");
+  length-8: length("one", "two");
+}

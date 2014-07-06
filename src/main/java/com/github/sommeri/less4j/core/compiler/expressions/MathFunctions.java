@@ -23,6 +23,7 @@ public class MathFunctions extends BuiltInFunctionsPack {
   protected static final String ROUND = "round";
   protected static final String MIN = "min";
   protected static final String MAX = "max";
+  protected static final String LENGTH = "length";
   protected static final String FLOOR = "floor";
   protected static final String CEIL = "ceil";
   protected static final String SQRT = "sqrt";
@@ -56,6 +57,8 @@ public class MathFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(PI, new Pi());
     FUNCTIONS.put(MIN, new Min());
     FUNCTIONS.put(MAX, new Max());
+    FUNCTIONS.put(LENGTH, new Length());
+    
   }
 
   public MathFunctions(ProblemsHandler problemsHandler) {
@@ -606,6 +609,41 @@ class Max extends MinMax {
       return second;
     
     return first;
+  }
+
+}
+
+class Length extends AbtractMultiParameterMathFunction {
+
+  @Override
+  protected String getName() {
+    return MathFunctions.LENGTH;
+  }
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression call, HiddenTokenAwareTree token) {
+    Expression expression = splitParameters.get(0);
+    if (expression.getType()!=ASTCssNodeType.LIST_EXPRESSION)
+      return new NumberExpression(call.getUnderlyingStructure(), Double.valueOf(1), "", null, Dimension.NUMBER);
+    
+    ListExpression list = (ListExpression) expression;
+    int length = list.getExpressions().size();
+    return new NumberExpression(call.getUnderlyingStructure(), Double.valueOf(length), "", null, Dimension.NUMBER);
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return true;
+  }
+  
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return Integer.MAX_VALUE;
   }
 
 }

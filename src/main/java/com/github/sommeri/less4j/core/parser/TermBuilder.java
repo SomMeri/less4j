@@ -1,7 +1,9 @@
 package com.github.sommeri.less4j.core.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
@@ -12,6 +14,8 @@ import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
+import com.github.sommeri.less4j.core.ast.ListExpression;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
@@ -27,6 +31,7 @@ import com.github.sommeri.less4j.utils.URIUtils;
 
 public class TermBuilder {
 
+  private static final String URL = "url";
   private final ASTBuilderSwitch parentBuilder;
   private ProblemsHandler problemsHandler;
 
@@ -77,7 +82,7 @@ public class TermBuilder {
       return buildFromNumber(token, offsetChild);
 
     case LessLexer.URI:
-      return buildFromSpecialFunction(token, "url", offsetChild);
+      return buildFromSpecialFunction(token, URL, offsetChild);
 
     case LessLexer.DOMAIN:
       return buildFromSpecialFunction(token, "domain", offsetChild);
@@ -247,7 +252,9 @@ public class TermBuilder {
   }
 
   private FunctionExpression buildFromSpecialFunction(HiddenTokenAwareTree token, String function, HiddenTokenAwareTree first) {
-    return new FunctionExpression(token, function, extractUrlParameter(token, function, normalizeNewLineSymbols(first.getText())));
+    Expression parameter = extractUrlParameter(token, function, normalizeNewLineSymbols(first.getText()));
+    parameter = packIntoListExpression(parameter);
+    return new FunctionExpression(token, function, parameter);
   }
 
   // some places (e.g. only url) allow new lines in them. Less.js tend to
@@ -283,7 +290,32 @@ public class TermBuilder {
     HiddenTokenAwareTree parameterNode = children.get(1);
 
     Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
+    //FIXME: (API) this is a hack - if what come out is not comma separated list, add it to comma separated list. - once there is API changing version it will be better to store parameters list in the function
+    if (!isListOfParameters(parameter)) {
+      parameter = packIntoListExpression(parameter);
+    }
     return new FunctionExpression(token, name, parameter);
+  }
+
+  private Expression packIntoListExpression(Expression parameter) {
+    ListExpressionOperator operator = new ListExpressionOperator(parameter.getUnderlyingStructure(), ListExpressionOperator.Operator.COMMA);
+    return new ListExpression(parameter.getUnderlyingStructure(), asList(parameter), operator);
+  }
+
+  private List<Expression> asList(Expression... parameter) {
+    List<Expression> result = new ArrayList<Expression>();
+    for (Expression expression : parameter) {
+      result.add(expression);
+    }
+    return result;
+  }
+
+  private boolean isListOfParameters(Expression parameter) {
+    if (parameter.getType()!=ASTCssNodeType.LIST_EXPRESSION)
+      return false;
+    
+    ListExpression list = (ListExpression)parameter;
+    return list.getOperator().getOperator()==ListExpressionOperator.Operator.COMMA;
   }
 
   private String buildFunctionName(HiddenTokenAwareTree token) {

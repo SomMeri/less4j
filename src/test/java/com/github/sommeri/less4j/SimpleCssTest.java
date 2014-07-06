@@ -20,7 +20,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
  * from the master branch.
  * 
  */
-@Ignore
+//@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
@@ -107,8 +107,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   @Override
   protected Configuration createConfiguration(File cssOutput) {
     Configuration configuration = super.createConfiguration(cssOutput);
-    //configuration.getSourceMapConfiguration().setInline(true);
-    configuration.getSourceMapConfiguration().setLinkSourceMap(true);
+    configuration.getSourceMapConfiguration().setInline(false);
+    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
     return configuration;
   }
 

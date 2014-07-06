@@ -307,11 +307,15 @@ public class ExpressionEvaluator {
     for (Expression expression : input.getExpressions()) {
       evaluated.add(evaluate(expression));
     }
-    return new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone(), input.getScope());
+    ListExpression result = new ListExpression(input.getUnderlyingStructure(), evaluated, input.getOperator().clone(), input.getScope());
+    result.configureParentToAllChilds();
+    return result;
   }
 
   public Expression evaluate(NamedExpression input) {
-    return new NamedExpression(input.getUnderlyingStructure(), input.getName(), evaluate(input.getExpression()), input.getScope());
+    NamedExpression result = new NamedExpression(input.getUnderlyingStructure(), input.getName(), evaluate(input.getExpression()), input.getScope());
+    result.configureParentToAllChilds();
+    return result;
   }
 
   public Expression evaluate(SignedExpression input) {

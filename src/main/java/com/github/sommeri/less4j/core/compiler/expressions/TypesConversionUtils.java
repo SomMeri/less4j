@@ -1,5 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import java.util.List;
+
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.CssString;
@@ -48,7 +50,11 @@ public class TypesConversionUtils {
     if (!"url".equals(function.getName().toLowerCase()))
       return null;
 
-    return toJavaFileSeparator(contentToString(expressionEvaluator.evaluate(function.getParameter())));
+    List<Expression> parameters = expressionEvaluator.evaluate(function.getParameter()).splitByComma();
+    if (parameters.isEmpty())
+      return null;
+    
+    return toJavaFileSeparator(contentToString(parameters.get(0)));
   }
 
   private String toJavaFileSeparator(String path) {
