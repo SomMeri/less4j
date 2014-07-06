@@ -23,6 +23,9 @@ public class ColorFunctions extends BuiltInFunctionsPack {
   protected static final String HSLA = "hsla";
   protected static final String HSV = "hsv";
   protected static final String HSVA = "hsva";
+  protected static final String HSV_HUE = "hsvhue";
+  protected static final String HSV_SATURATION = "hsvsaturation";
+  protected static final String HSV_VALUE = "hsvvalue";
 
   protected static final String HUE = "hue";
   protected static final String SATURATION = "saturation";
@@ -56,7 +59,7 @@ public class ColorFunctions extends BuiltInFunctionsPack {
   protected static final String NEGATION = "negation";
 
   protected static final String TINT = "tint";
-  protected static final String SHADE = "shade";
+  protected static final String SHADE = "shade"; 
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -67,6 +70,11 @@ public class ColorFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(HSLA, new HSLA());
     FUNCTIONS.put(HSV, new HSV());
     FUNCTIONS.put(HSVA, new HSVA());
+    FUNCTIONS.put(HSV_HUE, new HSVHue());
+    FUNCTIONS.put(HSV_SATURATION, new HSVSaturation());
+    FUNCTIONS.put(HSV_VALUE, new HSVValue());
+    
+    
 
     FUNCTIONS.put(HUE, new Hue());
     FUNCTIONS.put(SATURATION, new Saturation());
@@ -382,6 +390,51 @@ class Lightness extends AbstractColorOperationFunction {
   @Override
   protected String getName() {
     return ColorFunctions.LIGHTNESS;
+  }
+
+}
+
+class HSVHue extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    HSVAValue hsva = toHSVA(color);
+    return new NumberExpression(token, Double.valueOf(Math.round(hsva.h)), "", null, Dimension.NUMBER);
+  }
+
+  @Override
+  protected String getName() {
+    return ColorFunctions.HSV_HUE;
+  }
+
+}
+
+class HSVSaturation extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    HSVAValue hsva = toHSVA(color);
+    return new NumberExpression(token, Double.valueOf(Math.round(hsva.s * 100)), "%", null, Dimension.PERCENTAGE);
+  }
+
+  @Override
+  protected String getName() {
+    return ColorFunctions.HSV_SATURATION;
+  }
+
+}
+
+class HSVValue extends AbstractColorOperationFunction {
+
+  @Override
+  protected Expression evaluate(ColorExpression color, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
+    HSVAValue hsva = toHSVA(color);
+    return new NumberExpression(token, Double.valueOf(Math.round(hsva.v * 100)), "%", null, Dimension.PERCENTAGE);
+  }
+
+  @Override
+  protected String getName() {
+    return ColorFunctions.HSV_VALUE;
   }
 
 }
@@ -1075,6 +1128,33 @@ abstract class AbstractColorFunction extends CatchAllMultiParameterFunction {
     return new HSLAValue((h * 360), s, l, a);
   }
 
+  static HSVAValue toHSVA(ColorExpression color) {
+    double r = color.getRed() / 255.0, g = color.getGreen() / 255.0, b = color.getBlue() / 255.0, a = color.getAlpha();
+
+    double max = Math.max(r, Math.max(g, b)), min = Math.min(r, Math.min(g, b));
+    double h, s, v = max, d = max - min;
+
+    if (max == 0) {
+      s = 0;
+    } else {
+      s = d / max;
+    }
+
+    if (max == min) {
+      h = 0;
+    } else {
+      if (max == r) {
+        h = (g - b) / d + (g < b ? 6 : 0);
+      } else if (max == g) {
+        h = (b - r) / d + 2;
+      } else { //if (max == b) 
+        h = (r - g) / d + 4;
+      }
+      h = h / 6;
+    }
+
+    return new HSVAValue(h * 360, s, v, a);
+  }
 }
 
 class HSLAValue {
@@ -1097,6 +1177,30 @@ class HSLAValue {
     this.h = h;
     this.s = s;
     this.l = l;
+    this.a = 1.0f;
+  }
+}
+
+class HSVAValue {
+  public double h, s, v, a;
+
+  public HSVAValue() {
+    super();
+  }
+
+  public HSVAValue(double h, double s, double v, double a) {
+    super();
+    this.h = h;
+    this.s = s;
+    this.v = v;
+    this.a = a;
+  }
+
+  public HSVAValue(double h, double s, double v) {
+    super();
+    this.h = h;
+    this.s = s;
+    this.v = v;
     this.a = 1.0f;
   }
 }
