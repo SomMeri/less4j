@@ -1,0 +1,15 @@
+.is-url {
+  url-1: true;
+  url-2: true;
+  url-3: true;
+}
+.is-unit {
+  unit-casing: true;
+  unit-string: true;
+  unit-escape: true;
+  no-unit-casing: false;
+  no-unit-string: false;
+  no-unit-escape: false;
+  unit-wrong-param-1: false;
+  unit-wrong-param-2: false;
+}

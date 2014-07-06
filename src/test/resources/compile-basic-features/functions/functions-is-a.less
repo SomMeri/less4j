@@ -1,0 +1,15 @@
+.is-url {
+	url-1: isurl(url(data://img1.png));
+    url-2: isurl(url("data://img1.png"));
+    url-3: isurl(url("something"));
+}
+.is-unit {
+  unit-casing: isunit(32PX, px);
+  unit-string: isunit(32px, "px");
+  unit-escape: isunit(32px, ~'px');
+  no-unit-casing: isunit(32, "");
+  no-unit-string: isunit(32, px);
+  no-unit-escape: isunit(32, ~'');
+  unit-wrong-param-1: isunit("32px", ~'px');
+  unit-wrong-param-2: isunit(32px,23);
+}

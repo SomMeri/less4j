@@ -10,6 +10,7 @@ import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class TypeFunctions extends BuiltInFunctionsPack {
@@ -21,6 +22,8 @@ public class TypeFunctions extends BuiltInFunctionsPack {
   protected static final String ISPIXEL = "ispixel";
   protected static final String ISPERCENTAGE = "ispercentage";
   protected static final String ISEM = "isem";
+  protected static final String ISURL = "isurl";
+  protected static final String ISUNIT = "isunit";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -31,6 +34,8 @@ public class TypeFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(ISPIXEL, new IsPixel());
     FUNCTIONS.put(ISPERCENTAGE, new IsPercentage());
     FUNCTIONS.put(ISEM, new IsEm());
+    FUNCTIONS.put(ISURL, new IsUrl());
+    FUNCTIONS.put(ISUNIT, new IsUnit());
   }
 
   public TypeFunctions(ProblemsHandler problemsHandler) {
@@ -80,6 +85,19 @@ class IsString extends AbstractTypeFunction {
   
 }
 
+class IsUrl extends AbstractTypeFunction {
+
+  @Override
+  protected boolean checkType(Expression parameter) {
+    if (parameter.getType() != ASTCssNodeType.FUNCTION)
+      return false;
+    
+    FunctionExpression function = (FunctionExpression) parameter;
+    return function.getName().equalsIgnoreCase("url");
+  }
+  
+}
+
 class IsPixel extends AbstractTypeFunction {
 
   @Override
@@ -87,6 +105,53 @@ class IsPixel extends AbstractTypeFunction {
     return parameter.getType() == ASTCssNodeType.NUMBER && ((NumberExpression)parameter).getSuffix().equalsIgnoreCase("px");
   }
   
+}
+
+class IsUnit extends CatchAllMultiParameterFunction {
+  
+  private final TypesConversionUtils utils = new TypesConversionUtils();
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
+    Expression expression = splitParameters.get(0);
+    Expression unitExpression = splitParameters.get(1);
+    
+    String unit = utils.contentToString(unitExpression);
+    if (expression.getType()!=ASTCssNodeType.NUMBER || unit==null)
+      return new IdentifierExpression(functionCall.getUnderlyingStructure(), "false");
+    
+    return isunit((NumberExpression) expression, unit, functionCall.getUnderlyingStructure());
+  }
+
+  private Expression isunit(NumberExpression expression, String unit, HiddenTokenAwareTree token) {
+    String suffix = expression.getSuffix();
+    String result="true"; 
+    if (suffix == null || unit.isEmpty() || !suffix.equals(unit))
+      result="false";
+    
+    return new IdentifierExpression(token, result);
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return true;
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 2;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 2;
+  }
+
+  @Override
+  protected String getName() {
+    return TypeFunctions.ISUNIT;
+  }
+
 }
 
 class IsPercentage extends AbstractTypeFunction {
