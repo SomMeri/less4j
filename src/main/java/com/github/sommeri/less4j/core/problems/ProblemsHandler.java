@@ -353,6 +353,14 @@ public class ProblemsHandler implements LessProblems {
     addError(errorNode, "Can not compare '" + suffix1 +"' with '" + suffix2 + "'."); 
   }
 
+  public void wrongEnumeratedArgument(FunctionExpression errorNode, String argumentName, String... allowed) {
+    addError(errorNode, "Wrong '" + errorNode +"' argument to function '" + errorNode.getName() + "'. Should be one of: " + PrintUtils.toString(allowed)); 
+  }
+
+  public void errorSvgGradientArgument(FunctionExpression errorNode) {
+    addError(errorNode, "svg-gradient expects direction, start_color [start_position], [color position,]..., end_color [end_position]"); 
+  }
+
   @Override
   public String toString() {
     return collector.toString();

@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import com.github.sommeri.less4j.core.parser.ConversionUtils;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.nodemime.NodeMime;
+import com.github.sommeri.less4j.utils.InStringCssPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
 public class MiscFunctions extends BuiltInFunctionsPack {
@@ -32,6 +34,7 @@ public class MiscFunctions extends BuiltInFunctionsPack {
   protected static final String CONVERT = "convert";
   protected static final String EXTRACT = "extract";
   protected static final String DATA_URI = "data-uri";
+  protected static final String SVG_GRADIENT = "svg-gradient";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -41,6 +44,7 @@ public class MiscFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(CONVERT, new Convert());
     FUNCTIONS.put(EXTRACT, new Extract());
     FUNCTIONS.put(DATA_URI, new DataUri());
+    FUNCTIONS.put(SVG_GRADIENT, new SvgGradient());
   }
 
   public MiscFunctions(ProblemsHandler problemsHandler) {
@@ -356,3 +360,143 @@ class DataUri extends CatchAllMultiParameterFunction {
   }
 
 }
+
+class SvgGradient extends CatchAllMultiParameterFunction {
+
+  private final TypesConversionUtils conversions = new TypesConversionUtils();
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
+    String direction = toDirection(splitParameters.get(0)), gradientDirectionSvg ="";
+    List<Expression> stops = splitParameters.subList(1, splitParameters.size());
+
+    String gradientType = "linear", rectangleDimension = "x=\"0\" y=\"0\" width=\"1\" height=\"1\"";
+    boolean useBase64 = true;
+    if ("to bottom".equals(direction)) {
+      gradientDirectionSvg = "x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"";
+    } else if ("to right".equals(direction)) {
+      gradientDirectionSvg = "x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"";
+    } else if ("to bottom right".equals(direction)) {
+      gradientDirectionSvg = "x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"";
+    } else if ("to top right".equals(direction)) {
+      gradientDirectionSvg = "x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\"";
+    } else if (direction!=null && direction.startsWith("ellipse")) {
+      gradientType = "radial";
+      gradientDirectionSvg = "cx=\"50%\" cy=\"50%\" r=\"75%\"";
+      rectangleDimension = "x=\"-50\" y=\"-50\" width=\"101\" height=\"101\"";
+    } else {
+      problemsHandler.wrongEnumeratedArgument(functionCall, "direction", "to bottom", "to right", "to bottom right", "to top right", "ellipse", "ellipse at center");
+      return new FaultyExpression(functionCall);
+    }
+    
+    StringBuilder returner = new StringBuilder("<?xml version=\"1.0\" ?>");
+    returner.append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\">");
+    returner.append("<");
+    returner.append(gradientType);
+    returner.append("Gradient id=\"gradient\" gradientUnits=\"userSpaceOnUse\" ");
+    returner.append(gradientDirectionSvg);
+    returner.append(">");
+    
+    Iterator<Expression> iterator = stops.iterator();
+    boolean isFirstStop = true;
+    while (iterator.hasNext()) {
+      Expression stop = iterator.next();
+      if (!addColorStop(returner, stop, isFirstStop, !iterator.hasNext(), functionCall, problemsHandler))
+        return new FaultyExpression(functionCall);
+      isFirstStop = false;
+    }
+    
+    returner.append("</").append(gradientType).append("Gradient>");
+    returner.append("<rect ").append(rectangleDimension).append(" fill=\"url(#gradient)\" /></svg>");
+
+    String result = useBase64? PrintUtils.base64Encode(returner.toString().getBytes()) : returner.toString();
+    return toDataUri(functionCall.getUnderlyingStructure(), result, useBase64);
+  }
+
+  private Expression toDataUri(HiddenTokenAwareTree token, String data, boolean useBase64) {
+    StringBuilder value = new StringBuilder("data:image/svg+xml");
+    if (useBase64)
+      value.append(";base64");
+    value.append(",").append(data);
+
+    CssString parameter = new CssString(token, value.toString(), "\'"); 
+    return new FunctionExpression(token, "url", parameter);
+  }
+
+  private boolean addColorStop(StringBuilder returner, Expression colorStop, boolean isFirst, boolean isLast, FunctionExpression errorNode, ProblemsHandler problemsHandler) {
+    if (colorStop.getType()==ASTCssNodeType.LIST_EXPRESSION) {
+      ListExpression list = (ListExpression) colorStop;
+      List<Expression> expressions = list.getExpressions();
+      if (expressions.isEmpty() || expressions.size()>2) {
+        problemsHandler.errorSvgGradientArgument(errorNode);
+        return false;
+      } 
+      
+      Expression color = expressions.get(0);
+      Expression position =expressions.size()>1? expressions.get(1) : null;
+      addColorStop(returner, color, position, isFirst, isLast, errorNode, problemsHandler);
+    } else {
+      addColorStop(returner, colorStop, null, isFirst, isLast, errorNode, problemsHandler);
+    }
+    return true;
+  }
+
+  private boolean addColorStop(StringBuilder returner, Expression colorE, Expression position, boolean isFirst, boolean isLast, FunctionExpression errorNode, ProblemsHandler problemsHandler) {
+    if (colorE.getType()!=ASTCssNodeType.COLOR_EXPRESSION) {
+      problemsHandler.errorSvgGradientArgument(errorNode);
+      return false;
+    }
+    if (!isLast && !isFirst && position==null) {
+      problemsHandler.errorSvgGradientArgument(errorNode);
+      return false;
+    }
+    
+    ColorExpression color = (ColorExpression) colorE;
+    String  positionValue = position!=null ? toCss(position) : isFirst ? "0%" : "100%";
+    returner.append("<stop offset=\"").append(positionValue);
+    returner.append("\" stop-color=\"").append(color.getValueInHexadecimal());
+    returner.append("\"");
+    if (color.hasAlpha()) {
+      returner.append(" stop-opacity=\"").append(PrintUtils.formatNumber(color.getAlpha())).append("\"");
+    }
+    returner.append("/>");
+    return true;
+  }
+
+  private String toDirection(Expression direction) {
+    String result = conversions.contentToString(direction);
+    if (result!=null)
+      return result;
+    
+    return toCss(direction);
+  }
+
+  private String toCss(Expression direction) {
+    InStringCssPrinter printer = new InStringCssPrinter();
+    printer.append(direction);
+    return printer.toString();
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    // TODO Auto-generated method stub
+    return true;
+  } 
+  
+  @Override
+  protected int getMinParameters() {
+    return 3;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return Integer.MAX_VALUE;
+  }
+
+  @Override
+  protected String getName() {
+    return MiscFunctions.SVG_GRADIENT;
+  }
+
+}
+

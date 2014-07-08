@@ -192,4 +192,16 @@ public class PrintUtils {
     return DatatypeConverter.printBase64Binary(data);
   }
 
+  public static String toString(String[] strings) {
+    StringBuilder result = new StringBuilder();
+    boolean first = true;
+    for (String string : strings) {
+      if (!first)
+        result.append(", ");
+      result.append(string);
+      first = false;
+    }
+    return result.toString();
+  }
+
 }

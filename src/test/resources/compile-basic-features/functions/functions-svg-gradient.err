@@ -1,0 +1,2 @@
+Errors produced by compilation of testCase
+ERROR 28:7 Wrong 'FunctionExpression (28:7)' argument to function 'svg-gradient'. Should be one of: to bottom, to right, to bottom right, to top right, ellipse, ellipse at center
