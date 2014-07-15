@@ -38,6 +38,18 @@ public class TypesConversionUtils {
     }
   }
 
+  public boolean canConvertToString(Expression input) {
+    switch (input.getType()) {
+    case IDENTIFIER_EXPRESSION:
+    case STRING_EXPRESSION:
+    case ESCAPED_VALUE:
+      return true;
+
+    default:
+      return false;
+    }
+  }
+
   public String extractFilename(Expression urlInput, ProblemsHandler problemsHandler, Configuration configuration) {
     ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler, configuration);
     Expression urlExpression = expressionEvaluator.evaluate(urlInput);

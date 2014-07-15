@@ -39,6 +39,11 @@ public class ProblemsHandler implements LessProblems {
   private ProblemsCollector collector = new ProblemsCollector();
   private LessPrinter printer = new LessPrinter();
 
+  @Override
+  public String toString() {
+    return collector.toString();
+  }
+
   public void wrongMemberInCssBody(ASTCssNode member, Body node) {
     ASTCssNode parent = node.getParent()==null? node : node.getParent();
     ASTCssNodeType parentType = node.getParent()==null? ASTCssNodeType.STYLE_SHEET : node.getParent().getType(); 
@@ -361,9 +366,8 @@ public class ProblemsHandler implements LessProblems {
     addError(errorNode, "svg-gradient expects direction, start_color [start_position], [color position,]..., end_color [end_position]"); 
   }
 
-  @Override
-  public String toString() {
-    return collector.toString();
+  public void regexpFunctionError(FunctionExpression call, String message) {
+    addError(call, "Regular expression failed: " + message); 
   }
 
 }

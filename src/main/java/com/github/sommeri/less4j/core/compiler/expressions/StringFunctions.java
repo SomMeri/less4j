@@ -11,10 +11,12 @@ import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
+import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringFormatter;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.js.JsRegExp;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
@@ -23,12 +25,14 @@ public class StringFunctions extends BuiltInFunctionsPack {
   protected static final String ESCAPE = "escape";
   protected static final String E = "e";
   protected static final String FORMAT = "%";
+  protected static final String REPLACE = "replace";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
     FUNCTIONS.put(ESCAPE, new Escape());
     FUNCTIONS.put(E, new E());
     FUNCTIONS.put(FORMAT, new Format());
+    FUNCTIONS.put(REPLACE, new Replace());
   }
 
   public StringFunctions(ProblemsHandler problemsHandler) {
@@ -46,17 +50,17 @@ class E extends AbstractFunction {
 
   @Override
   public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
-    if (parameters.size()>1)
+    if (parameters.size() > 1)
       problemsHandler.wrongNumberOfArgumentsToFunctionMin(call.getParameter(), call.getName(), 1);
 
     Expression parameter = parameters.get(0);
-    if (parameter.getType()==ASTCssNodeType.STRING_EXPRESSION) 
+    if (parameter.getType() == ASTCssNodeType.STRING_EXPRESSION)
       return evaluate((CssString) parameter);
 
-    if (parameter.getType()==ASTCssNodeType.ESCAPED_VALUE) 
+    if (parameter.getType() == ASTCssNodeType.ESCAPED_VALUE)
       return evaluate((EscapedValue) parameter);
 
-    if (parameter.getType()==ASTCssNodeType.NUMBER) 
+    if (parameter.getType() == ASTCssNodeType.NUMBER)
       return evaluate((NumberExpression) parameter);
 
     problemsHandler.warnEFunctionArgument(parameter);
@@ -84,19 +88,19 @@ class Escape extends AbstractFunction {
 
   @Override
   public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
-    if (parameters.size()>1)
-      problemsHandler.wrongNumberOfArgumentsToFunctionMin(call.getParameter(), call.getName(), 1);
+    if (parameters.size() > 1)
+      problemsHandler.wrongNumberOfArgumentsToFunctionMax(call.getParameter(), call.getName(), 1);
 
     Expression parameter = parameters.get(0);
-    if (parameter.getType()==ASTCssNodeType.STRING_EXPRESSION) 
+    if (parameter.getType() == ASTCssNodeType.STRING_EXPRESSION)
       return evaluate((CssString) parameter);
 
-    if (parameter.getType()==ASTCssNodeType.ESCAPED_VALUE) 
+    if (parameter.getType() == ASTCssNodeType.ESCAPED_VALUE)
       return evaluate((EscapedValue) parameter);
 
     problemsHandler.warnEscapeFunctionArgument(call.getParameter());
 
-    if (parameter.getType()==ASTCssNodeType.COLOR_EXPRESSION) 
+    if (parameter.getType() == ASTCssNodeType.COLOR_EXPRESSION)
       return evaluate((ColorExpression) parameter);
 
     return call.getParameter();
@@ -122,19 +126,19 @@ class Format extends AbstractFunction {
 
   @Override
   public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
-    if (parameters.isEmpty()) 
+    if (parameters.isEmpty())
       problemsHandler.errFormatWrongFirstParameter(call.getParameter());
-    
+
     Expression format = parameters.get(0);
-    if (format.getType()==ASTCssNodeType.STRING_EXPRESSION) 
+    if (format.getType() == ASTCssNodeType.STRING_EXPRESSION)
       return evaluate((CssString) format, parameters.subList(1, parameters.size()), problemsHandler, call.getUnderlyingStructure());
 
-    if (format.getType()==ASTCssNodeType.ESCAPED_VALUE) 
+    if (format.getType() == ASTCssNodeType.ESCAPED_VALUE)
       return evaluate((EscapedValue) format, parameters.subList(1, parameters.size()), problemsHandler, call.getUnderlyingStructure());
 
-    if (!format.isFaulty()) 
-        problemsHandler.errFormatWrongFirstParameter(call.getParameter());
-    
+    if (!format.isFaulty())
+      problemsHandler.errFormatWrongFirstParameter(call.getParameter());
+
     return new FaultyExpression(call);
   }
 
@@ -152,5 +156,83 @@ class Format extends AbstractFunction {
     StringFormatter formatter = new StringFormatter(problemsHandler);
     return formatter.replaceIn(value, parameters.iterator(), technicalUnderlying);
   }
+
+}
+
+//string, pattern, replacement, flags
+class Replace extends AbstractMultiParameterFunction {
+
+  private TypesConversionUtils conversions = new TypesConversionUtils();
+
+  @Override
+  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+    Expression targetExpression = parameters.get(0);
+    String string = conversions.contentToString(targetExpression);
+    String pattern = conversions.contentToString(parameters.get(1));
+    String replacement = conversions.contentToString(parameters.get(2));
+    String flags = parameters.size() > 3 ? conversions.contentToString(parameters.get(3)) : "";
+
+    Expression replaced = regexp(targetExpression, string, pattern, replacement, flags, problemsHandler, call);
+    return replaced;
+  }
+
+  private Expression regexp(Expression targetExpression, String string, String pattern, String replacement, String flags, ProblemsHandler problemsHandler, FunctionExpression call) {
+    try {
+      JsRegExp exp = JsRegExp.compile(pattern, flags);
+      String replaced = exp.replace(string, replacement);
+      return buildResult(targetExpression, replaced);
+    } catch (IllegalArgumentException ex) {
+      problemsHandler.regexpFunctionError(call, ex.getMessage());
+      return new FaultyExpression(call.getUnderlyingStructure());
+    }
+  }
+
+  private Expression buildResult(Expression targetExpression, String replaced) {
+    HiddenTokenAwareTree token = targetExpression.getUnderlyingStructure();
+    switch (targetExpression.getType()) {
+    case IDENTIFIER_EXPRESSION:
+      return new IdentifierExpression(token, replaced);
+
+    case STRING_EXPRESSION:
+      CssString string = (CssString) targetExpression;
+      return new CssString(token, replaced, string.getQuoteType());
+
+    case ESCAPED_VALUE:
+      return new EscapedValue(token, replaced);
+
+    default:
+      return new CssString(token, replaced, "'");
+    }
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 3;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 4;
+  }
+
+  @Override
+  protected String getName() {
+    return StringFunctions.REPLACE;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    //FIXME: !!!!!!! functions descriptions to errors
+    return conversions.canConvertToString(parameter);
+  }
+
+  //  @Override
+  //  public Expression evaluate(List<Expression> parameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
+  //    if (parameters.size()>4)
+  //      problemsHandler.wrongNumberOfArgumentsToFunctionMax(call.getParameter(), call.getName(), 4);
+  //
+  //    if (parameters.size()<3)
+  //      problemsHandler.wrongNumberOfArgumentsToFunctionMin(call.getParameter(), call.getName(), 3);
+  //  }
 
 }

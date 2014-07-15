@@ -44,7 +44,12 @@
   contrast-dark-thresh: contrast(#000, #111111, #eeeeee, 0.5);
   contrast-high-thresh: contrast(#555, #111111, #eeeeee, 0.6);
   contrast-low-thresh: contrast(#555, #111111, #eeeeee, 0.1);
-  format: %("rgb(%d, %d, %d)", @r, 128, 64);
+  replace: replace("Hello, Mars.", "Mars\.", "World!");
+  replace-captured: replace("This is a string.", "(string)\.$", "new $1.");
+  replace-with-flags: replace("One + one = 4", "one", "2", "gi");
+  replace-single-quoted: replace('foo-1', "1", "2");
+  replace-escaped-string: replace(~"bar-1", "1", "2");
+  replace-keyword: replace(baz-1, "1", "2");  format: %("rgb(%d, %d, %d)", @r, 128, 64);
   format-string: %("hello %s", "world");
   format-multiple: %("hello %s %d", "earth", 2);
   format-url-encode: %('red is %A', #ff0000);

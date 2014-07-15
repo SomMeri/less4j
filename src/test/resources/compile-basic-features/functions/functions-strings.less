@@ -110,3 +110,8 @@
 //#format-list-split {
 //  list-split: %("%d - %d - %d - %d", 1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4);
 //}
+
+replace {
+  replace-identifier: replace(foo1, "1", "2");
+  replace-error-in-regexp: replace('test-error', 'error', 'something', 'aaa');
+}

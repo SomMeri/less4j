@@ -119,3 +119,7 @@
 #format-list-split {
   format2: "d: "1 whatever" "2 whatever" 5";
 }
+replace {
+  replace-identifier: foo2;
+  replace-error-in-regexp: !#error#!;
+}

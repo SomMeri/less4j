@@ -40,6 +40,12 @@
   contrast-dark-thresh: #eeeeee;
   contrast-high-thresh: #eeeeee;
   contrast-low-thresh: #111111;
+  replace: "Hello, World!";
+  replace-captured: "This is a new string.";
+  replace-with-flags: "2 + 2 = 4";
+  replace-single-quoted: 'foo-2';
+  replace-escaped-string: bar-2;
+  replace-keyword: baz-2;
   format: "rgb(32, 128, 64)";
   format-string: "hello world";
   format-multiple: "hello earth 2";

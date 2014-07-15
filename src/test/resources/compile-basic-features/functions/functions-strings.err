@@ -3,3 +3,5 @@ WARNING 40:19 Escape function argument should be a string.
 WARNING 41:20 Escape function argument should be a string.
 WARNING 42:19 Escape function argument should be a string.
 WARNING 43:19 Escape function argument should be a string.
+Errors produced by compilation of testCase
+ERROR 116:28 Regular expression failed: Flag cannot be specified twice: 'a'
