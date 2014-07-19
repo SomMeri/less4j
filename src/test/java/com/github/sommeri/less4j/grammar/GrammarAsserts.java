@@ -128,8 +128,8 @@ class CountNodesAction implements TreeVisitorAction {
     List<? extends Token> list = tokens.get(start, end);
     int count = 0;
     for (Token token : list) {
-      CommonToken commonToke = CommonToken.class.cast(token);
-      if (isOnChannel(commonToke) && !isDummy(commonToke))
+      CommonToken commonToken = CommonToken.class.cast(token);
+      if (isOnChannel(commonToken) && !isDummy(commonToken))
         count++;
     }
     return count;
