@@ -1,2 +1,2 @@
 Errors produced by compilation of testCase
-ERROR import#FILE_SEPARATOR#syntactically-incorrect-unclosed-ruleset.less 0:0 no viable alternative at input '<EOF>' in ruleset (which started at 2:1)
+ERROR import#FILE_SEPARATOR#syntactically-incorrect-unclosed-ruleset.less 4:3 no viable alternative at input '<EOF>' in ruleset (which started at 2:1)
