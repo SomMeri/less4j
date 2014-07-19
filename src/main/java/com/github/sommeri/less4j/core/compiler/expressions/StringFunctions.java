@@ -159,7 +159,6 @@ class Format extends AbstractFunction {
 
 }
 
-//string, pattern, replacement, flags
 class Replace extends AbstractMultiParameterFunction {
 
   private TypesConversionUtils conversions = new TypesConversionUtils();
@@ -222,7 +221,6 @@ class Replace extends AbstractMultiParameterFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    //FIXME: !!!!!!! functions descriptions to errors
     return conversions.canConvertToString(parameter);
   }
 
