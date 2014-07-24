@@ -46,10 +46,11 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
 
   @SuppressWarnings("unchecked")
   public List<HiddenTokenAwareTree> getChildren() {
-    List<HiddenTokenAwareTree> result = super.getChildren();
+    List<? extends Object> result = super.getChildren();
     if (result == null)
       result = Collections.emptyList();
-    return result;
+
+    return (List<HiddenTokenAwareTree>) result;
   }
 
   public boolean hasChildren() {

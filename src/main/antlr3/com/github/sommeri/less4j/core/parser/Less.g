@@ -142,7 +142,7 @@ tokens {
   public Token nextToken() {
         super.nextToken();
         if ( tokens.size()==0 ) {
-            return Token.EOF_TOKEN;
+            return getEOFToken();
         }
         return (Token)tokens.remove(0);
   }

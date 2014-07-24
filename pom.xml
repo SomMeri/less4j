@@ -30,7 +30,7 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 	<properties>
 		<slf4j.version>1.6.6</slf4j.version>
 		<wro4j.version>1.4.6</wro4j.version>
-		<antlr.version>3.4</antlr.version>
+		<antlr.version>3.5.2</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>

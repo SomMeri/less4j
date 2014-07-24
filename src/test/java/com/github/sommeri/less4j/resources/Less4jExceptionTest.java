@@ -40,7 +40,7 @@ public class Less4jExceptionTest {
   @Test
   public void testAntlrError() {
     String less = ".class { margin: 1 1 1 1; ";
-    String expectedError = "Could not compile less. 1 error(s) occurred:\nERROR 0:0 no viable alternative at input '<EOF>' in ruleset (which started at 1:1)\n";
+    String expectedError = "Could not compile less. 1 error(s) occurred:\nERROR 1:27 no viable alternative at input '<EOF>' in ruleset (which started at 1:1)\n";
 
     expectCompileError(less, expectedError);
   }
