@@ -272,7 +272,7 @@ class DataUri extends CatchAllMultiParameterFunction {
     if (splitParameters.size() == 1) {
       CssString filenameArg = (CssString) splitParameters.get(0);
       filename = filenameArg.getValue();
-      
+
       mimetype = guessMimetype(filename);
     } else {
       CssString mimetypeArg = (CssString) splitParameters.get(0);
@@ -282,24 +282,27 @@ class DataUri extends CatchAllMultiParameterFunction {
       filename = filenameArg.getValue();
     }
 
+    String[] filenameParts = filename.split("#", 2);
+    filename = filenameParts[0];
+    String fragments = filenameParts.length > 1 ? filenameParts[1] : "";
+
     LessSource source = token.getSource();
     try {
-
       LessSource dataSource = source.relativeSource(filename);
       byte[] data = dataSource.getBytes();
 
       // **** less.js comment - flag is not implemented yet ****
       // IE8 cannot handle a data-uri larger than 32KB. If this is exceeded
       // and the --ieCompat flag is enabled, return a normal url() instead.
-      int fileSizeInKB = data.length/1024;
-      if (fileSizeInKB >=DATA_URI_MAX_KB) {
+      int fileSizeInKB = data.length / 1024;
+      if (fileSizeInKB >= DATA_URI_MAX_KB) {
         problemsHandler.warnIE8UnsafeDataUri(functionCall, filename, fileSizeInKB, DATA_URI_MAX_KB);
         FunctionExpression result = new FunctionExpression(token, "url", functionCall.getParameter().clone());
         result.configureParentToAllChilds();
         return result;
       }
-      
-      return toDataUri(token, mimetype, data);
+
+      return toDataUri(token, mimetype, data, fragments);
 
     } catch (FileNotFound ex) {
       problemsHandler.errorFileNotFound(functionCall, filename);
@@ -324,18 +327,18 @@ class DataUri extends CatchAllMultiParameterFunction {
     return mimetype;
   }
 
-  private Expression toDataUri(HiddenTokenAwareTree token, String mimetype, byte[] data) {
+  private Expression toDataUri(HiddenTokenAwareTree token, String mimetype, byte[] data, String fragments) {
     if (mimetype != null && mimetype.toLowerCase().endsWith("base64"))
-      return toDataUri(token, mimetype, PrintUtils.base64Encode(data));
+      return toDataUri(token, mimetype, PrintUtils.base64Encode(data), fragments);
     else
-      return toDataUri(token, mimetype, PrintUtils.toUtf8AsUri(new String(data)));
+      return toDataUri(token, mimetype, PrintUtils.toUtf8AsUri(new String(data)), fragments);
   }
 
-  private Expression toDataUri(HiddenTokenAwareTree token, String mimetype, String data) {
+  private Expression toDataUri(HiddenTokenAwareTree token, String mimetype, String data, String fragments) {
     StringBuilder value = new StringBuilder("data:");
-    value.append(mimetype).append(",").append(data);
+    value.append(mimetype).append(",").append(data).append(fragments);
 
-    CssString parameter = new CssString(token, value.toString(), "\""); 
+    CssString parameter = new CssString(token, value.toString(), "\"");
     return new FunctionExpression(token, "url", parameter);
   }
 
@@ -367,7 +370,7 @@ class SvgGradient extends CatchAllMultiParameterFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
-    String direction = toDirection(splitParameters.get(0)), gradientDirectionSvg ="";
+    String direction = toDirection(splitParameters.get(0)), gradientDirectionSvg = "";
     List<Expression> stops = splitParameters.subList(1, splitParameters.size());
 
     String gradientType = "linear", rectangleDimension = "x=\"0\" y=\"0\" width=\"1\" height=\"1\"";
@@ -380,7 +383,7 @@ class SvgGradient extends CatchAllMultiParameterFunction {
       gradientDirectionSvg = "x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"";
     } else if ("to top right".equals(direction)) {
       gradientDirectionSvg = "x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\"";
-    } else if (direction!=null && direction.startsWith("ellipse")) {
+    } else if (direction != null && direction.startsWith("ellipse")) {
       gradientType = "radial";
       gradientDirectionSvg = "cx=\"50%\" cy=\"50%\" r=\"75%\"";
       rectangleDimension = "x=\"-50\" y=\"-50\" width=\"101\" height=\"101\"";
@@ -388,7 +391,7 @@ class SvgGradient extends CatchAllMultiParameterFunction {
       problemsHandler.wrongEnumeratedArgument(functionCall, "direction", "to bottom", "to right", "to bottom right", "to top right", "ellipse", "ellipse at center");
       return new FaultyExpression(functionCall);
     }
-    
+
     StringBuilder returner = new StringBuilder("<?xml version=\"1.0\" ?>");
     returner.append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\">");
     returner.append("<");
@@ -396,7 +399,7 @@ class SvgGradient extends CatchAllMultiParameterFunction {
     returner.append("Gradient id=\"gradient\" gradientUnits=\"userSpaceOnUse\" ");
     returner.append(gradientDirectionSvg);
     returner.append(">");
-    
+
     Iterator<Expression> iterator = stops.iterator();
     boolean isFirstStop = true;
     while (iterator.hasNext()) {
@@ -405,11 +408,11 @@ class SvgGradient extends CatchAllMultiParameterFunction {
         return new FaultyExpression(functionCall);
       isFirstStop = false;
     }
-    
+
     returner.append("</").append(gradientType).append("Gradient>");
     returner.append("<rect ").append(rectangleDimension).append(" fill=\"url(#gradient)\" /></svg>");
 
-    String result = useBase64? PrintUtils.base64Encode(returner.toString().getBytes()) : returner.toString();
+    String result = useBase64 ? PrintUtils.base64Encode(returner.toString().getBytes()) : returner.toString();
     return toDataUri(functionCall.getUnderlyingStructure(), result, useBase64);
   }
 
@@ -419,21 +422,21 @@ class SvgGradient extends CatchAllMultiParameterFunction {
       value.append(";base64");
     value.append(",").append(data);
 
-    CssString parameter = new CssString(token, value.toString(), "\'"); 
+    CssString parameter = new CssString(token, value.toString(), "\'");
     return new FunctionExpression(token, "url", parameter);
   }
 
   private boolean addColorStop(StringBuilder returner, Expression colorStop, boolean isFirst, boolean isLast, FunctionExpression errorNode, ProblemsHandler problemsHandler) {
-    if (colorStop.getType()==ASTCssNodeType.LIST_EXPRESSION) {
+    if (colorStop.getType() == ASTCssNodeType.LIST_EXPRESSION) {
       ListExpression list = (ListExpression) colorStop;
       List<Expression> expressions = list.getExpressions();
-      if (expressions.isEmpty() || expressions.size()>2) {
+      if (expressions.isEmpty() || expressions.size() > 2) {
         problemsHandler.errorSvgGradientArgument(errorNode);
         return false;
-      } 
-      
+      }
+
       Expression color = expressions.get(0);
-      Expression position =expressions.size()>1? expressions.get(1) : null;
+      Expression position = expressions.size() > 1 ? expressions.get(1) : null;
       addColorStop(returner, color, position, isFirst, isLast, errorNode, problemsHandler);
     } else {
       addColorStop(returner, colorStop, null, isFirst, isLast, errorNode, problemsHandler);
@@ -442,17 +445,17 @@ class SvgGradient extends CatchAllMultiParameterFunction {
   }
 
   private boolean addColorStop(StringBuilder returner, Expression colorE, Expression position, boolean isFirst, boolean isLast, FunctionExpression errorNode, ProblemsHandler problemsHandler) {
-    if (colorE.getType()!=ASTCssNodeType.COLOR_EXPRESSION) {
+    if (colorE.getType() != ASTCssNodeType.COLOR_EXPRESSION) {
       problemsHandler.errorSvgGradientArgument(errorNode);
       return false;
     }
-    if (!isLast && !isFirst && position==null) {
+    if (!isLast && !isFirst && position == null) {
       problemsHandler.errorSvgGradientArgument(errorNode);
       return false;
     }
-    
+
     ColorExpression color = (ColorExpression) colorE;
-    String  positionValue = position!=null ? toCss(position) : isFirst ? "0%" : "100%";
+    String positionValue = position != null ? toCss(position) : isFirst ? "0%" : "100%";
     returner.append("<stop offset=\"").append(positionValue);
     returner.append("\" stop-color=\"").append(color.getValueInHexadecimal());
     returner.append("\"");
@@ -465,9 +468,9 @@ class SvgGradient extends CatchAllMultiParameterFunction {
 
   private String toDirection(Expression direction) {
     String result = conversions.contentToString(direction);
-    if (result!=null)
+    if (result != null)
       return result;
-    
+
     return toCss(direction);
   }
 
@@ -481,8 +484,8 @@ class SvgGradient extends CatchAllMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     // TODO Auto-generated method stub
     return true;
-  } 
-  
+  }
+
   @Override
   protected int getMinParameters() {
     return 3;
@@ -499,4 +502,3 @@ class SvgGradient extends CatchAllMultiParameterFunction {
   }
 
 }
-
