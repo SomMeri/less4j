@@ -272,8 +272,6 @@ class DataUri extends CatchAllMultiParameterFunction {
     if (splitParameters.size() == 1) {
       CssString filenameArg = (CssString) splitParameters.get(0);
       filename = filenameArg.getValue();
-
-      mimetype = guessMimetype(filename);
     } else {
       CssString mimetypeArg = (CssString) splitParameters.get(0);
       mimetype = mimetypeArg.getValue();
@@ -284,7 +282,10 @@ class DataUri extends CatchAllMultiParameterFunction {
 
     String[] filenameParts = filename.split("#", 2);
     filename = filenameParts[0];
-    String fragments = filenameParts.length > 1 ? filenameParts[1] : "";
+    String fragments = filenameParts.length > 1 ? "#" + filenameParts[1] : "";
+
+    if (mimetype==null)
+      mimetype = guessMimetype(filename);
 
     LessSource source = token.getSource();
     try {
