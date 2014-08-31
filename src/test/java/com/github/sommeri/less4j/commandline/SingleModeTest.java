@@ -1,9 +1,14 @@
 package com.github.sommeri.less4j.commandline;
 
+import org.junit.Rule;
 import org.junit.Test;
+
+import com.github.sommeri.less4j.utils.DeleteFilesRule;
 
 public class SingleModeTest extends CommandLineTest {
   
+  @Rule
+  public DeleteFilesRule cleaner = new DeleteFilesRule();
 
   @Test
   public void oneInputFile() {
@@ -18,8 +23,8 @@ public class SingleModeTest extends CommandLineTest {
     String lessFile = inputDir+"one.less";
     String cssFile = inputDir+"oneNew.css";
     String mapFile = inputDir+"oneNew.css.map";
-    fileUtils.removeFile(cssFile);
-    fileUtils.removeFile(mapFile);
+    cleaner.ensureRemoval(cssFile);
+    cleaner.ensureRemoval(mapFile);
     CommandLine.main(new String[] {lessFile, cssFile});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
     fileUtils.assertFileNotExists(mapFile);
@@ -32,8 +37,8 @@ public class SingleModeTest extends CommandLineTest {
     String mapdataFile = inputDir+"one.mapdata";
     String cssFile = inputDir+"oneNew.css";
     String mapFile = inputDir+"oneNew.css.map";
-    fileUtils.removeFile(cssFile);
-    fileUtils.removeFile(mapFile);
+    cleaner.ensureRemoval(cssFile);
+    cleaner.ensureRemoval(mapFile);
     CommandLine.main(new String[] {lessFile, cssFile, "-sm"});
     fileUtils.assertFileContent(cssFile, correctCssWithSourceMap("one", "oneNew.css.map"));
     assertNoErrors();
@@ -59,7 +64,7 @@ public class SingleModeTest extends CommandLineTest {
   public void fileWithErrors() {
     String lessFile = inputDir+"errors.less";
     String cssFile = inputDir+"errors.css";
-    fileUtils.removeFile(cssFile);
+    cleaner.ensureRemoval(cssFile);
     CommandLine.main(new String[] {lessFile});
     assertSysout(incorrectCss());
     assertErrorsAsInFile(inputDir+"errors.err");
@@ -69,7 +74,7 @@ public class SingleModeTest extends CommandLineTest {
   public void fileWithWarnings() {
     String lessFile = inputDir+"warnings.less";
     String cssFile = inputDir+"warnings.css";
-    fileUtils.removeFile(cssFile);
+    cleaner.ensureRemoval(cssFile);
     CommandLine.main(new String[] {lessFile});
     assertSysout(warningsCss());
     assertErrorsAsInFile(inputDir+"warnings.err");
@@ -79,7 +84,7 @@ public class SingleModeTest extends CommandLineTest {
   public void fileWithErrorsAndWarnings() {
     String lessFile = inputDir+"errorsandwarnings.less";
     String cssFile = inputDir+"errorsandwarnings.css";
-    fileUtils.removeFile(cssFile);
+    cleaner.ensureRemoval(cssFile);
     CommandLine.main(new String[] {lessFile});
     assertSysout(incorrectCss());
     assertErrorsAsInFile(inputDir+"errorsandwarnings.err");
@@ -90,7 +95,7 @@ public class SingleModeTest extends CommandLineTest {
     String lessFile = inputDir+"errorsandwarnings.less";
     String cssFile = inputDir+"errorsandwarnings.css";
     String expectedCssFile = inputDir+"errorsandwarnings.expcss";
-    fileUtils.removeFile(cssFile);
+    cleaner.ensureRemoval(cssFile);
     CommandLine.main(new String[] {"-pi", lessFile});
     assertSysoutAsInFile(expectedCssFile);
     assertErrorsAsInFile(inputDir+"errorsandwarnings.err");
@@ -100,7 +105,7 @@ public class SingleModeTest extends CommandLineTest {
   public void compressCss() {
     String lessFile = inputDir+"one.less";
     String cssFile = inputDir+"oneNew.css";
-    fileUtils.removeFile(cssFile);
+    cleaner.ensureRemoval(cssFile);
     CommandLine.main(new String[] {lessFile, cssFile, "-x"});
     fileUtils.assertFileContent(cssFile, correctCompressedCss("one"));
     assertNoErrors();

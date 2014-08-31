@@ -1,8 +1,14 @@
 package com.github.sommeri.less4j.commandline;
 
+import org.junit.Rule;
 import org.junit.Test;
 
+import com.github.sommeri.less4j.utils.DeleteFilesRule;
+
 public class MultiModeTest extends CommandLineTest {
+
+  @Rule
+  public DeleteFilesRule cleaner = new DeleteFilesRule();
 
   @Test
   public void noInputFile() {
@@ -15,7 +21,7 @@ public class MultiModeTest extends CommandLineTest {
     String lessFile = inputDir+"one.less";
     String cssFile = inputDir+"one.css";
     String mapFile = inputDir+"one.css.map";
-    fileUtils.removeFiles(cssFile, mapFile);
+    cleaner.ensureRemoval(cssFile, mapFile);
     CommandLine.main(new String[] {"-m", lessFile});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
     fileUtils.assertFileNotExists(mapFile);
@@ -35,7 +41,7 @@ public class MultiModeTest extends CommandLineTest {
     String multiMapFile3 = inputDir+"multi3.map";
     String wrongFile = inputDir+"doesNotExists.less";
 
-    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiCssFile3, multiMapFile1, multiMapFile2, multiMapFile3);
+    cleaner.ensureRemoval(multiCssFile1, multiCssFile2, multiCssFile3, multiMapFile1, multiMapFile2, multiMapFile3);
     CommandLine.main(new String[] {"-m", multiLessFile1, wrongFile, multiLessFile2, multiLessFile3});
     fileUtils.assertFileContent(multiCssFile1, correctCss("multi1"));
     fileUtils.assertFileNotExists(multiMapFile1);
@@ -59,7 +65,7 @@ public class MultiModeTest extends CommandLineTest {
     String mapdataFile2 = inputDir+"multi2.mapdata";
 
 
-    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiMapFile1, multiMapFile2);
+    cleaner.ensureRemoval(multiCssFile1, multiCssFile2, multiMapFile1, multiMapFile2);
     CommandLine.main(new String[] {"-m", "--sourceMap", multiLessFile1, multiLessFile2});
     fileUtils.assertFileContent(multiCssFile1, correctCssWithSourceMap("multi1", "multi1.css.map"));
     validateSourceMap(mapdataFile1, multiCssFile1, multiMapFile1);
@@ -83,7 +89,7 @@ public class MultiModeTest extends CommandLineTest {
   }
 
   private void customOutputTest(String customOutputDir, String multiLessFile1, String multiCssFile1, String multiLessFile2, String multiCssFile2, String multiLessFile3, String multiCssFile3, String wrongFile) {
-    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiCssFile3);
+    cleaner.ensureRemoval(multiCssFile1, multiCssFile2, multiCssFile3);
     CommandLine.main(new String[] {"-m", "-o", customOutputDir, multiLessFile1, wrongFile, multiLessFile2, multiLessFile3});
     fileUtils.assertFileContent(multiCssFile1, correctCss("multi1"));
     fileUtils.assertFileContent(multiCssFile2, correctCss("multi2"));
@@ -98,7 +104,7 @@ public class MultiModeTest extends CommandLineTest {
     String lessFile = inputDir+"one.less";
     String cssFile = newDir+"one.css";
     String mapFile = newDir+"one.map";
-    fileUtils.removeFile(newDir);
+    cleaner.ensureRemoval(newDir);
     CommandLine.main(new String[] {"--multiMode", "--outputDir", newDir, lessFile});
     fileUtils.assertFileContent(cssFile, correctCss("one"));
     fileUtils.assertFileNotExists(mapFile);
@@ -117,7 +123,7 @@ public class MultiModeTest extends CommandLineTest {
     String multiCssFile3 = inputDir+"errorsandwarnings.css";
     String multiErrFile3 = inputDir+"errorsandwarnings.err";
 
-    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiCssFile3);
+    cleaner.ensureRemoval(multiCssFile1, multiCssFile2, multiCssFile3);
     CommandLine.main(new String[] {"-m", multiLessFile1, multiLessFile2, multiLessFile3});
     fileUtils.assertFileNotExists(multiCssFile1);
     fileUtils.assertFileContent(multiCssFile2, warningsCss());
@@ -139,7 +145,7 @@ public class MultiModeTest extends CommandLineTest {
     String multiErrFile3 = inputDir+"errorsandwarnings.err";
     String multiExpectedCssFile3 = inputDir+"errorsandwarnings.expcss";
 
-    fileUtils.removeFiles(multiCssFile1, multiCssFile2, multiCssFile3);
+    cleaner.ensureRemoval(multiCssFile1, multiCssFile2, multiCssFile3);
     CommandLine.main(new String[] {"-m", "-pi", multiLessFile1, multiLessFile2, multiLessFile3});
     fileUtils.assertSameFileContent(multiExpectedCssFile1, multiCssFile1);
     fileUtils.assertFileContent(multiCssFile2, warningsCss());

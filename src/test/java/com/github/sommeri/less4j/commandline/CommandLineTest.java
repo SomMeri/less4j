@@ -20,7 +20,6 @@ import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 public abstract class CommandLineTest {
 
-
   protected static final String FILE_DOES_NOT_EXISTS = "Errors produced by compilation of src/test/resources/command-line/doesNotExists.less\nERROR The file " + DebugAndTestPrint.slashToplatformFileSeparator("src/test/resources/command-line/doesNotExists.less")+" does not exists.\nCould not compile the file src/test/resources/command-line/doesNotExists.less\n";
 
   protected static final String inputDir = "src/test/resources/command-line/";
