@@ -87,7 +87,8 @@ public class HiddenTokenAwareErrorTree extends HiddenTokenAwareTree {
     errorNode.setUnknownTokenBoundaries();
   }
 
-  public void addChildren(@SuppressWarnings("rawtypes") List kids) {
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public void addChildren(List kids) {
     errorNode.addChildren(kids);
   }
 
@@ -174,7 +175,7 @@ public class HiddenTokenAwareErrorTree extends HiddenTokenAwareTree {
     errorNode.sanityCheckParentAndChildIndexes();
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public List getAncestors() {
     return errorNode.getAncestors();
   }
