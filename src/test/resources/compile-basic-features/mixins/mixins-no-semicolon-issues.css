@@ -4,3 +4,6 @@
 .max2 {
   width: 8;
 }
+.namespace-call {
+  arguments: 1 2 3;
+}

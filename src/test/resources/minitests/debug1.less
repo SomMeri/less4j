@@ -1,26 +1,11 @@
-* {
-  background-size: 100% 100%;
-  height: 50px;
-}
+#gradient {
+	.vertical(...) {
+	  wtf: wtf;
+	}
+} 
 
-.to-bottom {
-  background-image: svg-gradient(to bottom, red, black);
-}
-.to-right {
-  background-image: svg-gradient(to right, white, black 30%, white);
-}
-.to-bottom-right {
-  background-image: svg-gradient(~"to bottom right", white, blue 50%, black);
-}
-.to-top-right {
-  background-image: svg-gradient(to top right, white, black 30%);
-}
-.ellipse {
-  background-image: svg-gradient(ellipse, white, black 30%, white 60%, black 90%, white);
-}
-.ellipse-at-center {
-  background-image: svg-gradient(ellipse at center, white, red 50%);
-}
-.ellipse-at-center-2 {
-  background-image: svg-gradient(ellipse at center, white, red);
+// Give the progress background some depth
+.progress {
+  @progress-bg: value;
+  #gradient > .vertical(@start-color: darken(@progress-bg, 4%); @end-color: @progress-bg);
 }

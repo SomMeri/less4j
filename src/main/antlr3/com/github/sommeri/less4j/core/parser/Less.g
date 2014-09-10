@@ -664,7 +664,7 @@ referenceSeparator:
 namespaceReference
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
     : ((reusableStructureName referenceSeparator)=> a+=reusableStructureName referenceSeparator)+
-      c+=mixinReferenceWithSemi -> ^(NAMESPACE_REFERENCE $a* $c);
+      c+=mixinReference -> ^(NAMESPACE_REFERENCE $a* $c);
 finally { leaveRule(); }
 
 namespaceReferenceWithSemi

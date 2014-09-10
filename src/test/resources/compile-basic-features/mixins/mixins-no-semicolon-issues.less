@@ -1,0 +1,21 @@
+//issue 32
+.max (@a, @b) when (@a > @b) {
+  width: @a;
+}
+.max (@a, @b) when (@a < @b) {
+  width: @b;
+}
+
+.max1 { .max(3, 6) }
+.max2 { .max(8, 1) }
+
+//issue 228
+#namespace {
+  .mixin(...) {
+    arguments: @arguments;
+  }
+}
+
+.namespace-call {
+  #namespace > .mixin(1; 2; 3)
+}
