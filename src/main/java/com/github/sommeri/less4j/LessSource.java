@@ -241,8 +241,12 @@ public abstract class LessSource {
     }
     
     public FileSource(FileSource parent, String filename, String charsetName) {
+      this(parent, new File(parent.getInputFile().getParentFile(), filename), charsetName);
+    }
+
+    public FileSource(FileSource parent, File inputFile, String charsetName) {
       super(parent);
-      this.inputFile = new File(parent.inputFile.getParentFile(), filename);
+      this.inputFile = inputFile;
       this.charsetName = charsetName;
       parent.addImportedSource(this);
     }
@@ -250,7 +254,7 @@ public abstract class LessSource {
     @Override
     public URI getURI() {
       try {
-        String path = inputFile.toString();
+        String path = getInputFile().toString();
         path = URIUtils.convertPlatformSeparatorToUri(path);
         return new URI(path);
       } catch (URISyntaxException e) {
@@ -260,7 +264,7 @@ public abstract class LessSource {
 
     @Override
     public String getName() {
-      return inputFile.getName();
+      return getInputFile().getName();
     }
 
     @Override
@@ -268,13 +272,13 @@ public abstract class LessSource {
       try {
         Reader input;
         if (charsetName != null) {
-          input = new InputStreamReader(new FileInputStream(inputFile), charsetName);
+          input = new InputStreamReader(new FileInputStream(getInputFile()), charsetName);
         } else {
-          input = new FileReader(inputFile);
+          input = new FileReader(getInputFile());
         }
         try {
           String content = IOUtils.toString(input).replace("\r\n", "\n");
-          setLastModified(inputFile.lastModified());
+          setLastModified(getInputFile().lastModified());
           return content;
         } finally {
           input.close();
@@ -289,8 +293,8 @@ public abstract class LessSource {
     @Override
     public byte[] getBytes() throws FileNotFound, CannotReadFile {
       try {
-        byte[] content = FileUtils.readFileToByteArray(inputFile);
-        setLastModified(inputFile.lastModified());
+        byte[] content = FileUtils.readFileToByteArray(getInputFile());
+        setLastModified(getInputFile().lastModified());
         return content;
       } catch (FileNotFoundException ex) {
         throw new FileNotFound();
@@ -309,7 +313,7 @@ public abstract class LessSource {
     }
 
     public String toString() {
-      return inputFile.toString();
+      return getInputFile().toString();
     }
 
     @Override
@@ -324,9 +328,9 @@ public abstract class LessSource {
 
     private File getCanonicalFile() {
       try {
-        return inputFile.getCanonicalFile();
+        return getInputFile().getCanonicalFile();
       } catch (IOException e) {
-        return inputFile.getAbsoluteFile();
+        return getInputFile().getAbsoluteFile();
       }
     }
 
@@ -341,9 +345,9 @@ public abstract class LessSource {
       FileSource other = (FileSource) obj;
       File absoluteInputFile = getCanonicalFile();
       if (absoluteInputFile == null) {
-        if (other.inputFile != null)
+        if (other.getInputFile() != null)
           return false;
-      } else if (!absoluteInputFile.equals(other.inputFile.getAbsoluteFile()))
+      } else if (!absoluteInputFile.equals(other.getInputFile().getAbsoluteFile()))
         return false;
       if (charsetName == null) {
         if (other.charsetName != null)

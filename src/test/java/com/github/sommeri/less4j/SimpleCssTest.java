@@ -3,7 +3,10 @@ package com.github.sommeri.less4j;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
@@ -13,6 +16,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.LessSource.FileSource;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -100,11 +104,69 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 //    return actual;
 //  }
 
-  @Override
+//  @Override
+//  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
+//    CompilationResult result = super.compile(lessFile, cssOutput);
+//    System.out.println(result.getSourceMap());
+//    return result;
+//  }
+
   protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
-    CompilationResult result = super.compile(lessFile, cssOutput);
-    System.out.println(result.getSourceMap());
-    return result;
+    LessCompiler compiler = getCompiler();
+    Configuration configuration = createConfiguration(cssOutput);
+    
+    CompilationResult actual = compiler.compile(new CustomLessSource(Arrays.asList("c:/data"), lessFile), configuration);
+    return actual;
+  }
+  
+  public static class CustomLessSource extends LessSource.FileSource {
+
+    private final List<String> searchPaths;
+
+    public CustomLessSource(List<String> searchPaths, File inputFile) {
+      super(inputFile);
+      this.searchPaths = searchPaths;
+    }
+    
+    public CustomLessSource(List<String> searchPaths, File inputFile, String charsetName) {
+      super(inputFile, charsetName);
+      this.searchPaths = searchPaths;
+    }
+
+    public CustomLessSource(List<String> searchPaths, FileSource parent, String filename, String charsetName) {
+      super(parent, filename, charsetName);
+      this.searchPaths = searchPaths;
+    }
+
+    public CustomLessSource(List<String> searchPaths, FileSource parent, File inputFile, String charsetName) {
+      super(parent, inputFile, charsetName);
+      this.searchPaths = searchPaths;
+    }
+
+    /**
+     * 
+     * @param filename
+     * @return
+     */
+    protected File createRelativeFile(String filename) {
+      File thisFile = getInputFile();
+      if (thisFile==null)
+        return null;
+      
+      File thisDirectory = thisFile.getParentFile();
+      File inputFile = new File(thisDirectory, filename);
+      Iterator<String> cpIterator = searchPaths.iterator();
+      while (!inputFile.exists() && cpIterator.hasNext()) {
+        inputFile = new File(cpIterator.next(), filename);
+      }
+      
+      return inputFile;
+    }
+    
+    @Override
+    public FileSource relativeSource(String filename) {
+      return new CustomLessSource(searchPaths, this, createRelativeFile(filename), null);
+    }
   }
 
   @Override
