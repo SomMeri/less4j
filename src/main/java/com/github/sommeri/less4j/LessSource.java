@@ -305,7 +305,7 @@ public abstract class LessSource {
 
     @Override
     public FileSource relativeSource(String filename) {
-      return new FileSource(this, filename);
+      return new FileSource(this, filename, charsetName);
     }
 
     public File getInputFile() {
