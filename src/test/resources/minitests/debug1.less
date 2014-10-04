@@ -1,13 +1,5 @@
-#gradient {
-	.vertical(...) {
-	  wtf: wtf;
-	}
-} 
-
-// Give the progress background some depth
-.progress {
-  @progress-bg: value;
-  #gradient > .vertical(@start-color: darken(@progress-bg, 4%); @end-color: @progress-bg);
+@counter-style triangle {
+  system: cyclic;
+  symbols:  ‣;
+  suffix: " ";
 }
-
-@import "vymaz-ma.less";

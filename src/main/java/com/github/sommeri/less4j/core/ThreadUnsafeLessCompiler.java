@@ -46,7 +46,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(File lessFile, Configuration options) throws Less4jException {
-    return compile(new LessSource.FileSource(lessFile), options);
+    return compile(new LessSource.FileSource(lessFile, "utf-8"), options);
   }
 
   @Override

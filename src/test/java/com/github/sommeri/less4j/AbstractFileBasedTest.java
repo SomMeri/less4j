@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
@@ -120,7 +122,7 @@ public abstract class AbstractFileBasedTest {
 
   protected String readFile(File file) {
     try {
-      return IOUtils.toString(new FileReader(file));
+      return IOUtils.toString(new InputStreamReader(new FileInputStream(file), "utf-8"));
     } catch (Throwable ex) {
       throw new RuntimeException(ex.getMessage(), ex);
     }

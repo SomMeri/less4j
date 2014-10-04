@@ -1,14 +1,12 @@
 package com.github.sommeri.less4j;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -16,7 +14,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
-import com.github.sommeri.less4j.LessSource.FileSource;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -115,7 +112,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     LessCompiler compiler = getCompiler();
     Configuration configuration = createConfiguration(cssOutput);
     
-    CompilationResult actual = compiler.compile(new CustomLessSource(Arrays.asList("c:/data"), lessFile), configuration);
+    CompilationResult actual = compiler.compile(new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8"), configuration);
     return actual;
   }
   

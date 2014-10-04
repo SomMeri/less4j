@@ -5,9 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collection;
@@ -126,7 +127,7 @@ public class SourceMapValidator {
       return new Mapdata();
 
     try {
-      JSONTokener tokener = new JSONTokener(new FileReader(mapdataFile));
+      JSONTokener tokener = new JSONTokener(new InputStreamReader(new FileInputStream(mapdataFile), "utf-8"));
       JSONObject mapdata = new JSONObject(tokener);
 
       List<String> expectedSources = JSONUtils.getStringList(mapdata, SOURCES_PROPERTY);
@@ -168,7 +169,7 @@ public class SourceMapValidator {
       return contents.get(name);
 
     File file = new File(root + URLDecoder.decode(name, "utf-8"));
-    String content = IOUtils.toString(new FileReader(file));
+    String content = IOUtils.toString(new InputStreamReader(new FileInputStream(file), "utf-8"));
     return content;
   }
 
