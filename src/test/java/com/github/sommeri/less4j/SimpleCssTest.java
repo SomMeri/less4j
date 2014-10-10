@@ -14,6 +14,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -21,7 +22,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
  * from the master branch.
  * 
  */
-@Ignore
+//@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
@@ -112,7 +113,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     LessCompiler compiler = getCompiler();
     Configuration configuration = createConfiguration(cssOutput);
     
-    CompilationResult actual = compiler.compile(new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8"), configuration);
+    CustomLessSource source = new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8");
+    CompilationResult actual = compiler.compile(source, configuration);
     return actual;
   }
   

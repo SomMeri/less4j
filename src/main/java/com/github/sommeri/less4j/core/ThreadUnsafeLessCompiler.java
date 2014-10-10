@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.GeneralProblem;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
