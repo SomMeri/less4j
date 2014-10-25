@@ -55,9 +55,12 @@ public class TermBuilder {
 
   private Expression buildFromTerm(HiddenTokenAwareTree token, HiddenTokenAwareTree offsetChild, int offsetChildIndx) {
     switch (offsetChild.getType()) {
+    case LessLexer.IDENT_TERM:
+      return buildFromLongIdentifier(token, offsetChild);
+      
     case LessLexer.IDENT:
     case LessLexer.PERCENT:
-      return buildFromIdentifier(token, offsetChild);
+      return buildFromPercent(token, offsetChild);
 
     case LessLexer.STRING:
       return buildFromString(token, offsetChild);
@@ -239,8 +242,20 @@ public class TermBuilder {
     return new FunctionExpression(token, "`", new EmbeddedScript(token, text));
   }
 
-  private Expression buildFromIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
+  private Expression buildFromPercent(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
     String text = first.getText();
+    return createIdentifierExpression(parent, text);
+  }
+
+  private Expression buildFromLongIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
+    StringBuilder text = new StringBuilder();
+    for (HiddenTokenAwareTree child : first.getChildren()) {
+      text.append(child.getText());
+    }
+    return createIdentifierExpression(parent, text.toString());
+  }
+
+  private Expression createIdentifierExpression(HiddenTokenAwareTree parent, String text) {
     if (NamedColorExpression.isColorName(text))
       return new NamedColorExpression(parent, text);
 

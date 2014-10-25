@@ -1,0 +1,7 @@
+identifier {
+  padding: value;
+}
+.complicated {
+  in-variable: $a.a b.$b;
+  direct: $a.a c-c;
+}

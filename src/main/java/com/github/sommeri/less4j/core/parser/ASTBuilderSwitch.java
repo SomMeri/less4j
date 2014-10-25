@@ -24,6 +24,7 @@ import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
+import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.Extend;
@@ -862,7 +863,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       token.addBeforeFollowing(semi.getFollowing());
     }
 
-    return new VariableDeclaration(token, new Variable(name, name.getText()), (Expression) switchOn(expression));
+    Variable variable = new Variable(name, name.getText());
+    Expression value = variableValue(token, expression);
+    return new VariableDeclaration(token, variable, value);
+  }
+
+  private Expression variableValue(HiddenTokenAwareTree underlyingIfEmpty, HiddenTokenAwareTree expression) {
+    if (expression.getType()==LessLexer.SEMI) {
+      return new EmptyExpression(underlyingIfEmpty);
+    } 
+    
+    return (Expression) switchOn(expression);
   }
 
   // FIXME: fail on wrong distribution of arguments (e.g. collector must be

@@ -27,6 +27,7 @@ public abstract class SuperLessParser extends Parser {
   static {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("STRING", "string");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("SEMI", ";");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DOLLAR", "$");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IMPORT_SYM", "@import");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("URI", "url(...)");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("COMMA", ",");
@@ -125,7 +126,7 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("DETACHED_RULESET_REFERENCE", "detached ruleset call");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNKNOWN_AT_RULE", "unknown at-rule");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNKNOWN_AT_RULE_NAMES_SET", "unknown at-rule");
-
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IDENT_TERM", "identifier");
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";

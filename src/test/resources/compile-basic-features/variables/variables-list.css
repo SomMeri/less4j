@@ -1,4 +1,5 @@
 .ja {
-  something: 12 23;
-  something: 12, 23 78;
+  something-1: 12 23;
+  something-2: 12, 23 78;
+  empty: ;
 }

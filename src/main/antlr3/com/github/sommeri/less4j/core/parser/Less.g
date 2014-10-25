@@ -51,6 +51,7 @@ tokens {
   EMPTY_SEPARATOR;
   ELEMENT_NAME;
   CSS_CLASS;
+  IDENT_TERM;
   NTH;
   EXTEND_IN_DECLARATION;
   PSEUDO;
@@ -355,7 +356,7 @@ top_level_element
 
 variabledeclaration
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : AT_NAME COLON (a+=expr) SEMI -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* SEMI)
+    : AT_NAME COLON (a+=expr)? SEMI -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* SEMI)
     ;
 finally { leaveRule(); }
 
@@ -870,10 +871,14 @@ value_term
 
 unsigned_value_term
     : STRING
-    | IDENT
     | UNICODE_RANGE
     | PERCENT
+    | identifierValueTerm
     ;
+    
+identifierValueTerm
+    : a+=IDENT ({predicates.directlyFollows(input) && predicates.notSemi(input)}?=> (a+=DOT | a+=HASH | a+=IDENT))* -> ^(IDENT_TERM $a*);
+// /*({predicates.directlyFollows(input)}?=> (a+=DOT | a+=HASH | a+=IDENT))* */
 
 special_function
     : URI | URL_PREFIX | DOMAIN 
@@ -962,14 +967,14 @@ fragment UNICODE : '\\' HEXCHAR
                                 
 fragment ESCAPE : UNICODE | '\\' ~('\r'|'\n'|'\f'|HEXCHAR) ;
 
-fragment NMSTART :  UNDERSCORE
+fragment NMSTART :  UNDERSCORE | DOLLAR
                         | 'a'..'z'
                         | 'A'..'Z'
                         | NONASCII
                         | ESCAPE
                         ;
 
-fragment NMCHAR : UNDERSCORE
+fragment NMCHAR : UNDERSCORE | DOLLAR
                         | 'a'..'z'
                         | 'A'..'Z'
                         | '0'..'9'
@@ -984,7 +989,7 @@ fragment UNKNOWN_DIMENSION : NMSTART NMCHAR* ;
 // The original URL did not allowed characters, '.', '=', ':', ';', ',' and so on
 // I added those characters that appear in less.js css test case.
 fragment URL : (
-                              '['|'!'|'#'|'$'|'%'|'&'|'*'|'~'|'/'|'.'|'='|':'|';'|','|'\r'|'\n'|'\t'|' '|'+'|'?'
+                              '['|'!'|'#'|'%'|'&'|'*'|'~'|'/'|'.'|'='|':'|';'|','|'\r'|'\n'|'\t'|' '|'+'|'?'
                             | NMCHAR | '@{'NAME'}'
                           )*
                         ;
@@ -1258,6 +1263,7 @@ HASH_SYMBOL: '#';
 DOT : '.' ;
 DOT3 : '...' ;
 UNDERSCORE: '_';
+DOLLAR: '$';
 //TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
 fragment APPENDER_FRAGMENT: '&';
 fragment MEANINGFULL_WHITESPACE: ;

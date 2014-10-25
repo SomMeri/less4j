@@ -97,23 +97,38 @@ public class ParsersSemanticPredicates {
    * @return <code>true</code> if it is possible for a function to start with these two tokens.
    */
   public boolean onFunctionStart(TokenStream input) {
-    return isFunctionStart(input.LT(1), input.LT(2));
+    return isFunctionStart(input, 1);
   }
 
-  private boolean isFunctionStart(Token first, Token second) {
-    if (first == null || second == null)
+  //identifier contains either:
+  // * simple function name and is followed by a parenthesis (e.g. "name()")
+  // * composed function name (e.g. "name:something.else ... " and is followed by a parenthesis)
+  //there must be no space between function name and parenthesis with arguments
+  private boolean isFunctionStart(TokenStream input, int indx) {
+    Token first =input.LT(indx);
+    if (first == null)
       return false;
-
-    //identifier contains either:
-    // * simple function name and is followed by a parenthesis (e.g. "name()")
-    // * composed function name (e.g. "name:something ... ")
+    
     int ft = first.getType();
-    int st = second.getType();
-    if (!(ft == LessParser.IDENT || ft == LessParser.PERCENT) || !(st == LessParser.LPAREN || st == LessParser.COLON || st == LessParser.DOT))
+    if (!(ft == LessParser.IDENT || ft == LessParser.PERCENT))
       return false;
 
-    //there must be no space between function name and parenthesis with arguments
-    return directlyFollows(first, second);
+    Token previous = first;
+    Token next = input.LT(++indx);
+    
+    while (next!=null && directlyFollows(previous, next)) {
+      int nt = next.getType();
+      if (nt==LessParser.LPAREN)
+        return true;
+      
+      if (!(nt == LessParser.IDENT || nt == LessParser.PERCENT || nt == LessParser.COLON || nt == LessParser.DOT))
+        return false;
+      
+      previous = next;
+      next = input.LT(++indx);
+    }
+
+    return false;
   }
 
   /**
@@ -170,6 +185,21 @@ public class ParsersSemanticPredicates {
 
   public boolean directlyFollows(TokenStream input) {
     return directlyFollows(input.LT(-1), input.LT(1));
+  }
+
+  public boolean notSemi(TokenStream input) {
+    return notSemi(input.LT(1));
+  }
+
+  public boolean notSemi(Token token) {
+    return !isSemi(token);
+  }
+
+  private boolean isSemi(Token token) {
+    if (token == null || !(token instanceof CommonToken) || token.getType() != LessParser.SEMI)
+      return false;
+
+    return true;
   }
 
   public boolean directlyFollows(Token first, Token second) {
