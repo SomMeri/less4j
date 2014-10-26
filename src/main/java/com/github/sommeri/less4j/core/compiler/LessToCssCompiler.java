@@ -48,6 +48,7 @@ public class LessToCssCompiler {
     solveExtends(less);
 
     finalMediaMergingAndBubbling(less);
+    // TODO the following line is probably useless now, investigate (removal is now part of freeNestedRulesetsAndMedia step)
     removeUselessLessElements(less);
     removeEmptyRulesetsAndMedia(less);
     mergeMergingProperties(less);
