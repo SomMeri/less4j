@@ -29,18 +29,22 @@ public class UselessLessElementsRemover {
     }
   }
 
-  private void removeFrom(RuleSet ruleSet) {
+  public void removeFrom(RuleSet ruleSet) {
     List<Selector> selectors = ruleSet.getSelectors();
     for (Selector selector : selectors) {
       removeFrom(selector, ruleSet);
     }
   }
 
-  private void removeFrom(Selector selector, RuleSet parentRuleSet) {
+  public void removeFrom(Selector selector, RuleSet parentRuleSet) {
     selector = replaceLeadingAppendersByEmptiness(selector, parentRuleSet);
     if (!selector.containsAppender())
       return ;
     
+    replaceMiddleAppendersByEmptiness(selector, parentRuleSet);
+  }
+
+  private void replaceMiddleAppendersByEmptiness(Selector selector, RuleSet parentRuleSet) {
     SelectorsManipulator manipulator= new SelectorsManipulator();
     Selector empty = new Selector(selector.getUnderlyingStructure(), createEmptySimpleSelector(selector));
     List<Selector> replaceAppenders = manipulator.replaceAppenders(selector, Arrays.asList(empty));

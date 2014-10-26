@@ -26,13 +26,15 @@ import com.github.sommeri.less4j.core.problems.BugHappened;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-  private static final String inputLess = "src/test/resources/minitests/debug1.less";
+//  private static final String inputLess = "src/test/resources/minitests/debug1.less";
   //private static final String inputLess = "c:/data/meri/less4java/srot/sample.less";
   //private static final String inputLess = "src/test/resources/minitests/javascript.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
   private static final String mapdata = "src/test/resources/minitests/debug1.mapdata";
 
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.2//bootstrap-3.0.2//less//theme.less";
+//private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//less//bootstrap.less";
+private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//flamingo-m.less";
 
   //private static final String inputLess = "src/test/resources/minitests/bootstrap-debug.less";
   //private static final String inputLess = "src/test/resources/minitests/bootstrap-debug-2.less";

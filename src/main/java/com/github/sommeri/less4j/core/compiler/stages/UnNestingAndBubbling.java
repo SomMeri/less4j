@@ -12,12 +12,13 @@ import com.github.sommeri.less4j.core.ast.Page;
 import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
+import com.github.sommeri.less4j.core.compiler.selectors.UselessLessElementsRemover;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class UnNestingAndBubbling {
 
-  private final ASTManipulator astManipulator = new ASTManipulator();
   private final ASTManipulator manipulator = new ASTManipulator();
+  private final UselessLessElementsRemover uselessLessElementsRemover = new UselessLessElementsRemover();
 
   public void unnestRulesetAndMedia(Body generalBody) {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(generalBody.getChilds());
@@ -25,7 +26,8 @@ public class UnNestingAndBubbling {
       switch (kid.getType()) {
       case RULE_SET: {
         List<ASTCssNode> nestedRulesets = collectNestedRuleSets((RuleSet) kid);
-        astManipulator.addIntoBody(nestedRulesets, kid);
+        manipulator.addIntoBody(nestedRulesets, kid);
+        uselessLessElementsRemover.removeFrom((RuleSet)kid);
         break;
       }
       case MEDIA: {
