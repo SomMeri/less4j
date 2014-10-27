@@ -4,56 +4,71 @@ import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.ColorExpression.ColorWithAlphaExpression;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
-import com.github.sommeri.less4j.core.ast.SelectorCombinator.Combinator;
+import com.github.sommeri.less4j.core.ast.SelectorCombinator.CombinatorType;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
 public class ConversionUtils {
 
   public static SelectorCombinator createSelectorCombinator(HiddenTokenAwareTree token) {
-    Combinator combinator = safeToSelectorCombinator(token);
+    CombinatorType combinator = safeToSelectorCombinator(token);
     if (combinator == null)
       throw new IllegalStateException("Unknown: " + token.getType() + " " + PrintUtils.toName(token.getType()));
 
-    return new SelectorCombinator(token, combinator);
+    String symbol = extractSymbol(token, combinator);
+    return new SelectorCombinator(token, combinator, symbol);
+  }
+
+  private static String extractSymbol(HiddenTokenAwareTree token, CombinatorType combinator) {
+    if (combinator != CombinatorType.NAMED)
+      return token.getText();
+    
+    StringBuilder symbol = new StringBuilder();
+    for (HiddenTokenAwareTree child : token.getChildren()) {
+      symbol.append(child.getText());
+    }
+    
+    return symbol.toString();
   }
 
   public static boolean isSelectorCombinator(HiddenTokenAwareTree token) {
     return null != safeToSelectorCombinator(token);
   }
 
-  private static SelectorCombinator.Combinator safeToSelectorCombinator(HiddenTokenAwareTree token) {
+  private static SelectorCombinator.CombinatorType safeToSelectorCombinator(HiddenTokenAwareTree token) {
     switch (token.getType()) {
     case LessLexer.PLUS:
-      return SelectorCombinator.Combinator.ADJACENT_SIBLING;
+      return SelectorCombinator.CombinatorType.ADJACENT_SIBLING;
     case LessLexer.GREATER:
-      return SelectorCombinator.Combinator.CHILD;
+      return SelectorCombinator.CombinatorType.CHILD;
     case LessLexer.TILDE:
-      return SelectorCombinator.Combinator.GENERAL_SIBLING;
+      return SelectorCombinator.CombinatorType.GENERAL_SIBLING;
     case LessLexer.EMPTY_COMBINATOR:
-      return SelectorCombinator.Combinator.DESCENDANT;
+      return SelectorCombinator.CombinatorType.DESCENDANT;
     case LessLexer.HAT:
-      return SelectorCombinator.Combinator.HAT;
+      return SelectorCombinator.CombinatorType.HAT;
     case LessLexer.CAT:
-      return SelectorCombinator.Combinator.CAT;
+      return SelectorCombinator.CombinatorType.CAT;
+    case LessLexer.NAMED_COMBINATOR:
+      return SelectorCombinator.CombinatorType.NAMED;
     default:
       return null;
     }
   }
 
   public static ColorExpression parseColor(HiddenTokenAwareTree token, String string) {
-    if (string==null)
+    if (string == null)
       return null;
-    
+
     if (NamedColorExpression.isColorName(string))
       return new NamedColorExpression(token, string);
 
     double red = decodeColorPart(string, 0);
     double green = decodeColorPart(string, 1);
     double blue = decodeColorPart(string, 2);
-    
+
     if (Double.isNaN(red) || Double.isNaN(green) || Double.isNaN(blue))
       return null;
-    
+
     double alpha = decodeColorPart(string, 3);
     if (!Double.isNaN(alpha))
       return new ColorWithAlphaExpression(token, string, red, green, blue, alpha);

@@ -12,7 +12,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
-import com.github.sommeri.less4j.core.ast.SelectorCombinator.Combinator;
+import com.github.sommeri.less4j.core.ast.SelectorCombinator.CombinatorType;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.SupportedLessBodyMembers;
@@ -56,7 +56,7 @@ public class AstLogic {
   }
 
   public static boolean hasNonSpaceCombinator(SimpleSelector selector) {
-    return selector.hasLeadingCombinator() && selector.getLeadingCombinator().getCombinator()!=Combinator.DESCENDANT;
+    return selector.hasLeadingCombinator() && selector.getLeadingCombinator().getCombinatorType()!=CombinatorType.DESCENDANT;
   }
 
   public static boolean isQuotelessUrlFunction(ASTCssNode kid) {

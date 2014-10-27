@@ -8,23 +8,33 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class SelectorCombinator extends ASTCssNode implements Cloneable {
 
-  private Combinator combinator;
+  private CombinatorType combinator;
+  private String symbol;
 
   public SelectorCombinator(HiddenTokenAwareTree underlyingStructure) {
-    this(underlyingStructure, Combinator.DESCENDANT);
+    this(underlyingStructure, CombinatorType.DESCENDANT, CombinatorType.DESCENDANT.getDefaultSymbol());
   }
 
-  public SelectorCombinator(HiddenTokenAwareTree underlyingStructure, Combinator combinator) {
+  public SelectorCombinator(HiddenTokenAwareTree underlyingStructure, CombinatorType combinator, String symbol) {
     super(underlyingStructure);
     this.combinator = combinator;
+    this.symbol = symbol;
   }
 
-  public Combinator getCombinator() {
+  public CombinatorType getCombinatorType() {
     return combinator;
   }
 
-  public void setCombinator(Combinator combinator) {
+  public void setCombinator(CombinatorType combinator) {
     this.combinator = combinator;
+  }
+
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public void setSymbol(String symbol) {
+    this.symbol = symbol;
   }
 
   @Override
@@ -38,16 +48,16 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
     return Collections.emptyList();
   }
 
-  public enum Combinator {
-    ADJACENT_SIBLING("+"), CHILD(">"), DESCENDANT("' '"), GENERAL_SIBLING("~"), HAT("^"), CAT("^^");
+  public enum CombinatorType {
+    ADJACENT_SIBLING("+"), CHILD(">"), DESCENDANT("' '"), GENERAL_SIBLING("~"), HAT("^"), CAT("^^"), NAMED(null);
     
     private final String symbol;
 
-    private Combinator(String symbol) {
+    private CombinatorType(String symbol) {
       this.symbol = symbol;
     }
 
-    public String getSymbol() {
+    private String getDefaultSymbol() {
       return symbol;
     }
   }
@@ -59,7 +69,7 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
 
   @Override
   public String toString() {
-    return "" + combinator.getSymbol();
+    return symbol;
   }
   
 }

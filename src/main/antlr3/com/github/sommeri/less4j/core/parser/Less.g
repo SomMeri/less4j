@@ -96,6 +96,7 @@ tokens {
   INTERPOLABLE_NAME;
   UNKNOWN_AT_RULE;
   UNKNOWN_AT_RULE_NAMES_SET;
+  NAMED_COMBINATOR;
 }
 
 @lexer::header {
@@ -425,6 +426,7 @@ combinator
     | TILDE
     | HAT
     | CAT
+    | (a+=SOLIDUS a+=IDENT a+=SOLIDUS -> ^(NAMED_COMBINATOR $a*))
     | ({predicates.onEmptyCombinator(input)}?)=> -> EMPTY_COMBINATOR
     ;
     

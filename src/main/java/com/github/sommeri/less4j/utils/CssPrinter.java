@@ -1022,14 +1022,14 @@ public class CssPrinter {
   }
 
   public boolean appendSelectorCombinator(SelectorCombinator combinator) {
-    SelectorCombinator.Combinator realCombinator = combinator.getCombinator();
+    SelectorCombinator.CombinatorType realCombinator = combinator.getCombinatorType();
     switch (realCombinator) {
     case DESCENDANT:
       cssOnly.ensureSeparator();
       break;
 
     default:
-      cssOnly.ensureSeparator().append(realCombinator.getSymbol());
+      cssOnly.ensureSeparator().append(combinator.getSymbol());
 
     }
 

@@ -78,3 +78,6 @@ h2 {
 .something > .ghi + .selector {
   property: value;
 }
+.deepOuter /deep/ .inner {
+  property: value;
+}

@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
-import com.github.sommeri.less4j.core.ast.SelectorCombinator.Combinator;
+import com.github.sommeri.less4j.core.ast.SelectorCombinator.CombinatorType;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
@@ -84,6 +84,6 @@ public class SelectorBuilder {
 
 
   private boolean isDescendant(SelectorCombinator combinator) {
-    return combinator != null && combinator.getCombinator() == Combinator.DESCENDANT;
+    return combinator != null && combinator.getCombinatorType() == CombinatorType.DESCENDANT;
   }
 }

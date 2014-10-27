@@ -163,12 +163,12 @@ public class SimpleSelectorComparator implements ListMemberComparator<SimpleSele
      * :extend(h1) does not have
      */
     if (cmb1 == null)
-      return cmb2 == null || cmb2.getCombinator() == SelectorCombinator.Combinator.DESCENDANT;
+      return cmb2 == null || cmb2.getCombinatorType() == SelectorCombinator.CombinatorType.DESCENDANT;
 
     if (cmb2 == null)
-      return cmb1 == null || cmb1.getCombinator() == SelectorCombinator.Combinator.DESCENDANT;
+      return cmb1 == null || cmb1.getCombinatorType() == SelectorCombinator.CombinatorType.DESCENDANT;
 
-    return cmb1.getCombinator() == cmb2.getCombinator();
+    return cmb1.getCombinatorType() == cmb2.getCombinatorType();
   }
 
   public boolean contains(SimpleSelector lookFor, SimpleSelector inside) {
