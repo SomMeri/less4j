@@ -204,6 +204,10 @@ public class SourceMapGeneratorV3 implements SourceMapGenerator {
     mappings.add(mapping);
   }
 
+  public void addSourceFile(String sourceName, String sourceContent) {
+    getSourceId(sourceName, sourceContent);
+  }
+
   private FilePosition adjustPosition(FilePosition mapping, FilePosition offset) {
     int offsetLine = offset.getLine();
     int offsetColumn = offset.getColumn();

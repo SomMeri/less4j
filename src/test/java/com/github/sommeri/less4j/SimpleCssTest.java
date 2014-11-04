@@ -83,40 +83,13 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
-//  @SuppressWarnings("unused")
-//  protected CompilationResult supercompile(File lessFile, File cssOutput) throws Less4jException {
-//    LessCompiler compiler = getCompiler();
-//    Configuration configuration = createConfiguration(cssOutput);
-//    configuration.setCssResultLocation((LessSource)null);
-//    CompilationResult actual=null;
-//    try {
-//      String content = ".class {\n  margin: 1 1 1 1;\n}";//IOUtils.toString(new FileReader(lessFile));
-//      String fullPath = "path/to/filename.less";
-//      String filename = "filename.less";
-////      LessSource.StringSource lessSource = new LessSource.StringSource(content, filename, new URI(fullPath));
-//      LessSource.StringSource lessSource = new LessSource.StringSource(content);
-//      actual = compiler.compile(lessSource, configuration);
-//      
-//      //System.out.println(actual.getSourceMap());
-//    } catch (Throwable e) {
-//      e.printStackTrace();
-//    }
-//    return actual;
-//  }
-
-//  @Override
-//  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
-//    CompilationResult result = super.compile(lessFile, cssOutput);
-//    System.out.println(result.getSourceMap());
-//    return result;
-//  }
-
   protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
     LessCompiler compiler = getCompiler();
     Configuration configuration = createConfiguration(cssOutput);
     
     CustomLessSource source = new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8");
     CompilationResult actual = compiler.compile(source, configuration);
+    System.out.println(actual.getSourceMap());
     return actual;
   }
   

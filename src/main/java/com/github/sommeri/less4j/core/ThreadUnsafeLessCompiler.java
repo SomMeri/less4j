@@ -3,6 +3,7 @@ package com.github.sommeri.less4j.core;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
@@ -14,7 +15,6 @@ import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
-import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.GeneralProblem;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
@@ -85,7 +85,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
     ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
 
-    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, options);
+    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, compiler.getImportedsources(), options);
     return compilationResult;
   }
 
@@ -106,7 +106,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return result;
   }
 
-  private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Configuration options) {
+  private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Collection<LessSource> additionalSourceFiles, Configuration options) {
     LessSource cssDestination = options == null ? null : options.getCssResultLocation();
     if (cssDestination==null) {
       String guessedCssName = URIUtils.changeSuffix(lessSource.getName(), Constants.CSS_SUFFIX);
@@ -114,7 +114,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       cssDestination = new LessSource.StringSource("", guessedCssName, guessedURI);
     }
     
-    CssPrinter builder = new CssPrinter(lessSource, cssDestination, options);
+    CssPrinter builder = new CssPrinter(lessSource, cssDestination, additionalSourceFiles, options);
     builder.append(cssStyleSheet);
     StringBuilder css = builder.toCss();
     String sourceMap = builder.toSourceMap();

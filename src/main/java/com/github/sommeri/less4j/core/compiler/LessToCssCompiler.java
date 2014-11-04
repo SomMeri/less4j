@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
@@ -33,6 +34,7 @@ public class LessToCssCompiler {
 
   private ProblemsHandler problemsHandler;
   private Configuration configuration;
+  private Set<LessSource> importedSources;
 
   public LessToCssCompiler(ProblemsHandler problemsHandler, Configuration configuration) {
     super();
@@ -41,7 +43,7 @@ public class LessToCssCompiler {
   }
 
   public ASTCssNode compileToCss(StyleSheet less, LessSource source, Configuration options) {
-    resolveImportsAndReferences(less, source);
+    this.importedSources = resolveImportsAndReferences(less, source);
     
     evaluateExpressions(less);
     freeNestedRulesetsAndMedia(less);
@@ -84,13 +86,16 @@ public class LessToCssCompiler {
     nestingBubbling.unnestRulesetAndMedia(less);
   }
 
-  private void resolveImportsAndReferences(StyleSheet less, LessSource source) {
+  private Set<LessSource> resolveImportsAndReferences(StyleSheet less, LessSource source) {
     ImportsAndScopeSolver solver = new ImportsAndScopeSolver(problemsHandler, configuration);
     IScope scope = solver.buildImportsAndScope(less, source);
+    Set<LessSource> importedSources = solver.getImportedSources();
 
     ReferencesSolver referencesSolver = new ReferencesSolver(problemsHandler, configuration);
     referencesSolver.solveReferences(less, scope);
-    // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful. 
+    // Warning at this point: ast changed, but the scope did not changed its structure. The scope stopped to be useful.
+    
+    return importedSources;
   }
 
   private void removeUselessLessElements(StyleSheet node) {
@@ -197,6 +202,10 @@ public class LessToCssCompiler {
   private void validateFinalCss(StyleSheet less) {
     CssAstValidator validator = new CssAstValidator(problemsHandler);
     validator.validate(less);
+  }
+
+  public Set<LessSource> getImportedsources() {
+    return importedSources;
   }
 
 }

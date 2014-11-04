@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -92,24 +93,27 @@ public class CssPrinter {
   private LessSource lessSource;
   private LessSource cssDestination;
   private LessCompiler.Configuration options;
+  private Collection<LessSource> additionalSourceFiles;
 
   public CssPrinter() {
     super();
   }
 
-  public CssPrinter(LessSource lessSource, LessSource cssDestination, LessCompiler.Configuration options) {
+  public CssPrinter(LessSource lessSource, LessSource cssDestination, Collection<LessSource> additionalSourceFiles, LessCompiler.Configuration options) {
     this.lessSource = lessSource;
     this.cssDestination = cssDestination;
     this.options = options;
-    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, getSourceMapConfiguration(options));
+    this.additionalSourceFiles = additionalSourceFiles;
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, additionalSourceFiles, getSourceMapConfiguration(options));
   }
 
   public CssPrinter(CssPrinter configureFromPrinter) {
     this.options = configureFromPrinter.options;
     this.lessSource = configureFromPrinter.lessSource;
     this.cssDestination = configureFromPrinter.cssDestination;
+    this.additionalSourceFiles = configureFromPrinter.additionalSourceFiles;
     this.cssOnly = new ExtendedStringBuilder(configureFromPrinter.cssOnly);
-    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, getSourceMapConfiguration(options));
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, additionalSourceFiles, getSourceMapConfiguration(options));
   }
 
   private LessCompiler.SourceMapConfiguration getSourceMapConfiguration(LessCompiler.Configuration options) {

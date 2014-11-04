@@ -1,0 +1,11 @@
+@import "import/no-mappable-symbol.less";
+
+.define-variable();
+
+.if-one-is-one() when (@one=1) {
+  property: value;
+}
+
+.selector {
+  .if-one-is-one();
+}

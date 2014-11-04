@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.output;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
@@ -22,13 +23,15 @@ public class SourceMapBuilder {
   private final ExtendedStringBuilder cssBuilder;
   private final SourceMapGenerator generator;
   private final LessCompiler.SourceMapConfiguration configuration;
+  private final Collection<LessSource> additionalSourceFiles;
 
   private LessSource cssDestination;
 
-  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource cssDestination, LessCompiler.SourceMapConfiguration configuration) {
+  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource cssDestination, Collection<LessSource> additionalSourceFiles, LessCompiler.SourceMapConfiguration configuration) {
     this.cssBuilder = cssBuilder;
     this.cssDestination = cssDestination;
     this.configuration = configuration;
+    this.additionalSourceFiles = additionalSourceFiles;
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
   }
 
@@ -86,6 +89,10 @@ public class SourceMapBuilder {
 
   private String toSourceName(HiddenTokenAwareTree underlyingStructure) {
     LessSource source = underlyingStructure.getSource();
+    return toSourceName(source);
+  }
+
+  private String toSourceName(LessSource source) {
     if (configuration.isRelativizePaths()) {
       return URIUtils.relativizeSourceURIs(cssDestination, source);
     } else {
@@ -95,6 +102,10 @@ public class SourceMapBuilder {
 
   private String toSourceContent(HiddenTokenAwareTree underlyingStructure, String sourceName) {
     LessSource source = underlyingStructure.getSource();
+    return toSourceContent(underlyingStructure, sourceName, source);
+  }
+
+  private String toSourceContent(HiddenTokenAwareTree underlyingStructure, String sourceName, LessSource source) {
     if (configuration.isIncludeSourcesContent() || sourceName==null) { 
       try {
         return source.getContent();
@@ -109,6 +120,11 @@ public class SourceMapBuilder {
   }
 
   public String toSourceMap() {
+    for (LessSource source : additionalSourceFiles) {
+      String sourceName = toSourceName(source);
+      String sourceContent = toSourceContent(null, sourceName, source);
+      generator.addSourceFile(sourceName, sourceContent);
+    }
     // map file is assumed to have the same location as generated css 
     String name = "";
     if (cssDestination != null && cssDestination.getName() != null) {

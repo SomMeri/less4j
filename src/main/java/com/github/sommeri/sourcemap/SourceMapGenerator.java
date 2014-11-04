@@ -73,6 +73,14 @@ public interface SourceMapGenerator {
   void addMapping(String sourceName, String sourceContent, String symbolName,
            FilePosition sourceStartPosition,
            FilePosition outputStartPosition, FilePosition outputEndPosition);
+  
+  /**
+   * TODO: add file 
+   * 
+   * @param sourceName
+   * @param sourceContent
+   */
+  void addSourceFile(String sourceName, String sourceContent);
 
   /**
    * Sets the prefix used for wrapping the generated source file before

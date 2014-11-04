@@ -155,6 +155,10 @@ public class SingleImportSolver {
   private boolean alreadyVisited(LessSource importedSource) {
     return importedSources.contains(importedSource);
   }
+  
+  public Set<LessSource> getImportedSources() {
+    return importedSources;
+  }
 
   private StyleSheet parseContent(Import importNode, String importedContent, LessSource source) {
     ANTLRParser parser = new ANTLRParser();

@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
@@ -60,6 +61,10 @@ public class ImportsAndScopeSolver {
     }
     
     return Collections.emptyList();
+  }
+
+  public Set<LessSource> getImportedSources() {
+    return importsSolver.getImportedSources();
   }
 
 }
