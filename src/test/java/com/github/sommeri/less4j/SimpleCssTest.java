@@ -86,6 +86,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
     LessCompiler compiler = getCompiler();
     Configuration configuration = createConfiguration(cssOutput);
+    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
     
     CustomLessSource source = new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8");
     CompilationResult actual = compiler.compile(source, configuration);
