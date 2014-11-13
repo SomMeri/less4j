@@ -607,7 +607,7 @@ elementName
     :  a+=elementNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=elementNamePart)* -> ^(ELEMENT_NAME $a*);
     
 elementNamePart
-    : STAR | IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
+    : STAR | IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE | UNDERSCORE;
         
 allNumberKinds: NUMBER | EMS | EXS | LENGTH | ANGLE | TIME | FREQ | REPEATER | PERCENTAGE | UNKNOWN_DIMENSION;
 
