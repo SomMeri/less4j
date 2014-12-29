@@ -69,7 +69,7 @@ public class SingleImportSolver {
 
     // css file imports should be left as they are
     // FIXME ! they should be relativized
-    if (treatAsCss(node, filename))
+    if (!node.isInline() && treatAsCss(node, filename))
       return null; 
 
     filename = addLessSuffixIfNeeded(filename, urlParams);

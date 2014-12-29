@@ -2,6 +2,7 @@ first {
   first: first;	
 }
 @variable: main;
+
 @import (inline) "import/namespaces-and-mixins.less";
 
 .mixin() {
@@ -12,3 +13,5 @@ div {
   .mixin();
   variable: @variable;
 }
+//import also css files: https://github.com/SomMeri/less4j/issues/248
+@import (inline) "import/incorrect.css";
