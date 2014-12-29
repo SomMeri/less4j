@@ -1,11 +1,21 @@
-// IE 11 hack to reverse the iOS temporal input hack.
-_:-ms-fullscreen, :root input[type="date"],
-_:-ms-fullscreen, :root input[type="time"],
-_:-ms-fullscreen, :root input[type="datetime-local"],
-_:-ms-fullscreen, :root input[type="month"] {
-  line-height: 1;
+@color: transparent;
+//@color: rgba(0,0,0,0);
 
-  &.input-sm {
-    line-height: 2;
-  }
+body {
+  background: darken(@color, 20%);
 }
+
+//@wrong: red noncolor;
+//selector {
+//  property: @wrong;
+//}
+
+//@wrongtoo: red !noncolor;
+//selector {
+// property: @wrongtoo;
+//}
+
+// @wrongalso: red !important;
+// selector {
+// property: @wrongalso;
+// }

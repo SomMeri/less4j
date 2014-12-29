@@ -60,7 +60,7 @@ public class ConversionUtils {
       return null;
 
     if (NamedColorExpression.isColorName(string))
-      return new NamedColorExpression(token, string);
+      return NamedColorExpression.createNamedColorExpression(token, string);
 
     double red = decodeColorPart(string, 0);
     double green = decodeColorPart(string, 1);

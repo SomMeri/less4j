@@ -257,7 +257,7 @@ public class TermBuilder {
 
   private Expression createIdentifierExpression(HiddenTokenAwareTree parent, String text) {
     if (NamedColorExpression.isColorName(text))
-      return new NamedColorExpression(parent, text);
+      return NamedColorExpression.createNamedColorExpression(parent, text);
 
     return new IdentifierExpression(parent, text);
   }

@@ -123,12 +123,26 @@ public class ColorExpression extends Expression {
     return false;
   }
 
+  public boolean isNamed() {
+    return false;
+  }
+
+  public String getColorName() {
+    return null;
+  }
+
   public static class ColorWithAlphaExpression extends ColorExpression {
 
     /**
      * Alpha in the range 0-1.
      */
     private double alpha;
+
+    public ColorWithAlphaExpression(HiddenTokenAwareTree token, ColorExpression colorExpression) {
+      super(token, colorExpression);
+      alpha = colorExpression.getAlpha();
+      this.value = encode(red, green, blue, alpha);
+    }
 
     public ColorWithAlphaExpression(HiddenTokenAwareTree token, double red, double green, double blue, double alpha) {
       super(token, red, green, blue);

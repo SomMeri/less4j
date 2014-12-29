@@ -52,7 +52,6 @@ import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumModifier.Modifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.Name;
-import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
@@ -908,9 +907,8 @@ public class CssPrinter {
 
   protected boolean appendColorExpression(ColorExpression expression) {
     // if it is named color expression, write out the name
-    if (expression instanceof NamedColorExpression) {
-      NamedColorExpression named = (NamedColorExpression) expression;
-      cssOnly.append(named.getColorName());
+    if (expression.isNamed()) {
+      cssOnly.append(expression.getColorName());
     } else {
 //      cssAndSM.append(expression.getValue(), expression.getUnderlyingStructure());
       cssOnly.append(expression.getValue());

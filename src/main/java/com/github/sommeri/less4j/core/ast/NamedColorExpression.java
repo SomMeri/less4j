@@ -163,14 +163,15 @@ public class NamedColorExpression extends ColorExpression {
     names.put("whitesmoke", "#f5f5f5");
     names.put("yellow", "#ffff00");
     names.put("yellowgreen", "#9acd32");
+    names.put("transparent", "#00000000");
     
     ALL_NAMES = Collections.unmodifiableMap(names);
   }
 
   private String colorName;
 
-  public NamedColorExpression(HiddenTokenAwareTree token, String colorName) {
-    super(token, ConversionUtils.parseColor(token, ALL_NAMES.get(colorName.toLowerCase())));
+  public NamedColorExpression(HiddenTokenAwareTree token, String colorName, ColorExpression color) {
+    super(token, color);
     this.colorName = colorName;
   }
 
@@ -189,7 +190,19 @@ public class NamedColorExpression extends ColorExpression {
   public static Map<String, String> getAllNames() {
     return ALL_NAMES;
   }
+  
+  public static ColorExpression createNamedColorExpression(HiddenTokenAwareTree token, String colorName) {
+    ColorExpression color = ConversionUtils.parseColor(token, ALL_NAMES.get(colorName.toLowerCase()));
+    if (!color.hasAlpha())
+      return new NamedColorExpression(token, colorName, color);
+    
+    return new NamedColorWithAlphaExpression(token, colorName, color);
+  }
 
+  public boolean isNamed() {
+    return true;
+  }
+  
   @Override
   public NamedColorExpression clone() {
     return (NamedColorExpression) super.clone();
