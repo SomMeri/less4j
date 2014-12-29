@@ -14,7 +14,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
-import com.github.sommeri.less4j.core.problems.BugHappened;
 
 /**
  * The test reproduces test files found in original less.js implementation. As

@@ -1,0 +1,2 @@
+Errors produced by compilation of testCase
+ERROR 1:1 The file the-file-does-not-exists.css does not exist.

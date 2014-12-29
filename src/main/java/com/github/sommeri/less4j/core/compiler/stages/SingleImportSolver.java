@@ -93,11 +93,11 @@ public class SingleImportSolver {
       astManipulator.removeFromBody(node);
       return null;
     }
-    importedSources.add(importedSource);
 
     String importedContent;
     try {
       importedContent = importedSource.getContent();
+      importedSources.add(importedSource);
     } catch (FileNotFound e) {
       problemsHandler.errorFileNotFound(node, filename);
       return null;
