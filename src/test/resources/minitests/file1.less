@@ -1,0 +1,23 @@
+@media (max-width:767px) {
+  .class1{
+    color: #ff0000;
+  }
+  .ignore-me { property: value; }
+}
+
+@supports(display: flex) {
+  .class1{
+    display: flex;
+  }
+  .ignore-me { property: value; }
+}
+//combination
+@media screen {
+  @media (max-width:767px) {
+    .class1{
+      media: merging;
+    }
+    .ignore-me { property: value; }
+  }
+}
+

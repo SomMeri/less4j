@@ -9,8 +9,13 @@ import java.util.Map;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Extend;
+import com.github.sommeri.less4j.core.ast.GeneralBody;
+import com.github.sommeri.less4j.core.ast.Media;
+import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
+import com.github.sommeri.less4j.core.ast.Supports;
+import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
@@ -104,11 +109,47 @@ public class ExtendsSolver {
     if (newSelector.isSilent() || !ruleSet.isSilent())
       return ;
     ruleSet.setSilent(false);
+    ASTCssNode node = ruleSet;
+    while (node.hasParent()){
+      node = node.getParent();
+      setNecessaryParentVisibility(node, false);
+    }
 
     List<? extends ASTCssNode> childs = ruleSet.getChilds();
     childs.removeAll(ruleSet.getSelectors());
     for (ASTCssNode kid : childs) {
       manipulator.setTreeSilentness(kid, false);
+    }
+  }
+
+  private void setNecessaryParentVisibility(ASTCssNode node, boolean isSilent) {
+      switch (node.getType()) {
+      case GENERAL_BODY:
+        node.setSilent(isSilent);
+        GeneralBody body = (GeneralBody)node;
+        safeSetSilent(body.getOpeningCurlyBrace(), isSilent);
+        safeSetSilent(body.getClosingCurlyBrace(), isSilent);
+        break;
+      case MEDIA:
+        node.setSilent(isSilent);
+        Media media = (Media)node;
+        for (MediaQuery medium : media.getMediums()) {
+          manipulator.setTreeSilentness(medium, isSilent);
+        }
+        break;
+      case SUPPORTS:
+        node.setSilent(isSilent);
+        Supports supports = (Supports)node;
+        manipulator.setTreeSilentness(supports.getCondition(), isSilent);
+        break;
+      default:
+        break;
+      }
+  }
+
+  private void safeSetSilent(SyntaxOnlyElement node, boolean isSilent) {
+    if (node!=null) {
+      node.setSilent(isSilent);
     }
   }
 

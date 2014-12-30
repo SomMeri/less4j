@@ -1,5 +1,20 @@
-//error handling error: - file does not exists
-@import (inline) "the-file-does-not-exists.less";
+// file2.less
+@import (reference) "file1.less";
+
+.class3{
+  &:extend(.class1);
+  background-color: #0000ff;
+}
+//@supports(display: flex) {
+//  @media screen {
+//    @media (max-width:767px) {
+//      .class1{
+//        property: both;
+//      }
+//      .ignore-me { property: value; }
+//    }
+//  }
+//}
 
 //@wrong: red noncolor;
 //selector {
