@@ -12,6 +12,7 @@ import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaQuery;
+import com.github.sommeri.less4j.core.ast.MultiTargetExtend;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.Supports;
@@ -220,6 +221,10 @@ public class ExtendsSolver {
         Extend extend = (Extend) node;
         manipulator.removeFromBody(extend);
         result.add(extend);
+      } else if (node.getType()==ASTCssNodeType.MULTI_TARGET_EXTEND) {
+        MultiTargetExtend extend = (MultiTargetExtend) node;
+        manipulator.removeFromBody(extend);
+        result.addAll(extend.getAllExtends());
       }
     }
     return result;

@@ -1,9 +1,10 @@
-// file2.less
-@import (reference) "file1.less";
-
-.class3{
-  &:extend(.class1);
+.class1 {
+  color: #ff0000;
+}
+.class2 {
   background-color: #0000ff;
+}
+.class3:extend(.class1, .class2) {
 }
 //@supports(display: flex) {
 //  @media screen {

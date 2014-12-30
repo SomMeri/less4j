@@ -7,6 +7,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.Extend;
+import com.github.sommeri.less4j.core.ast.MultiTargetExtend;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
@@ -58,8 +59,7 @@ public class SelectorBuilder {
   private void addPart(Selector selector, SelectorPart part) {
     ElementSubsequent lastSubsequent = part.getLastSubsequent();
     while (lastSubsequent!=null && isExtends(lastSubsequent)) {
-      Extend extend = convertToExtend((PseudoClass) lastSubsequent);
-      selector.addExtend(extend);
+      convertAndAddExtends(selector, (PseudoClass) lastSubsequent);
       part.removeSubsequent(lastSubsequent);
       lastSubsequent = part.getLastSubsequent();
     } 
@@ -69,13 +69,18 @@ public class SelectorBuilder {
       selector.addPart(part);
   }
   
-  private Extend convertToExtend(PseudoClass extend) {
-    ASTCssNode parameter = extend.getParameter();
-    if (parameter.getType()!=ASTCssNodeType.EXTEND) {
+  private void convertAndAddExtends(Selector selector, PseudoClass extendPC) {
+    ASTCssNode parameter = extendPC.getParameter();
+    if (parameter.getType()==ASTCssNodeType.EXTEND) {
+      selector.addExtend((Extend) parameter);
+    } else if (parameter.getType()==ASTCssNodeType.MULTI_TARGET_EXTEND) {
+      MultiTargetExtend extend = (MultiTargetExtend) parameter;
+      for (Extend node : extend.getAllExtends()) {
+        selector.addExtend((Extend) node);
+      }
+    } else {
       throw new BugHappened(ASTBuilderSwitch.GRAMMAR_MISMATCH, parameter.getUnderlyingStructure());
     }
-    
-    return (Extend) parameter;
   }
 
   private boolean isExtends(ElementSubsequent subsequent) {

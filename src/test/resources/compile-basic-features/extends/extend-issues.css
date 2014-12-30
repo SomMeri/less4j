@@ -1,3 +1,19 @@
 ::-webkit-input-placeholder {
   color: red;
 }
+.extendPseudo1,
+.extendPseudo3 {
+  color: #ff0000;
+}
+.extendPseudo2,
+.extendPseudo3 {
+  background-color: #0000ff;
+}
+.extendDeclared1,
+.extendDeclared3 {
+  color: #ff0000;
+}
+.extendDeclared2,
+.extendDeclared3 {
+  background-color: #0000ff;
+}

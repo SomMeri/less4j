@@ -6,4 +6,19 @@
   &:extend(.clearfix all); 
 }
 .placeholder();
-
+//https://github.com/SomMeri/less4j/issues/246
+.extendPseudo1 {
+  color: #ff0000;
+}
+.extendPseudo2 {
+  background-color: #0000ff;
+}
+.extendPseudo3:extend(.extendPseudo1, .extendPseudo2) {}
+.extendDeclared1 {
+  color: #ff0000;
+}
+.extendDeclared2 {
+  background-color: #0000ff;
+}
+.extendDeclared3:extend(.extendDeclared1, .extendDeclared2) {
+}

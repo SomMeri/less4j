@@ -559,8 +559,8 @@ finally { leaveRule(); }
 //    ;
 //finally { leaveRule(); }
 
-extendTargetSelector 
-    : a+=selector
+extendTargetSelectors 
+    : a+=selector (a+=selectorSeparator a+=selector)*
     -> ^(EXTEND_TARGET_SELECTOR $a*) 
     ;
 
@@ -642,7 +642,7 @@ pseudo
     : (c+=COLON c+=COLON? a=IDENT (
         (LPAREN)=>(
           { predicates.insideNth(input)}?=> LPAREN (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) RPAREN
-          | { predicates.insideExtend(input)}?=> LPAREN (b4=extendTargetSelector) RPAREN
+          | { predicates.insideExtend(input)}?=> LPAREN (b4+=extendTargetSelectors) RPAREN
           | { predicates.insideNot(input)}?=> LPAREN (b5=selector) RPAREN
           | LPAREN b6=pseudoparameters RPAREN 
         )

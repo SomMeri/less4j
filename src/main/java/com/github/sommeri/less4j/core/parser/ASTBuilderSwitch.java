@@ -53,6 +53,7 @@ import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.MultiTargetExtend;
 import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
@@ -544,9 +545,31 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return builder.buildSelector();
   }
 
-  public Extend handleExtendTargetSelector(HiddenTokenAwareTree token) {
+  //This is kind of hack, extend compiles to list of extends
+  public ASTCssNode handleExtendTargetSelector(HiddenTokenAwareTree token) {
+    token.pushHiddenToKids();
+    
+    if (token.getChildren().size()==1) {
+      Selector selector = (Selector) switchOn(token.getChildren().get(0));
+      return convertSelectorToExtend(token, selector);
+    }
+      
+    
+    MultiTargetExtend extend = new MultiTargetExtend(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
-    Selector selector = (Selector) switchOn(children.get(0));
+    for (HiddenTokenAwareTree kid : children) {
+      if (kid.getType()==LessLexer.COMMA) {
+        kid.pushHiddenToSiblings();
+      } else {
+        Selector selector = (Selector) switchOn(kid);
+        extend.addExtend(convertSelectorToExtend(token, selector));
+      }
+    }
+   
+    return extend;
+  }
+
+  private Extend convertSelectorToExtend(HiddenTokenAwareTree token, Selector selector) {
     if (selector.isExtending()) {
       problemsHandler.warnExtendInsideExtend(selector);
     }
@@ -648,15 +671,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return createPseudoElement(token, 1, true);
     }
 
+    String pseudoClassName = children.get(1).getText();
     if (children.size() == 2)
-      return new PseudoClass(token, children.get(1).getText());
+      return new PseudoClass(token, pseudoClassName);
 
-    if (children.size() == 3) {
+    if (children.size() >= 3) {
       HiddenTokenAwareTree parameter = children.get(2);
       //FIXME: this is not really sufficient for all cases less.js supports (1@{num}n+3)
       if (parameter.getType() == LessLexer.INTERPOLATED_VARIABLE)
-        return new PseudoClass(token, children.get(1).getText(), toInterpolabledVariable(parameter, parameter.getText()));
-      return new PseudoClass(token, children.get(1).getText(), switchOn(parameter));
+        return new PseudoClass(token, pseudoClassName, toInterpolabledVariable(parameter, parameter.getText()));
+      
+      return new PseudoClass(token, pseudoClassName, switchOn(parameter));
     }
 
     throw new BugHappened(GRAMMAR_MISMATCH, token);
@@ -1230,7 +1255,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   @Override
-  public Extend handleExtendInDeclaration(HiddenTokenAwareTree token) {
+  public ASTCssNode handleExtendInDeclaration(HiddenTokenAwareTree token) {
     HiddenTokenAwareTree child = token.getChild(0);
     Pseudo extendAsPseudo = handlePseudo(child);
 
@@ -1238,10 +1263,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
 
     PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
-    if (!(asPseudoclass.getParameter() instanceof Extend))
+    ASTCssNode parameter = asPseudoclass.getParameter();
+    if (parameter.getType()!=ASTCssNodeType.EXTEND && parameter.getType()!=ASTCssNodeType.MULTI_TARGET_EXTEND)
       throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
-
-    return (Extend) asPseudoclass.getParameter();
+    
+    return parameter;
   }
 
   @Override

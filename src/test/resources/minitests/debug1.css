@@ -1,18 +1,8 @@
-@media (max-width: 767px) {
-  .class3 {
-    color: red;
-  }
-}
-@supports (display: flex) {
-  .class3 {
-    display: flex;
-  }
-}
-@media screen and (max-width: 767px) {
-  .class3 {
-    media: merging;
-  }
-}
+.class1,
 .class3 {
-  background-color: blue;
+  color: #ff0000;
+}
+.class2,
+.class3 {
+  background-color: #0000ff;
 }
