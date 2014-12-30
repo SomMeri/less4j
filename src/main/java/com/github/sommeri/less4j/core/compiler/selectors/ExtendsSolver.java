@@ -123,6 +123,7 @@ public class ExtendsSolver {
   }
 
   private void setNecessaryParentVisibility(ASTCssNode node, boolean isSilent) {
+      //TODO:this could have nicer more general solution
       switch (node.getType()) {
       case GENERAL_BODY:
         node.setSilent(isSilent);
