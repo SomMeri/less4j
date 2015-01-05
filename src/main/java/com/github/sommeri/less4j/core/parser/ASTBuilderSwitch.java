@@ -877,28 +877,36 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   // this handles both variable declaration and a mixin parameter with default
   // value
   public VariableDeclaration handleVariableDeclaration(HiddenTokenAwareTree token) {
-    List<HiddenTokenAwareTree> children = token.getChildren();
-    HiddenTokenAwareTree name = children.get(0);
-    HiddenTokenAwareTree colon = children.get(1);
-    HiddenTokenAwareTree expression = children.get(2);
-    if (children.size() > 3) {
-      HiddenTokenAwareTree semi = children.get(3);
-      colon.giveHidden(name, expression);
-      semi.giveHidden(expression, null);
-      token.addBeforeFollowing(semi.getFollowing());
+    Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
+    HiddenTokenAwareTree name = children.next();
+    HiddenTokenAwareTree colon = children.next();
+    
+    List<HiddenTokenAwareTree> expressionPriority = new ArrayList<HiddenTokenAwareTree>();
+    while (children.hasNext()) {
+        HiddenTokenAwareTree next = children.next();
+        if (next.getType()==LessLexer.SEMI) {
+        	next.giveHidden(ArraysUtils.last(expressionPriority), null);
+            token.addBeforeFollowing(next.getFollowing());
+        } else {
+        	expressionPriority.add(next);
+        }
     }
+//    colon.giveHidden(name, following.get(0));DOLEZITE
 
     Variable variable = new Variable(name, name.getText());
-    Expression value = variableValue(token, expression);
+    Expression value = variableValue(token, expressionPriority);
     return new VariableDeclaration(token, variable, value);
   }
 
-  private Expression variableValue(HiddenTokenAwareTree underlyingIfEmpty, HiddenTokenAwareTree expression) {
-    if (expression.getType()==LessLexer.SEMI) {
+  private Expression variableValue(HiddenTokenAwareTree underlyingIfEmpty, List<HiddenTokenAwareTree> expressionOrPriority) {
+    if (expressionOrPriority.isEmpty()) {
       return new EmptyExpression(underlyingIfEmpty);
     } 
     
-    return (Expression) switchOn(expression);
+    for (HiddenTokenAwareTree hiddenTokenAwareTree : expressionOrPriority) {
+		
+	}
+    return (Expression) switchOn(expressionOrPriority);
   }
 
   // FIXME: fail on wrong distribution of arguments (e.g. collector must be

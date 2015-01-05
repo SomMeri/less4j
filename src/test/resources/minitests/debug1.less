@@ -1,11 +1,3 @@
-.class1 {
-  color: #ff0000;
-}
-.class2 {
-  background-color: #0000ff;
-}
-.class3:extend(.class1, .class2) {
-}
 //@supports(display: flex) {
 //  @media screen {
 //    @media (max-width:767px) {
@@ -27,7 +19,7 @@
 // property: @wrongtoo;
 //}
 
-// @wrongalso: red !important;
-// selector {
-// property: @wrongalso;
-// }
+@wrongalso: red !important;
+selector {
+  property: @wrongalso;
+}

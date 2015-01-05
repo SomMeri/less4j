@@ -357,14 +357,14 @@ top_level_element
 
 variabledeclaration
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : AT_NAME COLON (a+=expr)? SEMI -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* SEMI)
+    : AT_NAME COLON a+=expr? a+=prio? SEMI -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* SEMI)
     ;
 finally { leaveRule(); }
 
 //used in mixinReferenceArgument
 variabledeclarationNoSemi
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : AT_NAME COLON (a+=expr) -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* )
+    : AT_NAME COLON a+=expr? a+=prio? -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* )
     ;
 finally { leaveRule(); }
 
