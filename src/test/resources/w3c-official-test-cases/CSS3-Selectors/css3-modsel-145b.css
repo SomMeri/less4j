@@ -5,7 +5,7 @@ line {
   display: block;
 }
 [type~=odd] {
-  background: lime !important;
+  background: lime ! important;
 }
 line:nth-of-type(odd) {
   background: red;

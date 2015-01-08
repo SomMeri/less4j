@@ -2,7 +2,7 @@
 NEGATED :first-child pseudo-class
 */
 .green {
-  background-color: lime !important;
+  background-color: lime ! important;
 }
 .t1 td:not(:first-child) {
   background-color: red;

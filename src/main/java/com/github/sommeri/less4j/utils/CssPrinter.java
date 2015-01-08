@@ -660,9 +660,6 @@ public class CssPrinter {
     if (declaration.getExpression() != null)
       append(declaration.getExpression());
 
-    if (declaration.isImportant())
-      cssOnly.ensureSeparator().append("!important");
-
     if (shouldHaveSemicolon(declaration))
       cssOnly.appendIgnoreNull(";");
 

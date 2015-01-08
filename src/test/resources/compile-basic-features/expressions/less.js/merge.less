@@ -36,12 +36,12 @@
   .first-background();
 }
 .test4 {
-  // Wont merge values from sources that merked as !important, for backwards compatibility with css
+  // Wont merge values from sources that marked as !important, for backwards compatibility with css
   .first-transform();
   .fifth-transform();
 }
 .test5 {
-  // Wont merge values from mixins that merked as !important, for backwards compatibility with css 
+  // Wont merge values from mixins that marked as !important, for backwards compatibility with css 
   .first-transform();
   .second-transform() !important;
 }
@@ -75,4 +75,9 @@
     background+_: b2s, b3;
     transform+_:  t6s;
     background+:  b4;
+}
+
+merge-commented {
+  property+: a1 !important;
+  property+: a2 !/*some comment here*/important;
 }

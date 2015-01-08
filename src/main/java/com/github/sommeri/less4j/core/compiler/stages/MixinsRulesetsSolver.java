@@ -12,10 +12,14 @@ import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
+import com.github.sommeri.less4j.core.ast.KeywordExpression;
+import com.github.sommeri.less4j.core.ast.ListExpression;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionManipulator;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
@@ -25,6 +29,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.IFun
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.utils.ArraysUtils;
 
 class MixinsRulesetsSolver {
 
@@ -34,6 +39,7 @@ class MixinsRulesetsSolver {
   private final Configuration configuration;
   private final DefaultGuardHelper defaultGuardHelper;
   private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
+  private final ExpressionManipulator expressionManipulator = new ExpressionManipulator();
 
   public MixinsRulesetsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = parentSolver;
@@ -175,12 +181,31 @@ class MixinsRulesetsSolver {
     for (ASTCssNode kid : result.getMembers()) {
       if (kid instanceof Declaration) {
         Declaration declaration = (Declaration) kid;
-        declaration.setImportant(true);
+        addImportantKeyword(declaration);
       } else if (kid instanceof BodyOwner<?>) {
         BodyOwner owner = (BodyOwner) kid;
         declarationsAreImportant(owner.getBody());
       }
     }
+  }
+
+  private void addImportantKeyword(Declaration declaration) {
+    Expression expression = declaration.getExpression();
+    if (expressionManipulator.isImportant(expression))
+      return ;
+    
+    //FIXME !!!!!!!!!! correct underlying - or correct  keyword!!!
+    KeywordExpression important = new KeywordExpression(expression.getUnderlyingStructure(), "!important", true);
+    
+    ListExpression list = expressionManipulator.findRightmostSpaceSeparatedList(expression);
+    if (list==null) {
+      list = new ListExpression(expression.getUnderlyingStructure(), ArraysUtils.asList(expression), new ListExpressionOperator(expression.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR));
+    }
+    list.addExpression(important);
+    list.configureParentToAllChilds();
+    
+    declaration.setExpression(list);
+    list.setParent(declaration);
   }
 
   class ImportedScopeFilter implements ExpressionFilter {

@@ -2,7 +2,7 @@
 NEGATED :only-child pseudo-class
 */
 .green {
-  background-color: lime !important;
+  background-color: lime ! important;
 }
 p:not(:only-child) {
   background-color: lime;

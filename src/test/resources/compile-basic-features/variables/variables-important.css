@@ -14,5 +14,5 @@
   normal: value !important;
   important: value !important;
   variable-normal: value !important;
-  variable-important: value !important;
+  variable-important: value ! important;
 }

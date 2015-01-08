@@ -32,3 +32,6 @@
   transform: t1s, t2 t3s, t4 t5s t6s;
   background: b1 b2s, b3, b4;
 }
+merge-commented {
+  property: a1, a2 !important;
+}

@@ -2,7 +2,7 @@
 Child combinator
 */
 .white {
-  background-color: transparent !important;
+  background-color: transparent ! important;
 }
 .green {
   background-color: lime;

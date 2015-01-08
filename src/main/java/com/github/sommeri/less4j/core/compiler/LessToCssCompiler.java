@@ -27,6 +27,7 @@ import com.github.sommeri.less4j.core.compiler.stages.PropertiesMerger;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.UnNestingAndBubbling;
 import com.github.sommeri.less4j.core.compiler.stages.UrlsAndImportsNormalizer;
+import com.github.sommeri.less4j.core.compiler.stages.UselessImportantRemover;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.CssAstValidator;
 
@@ -53,7 +54,7 @@ public class LessToCssCompiler {
     // TODO the following line is probably useless now, investigate (removal is now part of freeNestedRulesetsAndMedia step)
     removeUselessLessElements(less);
     removeEmptyRulesetsAndMedia(less);
-    mergeMergingProperties(less);
+    finishDeclarations(less);
     //normalizeUrlsAndImportsInImportedFiles(less);
 
     //final clean up  
@@ -71,9 +72,12 @@ public class LessToCssCompiler {
     remover.removeEmptyBodies(less);
   }
 
-  private void mergeMergingProperties(StyleSheet less) {
+  private void finishDeclarations(StyleSheet less) {
     PropertiesMerger propertiesMerger = new PropertiesMerger();
-    propertiesMerger.propertiesMerger(less);
+    propertiesMerger.applyToProperties(less);
+    
+    UselessImportantRemover remover = new UselessImportantRemover();
+    remover.applyToProperties(less);
   }
 
   private void solveExtends(StyleSheet less) {

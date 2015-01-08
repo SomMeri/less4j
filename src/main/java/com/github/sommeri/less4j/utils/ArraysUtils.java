@@ -33,6 +33,10 @@ public class ArraysUtils {
     return new HashSet<T>(Arrays.asList(args));
   }
 
+  public static <T> List<T> asList(T... args) {
+    return new ArrayList<T>(Arrays.asList(args));
+  }
+
   public static <T> int count(Collection<T> collection, Filter<T> filter) {
     int result = 0;
     for (T t : collection) {

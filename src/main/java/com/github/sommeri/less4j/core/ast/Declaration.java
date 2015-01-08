@@ -12,22 +12,16 @@ public class Declaration extends ASTCssNode {
   //private String name;
   private InterpolableName name;
   private Expression expression;
-  private boolean important;
   private ListExpressionOperator.Operator mergeOperator;
 
   public Declaration(HiddenTokenAwareTree token, InterpolableName name) {
-    this(token, name, null, false, null);
+    this(token, name, null, null);
   }
 
   public Declaration(HiddenTokenAwareTree token, InterpolableName name, Expression expression, Operator mergeOperator) {
-    this(token, name, expression, false, mergeOperator);
-  }
-
-  public Declaration(HiddenTokenAwareTree token, InterpolableName name, Expression expression, boolean important, Operator mergeOperator) {
     super(token);
     this.name = name;
     this.expression = expression;
-    this.important = important;
     this.mergeOperator = mergeOperator;
   }
 
@@ -39,10 +33,6 @@ public class Declaration extends ASTCssNode {
     return expression;
   }
 
-  public boolean isImportant() {
-    return important;
-  }
-  
   public boolean isMerging() {
     return mergeOperator!=null;
   }
@@ -53,10 +43,6 @@ public class Declaration extends ASTCssNode {
 
   public void setExpression(Expression expression) {
     this.expression = expression;
-  }
-
-  public void setImportant(boolean important) {
-    this.important = important;
   }
 
   public ListExpressionOperator.Operator getMergeOperator() {

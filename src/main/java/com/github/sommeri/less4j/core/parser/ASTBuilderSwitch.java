@@ -299,16 +299,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       }
     }
 
-    if (expressionToken.getType() == LessLexer.IMPORTANT_SYM)
-      return new Declaration(token, name, null, true, mergeOperator);
-
     Expression expression = (Expression) switchOn(expressionToken);
-    if (!iterator.hasNext())
+    if (!iterator.hasNext()) {
       return new Declaration(token, name, expression, mergeOperator);
-
-    HiddenTokenAwareTree importantToken = iterator.next();
-    if (importantToken.getType() == LessLexer.IMPORTANT_SYM)
-      return new Declaration(token, name, expression, true, mergeOperator);
+    }
 
     throw new BugHappened(GRAMMAR_MISMATCH, token);
   }

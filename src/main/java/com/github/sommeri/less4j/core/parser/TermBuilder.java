@@ -14,6 +14,7 @@ import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
+import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
@@ -249,9 +250,15 @@ public class TermBuilder {
 
   private Expression buildFromLongIdentifier(HiddenTokenAwareTree parent, HiddenTokenAwareTree first) {
     StringBuilder text = new StringBuilder();
-    for (HiddenTokenAwareTree child : first.getChildren()) {
-      text.append(child.getText());
+    List<HiddenTokenAwareTree> children = first.getChildren();
+    for (HiddenTokenAwareTree child : children) {
+      text.append(child.getText().trim());
     }
+    
+    if (children.size()==1 && children.get(0).getType() == LessLexer.IMPORTANT_SYM) {
+      return new KeywordExpression(parent, children.get(0).getText().trim(), true);
+    }
+    
     return createIdentifierExpression(parent, text.toString());
   }
 

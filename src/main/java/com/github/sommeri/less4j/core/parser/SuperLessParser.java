@@ -128,6 +128,9 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNKNOWN_AT_RULE_NAMES_SET", "unknown at-rule");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IDENT_TERM", "identifier");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NAMED_COMBINATOR", "named selector combinator");
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EXCLAMATION_MARK", "!");
+    
+    
   }
 
   protected static final String RULE_STYLESHEET = "stylesheet";

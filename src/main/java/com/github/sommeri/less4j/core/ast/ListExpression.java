@@ -41,7 +41,20 @@ public class ListExpression extends Expression {
   public void addExpression(Expression expression) {
     expressions.add(expression);
   }
-  
+
+  public void addExpression(Expression expression, int position) {
+    expressions.add(position>=0 ? position : expressions.size() + position, expression);
+  }
+
+  public void removeExpression(Expression expression) {
+    expressions.remove(expression);
+  }
+
+  public void removeExpression(int removalIndex) {
+    expressions.remove(removalIndex);
+  }
+
+
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.LIST_EXPRESSION;

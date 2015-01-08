@@ -879,8 +879,7 @@ unsigned_value_term
     ;
     
 identifierValueTerm
-    : a+=IDENT ({predicates.directlyFollows(input) && predicates.notSemi(input)}?=> (a+=DOT | a+=HASH | a+=IDENT))* -> ^(IDENT_TERM $a*);
-// /*({predicates.directlyFollows(input)}?=> (a+=DOT | a+=HASH | a+=IDENT))* */
+    : (a+=IDENT | a+=EXCLAMATION_MARK | a+=DOT | a+=IMPORTANT_SYM) ({predicates.directlyFollows(input) && predicates.notSemi(input)}?=> (a+=DOT | a+=HASH | a+=IDENT | a+=EXCLAMATION_MARK | a+=IMPORTANT_SYM))* -> ^(IDENT_TERM $a*);
 
 special_function
     : URI | URL_PREFIX | DOMAIN 
@@ -1266,6 +1265,7 @@ DOT : '.' ;
 DOT3 : '...' ;
 UNDERSCORE: '_';
 DOLLAR: '$';
+EXCLAMATION_MARK: '!';
 //TODO: this trick could be used in other places too. I may be able to avoid some predicates and token position comparisons!
 fragment APPENDER_FRAGMENT: '&';
 fragment MEANINGFULL_WHITESPACE: ;

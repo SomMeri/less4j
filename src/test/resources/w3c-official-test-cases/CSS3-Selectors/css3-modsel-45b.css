@@ -5,7 +5,7 @@ Direct adjacent combinator
   background-color: lime;
 }
 .white {
-  background-color: transparent !important;
+  background-color: transparent ! important;
 }
 div.stub > p + p {
   background-color: red;

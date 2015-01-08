@@ -2,7 +2,7 @@
 Nondeterministic matching of direct and indirect adjacent combinators
 */
 p {
-  color: green !important;
+  color: green ! important;
 }
 blockquote + div ~ p {
   color: red;
