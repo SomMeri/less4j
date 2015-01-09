@@ -1,4 +1,13 @@
 Errors produced by compilation of testCase
 ERROR 2:29 no viable alternative at character ';'
+ 1: h1 {
+ 2:   padding: 2 2 2 2 !importan;
+ 3: }
+
 ERROR 7:2 mismatched character '<EOF>' expecting '*'
+ 6:  /* unfinished comment
+ 7: }
+
 ERROR 7:2 no viable alternative at input '<EOF>' in ruleset (which started at 5:1)
+ 6:  /* unfinished comment
+ 7: }

@@ -1,7 +1,30 @@
 Warnings produced by compilation of testCase
 WARNING 12:2 Selector fragment (~"h1") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 11: 
+ 12: (~"h1") {
+ 13:   margin: 1 ~"2 2" 3;
+
 WARNING 17:2 Selector fragment (~"h1") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 16: 
+ 17: (~"h1"), h2, (~'h3') {
+ 18:   margin: 2;
+
 WARNING 17:15 Selector fragment (~'h3') uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 16: 
+ 17: (~"h1"), h2, (~'h3') {
+ 18:   margin: 2;
+
 WARNING 22:2 Selector fragment (~".@{variable}") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 21: @variable: "span";
+ 22: (~".@{variable}") { 
+ 23:   text: ~'@{variable}';
+
 WARNING 27:2 Selector fragment (~".@{escapedVariable}") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 26: @escapedVariable: ~"whatever";
+ 27: (~".@{escapedVariable}") { 
+ 28:   text: ~'@{escapedVariable}';
+
 WARNING 33:4 Selector fragment (~'@{a}') uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 32:   @a: '.something';
+ 33:   (~'@{a}') {
+ 34:     margin: 2 2 2 2;

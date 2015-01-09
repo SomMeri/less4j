@@ -1,13 +1,61 @@
 Warnings produced by compilation of testCase
 WARNING 2:1 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 1: //no body
+ 2: @top-level-one-name-no-body something;
+ 3: @top-level-many-names-no-body something, else, 'and', also;
+
 WARNING 3:1 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 2: @top-level-one-name-no-body something;
+ 3: @top-level-many-names-no-body something, else, 'and', also;
+ 4: 
+
 WARNING 6:1 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 5: //only body
+ 6: @top-level-with-body {
+ 7:   value: value;
+
 WARNING 11:1 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 10: 
+ 11: @top-level-with-body {
+ 12:   h1 {
+
 WARNING 18:1 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 17: //both name and body
+ 18: @top-level-one-name-with-body something {
+ 19:   value: value;
+
 WARNING 23:1 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 22: 
+ 23: @top-level-many-names-with-body something, else, and, also {
+ 24:   h1 {
+
 WARNING 32:3 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 31:   //no body
+ 32:   @nested-one-name-no-body something;
+ 33:   @nested-many-names-no-body something, else, and, also;
+
 WARNING 33:3 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 32:   @nested-one-name-no-body something;
+ 33:   @nested-many-names-no-body something, else, and, also;
+ 34: 
+
 WARNING 36:3 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 35:   //only body
+ 36:   @nested-with-body {
+ 37:     value: value;
+
 WARNING 41:3 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 40: 
+ 41:   @nested-with-body {
+ 42:     h1 {
+
 WARNING 48:3 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 47:   //both name and body
+ 48:   @nested-one-name-with-body something {
+ 49:     value: value;
+
 WARNING 53:3 Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.
+ 52: 
+ 53:   @nested-many-names-with-body something, else, and, also {
+ 54:     div {
+

@@ -1,2 +1,5 @@
 Warnings produced by compilation of testCase
 WARNING 38:65 CSS specification does not allow mixing of 'and', 'or', and 'not' operators without a layer of parentheses. Operators 'and' at 38:65' and 'or' at 38:40 are in the same layer of parentheses.
+ 37: //For example, the following rule is not valid: 
+ 38: @supports (transition-property: color) or (animation-name: foo) and (transform: rotate(10deg)) {
+ 39:   div { margin: 2 2 2 2; }

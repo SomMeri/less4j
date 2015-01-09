@@ -1,8 +1,35 @@
 Errors produced by compilation of testCase
 ERROR 3:2 Could not find detached ruleset for "@does-not-exists".
+ 2: .does-not-exists {
+ 3: 	@does-not-exists();
+ 4: }
+
 ERROR 8:3 Detached ruleset reference "@wrongDatatype"  does not evaluate to detached ruleset. It resolved to expression defined at 6:17
+ 7: .wrong-datatype {
+ 8:   @wrongDatatype();
+ 9: }
+
 ERROR 13:18 String interpolation does not requeted expression type. Requested expression was defined at 11:12
+ 12: .selector {
+ 13:   interpolation: "@{detached}";
+ 14: }
+
 ERROR 20:3 Could not find detached ruleset for "@unlocked-detached".
+ 19: .selector {
+ 20:   @unlocked-detached();
+ 21:   .calling-before-unlocking-mixin();
+
 ERROR 30:12 The variable "@color" was not declared.
+ 29:     @detached-ruleset();
+ 30:     color: @color; 
+ 31:   }
+
 ERROR 36:40 The variable "@one" was not declared.
+ 35:   @zero: visible;
+ 36:   @detached-1: { scope-detached: @zero @one @two @three; };
+ 37:   .one {
+
 ERROR 36:45 The variable "@two" was not declared.
+ 35:   @zero: visible;
+ 36:   @detached-1: { scope-detached: @zero @one @two @three; };
+ 37:   .one {

@@ -1,2 +1,5 @@
 Errors produced by compilation of testCase
-ERROR import#FILE_SEPARATOR#even-deeper#FILE_SEPARATOR#syntactically-incorrect-wrong-variable.less 3:10 The variable "@undefinedVariable" was not declared.
+ERROR import\even-deeper\syntactically-incorrect-wrong-variable.less 3:10 The variable "@undefinedVariable" was not declared.
+ 2: ruleset {
+ 3:   color: @undefinedVariable;
+ 4: }

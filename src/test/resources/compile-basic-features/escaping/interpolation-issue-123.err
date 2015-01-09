@@ -1,3 +1,10 @@
 Warnings produced by compilation of testCase
 WARNING 8:9 This works, but is incompatible with less.js. Only less.js compatible selector attribute values are string, number and identifier.
+ 7: @string-variable: "some-class";
+ 8: [class*=@string-variable] {
+ 9:     margin: 2 2 2 2;
+
 WARNING 12:7 This works, but is incompatible with less.js. Only less.js compatible selector attribute values are string, number and identifier.
+ 11: @number: 2+3;
+ 12: [size=@number] {
+ 13:     margin: 2 2 2 2;

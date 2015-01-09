@@ -1,7 +1,26 @@
 Warnings produced by compilation of testCase
 WARNING 40:19 Escape function argument should be a string.
+ 39:   escape5: escape(~"//");
+ 40:   escape6: escape(#ff8877);
+ 41:   escape6b: escape(green);
+
 WARNING 41:20 Escape function argument should be a string.
+ 40:   escape6: escape(#ff8877);
+ 41:   escape6b: escape(green);
+ 42:   escape7: escape(identifier);
+
 WARNING 42:19 Escape function argument should be a string.
+ 41:   escape6b: escape(green);
+ 42:   escape7: escape(identifier);
+ 43:   escape8: escape(11);
+
 WARNING 43:19 Escape function argument should be a string.
+ 42:   escape7: escape(identifier);
+ 43:   escape8: escape(11);
+ 44: //  escape9: escape(11 12 14 "test");
+
 Errors produced by compilation of testCase
 ERROR 116:28 Regular expression failed: Flag cannot be specified twice: 'a'
+ 115:   replace-identifier: replace(foo1, "1", "2");
+ 116:   replace-error-in-regexp: replace('test-error', 'error', 'something', 'aaa');
+ 117: }

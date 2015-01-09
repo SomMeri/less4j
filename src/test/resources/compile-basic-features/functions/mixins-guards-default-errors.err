@@ -1,7 +1,30 @@
 Errors produced by compilation of testCase
 ERROR 11:3 Ambiguous use of `default()` found when matching reference CssClass [.m]. Matched mixins using default are located at (8:3) -> (9:3)
+ 10:   
+ 11:   .m(2); //SHOULD produce error explained-in-less.js#1800  
+ 12: }
+
 ERROR 18:3 Ambiguous use of `default()` found when matching reference CssClass [.m]. Matched mixins using default are located at (14:3) -> (15:3) -> (16:3)
+ 17:   
+ 18:   .m(1); //shoud produce error
+ 19:   .m(2); //shoud produce error
+
 ERROR 19:3 Ambiguous use of `default()` found when matching reference CssClass [.m]. Matched mixins using default are located at (14:3) -> (15:3)
+ 18:   .m(1); //shoud produce error
+ 19:   .m(2); //shoud produce error
+ 20: }
+
 ERROR 41:5 Ambiguous use of `default()` found when matching reference CssClass [.m]. Matched mixins using default are located at (38:5) -> (39:5)
+ 40: 
+ 41:     .m(2);
+ 42: }
+
 ERROR 55:5 Ambiguous use of `default()` found when matching reference CssClass [.m]. Matched mixins using default are located at (51:5) -> (52:2) -> (53:5)
+ 54: 
+ 55:     .m(1); //SHOULD produce error
+ 56:     .m(2); //SHOULD produce error
+
 ERROR 56:5 Ambiguous use of `default()` found when matching reference CssClass [.m]. Matched mixins using default are located at (52:2) -> (53:5)
+ 55:     .m(1); //SHOULD produce error
+ 56:     .m(2); //SHOULD produce error
+ 57: }

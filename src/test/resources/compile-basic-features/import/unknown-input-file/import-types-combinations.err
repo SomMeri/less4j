@@ -1,7 +1,29 @@
 Warnings produced by compilation of testCase
 WARNING 4:9 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+ 3: }
+ 4: @import "import\one-simple-ruleset.less";
+ 5: @import "import\one-simple-ruleset.less";
+
 WARNING 5:9 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+ 4: @import "import\one-simple-ruleset.less";
+ 5: @import "import\one-simple-ruleset.less";
+ 6: @import (once) "import\one-simple-ruleset.less";
+
 WARNING 6:16 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+ 5: @import "import\one-simple-ruleset.less";
+ 6: @import (once) "import\one-simple-ruleset.less";
+ 7: @import (once) "import\one-simple-ruleset.less";
+
 WARNING 7:16 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+ 6: @import (once) "import\one-simple-ruleset.less";
+ 7: @import (once) "import\one-simple-ruleset.less";
+ 8: @import (multiple) "import\one-simple-ruleset.less";
+
 WARNING 8:20 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+ 7: @import (once) "import\one-simple-ruleset.less";
+ 8: @import (multiple) "import\one-simple-ruleset.less";
+ 9: @import (multiple) "import\one-simple-ruleset.less";
+
 WARNING 9:20 Attempt to import less file with an unknown compiled file location. Import statement left unchanged.
+ 8: @import (multiple) "import\one-simple-ruleset.less";
+ 9: @import (multiple) "import\one-simple-ruleset.less";

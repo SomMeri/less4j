@@ -1,13 +1,60 @@
 Warnings produced by compilation of testCase
 WARNING 4:17 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 3: 
+ 4: first:something(@variable), second:pseudoclass(@xxx) {
+ 5:   @xxx: 'string';
+
 WARNING 4:48 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 3: 
+ 4: first:something(@variable), second:pseudoclass(@xxx) {
+ 5:   @xxx: 'string';
+
 WARNING 10:18 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+  9: 
+ 10:   nested1:length(@xxx), nested2:content(@variable) {
+ 11:     declaration: value;
+
 WARNING 10:41 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+  9: 
+ 10:   nested1:length(@xxx), nested2:content(@variable) {
+ 11:     declaration: value;
+
 WARNING 13:19 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 12:   }
+ 13:   nested3:content(@variable), nested4:length(@xxx) {
+ 14:     declaration: value;
+
 WARNING 13:46 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 12:   }
+ 13:   nested3:content(@variable), nested4:length(@xxx) {
+ 14:     declaration: value;
+
 WARNING 18:17 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 17: 
+ 18: first:something(@variable), second:pseudoclass(@xxx) {
+ 19:   @xxx: 'string';
+
 WARNING 18:48 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 17: 
+ 18: first:something(@variable), second:pseudoclass(@xxx) {
+ 19:   @xxx: 'string';
+
 WARNING 24:18 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 23: 
+ 24:   nested1:length(@xxx), nested2:content(@variable) {
+ 25:     declaration: value;
+
 WARNING 24:41 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 23: 
+ 24:   nested1:length(@xxx), nested2:content(@variable) {
+ 25:     declaration: value;
+
 WARNING 26:18 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 25:     declaration: value;
+ 26:     deep1:length(@xxx), deep2:content(@variable) {
+ 27:       declaration: 1 2;
+
 WARNING 26:39 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 25:     declaration: value;
+ 26:     deep1:length(@xxx), deep2:content(@variable) {
+ 27:       declaration: 1 2;

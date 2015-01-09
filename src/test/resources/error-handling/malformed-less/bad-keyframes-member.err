@@ -1,6 +1,21 @@
 Warnings produced by compilation of testCase
 WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of @keyframes located at 13:1.
+ 1: .mixin1() {
+ 2:   color: blue;
+ 3: }
+
 WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of @keyframes located at 23:1.
+ 1: .mixin1() {
+ 2:   color: blue;
+ 3: }
+
 Errors produced by compilation of testCase
 ERROR 14:3 The reference brought declaration from 2:3 into @keyframes which started at 13:26. Compilation produced an incorrect CSS.
+ 13: @keyframes mixinUsePlace {
+ 14:   .mixin3();
+ 15: }
+
 ERROR 24:3 The reference brought declaration from 2:3 into @keyframes which started at 23:30. Compilation produced an incorrect CSS.
+ 23: @keyframes namespaceUsePlace {
+ 24:   #namespace .mixin4();
+ 25: }

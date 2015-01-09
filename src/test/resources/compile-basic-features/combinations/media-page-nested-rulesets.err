@@ -1,5 +1,20 @@
 Warnings produced by compilation of testCase
 WARNING 12:3 Compilation resulted in incorrect CSS. The rule set ended up inside a body of @page located at 1:1.
+ 11: 
+ 12:   h2 {
+ 13:      color: red;
+
 WARNING 14:6 Compilation resulted in incorrect CSS. The rule set ended up inside a body of @page located at 1:1.
+ 13:      color: red;
+ 14:      :visit {
+ 15:        margin: 2;
+
 WARNING 4:5 Compilation resulted in incorrect CSS. The rule set ended up inside a body of page margin box located at 2:3.
+ 3:     margin-left: 3cm;
+ 4:     h1 {
+ 5:        bla: bla;
+
 WARNING 6:8 Compilation resulted in incorrect CSS. The rule set ended up inside a body of page margin box located at 2:3.
+ 5:        bla: bla;
+ 6:        :hover {
+ 7:          padding: 2;

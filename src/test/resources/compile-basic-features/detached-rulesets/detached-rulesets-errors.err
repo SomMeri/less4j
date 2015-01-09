@@ -1,7 +1,26 @@
 Warnings produced by compilation of testCase
 WARNING 15:26 This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.
+ 14: //less.js detached-ruleset-4.less
+ 15: .warning-for-default(@a: {
+ 16:   b: 1;
+
 WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of top level style sheet located at 1:1.
+ 1: @a: {
+ 2:   b: 1;
+ 3: };
+
 Errors produced by compilation of testCase
 ERROR 6:2 Detached ruleset call is missing parentheses.
+ 5: .call-without-parentheses {
+ 6: 	@a; 
+ 7: }
+
 ERROR 31:6 Detached ruleset is not allowed outside of variable declaration.
+ 30: .variable-declaration-symbol-missing {
+ 31:   b: {
+ 32:     color: red;
+
 ERROR 12:1 The reference brought declaration from 2:3 into top level style sheet which started at 1:1. Compilation produced an incorrect CSS.
+ 11: .brings-property-on-top {}
+ 12: @a(); 
+ 13: 

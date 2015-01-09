@@ -1,3 +1,9 @@
 Warnings produced by compilation of testCase
 WARNING 30:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 29:1.
+ 29: @media print {
+ 30:   font-size: 3em;
+ 31: }
 WARNING 34:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 33:1.
+ 33: @media screen {
+ 34:   font-size: 10px;
+ 35: }

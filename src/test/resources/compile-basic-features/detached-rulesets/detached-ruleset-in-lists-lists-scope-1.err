@@ -1,2 +1,4 @@
 Errors produced by compilation of testCase
 ERROR 1:35 The variable "@variable" was not declared.
+ 1: @detached-ruleset1: { property-1: @variable; };
+ 2: .list-namespacer {

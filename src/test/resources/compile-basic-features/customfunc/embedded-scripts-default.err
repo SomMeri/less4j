@@ -1,14 +1,65 @@
 Errors produced by compilation of testCase
 ERROR 17:11 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 16: .vars {
+ 17:     @var: `4 + 4`;
+ 18:     width: @var;
+
 ERROR 2:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 1: .eval {
+ 2:     js: `42`;
+ 3:     js: `1 + 1`;
+
 ERROR 3:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 2:     js: `42`;
+ 3:     js: `1 + 1`;
+ 4:     js: `"hello world"`;
+
 ERROR 4:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 3:     js: `1 + 1`;
+ 4:     js: `"hello world"`;
+ 5:     js: `[1, 2, 3]`;
+
 ERROR 5:9 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 4:     js: `"hello world"`;
+ 5:     js: `[1, 2, 3]`;
+ 6:     title: `typeof process.title`;
+
 ERROR 6:12 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 5:     js: `[1, 2, 3]`;
+ 6:     title: `typeof process.title`;
+ 7:     ternary: `(1 + 1 == 2 ? true : false)`;
+
 ERROR 7:14 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 6:     title: `typeof process.title`;
+ 7:     ternary: `(1 + 1 == 2 ? true : false)`;
+ 8:     multiline: `(function(){var x = 1 + 1;
+
 ERROR 8:16 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 7:     ternary: `(1 + 1 == 2 ? true : false)`;
+ 8:     multiline: `(function(){var x = 1 + 1;
+ 9:            return x})()`;
+
 ERROR 13:10 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 12:     @foo: 42;
+ 13:     var: `parseInt(this.foo.toJS())`;
+ 14:     escaped: ~`2 + 5 + 'px'`;
+
 ERROR 14:14 Escaped script ~`...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 13:     var: `parseInt(this.foo.toJS())`;
+ 14:     escaped: ~`2 + 5 + 'px'`;
+ 15: }
+
 ERROR 22:12 Escaped script ~`...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 21:     @world: "world";
+ 22:     width: ~`"hello" + " " + @{world}`;
+ 23: }
+
 ERROR 27:10 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 26:     @ary2: 1  2  3;
+ 27:     ary: `@{ary}.join(', ')`;
+ 28:     ary1: `@{ary2}.join(', ')`;
+
 ERROR 28:11 Embedded scripts `...`are not supported. The problem can be solved using custom functions. Compilation resulted in incorrect CSS.
+ 27:     ary: `@{ary}.join(', ')`;
+ 28:     ary1: `@{ary2}.join(', ')`;
+ 29: }

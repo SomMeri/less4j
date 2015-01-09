@@ -1,2 +1,5 @@
 Errors produced by compilation of testCase
 ERROR 2:10 The string "#white" is not a valid color.
+ 1: #ugly {
+ 2:   color: #white;
+ 3: }

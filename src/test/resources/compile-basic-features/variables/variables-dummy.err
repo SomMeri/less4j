@@ -1,2 +1,5 @@
 Warnings produced by compilation of testCase
 WARNING 52:13 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 51: 
+ 52: a:nth-child(@a) {
+ 53:     border: 1px;

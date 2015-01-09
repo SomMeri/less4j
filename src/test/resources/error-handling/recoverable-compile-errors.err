@@ -1,20 +1,95 @@
 Errors produced by compilation of testCase
 ERROR 2:11 The variable "@undefinedVariable" was not declared.
+ 1: #undefinedVariable {
+ 2:   margin: @undefinedVariable;
+ 3: }
+
 ERROR 6:3 The namespace "#doesNotExists > .mixin(...)" was not declared.
+ 5:   padding: 2 2 2 2;
+ 6:   #doesNotExists > .mixin();
+ 7: }
+
 ERROR 6:20 Could not find mixin named ".mixin".
+ 5:   padding: 2 2 2 2;
+ 6:   #doesNotExists > .mixin();
+ 7: }
+
 ERROR 10:3 The namespace "#undefinedNamespace > #doesNotExists > .mixin(...)" was not declared.
+  9:   padding: 2 2 2 2;
+ 10:   #undefinedNamespace > #doesNotExists > .mixin();
+ 11: }
+
 ERROR 10:42 Could not find mixin named ".mixin".
+  9:   padding: 2 2 2 2;
+ 10:   #undefinedNamespace > #doesNotExists > .mixin();
+ 11: }
+
 ERROR 15:11 The variable "@11" was not declared.
+ 14:   padding: @nonString @nonString;
+ 15:   margin: @@nonString;
+ 16: }
+
 ERROR 37:17 The operator '>' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var > ...)`. The operator is located at position 32:28.
+ 36:   padding: 2 2 2 2;
+ 37:   .guardedMixin("string");
+ 38: }
+
 ERROR 41:3 Undefined parameter @a of mixin .guardedMixin defined on line 32
+ 40:   padding: 2 2 2 2;
+ 41:   .guardedMixin(@b:4);
+ 42: }
+
 ERROR 32:25 The variable "@a" was not declared.
+ 31: }
+ 32: .guardedMixin(@a) when (@a > 3) {
+ 33:   margin: @a @a @a @a;
+
 ERROR 32:25 The operator '>' on non-numbers is not defined. The behaviour of less.js and less4j may/does differ. Avoid its use with non-numbers or use one of `istype(@arument)` functions to protect against mismatches: `when (isnumber(@var)) and (@var > ...)`. The operator is located at position 32:28.
+ 31: }
+ 32: .guardedMixin(@a) when (@a > 3) {
+ 33:   margin: @a @a @a @a;
+
 ERROR 45:3 Could not find mixin named ".doesNotExists".
+ 44:   padding: 2 2 2 2;
+ 45:   .doesNotExists();
+ 46: }
+
 ERROR 49:25 Could not find mixin named ".doesNotExists".
+ 48:   padding: 2 2 2 2;
+ 49:   #undefinedNamespace > .doesNotExists();
+ 50: }
+
 ERROR 56:3 No mixin named ".mixinWithPattern" has matching patterns.
+ 55:   padding: 2 2 2 2;
+ 56:   .mixinWithPattern(wrongpattern);
+ 57: }
+
 ERROR 19:11 Cannot negate non number.
+ 18:   padding: 2 2 2 2;
+ 19:   margin: -("hello");
+ 20: }
+
 ERROR 22:12 Can't subtract or divide a color from a number
+ 21: #substractColorFromNumber {
+ 22:   padding: 2 - #003300;
+ 23:   margin: 2 - green;
+
 ERROR 23:11 Can't subtract or divide a color from a number
+ 22:   padding: 2 - #003300;
+ 23:   margin: 2 - green;
+ 24: }
+
 ERROR 26:12 Can't subtract or divide a color from a number
+ 25: #divideNumberByColor {
+ 26:   padding: 2/#003300;
+ 27:   margin: 2/green;
+
 ERROR 27:11 Can't subtract or divide a color from a number
+ 26:   padding: 2/#003300;
+ 27:   margin: 2/green;
+ 28: }
+
 ERROR 30:9 Unable to evaluate expression
+ 29: #operationOnString-cannotEvaluate {
+ 30:   text: "input" - "output";
+ 31: }

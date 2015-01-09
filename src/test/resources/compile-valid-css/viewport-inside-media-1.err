@@ -1,3 +1,11 @@
 Warnings produced by compilation of testCase
 WARNING 6:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 5:1.
+ 5: @media screen and (width: 397px) {
+ 6:   font-size: 3em;
+ 7:   h1 { color: blue; }
+
 WARNING 12:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of MEDIA located at 5:1.
+ 11:   div { color: green; }
+ 12:   font-size: 5em;
+ 13: }
+

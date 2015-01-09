@@ -1,2 +1,4 @@
 Warnings produced by compilation of testCase
 WARNING 1:1 Ruleset without selector encountered.
+ 1: {
+ 2:   text: "ruleset without selector";

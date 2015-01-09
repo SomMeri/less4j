@@ -1,6 +1,17 @@
 Warnings produced by compilation of src/test/resources/command-line/errorsandwarnings.less
 WARNING 1:1 Ruleset without selector encountered.
+ 1: {
+ 2:   declaration: @variable;
+
 Errors produced by compilation of src/test/resources/command-line/errorsandwarnings.less
 ERROR 4:3 Could not find mixin named ".mixin".
+ 3:   padding: 2 2 2 2;
+ 4:   .mixin();
+ 5: }
+
 ERROR 2:16 The variable "@variable" was not declared.
+ 1: {
+ 2:   declaration: @variable;
+ 3:   padding: 2 2 2 2;
+
 Could not compile the file src/test/resources/command-line/errorsandwarnings.less

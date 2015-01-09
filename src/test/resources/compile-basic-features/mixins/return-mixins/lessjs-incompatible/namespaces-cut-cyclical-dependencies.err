@@ -1,2 +1,5 @@
 Errors produced by compilation of testCase
 ERROR 12:5 Could not find mixin named ".nested".
+ 11:     voila: voila;
+ 12:     .nested();
+ 13:   }

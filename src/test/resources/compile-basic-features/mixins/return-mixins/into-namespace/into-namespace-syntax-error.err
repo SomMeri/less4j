@@ -1,2 +1,5 @@
 Errors produced by compilation of testCase
 ERROR 4:11 The variable "@ignoreCallersVariable" was not declared.
+ 3: #namespace {
+ 4:   .apples(@ignoreCallersVariable);
+ 5: }

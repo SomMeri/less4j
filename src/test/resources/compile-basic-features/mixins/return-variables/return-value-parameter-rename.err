@@ -1,3 +1,10 @@
 Errors produced by compilation of testCase
 ERROR 5:10 The variable "@new" was not declared.
+ 4: .with-parameter {
+ 5:   width: @new; // syntax error - variable not available
+ 6:   .box(23);
+
 ERROR 9:10 The variable "@new" was not declared.
+  8: .without-parameter {
+  9:   width: @new; // syntax error - variable not available
+ 10:   .box();

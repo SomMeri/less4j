@@ -1,3 +1,9 @@
 Warnings produced by compilation of testCase
 WARNING 112:2 Selector fragment (~".@{theme}") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 111: @theme: blood;
+ 112: (~".@{theme}") {
+ 113:   color: #f00;
 WARNING 129:30 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 128: @num: 3;
+ 129: :nth-child(@{num}):nth-child(@num) {
+ 130: 	second-use: deprecated;

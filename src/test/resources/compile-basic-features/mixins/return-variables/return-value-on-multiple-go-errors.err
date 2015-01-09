@@ -1,4 +1,15 @@
 Errors produced by compilation of testCase
 ERROR 3:20 The variable "@second" was not declared.
+ 2:   @first: 10;
+ 3:   second-in-first: @second; // syntax error - not declared
+ 4:   third-in-first: @third; // syntax error - not declared
+
 ERROR 4:19 The variable "@third" was not declared.
+ 3:   second-in-first: @second; // syntax error - not declared
+ 4:   third-in-first: @third; // syntax error - not declared
+ 5: }
+
 ERROR 8:20 The variable "@third" was not declared.
+ 7: .variableMixin2() {
+ 8:   third-in-second: @third; // syntax error - not declared
+ 9:   @second: 20;

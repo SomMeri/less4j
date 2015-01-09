@@ -1,8 +1,31 @@
 Warnings produced by compilation of testCase
 WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of top level style sheet located at 1:1.
+ 1: .mixin1(@color) {
+ 2:   color: @color;
+ 3: }
+
 WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of top level style sheet located at 1:1.
+ 1: .mixin1(@color) {
+ 2:   color: @color;
+ 3: }
+
 Errors produced by compilation of testCase
 ERROR 24:1 Appender symbol is not allowed inside top level rulesets.
+ 23: // appender in top level selector
+ 24: & h1 {
+ 25:   color: red;
+
 ERROR 29:9 Appender symbol is not allowed inside top level rulesets.
+ 28: // appender in top level selector
+ 29: h1.class& {
+ 30:   color: red;
+
 ERROR 13:1 The reference brought declaration from 2:3 into top level style sheet which started at 1:1. Compilation produced an incorrect CSS.
+ 12: 
+ 13: .mixin3(red);
+ 14: 
+
 ERROR 21:1 The reference brought declaration from 2:3 into top level style sheet which started at 1:1. Compilation produced an incorrect CSS.
+ 20: 
+ 21: #namespace .mixin4(green);
+ 22: 

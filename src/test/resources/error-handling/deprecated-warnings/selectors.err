@@ -1,4 +1,14 @@
 Warnings produced by compilation of testCase
 WARNING 1:2 Selector fragment (~"h1") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 1: (~"h1") {
+ 2:   margin: 1;
+
 WARNING 4:2 Selector fragment (~'h2') uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 3: }
+ 4: (~'h2') {
+ 5:   margin: 1;
+
 WARNING 8:14 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 7: @num: 2;
+ 8: h1:nth-child(@num) {
+ 9:   padding: 2;

@@ -1,3 +1,8 @@
 Warnings produced by compilation of testCase
 WARNING 1:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+ 1: @import-multiple "import/chained-import-1.less" screen and (max-width: 400px);
+ 2: @import-multiple 'import/chained-import-1.less' handheld;
+
 WARNING 2:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+ 1: @import-multiple "import/chained-import-1.less" screen and (max-width: 400px);
+ 2: @import-multiple 'import/chained-import-1.less' handheld;

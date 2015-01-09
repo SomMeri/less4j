@@ -1,2 +1,5 @@
 Warnings produced by compilation of src/test/resources/command-line/warnings.less
 WARNING 1:1 Ruleset without selector encountered.
+ 1: {
+ 2:   padding: 2 2 2 2;
+

@@ -1,11 +1,49 @@
 Warnings produced by compilation of testCase
 WARNING 11:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+ 10: 
+ 11: @import-once "import\some-file-once-1.css" screen and (max-width: 400px);
+ 12: @import-once 'import\some-file-once-2.css' handheld;
+
 WARNING 12:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+ 11: @import-once "import\some-file-once-1.css" screen and (max-width: 400px);
+ 12: @import-once 'import\some-file-once-2.css' handheld;
+ 13: @import-once url("import\some-file-once-3.css?id=123");
+
 WARNING 13:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+ 12: @import-once 'import\some-file-once-2.css' handheld;
+ 13: @import-once url("import\some-file-once-3.css?id=123");
+ 14: @import-once url('import\some-file-once-4.css');
+
 WARNING 14:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+ 13: @import-once url("import\some-file-once-3.css?id=123");
+ 14: @import-once url('import\some-file-once-4.css');
+ 15: @import-once url(import\some-file-once-5.css);
+
 WARNING 15:1 `@import-once <url>` have been deprecated. Use `@import (once) <url>` instead. Input file is less.js incompatible.
+ 14: @import-once url('import\some-file-once-4.css');
+ 15: @import-once url(import\some-file-once-5.css);
+ 16: 
+
 WARNING 17:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+ 16: 
+ 17: @import-multiple "import\some-file-multiple-1.css" screen and (max-width: 400px);
+ 18: @import-multiple 'import\some-file-multiple-2.css' handheld;
+
 WARNING 18:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+ 17: @import-multiple "import\some-file-multiple-1.css" screen and (max-width: 400px);
+ 18: @import-multiple 'import\some-file-multiple-2.css' handheld;
+ 19: @import-multiple url("import\some-file-multiple-3.css?id=123");
+
 WARNING 19:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+ 18: @import-multiple 'import\some-file-multiple-2.css' handheld;
+ 19: @import-multiple url("import\some-file-multiple-3.css?id=123");
+ 20: @import-multiple url('import\some-file-multiple-4.css');
+
 WARNING 20:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+ 19: @import-multiple url("import\some-file-multiple-3.css?id=123");
+ 20: @import-multiple url('import\some-file-multiple-4.css');
+ 21: @import-multiple url(import\some-file-multiple-5.css);
+
 WARNING 21:1 `@import-multiple <url>` have been deprecated. Use `@import (multiple) <url>` instead. Input file is less.js incompatible.
+ 20: @import-multiple url('import\some-file-multiple-4.css');
+ 21: @import-multiple url(import\some-file-multiple-5.css);

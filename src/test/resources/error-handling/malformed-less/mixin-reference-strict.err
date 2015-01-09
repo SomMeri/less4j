@@ -1,4 +1,15 @@
 Errors produced by compilation of testCase
 ERROR 7:3 Interpolation is not allowed inside mixin references.
+ 6:   @variable: ~"in";
+ 7:   .mix@{variable}();
+ 8: }
+
 ERROR 18:16 Interpolation is not allowed inside mixin references.
+ 17:   @variable: ~"in";
+ 18:   #namespace > .mix@{variable}2();
+ 19: }
+
 ERROR 23:3 Interpolation is not allowed inside namespace references.
+ 22:   @variable: ~"space";
+ 23:   #name@{variable} > .mixin2();
+ 24: }

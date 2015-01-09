@@ -1,2 +1,5 @@
 Errors produced by compilation of testCase
 ERROR 5:3 Could not find mixin named ".bananas".
+ 4:   }
+ 5:   .bananas(@width) // syntax error
+ 6: }

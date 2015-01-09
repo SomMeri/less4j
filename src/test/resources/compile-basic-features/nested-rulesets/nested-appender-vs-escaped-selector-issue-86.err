@@ -1,9 +1,39 @@
 Warnings produced by compilation of testCase
 WARNING 1:2 Selector fragment (~"escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 1: (~"escaped") {
+ 2:   &.black {
+
 WARNING 9:6 Selector fragment (~".escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+  8: .green {
+  9:   > (~".escaped") {
+ 10:     color:black;
+
 WARNING 16:5 Selector fragment (~"escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 15: .green {
+ 16:   &(~"escaped") {
+ 17:     color:black;
+
 WARNING 22:6 Selector fragment (~"#escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 21: .green {
+ 22:   & (~"#escaped") {
+ 23:     color:black;
+
 WARNING 28:2 Selector fragment (~"#escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 27: //this should work too
+ 28: (~"#escaped") {
+ 29:   &(~".escaped") {
+
 WARNING 29:5 Selector fragment (~".escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 28: (~"#escaped") {
+ 29:   &(~".escaped") {
+ 30:     color:black;
+
 WARNING 34:2 Selector fragment (~"#escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 33: 
+ 34: (~"#escaped") {
+ 35:   & (~".escaped") {
+
 WARNING 35:6 Selector fragment (~".escaped") uses deprecated (~"escaped-selector") syntax. Use selector interpolation @{variableName} instead.
+ 34: (~"#escaped") {
+ 35:   & (~".escaped") {
+ 36:     color:black;

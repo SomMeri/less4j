@@ -6,6 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
@@ -56,7 +58,7 @@ public abstract class AbstractFileBasedTest {
     } catch (Less4jException ex) {
       printErrors(ex);
       assertCorrectErrors(ex);
-    } 
+    }
   }
 
   protected void assertSourceMapValid(CompilationResult actual) {
@@ -98,6 +100,28 @@ public abstract class AbstractFileBasedTest {
     assertEquals(canonize(expectedErrors()), canonize(completeErrorReport));
   }
 
+  //this method will be useful if error reporting format changes again - call from assertCorrectCssAndWarnings and assertCorrectErrors
+  @SuppressWarnings("unused")
+  private void printNewErrFiles(String completeErrorReport) {
+    String expected = canonize(expectedErrors());
+    String actual = canonize(completeErrorReport);
+    if (!expected.equals(actual)) {
+      String path = "c:\\data\\delete\\" + lessFile.getPath();
+      path = path.replace(".less", ".err");
+      System.out.println(path);
+      try {
+        File file = new File(path);
+        file.getParentFile().mkdirs();
+        file.createNewFile();
+        FileWriter output = new FileWriter(file);
+        IOUtils.write(actual, output);
+        output.close();
+      } catch (IOException e) {
+        throw new IllegalStateException();
+      }
+    }
+  }
+
   protected String canonize(String text) {
     //ignore end of line separator differences
     text = text.replace("\r\n", "\n");
@@ -107,8 +131,8 @@ public abstract class AbstractFileBasedTest {
 
     //ignore occasional end lines
     while (text.endsWith("\n"))
-      text=text.substring(0, text.length()-1);
-    
+      text = text.substring(0, text.length() - 1);
+
     return text;
   }
 
@@ -129,9 +153,9 @@ public abstract class AbstractFileBasedTest {
   }
 
   private String expectedErrors() {
-    if (errorList==null || !errorList.exists())
+    if (errorList == null || !errorList.exists())
       return "";
-    
+
     try {
       return DebugAndTestPrint.platformFileSeparator(IOUtils.toString(new FileReader(errorList)));
     } catch (Throwable ex) {
@@ -145,7 +169,7 @@ public abstract class AbstractFileBasedTest {
 
     CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
     printer.reportErrorsAndWarnings(error, "testCase", lessFile);
-    
+
     String completeErrorReport = errContent.toString();
     return completeErrorReport;
   }
@@ -156,7 +180,7 @@ public abstract class AbstractFileBasedTest {
 
     CommandLinePrint printer = new CommandLinePrint(new PrintStream(outContent), new PrintStream(errContent));
     printer.printWarnings("testCase", lessFile, result);
-    
+
     String completeErrorReport = errContent.toString();
     return completeErrorReport;
   }

@@ -1,10 +1,41 @@
 Warnings produced by compilation of testCase
 WARNING 2:24 function 'percentage' requires number as a parameter.
+ 1: #percentage {
+ 2:   padding1: percentage(something); 
+ 3:   padding2: percentage("invalid"); 
+
 WARNING 3:24 function 'percentage' requires number as a parameter.
+ 2:   padding1: percentage(something); 
+ 3:   padding2: percentage("invalid"); 
+ 4: }
+
 Errors produced by compilation of testCase
 ERROR 6:19 Wrong argument type to function 'floor', expected number saw identifier.
+ 5: #floor {
+ 6:   padding1: floor(something);
+ 7:   padding2: floor("0.5");
+
 ERROR 7:19 Wrong argument type to function 'floor', expected number saw string.
+ 6:   padding1: floor(something);
+ 7:   padding2: floor("0.5");
+ 8: }
+
 ERROR 10:18 Wrong argument type to function 'ceil', expected number saw identifier.
+  9: #ceil {
+ 10:   padding1: ceil(something);
+ 11:   padding2: ceil("0.5");
+
 ERROR 11:18 Wrong argument type to function 'ceil', expected number saw string.
+ 10:   padding1: ceil(something);
+ 11:   padding2: ceil("0.5");
+ 12: }
+
 ERROR 14:19 Wrong argument type to function 'round', expected number saw identifier.
+ 13: #round {
+ 14:   padding1: round(something);
+ 15:   padding2: round("0.5");
+
 ERROR 15:19 Wrong argument type to function 'round', expected number saw string.
+ 14:   padding1: round(something);
+ 15:   padding2: round("0.5");
+ 16: }

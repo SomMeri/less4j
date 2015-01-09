@@ -1,3 +1,10 @@
 Warnings produced by compilation of testCase
 WARNING 2:22 This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.
+ 1: #basic-case {
+ 2:   .mixin(@parameter: {default: default;}) {
+ 3:     @parameter();
+
 WARNING 16:22 This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.
+ 15: #sees-caller-scope {
+ 16:   .mixin(@parameter: {.inCaller();}) {
+ 17:     @parameter();

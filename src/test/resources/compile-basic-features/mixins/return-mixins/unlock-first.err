@@ -1,3 +1,10 @@
 Errors produced by compilation of testCase
 ERROR 13:3 Could not find mixin named ".doSomething".
+ 12: #use-directly { 
+ 13:   .doSomething(); // use before unlocking, syntax error 
+ 14:   .unlock(5); 
+
 ERROR 8:3 Could not find mixin named ".doSomething".
+ 7: #namespace() {
+ 8:   .doSomething(); // use before unlocking, syntax error 
+ 9:   .unlock(5); 

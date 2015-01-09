@@ -1,10 +1,41 @@
 Warnings produced by compilation of testCase
 WARNING 2:24 function 'percentage' requires number as a parameter.
+ 1: #percentage {
+ 2:   padding1: percentage(something); 
+ 3:   padding2: percentage("invalid"); 
+
 WARNING 3:24 function 'percentage' requires number as a parameter.
+ 2:   padding1: percentage(something); 
+ 3:   padding2: percentage("invalid"); 
+ 4:   padding3: percentage("0.5"); 
+
 WARNING 11:14 function 'percentage' requires number as a parameter.
+ 10: 
+ 11: @percentBad: "string";
+ 12: @percentString: "0.5";
+
 Errors produced by compilation of testCase
 ERROR 225:16 Wrong number of arguments to function 'max', should be at least 1.
+ 224:   max-14: max("junk", "junk");
+ 225:   max-error-1: max(); 
+ 226:   max-error-2: max(3%, 2mm, 8%, 1cm); 
+
 ERROR 226:16 Can not compare '%' with 'mm'.
+ 225:   max-error-1: max(); 
+ 226:   max-error-2: max(3%, 2mm, 8%, 1cm); 
+ 227: }
+
 ERROR 247:16 Wrong number of arguments to function 'min', should be at least 1.
+ 246:   min-14: min("junk", "junk");
+ 247:   min-error-1: min(); 
+ 248:   min-error-2: min(3%, 2mm, 8%, 1cm); 
+
 ERROR 248:16 Can not compare '%' with 'mm'.
+ 247:   min-error-1: min(); 
+ 248:   min-error-2: min(3%, 2mm, 8%, 1cm); 
+ 249: }
+
 ERROR 252:11 Wrong number of arguments to function 'length', should be at least 1.
+ 251: #use-length {
+ 252:   length: length();
+ 253:   length-1: length("one");

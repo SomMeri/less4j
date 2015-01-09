@@ -1,2 +1,4 @@
 Warnings produced by compilation of testCase
 WARNING 8:18 Target selector of extend contains nested extend. Nested extend will be ignored. The behaviour of less.js and less4j differ on this type of input.
+ 7: //less.js would ignore this extend, we only ignore nested extends
+ 8: .topLevel:extend(.selector:extend(.aha)) {} // this should not be recognized 

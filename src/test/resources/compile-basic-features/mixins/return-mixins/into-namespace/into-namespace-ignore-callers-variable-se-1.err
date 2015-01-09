@@ -1,2 +1,5 @@
 Errors produced by compilation of testCase
 ERROR 5:14 The variable "@ignoreCallersVariable" was not declared.
+ 4:   // not sure whether this is less.js bug or feature, but it seems to be insignificant enough
+ 5:   @variable: @ignoreCallersVariable;
+ 6:   .apples(@variable);

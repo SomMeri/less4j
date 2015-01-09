@@ -1,5 +1,20 @@
 Warnings produced by compilation of testCase
 WARNING 5:19 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 4:   
+ 5:   first:something(@variable), second:pseudoclass(@xxx) {
+ 6:     declaration: value;
+
 WARNING 5:50 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 4:   
+ 5:   first:something(@variable), second:pseudoclass(@xxx) {
+ 6:     declaration: value;
+
 WARNING 7:20 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 6:     declaration: value;
+ 7:     nested1:length(@xxx), nested2:content(@variable) {
+ 8:       declaration: value;
+
 WARNING 7:43 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 6:     declaration: value;
+ 7:     nested1:length(@xxx), nested2:content(@variable) {
+ 8:       declaration: value;

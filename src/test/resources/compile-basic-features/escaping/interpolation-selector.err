@@ -1,2 +1,5 @@
 Warnings produced by compilation of testCase
 WARNING 86:30 Variables as pseudo classes parameters have been deprecated. Use selector interpolation @{variableName} instead.
+ 85: @num: 3;
+ 86: :nth-child(@{num}):nth-child(@num) {
+ 87: second-use: depreciated;
