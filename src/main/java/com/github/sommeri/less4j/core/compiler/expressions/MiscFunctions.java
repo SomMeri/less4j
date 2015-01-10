@@ -292,18 +292,19 @@ class DataUri extends CatchAllMultiParameterFunction {
       LessSource dataSource = source.relativeSource(filename);
       byte[] data = dataSource.getBytes();
 
+      String encodedData = encodeDataUri(mimetype, data);
       // **** less.js comment - flag is not implemented yet ****
       // IE8 cannot handle a data-uri larger than 32KB. If this is exceeded
       // and the --ieCompat flag is enabled, return a normal url() instead.
-      int fileSizeInKB = data.length / 1024;
-      if (fileSizeInKB >= DATA_URI_MAX_KB) {
-        problemsHandler.warnIE8UnsafeDataUri(functionCall, filename, fileSizeInKB, DATA_URI_MAX_KB);
+      int encodedSizeInKB = encodedData.length() / 1024;
+      if (encodedSizeInKB >= DATA_URI_MAX_KB) {
+        problemsHandler.warnIE8UnsafeDataUri(functionCall, filename, encodedSizeInKB, DATA_URI_MAX_KB);
         FunctionExpression result = new FunctionExpression(token, "url", functionCall.getParameter().clone());
         result.configureParentToAllChilds();
         return result;
       }
 
-      return toDataUri(token, mimetype, data, fragments);
+      return toDataUri(token, mimetype, encodedData, fragments);
 
     } catch (FileNotFound ex) {
       problemsHandler.errorFileNotFound(functionCall, filename);
@@ -328,11 +329,11 @@ class DataUri extends CatchAllMultiParameterFunction {
     return mimetype;
   }
 
-  private Expression toDataUri(HiddenTokenAwareTree token, String mimetype, byte[] data, String fragments) {
+  private String encodeDataUri(String mimetype, byte[] data) {
     if (mimetype != null && mimetype.toLowerCase().endsWith("base64"))
-      return toDataUri(token, mimetype, PrintUtils.base64Encode(data), fragments);
+      return PrintUtils.base64Encode(data);
     else
-      return toDataUri(token, mimetype, PrintUtils.toUtf8AsUri(new String(data)), fragments);
+      return PrintUtils.toUtf8AsUri(new String(data));
   }
 
   private Expression toDataUri(HiddenTokenAwareTree token, String mimetype, String data, String fragments) {

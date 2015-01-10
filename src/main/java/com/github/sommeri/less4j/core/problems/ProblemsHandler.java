@@ -285,7 +285,7 @@ public class ProblemsHandler implements LessProblems {
   }
 
   public void warnIE8UnsafeDataUri(FunctionExpression errorNode, String filename, int fileSizeInKB, int dataUriMaxKb) {
-    addWarning(errorNode, "Skipped data-uri embedding of " + filename + " because its size ("+fileSizeInKB+"dKB) exceeds IE8-safe "+dataUriMaxKb+"dKB!");
+    addWarning(errorNode, "Skipped data-uri embedding of " + filename + " because its size when encoded to string ("+fileSizeInKB+"dKB) exceeds IE8-safe "+dataUriMaxKb+"dKB!");
   }
 
   public void ambiguousDefaultSet(MixinReference reference, List<ASTCssNode> possibleMixins) {

@@ -1,5 +1,5 @@
 Warnings produced by compilation of testCase
-WARNING 22:8 Skipped data-uri embedding of ../data/data-uri-fail.png because its size (51dKB) exceeds IE8-safe 32dKB!
+WARNING 22:8 Skipped data-uri embedding of ../data/data-uri-fail.png because its size when encoded to string (68dKB) exceeds IE8-safe 32dKB!
  21: #data-uri-toobig {
  22:   uri: data-uri('../data/data-uri-fail.png');
  23: }
