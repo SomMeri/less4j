@@ -1,3 +1,7 @@
 .selector /deep/ .whatever {
   direct: something;
 }
+a,
+b {
+  border-width: 2px;
+}

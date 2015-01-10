@@ -461,7 +461,7 @@ ruleSet
 @init {enterRule(retval, RULE_RULESET);}
     : ((a+=selector (
          (reusableStructureGuards LBRACE) => g+=reusableStructureGuards
-         | ( a+=selectorSeparator a+=selector)*)
+         | ( a+=selectorSeparator a+=selector)* selectorSeparator?)
        ))? 
        b=general_body
      -> ^(RULESET $a* $g* $b)
@@ -766,14 +766,14 @@ reusableStructurePattern
 //their unit tests (so it was intentional)
 declaration
 @init {enterRule(retval, RULE_DECLARATION);}
-    : property COLON expr? prio? -> ^(DECLARATION property expr? prio?)
+    : property COLON expr? -> ^(DECLARATION property expr? )
     ;
 finally { leaveRule(); }
 
 //I had to do this to put semicolon as a last member of the declaration subtree - comments would be messed up otherwise.
 declarationWithSemicolon
 @init {enterRule(retval, RULE_DECLARATION);}
-    : property COLON expr? prio? SEMI -> ^(DECLARATION property expr? prio?)
+    : property COLON expr? SEMI -> ^(DECLARATION property expr? )
     ;
 finally { leaveRule(); }
     
