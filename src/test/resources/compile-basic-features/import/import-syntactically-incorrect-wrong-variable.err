@@ -1,5 +1,5 @@
 Errors produced by compilation of testCase
-ERROR import\syntactically-incorrect-wrong-variable.less 3:10 The variable "@undefinedVariable" was not declared.
+ERROR import#FILE_SEPARATOR#syntactically-incorrect-wrong-variable.less 3:10 The variable "@undefinedVariable" was not declared.
  2: ruleset {
  3:   color: @undefinedVariable;
  4: }
