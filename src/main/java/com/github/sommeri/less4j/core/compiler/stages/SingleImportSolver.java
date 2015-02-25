@@ -77,8 +77,7 @@ public class SingleImportSolver {
     try {
       importedSource = source.relativeSource(filename);
     } catch (FileNotFound ex) {
-      problemsHandler.errorFileNotFound(node, filename);
-      return null;
+      return importFileNotFound(node, filename);
     } catch (CannotReadFile e) {
       problemsHandler.errorFileCanNotBeRead(node, filename);
       return null;
@@ -99,22 +98,14 @@ public class SingleImportSolver {
       importedContent = importedSource.getContent();
       importedSources.add(importedSource);
     } catch (FileNotFound e) {
-      problemsHandler.errorFileNotFound(node, filename);
-      return null;
+      return importFileNotFound(node, filename);
     } catch (CannotReadFile e) {
       problemsHandler.errorFileCanNotBeRead(node, filename);
       return null;
     }
 
     if (node.isInline()) {
-      HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
-      StyleSheet result = new StyleSheet(underlyingStructure);
-      InlineContent content = new InlineContent(underlyingStructure, importedContent);
-      result.addMember(content);
-      result.configureParentToAllChilds();
-      
-      astManipulator.replaceInBody(node, content);
-      return result;
+      return replaceByInlineValue(node, importedContent);
     }
     
     StyleSheet importedAst = buildImportedAst(node, importedSource, importedContent);
@@ -123,6 +114,25 @@ public class SingleImportSolver {
     }
     astManipulator.replaceInBody(node, importedAst.getChilds());
     return importedAst;
+  }
+
+  private ASTCssNode replaceByInlineValue(Import node, String importedContent) {
+    HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
+    StyleSheet result = new StyleSheet(underlyingStructure);
+    InlineContent content = new InlineContent(underlyingStructure, importedContent);
+    result.addMember(content);
+    result.configureParentToAllChilds();
+    
+    astManipulator.replaceInBody(node, content);
+    return result;
+  }
+
+  private ASTCssNode importFileNotFound(Import node, String filename) {
+    if (!node.isOptional()) {
+      problemsHandler.errorFileNotFound(node, filename);
+      return null;
+    }
+    return replaceByInlineValue(node, "");
   }
 
   private StyleSheet buildImportedAst(Import node, LessSource source, String content) {

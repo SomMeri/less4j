@@ -119,7 +119,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private final static String IMPORT_OPTION_CSS = "css";
   private final static String IMPORT_OPTION_ONCE = "once";
   private final static String IMPORT_OPTION_MULTIPLE = "multiple";
-
+  private final static String IMPORT_OPTION_OPTIONAL = "optional";
+  
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
@@ -1233,6 +1234,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         node.setContentKind(ImportContent.CSS);
       } else if (IMPORT_OPTION_REFERENCE.equals(text)) {
         node.setReferenceOnly(true);
+      } else if (IMPORT_OPTION_OPTIONAL.equals(text)) {
+        node.setOptional(true);
       } else {
         problemsHandler.unknownImportOption(node, text);
       }

@@ -13,6 +13,7 @@ public class Import extends ASTCssNode {
   private ImportContent contentKind = ImportContent.SUFFIX_BASED;
   private boolean isInline = false;
   private boolean isReferenceOnly = false;
+  private boolean isOptional = false;
   private Expression urlExpression;
   private List<MediaQuery> mediums = new ArrayList<MediaQuery>();
 
@@ -34,6 +35,14 @@ public class Import extends ASTCssNode {
 
   public void setInline(boolean isInline) {
     this.isInline = isInline;
+  }
+
+  public boolean isOptional() {
+     return isOptional;
+  }
+
+  public void setOptional(boolean isOptional) {
+    this.isOptional = isOptional;
   }
 
   public ImportContent getContentKind() {

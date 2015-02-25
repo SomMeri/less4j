@@ -1,18 +1,8 @@
-/* a, b, {
-  @color: wheat;
-  @wheat: test;
-  property: @@color;
-} */
 h1 {
-	color: blue;
+  color: blue;
 }
 
 @import (optional) "file-that-does-not-exists.less";
 @import (optional, less, reference) "file-that-does-not-exists.less";
 @import (optional, css, inline) "file-that-does-not-exists.css";
-
-//TODO plus one that does exists
-
-h2 {
-	color: red;
-}
+@import (optional) "import/one-simple-ruleset.less";

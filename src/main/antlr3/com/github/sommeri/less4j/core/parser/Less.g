@@ -215,7 +215,7 @@ imports
 finally { leaveRule(); }
 
 importoptions:
-  LPAREN a+=IDENT+ RPAREN
+  LPAREN (a+=IDENT COMMA)* a+=IDENT? RPAREN
   -> ^(IMPORT_OPTIONS $a*)
   ;
 // ---------
