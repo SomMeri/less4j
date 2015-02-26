@@ -38,7 +38,7 @@ public abstract class ExpressionComparator {
 
   private boolean equalColor(ColorExpression pattern, Expression expression) {
     if (expression instanceof ColorExpression) {
-      return equals(pattern.getValue(), ((ColorExpression) expression).getValue());
+      return equals(pattern.getValueInHexadecimal(), ((ColorExpression) expression).getValueInHexadecimal());
     }
 
     return false;

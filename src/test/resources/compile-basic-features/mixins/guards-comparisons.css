@@ -148,3 +148,21 @@
   reversed-content: 3 is not theme2;
   reversed-content: 3 is theme1 no quotes;
 }
+.guard-short-vs-long-1 {
+  was-equal: equal;
+}
+.guard-short-vs-long-2 {
+  was-equal: equal;
+}
+.guard-named-vs-nonnamed-1 {
+  was-equal: equal;
+}
+.guard-named-vs-nonnamed-2 {
+  was-equal: equal;
+}
+.guard-short-vs-named-1 {
+  was-equal: equal;
+}
+.guard-short-vs-named-2 {
+  was-equal: equal;
+}

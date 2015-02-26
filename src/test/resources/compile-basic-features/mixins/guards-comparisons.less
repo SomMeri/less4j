@@ -128,3 +128,45 @@
 	.stringguard("theme2", 2);
 	.stringguard(theme1, 3);
 }
+
+// ignore form when comparing colors
+.isEqual(@one, @two) when (@one = @two) {
+  was-equal: equal;
+}
+
+.guard-short-vs-long-1 {
+   @short: #123;
+   @long: #112233;
+  .isEqual(@short, @long);
+}
+
+.guard-short-vs-long-2 {
+   @short: #123;
+   @long: #112233;
+  .isEqual(@long, @short);
+}
+
+.guard-named-vs-nonnamed-1 {
+   @short: aqua;
+   @long: #00ffff;
+  .isEqual(@short, @long);
+}
+
+.guard-named-vs-nonnamed-2 {
+   @short: aqua;
+   @long: #00ffff;
+  .isEqual(@long, @short);
+}
+
+.guard-short-vs-named-1 {
+   @short: #0ff;
+   @long: aqua;
+  .isEqual(@short, @long);
+}
+
+.guard-short-vs-named-2 {
+   @short: #0ff;
+   @long: aqua;
+  .isEqual(@long, @short);
+}
+ 

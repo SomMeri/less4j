@@ -1,18 +1,25 @@
-.noncolor {
-  normal: red !noncolor;
-  important: red !noncolor !important;
+b {
+  property: test;
 }
-.impblah {
-  normal: red !importantblaaah;
-  important: red !importantblaaah !important;
+in-string {
+  named: "wheat: wheat";
+  shorthand: "#123: #112233";
 }
-.important {
-  normal: red !important;
-  important: red !important;
+.guard-short-vs-long-1 {
+  was-equal: equal;
 }
-.mixin-reference-important {
-  normal: value !important;
-  important: value !important;
-  variable-normal: value !important;
-  variable-important: value !important;
+.guard-short-vs-long-2 {
+  was-equal: equal;
+}
+.guard-named-vs-nonnamed-1 {
+  was-equal: equal;
+}
+.guard-named-vs-nonnamed-2 {
+  was-equal: equal;
+}
+.guard-short-vs-named-1 {
+  was-equal: equal;
+}
+.guard-short-vs-named-2 {
+  was-equal: equal;
 }
