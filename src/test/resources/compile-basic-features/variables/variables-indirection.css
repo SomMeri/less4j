@@ -5,3 +5,6 @@
 .badge-grey {
   background-color: #333 !important;
 }
+named-color {
+  property: test;
+}

@@ -1,53 +1,5 @@
-b {
+named-color {
   @color: wheat;
   @wheat: test;
-  //property: @@color;
+  property: @@color;
 }
-
-in-string {
-  @named: wheat;
-  @shorthand: #123;
-  named: "wheat: @{named}";
-  shorthand: "#123: @{shorthand}";
-}
-
-.mixin(@one, @two) when (@one = @two) {
-  was-equal: equal;
-}
-
-.guard-short-vs-long-1 {
-   @short: #123;
-   @long: #112233;
-  .mixin(@short, @long);
-}
-
-.guard-short-vs-long-2 {
-   @short: #123;
-   @long: #112233;
-  .mixin(@long, @short);
-}
-
-.guard-named-vs-nonnamed-1 {
-   @short: aqua;
-   @long: #00ffff;
-  .mixin(@short, @long);
-}
-
-.guard-named-vs-nonnamed-2 {
-   @short: aqua;
-   @long: #00ffff;
-  .mixin(@long, @short);
-}
-
-.guard-short-vs-named-1 {
-   @short: #0ff;
-   @long: aqua;
-  .mixin(@short, @long);
-}
-
-.guard-short-vs-named-2 {
-   @short: #0ff;
-   @long: aqua;
-  .mixin(@long, @short);
-}
-

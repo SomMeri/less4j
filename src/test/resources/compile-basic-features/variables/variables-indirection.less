@@ -17,3 +17,10 @@
 }
 
 .label-color(~"grey");
+
+//variable name is also color https://github.com/SomMeri/less4j/issues/257
+named-color {
+  @color: wheat;
+  @wheat: test;
+  property: @@color;
+}
