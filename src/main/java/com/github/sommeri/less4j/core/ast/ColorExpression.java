@@ -43,6 +43,11 @@ public class ColorExpression extends Expression {
     return value;
   }
 
+  public boolean isShorthand() {
+    String value = getValue();
+    return !isNamed() && value!=null && value.length() < 7;
+  }
+  
   public String getValueInHexadecimal() {
     return encode(red, green, blue);
   }

@@ -144,12 +144,12 @@ class Format extends AbstractFunction {
 
   private Expression evaluate(EscapedValue format, List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree technicalUnderlying) {
     String newValue = format(format.getValue(), parameters, problemsHandler, technicalUnderlying);
-    return new CssString(format.getUnderlyingStructure(), newValue, "\"");
+    return new CssString(format.getUnderlyingStructure(), newValue, format.getQuoteType());
   }
 
   private Expression evaluate(CssString format, List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree technicalUnderlying) {
     String newValue = format(format.getValue(), parameters, problemsHandler, technicalUnderlying);
-    return new CssString(format.getUnderlyingStructure(), newValue, "\"");
+    return new CssString(format.getUnderlyingStructure(), newValue, format.getQuoteType());
   }
 
   private String format(String value, List<Expression> parameters, ProblemsHandler problemsHandler, HiddenTokenAwareTree technicalUnderlying) {
@@ -197,7 +197,7 @@ class Replace extends AbstractMultiParameterFunction {
       return new CssString(token, replaced, string.getQuoteType());
 
     case ESCAPED_VALUE:
-      return new EscapedValue(token, replaced);
+      return new EscapedValue(token, replaced, ((EscapedValue)targetExpression).getQuoteType());
 
     default:
       return new CssString(token, replaced, "'");

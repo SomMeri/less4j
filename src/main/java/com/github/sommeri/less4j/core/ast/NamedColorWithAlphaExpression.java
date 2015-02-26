@@ -16,6 +16,10 @@ public class NamedColorWithAlphaExpression extends ColorWithAlphaExpression {
     this.colorName = colorName;
   }
 
+  public String getValue() {
+    return getColorName();
+  }
+
   public String getColorName() {
     return colorName;
   }

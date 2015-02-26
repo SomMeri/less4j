@@ -9,10 +9,12 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 public class EscapedValue extends Expression {
 
   private String value;
+  private String quoteType; //"\""
 
-  public EscapedValue(HiddenTokenAwareTree token, String value) {
+  public EscapedValue(HiddenTokenAwareTree token, String value, String quoteType) {
     super(token);
     this.value = value;
+    this.quoteType = quoteType;
   }
 
   public String getValue() {
@@ -21,6 +23,14 @@ public class EscapedValue extends Expression {
 
   public void setValue(String value) {
     this.value = value;
+  }
+
+  public String getQuoteType() {
+    return quoteType;
+  }
+
+  public void setQuoteType(String quoteType) {
+    this.quoteType = quoteType;
   }
 
   @Override

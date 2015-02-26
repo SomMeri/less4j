@@ -129,7 +129,7 @@ public class ExpressionEvaluator {
 
   public Expression evaluate(EscapedValue input) {
     String value = stringInterpolator.replaceIn(input.getValue(), this, input.getUnderlyingStructure());
-    return new EscapedValue(input.getUnderlyingStructure(), value);
+    return new EscapedValue(input.getUnderlyingStructure(), value, input.getQuoteType());
   }
 
   public Expression evaluate(EmbeddedScript input) {

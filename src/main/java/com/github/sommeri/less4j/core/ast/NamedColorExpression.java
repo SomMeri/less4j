@@ -198,6 +198,10 @@ public class NamedColorExpression extends ColorExpression {
     
     return new NamedColorWithAlphaExpression(token, colorName, color);
   }
+  
+  public String getValue() {
+    return getColorName();
+  }
 
   public boolean isNamed() {
     return true;

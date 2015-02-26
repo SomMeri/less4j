@@ -28,10 +28,14 @@ public class InStringCssPrinter extends CssPrinter {
 
   @Override
   protected boolean appendColorExpression(ColorExpression expression) {
-    cssOnly.append(expression.getValueInHexadecimal());
-    return true;
+    if (expression.isShorthand()) {
+      cssOnly.append(expression.getValueInHexadecimal());
+      return true;
+    } else {
+      return super.appendColorExpression(expression);
+    }
   }
-  
+
   public boolean appendDetachedRuleset(DetachedRuleset node) {
     cssOnly.append(ERROR);
     unprintableNodes.add(node);

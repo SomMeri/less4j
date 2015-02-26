@@ -903,13 +903,14 @@ public class CssPrinter {
   }
 
   protected boolean appendColorExpression(ColorExpression expression) {
-    // if it is named color expression, write out the name
-    if (expression.isNamed()) {
-      cssOnly.append(expression.getColorName());
-    } else {
-//      cssAndSM.append(expression.getValue(), expression.getUnderlyingStructure());
-      cssOnly.append(expression.getValue());
-    }
+    cssOnly.append(expression.getValue());
+    //    // if it is named color expression, write out the name
+//    if (expression.isNamed()) {
+//      cssOnly.append(expression.getColorName());
+//    } else {
+////      cssAndSM.append(expression.getValue(), expression.getUnderlyingStructure());
+//      cssOnly.append(expression.getValue());
+//    }
 
     return true;
   }

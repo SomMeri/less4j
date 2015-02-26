@@ -219,7 +219,7 @@ public class TermBuilder {
     offsetChild.pushHiddenToKids();
     HiddenTokenAwareTree valueToken = offsetChild.getChild(0);
     String quotedText = valueToken.getText();
-    return new EscapedValue(valueToken, quotedText.substring(2, quotedText.length() - 1));
+    return new EscapedValue(valueToken, quotedText.substring(2, quotedText.length() - 1), quotedText.substring(1, 1));
   }
 
   private Expression buildFromString(HiddenTokenAwareTree token, HiddenTokenAwareTree first) {

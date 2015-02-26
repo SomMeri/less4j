@@ -49,7 +49,7 @@
   format: "rgb(32, 128, 64)";
   format-string: "hello world";
   format-multiple: "hello earth 2";
-  format-url-encode: "red is %23ff0000";
+  format-url-encode: 'red is %23ff0000';
   eformat: rgb(32, 128, 64);
   unitless: 12;
   unit: 14em;

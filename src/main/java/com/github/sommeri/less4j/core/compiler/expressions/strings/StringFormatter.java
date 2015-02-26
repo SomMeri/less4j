@@ -3,10 +3,7 @@ package com.github.sommeri.less4j.core.compiler.expressions.strings;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.IdentifierExpression;
-import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
@@ -59,14 +56,9 @@ public class StringFormatter extends AbstractStringReplacer<Iterator<Expression>
     }
 
     Expression replacement = replacements.next();
-    // special case: imitating less.js behavior on incorrect color input
-    if ("S".equals(name) && replacement.getType()==ASTCssNodeType.COLOR_EXPRESSION) {
-      return "undefined";
-    }
-
     if ("s".equalsIgnoreCase(name)) {
       InStringCssPrinter printer = new InStringCssPrinter();
-      printer.append(validate(replacement));
+      printer.append(replacement);
       return printer.toString();
     } else if ("d".equalsIgnoreCase(name) || "a".equalsIgnoreCase(name)) {
       QuotesKeepingInStringCssPrinter printer = new QuotesKeepingInStringCssPrinter();
@@ -75,16 +67,6 @@ public class StringFormatter extends AbstractStringReplacer<Iterator<Expression>
     } 
 
     return null;
-  }
-
-  private Expression validate(Expression replacement) {
-    if (replacement.getType() != ASTCssNodeType.COLOR_EXPRESSION)
-      return replacement;
-
-    if (replacement instanceof NamedColorExpression)
-      return new IdentifierExpression(replacement.getUnderlyingStructure(), "");
-
-    return new IdentifierExpression(replacement.getUnderlyingStructure(), "");
   }
 
   @Override
