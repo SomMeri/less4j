@@ -16,6 +16,7 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 public class TypeFunctions extends BuiltInFunctionsPack {
 
   protected static final String ISCOLOR = "iscolor";
+  protected static final String IS_RULESET = "isruleset";
   protected static final String ISKEYWORD = "iskeyword";
   protected static final String ISNUMBER = "isnumber";
   protected static final String ISSTRING = "isstring";
@@ -28,6 +29,7 @@ public class TypeFunctions extends BuiltInFunctionsPack {
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
     FUNCTIONS.put(ISCOLOR, new IsColor());
+    FUNCTIONS.put(IS_RULESET, new IsRuleset());
     FUNCTIONS.put(ISKEYWORD, new IsKeyword());
     FUNCTIONS.put(ISNUMBER, new IsNumber());
     FUNCTIONS.put(ISSTRING, new IsString());
@@ -54,6 +56,15 @@ class IsColor extends AbstractTypeFunction {
   @Override
   protected boolean checkType(Expression parameter) {
     return parameter.getType() == ASTCssNodeType.COLOR_EXPRESSION;
+  }
+
+}
+
+class IsRuleset extends AbstractTypeFunction {
+
+  @Override
+  protected boolean checkType(Expression parameter) {
+    return parameter.getType() == ASTCssNodeType.DETACHED_RULESET;
   }
 
 }

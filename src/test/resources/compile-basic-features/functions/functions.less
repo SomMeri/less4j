@@ -120,6 +120,10 @@
     percent: ispercentage(32%);
     em: isem(32em);
     cat: isunit(32cat, cat);
+    @detached: { yes: it is; };
+    isRuleset-yes: isruleset(@detached);
+    isRuleset-no-1: isruleset("hello");
+    isRuleset-no-2: isruleset(32em);
   }
 }
 

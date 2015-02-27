@@ -111,6 +111,9 @@
   percent: true;
   em: true;
   cat: true;
+  isRuleset-yes: true;
+  isRuleset-no-1: false;
+  isRuleset-no-2: false;
 }
 #alpha {
   alpha: rgba(153, 94, 51, 0.6);

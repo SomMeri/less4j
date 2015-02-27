@@ -1,5 +1,11 @@
-named-color {
-  @color: wheat;
-  @wheat: test;
-  property: @@color;
+@ruleset: {
+  property: value;
+};
+
+.isRuleset(@ruleset) when (isRuleset(@ruleset)) {
+  yes: it was;
+}
+
+.table {
+  .isRuleset(@ruleset);
 }
