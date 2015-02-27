@@ -1,11 +1,3 @@
-@ruleset: {
-  property: value;
-};
-
-.isRuleset(@ruleset) when (isRuleset(@ruleset)) {
-  yes: it was;
-}
-
-.table {
-  .isRuleset(@ruleset);
+#data-uri-ascii {
+  svg-not-base-64: data-uri('../compile-basic-features/data/image.svg');
 }

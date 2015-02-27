@@ -32,6 +32,17 @@ public class NodeMime {
     return lookupBySuffix(suffix);
   }
 
+  public String lookupCharset(String mimeType) {
+    return lookupCharset(mimeType, null);
+  }
+  
+  public String lookupCharset(String mimeType, String fallback) {
+    if (mimeType==null)
+      return fallback;
+    
+    return mimeType.startsWith("text") ? "UTF-8" : fallback;
+  }
+  
   private String lookupBySuffix(String suffix) {
     Map<String, String> typeDatabase = getTypeDatabase();
     String result = typeDatabase.get(suffix);

@@ -284,7 +284,7 @@ class DataUri extends CatchAllMultiParameterFunction {
     filename = filenameParts[0];
     String fragments = filenameParts.length > 1 ? "#" + filenameParts[1] : "";
 
-    if (mimetype==null)
+    if (mimetype == null)
       mimetype = guessMimetype(filename);
 
     LessSource source = token.getSource();
@@ -323,17 +323,27 @@ class DataUri extends CatchAllMultiParameterFunction {
   private String guessMimetype(String filename) {
     String mimetype;
     mimetype = mime.lookupMime(filename);
-    if (!mime.isText(mimetype)) {
+    String charset = mime.lookupCharset(mimetype);
+    if (!textCharset(charset) && !isSvg(mimetype)) {
       mimetype += ";base64";
     }
     return mimetype;
   }
 
+  private boolean isSvg(String mimetype) {
+    return "image/svg+xml".equals(mimetype);
+  }
+
   private String encodeDataUri(String mimetype, byte[] data) {
-    if (mimetype != null && mimetype.toLowerCase().endsWith("base64"))
+    if (mimetype != null && mimetype.toLowerCase().endsWith("base64")) {
       return PrintUtils.base64Encode(data);
-    else
+    } else {
       return PrintUtils.toUtf8AsUri(new String(data));
+    }
+  }
+
+  private boolean textCharset(String charset) {
+    return "UTF-8".equals(charset) || "US-ASCII".equals(charset);
   }
 
   private Expression toDataUri(HiddenTokenAwareTree token, String mimetype, String data, String fragments) {
