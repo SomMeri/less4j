@@ -1,0 +1,9 @@
+// variable named "i" https://github.com/SomMeri/less4j/issues/266
+.generate-fontface(@i ) when (@i =< 4) {
+  property: @i;
+  .generate-fontface(@i + 1);
+}
+
+@font-face {
+  .generate-fontface(1);
+}

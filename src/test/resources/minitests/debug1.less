@@ -1,3 +1,35 @@
-#data-uri-ascii {
-  svg-not-base-64: data-uri('../compile-basic-features/data/image.svg');
+//@impblah: red !importantblaaah;
+@ima: red;
+.impblah {
+  normal: red;
 }
+// variable named "i" https://github.com/SomMeri/less4j/issues/266
+.generate-fontface(@i ) when (@i =< 4) {
+  property: @i;
+  .generate-fontface(@i + 1);
+}
+
+@font-face {
+  .generate-fontface(1);
+}
+
+/*#namespace(@variable) { // mandatory parameter - can not be used as namespace
+  .mixin() { mandatory: parameter;  }
+}
+@go: true;
+#namespace(...) when (@go){ // ok
+  .mixin() { works: works;  }
+}
+#namespace(@variable: default) when (@go){ // ok - parameter is optional
+  .mixin() { optional: optional;  }
+}
+#namespace(...) when not(@go){  // false guard - can not be used as namespace
+  .mixin() { guard: false;  }
+}
+.use {
+  #namespace > .mixin();
+}
+
+//#namespace when (1=2) {
+//  .mixin() { no-parameter-guard: false;  }
+//}*/

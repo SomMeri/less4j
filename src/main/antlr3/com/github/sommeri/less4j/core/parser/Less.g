@@ -995,31 +995,33 @@ fragment URL : (
                           )*
                         ;
 
+// NOTE: I removed the "whitespace and newlines are unimportant even within keywords" 
+// part cause that is not true anymore in less
                         
 // Basic Alpha characters in upper, lower and escaped form. Note that
 // whitespace and newlines are unimportant even within keywords. We do not
 // however call a further fragment rule to consume these characters for
 // reasons of performance - the rules are still eminently readable.
 //
-fragment A : ('a'|'A') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment A : ('a'|'A') 
                 | '\\' ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'1'
                 ;
-fragment B : ('b'|'B') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment B : ('b'|'B') 
                 | '\\' ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'2'
                 ;
-fragment C : ('c'|'C') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment C : ('c'|'C') 
                 | '\\' ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'3'
                 ;
-fragment D : ('d'|'D') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment D : ('d'|'D') 
                 | '\\' ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'4'
                 ;
-fragment E : ('e'|'E') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment E : ('e'|'E') 
                 | '\\' ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'5'
                 ;
-fragment F : ('f'|'F') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment F : ('f'|'F') 
                 | '\\' ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'6'
                 ;
-fragment G : ('g'|'G') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment G : ('g'|'G') 
                 | '\\'
                         (
                               'g'
@@ -1027,7 +1029,7 @@ fragment G : ('g'|'G') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'7'
                         )
                 ;
-fragment H : ('h'|'H') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment H : ('h'|'H') 
                 | '\\'
                         (
                               'h'
@@ -1035,7 +1037,7 @@ fragment H : ('h'|'H') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'8'
                         )
                 ;
-fragment I : ('i'|'I') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment I : ('i'|'I') 
                 | '\\'
                         (
                               'i'
@@ -1043,7 +1045,7 @@ fragment I : ('i'|'I') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')'9'
                         )
                 ;
-fragment J : ('j'|'J') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment J : ('j'|'J') 
                 | '\\'
                         (
                               'j'
@@ -1051,7 +1053,7 @@ fragment J : ('j'|'J') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')('A'|'a')
                         )
                 ;
-fragment K : ('k'|'K') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment K : ('k'|'K') 
                 | '\\'
                         (
                               'k'
@@ -1059,7 +1061,7 @@ fragment K : ('k'|'K') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')('B'|'b')
                         )
                 ;
-fragment L : ('l'|'L') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment L : ('l'|'L') 
                 | '\\'
                         (
                               'l'
@@ -1067,7 +1069,7 @@ fragment L : ('l'|'L') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')('C'|'c')
                         )
                 ;
-fragment M : ('m'|'M') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment M : ('m'|'M') 
                 | '\\'
                         (
                               'm'
@@ -1075,7 +1077,7 @@ fragment M : ('m'|'M') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')('D'|'d')
                         )
                 ;
-fragment N : ('n'|'N') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment N : ('n'|'N') 
                 | '\\'
                         (
                               'n'
@@ -1083,7 +1085,7 @@ fragment N : ('n'|'N') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')('E'|'e')
                         )
                 ;
-fragment O : ('o'|'O') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment O : ('o'|'O') 
                 | '\\'
                         (
                               'o'
@@ -1091,7 +1093,7 @@ fragment O : ('o'|'O') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('4'|'6')('F'|'f')
                         )
                 ;
-fragment P : ('p'|'P') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment P : ('p'|'P') 
                 | '\\'
                         (
                               'p'
@@ -1099,7 +1101,7 @@ fragment P : ('p'|'P') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('0')
                         )
                 ;
-fragment Q : ('q'|'Q') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment Q : ('q'|'Q') 
                 | '\\'
                         (
                               'q'
@@ -1107,7 +1109,7 @@ fragment Q : ('q'|'Q') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('1')
                         )
                 ;
-fragment R : ('r'|'R') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment R : ('r'|'R') 
                 | '\\'
                         (
                               'r'
@@ -1115,7 +1117,7 @@ fragment R : ('r'|'R') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('2')
                         )
                 ;
-fragment S : ('s'|'S') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment S : ('s'|'S') 
                 | '\\'
                         (
                               's'
@@ -1123,7 +1125,7 @@ fragment S : ('s'|'S') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('3')
                         )
                 ;
-fragment T : ('t'|'T') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment T : ('t'|'T') 
                 | '\\'
                         (
                               't'
@@ -1131,7 +1133,7 @@ fragment T : ('t'|'T') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('4')
                         )
                 ;
-fragment U : ('u'|'U') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment U : ('u'|'U') 
                 | '\\'
                         (
                               'u'
@@ -1139,14 +1141,14 @@ fragment U : ('u'|'U') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('5')
                         )
                 ;
-fragment V : ('v'|'V') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment V : ('v'|'V') 
                 | '\\'
                         ( 'v'
                             | 'V'
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('6')
                         )
                 ;
-fragment W : ('w'|'W') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment W : ('w'|'W') 
                 | '\\'
                         (
                               'w'
@@ -1154,7 +1156,7 @@ fragment W : ('w'|'W') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('7')
                         )
                 ;
-fragment X : ('x'|'X') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment X : ('x'|'X') 
                 | '\\'
                         (
                               'x'
@@ -1162,7 +1164,7 @@ fragment X : ('x'|'X') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('8')
                         )
                 ;
-fragment Y : ('y'|'Y') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment Y : ('y'|'Y') 
                 | '\\'
                         (
                               'y'
@@ -1170,7 +1172,7 @@ fragment Y : ('y'|'Y') ('\r'|'\n'|'\t'|'\f'|' ')*
                             | ('0' ('0' ('0' '0'?)?)?)? ('5'|'7')('9')
                         )
                 ;
-fragment Z : ('z'|'Z') ('\r'|'\n'|'\t'|'\f'|' ')*
+fragment Z : ('z'|'Z') 
                 | '\\'
                         (
                               'z'
@@ -1450,7 +1452,7 @@ DOMAIN : ((D O M A I N '(' ((WS)=>WS)? URL WS? ')')
 // that process the whitespace within the parser, ANTLR does not
 // need to deal with the whitespace directly in the parser.
 //
-fragment WS_FRAGMENT : (' '|'\t')+ ;
+fragment WS_FRAGMENT : (' '|'\t'|'\f')+ ; //('\r'|'\n'|'\t'|'\f'|' ')
 WS : WS_FRAGMENT { $channel = HIDDEN; } ;
 fragment NL : ('\r' '\n'? | '\n');
 NEW_LINE: NL { $channel = HIDDEN; } ;
