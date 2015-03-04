@@ -1,0 +1,3 @@
+{
+"sources":["sm-add-unmappable-files.less", "import/no-mappable-symbol.less"],
+}

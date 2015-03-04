@@ -6,10 +6,8 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.BodyOwner;
+import com.github.sommeri.less4j.core.ast.Directive;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
-import com.github.sommeri.less4j.core.ast.Media;
-import com.github.sommeri.less4j.core.ast.Page;
-import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.compiler.selectors.UselessLessElementsRemover;
@@ -20,37 +18,26 @@ public class UnNestingAndBubbling {
   private final ASTManipulator manipulator = new ASTManipulator();
   private final UselessLessElementsRemover uselessLessElementsRemover = new UselessLessElementsRemover();
 
-  public void unnestRulesetAndMedia(Body generalBody) {
+  public void unnestRulesetsAndDirectives(Body generalBody) {
     List<? extends ASTCssNode> childs = new ArrayList<ASTCssNode>(generalBody.getChilds());
     for (ASTCssNode kid : childs) {
       switch (kid.getType()) {
       case RULE_SET: {
         List<ASTCssNode> nestedRulesets = collectNestedRuleSets((RuleSet) kid);
         manipulator.addIntoBody(nestedRulesets, kid);
-        uselessLessElementsRemover.removeFrom((RuleSet)kid);
-        break;
-      }
-      case MEDIA: {
-        Media media = (Media) kid;
-        unnestRulesetAndMedia(media.getBody());
-        break;
-      }
-      case PAGE: {
-        Page page = (Page) kid;
-        unnestRulesetAndMedia(page.getBody());
-        break;
-      }
-      case PAGE_MARGIN_BOX: {
-        PageMarginBox marginBox = (PageMarginBox) kid;
-        unnestRulesetAndMedia(marginBox.getBody());
+        uselessLessElementsRemover.removeFrom((RuleSet) kid);
         break;
       }
       default:
-        //nothing is needed
-        if (kid instanceof BodyOwner<?>) {
-          BodyOwner<?> bodyOwner = (BodyOwner<?>) kid;
-          if (bodyOwner.getBody() != null)
-            unnestRulesetAndMedia(bodyOwner.getBody());
+        if (AstLogic.isBubleableDirective(kid)) {
+          Directive directive = (Directive) kid;
+          unnestRulesetsAndDirectives(directive.getBody());
+        } else {
+          if (kid instanceof BodyOwner<?>) {
+            BodyOwner<?> bodyOwner = (BodyOwner<?>) kid;
+            if (bodyOwner.getBody() != null)
+              unnestRulesetsAndDirectives(bodyOwner.getBody());
+          }
         }
       }
     }
@@ -77,30 +64,28 @@ public class UnNestingAndBubbling {
         collectChildRuleSets(kid, nestedNodes);
 
         nestedNodes.popSelectors();
-      }
         break;
-      case MEDIA: {
-        List<Selector> outerSelectors = ArraysUtils.deeplyClonedList(nestedNodes.currentSelectors());
-
-        Media media = (Media) kid;
-        manipulator.removeFromBody(media);
-        nestedNodes.collect(media);
-
-        putMediaBodyIntoRuleset(media, outerSelectors);
-
-        unnestRulesetAndMedia(media.getBody());
-
       }
-        break;
-
       default:
-        //unless explicitly set, do not pass take rulessets out of body owners
-        if (!(kid instanceof BodyOwner<?>)) {
-          collectChildRuleSets(kid, nestedNodes);
+        if (AstLogic.isBubleableDirective(kid)) {
+          List<Selector> outerSelectors = ArraysUtils.deeplyClonedList(nestedNodes.currentSelectors());
+          Directive directive = (Directive) kid;
+          manipulator.removeFromBody(directive);
+          nestedNodes.collect(directive);
+
+          putBodyIntoRuleset(directive, outerSelectors);
+          unnestRulesetsAndDirectives(directive.getBody());
+
         } else {
-          BodyOwner<?> bodyOwner = (BodyOwner<?>) kid;
-          if (bodyOwner.getBody() != null)
-            unnestRulesetAndMedia(bodyOwner.getBody());
+          // unless explicitly set, do not pass take rulessets out of body
+          // owners
+          if (!(kid instanceof BodyOwner<?>)) {
+            collectChildRuleSets(kid, nestedNodes);
+          } else {
+            BodyOwner<?> bodyOwner = (BodyOwner<?>) kid;
+            if (bodyOwner.getBody() != null)
+              unnestRulesetsAndDirectives(bodyOwner.getBody());
+          }
         }
 
         break;
@@ -109,14 +94,14 @@ public class UnNestingAndBubbling {
     }
   }
 
-  private void putMediaBodyIntoRuleset(Media media, List<Selector> selectors) {
-    RuleSet newRuleset = new RuleSet(media.getUnderlyingStructure(), media.getBody(), selectors);
-    GeneralBody newMediaBody = new GeneralBody(media.getUnderlyingStructure());
-    newMediaBody.addMember(newRuleset);
-    media.setBody(newMediaBody);
+  private void putBodyIntoRuleset(Directive bodyOwner, List<Selector> selectors) {
+    RuleSet newRuleset = new RuleSet(bodyOwner.getUnderlyingStructure(), bodyOwner.getBody(), selectors);
+    GeneralBody newBodyForOwner = new GeneralBody(bodyOwner.getUnderlyingStructure());
+    newBodyForOwner.addMember(newRuleset);
+    bodyOwner.setBody(newBodyForOwner);
 
-    newMediaBody.configureParentToAllChilds();
-    media.configureParentToAllChilds();
+    newBodyForOwner.configureParentToAllChilds();
+    bodyOwner.configureParentToAllChilds();
     newRuleset.configureParentToAllChilds();
   }
 }

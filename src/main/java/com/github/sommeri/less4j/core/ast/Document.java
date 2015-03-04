@@ -7,7 +7,7 @@ import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class Document extends ASTCssNode implements BodyOwner<GeneralBody> {
+public class Document extends Directive {
 
   private String dialect;
   private List<FunctionExpression> urlMatchFunction = new ArrayList<FunctionExpression>();

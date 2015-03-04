@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.BodyOwner;
 import com.github.sommeri.less4j.core.ast.CssString;
+import com.github.sommeri.less4j.core.ast.Directive;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
@@ -21,6 +22,13 @@ public class AstLogic {
 
   public static boolean hasOwnScope(ASTCssNode node) {
     return isBody(node) || isBodyOwner(node);
+  }
+
+  public static boolean isBubleableDirective(ASTCssNode node) {
+    if (!(node instanceof Directive))
+      return false;
+    
+    return ((Directive) node).hasBody();
   }
 
   public static boolean isBodyOwner(ASTCssNode node) {

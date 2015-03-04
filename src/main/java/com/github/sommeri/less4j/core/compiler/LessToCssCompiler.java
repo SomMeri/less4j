@@ -22,7 +22,7 @@ import com.github.sommeri.less4j.core.compiler.selectors.UselessLessElementsRemo
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.core.compiler.stages.EmptyBodiesRemover;
 import com.github.sommeri.less4j.core.compiler.stages.ImportsAndScopeSolver;
-import com.github.sommeri.less4j.core.compiler.stages.MediaBubblerAndMerger;
+import com.github.sommeri.less4j.core.compiler.stages.DirectiveBubblerAndMerger;
 import com.github.sommeri.less4j.core.compiler.stages.PropertiesMerger;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.UnNestingAndBubbling;
@@ -87,7 +87,7 @@ public class LessToCssCompiler {
 
   private void freeNestedRulesetsAndMedia(StyleSheet less) {
     UnNestingAndBubbling nestingBubbling = new UnNestingAndBubbling();
-    nestingBubbling.unnestRulesetAndMedia(less);
+    nestingBubbling.unnestRulesetsAndDirectives(less);
   }
 
   private Set<LessSource> resolveImportsAndReferences(StyleSheet less, LessSource source) {
@@ -136,7 +136,7 @@ public class LessToCssCompiler {
   }
 
   private void finalMediaMergingAndBubbling(StyleSheet less) {
-    MediaBubblerAndMerger bubblerAndMerger = new MediaBubblerAndMerger(problemsHandler);
+    DirectiveBubblerAndMerger bubblerAndMerger = new DirectiveBubblerAndMerger(problemsHandler);
     bubblerAndMerger.bubbleAndMergeMedia(less);
   }
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Stack;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.Media;
+import com.github.sommeri.less4j.core.ast.Directive;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.compiler.selectors.SelectorsManipulator;
@@ -38,8 +38,8 @@ public class NestedInRulesetStack {
     nestedNodes.add(nestedSet);
   }
 
-  public void collect(Media media) {
-    nestedNodes.add(media);
+  public void collect(Directive directive) {
+    nestedNodes.add(directive);
   }
 
   private void combine(RuleSet ruleSet, List<Selector> previousSelectors) {

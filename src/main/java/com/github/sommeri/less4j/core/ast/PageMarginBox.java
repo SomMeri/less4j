@@ -6,7 +6,7 @@ import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class PageMarginBox extends ASTCssNode implements BodyOwner<GeneralBody> {
+public class PageMarginBox extends Directive {
 
   private Name name;
   private GeneralBody body;

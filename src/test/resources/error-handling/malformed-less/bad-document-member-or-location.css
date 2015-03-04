@@ -1,11 +1,3 @@
-#selector {
-  @-prefix-document regexp('aaaa'), url-prefix() {
-    declaration: not allowed;
-    pre {
-      declaration: weird in ruleset;
-    }
-  }
-}
 @-prefix-document regexp('aaaa'), url-prefix() {
   declaration: not allowed;
   pre {

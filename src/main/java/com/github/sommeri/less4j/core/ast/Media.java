@@ -7,7 +7,7 @@ import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
-public class Media extends ASTCssNode implements BodyOwner<GeneralBody> {
+public class Media extends Directive {
 
   private List<MediaQuery> mediums;
   private GeneralBody body;

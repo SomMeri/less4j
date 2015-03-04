@@ -89,7 +89,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     
     CustomLessSource source = new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8");
     CompilationResult actual = compiler.compile(source, configuration);
-    System.out.println(actual.getSourceMap());
+    //System.out.println(actual.getSourceMap());
     return actual;
   }
   

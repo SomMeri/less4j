@@ -1,14 +1,4 @@
 Warnings produced by compilation of testCase
-WARNING 6:3 Compilation resulted in incorrect CSS. The @document ended up inside a body of rule set located at 14:1.
- 5: .takeDocumentWithYou(@parameter) {
- 6:   @-prefix-document regexp('aaaa'), url-prefix() {
- 7:   .mixinWithDeclaration();
-
-WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of @document located at 6:3.
- 1: .mixinWithDeclaration() {
- 2:   declaration: not allowed;
- 3: }
-
 WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of @document located at 6:3.
  1: .mixinWithDeclaration() {
  2:   declaration: not allowed;
