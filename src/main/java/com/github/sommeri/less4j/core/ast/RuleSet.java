@@ -66,6 +66,7 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
     
     ReusableStructure reusable = new ReusableStructure(getUnderlyingStructure(), reusableNames, true);
     reusable.setBody(getBody().clone());
+    reusable.addGuards(ArraysUtils.deeplyClonedList(getGuards())); //(getBody().clone());
     reusable.configureParentToAllChilds();
     return reusable;
   }

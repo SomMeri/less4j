@@ -99,6 +99,10 @@ public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBo
     return result;
   }
 
+  public boolean hasMandatoryParameters() {
+    return !getMandatoryParameters().isEmpty();
+  }
+
   public void addParameter(ASTCssNode parameter) {
     if (parameter.getType()!=ASTCssNodeType.ARGUMENT_DECLARATION && !(parameter instanceof Expression))
       throw new IllegalArgumentException("The node can not be used as a mixin parameter: " + parameter);
@@ -112,6 +116,10 @@ public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBo
 
   public void addGuard(Guard guard) {
     this.guards.add(guard);
+  }
+
+  public void addGuards(List<Guard> guards) {
+    this.guards.addAll(guards);
   }
 
   @Override

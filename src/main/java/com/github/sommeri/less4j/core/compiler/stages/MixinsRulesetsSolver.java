@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Configuration;
@@ -22,6 +23,7 @@ import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionManipulator;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
+import com.github.sommeri.less4j.core.compiler.scopes.FoundMixin;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
@@ -101,7 +103,7 @@ class MixinsRulesetsSolver {
     return builder.build();
   }
 
-  public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final IScope callerScope, List<FullMixinDefinition> mixins) {
+  public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final IScope callerScope, List<FoundMixin> mixins) {
     GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     if (mixins.isEmpty())
       return result;
@@ -109,7 +111,7 @@ class MixinsRulesetsSolver {
     //candidate mixins with information about their default() function use are stored here
     final List<BodyCompilationResult> compiledMixins = new ArrayList<BodyCompilationResult>();
 
-    for (final FullMixinDefinition fullMixin : mixins) {
+    for (final FoundMixin fullMixin : mixins) {
       final ReusableStructure mixin = fullMixin.getMixin();
       final IScope mixinScope = fullMixin.getScope();
 
@@ -125,6 +127,10 @@ class MixinsRulesetsSolver {
 
           MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
           GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
+          
+          LinkedList<GuardValue> namespacesGuards = fullMixin.getGuardsOnPath();
+          namespacesGuards.add(guardValue);
+          guardValue = guardsValidator.andGuards(namespacesGuards);
 
           if (guardValue != GuardValue.DO_NOT_USE) {
             //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 

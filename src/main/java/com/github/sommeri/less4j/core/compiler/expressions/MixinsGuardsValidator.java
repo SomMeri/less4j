@@ -1,5 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import java.util.List;
+
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
@@ -54,5 +56,38 @@ public class MixinsGuardsValidator {
     }//
   }
 
- 
+  public GuardValue andGuards(List<GuardValue> guards) {
+    boolean ifDefaultGuardValue = ifDefaultGuardValue(guards);
+    boolean ifNotDefaultGuardValue = ifNotDefaultGuardValue(guards);
+    return toDefaultFunctionUse(ifDefaultGuardValue, ifNotDefaultGuardValue);
+  }
+
+  private boolean ifNotDefaultGuardValue(List<GuardValue> guards) {
+    for (GuardValue guardValue : guards) {
+      switch (guardValue) {
+      case USE:
+      case USE_IF_NOT_DEFAULT:
+        return true;
+      case DO_NOT_USE:
+      case USE_IF_DEFAULT:
+        return false;
+      }
+    }
+    return false;
+  }
+
+  private boolean ifDefaultGuardValue(List<GuardValue> guards) {
+    for (GuardValue guardValue : guards) {
+      switch (guardValue) {
+      case USE:
+      case USE_IF_DEFAULT:
+        return true;
+      case DO_NOT_USE:
+      case USE_IF_NOT_DEFAULT:
+        return false;
+      }
+    }
+    return false;
+  }
+
 }

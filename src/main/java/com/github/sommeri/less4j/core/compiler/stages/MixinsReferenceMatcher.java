@@ -11,7 +11,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionComparator;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.PatternsComparator;
-import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FoundMixin;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -24,19 +24,19 @@ public class MixinsReferenceMatcher {
     evaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
   }
 
-  public List<FullMixinDefinition> filterByParametersNumber(MixinReference reference, List<FullMixinDefinition> mixins) {
+  public List<FoundMixin> filterByParametersNumber(MixinReference reference, List<FoundMixin> mixins) {
     int requiredNumber = reference.getNumberOfDeclaredParameters();
-    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
-    for (FullMixinDefinition mixin : mixins) {
+    List<FoundMixin> result = new ArrayList<FoundMixin>();
+    for (FoundMixin mixin : mixins) {
       if (hasRightNumberOfParameters(mixin.getMixin(), requiredNumber))
         result.add(mixin);
     }
     return result;
   }
 
-  public List<FullMixinDefinition> filterByPatterns(MixinReference reference, List<FullMixinDefinition> mixins) {
-    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
-    for (FullMixinDefinition mixin : mixins) {
+  public List<FoundMixin> filterByPatterns(MixinReference reference, List<FoundMixin> mixins) {
+    List<FoundMixin> result = new ArrayList<FoundMixin>();
+    for (FoundMixin mixin : mixins) {
       if (patternsMatch(reference, mixin.getMixin()))
         result.add(mixin);
     }

@@ -28,7 +28,7 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.strings.StringInterpolator;
-import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
+import com.github.sommeri.less4j.core.compiler.scopes.FoundMixin;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
@@ -163,7 +163,7 @@ public class ReferencesSolver {
       if (isMixinReference(kid)) {
         MixinReference reference = (MixinReference) kid;
 
-        List<FullMixinDefinition> foundMixins = findReferencedMixins(reference, referenceScope);
+        List<FoundMixin> foundMixins = findReferencedMixins(reference, referenceScope);
         GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(reference, referenceScope, foundMixins);
 
         AstLogic.validateLessBodyCompatibility(reference, replacement.getMembers(), problemsHandler);
@@ -209,20 +209,20 @@ public class ReferencesSolver {
     solvedReferences.put(detachedRulesetReference, errorBody);
   }
 
-  protected List<FullMixinDefinition> findReferencedMixins(MixinReference mixinReference, IScope scope) {
-    MixinReferenceFinder finder = new MixinReferenceFinder(this, semiCompiledNodes);
-    List<FullMixinDefinition> sameNameMixins = finder.getNearestMixins(scope, mixinReference);
+  protected List<FoundMixin> findReferencedMixins(MixinReference mixinReference, IScope scope) {
+    MixinReferenceFinder finder = new MixinReferenceFinder(this, semiCompiledNodes, problemsHandler, configuration);
+    List<FoundMixin> sameNameMixins = finder.getNearestMixins(scope, mixinReference);
     if (sameNameMixins.isEmpty()) {
       //error reporting
       if (!finder.foundNamespace())
         problemsHandler.undefinedNamespace(mixinReference);
 
       problemsHandler.undefinedMixin(mixinReference);
-      return new ArrayList<FullMixinDefinition>();
+      return new ArrayList<FoundMixin>();
     }
 
     MixinsReferenceMatcher matcher = new MixinsReferenceMatcher(scope, problemsHandler, configuration);
-    List<FullMixinDefinition> mixins = matcher.filterByParametersNumber(mixinReference, sameNameMixins);
+    List<FoundMixin> mixins = matcher.filterByParametersNumber(mixinReference, sameNameMixins);
     if (mixins.isEmpty()) {
       problemsHandler.noMixinHasRightParametersCountError(mixinReference);
       return mixins;

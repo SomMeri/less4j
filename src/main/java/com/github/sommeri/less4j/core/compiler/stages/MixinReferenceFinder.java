@@ -3,24 +3,33 @@ package com.github.sommeri.less4j.core.compiler.stages;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
+import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
+import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
+import com.github.sommeri.less4j.core.compiler.scopes.FoundMixin;
 import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner;
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class MixinReferenceFinder {
 
   private final ReferencesSolver parentSolver;
   private final AstNodesStack semiCompiledNodes;
   private boolean foundNamespace = false;
+  private final ProblemsHandler problemsHandler;
+  private final Configuration configuration;
 
-  public MixinReferenceFinder(ReferencesSolver referencesSolver, AstNodesStack semiCompiledNodes) {
+  public MixinReferenceFinder(ReferencesSolver referencesSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = referencesSolver;
     this.semiCompiledNodes = semiCompiledNodes;
+    this.problemsHandler = problemsHandler;
+    this.configuration = configuration;
   }
 
   /**
@@ -32,12 +41,12 @@ public class MixinReferenceFinder {
    * needing itself) and completely ignores those who would cycle that way.
    * 
    */
-  public List<FullMixinDefinition> getNearestMixins(IScope scope, MixinReference reference) {
+  public List<FoundMixin> getNearestMixins(IScope scope, MixinReference reference) {
     foundNamespace = false;
     List<String> nameChain = reference.getNameChainAsStrings();
     IScope space = scope;
 
-    List<FullMixinDefinition> result = findInMatchingNamespace(scope, nameChain, reference);
+    List<FoundMixin> result = findInMatchingNamespace(scope, nameChain, reference);
     while (result.isEmpty() && space.hasParent()) {
       space = space.getParent();
       result = findInMatchingNamespace(space, nameChain, reference);
@@ -49,15 +58,22 @@ public class MixinReferenceFinder {
     return foundNamespace;
   }
 
-  private List<FullMixinDefinition> getNearestLocalMixins(IScope scope, List<String> nameChain, ReusableStructureName name) {
+  private List<FoundMixin> getNearestLocalMixins(IScope scope, List<String> nameChain, ReusableStructureName name) {
     if (scope.isBodyOwnerScope())
       scope = scope.firstChild();
 
     List<FullMixinDefinition> mixins = scope.getMixinsByName(nameChain, name);
     if (mixins != null)
       mixins = removeLegalCycles(mixins, name);
+    
+    List<FoundMixin> result = new ArrayList<FoundMixin>();
+    if (mixins == null)
+      return result;
 
-    return mixins == null ? new ArrayList<FullMixinDefinition>() : mixins;
+    for (FullMixinDefinition fulDefinition : mixins) {
+      result.add(new FoundMixin(fulDefinition));
+    }
+    return  result;
   }
 
   private List<FullMixinDefinition> removeLegalCycles(List<FullMixinDefinition> value, ReusableStructureName name) {
@@ -81,8 +97,8 @@ public class MixinReferenceFinder {
     return mixin.getMixin().isAlsoRuleset() && semiCompiledNodes.contains(mixin.getMixin());
   }
 
-  private List<FullMixinDefinition> findInMatchingNamespace(IScope scope, List<String> nameChain, MixinReference reference) {
-    List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
+  private List<FoundMixin> findInMatchingNamespace(IScope scope, List<String> nameChain, MixinReference reference) {
+    List<FoundMixin> result = new ArrayList<FoundMixin>();
 
     if (nameChain.isEmpty()) {
       foundNamespace = true;
@@ -92,7 +108,7 @@ public class MixinReferenceFinder {
         List<String> theRest = prefix==nameChain.size()? new ArrayList<String>(): nameChain.subList(prefix, nameChain.size());
 
         for (FullMixinDefinition fullMixin : scope.getMixinsByName(name)) {
-          List<FullMixinDefinition> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
+          List<FoundMixin> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
           result.addAll(foundInNamespaces);
         }
       }
@@ -110,13 +126,17 @@ public class MixinReferenceFinder {
     return builder.toString();
   }
 
-  private List<FullMixinDefinition> buildAndFind(FullMixinDefinition fullMixin, final List<String> nameChain, final MixinReference reference) {
+  private List<FoundMixin> buildAndFind(FullMixinDefinition fullMixin, final List<String> nameChain, final MixinReference reference) {
 
-    final List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
+    final List<FoundMixin> result = new ArrayList<FoundMixin>();
 
     final ReusableStructure mixin = fullMixin.getMixin();
     final GeneralBody bodyClone = mixin.getBody().clone();
     final IScope scope = fullMixin.getScope();
+    
+    if (mixin.hasMandatoryParameters()) {
+      return result;
+    }
 
     InScopeSnapshotRunner.runInLocalDataSnapshot(scope, new ITask() {
 
@@ -127,9 +147,17 @@ public class MixinReferenceFinder {
         if (!semiCompiledNodes.contains(bodyClone)) {
           parentSolver.unsafeDoSolveReferences(bodyClone, scope);
         }
-
-        List<FullMixinDefinition> found = findInMatchingNamespace(scope, nameChain, reference);
-        result.addAll(found);
+        MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(scope, problemsHandler, configuration);
+        GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
+        
+        if (guardValue!=GuardValue.DO_NOT_USE) { //FIXME: maybe, maybe not, I am not sure now
+          List<FoundMixin> found = findInMatchingNamespace(scope, nameChain, reference);
+          for (FoundMixin foundMixin : found) {
+            foundMixin.prefixGuardValue(guardValue);
+            result.add(foundMixin);
+          }
+        }
+        
       }
 
     });
