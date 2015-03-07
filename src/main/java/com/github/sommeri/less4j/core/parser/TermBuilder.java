@@ -177,7 +177,7 @@ public class TermBuilder {
 
   private void setDoubleAndType(NumberExpression result, String value) {
     value = value.toLowerCase().trim();
-    String numberPart = value.replaceAll("[a-z%]", "");
+    String numberPart = value.replaceAll("[^0-9\\.]*", "");
     result.setValueAsDouble(Double.valueOf(numberPart));
     if (numberPart.length() < value.length())
       result.setSuffix(value.substring(numberPart.length()));
