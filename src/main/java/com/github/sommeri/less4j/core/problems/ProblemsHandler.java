@@ -359,7 +359,7 @@ public class ProblemsHandler implements LessProblems {
   }
 
   public void errorSvgGradientArgument(FunctionExpression errorNode) {
-    addError(errorNode, "svg-gradient expects direction, start_color [start_position], [color position,]..., end_color [end_position]"); 
+    addError(errorNode, "svg-gradient expects direction and sequence of color stops. Color stops can be supplied either as parameters: `direction, start_color [start_position], [color position,]..., end_color [end_position]` or inside a list `direction, list`"); 
   }
 
   public void regexpFunctionError(FunctionExpression call, String message) {

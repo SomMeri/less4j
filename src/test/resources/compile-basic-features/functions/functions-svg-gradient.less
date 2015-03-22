@@ -24,6 +24,12 @@
 .ellipse-at-center-2 {
   background-image: svg-gradient(ellipse at center, white, red);
 }
+.ellipse-list {
+  @list: white, black 30%, white 60%, black 90%, white;
+  background-image: svg-gradient(ellipse, @list);
+}
 .errors {
 	e-a: svg-gradient(incorrect at center, white, red);
+    @list: white 30%;
+    e-b: svg-gradient(ellipse, @list);
 }

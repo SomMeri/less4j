@@ -383,7 +383,11 @@ class SvgGradient extends CatchAllMultiParameterFunction {
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     String direction = toDirection(splitParameters.get(0)), gradientDirectionSvg = "";
-    List<Expression> stops = splitParameters.subList(1, splitParameters.size());
+    List<Expression> stops = extractStops(splitParameters);
+    if (stops==null || stops.size() < 2) {
+      problemsHandler.errorSvgGradientArgument(functionCall);
+      return new FaultyExpression(functionCall.getUnderlyingStructure());
+    }
 
     String gradientType = "linear", rectangleDimension = "x=\"0\" y=\"0\" width=\"1\" height=\"1\"";
     boolean useBase64 = true;
@@ -416,8 +420,10 @@ class SvgGradient extends CatchAllMultiParameterFunction {
     boolean isFirstStop = true;
     while (iterator.hasNext()) {
       Expression stop = iterator.next();
-      if (!addColorStop(returner, stop, isFirstStop, !iterator.hasNext(), functionCall, problemsHandler))
+      if (!addColorStop(returner, stop, isFirstStop, !iterator.hasNext(), functionCall, problemsHandler)) {
+        problemsHandler.errorSvgGradientArgument(functionCall);
         return new FaultyExpression(functionCall);
+      }
       isFirstStop = false;
     }
 
@@ -426,6 +432,19 @@ class SvgGradient extends CatchAllMultiParameterFunction {
 
     String result = useBase64 ? PrintUtils.base64Encode(returner.toString().getBytes()) : returner.toString();
     return toDataUri(functionCall.getUnderlyingStructure(), result, useBase64);
+  }
+
+  private List<Expression> extractStops(List<Expression> splitParameters) {
+    if (splitParameters.size()==2) {
+      Expression expression = splitParameters.get(1);
+      if (ASTCssNodeType.LIST_EXPRESSION==expression.getType()) {
+        ListExpression list = (ListExpression) expression;
+        return list.getExpressions();
+      } else {
+        return null;
+      }
+    }
+    return splitParameters.subList(1, splitParameters.size());
   }
 
   private Expression toDataUri(HiddenTokenAwareTree token, String data, boolean useBase64) {
@@ -443,15 +462,16 @@ class SvgGradient extends CatchAllMultiParameterFunction {
       ListExpression list = (ListExpression) colorStop;
       List<Expression> expressions = list.getExpressions();
       if (expressions.isEmpty() || expressions.size() > 2) {
-        problemsHandler.errorSvgGradientArgument(errorNode);
         return false;
       }
 
       Expression color = expressions.get(0);
       Expression position = expressions.size() > 1 ? expressions.get(1) : null;
-      addColorStop(returner, color, position, isFirst, isLast, errorNode, problemsHandler);
+      if (!addColorStop(returner, color, position, isFirst, isLast, errorNode, problemsHandler))
+        return false;
     } else {
-      addColorStop(returner, colorStop, null, isFirst, isLast, errorNode, problemsHandler);
+      if (!addColorStop(returner, colorStop, null, isFirst, isLast, errorNode, problemsHandler))
+        return false;
     }
     return true;
   }
@@ -500,7 +520,7 @@ class SvgGradient extends CatchAllMultiParameterFunction {
 
   @Override
   protected int getMinParameters() {
-    return 3;
+    return 2;
   }
 
   @Override

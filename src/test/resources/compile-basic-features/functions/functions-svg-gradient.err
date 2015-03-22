@@ -1,5 +1,10 @@
 Errors produced by compilation of testCase
-ERROR 28:7 Wrong 'FunctionExpression (28:7)' argument to function 'svg-gradient'. Should be one of: to bottom, to right, to bottom right, to top right, ellipse, ellipse at center
- 27: .errors {
- 28: 	e-a: svg-gradient(incorrect at center, white, red);
- 29: }
+ERROR 32:7 Wrong 'FunctionExpression (32:7)' argument to function 'svg-gradient'. Should be one of: to bottom, to right, to bottom right, to top right, ellipse, ellipse at center
+ 31: .errors {
+ 32: 	e-a: svg-gradient(incorrect at center, white, red);
+ 33:     @list: white 30%;
+
+ERROR 34:10 svg-gradient expects direction and sequence of color stops. Color stops can be supplied either as parameters: `direction, start_color [start_position], [color position,]..., end_color [end_position]` or inside a list `direction, list`
+ 33:     @list: white 30%;
+ 34:     e-b: svg-gradient(ellipse, @list);
+ 35: }
