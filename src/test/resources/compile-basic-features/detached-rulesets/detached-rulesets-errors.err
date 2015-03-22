@@ -1,9 +1,4 @@
 Warnings produced by compilation of testCase
-WARNING 15:26 This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.
- 14: //less.js detached-ruleset-4.less
- 15: .warning-for-default(@a: {
- 16:   b: 1;
-
 WARNING 2:3 Compilation resulted in incorrect CSS. The declaration ended up inside a body of top level style sheet located at 1:1.
  1: @a: {
  2:   b: 1;

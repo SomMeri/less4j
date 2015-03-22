@@ -11,12 +11,12 @@ import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
-import com.github.sommeri.less4j.core.compiler.stages.AstLogic;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class MixinsParametersBuilder {
 
   private final ASTBuilderSwitch parentBuilder;
+  @SuppressWarnings("unused")
   private ProblemsHandler problemsHandler;
 
   public MixinsParametersBuilder(ASTBuilderSwitch astBuilderSwitch, ProblemsHandler problemsHandler) {
@@ -116,11 +116,6 @@ public class MixinsParametersBuilder {
   }
 
   private void addParameter(ReusableStructure declaration, ASTCssNode parameter) {
-    if (parameter.getType()==ASTCssNodeType.ARGUMENT_DECLARATION) {
-      Expression value = ((ArgumentDeclaration) parameter).getValue();
-      if (AstLogic.isDetachedRuleset(value))
-        problemsHandler.warnDetachedRulesetAsMixinParamDefault(value);
-    }
     declaration.addParameter(parameter);
   }
 

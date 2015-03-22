@@ -342,10 +342,6 @@ public class ProblemsHandler implements LessProblems {
     addError(reference, "Detached ruleset call is missing parentheses.");
   }
 
-  public void warnDetachedRulesetAsMixinParamDefault(Expression detached) {
-    addWarning(detached, "This works, but is incompatible with less.js. Less.js does not allow detached rulesets as default mixin parameter values.");
-  }
-
   public void wrongDetachedRulesetLocation(DetachedRuleset detachedRuleset) {
     addError(detachedRuleset, "Detached ruleset is not allowed outside of variable declaration.");
   }
