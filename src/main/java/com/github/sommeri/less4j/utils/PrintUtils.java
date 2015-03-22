@@ -32,7 +32,7 @@ public class PrintUtils {
 
     return FORMATTER.format(value);
   }
-
+  
   public static String formatNumber(Number value) {
     return FORMATTER.format(value);
   }

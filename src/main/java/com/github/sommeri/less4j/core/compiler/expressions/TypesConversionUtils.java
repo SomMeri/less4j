@@ -38,6 +38,10 @@ public class TypesConversionUtils {
     }
   }
 
+  public ASTCssNodeType[] allConvertibleToString() {
+    return new ASTCssNodeType[] {ASTCssNodeType.IDENTIFIER_EXPRESSION, ASTCssNodeType.STRING_EXPRESSION, ASTCssNodeType.ESCAPED_VALUE};
+  } 
+  
   public boolean canConvertToString(Expression input) {
     switch (input.getType()) {
     case IDENTIFIER_EXPRESSION:

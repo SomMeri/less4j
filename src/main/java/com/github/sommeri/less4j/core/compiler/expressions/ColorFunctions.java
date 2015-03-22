@@ -577,7 +577,29 @@ abstract class AbstractColorOperationFunction extends AbstractColorFunction {
 
 }
 
+class ColorParameterUtils {
+  
+  private TypesConversionUtils conversionUtils = new TypesConversionUtils();
+
+  protected boolean isAbsolute(List<Expression> allParameters, int index) {
+    boolean isAbsolute = true;
+    if (allParameters.size()>index) {
+      String kind = conversionUtils.contentToString(allParameters.get(index));
+      if (kind !=null && "relative".equals(kind.toLowerCase()))
+        isAbsolute = false;
+    }
+    return isAbsolute;
+  }
+
+  public ASTCssNodeType[] modeTypeAcceptableTypes() {
+    return conversionUtils.allConvertibleToString();
+  }
+
+}
+
 class Saturate extends CssNameClashMultiParameterFunction {
+  
+  private ColorParameterUtils paramUtils = new ColorParameterUtils();
 
   @Override
   public Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
@@ -589,14 +611,25 @@ class Saturate extends CssNameClashMultiParameterFunction {
 
     ColorExpression color = (ColorExpression) firstParam;
     NumberExpression amount = (NumberExpression) splitParameters.get(1);
+    
 
     HSLAValue hsla = AbstractColorFunction.toHSLA(color);
-    apply(amount, hsla);
+    boolean isAbsolute = paramUtils.isAbsolute(splitParameters, 2);
+    if (isAbsolute) {
+      applyAbsolute(amount, hsla);
+    } else { 
+      applyRelative(amount, hsla);
+    }
     return AbstractColorFunction.hsla(hsla, call.getUnderlyingStructure());
   }
 
-  protected void apply(NumberExpression amount, HSLAValue hsla) {
+  protected void applyAbsolute(NumberExpression amount, HSLAValue hsla) {
     hsla.s += amount.getValueAsDouble() / 100.0f;
+    hsla.s = AbstractColorFunction.clamp(hsla.s);
+  }
+
+  protected void applyRelative(NumberExpression amount, HSLAValue hsla) {
+    hsla.s += hsla.s * amount.getValueAsDouble() / 100.0f;
     hsla.s = AbstractColorFunction.clamp(hsla.s);
   }
 
@@ -607,7 +640,7 @@ class Saturate extends CssNameClashMultiParameterFunction {
 
   @Override
   protected int getMaxParameters() {
-    return 2;
+    return 3;
   }
 
   @Override
@@ -617,6 +650,9 @@ class Saturate extends CssNameClashMultiParameterFunction {
       return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 1:
       return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    case 2:
+      return validateParameterTypeReportError(parameter, problemsHandler, paramUtils.modeTypeAcceptableTypes());
+      
     }
     return false;
   }
@@ -631,8 +667,14 @@ class Saturate extends CssNameClashMultiParameterFunction {
 class Desaturate extends AbstractColorHSLAmountFunction {
 
   @Override
-  protected void apply(NumberExpression amount, HSLAValue hsla) {
+  protected void applyAbsolute(NumberExpression amount, HSLAValue hsla) {
     hsla.s -= amount.getValueAsDouble() / 100.0f;
+    hsla.s = clamp(hsla.s);
+  }
+
+  @Override
+  protected void applyRelative(NumberExpression amount, HSLAValue hsla) {
+    hsla.s -= hsla.s * amount.getValueAsDouble() / 100.0f;
     hsla.s = clamp(hsla.s);
   }
 
@@ -646,8 +688,14 @@ class Desaturate extends AbstractColorHSLAmountFunction {
 class Lighten extends AbstractColorHSLAmountFunction {
 
   @Override
-  protected void apply(NumberExpression amount, HSLAValue hsla) {
+  protected void applyAbsolute(NumberExpression amount, HSLAValue hsla) {
     hsla.l += amount.getValueAsDouble() / 100.0f;
+    hsla.l = clamp(hsla.l);
+  }
+
+  @Override
+  protected void applyRelative(NumberExpression amount, HSLAValue hsla) {
+    hsla.l += hsla.l * amount.getValueAsDouble() / 100.0f;
     hsla.l = clamp(hsla.l);
   }
 
@@ -661,8 +709,14 @@ class Lighten extends AbstractColorHSLAmountFunction {
 class Darken extends AbstractColorHSLAmountFunction {
 
   @Override
-  protected void apply(NumberExpression amount, HSLAValue hsla) {
+  protected void applyAbsolute(NumberExpression amount, HSLAValue hsla) {
     hsla.l -= amount.getValueAsDouble() / 100.0f;
+    hsla.l = clamp(hsla.l);
+  }
+
+  @Override
+  protected void applyRelative(NumberExpression amount, HSLAValue hsla) {
+    hsla.l -= hsla.l * amount.getValueAsDouble() / 100.0f;
     hsla.l = clamp(hsla.l);
   }
 
@@ -676,8 +730,14 @@ class Darken extends AbstractColorHSLAmountFunction {
 class FadeIn extends AbstractColorHSLAmountFunction {
 
   @Override
-  protected void apply(NumberExpression amount, HSLAValue hsla) {
+  protected void applyAbsolute(NumberExpression amount, HSLAValue hsla) {
     hsla.a += amount.getValueAsDouble() / 100.0f;
+    hsla.a = clamp(hsla.a);
+  }
+
+  @Override
+  protected void applyRelative(NumberExpression amount, HSLAValue hsla) {
+    hsla.a += hsla.a * amount.getValueAsDouble() / 100.0f;
     hsla.a = clamp(hsla.a);
   }
 
@@ -691,8 +751,14 @@ class FadeIn extends AbstractColorHSLAmountFunction {
 class FadeOut extends AbstractColorHSLAmountFunction {
 
   @Override
-  protected void apply(NumberExpression amount, HSLAValue hsla) {
+  protected void applyAbsolute(NumberExpression amount, HSLAValue hsla) {
     hsla.a -= amount.getValueAsDouble() / 100.0f;
+    hsla.a = clamp(hsla.a);
+  }
+
+  @Override
+  protected void applyRelative(NumberExpression amount, HSLAValue hsla) {
+    hsla.a -= hsla.a * amount.getValueAsDouble() / 100.0f;
     hsla.a = clamp(hsla.a);
   }
 
@@ -703,9 +769,21 @@ class FadeOut extends AbstractColorHSLAmountFunction {
 
 }
 
-class Fade extends AbstractColorHSLAmountFunction {
+class Fade extends AbstractColorAmountFunction {
+
+  public Fade() {
+    super(false);
+  }
 
   @Override
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, boolean isAbsolute, HiddenTokenAwareTree token) {
+    HSLAValue hsla = toHSLA(color);
+
+    apply(amount, hsla);
+
+    return hsla(hsla, token);
+  }
+
   protected void apply(NumberExpression amount, HSLAValue hsla) {
     hsla.a = (amount.getValueAsDouble() / 100.0f);
     hsla.a = clamp(hsla.a);
@@ -718,9 +796,21 @@ class Fade extends AbstractColorHSLAmountFunction {
 
 }
 
-class Spin extends AbstractColorHSLAmountFunction {
+class Spin extends AbstractColorAmountFunction {
+
+  public Spin() {
+    super(false);
+  }
 
   @Override
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, boolean isAbsolute, HiddenTokenAwareTree token) {
+    HSLAValue hsla = toHSLA(color);
+
+    apply(amount, hsla);
+
+    return hsla(hsla, token);
+  }
+
   protected void apply(NumberExpression amount, HSLAValue hsla) {
     double hue = ((hsla.h + amount.getValueAsDouble()) % 360);
     hsla.h = hue < 0 ? 360 + hue : hue;
@@ -989,8 +1079,12 @@ class Negation extends AbstractSimpleColorBlendFunction {
 
 class Tint extends AbstractColorAmountFunction {
 
+  public Tint() {
+    super(false);
+  }
+
   @Override
-  protected Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token) {
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, boolean isAbsolute, HiddenTokenAwareTree token) {
     return mix(rgb(255, 255, 255, token), color, amount, token);
   }
 
@@ -1003,8 +1097,12 @@ class Tint extends AbstractColorAmountFunction {
 
 class Shade extends AbstractColorAmountFunction {
 
+  public Shade() {
+    super(false);
+  }
+
   @Override
-  protected Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token) {
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, boolean isAbsolute, HiddenTokenAwareTree token) {
     return mix(rgb(0, 0, 0, token), color, amount, token);
   }
 
@@ -1235,16 +1333,23 @@ class HSVAValue {
 }
 
 abstract class AbstractColorAmountFunction extends AbstractColorFunction {
+  
+  private final ColorParameterUtils paramUtils = new ColorParameterUtils();
+  private final boolean supportsRelativeOption;
+
+  public AbstractColorAmountFunction(boolean supportsRelativeOption) {
+    this.supportsRelativeOption = supportsRelativeOption;
+  }
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     ColorExpression color = (ColorExpression) splitParameters.get(0);
     NumberExpression amount = (NumberExpression) splitParameters.get(1);
 
-    return evaluate(color, amount, token);
+    return evaluate(color, amount, paramUtils.isAbsolute(splitParameters, 2), token);
   }
 
-  protected abstract Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token);
+  protected abstract Expression evaluate(ColorExpression color, NumberExpression amount, boolean isAbsolute, HiddenTokenAwareTree token);
 
   @Override
   protected int getMinParameters() {
@@ -1253,7 +1358,7 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
 
   @Override
   protected int getMaxParameters() {
-    return 2;
+    return supportsRelativeOption? 3 : 2;
   }
 
   @Override
@@ -1263,6 +1368,8 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
       return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.COLOR_EXPRESSION);
     case 1:
       return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
+    case 2:
+      return validateParameterTypeReportError(parameter, problemsHandler, paramUtils.modeTypeAcceptableTypes());
     }
     return false;
   }
@@ -1271,11 +1378,19 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
 
 abstract class AbstractColorHSLAmountFunction extends AbstractColorAmountFunction {
 
+  public AbstractColorHSLAmountFunction() {
+    super(true);
+  }
+
   @Override
-  protected Expression evaluate(ColorExpression color, NumberExpression amount, HiddenTokenAwareTree token) {
+  protected Expression evaluate(ColorExpression color, NumberExpression amount, boolean isAbsolute, HiddenTokenAwareTree token) {
     HSLAValue hsla = toHSLA(color);
 
-    apply(amount, hsla);
+    if (isAbsolute) {
+      applyAbsolute(amount, hsla);
+    } else {
+      applyRelative(amount, hsla);
+    }
 
     return hsla(hsla, token);
   }
@@ -1286,6 +1401,14 @@ abstract class AbstractColorHSLAmountFunction extends AbstractColorAmountFunctio
    * @param amount
    * @param hsla
    */
-  protected abstract void apply(NumberExpression amount, HSLAValue hsla);
+  protected abstract void applyAbsolute(NumberExpression amount, HSLAValue hsla);
+
+  /**
+   * Apply the amount to the given hsla array.
+   * 
+   * @param amount
+   * @param hsla
+   */
+  protected abstract void applyRelative(NumberExpression amount, HSLAValue hsla);
 
 }

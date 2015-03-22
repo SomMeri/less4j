@@ -1,3 +1,7 @@
-span {
-  padding-right: 0\9; // remove padding for < ie9 since default arrow can't be removed
+div {
+  background: svg-gradient(to bottom, red 0, orange 20%, yellow 30%, green 50%, blue 70%, indigo 85%, violet 100%);
+}
+@colors: red 0, orange 20%, yellow 30%, green 50%, blue 70%, indigo 85%, violet 100%;
+div {
+  background: svg-gradient(to bottom, @colors);
 }
