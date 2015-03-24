@@ -23,24 +23,20 @@
   @nested-many-names-no-body something, else, and, also;
 }
 @nested-with-body {
-  .ruleset {
-    value: value;
-    another: 1;
-  }
+  value: value;
+  another: 1;
 }
 @nested-with-body {
-  .ruleset h1 {
+  h1 {
     something: something;
   }
 }
 @nested-one-name-with-body something {
-  .ruleset {
-    value: value;
-    another: 1;
-  }
+  value: value;
+  another: 1;
 }
 @nested-many-names-with-body something, else, and, also {
-  .ruleset div h1 {
+  div h1 {
     something: something;
   }
 }

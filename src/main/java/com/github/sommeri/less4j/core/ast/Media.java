@@ -39,6 +39,10 @@ public class Media extends Directive {
     mediums.addAll(result);
   }
 
+  public boolean bubleUpWithoutChanges() {
+    return false;
+  }
+
   @Override
   @NotAstProperty
   public List<ASTCssNode> getChilds() {

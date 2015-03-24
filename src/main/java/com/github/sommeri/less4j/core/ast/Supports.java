@@ -17,6 +17,9 @@ public class Supports extends Directive {
     this.dialect = dialect;
   }
 
+  public boolean bubleUpWithoutChanges() {
+    return false;
+  }
   public GeneralBody getBody() {
     return body;
   }

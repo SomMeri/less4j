@@ -1132,7 +1132,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       HiddenTokenAwareTree token = iterator.next();
       if (token.getType() == LessLexer.COMMA) {
         token.pushHiddenToSiblings();
-      } else if (token.getType() == LessLexer.IDENT || token.getType() == LessLexer.AT_NAME || token.getType()==LessLexer.INDIRECT_VARIABLE) {
+      } else if (token.getType() == LessLexer.STRING || token.getType() == LessLexer.IDENT || token.getType() == LessLexer.AT_NAME || token.getType()==LessLexer.INDIRECT_VARIABLE) {
         result.add(new KeyframesName(token.commentsLessClone(), termBuilder.buildFromTerm(token)));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);

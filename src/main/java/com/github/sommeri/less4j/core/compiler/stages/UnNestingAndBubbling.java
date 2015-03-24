@@ -68,12 +68,14 @@ public class UnNestingAndBubbling {
       }
       default:
         if (AstLogic.isBubleableDirective(kid)) {
-          List<Selector> outerSelectors = ArraysUtils.deeplyClonedList(nestedNodes.currentSelectors());
           Directive directive = (Directive) kid;
           manipulator.removeFromBody(directive);
           nestedNodes.collect(directive);
 
-          putBodyIntoRuleset(directive, outerSelectors);
+          if (!directive.bubleUpWithoutChanges()) {
+            List<Selector> outerSelectors = ArraysUtils.deeplyClonedList(nestedNodes.currentSelectors());
+            putBodyIntoRuleset(directive, outerSelectors);
+          }
           unnestRulesetsAndDirectives(directive.getBody());
 
         } else {

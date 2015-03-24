@@ -252,7 +252,7 @@ keyframes
 finally { leaveRule(); }
 
 keyframesname
-    : IDENT | variablereference
+    : IDENT | variablereference | STRING
     ;
 
 document
