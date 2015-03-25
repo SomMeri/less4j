@@ -30,7 +30,7 @@ public class CallerCalleeScopeJoiner {
   
   public IScope joinIfIndependent(IScope callerScope, IScope bodyScope) {
     // locally defined mixin does not require any other action
-    boolean isLocallyDefined = bodyScope.seesLocalDataOf(callerScope); 
+    boolean isLocallyDefined = isLocallyDefined(callerScope, bodyScope);
 
     if (isLocallyDefined) {
       return bodyScope;
@@ -39,6 +39,17 @@ public class CallerCalleeScopeJoiner {
     //join scopes
     IScope result = ScopeFactory.createJoinedScopesView(callerScope, bodyScope);
     return result;
+  }
+
+  private boolean isLocallyDefined(IScope callerScope, IScope bodyScope) {
+    boolean isLocallyDefined = true;
+    
+    IScope checkScope = callerScope;
+    while (isLocallyDefined && checkScope!=null) {
+      isLocallyDefined = bodyScope.seesLocalDataOf(checkScope);
+      checkScope = checkScope.getParent();
+    }
+    return isLocallyDefined;
   }
 
   public List<FullMixinDefinition> mixinsToImport(IScope callerScope, IScope calleeScope, List<FullMixinDefinition> unmodifiedMixinsToImport) {

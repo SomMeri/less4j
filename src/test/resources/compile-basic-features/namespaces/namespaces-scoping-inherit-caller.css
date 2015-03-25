@@ -1,3 +1,7 @@
 #mybox {
   width: 20px;
 }
+.for-cycle-issue-273 #basic-usage {
+  value: 3;
+  value: 2;
+}

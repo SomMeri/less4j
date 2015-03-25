@@ -7,3 +7,17 @@
   @width: 20px;
   #ns > .box();
 }
+//issue https://github.com/SomMeri/less4j/issues/273
+.for-cycle-issue-273 {
+  .for-impl_(@i) when (@i > 1)    {
+    .-each(@i);
+    .for-impl_((@i - 1));
+  }
+  #basic-usage {
+    .-each(@value) {
+        value: @value;
+    }
+    // it works when parameter is 2
+    .for-impl_(3);  
+  }
+}

@@ -1,7 +1,19 @@
-div {
-  background: svg-gradient(to bottom, red 0, orange 20%, yellow 30%, green 50%, blue 70%, indigo 85%, violet 100%);
+// .for
+.for(@i, @n) {.-each(@i)}
+.for(@n)     when (isnumber(@n)) {.for(1, @n)}
+.for(@i, @n) when not (@i = @n)  {
+    .for((@i + ((@n - @i) / abs(@n - @i))), @n);
 }
-@colors: red 0, orange 20%, yellow 30%, green 50%, blue 70%, indigo 85%, violet 100%;
-div {
-  background: svg-gradient(to bottom, @colors);
+
+// .for-each
+.for(@array)   when (default()) {.for-impl_(length(@array))}
+.for-impl_(@i) when (@i > 1)    {.for-impl_((@i - 1))}
+.for-impl_(@i)                  {.-each(extract(@array, @i));}
+
+@list: banana, apple, pear, potato, carrot, peach;
+
+#basic-usage {
+    .for(@list); .-each(@value) {
+        value: @value;
+    }
 }
