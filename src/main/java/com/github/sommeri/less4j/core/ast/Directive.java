@@ -16,4 +16,8 @@ public abstract class Directive extends ASTCssNode implements BodyOwner<GeneralB
     return getBody()!=null;
   }
 
+  @Override
+  public Directive clone() {
+    return (Directive) super.clone();
+  }
 }

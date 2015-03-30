@@ -17,6 +17,7 @@ public class ScopeView extends BasicScope {
   }
 
   public void saveLocalDataForTheWholeWayUp() {
+    //System.out.println(" +++ saving: " + this);
     this.saveableLocalScope.save();
     
     if (hasParent()) {

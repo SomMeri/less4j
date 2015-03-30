@@ -48,6 +48,10 @@ public class ScopeFactory {
     return result;
   }
 
+  public static ScopeView createSaveableView(IScope scope) {
+    return createJoinedScopesView(null, scope);  
+  }
+  
   public static ScopeView createJoinedScopesView(IScope parent, IScope underlyingChild) {
     return createChildScopeView(underlyingChild, null, parent);  
   }

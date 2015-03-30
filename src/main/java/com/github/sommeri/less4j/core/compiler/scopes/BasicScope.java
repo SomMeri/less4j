@@ -24,8 +24,10 @@ public class BasicScope extends ComposedDumbScope implements IScope {
   public Expression getValue(String name) {
     Expression value = getLocalValue(name);
 
-    if (value == null && hasParent())
+    if (value == null && hasParent()) {
+      //System.out.println("searching parent: " + getParent());
       value = getParent().getValue(name);
+    }
 
     return value;
   }

@@ -418,6 +418,7 @@ public class ExpressionEvaluator {
     if (owningScope == null)
       throw new BugHappened("Detached ruleset with unknown scope.", input);
 
+    //FIXME: !!!!!! this is pointless remove
     clone.setScope(composedScope(owningScope));
     return clone;
   }

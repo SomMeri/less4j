@@ -1,19 +1,46 @@
-// .for
-.for(@i, @n) {.-each(@i)}
-.for(@n)     when (isnumber(@n)) {.for(1, @n)}
-.for(@i, @n) when not (@i = @n)  {
-    .for((@i + ((@n - @i) / abs(@n - @i))), @n);
-}
+#test {
+  // define mixin
+  .apples(@width: 100px) {  
+    @bananas: {
+      width: @width;
+    };
+  }
 
-// .for-each
-.for(@array)   when (default()) {.for-impl_(length(@array))}
-.for-impl_(@i) when (@i > 1)    {.for-impl_((@i - 1))}
-.for-impl_(@i)                  {.-each(extract(@array, @i));}
+  // unlock
+  .apples(50px);
 
-@list: banana, apple, pear, potato, carrot, peach;
+  // use imported mixin
+  @bananas();
+} 
 
-#basic-usage {
-    .for(@list); .-each(@value) {
-        value: @value;
+/*#test {
+  // define mixin
+  .apples(@width: 100px) {  
+    .bananas() {
+      width: @width;
     }
-}
+  }
+
+  // unlock
+  .apples(50px);
+
+  // use imported mixin
+  .bananas();
+}*/
+
+ /*   .for(@n)  when (isnumber(@n)) {
+        isnumber: true;
+    }
+    .for(@array) when (default()) {
+        should-not-get-executed: but-did;
+        .-each(extract(@array, length(@array)));
+    }
+
+@list: one, two, three;
+.we {   
+	@number: 2;
+    .for(@number); 
+    .-each(@val) {
+        val: @val;
+    }
+}*/

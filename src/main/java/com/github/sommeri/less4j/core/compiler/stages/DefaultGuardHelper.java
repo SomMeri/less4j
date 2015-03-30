@@ -21,7 +21,7 @@ public class DefaultGuardHelper {
     this.problemsHandler = problemsHandler;
   }
 
-  public List<BodyCompilationResult> chooseMixinsToBeUsed(List<BodyCompilationResult> compiledMixins, final MixinReference reference) {
+  public List<BodyCompilationData> chooseMixinsToBeUsed(List<BodyCompilationData> compiledMixins, final MixinReference reference) {
     // count how many mixins of each kind we encountered
     int normalMixinsCnt = ArraysUtils.count(compiledMixins, GuardValue.USE.filter());
     int ifNotCnt = ArraysUtils.count(compiledMixins, GuardValue.USE_IF_NOT_DEFAULT.filter());
@@ -38,7 +38,7 @@ public class DefaultGuardHelper {
     
     //there are multiple mixins using default() function and nothing else - that is ambiguous (period). 
     if (ifDefaultCnt+ifNotCnt > 1) {
-      List<BodyCompilationResult> errorSet = keepOnly(compiledMixins, GuardValue.USE_IF_DEFAULT,GuardValue.USE_IF_NOT_DEFAULT);
+      List<BodyCompilationData> errorSet = keepOnly(compiledMixins, GuardValue.USE_IF_DEFAULT,GuardValue.USE_IF_NOT_DEFAULT);
       problemsHandler.ambiguousDefaultSet(reference, extractOriginalMixins(errorSet));
       //no mixins are going to be used
       return Collections.emptyList();
@@ -56,11 +56,11 @@ public class DefaultGuardHelper {
    * @param kind - types of mixins that are going to stay.
    * @return compiledMixins - for convenience
    */
-  private List<BodyCompilationResult> keepOnly(List<BodyCompilationResult> compiledMixins, GuardValue... kind) {
+  private List<BodyCompilationData> keepOnly(List<BodyCompilationData> compiledMixins, GuardValue... kind) {
     Set<GuardValue> expectedUses = ArraysUtils.asSet(kind);
-    Iterator<BodyCompilationResult> iterator = compiledMixins.iterator();
+    Iterator<BodyCompilationData> iterator = compiledMixins.iterator();
     while (iterator.hasNext()) {
-      BodyCompilationResult compiled = iterator.next();
+      BodyCompilationData compiled = iterator.next();
       if (!expectedUses.contains(compiled.getGuardValue())) {
         iterator.remove();
       }
@@ -68,10 +68,10 @@ public class DefaultGuardHelper {
     return compiledMixins;
   }
 
-  private List<ASTCssNode> extractOriginalMixins(List<BodyCompilationResult> compiledMixins) {
+  private List<ASTCssNode> extractOriginalMixins(List<BodyCompilationData> compiledMixins) {
     List<ASTCssNode> result = new ArrayList<ASTCssNode>();
-    for (BodyCompilationResult compiled : compiledMixins) {
-      result.add(compiled.getCompiledBodyOwner());
+    for (BodyCompilationData compiled : compiledMixins) {
+      result.add((ASTCssNode)compiled.getCompiledBodyOwner());
     }
     return result;
   }
