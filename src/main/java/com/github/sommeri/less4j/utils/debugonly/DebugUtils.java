@@ -16,15 +16,19 @@ public class DebugUtils {
   public DebugUtils() {
   }
 
-  public void scopeTest(IScope scope, Object id) {
+  /** 
+   * Variable name should contain @ too e.g. "@width"
+   */
+  public void scopeTest(IScope scope, Object id, String variableName) {
     try {
-      System.out.println("--- Name: " +id+ " | " + scope);
+      System.out.println("--- Scope Test: " +id+ " Scope name: " + scope);
       Expression value = scope.getValue("@width");
       
-      if (value==null)
-        System.out.println("@width: " + value + " !");
-      else 
-        System.out.println("@width: " + value);
+      String text = variableName + ": " + value;
+      if (value==null) {
+        text +=" !";
+      }
+      System.out.println(text);
     } catch (Throwable th) {
       th.printStackTrace();
     }

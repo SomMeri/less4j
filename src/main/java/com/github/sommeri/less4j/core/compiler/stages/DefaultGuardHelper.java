@@ -26,9 +26,10 @@ public class DefaultGuardHelper {
     int normalMixinsCnt = ArraysUtils.count(compiledMixins, GuardValue.USE.filter());
     int ifNotCnt = ArraysUtils.count(compiledMixins, GuardValue.USE_IF_NOT_DEFAULT.filter());
     int ifDefaultCnt = ArraysUtils.count(compiledMixins, GuardValue.USE_IF_DEFAULT.filter());
-    
+    int doNotUse = ArraysUtils.count(compiledMixins, GuardValue.DO_NOT_USE.filter());
+
     //sanity check - could be removed - keeping only for debugging purposes
-    if (normalMixinsCnt+ifNotCnt+ifDefaultCnt!=compiledMixins.size())
+    if (normalMixinsCnt+ifNotCnt+ifDefaultCnt+doNotUse!=compiledMixins.size())
       throw new BugHappened("Unexpected mixin type in compiled mixins list.", reference);
 
     // We know now that default() value is false. We do not care whether there was some potentional ambiguity or not and return anything that is not default. 

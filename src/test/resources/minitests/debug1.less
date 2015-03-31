@@ -1,46 +1,28 @@
-#test {
-  // define mixin
-  .apples(@width: 100px) {  
-    @bananas: {
-      width: @width;
-    };
-  }
+ .wrapper {
+ @list: one, two, three;
+    @number: 2;
 
-  // unlock
-  .apples(50px);
-
-  // use imported mixin
-  @bananas();
-} 
-
-/*#test {
-  // define mixin
-  .apples(@width: 100px) {  
-    .bananas() {
-      width: @width;
+    .for(@i, @n) {
+        should-get-executed: and-did;
+        .-each(@i)
     }
-  }
-
-  // unlock
-  .apples(50px);
-
-  // use imported mixin
-  .bananas();
-}*/
-
- /*   .for(@n)  when (isnumber(@n)) {
-        isnumber: true;
+    .for(@n)     when (isnumber(@n)) {
+        .for(1, @n)
     }
-    .for(@array) when (default()) {
+    .for(@i, @n) when not (@i = @n)  {
+        .for((@i + ((@n - @i) / abs(@n - @i))), @n);
+    }
+    .for(@array)   when (default()) {
+        .for-impl_(length(@array))
+    }
+    .for-impl_(@i) when (@i > 1)    {.for-impl_((@i - 1))}
+    .for-impl_(@i)                  {
         should-not-get-executed: but-did;
-        .-each(extract(@array, length(@array)));
+        .-each(extract(@array, @i));
     }
 
-@list: one, two, three;
-.we {   
-	@number: 2;
-    .for(@number); 
-    .-each(@val) {
+   // CALL THE .for() MIXIN HERE WITH ONLY A NUMER FOR THE PARAMETER
+    .for(@number); .-each(@val) {
         val: @val;
     }
-}*/
+    }

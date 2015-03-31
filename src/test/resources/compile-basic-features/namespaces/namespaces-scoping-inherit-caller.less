@@ -7,6 +7,7 @@
   @width: 20px;
   #ns > .box();
 }
+
 //issue https://github.com/SomMeri/less4j/issues/273
 .for-cycle-issue-273 {
   .for-impl_(@i) when (@i > 1)    {
@@ -19,5 +20,22 @@
     }
     // it works when parameter is 2
     .for-impl_(3);  
+  }
+}
+//issue https://github.com/SomMeri/less4j/issues/275
+.for-cycle-issue-275 {
+  .for(@n)  when (isnumber(@n)) {
+    isnumber: true;
+  }
+  .for(@array) when (default()) {
+    should-not-get-executed: but-did;
+    .-each(extract(@array, length(@array)));
+  }
+
+  @list: one, two, three;
+  .we { 
+	@number: 2;
+    .for(@number); 
+    .-each(@val) {  val: @val; }
   }
 }

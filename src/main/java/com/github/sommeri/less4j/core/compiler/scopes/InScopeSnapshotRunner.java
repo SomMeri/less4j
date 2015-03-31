@@ -1,6 +1,5 @@
 package com.github.sommeri.less4j.core.compiler.scopes;
 
-import com.github.sommeri.less4j.utils.debugonly.DebugUtils;
 
 public class InScopeSnapshotRunner {
   private final IScope scope;
@@ -42,16 +41,11 @@ public class InScopeSnapshotRunner {
    * 
    */
   public void runInLocalDataSnapshot(ITask task) {
-//    DebugUtils debugUtils = new DebugUtils();
-//    debugUtils.scopeTest(scope, "before snapshot " + (id++));
     scope.createCurrentDataSnapshot();
-//    debugUtils.scopeTest(scope, "after snapshot " + (id++));
     try {
       task.run();
     } finally {
-//      debugUtils.scopeTest(scope, "before discard " + (id++));
       scope.discardLastDataSnapshot();
-//      debugUtils.scopeTest(scope, "after discard " + (id++));
     }
   }
 

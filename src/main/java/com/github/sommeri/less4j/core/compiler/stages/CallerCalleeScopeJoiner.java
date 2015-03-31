@@ -7,27 +7,11 @@ import com.github.sommeri.less4j.core.compiler.scopes.FullMixinDefinition;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.view.ScopeView;
-import com.github.sommeri.less4j.utils.debugonly.DebugUtils;
 
 public class CallerCalleeScopeJoiner {
 
   public ScopeView joinIfIndependentAndPreserveContent(IScope callerScope, IScope bodyScope) {
-    DebugUtils u = new DebugUtils();
-    // locally defined mixin does not require any other action
-    boolean isLocalImport = isLocallyDefined(callerScope, bodyScope);
-
-    u.scopeTest(callerScope, " * callerScope");
-    u.scopeTest(bodyScope, " * bodyScope");
-    ScopeView result = null;
-    if (isLocalImport) {
-      // we need to copy the whole tree, because this runs inside referenced mixin scope 
-      // snapshot and imported mixin needs to remember the scope as it is now 
-      result = ScopeFactory.createSaveableView(bodyScope);
-    } else {
-      // since this is non-local import, we need to join reference scope and imported mixins scope
-      // imported mixin needs to have access to variables defined in caller
-      result = ScopeFactory.createJoinedScopesView(callerScope, bodyScope);
-    }
+    ScopeView result = joinIfIndependent(callerScope, bodyScope);
     result.saveLocalDataForTheWholeWayUp();
     return result;
   }

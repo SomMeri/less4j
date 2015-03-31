@@ -67,13 +67,13 @@ public class MixinsGuardsValidator {
       switch (guardValue) {
       case USE:
       case USE_IF_NOT_DEFAULT:
-        return true;
+        break;
       case DO_NOT_USE:
       case USE_IF_DEFAULT:
         return false;
       }
     }
-    return false;
+    return true;
   }
 
   private boolean ifDefaultGuardValue(List<GuardValue> guards) {
@@ -81,13 +81,13 @@ public class MixinsGuardsValidator {
       switch (guardValue) {
       case USE:
       case USE_IF_DEFAULT:
-        return true;
+        break ;
       case DO_NOT_USE:
       case USE_IF_NOT_DEFAULT:
         return false;
       }
     }
-    return false;
+    return true;
   }
 
 }

@@ -18,8 +18,8 @@ import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionFilter;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionManipulator;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
@@ -33,7 +33,6 @@ import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.view.ScopeView;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
-import com.github.sommeri.less4j.utils.debugonly.DebugUtils;
 
 class MixinsRulesetsSolver {
 
@@ -44,9 +43,6 @@ class MixinsRulesetsSolver {
   private final DefaultGuardHelper defaultGuardHelper;
   private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
   private final ExpressionManipulator expressionManipulator = new ExpressionManipulator();
-  
-  public static int id = 0;
-  public static IScope watchedScopeInstance = null; 
 
   public MixinsRulesetsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = parentSolver;
@@ -62,7 +58,7 @@ class MixinsRulesetsSolver {
     final IScope referencedMixinScope = bodyWorkingScope;
     // ... and I'm starting to see the point of closures ...
     return InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new IFunction<BodyCompilationData>() {
-    //return InScopeSnapshotRunner.runInOriginalDataSnapshot(referencedMixinScope, new IFunction<BodyCompilationData>() {
+      //return InScopeSnapshotRunner.runInOriginalDataSnapshot(referencedMixinScope, new IFunction<BodyCompilationData>() {
 
       @Override
       public BodyCompilationData run() {
@@ -72,24 +68,14 @@ class MixinsRulesetsSolver {
         // collect variables and mixins to be imported
         IScope returnValues = ScopeFactory.createDummyScope();
         if (returnMode == ReturnMode.MIXINS_AND_VARIABLES) {
-          DebugUtils u = new DebugUtils();
-          u.scopeTest(callerScope, "callerScope");
-          u.scopeTest(referencedMixinScope, "referencedMixinScope");// switching between callerScope and referencedMixinScope on the line down
           returnValues.addFilteredVariables(new ImportedScopeFilter(expressionEvaluator, callerScope), referencedMixinScope);
         }
         List<FullMixinDefinition> unmodifiedMixinsToImport = referencedMixinScope.getAllMixins();
 
         List<FullMixinDefinition> allMixinsToImport = scopeManipulation.mixinsToImport(callerScope, referencedMixinScope, unmodifiedMixinsToImport);
         returnValues.addAllMixins(allMixinsToImport);
-        
-        for (FullMixinDefinition fullMixinDefinition : allMixinsToImport) {
-          if (fullMixinDefinition.getMixin().getNames().get(0).asString().equals(".bananas")) {
-            watchedScopeInstance = fullMixinDefinition.getScope();
-          }
-        }
-        
 
-        return new BodyCompilationData(bodyOwner, replacement, returnValues);
+        return new BodyCompilationData(bodyOwner, null, replacement, returnValues);
       }
 
     });
@@ -131,10 +117,7 @@ class MixinsRulesetsSolver {
       final ReusableStructure mixin = fullMixin.getMixin();
       final IScope mixinScope = fullMixin.getScope();
 
-      final BodyCompilationData data = new BodyCompilationData(fullMixin.getMixin(), null);
-      //FIXME !!!! remove this did not helped
-      final ScopeView callerScopeCopy = ScopeFactory.createSaveableView(callerScope);
-      callerScopeCopy.saveLocalDataForTheWholeWayUp();
+      final BodyCompilationData data = new BodyCompilationData(mixin, mixinScope, null);
       // the following needs to run in snapshot because calculateMixinsWorkingScope modifies that scope
       InScopeSnapshotRunner.runInLocalDataSnapshot(mixinScope.getParent(), new ITask() {
 
@@ -154,27 +137,43 @@ class MixinsRulesetsSolver {
           namespacesGuards.add(guardValue);
           guardValue = guardsValidator.andGuards(namespacesGuards);
           data.setGuardValue(guardValue);
+
+          compiledMixins.add(data);
         }
       }); //end of InScopeSnapshotRunner.runInLocalDataSnapshot
-
-      InScopeSnapshotRunner.runInLocalDataSnapshot(mixinScope.getParent(), new ITask() {
-
-        @Override
-        public void run() {
-          // add arguments
-          IScope mixinArguments = data.getMixinArguments();
-          ScopeView mixinWorkingScope = data.getMixinWorkingScope();
-          mixinWorkingScope.getParent().add(mixinArguments); 
-          mixinWorkingScope.saveLocalDataForTheWholeWayUp();
-          data.setMixinWorkingScope(mixinWorkingScope);
-
-          easilyMoveable(callerScope, compiledMixins, fullMixin, data);
-        }
-      }); //end of InScopeSnapshotRunner.runInLocalDataSnapshot
-}
-
+    }
     // filter out mixins we do not want to use  
     List<BodyCompilationData> mixinsToBeUsed = defaultGuardHelper.chooseMixinsToBeUsed(compiledMixins, reference);
+    for (final BodyCompilationData data : mixinsToBeUsed) {
+
+        final ScopeView mixinWorkingScope = data.getMixinWorkingScope();
+        //mixinScope data.getOriginalBodyOwnerScope()
+        InScopeSnapshotRunner.runInLocalDataSnapshot(data.getOriginalBodyOwnerScope().getParent(), new ITask() { //mixinScope <- original
+
+              @Override
+              public void run() {
+                // add arguments
+                // final ScopeView mixinWorkingScope = data.getMixinWorkingScope();
+                BodyOwner<?> mixin = data.getCompiledBodyOwner();
+                IScope mixinArguments = data.getMixinArguments();
+                mixinWorkingScope.getParent().add(mixinArguments);
+                mixinWorkingScope.saveLocalDataForTheWholeWayUp();
+                data.setMixinWorkingScope(mixinWorkingScope);
+
+                GuardValue guardValue2 = data.getGuardValue();
+                IScope mixinWorkingScope2 = data.getMixinWorkingScope();
+                if (guardValue2 != GuardValue.DO_NOT_USE) {
+                  //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
+                  //used and create snapshot operation is cheap now. It should be done later on.
+                  BodyCompilationData compiled = resolveCalledBody(callerScope, mixin, mixinWorkingScope2, ReturnMode.MIXINS_AND_VARIABLES);
+                  // *************************************************  
+                  data.setReplacement(compiled.getReplacement());
+                  data.setReturnValues(compiled.getReturnValues());
+                }
+              }
+            }); //end of InScopeSnapshotRunner.runInLocalData........Snapshot
+      
+    }
 
     // update mixin replacements and update scope with imported variables and mixins
     for (BodyCompilationData data : mixinsToBeUsed) {
@@ -187,39 +186,6 @@ class MixinsRulesetsSolver {
     shiftComments(reference, result);
 
     return result;
-  }
-
-  private void easilyMoveable(final IScope callerScope, final List<BodyCompilationData> compiledMixins, final FoundMixin fullMixin, final BodyCompilationData data) {
-    GuardValue guardValue2 = data.getGuardValue();
-    IScope mixinWorkingScope2 = data.getMixinWorkingScope();
-    if (guardValue2 != GuardValue.DO_NOT_USE) {
-      //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
-      //used and create snapshot operation is cheap now. It should be done later on.
-      BodyCompilationData compiled = resolveCalledBody(callerScope, fullMixin.getMixin(), mixinWorkingScope2, ReturnMode.MIXINS_AND_VARIABLES);
-      // *************************************************  
-      data.setReplacement(compiled.getReplacement());
-      data.setReturnValues(compiled.getReturnValues());
-      //store the mixin as candidate
-      compiledMixins.add(data);
-    }
-  }
-
-  private void scopetest(IScope scope, Object id) {
-    if (scope ==null) {
-      System.out.println("scopetest skipped");
-      return ;
-    }
-    try {
-      System.out.println("--- Name: " +id+ " scope: " + scope);
-      Expression value = scope.getValue("@width");
-      
-      if (value==null)
-        System.out.println("@width: " + value + " !!!!!!!!!!!!!!!");
-      else 
-        System.out.println("@width: " + value);
-    } catch (Throwable th) {
-      th.printStackTrace();
-    }
   }
 
   public GeneralBody buildDetachedRulesetReplacement(DetachedRulesetReference reference, IScope callerScope, DetachedRuleset detachedRuleset, IScope detachedRulesetScope) {
