@@ -1,8 +1,4 @@
-#guarded-caller {
-  guarded: namespace;
-  silent: namespace;
-  guarded: with default;
-}
-#guarded-deeper {
-  should: match 1;
+selector {
+  scary: 1;
+  scary: 0;
 }

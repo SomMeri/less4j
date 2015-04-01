@@ -1,5 +1,6 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Configuration;
@@ -37,6 +38,17 @@ public class MixinsGuardsValidator {
     boolean ifDefaultGuardValue = guardsSatisfied(mixin, true);
     boolean ifNotDefaultGuardValue = guardsSatisfied(mixin, false);
     return toDefaultFunctionUse(ifDefaultGuardValue, ifNotDefaultGuardValue);
+  }
+
+  /**
+   * CAREFULL: side-effect - the <code>namespacesGuards</code> list is modified
+   * @param namespacesGuards
+   * @param mixin
+   * @return
+   */
+  public GuardValue evaluateGuards(LinkedList<GuardValue> namespacesGuards, ReusableStructure mixin) {
+    namespacesGuards.add(evaluateGuards(mixin));
+    return andGuards(namespacesGuards);
   }
 
   /**

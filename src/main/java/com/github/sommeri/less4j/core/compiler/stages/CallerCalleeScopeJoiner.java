@@ -12,7 +12,7 @@ public class CallerCalleeScopeJoiner {
 
   public ScopeView joinIfIndependentAndPreserveContent(IScope callerScope, IScope bodyScope) {
     ScopeView result = joinIfIndependent(callerScope, bodyScope);
-    result.saveLocalDataForTheWholeWayUp();
+    result.toIndependentWorkingCopyAllParents();
     return result;
   }
   
@@ -54,7 +54,7 @@ public class CallerCalleeScopeJoiner {
         // imported mixin needs to have access to variables defined in caller
         newScope = ScopeFactory.createJoinedScopesView(calleeScope, mixinToImport.getScope());
       }
-      newScope.saveLocalDataForTheWholeWayUp();
+      newScope.toIndependentWorkingCopyAllParents();
       result.add(new FullMixinDefinition(mixinToImport.getMixin(), newScope));
     }
     return result;

@@ -1,28 +1,12 @@
- .wrapper {
- @list: one, two, three;
-    @number: 2;
-
-    .for(@i, @n) {
-        should-get-executed: and-did;
-        .-each(@i)
-    }
-    .for(@n)     when (isnumber(@n)) {
-        .for(1, @n)
-    }
-    .for(@i, @n) when not (@i = @n)  {
-        .for((@i + ((@n - @i) / abs(@n - @i))), @n);
-    }
-    .for(@array)   when (default()) {
-        .for-impl_(length(@array))
-    }
-    .for-impl_(@i) when (@i > 1)    {.for-impl_((@i - 1))}
-    .for-impl_(@i)                  {
-        should-not-get-executed: but-did;
-        .-each(extract(@array, @i));
-    }
-
-   // CALL THE .for() MIXIN HERE WITH ONLY A NUMER FOR THE PARAMETER
-    .for(@number); .-each(@val) {
-        val: @val;
-    }
-    }
+//loop calling another mixin: issue #169 https://github.com/SomMeri/less4j/issues/169
+.make-grid(@index) when (@index >= 0) {
+  .calc-grid(@index); //call needs to be here
+  .make-grid(@index - 1);
+}
+.calc-grid(@index) {
+  //nothing here
+  scary: @index;
+}
+selector {
+  .make-grid(1); // 0 would not fail
+}

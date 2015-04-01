@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.github.sommeri.less4j.LessCompiler.Configuration;
@@ -33,6 +32,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.view.ScopeView;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.utils.ArraysUtils;
+import com.github.sommeri.less4j.utils.Couple;
 
 class MixinsRulesetsSolver {
 
@@ -52,16 +52,14 @@ class MixinsRulesetsSolver {
     this.defaultGuardHelper = new DefaultGuardHelper(problemsHandler);
   }
 
-  private BodyCompilationData resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope bodyWorkingScope, final ReturnMode returnMode) {
-    final ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(bodyWorkingScope, problemsHandler, configuration);
+  private Couple<List<ASTCssNode>, IScope> resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope referencedMixinScope, final ReturnMode returnMode) {
+    final ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referencedMixinScope, problemsHandler, configuration);
 
-    final IScope referencedMixinScope = bodyWorkingScope;
     // ... and I'm starting to see the point of closures ...
-    return InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new IFunction<BodyCompilationData>() {
-      //return InScopeSnapshotRunner.runInOriginalDataSnapshot(referencedMixinScope, new IFunction<BodyCompilationData>() {
+    return InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new IFunction<Couple<List<ASTCssNode>, IScope>>() {
 
       @Override
-      public BodyCompilationData run() {
+      public Couple<List<ASTCssNode>, IScope> run() {
         // compile referenced mixin - keep the original copy unchanged
         List<ASTCssNode> replacement = compileBody(bodyOwner.getBody(), referencedMixinScope);
 
@@ -75,7 +73,7 @@ class MixinsRulesetsSolver {
         List<FullMixinDefinition> allMixinsToImport = scopeManipulation.mixinsToImport(callerScope, referencedMixinScope, unmodifiedMixinsToImport);
         returnValues.addAllMixins(allMixinsToImport);
 
-        return new BodyCompilationData(bodyOwner, null, replacement, returnValues);
+        return new Couple<List<ASTCssNode>, IScope>(replacement, returnValues);
       }
 
     });
@@ -106,7 +104,7 @@ class MixinsRulesetsSolver {
   }
 
   public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final IScope callerScope, List<FoundMixin> mixins) {
-    GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
+    final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     if (mixins.isEmpty())
       return result;
 
@@ -117,7 +115,7 @@ class MixinsRulesetsSolver {
       final ReusableStructure mixin = fullMixin.getMixin();
       final IScope mixinScope = fullMixin.getScope();
 
-      final BodyCompilationData data = new BodyCompilationData(mixin, mixinScope, null);
+      final BodyCompilationData data = new BodyCompilationData(mixin);
       // the following needs to run in snapshot because calculateMixinsWorkingScope modifies that scope
       InScopeSnapshotRunner.runInLocalDataSnapshot(mixinScope.getParent(), new ITask() {
 
@@ -125,60 +123,51 @@ class MixinsRulesetsSolver {
         public void run() {
           // add arguments
           IScope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
-          data.setMixinArguments(mixinArguments);
-          mixinScope.getParent().add(mixinArguments); //this gets lost
+          data.setArguments(mixinArguments);
+          mixinScope.getParent().add(mixinArguments);
           ScopeView mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, mixinScope);
+          //it the mixin calls itself recursively, each copy should work on independent copy of local data
+          //that is matters mostly for scope placeholders - if both close placeholders in same copy error happen
+          mixinWorkingScope.toIndependentWorkingCopy();
           data.setMixinWorkingScope(mixinWorkingScope);
 
           MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
-          GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
-
-          LinkedList<GuardValue> namespacesGuards = fullMixin.getGuardsOnPath();
-          namespacesGuards.add(guardValue);
-          guardValue = guardsValidator.andGuards(namespacesGuards);
+          GuardValue guardValue = guardsValidator.evaluateGuards(fullMixin.getGuardsOnPath(), mixin);
           data.setGuardValue(guardValue);
 
           compiledMixins.add(data);
         }
       }); //end of InScopeSnapshotRunner.runInLocalDataSnapshot
     }
+
     // filter out mixins we do not want to use  
     List<BodyCompilationData> mixinsToBeUsed = defaultGuardHelper.chooseMixinsToBeUsed(compiledMixins, reference);
+
     for (final BodyCompilationData data : mixinsToBeUsed) {
+      final ScopeView mixinWorkingScope = data.getMixinWorkingScope();
 
-        final ScopeView mixinWorkingScope = data.getMixinWorkingScope();
-        //mixinScope data.getOriginalBodyOwnerScope()
-        InScopeSnapshotRunner.runInLocalDataSnapshot(data.getOriginalBodyOwnerScope().getParent(), new ITask() { //mixinScope <- original
+      // compilation must run in another localDataSnapshot, because imported detached ruleset stored in 
+      // variables point to original scope - making snapshot above is not enough
+      // since they point to scope as defined during definition, they would not know parameters
+      // of mixins that define them
+      InScopeSnapshotRunner.runInLocalDataSnapshot(mixinWorkingScope.getParent(), new ITask() {
 
-              @Override
-              public void run() {
-                // add arguments
-                // final ScopeView mixinWorkingScope = data.getMixinWorkingScope();
-                BodyOwner<?> mixin = data.getCompiledBodyOwner();
-                IScope mixinArguments = data.getMixinArguments();
-                mixinWorkingScope.getParent().add(mixinArguments);
-                mixinWorkingScope.saveLocalDataForTheWholeWayUp();
-                data.setMixinWorkingScope(mixinWorkingScope);
+        @Override
+        public void run() {
+          BodyOwner<?> mixin = data.getCompiledBodyOwner();
+          // add arguments again - detached rulesets imported into this one 
+          // via returned variables from sub-calls need would not see arguments otherwise
+          // bc they keep link to original copy and there is no other way how to access them 
+          IScope arguments = data.getArguments();
+          mixinWorkingScope.getParent().add(arguments);
 
-                GuardValue guardValue2 = data.getGuardValue();
-                IScope mixinWorkingScope2 = data.getMixinWorkingScope();
-                if (guardValue2 != GuardValue.DO_NOT_USE) {
-                  //OPTIMIZATION POSSIBLE: there is no need to compile mixins at this point, some of them are not going to be 
-                  //used and create snapshot operation is cheap now. It should be done later on.
-                  BodyCompilationData compiled = resolveCalledBody(callerScope, mixin, mixinWorkingScope2, ReturnMode.MIXINS_AND_VARIABLES);
-                  // *************************************************  
-                  data.setReplacement(compiled.getReplacement());
-                  data.setReturnValues(compiled.getReturnValues());
-                }
-              }
-            }); //end of InScopeSnapshotRunner.runInLocalData........Snapshot
-      
-    }
+          Couple<List<ASTCssNode>, IScope> compiled = resolveCalledBody(callerScope, mixin, mixinWorkingScope, ReturnMode.MIXINS_AND_VARIABLES);
+          // update mixin replacements and update scope with imported variables and mixins
+          result.addMembers(compiled.getT());
+          callerScope.addToDataPlaceholder(compiled.getM());
+        }
+      }); //end of InScopeSnapshotRunner.runInLocalData........Snapshot
 
-    // update mixin replacements and update scope with imported variables and mixins
-    for (BodyCompilationData data : mixinsToBeUsed) {
-      result.addMembers(data.getReplacement());
-      callerScope.addToDataPlaceholder(data.getReturnValues());
     }
 
     callerScope.closeDataPlaceholder();
@@ -190,11 +179,11 @@ class MixinsRulesetsSolver {
 
   public GeneralBody buildDetachedRulesetReplacement(DetachedRulesetReference reference, IScope callerScope, DetachedRuleset detachedRuleset, IScope detachedRulesetScope) {
     IScope mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, detachedRulesetScope);
-    BodyCompilationData compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope, ReturnMode.MIXINS);
+    Couple<List<ASTCssNode>, IScope> compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope, ReturnMode.MIXINS);
     GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
 
-    result.addMembers(compiled.getReplacement());
-    callerScope.addToDataPlaceholder(compiled.getReturnValues());
+    result.addMembers(compiled.getT());
+    callerScope.addToDataPlaceholder(compiled.getM());
     callerScope.closeDataPlaceholder();
 
     //resolveImportance(reference, result);
