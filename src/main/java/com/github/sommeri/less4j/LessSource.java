@@ -223,12 +223,14 @@ public abstract class LessSource {
   }
 
   public static class FileSource extends AbstractHierarchicalSource {
+    
+    private static String DEFAULT_CHARSET = "utf-8";
 
     private File inputFile;
     private String charsetName;
 
     public FileSource(File inputFile) {
-      this(inputFile, null);
+      this(inputFile, DEFAULT_CHARSET);
     }
     
     public FileSource(File inputFile, String charsetName) {
@@ -237,7 +239,7 @@ public abstract class LessSource {
     }
 
     public FileSource(FileSource parent, String filename) {
-      this(parent, filename, null);
+      this(parent, filename, DEFAULT_CHARSET);
     }
     
     public FileSource(FileSource parent, String filename, String charsetName) {

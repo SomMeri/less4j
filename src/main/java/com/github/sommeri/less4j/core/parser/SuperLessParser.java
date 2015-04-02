@@ -129,7 +129,7 @@ public abstract class SuperLessParser extends Parser {
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("IDENT_TERM", "identifier");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("NAMED_COMBINATOR", "named selector combinator");
     ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("EXCLAMATION_MARK", "!");
-    
+    ALTERNATIVE_NAMES_FOR_ERROR_REPORTING.put("UNICODE_NON_BREAKING_WS", "nbsp U+00A0"); //this will never appear in output - it is fragment
     
   }
 

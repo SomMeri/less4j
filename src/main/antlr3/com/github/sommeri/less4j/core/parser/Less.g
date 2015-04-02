@@ -954,7 +954,9 @@ fragment EMPTY_COMBINATOR: ;
 
 fragment HEXCHAR : ('a'..'f'|'A'..'F'|'0'..'9') ;
 
-fragment NONASCII : '\u0080'..'\uFFFF' ; // NB: Upper bound should be \u4177777
+fragment NONASCII : ( '\u00B0'..'\uFFFF') ; // NB: Upper bound should be \u4177777| ('\u0080'..'\u009F')  
+
+//fragment U+00A0
 
 fragment UNICODE : '\\' HEXCHAR
                                 (HEXCHAR
@@ -1452,7 +1454,8 @@ DOMAIN : ((D O M A I N '(' ((WS)=>WS)? URL WS? ')')
 // that process the whitespace within the parser, ANTLR does not
 // need to deal with the whitespace directly in the parser.
 //
-fragment WS_FRAGMENT : (' '|'\t'|'\f')+ ; //('\r'|'\n'|'\t'|'\f'|' ')
+fragment UNICODE_NON_BREAKING_WS: '\u00A0'; 
+fragment WS_FRAGMENT : (' '|'\t'|'\f'|UNICODE_NON_BREAKING_WS)+ ; //('\r'|'\n'|'\t'|'\f'|' ')
 WS : WS_FRAGMENT { $channel = HIDDEN; } ;
 fragment NL : ('\r' '\n'? | '\n');
 NEW_LINE: NL { $channel = HIDDEN; } ;
