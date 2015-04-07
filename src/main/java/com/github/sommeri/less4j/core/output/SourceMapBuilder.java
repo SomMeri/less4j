@@ -2,6 +2,8 @@ package com.github.sommeri.less4j.core.output;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessSource;
@@ -24,6 +26,7 @@ public class SourceMapBuilder {
   private final SourceMapGenerator generator;
   private final LessCompiler.SourceMapConfiguration configuration;
   private final Collection<LessSource> additionalSourceFiles;
+  private final Map<LessSource, String> cachedContent;
 
   private LessSource cssDestination;
 
@@ -33,6 +36,7 @@ public class SourceMapBuilder {
     this.configuration = configuration;
     this.additionalSourceFiles = additionalSourceFiles;
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
+    cachedContent = new HashMap<LessSource, String>();
   }
 
   public SourceMapBuilder append(String str, HiddenTokenAwareTree sourceToken) {
@@ -106,14 +110,21 @@ public class SourceMapBuilder {
   }
 
   private String toSourceContent(HiddenTokenAwareTree underlyingStructure, String sourceName, LessSource source) {
-    if (configuration.isIncludeSourcesContent() || sourceName==null) { 
+    if (configuration.isIncludeSourcesContent() || sourceName==null) {
+      if (cachedContent.containsKey(source)) {
+        return cachedContent.get(source);
+      }
+
+      String content;
       try {
-        return source.getContent();
+        content = source.getContent();
       } catch (FileNotFound e) {
         throw new BugHappened("How did we compiled something we did not read?", underlyingStructure);
       } catch (CannotReadFile e) {
         throw new BugHappened("How did we compiled something we did not read?", underlyingStructure);
       }
+      cachedContent.put(source, content);
+      return content;
     } else {
       return null;
     }
