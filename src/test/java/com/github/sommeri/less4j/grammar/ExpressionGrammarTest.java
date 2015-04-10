@@ -80,7 +80,7 @@ public class ExpressionGrammarTest {
 
     assertValidExpression(result);
     assertEquals(1, result.getTree().getChildren().size());
-    assertEquals(LessLexer.NUMBER, result.getTree().getChild(0).getType());
+    assertEquals(LessLexer.NUMBER, result.getTree().getChild(0).getGeneralType());
   }
 
   @Test
@@ -90,7 +90,7 @@ public class ExpressionGrammarTest {
 
     assertValidExpression(result);
     assertEquals(1, result.getTree().getChildren().size());
-    assertEquals(LessLexer.NUMBER, result.getTree().getChild(0).getType());
+    assertEquals(LessLexer.NUMBER, result.getTree().getChild(0).getGeneralType());
   }
 
 }

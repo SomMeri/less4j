@@ -18,6 +18,10 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
   private List<CommonToken> orphans = new LinkedList<CommonToken>();
   private List<CommonToken> following = new LinkedList<CommonToken>();
   private CommonToken tokenAsCommon;
+  
+  private ParsersSemanticPredicates grammarKnowledge = new ParsersSemanticPredicates();
+  protected int generalType = -3;
+
 
   public HiddenTokenAwareTree(CommonToken payload, LessSource source) {
     super(payload);
@@ -280,6 +284,26 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
     } catch (CloneNotSupportedException e) {
       throw new IllegalStateException();
     }
+  }
+
+  @Override
+  @Deprecated
+  public int getType() {
+    return super.getType();
+  }
+
+  public int getGeneralType() {
+    if ( generalType==-3 ) {
+      generalType = generalizeTokenType(super.getType());
+    }
+    return generalType;
+  }
+
+  private int generalizeTokenType(int type) {
+    if (grammarKnowledge.isAtName(type))
+      return LessLexer.AT_NAME;
+    
+    return type;
   }
 
 }

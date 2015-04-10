@@ -15,7 +15,7 @@ public class ParsersSemanticPredicates {
   private static final String VIEWPORT = "viewport";
   private static final String SUPPORTS = "supports";
   private static final String CHARSET = "charset";
-  
+
   private static final Set<String> PAGE_MARGIN_BOXES = new HashSet<String>(Arrays.asList(new String[] { "@top-left-corner", "@top-left", "@top-center", "@top-right", "@top-right-corner", "@bottom-left-corner", "@bottom-left", "@bottom-center", "@bottom-right", "@bottom-right-corner", "@left-top", "@left-middle", "@left-bottom", "@right-top", "@right-middle", "@right-bottom" }));
 
   private static Set<String> NTH_PSEUDOCLASSES = new HashSet<String>();
@@ -28,11 +28,37 @@ public class ParsersSemanticPredicates {
 
   private static String EXTEND_PSEUDOCLASS = "extend";
   private static String NOT_PSEUDOCLASS = "not";
-  
+
+  public int atNameType(String text) {
+    if (text == null)
+      return LessLexer.AT_NAME;
+
+    if (text.toLowerCase().endsWith(DOCUMENT))
+      return LessLexer.AT_DOCUMENT;
+
+    if (text.toLowerCase().endsWith(KEYFRAMES))
+      return LessLexer.AT_KEYFRAMES;
+
+    if (text.toLowerCase().endsWith(VIEWPORT))
+      return LessLexer.AT_VIEWPORT;
+
+    if (text.toLowerCase().endsWith(SUPPORTS))
+      return LessLexer.AT_SUPPORTS;
+
+    if (text.toLowerCase().endsWith(CHARSET))
+      return LessLexer.AT_CHARSET;
+
+    return LessLexer.AT_NAME;
+  }
+
+  public boolean isAtName(int type) {
+    return type == LessLexer.AT_NAME || type == LessLexer.AT_DOCUMENT || type == LessLexer.AT_KEYFRAMES || type == LessLexer.AT_VIEWPORT || type == LessLexer.AT_SUPPORTS || type == LessLexer.AT_CHARSET;
+  }
+
   public boolean matchingAllRparent(TokenStream input) {
     Token all = input.LT(1);
     Token rparent = input.LT(2);
-    
+
     if (all.getType() != LessParser.IDENT || all.getText() == null)
       return false;
 
@@ -80,7 +106,7 @@ public class ParsersSemanticPredicates {
       return false;
     return NOT_PSEUDOCLASS.equals(text.toLowerCase());
   }
-  
+
   /**
    * Basically, this is an ugly hack. The parser grammar is unable to tell the difference 
    * between "identifier (expression)" and "identifier(expression)". They differ only 
@@ -105,25 +131,25 @@ public class ParsersSemanticPredicates {
   // * composed function name (e.g. "name:something.else ... " and is followed by a parenthesis)
   //there must be no space between function name and parenthesis with arguments
   private boolean isFunctionStart(TokenStream input, int indx) {
-    Token first =input.LT(indx);
+    Token first = input.LT(indx);
     if (first == null)
       return false;
-    
+
     int ft = first.getType();
     if (!(ft == LessParser.IDENT || ft == LessParser.PERCENT))
       return false;
 
     Token previous = first;
     Token next = input.LT(++indx);
-    
-    while (next!=null && directlyFollows(previous, next)) {
+
+    while (next != null && directlyFollows(previous, next)) {
       int nt = next.getType();
-      if (nt==LessParser.LPAREN)
+      if (nt == LessParser.LPAREN)
         return true;
-      
+
       if (!(nt == LessParser.IDENT || nt == LessParser.PERCENT || nt == LessParser.COLON || nt == LessParser.DOT))
         return false;
-      
+
       previous = next;
       next = input.LT(++indx);
     }
@@ -176,7 +202,7 @@ public class ParsersSemanticPredicates {
   }
 
   private boolean isOperator(CommonToken previous) {
-    return isArithmeticOperator(previous)|| previous.getType() == LessLexer.COMMA;
+    return isArithmeticOperator(previous) || previous.getType() == LessLexer.COMMA;
   }
 
   private boolean isArithmeticOperator(CommonToken previous) {
@@ -244,6 +270,7 @@ public class ParsersSemanticPredicates {
   public boolean isCharset(Token token) {
     return isVendorPrefixedAtName(token, CHARSET);
   }
+
   public boolean isKeyframes(Token token) {
     return isVendorPrefixedAtName(token, KEYFRAMES);
   }
@@ -259,7 +286,7 @@ public class ParsersSemanticPredicates {
   public boolean isSupports(Token token) {
     return isVendorPrefixedAtName(token, SUPPORTS);
   }
-  
+
   public boolean isPageMarginBox(Token token) {
     return isAmongAtNames(token, PAGE_MARGIN_BOXES);
   }

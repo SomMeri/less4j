@@ -62,8 +62,8 @@ public class DebugAndTestPrint {
 
   public static void printSingleNode(HiddenTokenAwareTree tree) {
     String invalid = "";
-    if (tree.getType()==0)
-      invalid = " (" + PrintUtils.toName(tree.getType()) + ")";
+    if (tree.getGeneralType()==0)
+      invalid = " (" + PrintUtils.toName(tree.getGeneralType()) + ")";
     
     String base = " " + " " + toOneLine(tree.getText()) + invalid;
     if (printIndexes) {

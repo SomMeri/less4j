@@ -40,7 +40,7 @@ public class SelectorBuilder {
         kid = iterator.next();
         part = (SelectorPart) parent.switchOn(kid);
         // Ignore descendant combinator before appender. This info is already hidden in appender.isDirectlyBefore. 
-        if (isDescendant(combinator) && kid.getType() == LessLexer.NESTED_APPENDER)
+        if (isDescendant(combinator) && kid.getGeneralType() == LessLexer.NESTED_APPENDER)
           combinator = null;
       } else {
         //if it is not a combinator, then it is either nested appender, simple selector or escaped selector   

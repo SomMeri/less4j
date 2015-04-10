@@ -38,7 +38,7 @@ public class MixinsParametersBuilder {
   private void handleSemicolonSplitMixinReferenceArguments(HiddenTokenAwareTree token, MixinReference reference) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() != LessLexer.SEMI) {
+      if (kid.getGeneralType() != LessLexer.SEMI) {
         ASTCssNode parameter = parentBuilder.switchOn(kid);
         if (parameter.getType() == ASTCssNodeType.VARIABLE_DECLARATION)
           reference.addNamedParameter((VariableDeclaration) parameter);
@@ -75,7 +75,7 @@ public class MixinsParametersBuilder {
 
   private boolean containsType(List<HiddenTokenAwareTree> list, int type) {
     for (HiddenTokenAwareTree element : list) {
-      if (element.getType() == type)
+      if (element.getGeneralType() == type)
         return true;
     }
     return false;
@@ -95,7 +95,7 @@ public class MixinsParametersBuilder {
   private void handleCommaSplitMixinDeclarationArguments(HiddenTokenAwareTree token, ReusableStructure declaration) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() != LessLexer.SEMI) {
+      if (kid.getGeneralType() != LessLexer.SEMI) {
         ASTCssNode argument = parentBuilder.switchOn(kid);
         
         if (argument.getType() == ASTCssNodeType.ARGUMENT_DECLARATION) {
@@ -134,7 +134,7 @@ public class MixinsParametersBuilder {
   private void handleSemicolonSplitMixinDeclarationArguments(HiddenTokenAwareTree token, ReusableStructure declaration) {
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getType() != LessLexer.SEMI) {
+      if (kid.getGeneralType() != LessLexer.SEMI) {
         addParameter(declaration, parentBuilder.switchOn(kid));
       }
     }

@@ -7,7 +7,7 @@ import com.github.sommeri.less4j.utils.PrintUtils;
 public abstract class TokenTypeSwitch<T> {
 
   public T switchOn(HiddenTokenAwareTree token) {
-    int type = token.getType();
+    int type = token.getGeneralType();
 
     if (type == LessLexer.LBRACE) {
       return handleLbrace(token);

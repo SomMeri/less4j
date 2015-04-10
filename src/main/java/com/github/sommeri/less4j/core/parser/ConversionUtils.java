@@ -12,7 +12,7 @@ public class ConversionUtils {
   public static SelectorCombinator createSelectorCombinator(HiddenTokenAwareTree token) {
     CombinatorType combinator = safeToSelectorCombinator(token);
     if (combinator == null)
-      throw new IllegalStateException("Unknown: " + token.getType() + " " + PrintUtils.toName(token.getType()));
+      throw new IllegalStateException("Unknown: " + token.getGeneralType() + " " + PrintUtils.toName(token.getGeneralType()));
 
     String symbol = extractSymbol(token, combinator);
     return new SelectorCombinator(token, combinator, symbol);
@@ -35,7 +35,7 @@ public class ConversionUtils {
   }
 
   private static SelectorCombinator.CombinatorType safeToSelectorCombinator(HiddenTokenAwareTree token) {
-    switch (token.getType()) {
+    switch (token.getGeneralType()) {
     case LessLexer.PLUS:
       return SelectorCombinator.CombinatorType.ADJACENT_SIBLING;
     case LessLexer.GREATER:

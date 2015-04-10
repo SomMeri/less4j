@@ -24,17 +24,17 @@ public class GrammarAsserts {
 
   public static void assertValidSelector(ANTLRParser.ParseResult result) {
     assertValid(result);
-    assertEquals(LessLexer.SELECTOR, result.getTree().getType());
+    assertEquals(LessLexer.SELECTOR, result.getTree().getGeneralType());
   }
 
   public static void assertValidExpression(ANTLRParser.ParseResult result) {
     assertValid(result);
-    assertEquals(LessLexer.EXPRESSION, result.getTree().getType());
+    assertEquals(LessLexer.EXPRESSION, result.getTree().getGeneralType());
   }
 
   public static void assertValidTerm(ANTLRParser.ParseResult result) {
     assertValid(result);
-    assertEquals(LessLexer.TERM, result.getTree().getType());
+    assertEquals(LessLexer.TERM, result.getTree().getGeneralType());
   }
 
   public static void assertValid(ANTLRParser.ParseResult result) {

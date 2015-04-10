@@ -55,7 +55,7 @@ public class TermBuilder {
   }
 
   private Expression buildFromTerm(HiddenTokenAwareTree token, HiddenTokenAwareTree offsetChild, int offsetChildIndx) {
-    switch (offsetChild.getType()) {
+    switch (offsetChild.getGeneralType()) {
     case LessLexer.IDENT_TERM:
       return buildFromLongIdentifier(token, offsetChild);
       
@@ -122,7 +122,7 @@ public class TermBuilder {
       return buildFromEmbeddedScript(token, offsetChild);
 
     default:
-      throw new BugHappened("type number: " + PrintUtils.toName(offsetChild.getType()) + "(" + offsetChild.getType() + ") for " + offsetChild.getText(), offsetChild);
+      throw new BugHappened("type number: " + PrintUtils.toName(offsetChild.getGeneralType()) + "(" + offsetChild.getGeneralType() + ") for " + offsetChild.getText(), offsetChild);
 
     }
   }
@@ -149,17 +149,17 @@ public class TermBuilder {
       NumberExpression number = (NumberExpression) value;
       number.setExpliciteSign(true);
 
-      if (sign.getType() == LessLexer.MINUS) {
+      if (sign.getGeneralType() == LessLexer.MINUS) {
         number.negate();
         number.setOriginalString("-" + number.getOriginalString());
-      } else if (sign.getType() == LessLexer.PLUS) {
+      } else if (sign.getGeneralType() == LessLexer.PLUS) {
         number.setOriginalString("+" + number.getOriginalString());
       }
 
       return number;
     }
 
-    if (sign.getType() == LessLexer.MINUS) {
+    if (sign.getGeneralType() == LessLexer.MINUS) {
       return new SignedExpression(sign, SignedExpression.Sign.MINUS, value);
     }
 
@@ -186,7 +186,7 @@ public class TermBuilder {
   }
 
   private Dimension toDimension(HiddenTokenAwareTree actual) {
-    switch (actual.getType()) {
+    switch (actual.getGeneralType()) {
     case LessLexer.NUMBER:
       return Dimension.NUMBER;
     case LessLexer.PERCENTAGE:
@@ -209,7 +209,7 @@ public class TermBuilder {
       return Dimension.FREQ;
 
     default:
-      throw new BugHappened("Unknown dimension type: " + actual.getType() + " " + actual.getText(), actual);
+      throw new BugHappened("Unknown dimension type: " + actual.getGeneralType() + " " + actual.getText(), actual);
 
     }
   }
@@ -255,7 +255,7 @@ public class TermBuilder {
       text.append(child.getText().trim());
     }
     
-    if (children.size()==1 && children.get(0).getType() == LessLexer.IMPORTANT_SYM) {
+    if (children.size()==1 && children.get(0).getGeneralType() == LessLexer.IMPORTANT_SYM) {
       return new KeywordExpression(parent, children.get(0).getText().trim(), true);
     }
     

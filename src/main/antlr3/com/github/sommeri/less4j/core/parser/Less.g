@@ -104,6 +104,7 @@ tokens {
   import com.github.sommeri.less4j.core.parser.AntlrException;
   import com.github.sommeri.less4j.LessCompiler.Problem;
   import com.github.sommeri.less4j.LessSource;
+  import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
 }
  
 @parser::header {
@@ -128,6 +129,8 @@ tokens {
       this.errors = errors;
       this.source = source;
     }
+
+  protected ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
 
   //This trick allow Lexer to emit multiple tokens per one rule.
   List tokens = new ArrayList();
@@ -201,7 +204,7 @@ finally { leaveRule(); }
 // https://developer.mozilla.org/en/CSS/@charset
 charSet
 @init {enterRule(retval, RULE_CHARSET);}
-    : {predicates.isCharset(input.LT(1))}? AT_NAME STRING SEMI -> ^(CHARSET_DECLARATION AT_NAME STRING)
+    : AT_CHARSET STRING SEMI -> ^(CHARSET_DECLARATION AT_CHARSET STRING)
     ;
 finally { leaveRule(); }
 
@@ -245,9 +248,9 @@ finally { leaveRule(); }
 
 keyframes
 @init {enterRule(retval, RULE_KEYFRAME);}
-    : {predicates.isKeyframes(input.LT(1))}? (AT_NAME (firstname+=keyframesname (commas+=COMMA names+=keyframesname )*)?)
+    : (AT_KEYFRAMES (firstname+=keyframesname (commas+=COMMA names+=keyframesname )*)?)
       body+=general_body
-    -> ^(KEYFRAMES AT_NAME ^(KEYFRAMES_DECLARATION $firstname* ($commas $names)*) $body )
+    -> ^(KEYFRAMES AT_KEYFRAMES ^(KEYFRAMES_DECLARATION $firstname* ($commas $names)*) $body )
     ;
 finally { leaveRule(); }
 
@@ -257,26 +260,26 @@ keyframesname
 
 document
 @init {enterRule(retval, RULE_DOCUMENT);}
-    : {predicates.isDocument(input.LT(1))}? AT_NAME 
+    : AT_DOCUMENT 
       url_match_fn1+=term_only_function (c+=COMMA url_match_fn2+=term_only_function)*
       body+=top_level_body
-    -> ^(DOCUMENT AT_NAME ^(DOCUMENT_DECLARATION $url_match_fn1 ($c $url_match_fn2)*) $body)
+    -> ^(DOCUMENT AT_DOCUMENT ^(DOCUMENT_DECLARATION $url_match_fn1 ($c $url_match_fn2)*) $body)
     ;
 finally { leaveRule(); }
 
 viewport
 @init {enterRule(retval, RULE_VIEWPORT);}
-    : {predicates.isViewport(input.LT(1))}? AT_NAME
+    : AT_VIEWPORT
       body+=general_body
-    -> ^(VIEWPORT AT_NAME $body )
+    -> ^(VIEWPORT AT_VIEWPORT $body )
     ;
 finally { leaveRule(); }
 
 supports
 @init {enterRule(retval, RULE_SUPPORTS);}
-    : {predicates.isSupports(input.LT(1))}? AT_NAME condition+=supportsCondition
+    : AT_SUPPORTS condition+=supportsCondition
       body+=general_body
-    -> ^(SUPPORTS AT_NAME $condition $body )
+    -> ^(SUPPORTS AT_SUPPORTS $condition $body )
     ;
 finally { leaveRule(); }
 
@@ -295,7 +298,6 @@ supportsQuery: LPAREN q+=declaration RPAREN -> ^(SUPPORTS_QUERY LPAREN $q RPAREN
 
 unknownAtRule
 @init {enterRule(retval, RULE_UNKNOWN_AT_RULE);}
-//    : {predicates.isUnknownAtRule(input.LT(1))}? AT_NAME (IDENT | variablereference)* (
     : AT_NAME names+=unknownAtRuleNamesSet? ( body+=general_body | semi+=SEMI )
     -> ^(UNKNOWN_AT_RULE AT_NAME ^(UNKNOWN_AT_RULE_NAMES_SET $names*) $body* $semi*)
     ;
@@ -354,17 +356,21 @@ top_level_element
     | charSet
     | unknownAtRule
     ;
+    
+variablename:
+  AT_NAME | IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM | PAGE_SYM | MEDIA_SYM | FONT_FACE_SYM | AT_KEYFRAMES | AT_DOCUMENT | AT_VIEWPORT | AT_SUPPORTS | AT_CHARSET
+  ;
 
 variabledeclaration
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : AT_NAME COLON (a+=expr)? SEMI -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* SEMI)
+    : variablename COLON (a+=expr)? SEMI -> ^(VARIABLE_DECLARATION variablename COLON $a* SEMI)
     ;
 finally { leaveRule(); }
 
 //used in mixinReferenceArgument
 variabledeclarationNoSemi
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : AT_NAME COLON (a+=expr) -> ^(VARIABLE_DECLARATION AT_NAME COLON $a* )
+    : variablename COLON (a+=expr) -> ^(VARIABLE_DECLARATION variablename COLON $a* )
     ;
 finally { leaveRule(); }
 
@@ -383,7 +389,7 @@ collector:   DOT3 -> ^(ARGUMENT_DECLARATION DOT3);
 
 variablereference
 @init {enterRule(retval, RULE_VARIABLE_REFERENCE);}
-    : AT_NAME | INDIRECT_VARIABLE
+    : variablename | INDIRECT_VARIABLE
     ;
 finally { leaveRule(); }
 
@@ -444,17 +450,7 @@ property
     
 propertyNamePart
     :  IDENT | NUMBER | MINUS | INTERPOLATED_VARIABLE;
-/*
-elementName
-    :  propertyNamePart ({predicates.directlyFollows(input)}?=>propertyNamePart)*;
 
-elementName
-    :  a+=elementNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=elementNamePart)* -> ^(ELEMENT_NAME $a*);
-    
-elementNamePart
-    : STAR | IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
-
-*/    
 //we need to put comma into the tree so we can collect comments to it
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 ruleSet
@@ -545,20 +541,6 @@ finally { leaveRule(); }
 // if this is changed, chances are the selector must be changed too
 // Less keyword-pseudoclass "extend" takes selector as an argument. The selector can be optionally
 // followed by keyword all. The grammar is ambiguous as a result and its predictability suffers.  
-//extendedSelector 
-//@init {enterRule(retval, RULE_SELECTOR);}
-//    : ( { !predicates.matchingAllRparent(input)}?=>(
-//            ((combinator)=>a+=combinator | ) 
-//            (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax)
-//        )
-//      )+
-//      (  { predicates.matchingAllRparent(input)}?=>b+=IDENT
-//         |
-//      )
-//    -> ^(EXTENDED_SELECTOR ^(SELECTOR $a* ) $b*) 
-//    ;
-//finally { leaveRule(); }
-
 extendTargetSelectors 
     : a+=selector (a+=selectorSeparator a+=selector)*
     -> ^(EXTEND_TARGET_SELECTOR $a*) 
@@ -1351,7 +1333,13 @@ PAGE_SYM : '@' P A G E ;
 MEDIA_SYM : '@' M E D I A ;
 FONT_FACE_SYM : '@' F O N T MINUS F A C E ;
 
-AT_NAME : '@' NAME ;
+fragment AT_DOCUMENT : ;
+fragment AT_KEYFRAMES: ;
+fragment AT_VIEWPORT: ;
+fragment AT_SUPPORTS: ;
+fragment AT_CHARSET: ;
+
+AT_NAME : '@' NAME { $type = predicates.atNameType(getText()); };
 INDIRECT_VARIABLE : '@' '@' NAME ;
 INTERPOLATED_VARIABLE : '@' LBRACE NAME RBRACE;
 
