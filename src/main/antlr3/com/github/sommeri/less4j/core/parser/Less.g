@@ -769,10 +769,6 @@ operator
     | ({predicates.onEmptySeparator(input)}?=> -> EMPTY_SEPARATOR)
     ;
     
-operatorNoComma    
-    : ({predicates.onEmptySeparator(input)}?=> -> EMPTY_SEPARATOR)
-    ;
-    
 mathOperatorHighPrior
     : SOLIDUS //ratio in pure CSS
     | STAR
