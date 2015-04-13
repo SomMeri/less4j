@@ -184,6 +184,14 @@ tokens {
   
 }
 
+ident_nth: IDENT_NTH_CHILD | NTH_LAST_CHILD | NTH_OF_TYPE | NTH_LAST_OF_TYPE;
+ident_keywords: IDENT_WHEN;
+
+ident_special_pseudoclasses: ident_nth | IDENT_EXTEND;
+
+ident: IDENT | IDENT_NOT | ident_keywords | ident_special_pseudoclasses;
+ident_except_not: IDENT | ident_keywords | ident_special_pseudoclasses;
+ident_general_pseudo: IDENT | IDENT_NOT | ident_keywords;
 // -------------
 // Main rule. This is the main entry rule for the parser, the top level
 // grammar rule.
@@ -218,7 +226,7 @@ imports
 finally { leaveRule(); }
 
 importoptions:
-  LPAREN (a+=IDENT COMMA)* a+=IDENT? RPAREN
+  LPAREN (a+=ident COMMA)* a+=ident? RPAREN
   -> ^(IMPORT_OPTIONS $a*)
   ;
 // ---------
@@ -255,7 +263,7 @@ keyframes
 finally { leaveRule(); }
 
 keyframesname
-    : IDENT | variablereference | STRING
+    : ident | variablereference | STRING
     ;
 
 document
@@ -284,13 +292,13 @@ supports
 finally { leaveRule(); }
 
 supportsCondition: 
-     first+=simpleSupportsCondition ((IDENT)=> oper+=IDENT second+=simpleSupportsCondition)*
+     first+=simpleSupportsCondition ((ident_except_not)=> oper+=ident_except_not second+=simpleSupportsCondition)*
      -> ^(SUPPORTS_CONDITION $first ($oper $second)*)
     ;
 
 simpleSupportsCondition:   
      (supportsQuery)=> q+=supportsQuery -> ^(SUPPORTS_SIMPLE_CONDITION $q) //( declaration ) 
-     | IDENT q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT $q) // not condition
+     | IDENT_NOT q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT_NOT $q) // not condition
      | LPAREN q+=supportsCondition RPAREN -> ^(SUPPORTS_SIMPLE_CONDITION LPAREN $q RPAREN) //nested condition
     ;
     
@@ -306,19 +314,14 @@ finally { leaveRule(); }
 unknownAtRuleNamesSet
     : (mathExprHighPrior) (COMMA (mathExprHighPrior))*
     ;
-/*unknownBodylessAtRule:
-@init {enterRule(retval, UNKNOWN_BODYLESS_AT_RULE);}
-    : AT_NAME (IDENT | variablereference)*
-    ;
-finally { leaveRule(); }*/
 
 // ---------
 // Medium. The name of a medim that are particulare set of rules applies to.
 //
 mediaQuery
 @init {enterRule(retval, RULE_MEDIUM);}
-    : a+=IDENT (a+=IDENT)? (b+=IDENT c+=mediaExpression)* -> ^(MEDIA_QUERY ^(MEDIUM_TYPE $a*) ($b $c)*)
-    | d=mediaExpression (e+=IDENT f+=mediaExpression)* -> ^(MEDIA_QUERY $d ($e $f)*)
+    : a+=ident (a+=ident)? (b+=ident c+=mediaExpression)* -> ^(MEDIA_QUERY ^(MEDIUM_TYPE $a*) ($b $c)*)
+    | d=mediaExpression (e+=ident f+=mediaExpression)* -> ^(MEDIA_QUERY $d ($e $f)*)
     ;
 finally { leaveRule(); }
     
@@ -335,7 +338,7 @@ interpolatedMediaExpression
     ;
     
 mediaFeature
-    : IDENT
+    : ident
     ;
 
 top_level_element
@@ -401,7 +404,7 @@ finally { leaveRule(); }
 
 page
 @init {enterRule(retval, RULE_PAGE);}
-    : PAGE_SYM a+=IDENT? b+=pseudoPage? c+=general_body
+    : PAGE_SYM a+=ident? b+=pseudoPage? c+=general_body
       -> ^(PAGE_SYM $a* $b* $c*)
     ;
 finally { leaveRule(); }
@@ -416,8 +419,8 @@ finally { leaveRule(); }
 
 pseudoPage
 @init {enterRule(retval, RULE_PSEUDO_PAGE);}
-    : {predicates.directlyFollows(input.LT(-1), input.LT(1))}? COLON IDENT -> ^(PSEUDO_PAGE COLON IDENT)
-      | COLON IDENT -> ^(PSEUDO_PAGE MEANINGFULL_WHITESPACE COLON IDENT)
+    : {predicates.directlyFollows(input.LT(-1), input.LT(1))}? COLON ident -> ^(PSEUDO_PAGE COLON ident)
+      | COLON ident -> ^(PSEUDO_PAGE MEANINGFULL_WHITESPACE COLON ident)
     ;
 finally { leaveRule(); }
     
@@ -432,7 +435,7 @@ combinator
     | TILDE
     | HAT
     | CAT
-    | (a+=SOLIDUS a+=IDENT a+=SOLIDUS -> ^(NAMED_COMBINATOR $a*))
+    | (a+=SOLIDUS b+=ident c+=SOLIDUS -> ^(NAMED_COMBINATOR $a* $b* $c*))
     | ({predicates.onEmptyCombinator(input)}?)=> -> EMPTY_COMBINATOR
     ;
     
@@ -449,7 +452,7 @@ property
     ;
     
 propertyNamePart
-    :  IDENT | NUMBER | MINUS | INTERPOLATED_VARIABLE;
+    :  ident | NUMBER | MINUS | INTERPOLATED_VARIABLE;
 
 //we need to put comma into the tree so we can collect comments to it
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
@@ -583,7 +586,7 @@ cssClass
     : dot=DOT a+=idOrClassNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=idOrClassNamePart)* -> ^(CSS_CLASS $dot $a*); 
     
 idOrClassNamePart
-    : IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
+    : ident | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
     
 elementName
     :  a+=elementNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=elementNamePart)* -> ^(ELEMENT_NAME $a*);
@@ -596,23 +599,23 @@ allNumberKinds: NUMBER | EMS | EXS | LENGTH | ANGLE | TIME | FREQ | REPEATER | P
 attrib
     : (LBRACKET
     
-        a+=IDENT
+        a+=ident
             (
                 (
-                      a+=OPEQ
-                    | a+=INCLUDES
-                    | a+=DASHMATCH
-                    | a+=PREFIXMATCH
-                    | a+=SUFFIXMATCH
-                    | a+=SUBSTRINGMATCH
+                      b+=OPEQ
+                    | b+=INCLUDES
+                    | b+=DASHMATCH
+                    | b+=PREFIXMATCH
+                    | b+=SUFFIXMATCH
+                    | b+=SUBSTRINGMATCH
                 )
                 (
-                      b+=term
+                      c+=term
                 )
             )?
     
       RBRACKET)
-      -> ^(ATTRIBUTE $a* $b*)
+      -> ^(ATTRIBUTE $a* $b* $c*)
 ;
 
 extendInDeclarationWithSemi
@@ -621,26 +624,24 @@ extendInDeclarationWithSemi
   ;
   
 pseudo
-    : (c+=COLON c+=COLON? a=IDENT (
-        (LPAREN)=>(
-          { predicates.insideNth(input)}?=> LPAREN (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) RPAREN
-          | { predicates.insideExtend(input)}?=> LPAREN (b4+=extendTargetSelectors) RPAREN
-          | { predicates.insideNot(input)}?=> LPAREN (b5=selector) RPAREN
-          | LPAREN b6=pseudoparameters RPAREN 
-        )
-        |)
-      ) -> ^(PSEUDO $c+ $a $b1* $b2* $b3* $b4* $b5* $b6*)
+    : (c+=COLON c+=COLON? ( 
+          ((ident_nth)=> ar+=ident_nth LPAREN (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) RPAREN)
+        | (IDENT_EXTEND)=>(at+=IDENT_EXTEND LPAREN (b4+=extendTargetSelectors) RPAREN)
+        | (IDENT_NOT)=>(at+=IDENT_NOT LPAREN (b5=selector) RPAREN)
+        | (ident_general_pseudo LPAREN)=>(ar+=ident_general_pseudo LPAREN b6=pseudoparameters RPAREN)
+        |  ar+=ident
+    )) -> ^(PSEUDO $c+ $ar* $at* $b1* $b2* $b3* $b4* $b5* $b6*)
     ;
     
 pseudoparameters:
-     ((IDENT | STRING | NUMBER | variablereference) RPAREN) => term
+     ((ident | STRING | NUMBER | variablereference) RPAREN) => term
     | selector
  ;
 
 //TODO: add special error message here 
- nth: ((a+=PLUS | a+=MINUS)? (a+=REPEATER | a+=IDENT) ((b+=PLUS | b+=MINUS) b+=NUMBER)?
-                      | (b+=PLUS | b+=MINUS)? b+=NUMBER)
-      -> ^(NTH ^(TERM $a*) ^(TERM $b*));
+ nth: ((a+=PLUS | a+=MINUS)? (a+=REPEATER | b+=ident) ((c+=PLUS | c+=MINUS) c+=NUMBER)?
+                      | (c+=PLUS | c+=MINUS)? c+=NUMBER)
+      -> ^(NTH ^(TERM $a* $b*) ^(TERM $c*));
 
 referenceSeparator:
        GREATER
@@ -698,17 +699,17 @@ reusableStructure
 finally { leaveRule(); }
 
 reusableStructureGuards
-    : ({predicates.isWhenKeyword(input.LT(1))}?) IDENT b+=guard (COMMA d+=guard)*
+    : IDENT_WHEN b+=guard (COMMA d+=guard)*
     -> $b $d*
     ;
     
 guard
-    : a=guardCondition  (b+=IDENT c+=guardCondition)*
+    : a=guardCondition  (b+=ident c+=guardCondition)*
     -> ^(GUARD $a* ($b $c)*)
     ;    
 
 guardCondition
-    : a+=IDENT? LPAREN b+=mathExprHighPrior (b+=compareOperator b+=mathExprHighPrior)? RPAREN
+    : a+=ident? LPAREN b+=mathExprHighPrior (b+=compareOperator b+=mathExprHighPrior)? RPAREN
     -> ^(GUARD_CONDITION $a* $b*)
     ;   
 
@@ -861,7 +862,14 @@ unsigned_value_term
     ;
     
 identifierValueTerm
-    : (a+=IDENT | a+=EXCLAMATION_MARK | a+=DOT | a+=IMPORTANT_SYM) ({predicates.directlyFollows(input) && predicates.notSemi(input)}?=> (a+=DOT | a+=HASH | a+=IDENT | a+=EXCLAMATION_MARK | a+=IMPORTANT_SYM))* -> ^(IDENT_TERM $a*);
+    : (a+=ident | b+=EXCLAMATION_MARK | b+=DOT | b+=IMPORTANT_SYM) 
+          ({predicates.directlyFollows(input) && predicates.notSemi(input)}?=> 
+          (c+=identifierValueTermHelper))* 
+          -> ^(IDENT_TERM $a* $b* $c*);
+          
+identifierValueTermHelper
+    : DOT | HASH | ident | EXCLAMATION_MARK | IMPORTANT_SYM
+    ;
 
 special_function
     : URI | URL_PREFIX | DOMAIN 
@@ -877,9 +885,9 @@ function
 
 //function names should allow filters: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF0000ff', endColorstr='#FFff0000', GradientType=1)
 functionName
-    : (a+=IDENT (a+=COLON a+=IDENT| a+=DOT a+=IDENT)*
-    | a+=PERCENT)
-    -> ^(TERM_FUNCTION_NAME $a*)
+    : (a+=ident (b+=COLON c+=ident| b+=DOT c+=ident)*
+    | f+=PERCENT)
+    -> ^(TERM_FUNCTION_NAME $a* ($b $c)* $f*)
     ;
     
 functionParameters
@@ -887,7 +895,7 @@ functionParameters
     | expr;
 
 namedFunctionParameter
-    : IDENT OPEQ term -> ^(NAMED_EXPRESSION IDENT term);
+    : ident OPEQ term -> ^(NAMED_EXPRESSION ident term);
     
 // ==============================================================
 // LEXER
@@ -1316,6 +1324,14 @@ ESCAPED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\f'|'\\'|'`') )*
 // Identifier. Identifier tokens pick up properties names and values
 //
 //
+IDENT_NOT: N O T;
+IDENT_EXTEND: E X T E N D;
+IDENT_NTH_CHILD: N T H MINUS C H I L D; 
+NTH_LAST_CHILD: N T H MINUS L A S T MINUS C H I L D;
+NTH_OF_TYPE: N T H MINUS O F MINUS T Y P E;
+NTH_LAST_OF_TYPE: N T H MINUS L A S T MINUS O F MINUS T Y P E;
+
+IDENT_WHEN : W H E N;
 IDENT : '-'? NMSTART NMCHAR*;
 fragment UNICODE_RANGE_HEX: HEXCHAR | '?';
 UNICODE_RANGE: U PLUS UNICODE_RANGE_HEX+ (MINUS UNICODE_RANGE_HEX+)?;

@@ -26,9 +26,6 @@ public class ParsersSemanticPredicates {
     NTH_PSEUDOCLASSES.add("nth-last-of-type");
   }
 
-  private static String EXTEND_PSEUDOCLASS = "extend";
-  private static String NOT_PSEUDOCLASS = "not";
-
   public int atNameType(String text) {
     if (text == null)
       return LessLexer.AT_NAME;
@@ -55,56 +52,8 @@ public class ParsersSemanticPredicates {
     return type == LessLexer.AT_NAME || type == LessLexer.AT_DOCUMENT || type == LessLexer.AT_KEYFRAMES || type == LessLexer.AT_VIEWPORT || type == LessLexer.AT_SUPPORTS || type == LessLexer.AT_CHARSET;
   }
 
-  public boolean matchingAllRparent(TokenStream input) {
-    Token all = input.LT(1);
-    Token rparent = input.LT(2);
-
-    if (all.getType() != LessParser.IDENT || all.getText() == null)
-      return false;
-
-    if (rparent.getType() != LessParser.RPAREN)
-      return false;
-
-    return "all".equals(all.getText().toLowerCase());
-  }
-
-  public boolean insideNth(TokenStream input) {
-    return isNthPseudoClass(input.LT(-1));
-  }
-
-  private boolean isNthPseudoClass(Token a) {
-    if (a == null)
-      return false;
-    String text = a.getText();
-    if (text == null)
-      return false;
-    return NTH_PSEUDOCLASSES.contains(text.toLowerCase());
-  }
-
-  public boolean insideExtend(TokenStream input) {
-    return isExtendPseudoClass(input.LT(-1));
-  }
-
-  private boolean isExtendPseudoClass(Token a) {
-    if (a == null)
-      return false;
-    String text = a.getText();
-    if (text == null)
-      return false;
-    return EXTEND_PSEUDOCLASS.equals(text.toLowerCase());
-  }
-
-  public boolean insideNot(TokenStream input) {
-    return insideNot(input.LT(-1));
-  }
-
-  private boolean insideNot(Token a) {
-    if (a == null)
-      return false;
-    String text = a.getText();
-    if (text == null)
-      return false;
-    return NOT_PSEUDOCLASS.equals(text.toLowerCase());
+  public boolean isIdentifier(int type) {
+    return type == LessLexer.IDENT || type == LessLexer.IDENT_WHEN || type == LessLexer.IDENT_NOT  || type == LessLexer.IDENT_NTH_CHILD || type == LessLexer.NTH_LAST_CHILD || type == LessLexer.NTH_OF_TYPE || type == LessLexer.NTH_LAST_OF_TYPE || type == LessLexer.IDENT_EXTEND;
   }
 
   /**
@@ -251,40 +200,12 @@ public class ParsersSemanticPredicates {
     return substring.equals(substring.trim());
   }
 
-  public boolean isWhenKeyword(Token token) {
-    if (token == null || !(token instanceof CommonToken) || token.getType() != LessParser.IDENT)
-      return false;
-
-    String word = token.getText().trim().toLowerCase();
-    return "when".equals(word);
-  }
-
   public boolean onEmptyCombinator(TokenStream input) {
     return isEmptyCombinator(input.LT(-1), input.LT(1));
   }
 
   private boolean isEmptyCombinator(Token first, Token second) {
     return !directlyFollows(first, second);
-  }
-
-  public boolean isCharset(Token token) {
-    return isVendorPrefixedAtName(token, CHARSET);
-  }
-
-  public boolean isKeyframes(Token token) {
-    return isVendorPrefixedAtName(token, KEYFRAMES);
-  }
-
-  public boolean isDocument(Token token) {
-    return isVendorPrefixedAtName(token, DOCUMENT);
-  }
-
-  public boolean isViewport(Token token) {
-    return isVendorPrefixedAtName(token, VIEWPORT);
-  }
-
-  public boolean isSupports(Token token) {
-    return isVendorPrefixedAtName(token, SUPPORTS);
   }
 
   public boolean isPageMarginBox(Token token) {
@@ -297,15 +218,6 @@ public class ParsersSemanticPredicates {
 
     String text = token.getText().toLowerCase();
     return atNames.contains(text);
-  }
-
-  private boolean isVendorPrefixedAtName(Token token, String atName) {
-    if (token.getType() != LessParser.AT_NAME || token.getText() == null)
-      return false;
-
-    String text = token.getText().toLowerCase();
-    //anything in between is assumed to be vendor prefix
-    return text.startsWith("@") && text.endsWith(atName);
   }
 
   public boolean truthy() {

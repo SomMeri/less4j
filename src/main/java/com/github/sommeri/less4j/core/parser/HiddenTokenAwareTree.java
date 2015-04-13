@@ -303,6 +303,9 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
     if (grammarKnowledge.isAtName(type))
       return LessLexer.AT_NAME;
     
+    if (grammarKnowledge.isIdentifier(type))
+      return LessLexer.IDENT;
+    
     return type;
   }
 
