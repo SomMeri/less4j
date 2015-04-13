@@ -18,14 +18,6 @@ public class ParsersSemanticPredicates {
 
   private static final Set<String> PAGE_MARGIN_BOXES = new HashSet<String>(Arrays.asList(new String[] { "@top-left-corner", "@top-left", "@top-center", "@top-right", "@top-right-corner", "@bottom-left-corner", "@bottom-left", "@bottom-center", "@bottom-right", "@bottom-right-corner", "@left-top", "@left-middle", "@left-bottom", "@right-top", "@right-middle", "@right-bottom" }));
 
-  private static Set<String> NTH_PSEUDOCLASSES = new HashSet<String>();
-  static {
-    NTH_PSEUDOCLASSES.add("nth-child");
-    NTH_PSEUDOCLASSES.add("nth-last-child");
-    NTH_PSEUDOCLASSES.add("nth-of-type");
-    NTH_PSEUDOCLASSES.add("nth-last-of-type");
-  }
-
   public int atNameType(String text) {
     if (text == null)
       return LessLexer.AT_NAME;

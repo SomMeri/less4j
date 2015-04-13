@@ -1456,12 +1456,10 @@ DOMAIN : ((D O M A I N '(' ((WS)=>WS)? URL WS? ')')
 //
 fragment UNICODE_NON_BREAKING_WS: '\u00A0'; 
 fragment WS_FRAGMENT : (' '|'\t'|'\f'|UNICODE_NON_BREAKING_WS)+ ; //('\r'|'\n'|'\t'|'\f'|' ')
-WS : WS_FRAGMENT { $channel = HIDDEN; } ;
 fragment NL : ('\r' '\n'? | '\n');
+WS : WS_FRAGMENT { $channel = HIDDEN; } ;
 NEW_LINE: NL { $channel = HIDDEN; } ;
 
 // -------------
 // Illegal. Any other character shoudl not be allowed.
 //
-
-
