@@ -12,7 +12,7 @@ public class Comment extends ASTCssNode {
   private boolean hasNewLine;
   
   public Comment(HiddenTokenAwareTree underlyingStructure) {
-    this(underlyingStructure, underlyingStructure.getText(), false);
+    this(underlyingStructure, underlyingStructure.getText());
   }
   
   public Comment(HiddenTokenAwareTree underlyingStructure, String comment) {

@@ -83,7 +83,9 @@ public class ListToTreeCombiner {
     if (tail.isEmpty())
       return;
 
-    if (tail.peekLast().getType() == LessLexer.NEW_LINE)
+    //FIXME: !!!!!!!!!!!! clean this up
+    CommonToken lastInTail = tail.peekLast();
+    if (lastInTail.getType() == LessLexer.NEW_LINE || lastInTail.getText().endsWith("\n"))
       firstChild.addFollowing(tail);
     else
       secondChild.addPreceding(tail);

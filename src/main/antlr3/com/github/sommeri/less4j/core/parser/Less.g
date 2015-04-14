@@ -139,9 +139,13 @@ tokens {
         tokens.add(token);
   }
   public void emitAs(Token token, int type) {
+        emitAs(token, type, DEFAULT_TOKEN_CHANNEL);
+  }
+  public void emitAs(Token token, int type, int channel) {
         if (token==null)
           return ;
         token.setType(type);
+        token.setChannel(channel);
         emit(token);
   }
   public Token nextToken() {
@@ -1176,10 +1180,13 @@ fragment Z : ('z'|'Z')
 // COMMENTS are hidden from the parser which simplifies the parser
 // grammar a lot.
 //
-COMMENT : '/*' ( options { greedy=false; } : .*) '*/'
-    
+fragment COMMENT_CONTENT : '/*' ( options { greedy=false; } : .*) '*/';
+COMMENT : content=COMMENT_CONTENT WS_FRAGMENT? newLine=NL?
                     {
-                        $channel = HIDDEN; // Comments on channel 2 in case we want to find them
+                         // Comments on channel 2 in case we want to find them
+                         emitAs($content, COMMENT, HIDDEN);
+                         if ($newLine!=null)
+                            emitAs($newLine, NEW_LINE, HIDDEN);
                     }
                 ;
 
@@ -1355,7 +1362,7 @@ AT_NAME : '@' NAME { $type = predicates.atNameType(getText()); };
 INDIRECT_VARIABLE : '@' '@' NAME ;
 INTERPOLATED_VARIABLE : '@' LBRACE NAME RBRACE;
 
-IMPORTANT_SYM : '!' (WS|COMMENT)* I M P O R T A N T ;
+IMPORTANT_SYM : '!' (WS_FRAGMENT|COMMENT_CONTENT)* I M P O R T A N T ;
 
 // ---------
 // Numbers. Numbers can be followed by pre-known units or unknown units
@@ -1455,11 +1462,14 @@ DOMAIN : ((D O M A I N '(' ((WS)=>WS)? URL WS? ')')
 // need to deal with the whitespace directly in the parser.
 //
 fragment UNICODE_NON_BREAKING_WS: '\u00A0'; 
-fragment WS_FRAGMENT : (' '|'\t'|'\f'|UNICODE_NON_BREAKING_WS)+ ; //('\r'|'\n'|'\t'|'\f'|' ')
-fragment NL : ('\r' '\n'? | '\n');
+fragment WS_FRAGMENT : (' '|'\t'|'\f'|UNICODE_NON_BREAKING_WS)+ ;   //('\r'|'\n'|'\t'|'\f'|' ')
 WS : WS_FRAGMENT { $channel = HIDDEN; } ;
+fragment NL : ('\r' '\n'? | '\n');
 NEW_LINE: NL { $channel = HIDDEN; } ;
 
+//ws: (WS | NEW_LINE)*;
 // -------------
 // Illegal. Any other character shoudl not be allowed.
 //
+
+
