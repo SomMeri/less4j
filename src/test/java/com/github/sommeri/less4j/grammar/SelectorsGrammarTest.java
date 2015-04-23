@@ -52,7 +52,7 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ANTLRParser.ParseResult result = compiler.parseSelector("li:after {", null);
     assertValidSelector(result);
-    assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.SIMPLE_SELECTOR);
+    assertChilds(result.getTree(), LessLexer.SIMPLE_SELECTOR);
   }
 
   @Test
@@ -61,7 +61,7 @@ public class SelectorsGrammarTest {
     String selector = "li::after {";
     ANTLRParser.ParseResult result = compiler.parseSelector(selector, null);
     assertValidSelector(result);
-    assertChilds(result.getTree(), LessLexer.EMPTY_COMBINATOR, LessLexer.SIMPLE_SELECTOR);
+    assertChilds(result.getTree(), LessLexer.SIMPLE_SELECTOR);
   }
 
   @Test

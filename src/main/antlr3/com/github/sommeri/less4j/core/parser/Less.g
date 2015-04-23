@@ -20,6 +20,9 @@
 // namespaces with predicates
 grammar Less;
 
+//FIXME !!!! (GLOBAL) selectors use a lot of syntactic predicates in loops that should not be necessary anymore - were only temporary 
+//FIXME !!!! (GLOBAL) pri handling is fragile
+
 options {
     // antlr will generate java lexer and parser
     language = Java;
@@ -203,20 +206,27 @@ ident_general_pseudo: IDENT | IDENT_NOT | ident_keywords;
 // A style sheet consists of an optional character set specification, an optional series
 // of imports, and then the main body of style rules.
 //
+//FIXME !!!! (NOW)
 styleSheet
 @init {enterRule(retval, RULE_STYLESHEET);}
-    : ( (a+=top_level_element)*
+    : ( ws (a+=top_level_element ws)*
         EOF ) -> ^(STYLE_SHEET ($a)*)
     ;
 finally { leaveRule(); }
     
+//styleSheet
+//@init {enterRule(retval, RULE_STYLESHEET);}
+//    : ( ws a+=reusableStructureName ws
+//        EOF ) -> ^(STYLE_SHEET ($a)*)
+//    ;
+//finally { leaveRule(); }
 // -----------------
 // Character set. Picks up the user specified character set, should it be present.
 // Removed an empty option from this rule, ANTLR seems to have problems with this.
 // https://developer.mozilla.org/en/CSS/@charset
 charSet
 @init {enterRule(retval, RULE_CHARSET);}
-    : AT_CHARSET STRING SEMI -> ^(CHARSET_DECLARATION AT_CHARSET STRING)
+    : AT_CHARSET ws STRING ws SEMI -> ^(CHARSET_DECLARATION AT_CHARSET STRING)
     ;
 finally { leaveRule(); }
 
@@ -225,12 +235,12 @@ finally { leaveRule(); }
 //
 imports
 @init {enterRule(retval, RULE_IMPORTS);}
-    : (IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM)^ (((importoptions) => importoptions)|) term (mediaQuery (COMMA mediaQuery)*)? SEMI!
+      : (IMPORT_SYM | IMPORT_ONCE_SYM | IMPORT_MULTIPLE_SYM)^ ws! (((importoptions) => importoptions ws!)|) term (mandatory_ws! mediaQuery ws! (COMMA ws! mediaQuery ws!)*)? SEMI!
     ;
 finally { leaveRule(); }
 
 importoptions:
-  LPAREN (a+=ident COMMA)* a+=ident? RPAREN
+  LPAREN (ws a+=ident ws COMMA)* (ws a+=ident)? RPAREN
   -> ^(IMPORT_OPTIONS $a*)
   ;
 // ---------
@@ -240,28 +250,29 @@ importoptions:
 //
 //TODO media part of the grammar is throwing away tokens, so comments will not work correctly. fix that
 media_queries_declaration:
-    m1+=mediaQuery (n+=COMMA m+=mediaQuery)*
+    m1+=mediaQuery (ws n+=COMMA ws m+=mediaQuery)*
     -> ^(MEDIUM_DECLARATION $m1 ($n $m)*)
 ; 
 
+//FIXME !!! (NOW)
 media_top_level
 @init {enterRule(retval, RULE_MEDIA);}
-    : MEDIA_SYM m1+=media_queries_declaration b+=top_level_body_with_declaration
+    : MEDIA_SYM mandatory_ws m1+=media_queries_declaration ws b+=top_level_body_with_declaration
     -> ^(MEDIA_SYM $m1* $b*)
     ;
 finally { leaveRule(); }
 
 media_in_general_body
 @init {enterRule(retval, RULE_MEDIA);}
-    : MEDIA_SYM m1+=media_queries_declaration b+=general_body
+    : MEDIA_SYM mandatory_ws m1+=media_queries_declaration ws b+=general_body
     -> ^(MEDIA_SYM $m1* $b*)
     ;
 finally { leaveRule(); }
 
 keyframes
 @init {enterRule(retval, RULE_KEYFRAME);}
-    : (AT_KEYFRAMES (firstname+=keyframesname (commas+=COMMA names+=keyframesname )*)?)
-      body+=general_body
+    : (AT_KEYFRAMES (ws firstname+=keyframesname ( ws commas+=COMMA ws names+=keyframesname )*)?)
+      ws body+=general_body
     -> ^(KEYFRAMES AT_KEYFRAMES ^(KEYFRAMES_DECLARATION $firstname* ($commas $names)*) $body )
     ;
 finally { leaveRule(); }
@@ -272,16 +283,16 @@ keyframesname
 
 document
 @init {enterRule(retval, RULE_DOCUMENT);}
-    : AT_DOCUMENT 
-      url_match_fn1+=term_only_function (c+=COMMA url_match_fn2+=term_only_function)*
-      body+=top_level_body
+    : AT_DOCUMENT ws
+      url_match_fn1+=term_only_function (ws c+=COMMA ws url_match_fn2+=term_only_function)*
+      ws body+=top_level_body
     -> ^(DOCUMENT AT_DOCUMENT ^(DOCUMENT_DECLARATION $url_match_fn1 ($c $url_match_fn2)*) $body)
     ;
 finally { leaveRule(); }
 
 viewport
 @init {enterRule(retval, RULE_VIEWPORT);}
-    : AT_VIEWPORT
+    : AT_VIEWPORT ws
       body+=general_body
     -> ^(VIEWPORT AT_VIEWPORT $body )
     ;
@@ -289,34 +300,34 @@ finally { leaveRule(); }
 
 supports
 @init {enterRule(retval, RULE_SUPPORTS);}
-    : AT_SUPPORTS condition+=supportsCondition
+    : AT_SUPPORTS ws condition+=supportsCondition ws
       body+=general_body
     -> ^(SUPPORTS AT_SUPPORTS $condition $body )
     ;
 finally { leaveRule(); }
 
 supportsCondition: 
-     first+=simpleSupportsCondition ((ident_except_not)=> oper+=ident_except_not second+=simpleSupportsCondition)*
+     first+=simpleSupportsCondition ((ws ident_except_not)=> ws oper+=ident_except_not ws second+=simpleSupportsCondition)*
      -> ^(SUPPORTS_CONDITION $first ($oper $second)*)
     ;
 
 simpleSupportsCondition:   
      (supportsQuery)=> q+=supportsQuery -> ^(SUPPORTS_SIMPLE_CONDITION $q) //( declaration ) 
-     | IDENT_NOT q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT_NOT $q) // not condition
-     | LPAREN q+=supportsCondition RPAREN -> ^(SUPPORTS_SIMPLE_CONDITION LPAREN $q RPAREN) //nested condition
+     | IDENT_NOT ws q+=supportsCondition -> ^(SUPPORTS_SIMPLE_CONDITION IDENT_NOT $q) // not condition
+     | LPAREN ws q+=supportsCondition ws RPAREN -> ^(SUPPORTS_SIMPLE_CONDITION LPAREN $q RPAREN) //nested condition
     ;
     
-supportsQuery: LPAREN q+=declaration RPAREN -> ^(SUPPORTS_QUERY LPAREN $q RPAREN);
+supportsQuery: LPAREN ws q+=declaration ws RPAREN -> ^(SUPPORTS_QUERY LPAREN $q RPAREN);
 
 unknownAtRule
 @init {enterRule(retval, RULE_UNKNOWN_AT_RULE);}
-    : AT_NAME names+=unknownAtRuleNamesSet? ( body+=general_body | semi+=SEMI )
+    : AT_NAME (ws names+=unknownAtRuleNamesSet)? ws ( body+=general_body | semi+=SEMI )
     -> ^(UNKNOWN_AT_RULE AT_NAME ^(UNKNOWN_AT_RULE_NAMES_SET $names*) $body* $semi*)
     ;
 finally { leaveRule(); }
 
 unknownAtRuleNamesSet
-    : (mathExprHighPrior) (COMMA (mathExprHighPrior))*
+    : (mathExprHighPrior) (ws! COMMA (ws! mathExprHighPrior))*
     ;
 
 // ---------
@@ -324,8 +335,8 @@ unknownAtRuleNamesSet
 //
 mediaQuery
 @init {enterRule(retval, RULE_MEDIUM);}
-    : a+=ident (a+=ident)? (b+=ident c+=mediaExpression)* -> ^(MEDIA_QUERY ^(MEDIUM_TYPE $a*) ($b $c)*)
-    | d=mediaExpression (e+=ident f+=mediaExpression)* -> ^(MEDIA_QUERY $d ($e $f)*)
+    : a+=ident (ws a+=ident)? (ws b+=ident ws c+=mediaExpression)* -> ^(MEDIA_QUERY ^(MEDIUM_TYPE $a*) ($b $c)*)
+    | d=mediaExpression (ws e+=ident ws f+=mediaExpression)* -> ^(MEDIA_QUERY $d ($e $f)*)
     ;
 finally { leaveRule(); }
     
@@ -334,11 +345,11 @@ mediaExpression
     ;
 
 cssMediaExpression
-    : LPAREN a+=mediaFeature (b+=COLON c+=expr)? RPAREN -> ^(MEDIA_EXPRESSION $a* $b* $c*)
+    : LPAREN ws a+=mediaFeature ws (b+=COLON ws c+=expression_full ws)? RPAREN -> ^(MEDIA_EXPRESSION $a* $b* $c*)
     ;
 
 interpolatedMediaExpression
-    : variablereference+ -> ^(INTERPOLATED_MEDIA_EXPRESSION variablereference+)
+    : variablereference (ws variablereference)* -> ^(INTERPOLATED_MEDIA_EXPRESSION variablereference+)
     ;
     
 mediaFeature
@@ -346,9 +357,10 @@ mediaFeature
     ;
 
 top_level_element
-    : (mixinReferenceWithSemi)=>mixinReferenceWithSemi
+    : 
+    (mixinReferenceWithSemi)=>mixinReferenceWithSemi
     | (namespaceReferenceWithSemi)=>namespaceReferenceWithSemi
-    | (reusableStructureName LPAREN)=>reusableStructure
+    | (reusableStructureName ws LPAREN)=>reusableStructure
     | (detachedRulesetReference)=>detachedRulesetReference
     | (variabledeclaration)=>variabledeclaration
     | ruleSet
@@ -370,20 +382,20 @@ variablename:
 
 variabledeclaration
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : variablename COLON (a+=expr)? SEMI -> ^(VARIABLE_DECLARATION variablename COLON $a* SEMI)
+    : variablename ws COLON (ws a+=expression_full)? ws SEMI -> ^(VARIABLE_DECLARATION variablename COLON $a* SEMI)
     ;
 finally { leaveRule(); }
 
 //used in mixinReferenceArgument
 variabledeclarationNoSemi
 @init {enterRule(retval, RULE_VARIABLE_DECLARATION);}
-    : variablename COLON (a+=expr) -> ^(VARIABLE_DECLARATION variablename COLON $a* )
+    : variablename ws COLON ws a+=expression_full -> ^(VARIABLE_DECLARATION variablename COLON $a* )
     ;
 finally { leaveRule(); }
 
 //This looks like the declaration, allows also three dots
 reusableStructureParameterWithDefault
-    : AT_NAME ((b=COLON a+=expr) | b=DOT3) -> ^(ARGUMENT_DECLARATION AT_NAME $b* $a*)
+    : AT_NAME ((ws b=COLON ws a+=expression_full) | ws b=DOT3) -> ^(ARGUMENT_DECLARATION AT_NAME $b* $a*)
     ;
 
 reusableStructureParameterWithoutDefault
@@ -402,29 +414,29 @@ finally { leaveRule(); }
 
 fontface
 @init {enterRule(retval, RULE_FONT_FACE);}
-    : FONT_FACE_SYM body+=general_body -> ^(FONT_FACE_SYM $body*)
+    : FONT_FACE_SYM ws body+=general_body -> ^(FONT_FACE_SYM $body*)
     ;
 finally { leaveRule(); }
 
 page
 @init {enterRule(retval, RULE_PAGE);}
-    : PAGE_SYM a+=ident? b+=pseudoPage? c+=general_body
+    : PAGE_SYM (ws a+=ident)? (b+=pseudoPage)? ws c+=general_body
       -> ^(PAGE_SYM $a* $b* $c*)
     ;
 finally { leaveRule(); }
 
 pageMarginBox 
 @init {enterRule(retval, RULE_PAGE_MARGIN_BOX);}
-    : {predicates.isPageMarginBox(input.LT(1))}? AT_NAME general_body
+    : {predicates.isPageMarginBox(input.LT(1))}? AT_NAME ws general_body
     -> ^(PAGE_MARGIN_BOX AT_NAME general_body)
     ;
 finally { leaveRule(); }
    
-
+//FIXME: !!!!!!!!!! what to do here? did not filled ws
 pseudoPage
 @init {enterRule(retval, RULE_PSEUDO_PAGE);}
-    : {predicates.directlyFollows(input.LT(-1), input.LT(1))}? COLON ident -> ^(PSEUDO_PAGE COLON ident)
-      | COLON ident -> ^(PSEUDO_PAGE MEANINGFULL_WHITESPACE COLON ident)
+    : COLON ws ident -> ^(PSEUDO_PAGE COLON ident)
+      | mandatory_ws COLON ws ident -> ^(PSEUDO_PAGE MEANINGFULL_WHITESPACE COLON ident)
     ;
 finally { leaveRule(); }
     
@@ -432,26 +444,21 @@ topLevelOperator
     : COMMA
     | ( -> EMPTY_SEPARATOR)
     ;
-    
+
 combinator
-    : GREATER
-    | PLUS
-    | TILDE
-    | HAT
-    | CAT
-    | (a+=SOLIDUS b+=ident c+=SOLIDUS -> ^(NAMED_COMBINATOR $a* $b* $c*))
-    | ({predicates.onEmptyCombinator(input)}?)=> -> EMPTY_COMBINATOR
-    ;
-    
-unaryOperator
-    : MINUS
-    | PLUS
+    : (ws GREATER ws)=>(ws! GREATER ws!) 
+    | (ws PLUS ws )=>(ws! PLUS ws!)
+    | (ws TILDE ws )=>(ws! TILDE ws!)
+    | (ws HAT ws )=>(ws! HAT ws!)
+    | (ws CAT ws )=>(ws! CAT ws!)
+    | (ws a+=SOLIDUS b+=ident c+=SOLIDUS ws)=>(ws a+=SOLIDUS b+=ident c+=SOLIDUS ws -> ^(NAMED_COMBINATOR $a* $b* $c*))
+    | (mandatory_ws)=> mandatory_ws -> EMPTY_COMBINATOR
     ;
     
 property
     : // support for star prefix browser hack - more correct and strict solution would require them to directly follow
       // normal property| merged property 
-      (a+=STAR)? b+=propertyNamePart ({predicates.directlyFollows(input)}?=>b+=propertyNamePart)* ( | c+=PLUS ( | c+=UNDERSCORE))
+      (a+=STAR ws)? b+=propertyNamePart (b+=propertyNamePart)* ( | ws c+=PLUS ( | ws c+=UNDERSCORE))
       ->  ^(INTERPOLABLE_NAME $a* $b*) $c*
     ;
     
@@ -460,12 +467,19 @@ propertyNamePart
 
 //we need to put comma into the tree so we can collect comments to it
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
+// there is no whitespace before selector, cause leading selector combinator should eat it
+//FIXME: !!! test ending comma
+//FIXME: !!! used to be ( a+=selectorSeparator a+=selector)* selectorSeparator?) <- problematic
+//FIXME: !!! (NOW)
+//FIXME: !!! (NOW) - this is suspicions there should be `?` in `) ws)?` before body - now there is syntactic predicat and empty option which is suboptimal  
 ruleSet
 @init {enterRule(retval, RULE_RULESET);}
-    : ((a+=selector (
-         (reusableStructureGuards LBRACE) => g+=reusableStructureGuards
-         | ( a+=selectorSeparator a+=selector)* selectorSeparator?)
-       ))? 
+    : 
+      ((((selector)=>a+=selector | )(
+           (mandatory_ws reusableStructureGuards ws LBRACE)=> mandatory_ws g+=reusableStructureGuards
+          |((ws a+=selectorSeparator a+=selector)=>(ws a+=selectorSeparator a+=selector))* (ws selectorSeparator)?
+         )
+         ) ws)
        b=general_body
      -> ^(RULESET $a* $g* $b)
     ;
@@ -474,6 +488,7 @@ finally { leaveRule(); }
 selectorSeparator
     : COMMA ;
 
+//FIXME: !!!!!!!!!!!! did not done ws her cause who knows?
 nestedAppender // this must be here because of special case & & <- the space belongs to both appenders
     :  ((MEANINGFULL_WHITESPACE? APPENDER MEANINGFULL_WHITESPACE APPENDER)=>a+=MEANINGFULL_WHITESPACE? a+=APPENDER) -> ^(NESTED_APPENDER $a* DUMMY_MEANINGFULL_WHITESPACE)
        | (
@@ -490,58 +505,89 @@ nestedAppender // this must be here because of special case & & <- the space bel
 
 top_level_body
     : LBRACE
-            (a+=top_level_element)*
-      RBRACE
+            (ws a+=top_level_element)*
+      ws RBRACE
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
      -> ^(BODY LBRACE $a* RBRACE); 
 
 top_level_body_with_declaration
-    : LBRACE
-            ((declarationWithSemicolon)=> a+=declarationWithSemicolon
-            | a+=top_level_element)*
+    : LBRACE ( ws | (
+                (ws declarationWithSemicolon)=>(ws a+=declarationWithSemicolon)
+                | (ws a+=top_level_element)=>(ws a+=top_level_element)
+            )+) ws
       RBRACE
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
      -> ^(BODY LBRACE $a* RBRACE); 
 
+//FIXME: !!!!! (NOW)  
 general_body
-    : LBRACE
-            (   (declarationWithSemicolon)=> (a+=declarationWithSemicolon)
-               | (ruleSet)=> a+=ruleSet
-               | (mixinReferenceWithSemi)=>a+=mixinReferenceWithSemi
-               | (namespaceReferenceWithSemi)=>a+=namespaceReferenceWithSemi
-               | (reusableStructure)=>a+=reusableStructure
-               | (detachedRulesetReference)=>a+=detachedRulesetReference
-               | (variabledeclaration)=>a+=variabledeclaration
-               | a+=extendInDeclarationWithSemi
-               | a+=pageMarginBox 
-               | a+=media_in_general_body
-               | a+=viewport
-               | a+=keyframes
-               | a+=document
-               | a+=supports
-               | a+=page
-               | a+=fontface
-               | a+=imports
-               | a+=unknownAtRule
-               | SEMI
+  : LBRACE ( 
+                 (ws declarationWithSemicolon)=> (ws a+=declarationWithSemicolon)
+               | (ws ruleSet)=>(ws a+=ruleSet)
+               | (ws mixinReferenceWithSemi)=>(ws a+=mixinReferenceWithSemi)
+               | (ws namespaceReferenceWithSemi)=>(ws a+=namespaceReferenceWithSemi)
+               | (ws reusableStructure)=>(ws a+=reusableStructure)
+               | (ws detachedRulesetReference)=>(ws a+=detachedRulesetReference)
+               | (ws variabledeclaration)=>(ws a+=variabledeclaration)
+               //everything under this comment did not needed syntactic predicate before ws, now they do - FIXME find out why!!!  
+               | (ws a+=extendInDeclarationWithSemi)=>(ws a+=extendInDeclarationWithSemi)
+               | (ws a+=pageMarginBox)=>(ws a+=pageMarginBox ) //FIXME !!!!!!!!!!!!!!!!!!! (HERE START) need to add ws from here down, dumno what the problem is
+               | (ws media_in_general_body)=>(ws a+=media_in_general_body)
+               | (ws viewport)=>(ws a+=viewport)
+               | (ws keyframes)=>(ws a+=keyframes)
+               | (ws document)=>(ws a+=document)
+               | (ws supports)=>(ws a+=supports)
+               | (ws page)=>(ws a+=page)
+               | (ws fontface)=>(ws a+=fontface)
+               | (ws imports)=>(ws a+=imports)
+               | (ws unknownAtRule)=>(ws a+=unknownAtRule)
+               | (ws SEMI)=>(ws SEMI)
              )*
-             (  rbrace+=RBRACE
-                | (declaration RBRACE)=>a+=declaration rbrace+=RBRACE               
-                | (mixinReference RBRACE)=>a+=mixinReference rbrace+=RBRACE
-                | (namespaceReference RBRACE)=>a+=namespaceReference rbrace+=RBRACE
-            //    | (detachedRulesetCallNoSemi RBRACE)=>a+=detachedRulesetCallNoSemi rbrace+=RBRACE
-             )
-     //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
-     -> ^(BODY LBRACE $a* $rbrace*); 
-
+            (   (ws declaration ws RBRACE)=>(ws a+=declaration ws rbrace+=RBRACE)  
+              | (ws mixinReference ws RBRACE)=>(ws a+=mixinReference ws rbrace+=RBRACE)
+              | (ws namespaceReference ws RBRACE)=>(ws a+=namespaceReference ws rbrace+=RBRACE)
+              | (ws rbrace+=RBRACE)
+//            | (detachedRulesetCallNoSemi ws RBRACE)=>(a+=detachedRulesetCallNoSemi ws rbrace+=RBRACE)
+           )
+  -> ^(BODY LBRACE $a* $rbrace*)
+  ;
+  
+ws_semi: ws SEMI;
+  
+//FIXME: !!!!!!!!!!!!!!!!!! left this alone cause who knows?
 // if this is changed, changes are the extendedSelector must be changed too
+//FIXME: !!!! (NOW) second combinator should not have ? and nested appender should work with normal spaces
+//selector 
+//@init {enterRule(retval, RULE_SELECTOR);}
+//    : a+=combinator? (a+=selector_simple_selectors_segment | a+=escapedSelectorOldSyntax | a+=nestedAppender) 
+//      (
+//         a+=combinator (a+=selector_simple_selectors_segment | a+=nestedAppender+)
+//       )*
+//    -> ^(SELECTOR $a* ) 
+//    ;
+//finally { leaveRule(); }
+
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
-    : ( 
-        ((combinator)=>a+=combinator | ) 
-        (a+=simpleSelector | a+=nestedAppender | a+=escapedSelectorOldSyntax)
-      )+
+    : ((combinator)=>(a+=combinator) | ) (a+=selector_simple_and_appenders) 
+      ((combinator selector_simple_and_appenders)=>(a+=combinator a+=selector_simple_and_appenders))*
     -> ^(SELECTOR $a* ) 
+    ;
+finally { leaveRule(); }
+
+selector_simple_and_appenders
+@init {enterRule(retval, "selector_simple_and_appenders");} // REMOVE
+   : (nestedAppender+ selector_simple_selectors_segment)=>(((nestedAppender)=>(nestedAppender+ selector_simple_selectors_segment))* nestedAppender*) 
+     | (selector_simple_selectors_segment nestedAppender+)=>(((selector_simple_selectors_segment nestedAppender)=>(selector_simple_selectors_segment nestedAppender+))* selector_simple_selectors_segment?)
+     | nestedAppender+ 
+     | selector_simple_selectors_segment
+   ;
+finally { leaveRule(); }
+
+selector_simple_selectors_segment
+@init {enterRule(retval, "selector_simple_selectors_segment");} // REMOVE
+    : (simpleSelector|escapedSelectorOldSyntax) 
+      ((combinator (simpleSelector|escapedSelectorOldSyntax))=>(combinator (simpleSelector|escapedSelectorOldSyntax)))*
     ;
 finally { leaveRule(); }
 
@@ -549,7 +595,7 @@ finally { leaveRule(); }
 // Less keyword-pseudoclass "extend" takes selector as an argument. The selector can be optionally
 // followed by keyword all. The grammar is ambiguous as a result and its predictability suffers.  
 extendTargetSelectors 
-    : a+=selector (a+=selectorSeparator a+=selector)*
+    : a+=selector (ws a+=selectorSeparator ws a+=selector)*
     -> ^(EXTEND_TARGET_SELECTOR $a*) 
     ;
 
@@ -558,12 +604,14 @@ extendTargetSelectors
 escapedSelectorOldSyntax: LPAREN VALUE_ESCAPE RPAREN-> ^(ESCAPED_SELECTOR VALUE_ESCAPE);
 
 simpleSelector
-    : ( (a+=elementName ( {!predicates.onEmptyCombinator(input)}?=>a+=elementSubsequent)*)
-        | (a+=elementSubsequent ( {!predicates.onEmptyCombinator(input)}?=>a+=elementSubsequent)*)
+@init {enterRule(retval, "simpleSelector");} // REMOVE
+    : ( (a+=elementName (a+=elementSubsequent)*)
+        | (a+=elementSubsequent)+
       )
     -> ^(SIMPLE_SELECTOR $a*)
-    ;
-    
+    ;    
+finally { leaveRule(); }
+
 cssClassOrId    
     :   idSelector -> ^(ELEMENT_SUBSEQUENT idSelector)
         | cssClass -> ^(ELEMENT_SUBSEQUENT cssClass)
@@ -575,25 +623,24 @@ attribOrPseudo
     ;
 
 elementSubsequent
-    :   cssClassOrId
-      | attribOrPseudo
+    : cssClassOrId | 
+      attribOrPseudo
     ;
 
 idSelector: 
-      (b+=HASH | b+=HASH_SYMBOL b+=INTERPOLATED_VARIABLE) 
-      ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=idOrClassNamePart)* 
+      (b+=HASH | b+=HASH_SYMBOL b+=INTERPOLATED_VARIABLE) (a+=idOrClassNamePart)* 
    -> ^(ID_SELECTOR $b* $a*)
     ;
     
 //A class name can be also a number e.g., .56 or .5cm or anything else that starts with a dot '.'.
 cssClass
-    : dot=DOT a+=idOrClassNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=idOrClassNamePart)* -> ^(CSS_CLASS $dot $a*); 
+    : dot=DOT (a+=idOrClassNamePart)+ -> ^(CSS_CLASS $dot $a*); 
     
 idOrClassNamePart
     : ident | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
     
 elementName
-    :  a+=elementNamePart ({predicates.directlyFollows(input.LT(-1), input.LT(1))}?=>a+=elementNamePart)* -> ^(ELEMENT_NAME $a*);
+    :  (a+=elementNamePart)+ -> ^(ELEMENT_NAME $a*);
     
 elementNamePart
     : STAR | IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE | UNDERSCORE;
@@ -601,10 +648,8 @@ elementNamePart
 allNumberKinds: NUMBER | EMS | EXS | LENGTH | ANGLE | TIME | FREQ | REPEATER | PERCENTAGE | UNKNOWN_DIMENSION;
 
 attrib
-    : (LBRACKET
-    
-        a+=ident
-            (
+    : (LBRACKET ws a+=ident
+            ( ws
                 (
                       b+=OPEQ
                     | b+=INCLUDES
@@ -618,38 +663,38 @@ attrib
                 )
             )?
     
-      RBRACKET)
-      -> ^(ATTRIBUTE $a* $b* $c*)
+      ws RBRACKET) -> ^(ATTRIBUTE $a* $b* $c*)
 ;
 
+//FIXME: !!!!!!!!!!!!! not done yet
 extendInDeclarationWithSemi
   : MEANINGFULL_WHITESPACE? APPENDER MEANINGFULL_WHITESPACE? a+=pseudo
   -> ^(EXTEND_IN_DECLARATION $a*)
   ;
   
 pseudo
-    : (c+=COLON c+=COLON? ( 
-          ((ident_nth)=> ar+=ident_nth LPAREN (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) RPAREN)
-        | (IDENT_EXTEND)=>(at+=IDENT_EXTEND LPAREN (b4+=extendTargetSelectors) RPAREN)
-        | (IDENT_NOT)=>(at+=IDENT_NOT LPAREN (b5=selector) RPAREN)
-        | (ident_general_pseudo LPAREN)=>(ar+=ident_general_pseudo LPAREN b6=pseudoparameters RPAREN)
+    : (c+=COLON (c+=COLON)? ( 
+          ((ident_nth)=> ar+=ident_nth LPAREN ws (b1=nth| b2=variablereference|b3=INTERPOLATED_VARIABLE) ws RPAREN)
+        | (IDENT_EXTEND)=>(at+=IDENT_EXTEND LPAREN ws (b4+=extendTargetSelectors) ws RPAREN)
+        | (IDENT_NOT)=>(at+=IDENT_NOT LPAREN ws (b5=selector) ws RPAREN)
+        | (ident_general_pseudo LPAREN)=>(ar+=ident_general_pseudo LPAREN ws b6=pseudoparameters ws RPAREN)
         |  ar+=ident
     )) -> ^(PSEUDO $c+ $ar* $at* $b1* $b2* $b3* $b4* $b5* $b6*)
     ;
     
 pseudoparameters:
-     ((ident | STRING | NUMBER | variablereference) RPAREN) => term
+     ((ident | STRING | NUMBER | variablereference) ws RPAREN) => term
     | selector
  ;
 
 //TODO: add special error message here 
- nth: ((a+=PLUS | a+=MINUS)? (a+=REPEATER | b+=ident) ((c+=PLUS | c+=MINUS) c+=NUMBER)?
-                      | (c+=PLUS | c+=MINUS)? c+=NUMBER)
+ nth: (((a+=PLUS | a+=MINUS) ws )? (a+=REPEATER | b+=ident) (ws (c+=PLUS | c+=MINUS) ws c+=NUMBER)?
+                      | ((c+=PLUS | c+=MINUS) ws)? c+=NUMBER)
       -> ^(NTH ^(TERM $a* $b*) ^(TERM $c*));
 
 referenceSeparator:
-       GREATER
-       | -> EMPTY_COMBINATOR;
+       ((ws GREATER)=> ws GREATER ws)
+       | (ws) -> EMPTY_COMBINATOR;
  
 namespaceReference
 @init {enterRule(retval, RULE_NAMESPACE_REFERENCE);}
@@ -665,20 +710,20 @@ finally { leaveRule(); }
 
 mixinReference
 @init {enterRule(retval, RULE_MIXIN_REFERENCE);}
-    : a=reusableStructureName (LPAREN b=semiSplitMixinReferenceArguments RPAREN)? c=IMPORTANT_SYM?
+    : a=reusableStructureName (ws LPAREN ws b=semiSplitMixinReferenceArguments ws RPAREN ws)? (ws c=IMPORTANT_SYM)?
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ;
 finally { leaveRule(); }
 
 mixinReferenceWithSemi
 @init {enterRule(retval, RULE_MIXIN_REFERENCE);}
-    : a=reusableStructureName (LPAREN b=semiSplitMixinReferenceArguments RPAREN)? c=IMPORTANT_SYM? SEMI
+    : a=reusableStructureName (ws LPAREN ws b=semiSplitMixinReferenceArguments ws RPAREN ws)? (ws c=IMPORTANT_SYM)? SEMI
     -> ^(MIXIN_REFERENCE $a $b* $c*)
     ; 
 finally { leaveRule(); }
 
 semiSplitMixinReferenceArguments
-    : a+=mixinReferenceArguments ( a+=semicolon a+=mixinReferenceArguments)* 
+    : a+=mixinReferenceArguments ( ws a+=semicolon ws a+=mixinReferenceArguments)* 
     -> ^(SEMI_SPLIT_MIXIN_REFERENCE_ARGUMENTS $a*)
     ;
 
@@ -687,8 +732,8 @@ semicolon
     
 mixinReferenceArguments
     : // nothing
-    | variabledeclarationNoSemi (COMMA! variabledeclarationNoSemi)*
-    | expr (COMMA! variabledeclarationNoSemi (COMMA! variabledeclarationNoSemi)*)?
+    | variabledeclarationNoSemi (ws! COMMA! ws! variabledeclarationNoSemi)*
+    | expression_full (ws! COMMA! ws! variabledeclarationNoSemi (ws! COMMA! ws! variabledeclarationNoSemi)*)?
     ;
 
 reusableStructureName
@@ -697,23 +742,23 @@ reusableStructureName
 //we can loose parentheses, because comments inside mixin definition are going to be lost anyway
 reusableStructure 
 @init {enterRule(retval, RULE_ABSTRACT_MIXIN_OR_NAMESPACE);}
-    : a=reusableStructureName LPAREN c=semiSplitReusableStructureArguments RPAREN e=reusableStructureGuards? f=general_body
+    : a=reusableStructureName ws LPAREN ws c=semiSplitReusableStructureArguments ws RPAREN (ws e=reusableStructureGuards)? ws f=general_body
     -> ^(REUSABLE_STRUCTURE $a $c* $e* $f)
     ;
 finally { leaveRule(); }
 
 reusableStructureGuards
-    : IDENT_WHEN b+=guard (COMMA d+=guard)*
+    : IDENT_WHEN ws b+=guard (ws COMMA ws d+=guard)*
     -> $b $d*
     ;
     
 guard
-    : a=guardCondition  (b+=ident c+=guardCondition)*
+    : a=guardCondition  (ws b+=ident ws c+=guardCondition)*
     -> ^(GUARD $a* ($b $c)*)
     ;    
 
 guardCondition
-    : a+=ident? LPAREN b+=mathExprHighPrior (b+=compareOperator b+=mathExprHighPrior)? RPAREN
+    : (a+=ident ws)? LPAREN ws b+=mathExprHighPrior (ws b+=compareOperator ws b+=mathExprHighPrior)? ws RPAREN
     -> ^(GUARD_CONDITION $a* $b*)
     ;   
 
@@ -723,25 +768,25 @@ compareOperator
     
 semiSplitReusableStructureArguments
     : (    // nothing 
-           | a+=commaSplitReusableStructureArgument ( a+=semicolon a+=commaSplitReusableStructureArgument)* (a+=semicolon)?
+           | a+=commaSplitReusableStructureArgument (ws a+=semicolon ws a+=commaSplitReusableStructureArgument)* (ws a+=semicolon)?
       ) -> ^(SEMI_SPLIT_MIXIN_DECLARATION_ARGUMENTS $a*)
     ;
 
 commaSplitReusableStructureArgument
-    : sequenceOfReusableStructureArgumentsWithDefault (COMMA! collector)?
-    | patternAndNoDefaultOnlyReusableStructureArguments (COMMA! sequenceOfReusableStructureArgumentsWithDefault (COMMA! collector)?)?   
+    : sequenceOfReusableStructureArgumentsWithDefault (ws! COMMA! ws! collector)?
+    | patternAndNoDefaultOnlyReusableStructureArguments (ws! COMMA! ws! sequenceOfReusableStructureArgumentsWithDefault (ws! COMMA! ws! collector)?)?   
     ;
     
 sequenceOfReusableStructureArgumentsWithDefault
-    : reusableStructureParameterWithDefault (COMMA! reusableStructureParameterWithDefault)*
+    : reusableStructureParameterWithDefault (ws! COMMA! ws! reusableStructureParameterWithDefault)*
     ;
     
 patternAndNoDefaultOnlyReusableStructureArguments
-    : (reusableStructureParameterWithoutDefault | reusableStructurePattern) (COMMA! (reusableStructureParameterWithoutDefault | reusableStructurePattern))*
+    : (reusableStructureParameterWithoutDefault | reusableStructurePattern) (ws! COMMA! ws! (reusableStructureParameterWithoutDefault | reusableStructurePattern))*
     ;    
 
 reusableStructurePattern
-    : (( a+=unaryOperator? (a+=value_term)
+    : (( (a+=plusOrMinus ws)? (a+=value_term)
     ) | (
        a+=unsigned_value_term
        | a+=hexColor
@@ -753,24 +798,28 @@ reusableStructurePattern
 //their unit tests (so it was intentional)
 declaration
 @init {enterRule(retval, RULE_DECLARATION);}
-    : property COLON expr? -> ^(DECLARATION property expr? )
+    : property ws COLON (ws expression_full)? -> ^(DECLARATION property COLON expression_full?)
     ;
 finally { leaveRule(); }
 
 //I had to do this to put semicolon as a last member of the declaration subtree - comments would be messed up otherwise.
 declarationWithSemicolon
 @init {enterRule(retval, RULE_DECLARATION);}
-    : property COLON expr? SEMI -> ^(DECLARATION property expr? )
+    : property ws COLON (ws expression_full)? ws SEMI -> ^(DECLARATION property COLON expression_full?)
     ;
 finally { leaveRule(); }
     
 prio
-    : IMPORTANT_SYM
+    : IMPORTANT_SYM -> ^(EXPRESSION ^(TERM ^(IDENT_TERM IMPORTANT_SYM)))
     ;
 
 operator
-    : COMMA
-    | ({predicates.onEmptySeparator(input)}?=> -> EMPTY_SEPARATOR)
+    : (ws COMMA ws)=>(ws a+=COMMA ws) -> $a
+    | (mandatory_ws)=>(mandatory_ws)-> EMPTY_SEPARATOR
+    ;
+
+operator_fictional
+    : ws -> EMPTY_SEPARATOR
     ;
     
 mathOperatorHighPrior
@@ -778,7 +827,7 @@ mathOperatorHighPrior
     | STAR
     ;
 
-mathOperatorLowPrior
+plusOrMinus
     : PLUS
     | MINUS
     ;
@@ -792,43 +841,81 @@ finally { leaveRule(); }
 
 detachedRulesetReference
 @init {enterRule(retval, RULE_DETACHED_RULESET_REFERENCE);}
-    : a+=AT_NAME (a+=LPAREN? a+=RPAREN?) SEMI
+    : a+=AT_NAME (ws a+=LPAREN ws a+=RPAREN)? ws SEMI
     -> ^(DETACHED_RULESET_REFERENCE $a*)
     ;
 finally { leaveRule(); }
 
-expr 
+expression_full
 @init {enterRule(retval, RULE_EXPRESSION);}
-    : (dr+=detachedRuleset | (a+=mathExprHighPrior (b+=operator c+=mathExprHighPrior)*)) -> ^(EXPRESSION $dr* $a* ($b $c)*)
+    : (dr+=detachedRuleset 
+      | (a+=mathExprHighPriorNoWhitespaceList (
+            (operator mathExprHighPriorNoWhitespaceList)=>(b+=operator c+=mathExprHighPriorNoWhitespaceList)
+            | (term_no_preceeding_whitespace)=>(b+=operator_fictional c+=term_no_preceeding_whitespace)
+         )* (b+=operator_fictional c+=prio)?
+      )) -> ^(EXPRESSION $dr* $a* ($b $c)* )
+    ;
+finally { leaveRule(); }
+
+        
+
+
+/*
+No: 1 +1 
+Yes: 1+1
+Yes: 1+ 1
+Yes: 1 + 1
+Yes: 1+-1
+        (ws plusOrMinus)=>(ws b+=plusOrMinus ws c+=mathExprLowPrior)
+*/
+mathExprHighPriorNoWhitespaceList
+@init {enterRule(retval, RULE_EXPRESSION);}
+    : a=mathExprLowPrior (
+        (plusOrMinus ws mathExprLowPrior)=>(b+=plusOrMinus ws c+=mathExprLowPrior)
+        | (plusOrMinus mandatory_ws mathExprLowPrior)=>(b+=plusOrMinus mandatory_ws c+=mathExprLowPrior)
+        | (mandatory_ws plusOrMinus mandatory_ws mathExprLowPrior)=>(mandatory_ws b+=plusOrMinus mandatory_ws c+=mathExprLowPrior)
+        | (ws plusOrMinus ws plusOrMinus ws mathExprLowPrior)=>(ws b+=plusOrMinus ws c+=mathExprLowPrior)
+      )* -> ^(EXPRESSION $a ($b $c)*)
     ;
 finally { leaveRule(); }
 
 mathExprHighPrior
 @init {enterRule(retval, RULE_EXPRESSION);}
-    : a=mathExprLowPrior (b+=mathOperatorLowPrior c+=mathExprLowPrior)* -> ^(EXPRESSION $a ($b $c)*)
+    : a=mathExprLowPrior (
+        (ws plusOrMinus)=>(ws b+=plusOrMinus ws c+=mathExprLowPrior)
+      )* -> ^(EXPRESSION $a ($b $c)*)
     ;
 finally { leaveRule(); }
 
 mathExprLowPrior
 @init {enterRule(retval, RULE_EXPRESSION);}
-    : a=term (b+=mathOperatorHighPrior c+=term)* -> ^(EXPRESSION $a ($b $c)*)
+    : a=term (ws b+=mathOperatorHighPrior ws c+=term)* -> ^(EXPRESSION $a ($b $c)*)
     ;
 finally { leaveRule(); }
 
 term
-    : (( a+=unaryOperator? (a+=value_term
-    | ({predicates.onFunctionStart(input)}?=> a+=function)
+    : (( (a+=plusOrMinus ws)? (a+=value_term
+    | a+=function
     | a+=expr_in_parentheses
     | a+=variablereference
     )
-    ) | (a+=unsigned_value_term
+    ) | (a+=unsigned_value_term 
         | a+=hexColor
         | a+=escapedValue
         | a+=embeddedScript
         | a+=special_function))
     -> ^(TERM $a*)
     ;
-    
+
+term_no_preceeding_whitespace
+    : ((a+=unsigned_value_term 
+        | a+=hexColor
+        | a+=escapedValue
+        | a+=embeddedScript
+        | a+=special_function))
+    -> ^(TERM $a*)
+    ;
+  
 term_only_function
     : (a+=function
     | a+=special_function)
@@ -840,7 +927,7 @@ escapedValue: VALUE_ESCAPE -> ^(ESCAPED_VALUE VALUE_ESCAPE);
 embeddedScript: EMBEDDED_SCRIPT | ESCAPED_SCRIPT;
     
 expr_in_parentheses
-    : LPAREN expr RPAREN -> ^(EXPRESSION_PARENTHESES LPAREN expr RPAREN );
+    : LPAREN ws expression_full ws RPAREN -> ^(EXPRESSION_PARENTHESES LPAREN expression_full RPAREN );
     
 value_term
     : NUMBER
@@ -862,9 +949,7 @@ unsigned_value_term
     ;
     
 identifierValueTerm
-    : (a+=ident | b+=EXCLAMATION_MARK | b+=DOT | b+=IMPORTANT_SYM) 
-          ({predicates.directlyFollows(input) && predicates.notSemi(input)}?=> 
-          (c+=identifierValueTermHelper))* 
+    : (a+=ident | b+=EXCLAMATION_MARK | b+=DOT | b+=IMPORTANT_SYM) ((identifierValueTermHelper)=>c+=identifierValueTermHelper)* 
           -> ^(IDENT_TERM $a* $b* $c*);
           
 identifierValueTermHelper
@@ -880,7 +965,7 @@ hexColor
     ;
 
 function
-    : a=functionName LPAREN b=functionParameters? RPAREN -> ^(TERM_FUNCTION $a* $b*)
+    : a=functionName LPAREN ws (b=functionParameters ws)? RPAREN -> ^(TERM_FUNCTION $a* $b*)
     ;
 
 //function names should allow filters: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF0000ff', endColorstr='#FFff0000', GradientType=1)
@@ -891,11 +976,12 @@ functionName
     ;
     
 functionParameters
-    : a=namedFunctionParameter (b+=COMMA c+=namedFunctionParameter)* -> ^(EXPRESSION $a ($b $c)*)
-    | expr;
+    : a=namedFunctionParameter (ws b+=COMMA ws c+=namedFunctionParameter)* -> ^(EXPRESSION $a ($b $c)*)
+    | expression_full;
+
 
 namedFunctionParameter
-    : ident OPEQ term -> ^(NAMED_EXPRESSION ident term);
+    : ident ws OPEQ ws term -> ^(NAMED_EXPRESSION ident term);
     
 // ==============================================================
 // LEXER
@@ -1463,11 +1549,12 @@ DOMAIN : ((D O M A I N '(' ((WS)=>WS)? URL WS? ')')
 //
 fragment UNICODE_NON_BREAKING_WS: '\u00A0'; 
 fragment WS_FRAGMENT : (' '|'\t'|'\f'|UNICODE_NON_BREAKING_WS)+ ;   //('\r'|'\n'|'\t'|'\f'|' ')
-WS : WS_FRAGMENT { $channel = HIDDEN; } ;
+WS : WS_FRAGMENT ;//{ $channel = HIDDEN; } ;
 fragment NL : ('\r' '\n'? | '\n');
-NEW_LINE: NL { $channel = HIDDEN; } ;
+NEW_LINE: NL ;//{ $channel = HIDDEN; } ;
 
-//ws: (WS | NEW_LINE)*;
+ws: (WS | NEW_LINE)*;
+mandatory_ws: (WS | NEW_LINE)+;
 // -------------
 // Illegal. Any other character shoudl not be allowed.
 //

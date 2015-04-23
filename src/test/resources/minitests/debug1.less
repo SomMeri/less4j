@@ -1,4 +1,60 @@
-merge-commented {
-  property+: a1 !important;
-  property+: a2 !/*some comment here*/important;
+/*#hash {
+    property: value;
+    aasa: no semi
+}
+
+#hash {
+  .div {
+    property: value;
+    aasa: no semi
+  }
+}
+// https://github.com/cloudhead/less.js/issues/1028
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'Helvetica Neue';
+    src: local('Heiti SC'), local(PMingLiU);
+  }
+}
+@media print{
+  h1 { color: blue; }
+}
+.top {
+  .inside & {
+    @supports (sandwitch: ham) {
+      property: value;
+    }
+  }
+}
+.set {
+  & .input-sm {
+      line-height: 2;
+  }
+  &.input-sm1 {
+      line-height: 2;
+  }
+  .input-sm2 & {
+      line-height: 2;
+  }
+  .input-sm3& {
+      line-height: 2;
+  }
+ {
+  test: 100px!important;
+}
+
+}
+
+.deepOuter {
+  /deep/ .inner {
+    property: value;
+  }	
+}
+.shorthands {
+  padding: 0 -4px;
+}
+*/
+
+@page /* 0 */ name /* 1 */ :first {
+  margin: 2;
 }

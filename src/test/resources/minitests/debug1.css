@@ -1,3 +1,42 @@
-merge-commented {
-  property: a1, a2 !important;
+#hash {
+  property: value;
+  aasa: no semi;
+}
+#hash .div {
+  property: value;
+  aasa: no semi;
+}
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  @font-face {
+    font-family: 'Helvetica Neue';
+    src: local('Heiti SC'), local(PMingLiU);
+  }
+}
+@media print {
+  h1 {
+    color: blue;
+  }
+}
+@supports (sandwitch: ham) {
+  .inside .top {
+    property: value;
+  }
+}
+.set .input-sm {
+  line-height: 2;
+}
+.set.input-sm1 {
+  line-height: 2;
+}
+.input-sm2 .set {
+  line-height: 2;
+}
+.input-sm3.set {
+  line-height: 2;
+}
+{
+  test: 100px !important;
+}
+.deepOuter /deep/ .inner {
+  property: value;
 }

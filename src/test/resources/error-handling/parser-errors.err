@@ -3,9 +3,9 @@ ERROR 1:10 no viable alternative at input ':' in unknown ruleset (which started 
  1: @variable: 2
  2: h1 {
 
-ERROR 1:12 no viable alternative at input '2' in selectors (which started at 1:10)
+ERROR 1:10 no viable alternative at input ':' in ruleset (which started at 1:10)
  1: @variable: 2
  2: h1 {
 
-ERROR 5:1 no viable alternative at input '<EOF>' in ruleset (which started at 1:10)
+ERROR 5:1 no viable alternative at input '<EOF>' in ruleset (which started at 1:12)
  4:   

@@ -286,25 +286,27 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     HiddenTokenAwareTree nameToken = iterator.next();
     InterpolableName name = toInterpolableName(nameToken, nameToken.getChildren());
 
-    if (!iterator.hasNext())
-      return new Declaration(token, name);
-
-    HiddenTokenAwareTree expressionToken = iterator.next();
+    HiddenTokenAwareTree colonToken = iterator.next();
     ListExpressionOperator.Operator mergeOperator = null;
-    if (expressionToken.getGeneralType() == LessLexer.PLUS) {
-      expressionToken = iterator.next();
+    if (colonToken.getGeneralType() == LessLexer.PLUS) {
+      colonToken = iterator.next();
       mergeOperator = ListExpressionOperator.Operator.COMMA;
-      if (expressionToken.getGeneralType() == LessLexer.UNDERSCORE) {
-        expressionToken = iterator.next();
+      if (colonToken.getGeneralType() == LessLexer.UNDERSCORE) {
+        colonToken = iterator.next();
         mergeOperator = ListExpressionOperator.Operator.EMPTY_OPERATOR;
       }
     }
 
+    colonToken.pushHiddenToSiblings();
+    if (!iterator.hasNext())
+      return new Declaration(token, name);
+
+    HiddenTokenAwareTree expressionToken = iterator.next();
     Expression expression = (Expression) switchOn(expressionToken);
     if (!iterator.hasNext()) {
       return new Declaration(token, name, expression, mergeOperator);
     }
-
+    
     throw new BugHappened(GRAMMAR_MISMATCH, token);
   }
 
@@ -1154,6 +1156,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         if (kid.getChild(0).getGeneralType() == LessLexer.MEANINGFULL_WHITESPACE) {
           pseudoPageIndex = 2;
           result.setDockedPseudopage(false);
+          kid.addPreceding(kid.getChild(0).getPreceding());
+        }
+        if (kid.getChild(1).getGeneralType() == LessLexer.COLON) {
+          kid.addPreceding(kid.getChild(1).getPreceding());
         }
         result.setPseudopage(new Name(kid, ":" + kid.getChild(pseudoPageIndex).getText()));
       } else if (kid.getGeneralType() == LessLexer.BODY) {

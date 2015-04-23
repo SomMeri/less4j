@@ -83,9 +83,8 @@ public class ListToTreeCombiner {
     if (tail.isEmpty())
       return;
 
-    //FIXME: !!!!!!!!!!!! clean this up
     CommonToken lastInTail = tail.peekLast();
-    if (lastInTail.getType() == LessLexer.NEW_LINE || lastInTail.getText().endsWith("\n"))
+    if (lastInTail.getType() == LessLexer.NEW_LINE)
       firstChild.addFollowing(tail);
     else
       secondChild.addPreceding(tail);
@@ -108,8 +107,11 @@ public class ListToTreeCombiner {
   }
 
   private void addAllPrecedingTokens(HiddenTokenAwareTree target) {
-    int start = target.getTokenStartIndex();
-    List<CommonToken> tokens = readPrefix(start);
+    int upTo = target.getTokenStartIndex();
+    if (!target.hasChildren())
+      upTo = target.getTokenStopIndex();
+    
+    List<CommonToken> tokens = readPrefix(upTo);
     target.addPreceding(tokens);
   }
 

@@ -21,6 +21,7 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
   
   private ParsersSemanticPredicates grammarKnowledge = new ParsersSemanticPredicates();
   protected int generalType = -3;
+  private Token stopToken;
 
 
   public HiddenTokenAwareTree(CommonToken payload, LessSource source) {
@@ -309,4 +310,11 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
     return type;
   }
 
+  public void setStopToken(Token stopToken) {
+    this.stopToken = stopToken;
+  }
+
+  public Token getStopToken() {
+    return this.stopToken;
+  }
 }

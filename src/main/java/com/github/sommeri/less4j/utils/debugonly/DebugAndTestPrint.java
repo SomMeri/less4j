@@ -5,6 +5,9 @@ import java.util.List;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 
+import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.LessSource.CannotReadFile;
+import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.platform.Constants;

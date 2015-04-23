@@ -17,6 +17,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.Tree;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessCompiler.Problem;
@@ -142,7 +143,7 @@ public class ANTLRParser {
     EXPRESSION {
       @Override
       public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
-        return parser.expr();
+        return parser.expression_full();
       }
     },
     DECLARATION {
@@ -234,6 +235,24 @@ class HiddenTokenAwareTreeAdaptor extends CommonTreeAdaptor {
     return new HiddenTokenAwareErrorTree(input, start, stop, e, source);
   }
 
+  @Override
+  public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
+    if ( t==null ) return;
+    int start = 0;
+    int stop = 0;
+    if ( startToken!=null ) start = startToken.getTokenIndex();
+    if ( stopToken!=null ) stop = stopToken.getTokenIndex();
+    ((Tree)t).setTokenStartIndex(start);
+    ((Tree)t).setTokenStopIndex(stop);
+    
+    //FIXME: !!!!!!!!!!!! maybe remove, only for debug purposes
+    if (t instanceof HiddenTokenAwareTree) {
+      HiddenTokenAwareTree token = (HiddenTokenAwareTree) t;
+      token.setStopToken(stopToken);
+      
+    }
+  }
+  
   public LessSource getSource() {
     return source;
   }
