@@ -107,7 +107,7 @@ tokens {
   import com.github.sommeri.less4j.core.parser.AntlrException;
   import com.github.sommeri.less4j.LessCompiler.Problem;
   import com.github.sommeri.less4j.LessSource;
-  import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
+  import com.github.sommeri.less4j.core.parser.LexerLogic;
 }
  
 @parser::header {
@@ -133,7 +133,7 @@ tokens {
       this.source = source;
     }
 
-  protected ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
+  protected LexerLogic lexerLogic = new LexerLogic();
 
   //This trick allow Lexer to emit multiple tokens per one rule.
   List tokens = new ArrayList();
@@ -254,7 +254,6 @@ media_queries_declaration:
     -> ^(MEDIUM_DECLARATION $m1 ($n $m)*)
 ; 
 
-//FIXME !!! (NOW)
 media_top_level
 @init {enterRule(retval, RULE_MEDIA);}
     : MEDIA_SYM mandatory_ws m1+=media_queries_declaration ws b+=top_level_body_with_declaration
@@ -427,12 +426,11 @@ finally { leaveRule(); }
 
 pageMarginBox 
 @init {enterRule(retval, RULE_PAGE_MARGIN_BOX);}
-    : {predicates.isPageMarginBox(input.LT(1))}? AT_NAME ws general_body
+    : {lexerLogic.isPageMarginBox(input.LT(1))}? AT_NAME ws general_body
     -> ^(PAGE_MARGIN_BOX AT_NAME general_body)
     ;
 finally { leaveRule(); }
    
-//FIXME: !!!!!!!!!! what to do here? did not filled ws
 pseudoPage
 @init {enterRule(retval, RULE_PSEUDO_PAGE);}
     : COLON ws ident -> ^(PSEUDO_PAGE COLON ident)
@@ -469,9 +467,6 @@ propertyNamePart
 //TODO: this does not accurately describes the grammar. Nested and real selectors are different.
 // there is no whitespace before selector, cause leading selector combinator should eat it
 //FIXME: !!! test ending comma
-//FIXME: !!! used to be ( a+=selectorSeparator a+=selector)* selectorSeparator?) <- problematic
-//FIXME: !!! (NOW)
-//FIXME: !!! (NOW) - this is suspicions there should be `?` in `) ws)?` before body - now there is syntactic predicat and empty option which is suboptimal  
 ruleSet
 @init {enterRule(retval, RULE_RULESET);}
     : 
@@ -488,7 +483,6 @@ finally { leaveRule(); }
 selectorSeparator
     : COMMA ;
 
-//FIXME: !!!!!!!!!!!! did not done ws her cause who knows?
 nestedAppender // this must be here because of special case & & <- the space belongs to both appenders
     :  ((MEANINGFULL_WHITESPACE? APPENDER MEANINGFULL_WHITESPACE APPENDER)=>a+=MEANINGFULL_WHITESPACE? a+=APPENDER) -> ^(NESTED_APPENDER $a* DUMMY_MEANINGFULL_WHITESPACE)
        | (
@@ -519,7 +513,6 @@ top_level_body_with_declaration
      //If we remove LBRACE from the tree, a ruleset with an empty selector will report wrong line number in the warning.
      -> ^(BODY LBRACE $a* RBRACE); 
 
-//FIXME: !!!!! (NOW)  
 general_body
   : LBRACE ( 
                  (ws declarationWithSemicolon)=> (ws a+=declarationWithSemicolon)
@@ -529,7 +522,6 @@ general_body
                | (ws reusableStructure)=>(ws a+=reusableStructure)
                | (ws detachedRulesetReference)=>(ws a+=detachedRulesetReference)
                | (ws variabledeclaration)=>(ws a+=variabledeclaration)
-               //everything under this comment did not needed syntactic predicate before ws, now they do - FIXME find out why!!!  
                | (ws a+=extendInDeclarationWithSemi)=>(ws a+=extendInDeclarationWithSemi)
                | (ws a+=pageMarginBox)=>(ws a+=pageMarginBox ) 
                | (ws media_in_general_body)=>(ws a+=media_in_general_body)
@@ -554,19 +546,6 @@ general_body
   
 ws_semi: ws SEMI;
   
-//FIXME: !!!!!!!!!!!!!!!!!! left this alone cause who knows?
-// if this is changed, changes are the extendedSelector must be changed too
-//FIXME: !!!! (NOW) second combinator should not have ? and nested appender should work with normal spaces
-//selector 
-//@init {enterRule(retval, RULE_SELECTOR);}
-//    : a+=combinator? (a+=selector_simple_selectors_segment | a+=escapedSelectorOldSyntax | a+=nestedAppender) 
-//      (
-//         a+=combinator (a+=selector_simple_selectors_segment | a+=nestedAppender+)
-//       )*
-//    -> ^(SELECTOR $a* ) 
-//    ;
-//finally { leaveRule(); }
-
 selector 
 @init {enterRule(retval, RULE_SELECTOR);}
     : ((combinator)=>(a+=combinator) | ) (a+=selector_simple_and_appenders) 
@@ -666,7 +645,6 @@ attrib
       ws RBRACKET) -> ^(ATTRIBUTE $a* $b* $c*)
 ;
 
-//FIXME: !!!!!!!!!!!!! not done yet
 extendInDeclarationWithSemi
   : MEANINGFULL_WHITESPACE? APPENDER MEANINGFULL_WHITESPACE? a+=pseudo
   -> ^(EXTEND_IN_DECLARATION $a*)
@@ -1444,7 +1422,7 @@ fragment AT_VIEWPORT: ;
 fragment AT_SUPPORTS: ;
 fragment AT_CHARSET: ;
 
-AT_NAME : '@' NAME { $type = predicates.atNameType(getText()); };
+AT_NAME : '@' NAME { $type = lexerLogic.atNameType(getText()); };
 INDIRECT_VARIABLE : '@' '@' NAME ;
 INTERPOLATED_VARIABLE : '@' LBRACE NAME RBRACE;
 
