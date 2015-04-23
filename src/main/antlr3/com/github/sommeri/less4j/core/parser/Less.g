@@ -531,7 +531,7 @@ general_body
                | (ws variabledeclaration)=>(ws a+=variabledeclaration)
                //everything under this comment did not needed syntactic predicate before ws, now they do - FIXME find out why!!!  
                | (ws a+=extendInDeclarationWithSemi)=>(ws a+=extendInDeclarationWithSemi)
-               | (ws a+=pageMarginBox)=>(ws a+=pageMarginBox ) //FIXME !!!!!!!!!!!!!!!!!!! (HERE START) need to add ws from here down, dumno what the problem is
+               | (ws a+=pageMarginBox)=>(ws a+=pageMarginBox ) 
                | (ws media_in_general_body)=>(ws a+=media_in_general_body)
                | (ws viewport)=>(ws a+=viewport)
                | (ws keyframes)=>(ws a+=keyframes)

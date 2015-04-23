@@ -15,7 +15,7 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 import com.github.sommeri.less4j.LessCompiler.Problem;
-import com.github.sommeri.less4j.core.parser.ParsersSemanticPredicates;
+import com.github.sommeri.less4j.core.parser.LexerLogic;
 import com.github.sommeri.less4j.core.parser.AntlrException;
 
 public abstract class SuperLessParser extends Parser {
@@ -178,7 +178,7 @@ public abstract class SuperLessParser extends Parser {
   
 
   protected List<Problem> errors = new ArrayList<Problem>();
-  protected ParsersSemanticPredicates predicates = new ParsersSemanticPredicates();
+  protected LexerLogic lexerLogic = new LexerLogic();
   protected Stack<EnterRuleInfo> paraphrases = new Stack<EnterRuleInfo>();
 
   public SuperLessParser(TokenStream input, List<Problem> errors) {

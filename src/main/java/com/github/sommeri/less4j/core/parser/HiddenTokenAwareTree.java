@@ -19,7 +19,7 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
   private List<CommonToken> following = new LinkedList<CommonToken>();
   private CommonToken tokenAsCommon;
   
-  private ParsersSemanticPredicates grammarKnowledge = new ParsersSemanticPredicates();
+  private LexerLogic grammarKnowledge = new LexerLogic();
   protected int generalType = -3;
   private Token stopToken;
 
