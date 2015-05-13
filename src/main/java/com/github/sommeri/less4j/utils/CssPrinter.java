@@ -80,6 +80,7 @@ import com.github.sommeri.less4j.core.ast.UnknownAtRule;
 import com.github.sommeri.less4j.core.ast.Viewport;
 import com.github.sommeri.less4j.core.output.ExtendedStringBuilder;
 import com.github.sommeri.less4j.core.output.SourceMapBuilder;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 //SelectorCombinator
 //EscapedSelector
 
@@ -1009,6 +1010,9 @@ public class CssPrinter {
     cssOnly.ensureSeparator();
     if (!selector.isStar() || !selector.isEmptyForm()) {
       InterpolableName elementName = selector.getElementName();
+      //FIXME !!!! add automatic error catches through some annotation
+      if (elementName==null) //FIXME !!!! remove this 
+        throw new BugHappened("!!!!!!!!!!!!!!!", selector); 
       cssAndSM.appendIgnoreNull(elementName.getName(), elementName.getUnderlyingStructure());
     }
   }

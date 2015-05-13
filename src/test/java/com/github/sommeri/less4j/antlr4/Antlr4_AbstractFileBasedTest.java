@@ -1,4 +1,4 @@
-package com.github.sommeri.less4j;
+package com.github.sommeri.less4j.antlr4;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,16 +17,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.commandline.CommandLinePrint;
-import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 import com.github.sommeri.less4j.utils.SourceMapValidator;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 @RunWith(Parameterized.class)
-public abstract class AbstractFileBasedTest {
+public abstract class Antlr4_AbstractFileBasedTest {
 
   private final SourceMapValidator sourceMapValidation = new SourceMapValidator();
 
@@ -37,7 +39,7 @@ public abstract class AbstractFileBasedTest {
   @SuppressWarnings("unused")
   private final String testName;
 
-  public AbstractFileBasedTest(File lessFile, File cssOutput, File errorList, File mapdataFile, String testName) {
+  public Antlr4_AbstractFileBasedTest(File lessFile, File cssOutput, File errorList, File mapdataFile, String testName) {
     this.lessFile = lessFile;
     this.cssOutput = cssOutput;
     this.mapdataFile = mapdataFile;
@@ -147,7 +149,7 @@ public abstract class AbstractFileBasedTest {
   }
 
   protected LessCompiler getCompiler() {
-    return new ThreadUnsafeLessCompiler();
+    return new Antlr4_ThreadUnsafeLessCompiler();
   }
 
   protected String expectedCss() {
