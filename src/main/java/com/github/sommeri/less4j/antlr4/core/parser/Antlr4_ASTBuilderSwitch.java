@@ -39,14 +39,13 @@ import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
-import com.github.sommeri.less4j.core.ast.Nth;
-import com.github.sommeri.less4j.core.ast.NumberExpression;
-import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
-import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
+import com.github.sommeri.less4j.core.ast.Nth;
+import com.github.sommeri.less4j.core.ast.Nth.Form;
+import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
@@ -56,15 +55,16 @@ import com.github.sommeri.less4j.core.ast.SelectorAttribute;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
+import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.parser.ConversionUtils;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.parser.LessG4Lexer;
-import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AllNumberKindsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AttribContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AttribOrPseudoContext;
@@ -131,6 +131,8 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Term_only_functionCont
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_elementContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Unsigned_value_termContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Value_termContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.VariabledeclarationContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.VariabledeclarationWithSemicolonContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariablenameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariablereferenceContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.WsContext;
@@ -1176,6 +1178,20 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     return expression;
   }
 
+  @Override
+  public ASTCssNode visitVariabledeclarationWithSemicolon(VariabledeclarationWithSemicolonContext ctx) {
+    return visitVariabledeclaration(ctx.variabledeclaration());
+  }
+
+  @Override
+  public ASTCssNode visitVariabledeclaration(VariabledeclarationContext ctx) {
+    HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    Variable variable = visitVariablename(ctx.variablename());
+    Expression value = visitExpression_full(ctx.expression_full());
+    return new VariableDeclaration(token, variable, value);
+  }
+
   /*
    * ***************************UNFINISHED HERE*******************************************
    */
@@ -1235,4 +1251,14 @@ class HiddenTokenAwareTreeAdapter extends HiddenTokenAwareTree {
     return start.getText();
   }
 
+  @Override
+  public int getLine() {
+    return start.getLine();
+  }
+  
+  @Override
+  public int getCharPositionInLine() {
+    return start.getCharPositionInLine();
+  }
+  
 }

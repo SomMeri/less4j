@@ -70,11 +70,11 @@ public class ANTLR4Parser {
     for (Entry<Tree, NodeCommentsHolder> entry : all) {
       NodeCommentsHolder holder = entry.getValue();
       if (!holder.getPreceding().isEmpty() || !holder.getFollowing().isEmpty() || !holder.getOrphans().isEmpty()) {
-        System.out.println(" **** " + formattedTree.getTextAndPosition(entry.getKey()));
+        //System.out.println(" **** " + formattedTree.getTextAndPosition(entry.getKey()));
       }
     }
     formattedTree.addToTreatAsTerminal("ws", "combinator_ws", "combinator");
-//    System.out.println(" --> Parse Tree <-- \n" + formattedTree.toStringTree(tree, parser));
+    //System.out.println(" --> Parse Tree <-- \n" + formattedTree.toStringTree(tree));
     return new ParserResult(tree, commentsMap);
   }
 

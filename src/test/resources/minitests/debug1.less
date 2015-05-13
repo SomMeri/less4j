@@ -1,1 +1,262 @@
-li:lang(en-GB) { background-color : lime }
+#percentage {
+  padding1: percentage(something); 
+  padding2: percentage("invalid"); 
+  padding3: percentage("0.5"); 
+  padding4: percentage(0.3);
+  padding5: percentage(1%);
+  padding6: percentage(1px);
+  padding7: percentage(1+0.3);
+}
+
+@percentBad: "string";
+@percentString: "0.5";
+@percentNumber: 0.3;
+@percentPercent: 1%;
+@percentCm: 1cm;
+#percentageVariable {
+  padding1: percentage(@percentBad); 
+  padding2: percentage(@percentString); 
+  padding3: percentage(@percentNumber);
+  padding4: percentage(@percentPercent);
+  padding5: percentage(@percentCm);
+}
+
+#floor {
+//  padding1: floor(something); - error evaluating function `floor`: argument must be a number
+//  padding2: floor("0.5"); - error evaluating function `floor`: argument must be a number
+  padding3: floor(0.8);
+  padding4: floor(1.5); 
+  padding5: floor(1.5%); 
+  padding6: floor(2.9px);
+  padding7: floor(3+0.03);
+}
+
+@floorBad: "string";
+@floorString: "0.5";
+@floorNumber: 0.8;
+@floorPercent: 1.5%;
+@floorCm: 2.02cm;
+#floorVariable {
+//  padding1: floor(@floorBad); - error evaluating function `floor`: argument must be a number
+//  padding2: floor(@floorString); - error evaluating function `floor`: argument must be a number
+  padding3: floor(@floorNumber);
+  padding4: floor(@floorPercent); 
+  padding5: floor(@floorCm);
+}
+
+#ceil {
+//  padding1: ceil(something); - error evaluating function `ceil`: argument must be a number
+//  padding2: ceil("0.5"); - error evaluating function `ceil`: argument must be a number
+  padding3: ceil(0.8);
+  padding4: ceil(1.5); 
+  padding5: ceil(1.5%); 
+  padding6: ceil(2.9px);
+  padding7: ceil(3+0.03);
+}
+
+@ceilBad: "string";
+@ceilString: "0.5";
+@ceilNumber: 0.8;
+@ceilPercent: 1.5%;
+@ceilCm: 2.02cm;
+#ceilVariable {
+//  padding1: ceil(@ceilBad); - error evaluating function `ceil`: argument must be a number
+//  padding2: ceil(@ceilString); - error evaluating function `ceil`: argument must be a number
+  padding3: ceil(@ceilNumber);
+  padding4: ceil(@ceilPercent); 
+  padding5: ceil(@ceilCm);
+}
+
+#round {
+//  padding1: round(something); - error evaluating function `round`: argument must be a number
+//  padding2: round("0.5"); - error evaluating function `round`: argument must be a number
+  padding3: round(0.8);
+  padding4: round(1.5); 
+  padding5: round(1.5%); 
+  padding6: round(2.9px);
+  padding7: round(3+0.03);
+}
+
+@roundBad: "string";
+@roundString: "0.5";
+@roundNumber: 0.8;
+@roundPercent: 1.5%;
+@roundCm: 2.02cm;
+#roundVariable {
+//  padding1: round(@roundBad); - error evaluating function `round`: argument must be a number
+//  padding2: round(@roundString); - error evaluating function `round`: argument must be a number
+  padding3: round(@roundNumber);
+  padding4: round(@roundPercent); //report bug - evaluates to 0%
+  padding5: round(@roundCm);
+}
+
+#caseInsensitivity-101 {
+  padding1: Percentage(0.3);
+  padding1: Floor(0.3);
+  padding1: Round(0.3);
+  padding1: Ceil(0.3);
+}
+
+documentation {
+  sqrt-cm: sqrt(25cm);
+  sqrt-percentage: sqrt(18.6%);
+  sqrt-zero-1: sqrt(0%);
+  sqrt-zero-2: sqrt(0);
+  sqrt-zero-negative: sqrt(-25);
+  abs-cm: abs(25cm);
+  abs-percentage: abs(-18.6%);
+  abs-zero-1: abs(-0%);
+  abs-zero-2: abs(0);
+  abs-zero-negative: abs(-25);
+  //trigonometric functions - sine
+  sin-pi-rounded: round(sin(3.1415926), 5);
+  sin-pi-exact-rounded: round(sin(pi()), 5);
+  sin-percent-0: sin(0%);
+  sin-one: sin(1);
+  sin-minus-one: sin(-1cm);
+  sin-deg-pi-rounded: round(sin(360deg), 5);
+  sin-deg-0: sin(0deg);
+  sin-deg-one: sin(1deg);
+  sin-deg-minus-one: sin(-1DEG);
+  sin-grad-pi-rounded: round(sin(400grad), 5);
+  sin-grad-0: sin(0grad);
+  sin-grad-one: sin(1grad);
+  sin-grad-minus-one: sin(-1grad);
+  //trigonometric functions - cosine
+  cos-pi-rounded: round(cos(3.1415926), 5);
+  cos-pi-exact-rounded: round(cos(pi()), 5);
+  cos-percent-0: cos(0%);
+  cos-one: cos(1);
+  cos-minus-one: cos(-1);
+  cos-deg-pi-rounded: round(cos(360deg), 5);
+  cos-deg-0: cos(0deg);
+  cos-deg-one: cos(1deg);
+  cos-deg-minus-one: cos(-1DEG);
+  cos-grad-pi-rounded: round(cos(400grad), 5);
+  cos-grad-0: cos(0grad);
+  cos-grad-one: cos(1grad);
+  cos-grad-minus-one: cos(-1grad);
+  //trigonometric functions - cosine
+//  tan-pi-half-rounded: round(tan(1.5707963267948966192313216916398), 5); - rounding differences most likely
+//  tan-pi-exact-half-rounded: round(tan(pi()/2), 5); - rounding differences most likely
+  tan-percent-0: tan(0%);
+  tan-one: tan(1);
+  tan-minus-one: tan(-1);
+  tan-deg-pi-half-rounded: round(tan(180deg), 5);
+  tan-deg-0: tan(0deg);
+  tan-deg-one: tan(1deg);
+  tan-deg-minus-one: tan(-1DEG);
+  tan-grad-pi-half-rounded: round(tan(200grad), 5);
+  tan-grad-0: tan(0grad);
+  tan-grad-one: tan(1grad);
+  tan-grad-minus-one: tan(-1grad);
+  asin-to-one: asin(0.8414709848078965);
+  asin-minus-one: asin(-0.8414709848078965);
+  asin-zero: asin(0);
+  asin-one: round(asin(1), 6);
+  asin-minus-one: round(asin(-1), 6);
+  asin-invalid: asin(2);
+  acos-to-one: acos(0.5403023058681398);
+  acos-minus: round(acos(-0.5403023058681398), 6);
+  acos-zero: round(acos(0), 6);
+  acos-one: round(acos(1), 6);
+  acos-minus-one: round(acos(-1), 6);
+  acos-invalid: acos(2);
+  atan-to-one: atan(1.5574077246549023);
+  atan-to-minus-one: atan(-1.5574077246549023);
+  atan-zero: atan(0);
+  atan-one: round(atan(1), 6);
+  atan-minus-one: round(atan(-1), 6);
+  atan-big: round(atan(22), 6);
+  pow-zero-zero: pow(0cm, 0px);
+  pow-negative-exponent: pow(25, -2);
+  pow-square-root: pow(25, 0.5);
+  pow-negative-base: pow(-25, 0.5);
+  pow-negative: pow(-25%, -0.5);
+  mod-zero-zero: mod(0cm, 0px);
+  mod-11-6: mod(11cm, 6px);
+  mod-negative-second: mod(11, -5);
+  mod-float-1: mod(25, 0.5);
+  mod-float-2: round(mod(25.6, 0.5), 3);
+  mod-negative-first: mod(-11, 5);
+  mod-negative: mod(-26%, -5);
+  convert-escape: convert(9s, ~"ms");
+  convert-string: convert(-9s, "ms");
+  convert-identifier: convert(9s, ms);
+  convert-identifier: convert(14cm, mm);
+  convert-incompatible: convert(9s, ms);
+  convert-unitless: convert(9, ms);
+//  convert-incorrect-second-1: convert(9s, 9);
+//  convert-incorrect-second-2: convert(9s, #00ff00);
+//  convert-incorrect-first-1: convert("9s", ms);
+//  convert-incorrect-first-2: convert(~"9s", ms);
+//  convert-incorrect-first-3: convert(#00ff00, ms);
+  unit-escape: unit(9s, ~"ms");
+  unit-string: unit(-9s, "ms");
+  unit-identifier: unit(9s, ms);
+  unit-identifier: unit(14cm, mm);
+  unit-incompatible: unit(9s, ms);
+  unit-unitless: unit(9, ms);
+//  unit-incorrect-second-1: unit(9s, 9);
+//  unit-incorrect-second-2: unit(9s, #00ff00);
+//  unit-incorrect-first-1: unit("9s", ms);
+//  unit-incorrect-first-2: unit(~"9s", ms);
+//  unit-incorrect-first-3: unit(#00ff00, ms);
+}
+
+#use-max {
+  max-0: max(3%);
+  max-1: max(3%, 8%);
+  max-3: max(1cm, 2mm);
+  max-4: max(200mm, 1cm);
+  max-5: max("junk", 1cm, 2mm);
+  max-6: max(2mm, 1cm, "junk");
+  max-7: max(3% 8%);
+  @list-comma: 1, 2, 3, 4;
+  @list-space: 5 6 7 8;
+  max-8: max(@list-comma);
+  max-9: max(@list-space);
+  max-10: max(@list-comma, @list-space);
+  @list-of-list: @list-comma, @list-space;
+  max-11: max(@list-of-list);
+  max-12: max(1, 2cm, 3mm);
+  max-13: max(5, 4cm, 3mm);
+  max-14: max("junk", "junk");
+  max-error-1: max(); 
+  max-error-2: max(3%, 2mm, 8%, 1cm); 
+}
+
+#use-min {
+  min-0: min(3%);
+  min-1: min(3%, 8%);
+  min-3: min(1cm, 2mm);
+  min-4: min(200mm, 1cm);
+  min-5: min("junk", 1cm, 2mm);
+  min-6: min(2mm, 1cm, "junk");
+  min-7: min(3% 8%);
+  @list-comma: 1, 2, 3, 4;
+  @list-space: 5 6 7 8;
+  min-8: min(@list-comma);
+  min-9: min(@list-space);
+  min-10: min(@list-comma, @list-space);
+  @list-of-list: @list-comma, @list-space;
+  min-11: min(@list-of-list);
+  min-12: min(1, 2cm, 3mm);
+  min-13: min(5, 4cm, 3mm);
+  min-14: min("junk", "junk");
+  min-error-1: min(); 
+  min-error-2: min(3%, 2mm, 8%, 1cm); 
+}
+
+#use-length {
+  length: length();
+  length-1: length("one");
+  length-2: length(1 2 3);
+  length-3: length(1, 2, 3);
+  length-4: length(1 2, 3);
+  length-5: length(1, 2, 3 4 5 6);
+  @indirectly: 1, 2, 3;
+  length-6: length(@indirectly);
+  length-7: length("one" "two");
+  length-8: length("one", "two");
+}
