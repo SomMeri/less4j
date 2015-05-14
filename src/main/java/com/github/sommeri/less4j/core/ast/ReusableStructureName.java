@@ -21,6 +21,11 @@ public class ReusableStructureName extends ASTCssNode {
     this.nameParts=nameParts;
   }
 
+  public ReusableStructureName(HiddenTokenAwareTree underlyingStructure, ElementSubsequent namePart) {
+    this(underlyingStructure);
+    this.nameParts.add(namePart);
+  }
+
   public boolean isInterpolated() {
     for (ElementSubsequent namePart : nameParts) {
       if (namePart.isInterpolated())

@@ -36,10 +36,6 @@ public class Antlr4_TermBuilder {
   }
 
   public Expression buildFromTerm(ParseTree token) {
-    return buildFromTerm(token, 0);
-  }
-
-  private Expression buildFromTerm(ParseTree token, int offsetChildIndx) {
     if (token instanceof TerminalNode) {
       Token symbol = ((TerminalNode) token).getSymbol();
 

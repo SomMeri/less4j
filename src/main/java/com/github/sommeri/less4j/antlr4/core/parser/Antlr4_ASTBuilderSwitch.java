@@ -16,12 +16,17 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
+import com.github.sommeri.less4j.core.ast.ComparisonExpression;
+import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.CssClass;
 import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
+import com.github.sommeri.less4j.core.ast.DetachedRuleset;
+import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EmptyExpression;
@@ -32,6 +37,8 @@ import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
+import com.github.sommeri.less4j.core.ast.Guard;
+import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
@@ -40,6 +47,7 @@ import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
+import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
@@ -49,6 +57,8 @@ import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
+import com.github.sommeri.less4j.core.ast.ReusableStructure;
+import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
@@ -62,18 +72,22 @@ import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
-import com.github.sommeri.less4j.core.parser.ConversionUtils;
-import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
-import com.github.sommeri.less4j.core.parser.LessG4Lexer;
+import com.github.sommeri.less4j.core.parser.*;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AllNumberKindsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AttribContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AttribOrPseudoContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.CollectorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CombinatorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Combinator_wsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.CommaSplitMixinReferenceArgumentsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.CommaSplitReusableStructureArgumentsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.CompareOperatorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CssClassContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CssClassOrIdContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationWithSemicolonContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.DetachedRulesetContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.DetachedRulesetReferenceContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ElementNameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ElementNamePartContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ElementSubsequentContext;
@@ -93,6 +107,8 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.FunctionParametersCont
 import com.github.sommeri.less4j.core.parser.LessG4Parser.General_bodyContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.General_body_memberContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.General_body_member_no_semiContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.GuardConditionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.GuardContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.HexColorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdSelectorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentContext;
@@ -104,11 +120,19 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Ident_special_pseudocl
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentifierValueTermContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentifierValueTermHelperContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Mandatory_wsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorNoWhitespaceListContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorNoWhitespaceList_helperContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprLowPriorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathOperatorHighPriorContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceArgument_no_commaContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceArgument_with_commaContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceArgumentsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceWithSemiContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.NamedFunctionParameterContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.NamespaceReferenceContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.NamespaceReferenceWithSemiContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.NestedAppenderContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Non_combinator_selector_blockContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.NthContext;
@@ -119,9 +143,22 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.PropertyContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PropertyNamePartContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PseudoContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Pseudoparameter_termValueContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ReferenceSeparatorContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureArgumentsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureNameContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.RsAtNameContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.RsParameterWithDefault_no_commaContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.RsParameterWithDefault_with_commaContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.RsParameterWithoutDefaultContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.RsParameter_no_commaContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.RsParameter_with_commaContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.RsPatternContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.RuleSetContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.SelectorAttributeOperatorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.SelectorContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SemiSplitMixinReferenceArgumentsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SemiSplitReusableStructureArgumentsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.SimpleSelectorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Special_functionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.StyleSheetContext;
@@ -136,7 +173,6 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.VariabledeclarationWit
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariablenameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariablereferenceContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.WsContext;
-import com.github.sommeri.less4j.core.parser.LessG4Visitor;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
@@ -308,6 +344,10 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public Expression visitExpression_full(Expression_fullContext ctx) {
+    DetachedRulesetContext detachedRuleset = ctx.detachedRuleset();
+    if (detachedRuleset!=null)
+      return visitDetachedRuleset(detachedRuleset);
+      
     return visitExpression_comma_separated_list(ctx.expression_comma_separated_list());
   }
 
@@ -665,6 +705,26 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       Expression value = (Expression) next.mathExprLowPrior().accept(this);
       result = new BinaryExpression(new HiddenTokenAwareTreeAdapter(next), result, operator, value);
     }
+
+    return result;
+  }
+
+  @Override
+  public Expression visitMathExprHighPrior(MathExprHighPriorContext ctx) {
+    //    public Expression visitMathExprHighPriorNoWhitespaceList(MathExprHighPriorNoWhitespaceListContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    Iterator<MathExprLowPriorContext> expressionCtx = ctx.mathExprLowPrior().iterator();
+    Expression result = visitMathExprLowPrior(expressionCtx.next());
+
+    Iterator<PlusOrMinusContext> operators = ctx.plusOrMinus().iterator();
+    while (expressionCtx.hasNext() && operators.hasNext()) {
+      BinaryExpressionOperator operator = visitPlusOrMinus(operators.next());
+      Expression value = visitMathExprLowPrior(expressionCtx.next());
+      result = new BinaryExpression(token, result, operator, value);
+    }
+    if (expressionCtx.hasNext() || operators.hasNext())
+      throw new BugHappened(GRAMMAR_MISMATCH, token);
 
     return result;
   }
@@ -1192,6 +1252,341 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     return new VariableDeclaration(token, variable, value);
   }
 
+  @Override
+  public ASTCssNode visitReusableStructure(ReusableStructureContext ctx) {
+    HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
+    ReusableStructure result = new ReusableStructure(token);
+
+    result.addName(visitReusableStructureName(ctx.reusableStructureName()));
+    ReusableStructureArgumentsContext argumentsCtx = ctx.reusableStructureArguments();
+    if (argumentsCtx != null) {
+      GeneralBody arguments = visitReusableStructureArguments(argumentsCtx);
+      for (ASTCssNode member : arguments.getMembers()) {
+        result.addParameter(member);
+      }
+    }
+
+    List<GuardContext> guards = ctx.guard();
+    if (guards != null) {
+      for (GuardContext guard : guards) {
+        result.addGuard(visitGuard(guard));
+      }
+    }
+
+    result.setBody(visitGeneral_body(ctx.general_body()));
+
+    return result;
+  }
+
+  @Override
+  public Guard visitGuard(GuardContext ctx) {
+    HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
+    Guard result = new Guard(token);
+    List<GuardConditionContext> conditions = ctx.guardCondition();
+    if (conditions != null) {
+      for (GuardConditionContext condition : conditions) {
+        result.addCondition(visitGuardCondition(condition));
+      }
+    }
+
+    return result;
+  }
+
+  @Override
+  public GuardCondition visitGuardCondition(GuardConditionContext ctx) {
+    // (ident ws)? LPAREN ws mathExprHighPrior (ws compareOperator ws mathExprHighPrior)? ws RPAREN;
+    HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    boolean isNegated = false;
+    IdentContext negationCtx = ctx.ident();
+    if (negationCtx != null) {
+      validateGuardNegation(negationCtx);
+      isNegated = true;
+    }
+
+    Expression condition = visitMathExprHighPrior(ctx.leftE);
+    if (ctx.rightE!=null) {
+      Expression rightE = visitMathExprHighPrior(ctx.rightE);
+      condition = new ComparisonExpression(token, condition, visitCompareOperator(ctx.compareOperator()), rightE);
+    }
+
+    return new GuardCondition(token, isNegated, condition);
+  }
+
+  @Override
+  public ComparisonExpressionOperator visitCompareOperator(CompareOperatorContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    ParseTree child = ctx.getChild(0);
+    if (!(child instanceof TerminalNode))
+      throw new BugHappened(GRAMMAR_MISMATCH, token);
+    
+    
+    TerminalNode terminal = (TerminalNode) child;
+    switch (terminal.getSymbol().getType()) {
+    case LessG4Lexer.GREATER:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.GREATER);
+
+    case LessG4Lexer.GREATER_OR_EQUAL:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.GREATER_OR_EQUAL);
+
+    case LessG4Lexer.OPEQ:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.OPEQ);
+
+    case LessG4Lexer.LOWER_OR_EQUAL:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.LOWER_OR_EQUAL);
+
+    case LessG4Lexer.LOWER:
+      return new ComparisonExpressionOperator(token, ComparisonExpressionOperator.Operator.LOWER);
+
+    default:
+      break;
+    }
+
+    throw new BugHappened(GRAMMAR_MISMATCH, token);
+  }
+
+  public void validateGuardNegation(IdentContext ctx) {
+    String operator = ctx.getText().trim();
+    if (!"not".equals(operator))
+      throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(ctx));
+  }
+
+  @Override
+  public GeneralBody visitReusableStructureArguments(ReusableStructureArgumentsContext ctx) {
+    GeneralBody arguments = null;
+    SemiSplitReusableStructureArgumentsContext semiSplit = ctx.semiSplitReusableStructureArguments();
+    if (semiSplit != null) {
+      return visitSemiSplitReusableStructureArguments(semiSplit);
+    }
+    CommaSplitReusableStructureArgumentsContext commaSplit = ctx.commaSplitReusableStructureArguments();
+    return visitCommaSplitReusableStructureArguments(commaSplit);
+  }
+
+  @Override
+  public GeneralBody visitCommaSplitReusableStructureArguments(CommaSplitReusableStructureArgumentsContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    GeneralBody result = new GeneralBody(token);
+    List<RsParameter_no_commaContext> parameters = ctx.rsParameter_no_comma();
+    for (RsParameter_no_commaContext parameter : parameters) {
+      result.addMember(parameter.accept(this));
+    }
+    return result;
+  }
+
+  @Override
+  public GeneralBody visitSemiSplitReusableStructureArguments(SemiSplitReusableStructureArgumentsContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    GeneralBody result = new GeneralBody(token);
+    List<RsParameter_with_commaContext> parameters = ctx.rsParameter_with_comma();
+    for (RsParameter_with_commaContext parameter : parameters) {
+      result.addMember(parameter.accept(this));
+    }
+    return result;
+  }
+
+  @Override
+  public ASTCssNode visitRsParameter_no_comma(RsParameter_no_commaContext ctx) {
+    return ctx.getChild(0).accept(this);
+  }
+
+  @Override
+  public ASTCssNode visitRsParameter_with_comma(RsParameter_with_commaContext ctx) {
+    return ctx.getChild(0).accept(this);
+  }
+
+  @Override
+  public ASTCssNode visitRsParameterWithoutDefault(RsParameterWithoutDefaultContext ctx) {
+    //atName | collector | rsPattern;
+    return ctx.getChild(0).accept(this);
+  }
+
+  @Override
+  public ASTCssNode visitRsParameterWithDefault_no_comma(RsParameterWithDefault_no_commaContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    TerminalNode nameCtx = ctx.AT_NAME();
+    Variable name = new Variable(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText());
+    Expression value = visitExpression_space_separated_list(ctx.value);
+
+    return new ArgumentDeclaration(token, name, value);
+  }
+
+  @Override
+  public ASTCssNode visitRsParameterWithDefault_with_comma(RsParameterWithDefault_with_commaContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    TerminalNode nameCtx = ctx.AT_NAME();
+    Variable name = new Variable(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText());
+    Expression value = visitExpression_full(ctx.value);
+
+    return new ArgumentDeclaration(token, name, value);
+  }
+
+  @Override
+  public ASTCssNode visitCollector(CollectorContext ctx) {
+    HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
+    return new ArgumentDeclaration(token, new Variable(token, "@"), null, true);
+  }
+
+  @Override
+  public ASTCssNode visitRsPattern(RsPatternContext ctx) {
+    //    rsPattern: (( (plusOrMinus ws)? (value_term)
+    //        ) | (
+    //           unsigned_value_term
+    //           | hexColor
+    //        ))
+    //        ;
+    PlusOrMinusContext sign = ctx.sign;
+    //last child is value
+    int valueIndx = ctx.getChildCount() - 1;
+    ParseTree value = ctx.getChild(valueIndx);
+    Expression expression = termBuilder.buildFromSignedTerm(sign, value);
+    return expression;
+  }
+
+  @Override
+  public ASTCssNode visitRsAtName(RsAtNameContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    TerminalNode nameCtx = ctx.AT_NAME();
+    Variable name = new Variable(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText());
+
+    return new ArgumentDeclaration(token, name, null, ctx.DOT3() != null);
+  }
+
+  @Override
+  public ReusableStructureName visitReusableStructureName(ReusableStructureNameContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    ElementSubsequent name = visitCssClassOrId(ctx.cssClassOrId());
+    return new ReusableStructureName(token, name);
+  }
+
+  @Override
+  public MixinReference visitMixinReferenceWithSemi(MixinReferenceWithSemiContext ctx) {
+    return visitMixinReference(ctx.mixinReference());
+  }
+
+  @Override
+  public MixinReference visitMixinReference(MixinReferenceContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    //reusableStructureName (ws LPAREN (ws mixinReferenceArguments)? ws RPAREN ws)? (ws IMPORTANT_SYM)?;
+    MixinReference result = new MixinReference(token);
+
+    ReusableStructureName name = visitReusableStructureName(ctx.reusableStructureName());
+    result.setFinalName(name);
+
+    MixinReferenceArgumentsContext argumentsCtx = ctx.mixinReferenceArguments();
+    if (argumentsCtx != null) {
+      GeneralBody arguments = visitMixinReferenceArguments(argumentsCtx);
+      for (ASTCssNode child : arguments.getMembers()) {
+        if (child instanceof Expression) {
+          Expression expression = (Expression) child;
+          result.addPositionalParameter(expression);
+        } else if (child instanceof VariableDeclaration) {
+          VariableDeclaration namedValue = (VariableDeclaration) child;
+          result.addNamedParameter(namedValue);
+        }
+      }
+    }
+
+    if (null != ctx.IMPORTANT_SYM())
+      result.setImportant(true);
+
+    return result;
+  }
+
+  @Override
+  public MixinReference visitNamespaceReference(NamespaceReferenceContext ctx) {
+    MixinReference reference = visitMixinReference(ctx.mixinReference());
+    List<ReusableStructureNameContext> reusableStructureName = ctx.reusableStructureName();
+    for (ReusableStructureNameContext name : reusableStructureName) {
+      reference.addName(visitReusableStructureName(name));
+    }
+
+    return reference;
+  }
+
+  @Override
+  public MixinReference visitNamespaceReferenceWithSemi(NamespaceReferenceWithSemiContext ctx) {
+    return visitNamespaceReference(ctx.namespaceReference());
+  }
+
+  @Override
+  public ASTCssNode visitReferenceSeparator(ReferenceSeparatorContext ctx) {
+    throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(ctx));
+  }
+
+  @Override
+  public GeneralBody visitMixinReferenceArguments(MixinReferenceArgumentsContext ctx) {
+    SemiSplitMixinReferenceArgumentsContext semiSplit = ctx.semiSplitMixinReferenceArguments();
+    if (semiSplit != null)
+      return visitSemiSplitMixinReferenceArguments(semiSplit);
+
+    return visitCommaSplitMixinReferenceArguments(ctx.commaSplitMixinReferenceArguments());
+  }
+
+  @Override
+  public GeneralBody visitSemiSplitMixinReferenceArguments(SemiSplitMixinReferenceArgumentsContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    GeneralBody result = new GeneralBody(token);
+    List<MixinReferenceArgument_with_commaContext> parameters = ctx.mixinReferenceArgument_with_comma();
+    for (MixinReferenceArgument_with_commaContext parameter : parameters) {
+      result.addMember(parameter.accept(this));
+    }
+    return result;
+  }
+
+  @Override
+  public GeneralBody visitCommaSplitMixinReferenceArguments(CommaSplitMixinReferenceArgumentsContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    GeneralBody result = new GeneralBody(token);
+    List<MixinReferenceArgument_no_commaContext> parameters = ctx.mixinReferenceArgument_no_comma();
+    for (MixinReferenceArgument_no_commaContext parameter : parameters) {
+      result.addMember(parameter.accept(this));
+    }
+    return result;
+  }
+
+  @Override
+  public ASTCssNode visitMixinReferenceArgument_with_comma(MixinReferenceArgument_with_commaContext ctx) {
+    Expression_fullContext posValue = ctx.posValue;
+    if (posValue != null)
+      return posValue.accept(this);
+
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    String name = ctx.variablename().getText();
+    Expression value = visitExpression_full(ctx.namedValue);
+    return new VariableDeclaration(token, new Variable(token, name), value);
+  }
+
+  @Override
+  public ASTCssNode visitMixinReferenceArgument_no_comma(MixinReferenceArgument_no_commaContext ctx) {
+    Expression_space_separated_listContext posValue = ctx.posValue;
+    if (posValue != null)
+      return posValue.accept(this);
+
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    String name = ctx.variablename().getText();
+    Expression value = visitExpression_space_separated_list(ctx.namedValue);
+    return new VariableDeclaration(token, new Variable(token, name), value);
+  }
+
+  @Override
+  public DetachedRuleset visitDetachedRuleset(DetachedRulesetContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    General_bodyContext bodyCtx = ctx.general_body();
+    GeneralBody body = visitGeneral_body(bodyCtx);
+    return new DetachedRuleset(token, body);
+  }
+
+  @Override
+  public DetachedRulesetReference visitDetachedRulesetReference(DetachedRulesetReferenceContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    TerminalNode nameCtx = ctx.AT_NAME();
+    HiddenTokenAwareTree vToken = new HiddenTokenAwareTreeAdapter(nameCtx);
+    return new DetachedRulesetReference(token, new Variable(vToken, nameCtx.getText()));
+  }
+
   /*
    * ***************************UNFINISHED HERE*******************************************
    */
@@ -1207,6 +1602,9 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     return null;
   }
 
+  /*
+   * ***************************part 2*******************************************
+   */
 }
 
 class HiddenTokenAwareTreeAdapter extends HiddenTokenAwareTree {
@@ -1255,10 +1653,10 @@ class HiddenTokenAwareTreeAdapter extends HiddenTokenAwareTree {
   public int getLine() {
     return start.getLine();
   }
-  
+
   @Override
   public int getCharPositionInLine() {
     return start.getCharPositionInLine();
   }
-  
+
 }
