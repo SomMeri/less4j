@@ -32,7 +32,7 @@ public class NestedSelectorAppender extends SelectorPart {
   }
 
   public boolean isDirectlyAfter() {
-    return directlyAfter;
+    return directlyAfter && !hasLeadingCombinator();
   }
 
   public void setDirectlyAfter(boolean directlyAfter) {

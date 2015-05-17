@@ -34,6 +34,7 @@ import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
+import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
@@ -43,10 +44,18 @@ import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
+import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
+import com.github.sommeri.less4j.core.ast.Media;
+import com.github.sommeri.less4j.core.ast.MediaExpression;
+import com.github.sommeri.less4j.core.ast.MediaExpressionFeature;
+import com.github.sommeri.less4j.core.ast.MediaQuery;
+import com.github.sommeri.less4j.core.ast.Medium;
+import com.github.sommeri.less4j.core.ast.MediumModifier;
+import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
@@ -63,6 +72,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorAttribute;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
+import com.github.sommeri.less4j.core.ast.SelectorCombinator.CombinatorType;
 import com.github.sommeri.less4j.core.ast.SelectorOperator;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
@@ -84,6 +94,7 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.CommaSplitReusableStru
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CompareOperatorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CssClassContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CssClassOrIdContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.CssMediaExpressionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationWithSemicolonContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DetachedRulesetContext;
@@ -119,12 +130,20 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Ident_nthContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Ident_special_pseudoclassesContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentifierValueTermContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentifierValueTermHelperContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.InterpolatedMediaExpressionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Mandatory_wsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorNoWhitespaceListContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorNoWhitespaceList_helperContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprLowPriorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathOperatorHighPriorContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MediaExpressionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MediaFeatureContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MediaQueryContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.Media_in_general_bodyContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.Media_queries_declarationContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.Media_top_levelContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.MediumContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceArgument_no_commaContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceArgument_with_commaContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MixinReferenceArgumentsContext;
@@ -165,6 +184,8 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.StyleSheetContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.TermContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Term_no_preceeding_whitespaceContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Term_only_functionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_body_with_declarationContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_body_with_declaration_memberContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_elementContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Unsigned_value_termContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Value_termContext;
@@ -250,10 +271,10 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   private ListExpressionOperator.Operator toDeclarationMergeOperator(DeclarationContext ctx) {
-    if (ctx.PLUS() != null)
-      return ListExpressionOperator.Operator.COMMA;
     if (ctx.UNDERSCORE() != null)
       return ListExpressionOperator.Operator.EMPTY_OPERATOR;
+    if (ctx.PLUS() != null)
+      return ListExpressionOperator.Operator.COMMA;
 
     return null;
   }
@@ -344,10 +365,6 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public Expression visitExpression_full(Expression_fullContext ctx) {
-    DetachedRulesetContext detachedRuleset = ctx.detachedRuleset();
-    if (detachedRuleset!=null)
-      return visitDetachedRuleset(detachedRuleset);
-      
     return visitExpression_comma_separated_list(ctx.expression_comma_separated_list());
   }
 
@@ -481,9 +498,10 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   @Override
-  public ASTCssNode visitVariablereference(VariablereferenceContext ctx) {
-    if (null != ctx.variablename())
-      return ctx.variablename().accept(this);
+  public Variable visitVariablereference(VariablereferenceContext ctx) {
+    VariablenameContext variablename = ctx.variablename();
+    if (null != variablename)
+      return visitVariablename(variablename);
 
     TerminalNode indirect = ctx.INDIRECT_VARIABLE();
     if (null != indirect) {
@@ -1025,12 +1043,14 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
     Iterator<Combinator_wsContext> combinators = ctx.combinator_ws().iterator();
     Iterator<Non_combinator_selector_blockContext> blocks = ctx.non_combinator_selector_block().iterator();
-
+    
+    boolean first = true;
     if (ctx.leading == null && blocks.hasNext()) {
       Non_combinator_selector_blockContext blockCtx = blocks.next();
       Selector block = visitNon_combinator_selector_block(blockCtx);
       result.addParts(block.getParts());
-    }
+      first = false;
+    } 
 
     while (combinators.hasNext() && blocks.hasNext()) {
       Combinator_wsContext combinatorCtx = combinators.next();
@@ -1043,8 +1063,11 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       if (parts.isEmpty()) {
         throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(blockCtx));
       }
-      parts.get(0).setLeadingCombinator(leadingCombinator);
+      if (!first || leadingCombinator.getCombinatorType()!=CombinatorType.DESCENDANT)
+        parts.get(0).setLeadingCombinator(leadingCombinator);
+      
       result.addParts(parts);
+      first = false;
     }
 
     if (combinators.hasNext() || blocks.hasNext()) {
@@ -1170,8 +1193,11 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public ASTCssNode visitNestedAppender(NestedAppenderContext ctx) {
     //FIXME: (antlr4) (deal with spaces before and after)
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
-    boolean directlyBefore = false;
-    boolean directlyAfter = false;
+    
+    //FIXME: (antlr4) (deal with spaces before and after and remove these two options - only combiner should influence it)
+    boolean directlyBefore = true;
+    boolean directlyAfter = true;
+    
     SelectorCombinator leadingCombinator = null;
     return new NestedSelectorAppender(token, directlyBefore, directlyAfter, leadingCombinator);
   }
@@ -1584,7 +1610,13 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
     TerminalNode nameCtx = ctx.AT_NAME();
     HiddenTokenAwareTree vToken = new HiddenTokenAwareTreeAdapter(nameCtx);
-    return new DetachedRulesetReference(token, new Variable(vToken, nameCtx.getText()));
+    
+    DetachedRulesetReference result = new DetachedRulesetReference(token, new Variable(vToken, nameCtx.getText()));
+    if (ctx.LPAREN()==null || ctx.RPAREN()==null) {
+      problemsHandler.detachedRulesetCallWithoutParentheses(result);
+    } 
+
+    return result;
   }
 
   /*
@@ -1605,6 +1637,159 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   /*
    * ***************************part 2*******************************************
    */
+  @Override
+  public GeneralBody visitTop_level_body_with_declaration(Top_level_body_with_declarationContext ctx) {
+    TerminalNode lbraceToken = ctx.LBRACE();
+    SyntaxOnlyElement lbrace = new SyntaxOnlyElement(new HiddenTokenAwareTreeAdapter(lbraceToken.getSymbol()), lbraceToken.getText().trim());
+    TerminalNode rbraceToken = ctx.RBRACE();
+    SyntaxOnlyElement rbrace = new SyntaxOnlyElement(new HiddenTokenAwareTreeAdapter(rbraceToken.getSymbol()), rbraceToken.getText().trim());
+
+    List<ASTCssNode> members = new ArrayList<ASTCssNode>();
+    List<Top_level_body_with_declaration_memberContext> childsCtxs = ctx.top_level_body_with_declaration_member();
+    for (Top_level_body_with_declaration_memberContext childCtx : childsCtxs) {
+      members.add(childCtx.accept(this));
+    }
+    GeneralBody result = new GeneralBody(new HiddenTokenAwareTreeAdapter(ctx), lbrace, rbrace, members);
+    return result;
+  }
+
+  @Override
+  public Media visitMedia_top_level(Media_top_levelContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    return doVisitMedia(token, ctx.media_queries_declaration(), ctx.body);
+  }
+
+  @Override
+  public Media visitMedia_in_general_body(Media_in_general_bodyContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    return doVisitMedia(token, ctx.media_queries_declaration(), ctx.body);
+  }
+
+  private Media doVisitMedia(HiddenTokenAwareTree token, Media_queries_declarationContext queriesCtx, ParserRuleContext body) {
+    Media result = visitMedia_queries_declaration(queriesCtx);
+    result.setUnderlyingStructure(token);
+    result.setBody((GeneralBody)body.accept(this));
+    return result;
+  }
+
+  @Override
+  public Media visitMedia_queries_declaration(Media_queries_declarationContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    Media result = new Media(token);
+    result.addMediaQuery(visitMediaQuery(ctx.firstQuery));
+   
+    Iterator<TerminalNode> comma = ctx.COMMA().iterator();
+    Iterator<MediaQueryContext> queriesCtx = ctx.tail!=null? ctx.tail.iterator() : new ArrayList<MediaQueryContext>().iterator();
+    
+    while (comma.hasNext() && queriesCtx.hasNext()) {
+      result.addMediaQuery(visitMediaQuery(queriesCtx.next()));
+      comma.next();
+    }
+    
+    if (comma.hasNext() || queriesCtx.hasNext())
+      throw new BugHappened(GRAMMAR_MISMATCH, token);
+
+    return result;
+  }
+
+  @Override
+  public MediaQuery visitMediaQuery(MediaQueryContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+   
+    MediumContext mediumCtx = ctx.medium();
+    Medium medium = mediumCtx!=null ? visitMedium(mediumCtx) : null;
+    
+    List<MediaExpression> expressions = new ArrayList<MediaExpression>();
+    List<MediaExpressionContext> mediaExpressionsCtx = ctx.mediaExpression();
+    for (MediaExpressionContext context : mediaExpressionsCtx) {
+      expressions.add(visitMediaExpression(context));
+    }
+    return new MediaQuery(token, medium,  expressions);
+  }
+
+  @Override
+  public Medium visitMedium(MediumContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    int childsCnt = ctx.getChildCount();
+    if (childsCnt == 1) {
+      ParseTree type = ctx.getChild(0);
+      HiddenTokenAwareTree typeToken = new HiddenTokenAwareTreeAdapter(type);
+      return new Medium(token, new MediumModifier(typeToken), new MediumType(typeToken, type.getText()));
+    }
+
+    ParseTree type = ctx.getChild(childsCnt-1);
+    HiddenTokenAwareTree typeToken = new HiddenTokenAwareTreeAdapter(type);
+    return new Medium(token, toMediumModifier(ctx.getChild(0)), new MediumType(typeToken, type.getText()));
+  }
+
+  private MediumModifier toMediumModifier(ParseTree ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    String modifier = ctx.getText().toLowerCase();
+
+    if ("not".equals(modifier))
+      return new MediumModifier(token, MediumModifier.Modifier.NOT);
+
+    if ("only".equals(modifier))
+      return new MediumModifier(token, MediumModifier.Modifier.ONLY);
+
+    throw new IllegalStateException("Unexpected medium modifier: " + modifier);
+  }
+
+  @Override
+  public MediaExpression visitMediaExpression(MediaExpressionContext ctx) {
+    CssMediaExpressionContext css = ctx.cssMediaExpression();
+    if (css!=null)
+      return visitCssMediaExpression(css);
+
+    InterpolatedMediaExpressionContext interpolated = ctx.interpolatedMediaExpression();
+    if (interpolated!=null)
+      return visitInterpolatedMediaExpression(interpolated);
+
+    throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(ctx));
+  }
+
+  @Override
+  public MediaExpression visitInterpolatedMediaExpression(InterpolatedMediaExpressionContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    
+    List<VariablereferenceContext> children = ctx.variablereference();
+    List<Expression> expressions = new ArrayList<Expression>();
+    for (VariablereferenceContext child : children) {
+      Variable expression = visitVariablereference(child);
+      expressions.add(expression);
+    }
+        
+    ListExpression list = new ListExpression(token, expressions, new ListExpressionOperator(token, ListExpressionOperator.Operator.EMPTY_OPERATOR));
+    return new InterpolatedMediaExpression(token, list);
+  }
+
+  @Override
+  public MediaExpression visitCssMediaExpression(CssMediaExpressionContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    MediaFeatureContext mediaFeatureCtx = ctx.mediaFeature();
+    Expression_fullContext expression_full = ctx.expression_full();
+    
+    MediaExpressionFeature mediaFeature = visitMediaFeature(mediaFeatureCtx);
+    if (expression_full==null)
+      return new FixedMediaExpression(token, mediaFeature, null);
+
+    // FIXME (antlr4) (comments) colon 
+    Expression expression = visitExpression_full(expression_full);
+    return new FixedMediaExpression(token, mediaFeature, expression);
+  }
+
+  @Override
+  public MediaExpressionFeature visitMediaFeature(MediaFeatureContext ctx) {
+    HiddenTokenAwareTree featureNode = new HiddenTokenAwareTreeAdapter(ctx);
+    return new MediaExpressionFeature(featureNode, ctx.getText());
+  }
+
+  @Override
+  public ASTCssNode visitTop_level_body_with_declaration_member(Top_level_body_with_declaration_memberContext ctx) {
+    return ctx.getChild(0).accept(this);
+  }
+
 }
 
 class HiddenTokenAwareTreeAdapter extends HiddenTokenAwareTree {

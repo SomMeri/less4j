@@ -155,7 +155,12 @@ public class SelectorsManipulator {
   }
 
   private List<Selector> joinAll(List<Selector> firsts, Selector second, SelectorCombinator beforeAppenderCombinator, boolean appenderDirectlyPlaced) {
+    System.out.println("--------------------------");
+    System.out.println("beforeAppenderCombinator: " + beforeAppenderCombinator);
+    System.out.println("appenderDirectlyPlaced: " + appenderDirectlyPlaced);
+    System.out.println("second: " + second);
     boolean directJoin = isDirect(beforeAppenderCombinator, appenderDirectlyPlaced, second);
+    System.out.println("directJoin: " + directJoin);
     if (directJoin)
       return directJoinAll(firsts, second);
     else

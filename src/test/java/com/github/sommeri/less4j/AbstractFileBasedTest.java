@@ -19,6 +19,7 @@ import org.junit.runners.Parameterized;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.antlr4.Antlr4_ThreadUnsafeLessCompiler;
 import com.github.sommeri.less4j.commandline.CommandLinePrint;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 import com.github.sommeri.less4j.utils.SourceMapValidator;
@@ -147,7 +148,8 @@ public abstract class AbstractFileBasedTest {
   }
 
   protected LessCompiler getCompiler() {
-    return new ThreadUnsafeLessCompiler();
+//    return new ThreadUnsafeLessCompiler();
+    return new Antlr4_ThreadUnsafeLessCompiler();
   }
 
   protected String expectedCss() {

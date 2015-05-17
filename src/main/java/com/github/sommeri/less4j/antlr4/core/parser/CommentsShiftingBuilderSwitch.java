@@ -8,8 +8,12 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Comment;
+import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.parser.LessG4Lexer;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.General_body_memberContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_elementContext;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
 public class CommentsShiftingBuilderSwitch extends Antlr4_ASTBuilderSwitch {
@@ -27,6 +31,21 @@ public class CommentsShiftingBuilderSwitch extends Antlr4_ASTBuilderSwitch {
     inheritCommentsFromToken(result, ctx);
     return result;
   }
+
+  @Override
+  public ASTCssNode visitDeclaration(DeclarationContext ctx) {
+    ASTCssNode result = super.visitDeclaration(ctx);
+    inheritCommentsFromToken(result, ctx);
+    return result;
+  }
+
+  @Override
+  public ASTCssNode visitGeneral_body_member(General_body_memberContext ctx) {
+    ASTCssNode result = super.visitGeneral_body_member(ctx);
+    inheritCommentsFromToken(result, ctx);
+    return result;
+  }
+
 
   private void inheritCommentsFromToken(ASTCssNode node, ParserRuleContext ctx) {
     NodeCommentsHolder comments = treeComments.get(ctx);
