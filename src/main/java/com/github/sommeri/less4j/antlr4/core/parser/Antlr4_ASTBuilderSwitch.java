@@ -503,7 +503,8 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public ASTCssNode visitTerminal(TerminalNode node) {
-    throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(node));
+    //FIXME: (antlr4) print type by name
+    throw new BugHappened(SHOULD_NOT_VISIT + ". Terminal "+ node.getSymbol().getType() +" " + node.getText(), new HiddenTokenAwareTreeAdapter(node));
   }
 
   @Override
@@ -1053,7 +1054,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       return new PseudoClass(token, pseudoName);
     }
     ParseTree parameter = ctx.getChild(paramenterIndx);
-    if (isTokenOfType(parameter, LessG4Lexer.INDIRECT_VARIABLE))
+    if (isTokenOfType(parameter, LessG4Lexer.INTERPOLATED_VARIABLE))
       return new PseudoClass(token, pseudoName, toInterpolabledVariable(parameter, parameter.getText()));
 
     return new PseudoClass(token, pseudoName, parameter.accept(this));
@@ -1232,7 +1233,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public EscapedSelector visitEscapedSelectorOldSyntax(EscapedSelectorOldSyntaxContext ctx) {
     //FIXME: (antlr4) (comments)
     //token.pushHiddenToKids();
-    HiddenTokenAwareTree valueToken = new HiddenTokenAwareTreeAdapter(ctx);
+    HiddenTokenAwareTree valueToken = new HiddenTokenAwareTreeAdapter(ctx.VALUE_ESCAPE());
     String quotedText = ctx.VALUE_ESCAPE().getText();
     return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), "" + quotedText.charAt(1), null);
   }
