@@ -306,7 +306,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     InterpolableName propertyName = visitProperty(ctx.property());
     ListExpressionOperator.Operator mergeOperator = toDeclarationMergeOperator(ctx);
     Expression_fullContext valueCtx = ctx.expression_full();
-    Expression expression = valueCtx==null? null: visitExpression_full(valueCtx);
+    Expression expression = valueCtx == null ? null : visitExpression_full(valueCtx);
 
     Declaration declaration = new Declaration(new HiddenTokenAwareTreeAdapter(ctx.start), propertyName, expression, mergeOperator);
     return declaration;
@@ -506,7 +506,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public ASTCssNode visitTerminal(TerminalNode node) {
     //FIXME: (antlr4) print type by name
-    throw new BugHappened(SHOULD_NOT_VISIT + ". Terminal "+ node.getSymbol().getType() +" " + node.getText(), new HiddenTokenAwareTreeAdapter(node));
+    throw new BugHappened(SHOULD_NOT_VISIT + ". Terminal " + node.getSymbol().getType() + " " + node.getText(), new HiddenTokenAwareTreeAdapter(node));
   }
 
   @Override
@@ -1324,7 +1324,8 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
 
     Variable variable = visitVariablename(ctx.variablename());
-    Expression value = visitExpression_full(ctx.expression_full());
+    Expression_fullContext valueCtx = ctx.expression_full();
+    Expression value = valueCtx == null ? new EmptyExpression(token) : visitExpression_full(valueCtx);
     return new VariableDeclaration(token, variable, value);
   }
 
@@ -1985,7 +1986,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public SupportsCondition visitSupportsCondition(SupportsConditionContext ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
 
-    SupportsCondition firstCondition = (SupportsCondition)ctx.first.accept(this);
+    SupportsCondition firstCondition = (SupportsCondition) ctx.first.accept(this);
     if (ctx.second == null || ctx.second.isEmpty())
       return firstCondition;
 
@@ -1998,7 +1999,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       SupportsLogicalOperator logicalOperator = toSupportsLogicalOperator(operCtx);
 
       SimpleSupportsConditionContext condCtx = second.next();
-      SupportsCondition condition = (SupportsCondition)condCtx.accept(this);
+      SupportsCondition condition = (SupportsCondition) condCtx.accept(this);
 
       result.addCondition(logicalOperator, condition);
     }
@@ -2069,15 +2070,15 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public ASTCssNode visitPage(PageContext ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
     Page result = new Page(token);
-    
+
     IdentContext nameCtx = ctx.ident();
-    if (nameCtx!=null)
+    if (nameCtx != null)
       result.setName(new Name(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText()));
-   
-     //mandatory_ws? COLON ws ident;
+
+    //mandatory_ws? COLON ws ident;
     PseudoPageContext pseudoPageCtx = ctx.pseudoPage();
-    if (pseudoPageCtx!=null) {
-      result.setDockedPseudopage(ctx.ppDock==null);
+    if (pseudoPageCtx != null) {
+      result.setDockedPseudopage(ctx.ppDock == null);
       result.setPseudopage(visitPseudoPage(pseudoPageCtx));
     }
 
@@ -2100,20 +2101,20 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public ASTCssNode visitUnknownAtRule(UnknownAtRuleContext ctx) {
-//    unknownAtRule: AT_NAME (ws names+=unknownAtRuleNamesSet)? ws ( body+=general_body | semi+=SEMI );
+    //    unknownAtRule: AT_NAME (ws names+=unknownAtRuleNamesSet)? ws ( body+=general_body | semi+=SEMI );
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
 
     UnknownAtRule result = new UnknownAtRule(token, ctx.AT_NAME().getText());
     UnknownAtRuleNamesSetContext names = ctx.unknownAtRuleNamesSet();
-    if (names!=null)
+    if (names != null)
       result.addNames(visitUnknownAtRuleNamesSet(names).getExpressions());
-    
+
     General_bodyContext general_body = ctx.general_body();
-    if (general_body!=null)
+    if (general_body != null)
       result.setBody(visitGeneral_body(general_body));
-    
+
     TerminalNode semi = ctx.SEMI();
-    if (semi!=null)
+    if (semi != null)
       result.setSemicolon(toSyntaxOnlyElement(semi));
 
     problemsHandler.warnUnknowAtRule(result);
@@ -2129,7 +2130,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     for (MathExprHighPriorContext childCtx : mathExprHighPrior) {
       result.addExpression(visitMathExprHighPrior(childCtx));
     }
-    
+
     return result;
   }
 
@@ -2141,7 +2142,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     TerminalNode nameCtx = ctx.AT_PAGE_MARGIN_BOX();
     result.setName(new Name(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText()));
     result.setBody(visitGeneral_body(ctx.general_body()));
-    
+
     return result;
   }
 }
