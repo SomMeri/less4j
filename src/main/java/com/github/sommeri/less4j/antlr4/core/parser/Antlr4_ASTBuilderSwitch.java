@@ -554,8 +554,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
     TerminalNode indirect = ctx.INDIRECT_VARIABLE();
     if (null != indirect) {
-      // FIXME: (antlr4) used to be in term builder
-      return new Variable(new HiddenTokenAwareTreeAdapter(indirect.getSymbol()), indirect.getText());
+      return termBuilder.buildFromIndirectVariable(ctx, indirect);
     }
 
     throw new BugHappened("Unexpected variable reference type.", new HiddenTokenAwareTreeAdapter(ctx));

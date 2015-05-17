@@ -1,11 +1,5 @@
-.test4 {
-  // Wont merge values from sources that marked as !important, for backwards compatibility with css
-  .first-transform();
-  .fifth-transform();
-}
-.first-transform() {
-  transform+: rotate(90deg), skew(30deg);
-}
-.fifth-transform() {
-  transform+: scale(2,4) !important;
+.variable-names {
+    @var: 'hello';
+    @name: 'var';
+    name: @@name;
 }

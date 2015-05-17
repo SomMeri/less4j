@@ -226,7 +226,7 @@ public class Antlr4_TermBuilder {
     return buildFromIndirectVariable(null, variableToken);
   }
 
-  private IndirectVariable buildFromIndirectVariable(ParseTree expressionToken, ParseTree variableToken) {
+  public IndirectVariable buildFromIndirectVariable(ParseTree expressionToken, ParseTree variableToken) {
     if (expressionToken != null) {
       //FIXME: (antlr4) (comments)
       //expressionToken.addFollowing(variableToken.getFollowing());
