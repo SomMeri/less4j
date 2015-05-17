@@ -42,12 +42,14 @@ import com.github.sommeri.less4j.core.ast.Guard;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
+import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
+import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
@@ -130,6 +132,8 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Ident_nthContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Ident_special_pseudoclassesContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentifierValueTermContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentifierValueTermHelperContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ImportoptionsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ImportsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.InterpolatedMediaExpressionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Mandatory_wsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorContext;
@@ -211,6 +215,14 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("before");
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
+  
+  private final static String IMPORT_OPTION_REFERENCE = "reference";
+  private final static String IMPORT_OPTION_INLINE = "inline";
+  private final static String IMPORT_OPTION_LESS = "less";
+  private final static String IMPORT_OPTION_CSS = "css";
+  private final static String IMPORT_OPTION_ONCE = "once";
+  private final static String IMPORT_OPTION_MULTIPLE = "multiple";
+  private final static String IMPORT_OPTION_OPTIONAL = "optional";
 
   private final ProblemsHandler problemsHandler;
   private final Antlr4_TermBuilder termBuilder;
@@ -1788,6 +1800,71 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public ASTCssNode visitTop_level_body_with_declaration_member(Top_level_body_with_declaration_memberContext ctx) {
     return ctx.getChild(0).accept(this);
+  }
+
+  @Override
+  public ASTCssNode visitImports(ImportsContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    Import result = new Import(token);
+    switch (ctx.kind.getType()) {
+    case LessG4Lexer.IMPORT_SYM:
+      result.setMultiplicity(Import.ImportMultiplicity.IMPORT);
+      break;
+    case LessG4Lexer.IMPORT_ONCE_SYM:
+      result.setMultiplicity(Import.ImportMultiplicity.IMPORT_ONCE);
+      problemsHandler.deprecatedImportOnce(result);
+      break;
+    case LessG4Lexer.IMPORT_MULTIPLE_SYM:
+      result.setMultiplicity(Import.ImportMultiplicity.IMPORT_MULTIPLE);
+      problemsHandler.deprecatedImportMultiple(result);
+      break;
+    default:
+      throw new BugHappened(GRAMMAR_MISMATCH, token);
+    }
+    
+    ImportoptionsContext importoptions = ctx.importoptions();
+    configureImportOptions(result, importoptions);
+    
+    result.setUrlExpression(visitTerm(ctx.url));
+    List<MediaQueryContext> mediaQuery = ctx.mediaQuery();
+    for (MediaQueryContext mediaQueryContext : mediaQuery) {
+      result.add(visitMediaQuery(mediaQueryContext));
+    }
+
+    return result;
+  }
+
+  private void configureImportOptions(Import node, ImportoptionsContext importoptions) {
+    if (importoptions==null)
+      return ;
+    
+    List<IdentContext> options = importoptions.option;
+    for (IdentContext optionCtx : options) {
+      String text = optionCtx.getText();
+      if (IMPORT_OPTION_INLINE.equals(text)) {
+        node.setInline(true);
+      } else if (IMPORT_OPTION_ONCE.equals(text)) {
+        node.setMultiplicity(Import.ImportMultiplicity.IMPORT_ONCE);
+      } else if (IMPORT_OPTION_MULTIPLE.equals(text)) {
+        node.setMultiplicity(Import.ImportMultiplicity.IMPORT_MULTIPLE);
+      } else if (IMPORT_OPTION_LESS.equals(text)) {
+        node.setContentKind(ImportContent.LESS);
+      } else if (IMPORT_OPTION_CSS.equals(text)) {
+        node.setContentKind(ImportContent.CSS);
+      } else if (IMPORT_OPTION_REFERENCE.equals(text)) {
+        node.setReferenceOnly(true);
+      } else if (IMPORT_OPTION_OPTIONAL.equals(text)) {
+        node.setOptional(true);
+      } else {
+        problemsHandler.unknownImportOption(node, text);
+      }
+    }
+    
+  }
+
+  @Override
+  public ASTCssNode visitImportoptions(ImportoptionsContext ctx) {
+    throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(ctx));
   }
 
 }
