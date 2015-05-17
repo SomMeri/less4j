@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -27,6 +28,7 @@ import com.github.sommeri.less4j.core.ast.CssString;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.DetachedRuleset;
 import com.github.sommeri.less4j.core.ast.DetachedRulesetReference;
+import com.github.sommeri.less4j.core.ast.Document;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.EmbeddedScript;
 import com.github.sommeri.less4j.core.ast.EmptyExpression;
@@ -52,6 +54,14 @@ import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
+import com.github.sommeri.less4j.core.ast.Supports;
+import com.github.sommeri.less4j.core.ast.SupportsCondition;
+import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
+import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
+import com.github.sommeri.less4j.core.ast.SupportsQuery;
+import com.github.sommeri.less4j.core.ast.Viewport;
 import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.Media;
@@ -104,6 +114,7 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationWithSemicolonContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DetachedRulesetContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.DetachedRulesetReferenceContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.DocumentContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ElementNameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ElementNamePartContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ElementSubsequentContext;
@@ -189,11 +200,19 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.SelectorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.SemiSplitMixinReferenceArgumentsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.SemiSplitReusableStructureArgumentsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.SimpleSelectorContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SimpleSupportsConditionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Special_functionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SscDeclarationContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SscNestedConditionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SscNotConditionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.StyleSheetContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SupportsConditionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SupportsContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SupportsQueryContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.TermContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Term_no_preceeding_whitespaceContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Term_only_functionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_bodyContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_body_with_declarationContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_body_with_declaration_memberContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_elementContext;
@@ -203,6 +222,7 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.VariabledeclarationCon
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariabledeclarationWithSemicolonContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariablenameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariablereferenceContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ViewportContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.WsContext;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -221,7 +241,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("before");
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
-  
+
   private final static String IMPORT_OPTION_REFERENCE = "reference";
   private final static String IMPORT_OPTION_INLINE = "inline";
   private final static String IMPORT_OPTION_LESS = "less";
@@ -268,7 +288,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   @Override
-  public ASTCssNode visitDeclaration(DeclarationContext ctx) {
+  public Declaration visitDeclaration(DeclarationContext ctx) {
     // FIXME (antlr4) (comments) push comments to used tokens
     TerminalNode colon = ctx.COLON();
 
@@ -863,8 +883,8 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   @Override
-  public Expression visitTerm_only_function(Term_only_functionContext ctx) {
-    return (Expression) ctx.getChild(0).accept(this);
+  public FunctionExpression visitTerm_only_function(Term_only_functionContext ctx) {
+    return (FunctionExpression) ctx.getChild(0).accept(this);
   }
 
   @Override
@@ -1061,14 +1081,14 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
     Iterator<Combinator_wsContext> combinators = ctx.combinator_ws().iterator();
     Iterator<Non_combinator_selector_blockContext> blocks = ctx.non_combinator_selector_block().iterator();
-    
+
     boolean first = true;
     if (ctx.leading == null && blocks.hasNext()) {
       Non_combinator_selector_blockContext blockCtx = blocks.next();
       Selector block = visitNon_combinator_selector_block(blockCtx);
       result.addParts(block.getParts());
       first = false;
-    } 
+    }
 
     while (combinators.hasNext() && blocks.hasNext()) {
       Combinator_wsContext combinatorCtx = combinators.next();
@@ -1081,9 +1101,9 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       if (parts.isEmpty()) {
         throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(blockCtx));
       }
-      if (!first || leadingCombinator.getCombinatorType()!=CombinatorType.DESCENDANT)
+      if (!first || leadingCombinator.getCombinatorType() != CombinatorType.DESCENDANT)
         parts.get(0).setLeadingCombinator(leadingCombinator);
-      
+
       result.addParts(parts);
       first = false;
     }
@@ -1211,11 +1231,11 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public ASTCssNode visitNestedAppender(NestedAppenderContext ctx) {
     //FIXME: (antlr4) (deal with spaces before and after)
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
-    
+
     //FIXME: (antlr4) (deal with spaces before and after and remove these two options - only combiner should influence it)
     boolean directlyBefore = true;
     boolean directlyAfter = true;
-    
+
     SelectorCombinator leadingCombinator = null;
     return new NestedSelectorAppender(token, directlyBefore, directlyAfter, leadingCombinator);
   }
@@ -1349,7 +1369,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     }
 
     Expression condition = visitMathExprHighPrior(ctx.leftE);
-    if (ctx.rightE!=null) {
+    if (ctx.rightE != null) {
       Expression rightE = visitMathExprHighPrior(ctx.rightE);
       condition = new ComparisonExpression(token, condition, visitCompareOperator(ctx.compareOperator()), rightE);
     }
@@ -1363,8 +1383,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     ParseTree child = ctx.getChild(0);
     if (!(child instanceof TerminalNode))
       throw new BugHappened(GRAMMAR_MISMATCH, token);
-    
-    
+
     TerminalNode terminal = (TerminalNode) child;
     switch (terminal.getSymbol().getType()) {
     case LessG4Lexer.GREATER:
@@ -1628,11 +1647,11 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
     TerminalNode nameCtx = ctx.AT_NAME();
     HiddenTokenAwareTree vToken = new HiddenTokenAwareTreeAdapter(nameCtx);
-    
+
     DetachedRulesetReference result = new DetachedRulesetReference(token, new Variable(vToken, nameCtx.getText()));
-    if (ctx.LPAREN()==null || ctx.RPAREN()==null) {
+    if (ctx.LPAREN() == null || ctx.RPAREN() == null) {
       problemsHandler.detachedRulesetCallWithoutParentheses(result);
-    } 
+    }
 
     return result;
   }
@@ -1672,6 +1691,22 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   @Override
+  public GeneralBody visitTop_level_body(Top_level_bodyContext ctx) {
+    TerminalNode lbraceToken = ctx.LBRACE();
+    SyntaxOnlyElement lbrace = new SyntaxOnlyElement(new HiddenTokenAwareTreeAdapter(lbraceToken.getSymbol()), lbraceToken.getText().trim());
+    TerminalNode rbraceToken = ctx.RBRACE();
+    SyntaxOnlyElement rbrace = new SyntaxOnlyElement(new HiddenTokenAwareTreeAdapter(rbraceToken.getSymbol()), rbraceToken.getText().trim());
+
+    List<ASTCssNode> members = new ArrayList<ASTCssNode>();
+    List<Top_level_elementContext> childsCtxs = ctx.top_level_element();
+    for (Top_level_elementContext childCtx : childsCtxs) {
+      members.add(childCtx.accept(this));
+    }
+    GeneralBody result = new GeneralBody(new HiddenTokenAwareTreeAdapter(ctx), lbrace, rbrace, members);
+    return result;
+  }
+
+  @Override
   public Media visitMedia_top_level(Media_top_levelContext ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
     return doVisitMedia(token, ctx.media_queries_declaration(), ctx.body);
@@ -1686,7 +1721,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   private Media doVisitMedia(HiddenTokenAwareTree token, Media_queries_declarationContext queriesCtx, ParserRuleContext body) {
     Media result = visitMedia_queries_declaration(queriesCtx);
     result.setUnderlyingStructure(token);
-    result.setBody((GeneralBody)body.accept(this));
+    result.setBody((GeneralBody) body.accept(this));
     return result;
   }
 
@@ -1695,15 +1730,15 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
     Media result = new Media(token);
     result.addMediaQuery(visitMediaQuery(ctx.firstQuery));
-   
+
     Iterator<TerminalNode> comma = ctx.COMMA().iterator();
-    Iterator<MediaQueryContext> queriesCtx = ctx.tail!=null? ctx.tail.iterator() : new ArrayList<MediaQueryContext>().iterator();
-    
+    Iterator<MediaQueryContext> queriesCtx = ctx.tail != null ? ctx.tail.iterator() : new ArrayList<MediaQueryContext>().iterator();
+
     while (comma.hasNext() && queriesCtx.hasNext()) {
       result.addMediaQuery(visitMediaQuery(queriesCtx.next()));
       comma.next();
     }
-    
+
     if (comma.hasNext() || queriesCtx.hasNext())
       throw new BugHappened(GRAMMAR_MISMATCH, token);
 
@@ -1713,16 +1748,16 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public MediaQuery visitMediaQuery(MediaQueryContext ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
-   
+
     MediumContext mediumCtx = ctx.medium();
-    Medium medium = mediumCtx!=null ? visitMedium(mediumCtx) : null;
-    
+    Medium medium = mediumCtx != null ? visitMedium(mediumCtx) : null;
+
     List<MediaExpression> expressions = new ArrayList<MediaExpression>();
     List<MediaExpressionContext> mediaExpressionsCtx = ctx.mediaExpression();
     for (MediaExpressionContext context : mediaExpressionsCtx) {
       expressions.add(visitMediaExpression(context));
     }
-    return new MediaQuery(token, medium,  expressions);
+    return new MediaQuery(token, medium, expressions);
   }
 
   @Override
@@ -1735,7 +1770,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       return new Medium(token, new MediumModifier(typeToken), new MediumType(typeToken, type.getText()));
     }
 
-    ParseTree type = ctx.getChild(childsCnt-1);
+    ParseTree type = ctx.getChild(childsCnt - 1);
     HiddenTokenAwareTree typeToken = new HiddenTokenAwareTreeAdapter(type);
     return new Medium(token, toMediumModifier(ctx.getChild(0)), new MediumType(typeToken, type.getText()));
   }
@@ -1756,11 +1791,11 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public MediaExpression visitMediaExpression(MediaExpressionContext ctx) {
     CssMediaExpressionContext css = ctx.cssMediaExpression();
-    if (css!=null)
+    if (css != null)
       return visitCssMediaExpression(css);
 
     InterpolatedMediaExpressionContext interpolated = ctx.interpolatedMediaExpression();
-    if (interpolated!=null)
+    if (interpolated != null)
       return visitInterpolatedMediaExpression(interpolated);
 
     throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(ctx));
@@ -1769,14 +1804,14 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public MediaExpression visitInterpolatedMediaExpression(InterpolatedMediaExpressionContext ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
-    
+
     List<VariablereferenceContext> children = ctx.variablereference();
     List<Expression> expressions = new ArrayList<Expression>();
     for (VariablereferenceContext child : children) {
       Variable expression = visitVariablereference(child);
       expressions.add(expression);
     }
-        
+
     ListExpression list = new ListExpression(token, expressions, new ListExpressionOperator(token, ListExpressionOperator.Operator.EMPTY_OPERATOR));
     return new InterpolatedMediaExpression(token, list);
   }
@@ -1787,9 +1822,9 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
     MediaFeatureContext mediaFeatureCtx = ctx.mediaFeature();
     Expression_fullContext expression_full = ctx.expression_full();
-    
+
     MediaExpressionFeature mediaFeature = visitMediaFeature(mediaFeatureCtx);
-    if (expression_full==null)
+    if (expression_full == null)
       return new FixedMediaExpression(token, mediaFeature, null);
 
     // FIXME (antlr4) (comments) colon 
@@ -1827,10 +1862,10 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     default:
       throw new BugHappened(GRAMMAR_MISMATCH, token);
     }
-    
+
     ImportoptionsContext importoptions = ctx.importoptions();
     configureImportOptions(result, importoptions);
-    
+
     result.setUrlExpression(visitTerm(ctx.url));
     List<MediaQueryContext> mediaQuery = ctx.mediaQuery();
     for (MediaQueryContext mediaQueryContext : mediaQuery) {
@@ -1841,9 +1876,9 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   private void configureImportOptions(Import node, ImportoptionsContext importoptions) {
-    if (importoptions==null)
-      return ;
-    
+    if (importoptions == null)
+      return;
+
     List<IdentContext> options = importoptions.option;
     for (IdentContext optionCtx : options) {
       String text = optionCtx.getText();
@@ -1865,7 +1900,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
         problemsHandler.unknownImportOption(node, text);
       }
     }
-    
+
   }
 
   @Override
@@ -1896,13 +1931,127 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   @Override
-  public ASTCssNode visitFontface(FontfaceContext ctx) {
+  public FontFace visitFontface(FontfaceContext ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
     FontFace result = new FontFace(token);
     result.setBody(visitGeneral_body(ctx.body));
     return result;
   }
 
+  @Override
+  public Document visitDocument(DocumentContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    Document result = new Document(token, ctx.AT_DOCUMENT().getText());
+    for (Term_only_functionContext fncCtx : ctx.urlFnc) {
+      result.addUrlMatchFunction(visitTerm_only_function(fncCtx));
+    }
+    result.setBody(visitTop_level_body(ctx.body));
+    return result;
+  }
+
+  @Override
+  public Viewport visitViewport(ViewportContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    Viewport result = new Viewport(token, ctx.AT_VIEWPORT().getText());
+    result.setBody(visitGeneral_body(ctx.body));
+    return result;
+  }
+
+  @Override
+  public Supports visitSupports(SupportsContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    Supports result = new Supports(token, ctx.AT_SUPPORTS().getText());
+    result.setCondition(visitSupportsCondition(ctx.condition));
+    result.setBody(visitGeneral_body(ctx.body));
+
+    return result;
+  }
+
+  @Override
+  public SupportsCondition visitSupportsCondition(SupportsConditionContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    SupportsCondition firstCondition = (SupportsCondition)ctx.first.accept(this);
+    if (ctx.second == null || ctx.second.isEmpty())
+      return firstCondition;
+
+    SupportsLogicalCondition result = new SupportsLogicalCondition(token, firstCondition);
+    Iterator<SimpleSupportsConditionContext> second = ctx.second.iterator();
+    Iterator<Ident_except_notContext> operator = ctx.oper.iterator();
+
+    while (operator.hasNext() && second.hasNext()) {
+      Ident_except_notContext operCtx = operator.next();
+      SupportsLogicalOperator logicalOperator = toSupportsLogicalOperator(operCtx);
+
+      SimpleSupportsConditionContext condCtx = second.next();
+      SupportsCondition condition = (SupportsCondition)condCtx.accept(this);
+
+      result.addCondition(logicalOperator, condition);
+    }
+    if (!operator.hasNext() || !second.hasNext())
+      throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(ctx));
+
+    return result;
+  }
+
+  private SupportsLogicalOperator toSupportsLogicalOperator(Ident_except_notContext operCtx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(operCtx);
+    String text = operCtx.getText();
+    Map<String, SupportsLogicalOperator.Operator> operatorsBySymbol = SupportsLogicalOperator.Operator.getSymbolsMap();
+    if (text == null || !operatorsBySymbol.containsKey(text.toLowerCase())) {
+      SupportsLogicalOperator result = new SupportsLogicalOperator(token, null);
+      problemsHandler.errWrongSupportsLogicalOperator(result, operCtx.getText());
+      return result;
+    }
+
+    SupportsLogicalOperator result = new SupportsLogicalOperator(token, operatorsBySymbol.get(text.toLowerCase()));
+    return result;
+  }
+
+  @Override
+  public SupportsCondition visitSscDeclaration(SscDeclarationContext ctx) {
+    return visitSupportsQuery(ctx.supportsQuery());
+  }
+
+  @Override
+  public SupportsCondition visitSscNotCondition(SscNotConditionContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    //TODO: warning on wrong operator (anything that is not 'not')
+    SyntaxOnlyElement negation = toSyntaxOnlyElement(ctx.IDENT_NOT());
+    SupportsCondition condition = visitSupportsCondition(ctx.supportsCondition());
+
+    SupportsConditionNegation result = new SupportsConditionNegation(token, negation, condition);
+    return result;
+  }
+
+  @Override
+  public SupportsCondition visitSscNestedCondition(SscNestedConditionContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    SyntaxOnlyElement openingParentheses = toSyntaxOnlyElement(ctx.LPAREN());
+    SupportsCondition condition = visitSupportsCondition(ctx.supportsCondition());
+    SyntaxOnlyElement closingParentheses = toSyntaxOnlyElement(ctx.RPAREN());
+    //
+    SupportsConditionInParentheses result = new SupportsConditionInParentheses(token, openingParentheses, condition, closingParentheses);
+    return result;
+  }
+
+  @Override
+  public SupportsCondition visitSupportsQuery(SupportsQueryContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    SyntaxOnlyElement openingParentheses = toSyntaxOnlyElement(ctx.LPAREN());
+    Declaration declaration = visitDeclaration(ctx.declaration());
+    SyntaxOnlyElement closingParentheses = toSyntaxOnlyElement(ctx.RPAREN());
+    SupportsQuery result = new SupportsQuery(token, openingParentheses, closingParentheses, declaration);
+    return result;
+  }
+
+  private SyntaxOnlyElement toSyntaxOnlyElement(ParseTree ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    return new SyntaxOnlyElement(token, ctx.getText());
+  }
 }
 
 class HiddenTokenAwareTreeAdapter extends HiddenTokenAwareTree {

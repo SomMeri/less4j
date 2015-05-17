@@ -67,4 +67,7 @@ public class Document extends Directive {
   public void addUrlMatchFunctions(List<FunctionExpression> urlMatchFunctions) {
     this.urlMatchFunction.addAll(urlMatchFunctions);
   }
+  public void addUrlMatchFunction(FunctionExpression urlMatchFunction) {
+    this.urlMatchFunction.add(urlMatchFunction);
+  }
 }

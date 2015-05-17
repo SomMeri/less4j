@@ -33,8 +33,8 @@ public class CommentsShiftingBuilderSwitch extends Antlr4_ASTBuilderSwitch {
   }
 
   @Override
-  public ASTCssNode visitDeclaration(DeclarationContext ctx) {
-    ASTCssNode result = super.visitDeclaration(ctx);
+  public Declaration visitDeclaration(DeclarationContext ctx) {
+    Declaration result = super.visitDeclaration(ctx);
     inheritCommentsFromToken(result, ctx);
     return result;
   }
