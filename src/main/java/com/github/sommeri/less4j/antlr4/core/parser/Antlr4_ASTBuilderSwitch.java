@@ -54,6 +54,8 @@ import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
+import com.github.sommeri.less4j.core.ast.Name;
+import com.github.sommeri.less4j.core.ast.Page;
 import com.github.sommeri.less4j.core.ast.Supports;
 import com.github.sommeri.less4j.core.ast.SupportsCondition;
 import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
@@ -178,10 +180,12 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Non_combinator_selecto
 import com.github.sommeri.less4j.core.parser.LessG4Parser.NthContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Nth_baseContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Nth_expressionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.PageContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PlusOrMinusContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PropertyContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PropertyNamePartContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PseudoContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.PseudoPageContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Pseudoparameter_termValueContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ReferenceSeparatorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureArgumentsContext;
@@ -2051,6 +2055,33 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   private SyntaxOnlyElement toSyntaxOnlyElement(ParseTree ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
     return new SyntaxOnlyElement(token, ctx.getText());
+  }
+
+  @Override
+  public ASTCssNode visitPage(PageContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    Page result = new Page(token);
+    
+    IdentContext nameCtx = ctx.ident();
+    if (nameCtx!=null)
+      result.setName(new Name(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText()));
+   
+     //mandatory_ws? COLON ws ident;
+    PseudoPageContext pseudoPageCtx = ctx.pseudoPage();
+    if (pseudoPageCtx!=null) {
+      result.setDockedPseudopage(ctx.ppDock!=null);
+      result.setPseudopage(visitPseudoPage(pseudoPageCtx));
+    }
+
+    result.setBody(visitGeneral_body(ctx.general_body()));
+    return result;
+  }
+
+  @Override
+  public Name visitPseudoPage(PseudoPageContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    return new Name(token, ":" + ctx.ident().getText());
   }
 }
 
