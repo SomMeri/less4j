@@ -74,7 +74,7 @@ public class ANTLR4Parser {
       }
     }
     formattedTree.addToTreatAsTerminal("ws", "combinator_ws", "combinator");
-    System.out.println(" --> Parse Tree <-- \n" + formattedTree.toStringTree(tree));
+    //System.out.println(" --> Parse Tree <-- \n" + formattedTree.toStringTree(tree));
     return new ParserResult(tree, commentsMap);
   }
 
