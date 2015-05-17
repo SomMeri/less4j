@@ -47,6 +47,7 @@ import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
@@ -184,6 +185,7 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.NthContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Nth_baseContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Nth_expressionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PageContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.PageMarginBoxContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PlusOrMinusContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PropertyContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PropertyNamePartContext;
@@ -2075,7 +2077,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
      //mandatory_ws? COLON ws ident;
     PseudoPageContext pseudoPageCtx = ctx.pseudoPage();
     if (pseudoPageCtx!=null) {
-      result.setDockedPseudopage(ctx.ppDock!=null);
+      result.setDockedPseudopage(ctx.ppDock==null);
       result.setPseudopage(visitPseudoPage(pseudoPageCtx));
     }
 
@@ -2127,6 +2129,18 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     for (MathExprHighPriorContext childCtx : mathExprHighPrior) {
       result.addExpression(visitMathExprHighPrior(childCtx));
     }
+    
+    return result;
+  }
+
+  @Override
+  public PageMarginBox visitPageMarginBox(PageMarginBoxContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    PageMarginBox result = new PageMarginBox(token);
+    TerminalNode nameCtx = ctx.AT_PAGE_MARGIN_BOX();
+    result.setName(new Name(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText()));
+    result.setBody(visitGeneral_body(ctx.general_body()));
     
     return result;
   }
