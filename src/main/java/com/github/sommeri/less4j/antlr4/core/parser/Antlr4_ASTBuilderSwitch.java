@@ -36,6 +36,7 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
+import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Guard;
@@ -46,6 +47,8 @@ import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
+import com.github.sommeri.less4j.core.ast.Keyframes;
+import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
@@ -114,6 +117,7 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Expression_space_separ
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ExtendInDeclarationWithSemiContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ExtendTargetSelectorsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.FixedIdOrClassNamePartContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.FontfaceContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.FunctionContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.FunctionNameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.FunctionParametersContext;
@@ -135,6 +139,8 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.IdentifierValueTermHel
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ImportoptionsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ImportsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.InterpolatedMediaExpressionContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.KeyframesContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.KeyframesnameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Mandatory_wsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.MathExprHighPriorNoWhitespaceListContext;
@@ -1865,6 +1871,36 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public ASTCssNode visitImportoptions(ImportoptionsContext ctx) {
     throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(ctx));
+  }
+
+  @Override
+  public ASTCssNode visitKeyframes(KeyframesContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    Keyframes result = new Keyframes(token, ctx.AT_KEYFRAMES().getText());
+    List<KeyframesnameContext> namesCtx = ctx.names;
+    for (KeyframesnameContext name : namesCtx) {
+      result.addName(visitKeyframesname(name));
+    }
+    result.setBody(visitGeneral_body(ctx.general_body()));
+
+    return result;
+  }
+
+  @Override
+  public KeyframesName visitKeyframesname(KeyframesnameContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    Expression name = termBuilder.buildFromTerm(ctx.getChild(0));
+    KeyframesName result = new KeyframesName(token, name);
+    return result;
+  }
+
+  @Override
+  public ASTCssNode visitFontface(FontfaceContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    FontFace result = new FontFace(token);
+    result.setBody(visitGeneral_body(ctx.body));
+    return result;
   }
 
 }

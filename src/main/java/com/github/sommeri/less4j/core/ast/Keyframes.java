@@ -63,4 +63,8 @@ public class Keyframes extends Directive {
   public void addNames(List<KeyframesName> names) {
     this.names.addAll(names);
   }
+
+  public void addName(KeyframesName name) {
+    this.names.add(name);
+  }
 }
