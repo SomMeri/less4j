@@ -17,7 +17,6 @@ public class StrictComplianceTest extends AbstractFileBasedTest {
 
   @Parameters(name="Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
-    //return createTestFileUtils().loadTestFile(inputDir, "nth-variants.less");
     return createTestFileUtils().loadTestFiles(inputDir);
   }
 

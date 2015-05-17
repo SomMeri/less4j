@@ -20,6 +20,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.BinaryExpression;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
+import com.github.sommeri.less4j.core.ast.CharsetDeclaration;
 import com.github.sommeri.less4j.core.ast.ColorExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
@@ -46,6 +47,7 @@ import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
+import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
 import com.github.sommeri.less4j.core.ast.InterpolatedMediaExpression;
@@ -54,17 +56,6 @@ import com.github.sommeri.less4j.core.ast.KeyframesName;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
-import com.github.sommeri.less4j.core.ast.Name;
-import com.github.sommeri.less4j.core.ast.Page;
-import com.github.sommeri.less4j.core.ast.Supports;
-import com.github.sommeri.less4j.core.ast.SupportsCondition;
-import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
-import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
-import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
-import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
-import com.github.sommeri.less4j.core.ast.SupportsQuery;
-import com.github.sommeri.less4j.core.ast.Viewport;
-import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.MediaExpression;
@@ -74,12 +65,14 @@ import com.github.sommeri.less4j.core.ast.Medium;
 import com.github.sommeri.less4j.core.ast.MediumModifier;
 import com.github.sommeri.less4j.core.ast.MediumType;
 import com.github.sommeri.less4j.core.ast.MixinReference;
+import com.github.sommeri.less4j.core.ast.Name;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
+import com.github.sommeri.less4j.core.ast.Page;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
@@ -95,14 +88,24 @@ import com.github.sommeri.less4j.core.ast.SelectorPart;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.Supports;
+import com.github.sommeri.less4j.core.ast.SupportsCondition;
+import com.github.sommeri.less4j.core.ast.SupportsConditionInParentheses;
+import com.github.sommeri.less4j.core.ast.SupportsConditionNegation;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalCondition;
+import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
+import com.github.sommeri.less4j.core.ast.SupportsQuery;
 import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
+import com.github.sommeri.less4j.core.ast.UnknownAtRule;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
+import com.github.sommeri.less4j.core.ast.Viewport;
 import com.github.sommeri.less4j.core.parser.*;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AllNumberKindsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AttribContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AttribOrPseudoContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.CharSetContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CollectorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.CombinatorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Combinator_wsContext;
@@ -220,6 +223,8 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_bodyContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_body_with_declarationContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_body_with_declaration_memberContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Top_level_elementContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.UnknownAtRuleContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.UnknownAtRuleNamesSetContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Unsigned_value_termContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Value_termContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.VariabledeclarationContext;
@@ -298,7 +303,8 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
     InterpolableName propertyName = visitProperty(ctx.property());
     ListExpressionOperator.Operator mergeOperator = toDeclarationMergeOperator(ctx);
-    Expression expression = visitExpression_full(ctx.expression_full());
+    Expression_fullContext valueCtx = ctx.expression_full();
+    Expression expression = valueCtx==null? null: visitExpression_full(valueCtx);
 
     Declaration declaration = new Declaration(new HiddenTokenAwareTreeAdapter(ctx.start), propertyName, expression, mergeOperator);
     return declaration;
@@ -1994,7 +2000,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
       result.addCondition(logicalOperator, condition);
     }
-    if (!operator.hasNext() || !second.hasNext())
+    if (operator.hasNext() || second.hasNext())
       throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(ctx));
 
     return result;
@@ -2080,8 +2086,49 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public Name visitPseudoPage(PseudoPageContext ctx) {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
-
     return new Name(token, ":" + ctx.ident().getText());
+  }
+
+  @Override
+  public ASTCssNode visitCharSet(CharSetContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    TerminalNode charset = ctx.STRING();
+    return new CharsetDeclaration(token, termBuilder.createCssString(charset, charset.getText()));
+  }
+
+  @Override
+  public ASTCssNode visitUnknownAtRule(UnknownAtRuleContext ctx) {
+//    unknownAtRule: AT_NAME (ws names+=unknownAtRuleNamesSet)? ws ( body+=general_body | semi+=SEMI );
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    UnknownAtRule result = new UnknownAtRule(token, ctx.AT_NAME().getText());
+    UnknownAtRuleNamesSetContext names = ctx.unknownAtRuleNamesSet();
+    if (names!=null)
+      result.addNames(visitUnknownAtRuleNamesSet(names).getExpressions());
+    
+    General_bodyContext general_body = ctx.general_body();
+    if (general_body!=null)
+      result.setBody(visitGeneral_body(general_body));
+    
+    TerminalNode semi = ctx.SEMI();
+    if (semi!=null)
+      result.setSemicolon(toSyntaxOnlyElement(semi));
+
+    problemsHandler.warnUnknowAtRule(result);
+    return result;
+  }
+
+  @Override
+  public ListExpression visitUnknownAtRuleNamesSet(UnknownAtRuleNamesSetContext ctx) {
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    ListExpression result = new ListExpression(token, new ArrayList<Expression>(), null);
+    List<MathExprHighPriorContext> mathExprHighPrior = ctx.mathExprHighPrior();
+    for (MathExprHighPriorContext childCtx : mathExprHighPrior) {
+      result.addExpression(visitMathExprHighPrior(childCtx));
+    }
+    
+    return result;
   }
 }
 
