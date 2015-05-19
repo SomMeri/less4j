@@ -1,4 +1,3 @@
-.test4 {
-  transform: rotate(90deg), skew(30deg);
-  transform: scale(2, 4) !important;
+#star-hack {
+  *width: 300px; /* IE7 and below (the broken box model browsers) only */
 }

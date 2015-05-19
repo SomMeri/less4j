@@ -36,6 +36,7 @@ import com.github.sommeri.less4j.core.ast.EmptyExpression;
 import com.github.sommeri.less4j.core.ast.EscapedSelector;
 import com.github.sommeri.less4j.core.ast.EscapedValue;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FixedMediaExpression;
 import com.github.sommeri.less4j.core.ast.FixedNamePart;
@@ -47,7 +48,8 @@ import com.github.sommeri.less4j.core.ast.GuardCondition;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
-import com.github.sommeri.less4j.core.ast.PageMarginBox;
+import com.github.sommeri.less4j.core.ast.MultiTargetExtend;
+import com.github.sommeri.less4j.core.ast.Pseudo;
 import com.github.sommeri.less4j.core.ast.Import.ImportContent;
 import com.github.sommeri.less4j.core.ast.InterpolableName;
 import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
@@ -74,6 +76,7 @@ import com.github.sommeri.less4j.core.ast.Nth;
 import com.github.sommeri.less4j.core.ast.Nth.Form;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.Page;
+import com.github.sommeri.less4j.core.ast.PageMarginBox;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.PseudoClass;
 import com.github.sommeri.less4j.core.ast.PseudoElement;
@@ -102,6 +105,7 @@ import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.ast.VariableNamePart;
 import com.github.sommeri.less4j.core.ast.Viewport;
+import com.github.sommeri.less4j.core.compiler.stages.AstLogic;
 import com.github.sommeri.less4j.core.parser.*;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AllNumberKindsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.AttribContext;
@@ -195,6 +199,7 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.Pseudoparameter_termVa
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ReferenceSeparatorContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureArgumentsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureGuardsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.ReusableStructureNameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.RsAtNameContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.RsParameterWithDefault_no_commaContext;
@@ -252,6 +257,9 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     COLONLESS_PSEUDOELEMENTS.add("before");
     COLONLESS_PSEUDOELEMENTS.add("after");
   }
+
+  private static String EXTEND_PSEUDO = "extend";
+  private final static String EXTEND_ALL_KEYWORD = "all";
 
   private final static String IMPORT_OPTION_REFERENCE = "reference";
   private final static String IMPORT_OPTION_INLINE = "inline";
@@ -331,12 +339,25 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public InterpolableName visitProperty(PropertyContext ctx) {
-    return toInterpolableName(ctx);
+    HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
+
+    InterpolableName result = new InterpolableName(token);
+    TerminalNode starCtx = ctx.STAR();
+    if (starCtx != null) {
+      InterpolableNamePart part = toInterpolableNamePart(starCtx);
+      result.add(part);
+    }
+    List<PropertyNamePartContext> propertyNamePart = ctx.propertyNamePart();
+    for (PropertyNamePartContext pnpCtx : propertyNamePart) {
+      InterpolableNamePart part = visitPropertyNamePart(pnpCtx);
+      result.add(part);
+    }
+    return result;
   }
 
   @Override
-  public ASTCssNode visitPropertyNamePart(PropertyNamePartContext ctx) {
-    throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(ctx));
+  public InterpolableNamePart visitPropertyNamePart(PropertyNamePartContext ctx) {
+    return toInterpolableNamePart(ctx);
   }
 
   private InterpolableName toInterpolableName(ParserRuleContext ctx) {
@@ -970,7 +991,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     String name = ctx.ident().getText();
 
     SelectorAttributeOperatorContext operatorCntx = ctx.selectorAttributeOperator();
-    SelectorOperator operator = operatorCntx != null ? visitSelectorAttributeOperator(operatorCntx) : null;
+    SelectorOperator operator = operatorCntx != null ? visitSelectorAttributeOperator(operatorCntx) : new SelectorOperator(new HiddenTokenAwareTreeAdapter(ctx), SelectorOperator.Operator.NONE);
 
     Expression value = null;
     TermContext termCntx = ctx.term();
@@ -1027,7 +1048,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   @Override
-  public ElementSubsequent visitPseudo(PseudoContext ctx) {
+  public Pseudo visitPseudo(PseudoContext ctx) {
     //    pseudo
     //    : (COLON COLON? ( 
     //          (ident_nth LPAREN ws (nth | variablereference | INTERPOLATED_VARIABLE) ws RPAREN)
@@ -1081,6 +1102,12 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       ruleSet.addSelector(selector);
     }
 
+    ReusableStructureGuardsContext guardsCtx = ctx.reusableStructureGuards();
+    if (guardsCtx != null) {
+      List<Guard> guards = doVisitReusableStructureGuards(guardsCtx);
+      ruleSet.addGuards(guards);
+    }
+
     General_bodyContext general_body = ctx.general_body();
     ruleSet.setBody(visitGeneral_body(general_body));
 
@@ -1098,7 +1125,10 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     if (ctx.leading == null && blocks.hasNext()) {
       Non_combinator_selector_blockContext blockCtx = blocks.next();
       Selector block = visitNon_combinator_selector_block(blockCtx);
-      result.addParts(block.getParts());
+      //FIXME: (antlr4) it should be possible to simplify this
+      for (SelectorPart selectorPart : block.getParts()) {
+        addPart(result, selectorPart);
+      }
       first = false;
     }
 
@@ -1116,7 +1146,12 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       if (!first || leadingCombinator.getCombinatorType() != CombinatorType.DESCENDANT)
         parts.get(0).setLeadingCombinator(leadingCombinator);
 
-      result.addParts(parts);
+      //FIXME: (antlr4) it should be possible to simplify this
+      for (SelectorPart selectorPart : parts) {
+        addPart(result, selectorPart);
+      }
+      
+      //result.addParts(parts);
       first = false;
     }
 
@@ -1125,6 +1160,37 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     }
 
     return result;
+  }
+
+  private void addPart(Selector selector, SelectorPart part) {
+    ElementSubsequent lastSubsequent = part.getLastSubsequent();
+    while (lastSubsequent!=null && isExtends(lastSubsequent)) {
+      convertAndAddExtends(selector, (PseudoClass) lastSubsequent);
+      part.removeSubsequent(lastSubsequent);
+      lastSubsequent = part.getLastSubsequent();
+    } 
+    
+    //if the part had only extend as members
+    if (!part.isEmpty())
+      selector.addPart(part);
+  }
+  
+  private void convertAndAddExtends(Selector selector, PseudoClass extendPC) {
+    ASTCssNode parameter = extendPC.getParameter();
+    if (parameter.getType()==ASTCssNodeType.EXTEND) {
+      selector.addExtend((Extend) parameter);
+    } else if (parameter.getType()==ASTCssNodeType.MULTI_TARGET_EXTEND) {
+      MultiTargetExtend extend = (MultiTargetExtend) parameter;
+      for (Extend node : extend.getAllExtends()) {
+        selector.addExtend((Extend) node);
+      }
+    } else {
+      throw new BugHappened(GRAMMAR_MISMATCH, parameter.getUnderlyingStructure());
+    }
+  }
+
+  private boolean isExtends(ElementSubsequent subsequent) {
+    return (subsequent instanceof PseudoClass) && EXTEND_PSEUDO.equals(subsequent.getName());
   }
 
   @Override
@@ -1343,11 +1409,10 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       }
     }
 
-    List<GuardContext> guards = ctx.guard();
-    if (guards != null) {
-      for (GuardContext guard : guards) {
-        result.addGuard(visitGuard(guard));
-      }
+    ReusableStructureGuardsContext guardsCtx = ctx.reusableStructureGuards();
+    if (guardsCtx != null) {
+      List<Guard> guards = doVisitReusableStructureGuards(guardsCtx);
+      result.addGuards(guards);
     }
 
     result.setBody(visitGeneral_body(ctx.general_body()));
@@ -1674,14 +1739,59 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
    */
   @Override
   public ASTCssNode visitExtendTargetSelectors(ExtendTargetSelectorsContext ctx) {
-    // TODO Auto-generated method stub
-    return null;
+    HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
+    //selector (ws COMMA ws selector)*;
+    List<SelectorContext> selectors = ctx.selector();
+    if (selectors.size() == 1) {
+      return convertSelectorToExtend(token, visitSelector(selectors.get(0)));
+    }
+
+    MultiTargetExtend extend = new MultiTargetExtend(token);
+    for (SelectorContext kid : selectors) {
+      Selector selector = visitSelector(kid);
+      extend.addExtend(convertSelectorToExtend(token, selector));
+    }
+
+    return extend;
+  }
+
+  private Extend convertSelectorToExtend(HiddenTokenAwareTree token, Selector selector) {
+    if (selector.isExtending()) {
+      problemsHandler.warnExtendInsideExtend(selector);
+    }
+
+    SelectorPart lastPart = selector.getLastPart();
+    if (lastPart == null || !(lastPart instanceof SimpleSelector))
+      return new Extend(token, selector);
+
+    SimpleSelector possibleAll = (SimpleSelector) lastPart;
+    if (possibleAll.hasSubsequent() || !possibleAll.hasElement())
+      return new Extend(token, selector);
+
+    if (!EXTEND_ALL_KEYWORD.equals(possibleAll.getElementName().getName()))
+      return new Extend(token, selector);
+
+    if (AstLogic.hasNonSpaceCombinator(possibleAll)) {
+      possibleAll.setElementName(null);
+    } else {
+      selector.getParts().remove(possibleAll);
+    }
+    return new Extend(token, selector, true);
   }
 
   @Override
-  public ASTCssNode visitExtendInDeclarationWithSemi(ExtendInDeclarationWithSemiContext ctx) {
-    // TODO Auto-generated method stub
-    return null;
+  public Extend visitExtendInDeclarationWithSemi(ExtendInDeclarationWithSemiContext ctx) {
+    Pseudo extendAsPseudo = visitPseudo(ctx.pseudo());
+
+    if (!(extendAsPseudo instanceof PseudoClass))
+      throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
+
+    PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
+    ASTCssNode parameter = asPseudoclass.getParameter();
+    if (parameter.getType()!=ASTCssNodeType.EXTEND && parameter.getType()!=ASTCssNodeType.MULTI_TARGET_EXTEND)
+      throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
+    
+    return (Extend)parameter;
   }
 
   /*
@@ -2143,6 +2253,22 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     result.setName(new Name(new HiddenTokenAwareTreeAdapter(nameCtx), nameCtx.getText()));
     result.setBody(visitGeneral_body(ctx.general_body()));
 
+    return result;
+  }
+
+  @Override
+  public ASTCssNode visitReusableStructureGuards(ReusableStructureGuardsContext ctx) {
+    throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(ctx));
+  }
+
+  public List<Guard> doVisitReusableStructureGuards(ReusableStructureGuardsContext ctx) {
+    List<Guard> result = new ArrayList<Guard>();
+    List<GuardContext> guards = ctx.guard();
+    if (guards != null) {
+      for (GuardContext guard : guards) {
+        result.add(visitGuard(guard));
+      }
+    }
     return result;
   }
 }

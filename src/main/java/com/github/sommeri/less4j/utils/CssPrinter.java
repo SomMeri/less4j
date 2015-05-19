@@ -321,6 +321,7 @@ public class CssPrinter {
     case PARENTHESES_EXPRESSION:
     case SIGNED_EXPRESSION:
     case VARIABLE:
+    case EXTEND:
     case DETACHED_RULESET_REFERENCE:
     case INDIRECT_VARIABLE:
     case VARIABLE_DECLARATION:

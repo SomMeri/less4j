@@ -13,7 +13,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import com.github.sommeri.less4j.core.parser.LessG4Lexer;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.Mandatory_wsContext;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.WsContext;
-import com.github.sommeri.less4j.core.parser.LessLexer;
 
 /**
  * This class is NOT thread-safe. 
@@ -82,7 +81,7 @@ public class Antlr4_ListToTreeCombiner {
       return;
 
     CommonToken lastInTail = tail.peekLast();
-    if (lastInTail.getType() == LessLexer.NEW_LINE)
+    if (lastInTail.getType() == LessG4Lexer.NEW_LINE)
       addFollowing(firstChild, tail);
     else
       addPreceding(secondChild, tail);
@@ -136,7 +135,7 @@ public class Antlr4_ListToTreeCombiner {
       return result;
 
     CommonToken first = hiddenTokens.peekFirst();
-    while (first != null && first.getTokenIndex() < end && first.getType() == LessLexer.COMMENT) {
+    while (first != null && first.getTokenIndex() < end && first.getType() == LessG4Lexer.COMMENT) {
       result.add(first);
       hiddenTokens.removeFirst();
       first = hiddenTokens.peekFirst();
@@ -183,7 +182,7 @@ public class Antlr4_ListToTreeCombiner {
     if (hiddenTokens==null || hiddenTokens.isEmpty()) 
       return ;
     
-    //System.out.println("addPreceding: " + hiddenTokens.get(0));
+    System.out.println("addPreceding: " + node + " comment: "+ hiddenTokens.get(0));
     comments.get(node).addPreceding(hiddenTokens);
   }
 

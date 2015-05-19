@@ -551,7 +551,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       return convertSelectorToExtend(token, selector);
     }
       
-    
     MultiTargetExtend extend = new MultiTargetExtend(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
