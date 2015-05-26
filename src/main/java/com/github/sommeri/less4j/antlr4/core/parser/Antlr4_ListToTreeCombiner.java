@@ -26,7 +26,7 @@ public class Antlr4_ListToTreeCombiner {
   private LinkedList<CommonToken> hiddenTokens;
   private final TreeComments comments = new TreeComments();
   
-  public void associate(ParseTree ast, LinkedList<CommonToken> hiddenTokens) {
+  public TreeComments associate(ParseTree ast, LinkedList<CommonToken> hiddenTokens) {
     initialize(hiddenTokens);
     
     LinkedList<ParseTree> children = getChildren(ast);
@@ -38,6 +38,8 @@ public class Antlr4_ListToTreeCombiner {
       ParseTree lastChild = children.getLast();
       addFollowing(lastChild, hiddenTokens);
     }
+    
+    return comments;
   }
 
   private void initialize(LinkedList<CommonToken> hiddenTokens) {
@@ -75,7 +77,7 @@ public class Antlr4_ListToTreeCombiner {
   private void assignFirstCommentsSegment(ParseTree firstChild, ParseTree secondChild) {
     if (firstChild == null)
       return;
-//
+
     LinkedList<CommonToken> tail = readTillNewLine(getTokenStartIndex(secondChild));
     if (tail.isEmpty())
       return;
@@ -174,8 +176,8 @@ public class Antlr4_ListToTreeCombiner {
     if (hiddenTokens==null || hiddenTokens.isEmpty()) 
       return ;
     
-    System.out.println("addFollowing");
-    comments.get(node).addFollowing(hiddenTokens);
+    System.out.println("addFollowing: " + node + " comment: "+ hiddenTokens.get(0));
+    comments.getOrCreate(node).addFollowing(hiddenTokens);
   }
 
   private void addPreceding(ParseTree node, List<CommonToken> hiddenTokens) {
@@ -183,15 +185,15 @@ public class Antlr4_ListToTreeCombiner {
       return ;
     
     System.out.println("addPreceding: " + node + " comment: "+ hiddenTokens.get(0));
-    comments.get(node).addPreceding(hiddenTokens);
+    comments.getOrCreate(node).addPreceding(hiddenTokens);
   }
 
   private void addOrphans(ParseTree node, List<CommonToken> hiddenTokens) {
     if (hiddenTokens==null || hiddenTokens.isEmpty()) 
       return ;
     
-    System.out.println("addOrphans");
-    comments.get(node).addOrphans(hiddenTokens);
+    System.out.println("addOrphans: " + node + " comment: "+ hiddenTokens.get(0));
+    comments.getOrCreate(node).addOrphans(hiddenTokens);
   }
 
   class PositionComparator implements Comparator<ParseTree> {
@@ -201,11 +203,6 @@ public class Antlr4_ListToTreeCombiner {
       return getTokenStartIndex(arg0) - getTokenStartIndex(arg1);
     }
 
-  }
-
-  //FIXME: (antlr4) clean up ugly method
-  public TreeComments getAssociatedMap() {
-    return comments;
   }
 
 }

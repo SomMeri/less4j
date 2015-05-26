@@ -14,14 +14,13 @@ import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.NamedColorExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
-import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
+import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.UnicodeRangeExpression;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.parser.ConversionUtils;
 import com.github.sommeri.less4j.core.parser.LessG4Lexer;
 import com.github.sommeri.less4j.core.parser.LessG4Parser.PlusOrMinusContext;
-import com.github.sommeri.less4j.core.parser.LessG4Parser.TermContext;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 
@@ -82,7 +81,7 @@ public class Antlr4_TermBuilder {
       //System.out.println(" ------- " + token.getClass());
       ASTCssNode result = token.accept(parentBuilder);
       if (!(result instanceof Expression)) {
-        throw new BugHappened("Term child should have been expression.", new HiddenTokenAwareTreeAdapter(((ParserRuleContext) token).start));
+        throw new BugHappened("Term child should have been expression.", new HiddenTokenAwareTreeAdapter(token));
       }
       return (Expression) result;
     } else {

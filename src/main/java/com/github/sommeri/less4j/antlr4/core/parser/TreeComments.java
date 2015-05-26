@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Tree;
 
 /**
@@ -24,12 +26,12 @@ import org.antlr.v4.runtime.tree.Tree;
  * You would make one decl (values here) in the listener and use lots of times
  * in your event methods.
  */
-public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>>{
+public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>> {
   protected Map<Tree, NodeCommentsHolder> comments = new IdentityHashMap<Tree, NodeCommentsHolder>();
 
-  public NodeCommentsHolder get(Tree node) {
+  public NodeCommentsHolder getOrCreate(Tree node) {
     NodeCommentsHolder result = comments.get(node);
-    if (result==null) {
+    if (result == null) {
       result = new NodeCommentsHolder();
       comments.put(node, result);
     }
@@ -44,7 +46,7 @@ public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>>{
   public NodeCommentsHolder removeFrom(Tree node) {
     return comments.remove(node);
   }
-  
+
   public Set<Entry<Tree, NodeCommentsHolder>> all() {
     return comments.entrySet();
   }
@@ -53,5 +55,16 @@ public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>>{
   public Iterator<Entry<Tree, NodeCommentsHolder>> iterator() {
     return all().iterator();
   }
-  
+
+  public void moveHidden(ParseTree previous, ParseTree fromSource, ParseTree following) {
+    if (!comments.containsKey(fromSource))
+      return;
+
+    NodeCommentsHolder from = comments.get(fromSource);
+    NodeCommentsHolder previousHolder = previous == null ? null : getOrCreate(previous);
+    NodeCommentsHolder followingHolder = following == null ? null : getOrCreate(following);
+    
+    from.moveHidden(previousHolder, followingHolder);
+  }
+
 }

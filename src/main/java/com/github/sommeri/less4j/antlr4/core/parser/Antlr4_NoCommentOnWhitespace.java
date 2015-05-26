@@ -55,7 +55,7 @@ public class Antlr4_NoCommentOnWhitespace {
       return ;
     
     System.out.println("addFollowing");
-    comments.get(node).addFollowing(hiddenTokens);
+    comments.getOrCreate(node).addFollowing(hiddenTokens);
   }
 
   private void addPreceding(ParseTree node, List<CommonToken> hiddenTokens) {
@@ -63,7 +63,7 @@ public class Antlr4_NoCommentOnWhitespace {
       return ;
     
     System.out.println("addPreceding");
-    comments.get(node).addPreceding(hiddenTokens);
+    comments.getOrCreate(node).addPreceding(hiddenTokens);
   }
 
   private void addOrphans(ParseTree node, List<CommonToken> hiddenTokens) {
@@ -71,7 +71,7 @@ public class Antlr4_NoCommentOnWhitespace {
       return ;
     
     System.out.println("addOrphans");
-    comments.get(node).addOrphans(hiddenTokens);
+    comments.getOrCreate(node).addOrphans(hiddenTokens);
   }
 
   class PositionComparator implements Comparator<ParseTree> {

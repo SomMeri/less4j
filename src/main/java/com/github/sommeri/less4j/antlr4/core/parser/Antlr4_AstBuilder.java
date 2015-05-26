@@ -26,8 +26,12 @@ public class Antlr4_AstBuilder {
   }
 
   public StyleSheet parse(ParseTree tree, TreeComments treeComments) {
-    LessG4Visitor<ASTCssNode> builder = new CommentsShiftingBuilderSwitch(problemsHandler, treeComments);
+//    LessG4Visitor<ASTCssNode> builder = new CommentsShiftingBuilderSwitch(problemsHandler, treeComments);
+    LessG4Visitor<ASTCssNode> builder = new Antlr4_ASTBuilderSwitch(problemsHandler, treeComments);
+    
     ASTCssNode result = builder.visit(tree);
+    Comments_shifting_experiment commentsShifting = new Comments_shifting_experiment(problemsHandler, treeComments);
+    commentsShifting.commentsForNode(result);
     //convertComments(result);
     solveParentChildRelationShips(result);
     checkForWarnings(result);

@@ -109,4 +109,14 @@ public class NodeCommentsHolder {
     following = new ArrayList<CommonToken>();
   }
 
+  public void removeAll() {
+    preceding = new LinkedList<CommonToken>();
+    orphans = new LinkedList<CommonToken>();
+    following = new LinkedList<CommonToken>();
+  }
+
+  public boolean isEmpty() {
+    return preceding.isEmpty() && orphans.isEmpty() && following.isEmpty();
+  }
+
 }

@@ -98,6 +98,10 @@ public abstract class ASTCssNode implements PubliclyCloneable {
     this.openingComments.addAll(openingComments);
   }
 
+  public void addBeforeOpeningComments(List<Comment> openingComments) {
+    this.openingComments.addAll(0, openingComments);
+  }
+
   @NotAstProperty
   public List<Comment> getOrphanComments() {
     return orphanComments;
@@ -105,6 +109,10 @@ public abstract class ASTCssNode implements PubliclyCloneable {
 
   public void setOrphanComments(List<Comment> orphanComments) {
     this.orphanComments = orphanComments;
+  }
+
+  public void addOrphanComments(List<Comment> orphans) {
+    this.orphanComments.addAll(orphanComments);
   }
 
   public abstract ASTCssNodeType getType();

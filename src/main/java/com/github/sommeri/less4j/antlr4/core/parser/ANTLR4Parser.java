@@ -64,8 +64,7 @@ public class ANTLR4Parser {
 
     LinkedList<CommonToken> hiddenTokens = toCommonTokens(tokens.filterForTypes(LessG4Lexer.COMMENT, LessG4Lexer.NEW_LINE));
         
-    Antlr4_ListToTreeCombiner combiner = merge(tree, hiddenTokens);
-    TreeComments commentsMap = combiner.getAssociatedMap();
+    TreeComments commentsMap = merge(tree, hiddenTokens);
     Set<Entry<Tree, NodeCommentsHolder>> all = commentsMap.all();
     for (Entry<Tree, NodeCommentsHolder> entry : all) {
       NodeCommentsHolder holder = entry.getValue();
@@ -86,10 +85,10 @@ public class ANTLR4Parser {
     return to;
   }
 
-  private Antlr4_ListToTreeCombiner merge(ParseTree ast, LinkedList<CommonToken> hiddenTokens) {
+  private TreeComments merge(ParseTree ast, LinkedList<CommonToken> hiddenTokens) {
     Antlr4_ListToTreeCombiner combiner = new Antlr4_ListToTreeCombiner();
-    combiner.associate(ast, hiddenTokens);
-    return combiner;
+    TreeComments result = combiner.associate(ast, hiddenTokens);
+    return result;
   }
 
   public class ParserResult {
