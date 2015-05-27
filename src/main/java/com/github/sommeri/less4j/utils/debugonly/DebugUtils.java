@@ -1,11 +1,19 @@
 package com.github.sommeri.less4j.utils.debugonly;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import com.github.sommeri.less4j.antlr4.core.parser.NodeCommentsHolder;
+import com.github.sommeri.less4j.antlr4.core.parser.TreeComments;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
+import com.github.sommeri.less4j.core.parser.LessG4Lexer;
 
 // marked deprecated so I get a warning if it is referenced somewhere
 @Deprecated
@@ -58,6 +66,23 @@ public class DebugUtils {
 
       doCheckParentChildRelationshipsSanity(kid, prefix);
     }
+  }
+
+  public void printFollowing(TreeComments treeComments, ParseTree node) {
+    NodeCommentsHolder holder = treeComments.get(node);
+    if (holder==null)
+      return ;
+    
+    System.out.println(" ---> Comments following " + node.getClass().getSimpleName());
+      
+    for (CommonToken token : holder.getFollowing()) {
+      if (token.getType()==LessG4Lexer.COMMENT) {
+        System.out.println("|-> " + token.getText());
+      }
+      
+    }
+    // TODO Auto-generated method stub
+    
   }
 
 

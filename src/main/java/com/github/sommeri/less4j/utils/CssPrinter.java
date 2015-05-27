@@ -316,6 +316,9 @@ public class CssPrinter {
 
     case DETACHED_RULESET:
       return appendDetachedRuleset((DetachedRuleset) node);
+    
+    case INTERPOLABLE_NAME:
+      return appendInterpolableName((InterpolableName) node);
       
     case ESCAPED_SELECTOR:
     case PARENTHESES_EXPRESSION:
@@ -330,6 +333,11 @@ public class CssPrinter {
     default:
       throw new IllegalStateException("Unknown: " + node.getType() + " " + node.getSourceLine() + ":" + node.getSourceColumn());
     }
+  }
+
+  private boolean appendInterpolableName(InterpolableName elementName) {
+    cssAndSM.appendIgnoreNull(elementName.getName(), elementName.getUnderlyingStructure());
+    return false;
   }
 
   public boolean appendDetachedRuleset(DetachedRuleset node) {
@@ -1011,10 +1019,7 @@ public class CssPrinter {
     cssOnly.ensureSeparator();
     if (!selector.isStar() || !selector.isEmptyForm()) {
       InterpolableName elementName = selector.getElementName();
-      //FIXME !!!! add automatic error catches through some annotation
-      if (elementName==null) //FIXME !!!! remove this 
-        throw new BugHappened("!!!!!!!!!!!!!!!", selector); 
-      cssAndSM.appendIgnoreNull(elementName.getName(), elementName.getUnderlyingStructure());
+      append(elementName);
     }
   }
 

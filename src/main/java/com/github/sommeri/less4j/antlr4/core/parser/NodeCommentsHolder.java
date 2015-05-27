@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class NodeCommentsHolder {
 
@@ -99,6 +100,16 @@ public class NodeCommentsHolder {
       next.addBeforePreceding(getFollowing());
       following = new LinkedList<CommonToken>();
     }
+  }
+
+  public void moveAsIs(NodeCommentsHolder to) {
+    if (to==null)
+      return ;
+
+    to.addBeforePreceding(getPreceding());
+    preceding = new LinkedList<CommonToken>();
+    to.addFollowing(getFollowing());
+    following = new LinkedList<CommonToken>();
   }
 
   public void removePreceding() {

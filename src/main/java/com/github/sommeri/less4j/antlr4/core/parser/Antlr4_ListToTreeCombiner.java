@@ -184,7 +184,7 @@ public class Antlr4_ListToTreeCombiner {
     if (hiddenTokens==null || hiddenTokens.isEmpty()) 
       return ;
     
-    System.out.println("addPreceding: " + node + " comment: "+ hiddenTokens.get(0));
+    System.out.println("addPreceding: " + node.getClass().getSimpleName() + " comment: "+ hiddenTokens.get(0));
     comments.getOrCreate(node).addPreceding(hiddenTokens);
   }
 

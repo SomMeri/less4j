@@ -112,7 +112,7 @@ public abstract class ASTCssNode implements PubliclyCloneable {
   }
 
   public void addOrphanComments(List<Comment> orphans) {
-    this.orphanComments.addAll(orphanComments);
+    this.orphanComments.addAll(orphans);
   }
 
   public abstract ASTCssNodeType getType();

@@ -2,13 +2,20 @@ package com.github.sommeri.less4j.antlr4.core.parser;
 
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Tree;
+
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationContext;
+import com.github.sommeri.less4j.core.parser.LessG4Parser.SimpleSelectorContext;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 /**
  * Associate a property with a parse tree node. Useful with parse tree listeners
@@ -39,6 +46,10 @@ public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>> {
     return result;
   }
 
+  public NodeCommentsHolder get(Tree node) {
+    return comments.get(node);
+  }
+
   public void put(Tree node, NodeCommentsHolder value) {
     comments.put(node, value);
   }
@@ -63,8 +74,66 @@ public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>> {
     NodeCommentsHolder from = comments.get(fromSource);
     NodeCommentsHolder previousHolder = previous == null ? null : getOrCreate(previous);
     NodeCommentsHolder followingHolder = following == null ? null : getOrCreate(following);
+
+    if (previousHolder!=followingHolder) {
+      from.moveHidden(previousHolder, followingHolder);
+    } else {
+      from.moveAsIs(followingHolder);
+    }
+  }
+
+  public void moveToPrevious(ParseTree previous, ParseTree fromSource, int upToType) {
+    if (!comments.containsKey(fromSource))
+      return;
+
+    NodeCommentsHolder from = comments.get(fromSource);
+    List<CommonToken> toBeMoved = from.chopPreceedingUpToLastOfType(upToType);
+
+    getOrCreate(previous).addFollowing(toBeMoved);
+  }
+
+  public void extractOrphans(ParseTree toOrphans, ParseTree preceedingFrom, int upToType) {
+    if (!comments.containsKey(preceedingFrom))
+      return ;
     
-    from.moveHidden(previousHolder, followingHolder);
+    NodeCommentsHolder commentsHolder = comments.get(preceedingFrom);
+    List<CommonToken> toBeOrphans = commentsHolder.chopPreceedingUpToLastOfType(upToType);
+    
+    getOrCreate(toOrphans).addOrphans(toBeOrphans);
+  }
+
+  public void pushHiddenToKids(ParseTree ctx) {
+    if (!comments.containsKey(ctx))
+      return ;
+    
+    int childCount = ctx.getChildCount();
+    if (childCount == 0)
+      return;
+    
+    ParseTree first = ctx.getChild(0);
+    ParseTree last = ctx.getChild(childCount-1);
+    
+    moveHidden(first, ctx, last);
+  }
+
+  public void moveHidden(HiddenTokenAwareTree underlyingStructure, ParseTree rbraceToken, ParseTree following) {
+    if (underlyingStructure instanceof HiddenTokenAwareTreeAdapter) {
+      HiddenTokenAwareTreeAdapter adapter = (HiddenTokenAwareTreeAdapter) underlyingStructure;
+      moveHidden(adapter.getUnderlyingNode(), rbraceToken, following);
+      return ;
+    }
+    
+    throw new BugHappened("this method should not exist at all", underlyingStructure);
+   
+  }
+
+  public void shiftFollowing(ParseTree from, ParseTree to) {
+    if (!comments.containsKey(from))
+      return ;
+    
+    NodeCommentsHolder fromHolder = comments.get(from);
+    NodeCommentsHolder toHolder = getOrCreate(to);
+    fromHolder.moveHidden(null, toHolder);
   }
 
 }
