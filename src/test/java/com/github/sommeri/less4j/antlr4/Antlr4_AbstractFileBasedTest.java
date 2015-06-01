@@ -150,8 +150,8 @@ public abstract class Antlr4_AbstractFileBasedTest {
   }
 
   protected LessCompiler getCompiler() {
-    return new Antlr4_ThreadUnsafeLessCompiler();
-    //return new ThreadUnsafeLessCompiler();
+//    return new Antlr4_ThreadUnsafeLessCompiler();
+    return new ThreadUnsafeLessCompiler();
   }
 
   protected String expectedCss() {

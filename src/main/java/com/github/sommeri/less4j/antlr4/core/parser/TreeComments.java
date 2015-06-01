@@ -9,12 +9,9 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Tree;
 
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
-import com.github.sommeri.less4j.core.parser.LessG4Parser.DeclarationContext;
-import com.github.sommeri.less4j.core.parser.LessG4Parser.SimpleSelectorContext;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
 /**
@@ -75,7 +72,7 @@ public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>> {
     NodeCommentsHolder previousHolder = previous == null ? null : getOrCreate(previous);
     NodeCommentsHolder followingHolder = following == null ? null : getOrCreate(following);
 
-    if (previousHolder!=followingHolder) {
+    if (previousHolder != followingHolder) {
       from.moveHidden(previousHolder, followingHolder);
     } else {
       from.moveAsIs(followingHolder);
@@ -94,43 +91,59 @@ public class TreeComments implements Iterable<Entry<Tree, NodeCommentsHolder>> {
 
   public void extractOrphans(ParseTree toOrphans, ParseTree preceedingFrom, int upToType) {
     if (!comments.containsKey(preceedingFrom))
-      return ;
-    
+      return;
+
     NodeCommentsHolder commentsHolder = comments.get(preceedingFrom);
     List<CommonToken> toBeOrphans = commentsHolder.chopPreceedingUpToLastOfType(upToType);
-    
+
     getOrCreate(toOrphans).addOrphans(toBeOrphans);
   }
 
   public void pushHiddenToKids(ParseTree ctx) {
     if (!comments.containsKey(ctx))
-      return ;
-    
+      return;
+
     int childCount = ctx.getChildCount();
     if (childCount == 0)
       return;
-    
+
     ParseTree first = ctx.getChild(0);
-    ParseTree last = ctx.getChild(childCount-1);
-    
+    ParseTree last = ctx.getChild(childCount - 1);
+
     moveHidden(first, ctx, last);
   }
 
-  public void moveHidden(HiddenTokenAwareTree underlyingStructure, ParseTree rbraceToken, ParseTree following) {
-    if (underlyingStructure instanceof HiddenTokenAwareTreeAdapter) {
-      HiddenTokenAwareTreeAdapter adapter = (HiddenTokenAwareTreeAdapter) underlyingStructure;
-      moveHidden(adapter.getUnderlyingNode(), rbraceToken, following);
-      return ;
+  @Deprecated
+  public void moveHidden(HiddenTokenAwareTree previous, ParseTree from, ParseTree following) {
+    if (previous instanceof HiddenTokenAwareTreeAdapter) {
+      HiddenTokenAwareTreeAdapter adapter = (HiddenTokenAwareTreeAdapter) previous;
+      moveHidden(adapter.getUnderlyingNode(), from, following);
+      return;
     }
-    
-    throw new BugHappened("this method should not exist at all", underlyingStructure);
-   
+
+    throw new BugHappened("this method should not exist at all", previous);
+
+  }
+
+  @Deprecated
+  public void moveHidden(HiddenTokenAwareTree previous, ParseTree from, HiddenTokenAwareTree following) {
+    if (following != null && !(following instanceof HiddenTokenAwareTreeAdapter)) {
+      throw new BugHappened("this method should not exist at all", previous);
+    }
+
+    if (previous != null && !(previous instanceof HiddenTokenAwareTreeAdapter)) {
+      throw new BugHappened("this method should not exist at all", previous);
+    }
+
+    HiddenTokenAwareTreeAdapter previousAdapter = (HiddenTokenAwareTreeAdapter) previous;
+    HiddenTokenAwareTreeAdapter followingAdapter = (HiddenTokenAwareTreeAdapter) following;
+    moveHidden(previousAdapter == null ? null : previousAdapter.getUnderlyingNode(), from, followingAdapter == null ? null : followingAdapter.getUnderlyingNode());
   }
 
   public void shiftFollowing(ParseTree from, ParseTree to) {
     if (!comments.containsKey(from))
-      return ;
-    
+      return;
+
     NodeCommentsHolder fromHolder = comments.get(from);
     NodeCommentsHolder toHolder = getOrCreate(to);
     fromHolder.moveHidden(null, toHolder);

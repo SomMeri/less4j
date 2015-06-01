@@ -348,7 +348,7 @@ public class CommentsShiftingBuilderSwitch extends Antlr4_ASTBuilderSwitch {
   }
 
   @Override
-  public ASTCssNode visitIdentifierValueTerm(IdentifierValueTermContext ctx) {
+  public Expression visitIdentifierValueTerm(IdentifierValueTermContext ctx) {
     return handleComments(super.visitIdentifierValueTerm(ctx), ctx);
   }
 

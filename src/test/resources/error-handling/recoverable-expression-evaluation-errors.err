@@ -1,10 +1,10 @@
 Warnings produced by compilation of testCase
-WARNING 3:17 Division by zero.
+WARNING 3:15 Division by zero.
  2:   margin: 10 / 2;
  3:   padding: 10 / 0;
  4:   size: 10 / (1-1);
 
-WARNING 4:15 Division by zero.
+WARNING 4:12 Division by zero.
  3:   padding: 10 / 0;
  4:   size: 10 / (1-1);
  5: }

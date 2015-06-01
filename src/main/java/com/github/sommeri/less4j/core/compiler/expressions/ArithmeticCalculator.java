@@ -41,57 +41,57 @@ class ArithmeticCalculator {
   }
 
   private Expression subtract(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
-    return subtractNumbers(first, second, originalExpression.getUnderlyingStructure());
+    return subtractNumbers(first, second, originalExpression.getOperator(), originalExpression.getUnderlyingStructure());
   }
 
-  private Expression subtractNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression subtractNumbers(NumberExpression first, NumberExpression second, BinaryExpressionOperator operator, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal - secondVal;
 
-    return createResultNumber(parentToken, resultVal, first, second);
+    return createResultNumber(parentToken, resultVal, first, second, operator);
   }
 
   private Expression multiply(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
-    return multiplyNumbers(first, second, originalExpression.getUnderlyingStructure());
+    return multiplyNumbers(first, second, originalExpression.getOperator(), originalExpression.getUnderlyingStructure());
   }
 
-  private Expression multiplyNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression multiplyNumbers(NumberExpression first, NumberExpression second, BinaryExpressionOperator operator, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal * secondVal;
 
-    return createResultNumber(parentToken, resultVal, first, second);
+    return createResultNumber(parentToken, resultVal, first, second, operator);
   }
 
   private Expression divide(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
-    return divideNumbers(first, second, originalExpression.getUnderlyingStructure());
+    return divideNumbers(first, second, originalExpression.getOperator(), originalExpression.getUnderlyingStructure());
   }
 
-  private Expression divideNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression divideNumbers(NumberExpression first, NumberExpression second, BinaryExpressionOperator operator, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal / secondVal;
     
-    return createResultNumber(parentToken, resultVal, first, second);
+    return createResultNumber(parentToken, resultVal, first, second, operator);
   }
 
   private Expression add(NumberExpression first, NumberExpression second, BinaryExpression originalExpression) {
-    return addNumbers(first, second, originalExpression.getUnderlyingStructure());
+    return addNumbers(first, second, originalExpression.getOperator(), originalExpression.getUnderlyingStructure());
   }
 
-  private Expression addNumbers(NumberExpression first, NumberExpression second, HiddenTokenAwareTree parentToken) {
+  private Expression addNumbers(NumberExpression first, NumberExpression second, BinaryExpressionOperator operator, HiddenTokenAwareTree parentToken) {
     Double firstVal = first.getValueAsDouble();
     Double secondVal = second.getValueAsDouble();
     Double resultVal = firstVal + secondVal;
 
-    return createResultNumber(parentToken, resultVal, first, second);
+    return createResultNumber(parentToken, resultVal, first, second, operator);
   }
 
-  private Expression createResultNumber(HiddenTokenAwareTree parentToken, Double resultVal, NumberExpression first, NumberExpression second) {
+  private Expression createResultNumber(HiddenTokenAwareTree parentToken, Double resultVal, NumberExpression first, NumberExpression second, BinaryExpressionOperator operator) {
     if (resultVal.isInfinite()) {
-      problemsHandler.divisionByZero(second);
-      return new FaultyExpression(second);
+      problemsHandler.divisionByZero(operator);
+      return new FaultyExpression(operator);
     }
     
     Dimension dimension = null;

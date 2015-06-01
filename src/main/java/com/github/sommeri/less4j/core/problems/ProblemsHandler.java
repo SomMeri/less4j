@@ -7,6 +7,7 @@ import com.github.sommeri.less4j.LessProblems;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
 import com.github.sommeri.less4j.core.ast.DetachedRuleset;
@@ -280,7 +281,7 @@ public class ProblemsHandler implements LessProblems {
     addWarning(errorNode, "Ruleset without selector encountered.");
   }
 
-  public void divisionByZero(NumberExpression errorNode) {
+  public void divisionByZero(BinaryExpressionOperator errorNode) {
     addWarning(errorNode, "Division by zero.");
   }
 

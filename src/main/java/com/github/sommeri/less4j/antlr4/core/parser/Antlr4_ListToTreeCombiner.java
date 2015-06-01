@@ -22,13 +22,15 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.WsContext;
  * 
  */
 public class Antlr4_ListToTreeCombiner {
-  
+
+  //FIXME: (antlr4) remove all sysout replace by proper logging 
+  private final boolean DEBUG = false;
   private LinkedList<CommonToken> hiddenTokens;
   private final TreeComments comments = new TreeComments();
-  
+
   public TreeComments associate(ParseTree ast, LinkedList<CommonToken> hiddenTokens) {
     initialize(hiddenTokens);
-    
+
     LinkedList<ParseTree> children = getChildren(ast);
     associateAllchilds(children);
 
@@ -38,7 +40,7 @@ public class Antlr4_ListToTreeCombiner {
       ParseTree lastChild = children.getLast();
       addFollowing(lastChild, hiddenTokens);
     }
-    
+
     return comments;
   }
 
@@ -116,17 +118,17 @@ public class Antlr4_ListToTreeCombiner {
       return false;
     }
     if (kid instanceof TerminalNode) {
-      return ((TerminalNode)kid).getSymbol().getType()!=LessG4Lexer.EOF;
+      return ((TerminalNode) kid).getSymbol().getType() != LessG4Lexer.EOF;
     }
-    
+
     return true;
   }
 
   private void addAllPrecedingTokens(ParseTree target) {
     int upTo = getTokenStartIndex(target);
-    if (target.getChildCount()==0)
+    if (target.getChildCount() == 0)
       upTo = getTokenStopIndex(target);
-    
+
     List<CommonToken> tokens = readPrefix(upTo);
     addPreceding(target, tokens);
   }
@@ -173,26 +175,29 @@ public class Antlr4_ListToTreeCombiner {
   }
 
   private void addFollowing(ParseTree node, List<CommonToken> hiddenTokens) {
-    if (hiddenTokens==null || hiddenTokens.isEmpty()) 
-      return ;
-    
-    System.out.println("addFollowing: " + node + " comment: "+ hiddenTokens.get(0));
+    if (hiddenTokens == null || hiddenTokens.isEmpty())
+      return;
+
+    if (DEBUG)
+      System.out.println("addFollowing: " + node + " comment: " + hiddenTokens.get(0));
     comments.getOrCreate(node).addFollowing(hiddenTokens);
   }
 
   private void addPreceding(ParseTree node, List<CommonToken> hiddenTokens) {
-    if (hiddenTokens==null || hiddenTokens.isEmpty()) 
-      return ;
-    
-    System.out.println("addPreceding: " + node.getClass().getSimpleName() + " comment: "+ hiddenTokens.get(0));
+    if (hiddenTokens == null || hiddenTokens.isEmpty())
+      return;
+
+    if (DEBUG)
+      System.out.println("addPreceding: " + node.getClass().getSimpleName() + " comment: " + hiddenTokens.get(0));
     comments.getOrCreate(node).addPreceding(hiddenTokens);
   }
 
   private void addOrphans(ParseTree node, List<CommonToken> hiddenTokens) {
-    if (hiddenTokens==null || hiddenTokens.isEmpty()) 
-      return ;
-    
-    System.out.println("addOrphans: " + node + " comment: "+ hiddenTokens.get(0));
+    if (hiddenTokens == null || hiddenTokens.isEmpty())
+      return;
+
+    if (DEBUG)
+      System.out.println("addOrphans: " + node + " comment: " + hiddenTokens.get(0));
     comments.getOrCreate(node).addOrphans(hiddenTokens);
   }
 

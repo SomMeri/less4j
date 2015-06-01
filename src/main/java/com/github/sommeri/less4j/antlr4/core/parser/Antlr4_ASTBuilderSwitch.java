@@ -243,9 +243,7 @@ import com.github.sommeri.less4j.core.parser.LessG4Parser.WsContext;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.platform.Constants;
-import com.github.sommeri.less4j.utils.PrintUtils;
 import com.github.sommeri.less4j.utils.URIUtils;
-import com.github.sommeri.less4j.utils.debugonly.DebugUtils;
 
 public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
@@ -283,9 +281,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public ASTCssNode visitErrorNode(ErrorNode node) {
-    // TODO Auto-generated method stub
-    System.out.println("visitErrorNode(ErrorNode node)");
-    return null;
+    throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(node));
   }
 
   @Override
@@ -312,13 +308,13 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public Declaration visitDeclaration(DeclarationContext ctx) {
-    // FIXME (antlr4) (comments) push comments to used tokens
-    TerminalNode colon = ctx.COLON();
-
+    //treeComments
     InterpolableName propertyName = visitProperty(ctx.property());
     ListExpressionOperator.Operator mergeOperator = toDeclarationMergeOperator(ctx);
     Expression_fullContext valueCtx = ctx.expression_full();
     Expression expression = valueCtx == null ? null : visitExpression_full(valueCtx);
+
+    treeComments.moveHidden(propertyName.getUnderlyingStructure(), ctx.COLON(), expression == null ? null : expression.getUnderlyingStructure());
 
     Declaration declaration = new Declaration(new HiddenTokenAwareTreeAdapter(ctx), propertyName, expression, mergeOperator);
     return declaration;
@@ -327,8 +323,8 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public ASTCssNode visitDeclarationWithSemicolon(DeclarationWithSemicolonContext ctx) {
     DeclarationContext declarationCtx = ctx.declaration();
-    ParseTree previous = declarationCtx.getChild(declarationCtx.getChildCount()-1);
-    
+    ParseTree previous = declarationCtx.getChild(declarationCtx.getChildCount() - 1);
+
     treeComments.moveHidden(previous, ctx.SEMI(), null);
     //treeComments.shiftFollowing(ctx.SEMI(), ctx);
 
@@ -451,7 +447,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public Expression visitExpression_comma_separated_list(Expression_comma_separated_listContext ctx) {
     List<Expression_space_separated_listContext> values = ctx.expression_space_separated_list();
     List<TerminalNode> commas = ctx.COMMA();
-    
+
     moveListSeparatorComments(commas, values);
 
     return doVisitExpressionsList(ctx, values, ListExpressionOperator.Operator.COMMA);
@@ -505,15 +501,11 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public ASTCssNode visitIdent_special_pseudoclasses(Ident_special_pseudoclassesContext ctx) {
-    // TODO Auto-generated method stub
-    System.out.println("visitIdent_special_pseudoclasses(Ident_special_pseudoclassesContext ctx)");
-    return null;
+    throw new BugHappened(SHOULD_NOT_VISIT, new HiddenTokenAwareTreeAdapter(ctx));
   }
 
   @Override
   public ASTCssNode visitIdent(IdentContext ctx) {
-    //FIXME: not really nice, this threw SHOULD_NOT_VISIT exception normally
-    //however I had to have it create expression cause term builder
     return createIdentifierExpression(ctx, ctx.getText());
   }
 
@@ -571,15 +563,15 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       lastMember = noSemiMember.accept(this);
       members.add(lastMember);
     }
-    
-    if (lastMember!=null) {
+
+    if (lastMember != null) {
       //treeComments.moveHidden(lastMemeberCtx, rbraceToken, null);
       treeComments.moveToPrevious(lastMemeberCtx, rbraceToken, LessG4Lexer.NEW_LINE);
     }
 
     if (members.isEmpty()) {
       treeComments.extractOrphans(ctx, rbraceToken, LessG4Lexer.NEW_LINE);
-    } 
+    }
     GeneralBody result = new GeneralBody(new HiddenTokenAwareTreeAdapter(ctx), lbrace, rbrace, members);
     return result;
   }
@@ -618,17 +610,15 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public Variable visitVariablename(VariablenameContext ctx) {
-    // FIXME: (antlr4) used to be in term builder
     return new Variable(new HiddenTokenAwareTreeAdapter(ctx), ctx.getText());
   }
 
   @Override
   public ParenthesesExpression visitExpr_in_parentheses(Expr_in_parenthesesContext ctx) {
-    // expr_in_parentheses: LPAREN ws expression_full ws RPAREN;
-    // FIXME: (antlr4) (comments) - deal with this
-    // first.addBeforeFollowing(first.getLastChild().getFollowing());
+    HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
+
     Expression nestedExpression = visitExpression_full(ctx.expression_full());
-    return new ParenthesesExpression(new HiddenTokenAwareTreeAdapter(ctx), nestedExpression);
+    return new ParenthesesExpression(token, nestedExpression);
   }
 
   @Override
@@ -744,7 +734,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   }
 
   @Override
-  public ASTCssNode visitIdentifierValueTerm(IdentifierValueTermContext ctx) {
+  public Expression visitIdentifierValueTerm(IdentifierValueTermContext ctx) {
     StringBuilder text = new StringBuilder();
     int childCount = ctx.getChildCount();
     for (int i = 0; i < childCount; i++) {
@@ -809,7 +799,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     ParseTree previous = first;
     Iterator<? extends ParseTree> commasIterator = separators.iterator();
     for (ParseTree member : members) {
-      if (previous!=null) {
+      if (previous != null) {
         treeComments.moveHidden(previous, commasIterator.next(), member);
       }
       previous = member;
@@ -820,7 +810,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     ParseTree previous = null;
     Iterator<? extends ParseTree> commasIterator = separators.iterator();
     for (ParseTree member : members) {
-      if (previous!=null) {
+      if (previous != null) {
         treeComments.moveHidden(previous, commasIterator.next(), member);
       }
       previous = member;
@@ -890,7 +880,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     if (!(node instanceof TerminalNode))
       throw new BugHappened(GRAMMAR_MISMATCH, new HiddenTokenAwareTreeAdapter(ctx));
 
-    BinaryExpressionOperator.Operator operator = toExpressionOperator((TerminalNode)node);
+    BinaryExpressionOperator.Operator operator = toExpressionOperator((TerminalNode) node);
     return new BinaryExpressionOperator(new HiddenTokenAwareTreeAdapter(ctx), operator);
   }
 
@@ -957,7 +947,8 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public Expression visitUnsigned_value_term(Unsigned_value_termContext ctx) {
     IdentifierValueTermContext identifierValueTerm = ctx.identifierValueTerm();
     if (identifierValueTerm != null)
-      return termBuilder.createIdentifierExpression(ctx, ctx.getText());
+      return visitIdentifierValueTerm(identifierValueTerm);
+    //termBuilder.createIdentifierExpression(ctx, ctx.getText());
 
     return termBuilder.buildFromTerm(ctx.getChild(0));
   }
@@ -1209,7 +1200,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
       for (SelectorPart selectorPart : parts) {
         addPart(result, selectorPart);
       }
-      
+
       //result.addParts(parts);
       first = false;
     }
@@ -1223,22 +1214,22 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   private void addPart(Selector selector, SelectorPart part) {
     ElementSubsequent lastSubsequent = part.getLastSubsequent();
-    while (lastSubsequent!=null && isExtends(lastSubsequent)) {
+    while (lastSubsequent != null && isExtends(lastSubsequent)) {
       convertAndAddExtends(selector, (PseudoClass) lastSubsequent);
       part.removeSubsequent(lastSubsequent);
       lastSubsequent = part.getLastSubsequent();
-    } 
-    
+    }
+
     //if the part had only extend as members
     if (!part.isEmpty())
       selector.addPart(part);
   }
-  
+
   private void convertAndAddExtends(Selector selector, PseudoClass extendPC) {
     ASTCssNode parameter = extendPC.getParameter();
-    if (parameter.getType()==ASTCssNodeType.EXTEND) {
+    if (parameter.getType() == ASTCssNodeType.EXTEND) {
       selector.addExtend((Extend) parameter);
-    } else if (parameter.getType()==ASTCssNodeType.MULTI_TARGET_EXTEND) {
+    } else if (parameter.getType() == ASTCssNodeType.MULTI_TARGET_EXTEND) {
       MultiTargetExtend extend = (MultiTargetExtend) parameter;
       for (Extend node : extend.getAllExtends()) {
         selector.addExtend((Extend) node);
@@ -1298,7 +1289,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public Selector visitNon_combinator_selector_block(Non_combinator_selector_blockContext ctx) {
     treeComments.pushHiddenToKids(ctx);
-    
+
     Selector result = new Selector(new HiddenTokenAwareTreeAdapter(ctx));
     int childCount = ctx.getChildCount();
     for (int i = 0; i < childCount; i++) {
@@ -1312,7 +1303,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   @Override
   public SimpleSelector visitSimpleSelector(SimpleSelectorContext ctx) {
     treeComments.pushHiddenToKids(ctx);
-    
+
     HiddenTokenAwareTreeAdapter token = new HiddenTokenAwareTreeAdapter(ctx);
     SimpleSelector result = null;
     SelectorCombinator leadingCombinator = null;
@@ -1339,7 +1330,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
   public InterpolableName visitElementName(ElementNameContext ctx) {
     if (!treeComments.getOrCreate(ctx).isEmpty())
       System.out.println("tralala");
-    
+
     InterpolableName interpolableName = toInterpolableName(ctx);
     return interpolableName;
   }
@@ -1364,8 +1355,6 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public EscapedSelector visitEscapedSelectorOldSyntax(EscapedSelectorOldSyntaxContext ctx) {
-    //FIXME: (antlr4) (comments)
-    //token.pushHiddenToKids();
     HiddenTokenAwareTree valueToken = new HiddenTokenAwareTreeAdapter(ctx.VALUE_ESCAPE());
     String quotedText = ctx.VALUE_ESCAPE().getText();
     return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), "" + quotedText.charAt(1), null);
@@ -1560,7 +1549,6 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public GeneralBody visitReusableStructureArguments(ReusableStructureArgumentsContext ctx) {
-    GeneralBody arguments = null;
     SemiSplitReusableStructureArgumentsContext semiSplit = ctx.semiSplitReusableStructureArguments();
     if (semiSplit != null) {
       return visitSemiSplitReusableStructureArguments(semiSplit);
@@ -1855,10 +1843,10 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
     PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
     ASTCssNode parameter = asPseudoclass.getParameter();
-    if (parameter.getType()!=ASTCssNodeType.EXTEND && parameter.getType()!=ASTCssNodeType.MULTI_TARGET_EXTEND)
+    if (parameter.getType() != ASTCssNodeType.EXTEND && parameter.getType() != ASTCssNodeType.MULTI_TARGET_EXTEND)
       throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
-    
-    return (Extend)parameter;
+
+    return (Extend) parameter;
   }
 
   @Override
@@ -2009,7 +1997,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
     TerminalNode colonCtx = ctx.COLON();
     treeComments.moveHidden(mediaFeatureCtx, colonCtx, ctx);
-    
+
     Expression expression = visitExpression_full(expression_full);
     return new FixedMediaExpression(token, mediaFeature, expression);
   }
@@ -2125,7 +2113,7 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
     HiddenTokenAwareTree token = new HiddenTokenAwareTreeAdapter(ctx);
 
     moveListSeparatorComments(ctx.COMMA(), ctx.urlFnc);
-    
+
     Document result = new Document(token, ctx.AT_DOCUMENT().getText());
     for (Term_only_functionContext fncCtx : ctx.urlFnc) {
       result.addUrlMatchFunction(visitTerm_only_function(fncCtx));
