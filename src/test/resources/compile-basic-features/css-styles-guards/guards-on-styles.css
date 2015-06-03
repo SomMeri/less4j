@@ -28,3 +28,6 @@
 .local-in-caller .caller mixin[type=2] {
   used-scope: correctly;
 }
+.guard-after-appender button {
+  color: green;
+}

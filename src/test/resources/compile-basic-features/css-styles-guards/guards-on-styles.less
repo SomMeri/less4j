@@ -84,3 +84,22 @@
 }
 
 //as namespace
+
+//guard on selector ending with appender https://github.com/SomMeri/less4j/issues/283
+@my-option: true;
+
+.test-1 {
+  .h1& when (@my-option = false) {
+    button {
+      color: white;
+    }
+  }
+}
+
+.guard-after-appender {
+  & when (@my-option = true) {
+    button {
+      color: green;
+    }
+  }
+}

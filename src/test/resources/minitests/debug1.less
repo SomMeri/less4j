@@ -1,15 +1,17 @@
-// issue https://github.com/SomMeri/less4j/issues/282
-#usePlace-282 {
-  .variations(@extra, @property) {
-    .generic-variations(@extra, {
-      @{property}: @extra;
-    });
-  }
+@my-option: true;
 
-  .generic-variations(@name, @set) {
-    name: @name;
-    @set();
+.test-1 {
+  .h1& when (@my-option = false) {
+    button {
+      color: white;
+    }
   }
-  
-  .variations(extra , property);
+}
+
+.test-2 {
+  & when (@my-option = true) {
+    button {
+      color: green;
+    }
+  }
 }

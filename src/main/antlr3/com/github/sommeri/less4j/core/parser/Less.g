@@ -197,6 +197,7 @@ ident_keywords: IDENT_WHEN;
 ident_special_pseudoclasses: ident_nth | IDENT_EXTEND;
 
 ident: IDENT | IDENT_NOT | ident_keywords | ident_special_pseudoclasses;
+ident_except_when: IDENT | IDENT_NOT | ident_special_pseudoclasses;
 ident_except_not: IDENT | ident_keywords | ident_special_pseudoclasses;
 ident_general_pseudo: IDENT | IDENT_NOT | ident_keywords;
 // -------------
@@ -471,7 +472,7 @@ ruleSet
 @init {enterRule(retval, RULE_RULESET);}
     : 
       ((((selector)=>a+=selector | )(
-           (mandatory_ws reusableStructureGuards ws LBRACE)=> mandatory_ws g+=reusableStructureGuards
+           (ws reusableStructureGuards ws LBRACE)=> ws g+=reusableStructureGuards
           |((ws a+=selectorSeparator a+=selector)=>(ws a+=selectorSeparator a+=selector))* (ws selectorSeparator)?
          )
          ) ws)
@@ -616,7 +617,7 @@ cssClass
     : dot=DOT (a+=idOrClassNamePart)+ -> ^(CSS_CLASS $dot $a*); 
     
 idOrClassNamePart
-    : ident | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
+    : ident_except_when | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
     
 elementName
     :  (a+=elementNamePart)+ -> ^(ELEMENT_NAME $a*);
