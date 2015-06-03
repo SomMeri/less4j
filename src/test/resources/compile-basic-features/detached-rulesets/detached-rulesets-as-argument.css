@@ -10,3 +10,8 @@
 #sees-caller-scope .custom-mixin-argument {
   from-custom: sees;
 }
+#list-of-arguments {
+  name: name;
+  first: set;
+  second: set;
+}

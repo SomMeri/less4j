@@ -31,3 +31,14 @@
 	.mixin({.inCaller();});
    }
 }
+
+// list of arguments
+.multiple-arguments(@name, @set, @set2) {
+  name: @name;
+  @set();
+  @set2();
+}
+
+#list-of-arguments {
+  .multiple-arguments(name, { first: set; }, { second: set;})
+}

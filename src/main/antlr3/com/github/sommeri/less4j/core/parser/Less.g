@@ -826,12 +826,11 @@ finally { leaveRule(); }
 
 expression_full
 @init {enterRule(retval, RULE_EXPRESSION);}
-    : (dr+=detachedRuleset 
-      | (a+=mathExprHighPriorNoWhitespaceList (
+    : ( (a+=mathExprHighPriorNoWhitespaceList (
             (operator mathExprHighPriorNoWhitespaceList)=>(b+=operator c+=mathExprHighPriorNoWhitespaceList)
             | (term_no_preceeding_whitespace)=>(b+=operator_fictional c+=term_no_preceeding_whitespace)
          )* (b+=operator_fictional c+=prio)?
-      )) -> ^(EXPRESSION $dr* $a* ($b $c)* )
+      )) -> ^(EXPRESSION $a* ($b $c)* )
     ;
 finally { leaveRule(); }
 
@@ -848,12 +847,13 @@ Yes: 1+-1
 */
 mathExprHighPriorNoWhitespaceList
 @init {enterRule(retval, RULE_EXPRESSION);}
-    : a=mathExprLowPrior (
+    : (dr+=detachedRuleset 
+      |(a=mathExprLowPrior (
         (plusOrMinus ws mathExprLowPrior)=>(b+=plusOrMinus ws c+=mathExprLowPrior)
         | (plusOrMinus mandatory_ws mathExprLowPrior)=>(b+=plusOrMinus mandatory_ws c+=mathExprLowPrior)
         | (mandatory_ws plusOrMinus mandatory_ws mathExprLowPrior)=>(mandatory_ws b+=plusOrMinus mandatory_ws c+=mathExprLowPrior)
         | (ws plusOrMinus ws plusOrMinus ws mathExprLowPrior)=>(ws b+=plusOrMinus ws c+=mathExprLowPrior)
-      )* -> ^(EXPRESSION $a ($b $c)*)
+      )*)) -> ^(EXPRESSION $dr* $a* ($b $c)*)
     ;
 finally { leaveRule(); }
 
