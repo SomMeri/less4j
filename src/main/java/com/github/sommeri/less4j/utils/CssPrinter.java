@@ -685,26 +685,23 @@ public class CssPrinter {
     // this is sort of hack, bypass the usual append method
     appendComments(node.getOpeningComments(), true);
 
-    cssOnly.ensureSeparator();
+    if (!isCompressing()) cssOnly.ensureSeparator();
     append(node.getOpeningCurlyBrace());
-    cssOnly.ensureNewLine().increaseIndentationLevel();
+    if (!isCompressing()) cssOnly.ensureNewLine().increaseIndentationLevel();
 
     Iterator<ASTCssNode> declarations = node.getDeclarations().iterator();
     List<ASTCssNode> notDeclarations = node.getNotDeclarations();
     while (declarations.hasNext()) {
       ASTCssNode declaration = declarations.next();
       append(declaration);
-      if (declarations.hasNext() || notDeclarations.isEmpty())
+      if (!isCompressing() && (declarations.hasNext() || notDeclarations.isEmpty()))
         cssOnly.ensureNewLine();
     }
-    for (ASTCssNode body : notDeclarations) {
-      boolean changedAnything = append(body);
-      if (changedAnything)
-        cssOnly.ensureNewLine();
-    }
+    
+    appendAll(notDeclarations);
 
     appendComments(node.getOrphanComments(), false);
-    cssOnly.decreaseIndentationLevel();
+    if (!isCompressing()) cssOnly.decreaseIndentationLevel();
     append(node.getClosingCurlyBrace());
 
     // this is sort of hack, bypass the usual append method

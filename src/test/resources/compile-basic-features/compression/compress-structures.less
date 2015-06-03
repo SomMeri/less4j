@@ -1,0 +1,13 @@
+// issue https://github.com/SomMeri/less4j/issues/279
+@media (min-width: 500px) and (max-width:1119px) {
+    @viewport {
+        width: 1120px;
+        user-zoom: fixed;
+    }
+}
+
+.default-margin {
+    @media (min-width: 500px) {
+        margin: auto;
+    }
+}
