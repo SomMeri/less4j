@@ -21,7 +21,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
  * from the master branch.
  * 
  */
-@Ignore
+//@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
@@ -85,7 +85,6 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
     LessCompiler compiler = getCompiler();
     Configuration configuration = createConfiguration(cssOutput);
-    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
     
     CustomLessSource source = new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8");
     CompilationResult actual = compiler.compile(source, configuration);
@@ -143,15 +142,25 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     }
   }
 
+//  @Override
+//  protected Configuration createConfiguration(File cssOutput) {
+//    Configuration configuration = super.createConfiguration(cssOutput);
+//    configuration.getSourceMapConfiguration().setInline(false);
+//    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
+//    configuration.getSourceMapConfiguration().setIncludeSourcesContent(true);
+//    return configuration;
+//  }
+
   @Override
   protected Configuration createConfiguration(File cssOutput) {
-    Configuration configuration = super.createConfiguration(cssOutput);
+    Configuration configuration = new Configuration();
+    configuration.setCssResultLocation(new LessSource.FileSource(cssOutput));
+
     configuration.getSourceMapConfiguration().setInline(false);
-    configuration.getSourceMapConfiguration().setLinkSourceMap(true);
-    configuration.getSourceMapConfiguration().setIncludeSourcesContent(true);
+    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
+    
     return configuration;
   }
-
   @Parameters(name = "Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
     //justWait();
