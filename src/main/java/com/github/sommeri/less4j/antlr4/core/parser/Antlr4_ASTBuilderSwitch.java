@@ -1328,9 +1328,6 @@ public class Antlr4_ASTBuilderSwitch implements LessG4Visitor<ASTCssNode> {
 
   @Override
   public InterpolableName visitElementName(ElementNameContext ctx) {
-    if (!treeComments.getOrCreate(ctx).isEmpty())
-      System.out.println("tralala");
-
     InterpolableName interpolableName = toInterpolableName(ctx);
     return interpolableName;
   }

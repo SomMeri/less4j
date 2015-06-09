@@ -55,7 +55,7 @@ import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 public class ANTLR4Parser {
 
   private static final String WARMED_UP_CAHE = "predictionContextCache.json";
-  private static final boolean isDebug = true;
+  private static final boolean isDebug = false;
   private final PerformanceUtil performanceUtil = new PerformanceUtil();
 
   public ParserResult parseStyleSheet(String content, LessSource source) {
@@ -73,7 +73,7 @@ public class ANTLR4Parser {
     PublicLessG4Parser parser = new PublicLessG4Parser(tokens);
 
     Map<PredictionContext, PredictionContext> chache = parser.getMap();
-    System.err.println("before: " + chache.size());
+    //System.err.println("before: " + chache.size());
     if (chache.size() == 0) {
       performanceUtil.start("cache_warmup");
       String cachedJson = readFile(WARMED_UP_CAHE);
@@ -84,13 +84,13 @@ public class ANTLR4Parser {
         chache2.add(predictionContext);
       }
       String howLong = performanceUtil.measureAsString("cache_warmup");
-      System.err.println("Load time: " + howLong);
-      System.err.println("after load: " + chache.size());
+//      System.err.println("Load time: " + howLong);
+//      System.err.println("after load: " + chache.size());
     }
 
     // two stage parsing is necessary due to css3-modsel-170c
     parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-    System.err.println("middle: " + chache.size());
+//    System.err.println("middle: " + chache.size());
     ParseTree tree = null;
     try {
       tree = parser.styleSheet(); // begin parsing at styleSheet rule
@@ -101,11 +101,11 @@ public class ANTLR4Parser {
       tree = parser.styleSheet(); // STAGE 2
     }
 
-    DFA[] array = parser.getArray();
-    System.err.println("after: " + array.length);
-    for (DFA dfa : array) {
-      System.err.println(" -- " + dfa.states.size());
-    }
+//    DFA[] array = parser.getArray();
+//    System.err.println("after: " + array.length);
+//    for (DFA dfa : array) {
+//      System.err.println(" -- " + dfa.states.size());
+//    }
     
     //    Set<String> classes = new HashSet<String>();
     //    Set<Integer> ids = new HashSet<Integer>();
