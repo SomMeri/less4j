@@ -40,7 +40,7 @@ import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 public class ANTLR4Parser {
 
   private static final String WARMED_UP_CAHE = "predictionContextCache.json";
-  private static final boolean isDebug = true;
+  private static final boolean isDebug = false;
   private final PerformanceUtil performanceUtil = new PerformanceUtil();
 
   public ParserResult parseStyleSheet(String content, LessSource source) {

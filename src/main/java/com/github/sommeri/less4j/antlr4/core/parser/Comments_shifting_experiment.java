@@ -153,7 +153,6 @@ public class Comments_shifting_experiment {
       if (token.getType() == LessG4Lexer.COMMENT) {
         comment = new Comment(new HiddenTokenAwareTreeAdapter(token));
         result.add(comment);
-        System.out.println(comment.getComment());
       }
       if (token.getType() == LessG4Lexer.NEW_LINE) {
         if (comment != null)
