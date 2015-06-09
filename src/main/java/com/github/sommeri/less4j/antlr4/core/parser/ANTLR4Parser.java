@@ -7,14 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -27,24 +22,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenFactory;
 import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.ArrayPredictionContext;
-import org.antlr.v4.runtime.atn.PredictionContext;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.atn.PublicPredictionContextCache;
-import org.antlr.v4.runtime.atn.SingletonPredictionContext;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.parser.LessG4Lexer;
@@ -70,27 +55,27 @@ public class ANTLR4Parser {
     EnhancedTokenStream tokens = new EnhancedTokenStream(lexer);
     // create a parser that feeds off the tokens buffer
     //FIXME: (antlr4) wtf is this about? related: http://www.antlr.org/papers/allstar-techreport.pdf
-    PublicLessG4Parser parser = new PublicLessG4Parser(tokens);
+    LessG4Parser parser = new LessG4Parser(tokens);
 
-    Map<PredictionContext, PredictionContext> chache = parser.getMap();
-    System.err.println("before: " + chache.size());
-    if (chache.size() == 0) {
-      performanceUtil.start("cache_warmup");
-      String cachedJson = readFile(WARMED_UP_CAHE);
-      Map<Integer, PredictionContext> parseJsonToPredictionContext = parseJsonToPredictionContext(cachedJson);
-      Collection<PredictionContext> values = parseJsonToPredictionContext.values();
-      for (PredictionContext predictionContext : values) {
-        PredictionContextCache chache2 = parser.getChache();
-        chache2.add(predictionContext);
-      }
-      String howLong = performanceUtil.measureAsString("cache_warmup");
-      System.err.println("Load time: " + howLong);
-      System.err.println("after load: " + chache.size());
-    }
+//    Map<PredictionContext, PredictionContext> chache = parser.getMap();
+//    System.err.println("before: " + chache.size());
+//    if (chache.size() == 0) {
+//      performanceUtil.start("cache_warmup");
+//      String cachedJson = readFile(WARMED_UP_CAHE);
+//      Map<Integer, PredictionContext> parseJsonToPredictionContext = parseJsonToPredictionContext(cachedJson);
+//      Collection<PredictionContext> values = parseJsonToPredictionContext.values();
+//      for (PredictionContext predictionContext : values) {
+//        PredictionContextCache chache2 = parser.getChache();
+//        chache2.add(predictionContext);
+//      }
+//      String howLong = performanceUtil.measureAsString("cache_warmup");
+//      System.err.println("Load time: " + howLong);
+//      System.err.println("after load: " + chache.size());
+//    }
 
     // two stage parsing is necessary due to css3-modsel-170c
     parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-    System.err.println("middle: " + chache.size());
+//    System.err.println("middle: " + chache.size());
     ParseTree tree = null;
     try {
       tree = parser.styleSheet(); // begin parsing at styleSheet rule
@@ -101,11 +86,11 @@ public class ANTLR4Parser {
       tree = parser.styleSheet(); // STAGE 2
     }
 
-    DFA[] array = parser.getArray();
-    System.err.println("after: " + array.length);
-    for (DFA dfa : array) {
-      System.err.println(" -- " + dfa.states.size());
-    }
+//    DFA[] array = parser.getArray();
+//    System.err.println("after: " + array.length);
+//    for (DFA dfa : array) {
+//      System.err.println(" -- " + dfa.states.size());
+//    }
     
     //    Set<String> classes = new HashSet<String>();
     //    Set<Integer> ids = new HashSet<Integer>();
@@ -140,120 +125,120 @@ public class ANTLR4Parser {
     return new ParserResult(tree, commentsMap);
   }
 
-  private void persistCache(Map<PredictionContext, PredictionContext> chache) {
-    StringBuffer buffer = new StringBuffer();
-    try {
-      String jsonString = cacheToJson(chache, buffer);
-      printStringToFile(WARMED_UP_CAHE, jsonString);
-      System.out.println(jsonString);
+//  private void persistCache(Map<PredictionContext, PredictionContext> chache) {
+//    StringBuffer buffer = new StringBuffer();
+//    try {
+//      String jsonString = cacheToJson(chache, buffer);
+//      printStringToFile(WARMED_UP_CAHE, jsonString);
+//      System.out.println(jsonString);
+//
+//      //      System.out.println(buffer);
+//
+//      Map<Integer, PredictionContext> oldIdToNewObject = parseJsonToPredictionContext(jsonString);
+//
+//      System.out.println(oldIdToNewObject);
+//
+//    } catch (JSONException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
+//  }
+//
+//  private Map<Integer, PredictionContext> parseJsonToPredictionContext(String jsonString) {
+//    JSONArray jsonarray;
+//    try {
+//      jsonarray = new JSONArray(jsonString);
+//      Map<Integer, PredictionContext> oldIdToNewObject = new HashMap<Integer, PredictionContext>();
+//      oldIdToNewObject.put(Integer.valueOf(0), PredictionContext.EMPTY);
+//
+//      for (int i = 0; i < jsonarray.length(); i++) {
+//        JSONObject object = jsonarray.getJSONObject(i);
+//        int oldId = object.getInt("id");
+//        if (object.has("returnState")) {
+//          int returnState = object.getInt("returnState");
+//          int parentid = object.getInt("parentid");
+//          PredictionContext parent = oldIdToNewObject.get(parentid);
+//          SingletonPredictionContext singleton = SingletonPredictionContext.create(parent, returnState);
+//          oldIdToNewObject.put(oldId, singleton);
+//        } else {
+//          JSONArray parentidsJson = object.getJSONArray("parentids");
+//          PredictionContext[] parents = new PredictionContext[parentidsJson.length()];
+//          for (int j = 0; j < parents.length; j++) {
+//            int parentId = parentidsJson.getInt(j);
+//            parents[j] = oldIdToNewObject.get(parentId);
+//          }
+//
+//          JSONArray returnStatesJson = object.getJSONArray("returnStates");
+//          int[] returnStates = new int[returnStatesJson.length()];
+//          for (int j = 0; j < returnStates.length; j++) {
+//            returnStates[j] = returnStatesJson.getInt(j);
+//          }
+//
+//          ArrayPredictionContext array = new ArrayPredictionContext(parents, returnStates);
+//          oldIdToNewObject.put(oldId, array);
+//        }
+//
+//      }
+//      return oldIdToNewObject;
+//    } catch (JSONException e) {
+//      // TODO Auto-generated catch block
+//      throw new RuntimeException(e);
+//    }
+//  }
 
-      //      System.out.println(buffer);
-
-      Map<Integer, PredictionContext> oldIdToNewObject = parseJsonToPredictionContext(jsonString);
-
-      System.out.println(oldIdToNewObject);
-
-    } catch (JSONException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-
-  private Map<Integer, PredictionContext> parseJsonToPredictionContext(String jsonString) {
-    JSONArray jsonarray;
-    try {
-      jsonarray = new JSONArray(jsonString);
-      Map<Integer, PredictionContext> oldIdToNewObject = new HashMap<Integer, PredictionContext>();
-      oldIdToNewObject.put(Integer.valueOf(0), PredictionContext.EMPTY);
-
-      for (int i = 0; i < jsonarray.length(); i++) {
-        JSONObject object = jsonarray.getJSONObject(i);
-        int oldId = object.getInt("id");
-        if (object.has("returnState")) {
-          int returnState = object.getInt("returnState");
-          int parentid = object.getInt("parentid");
-          PredictionContext parent = oldIdToNewObject.get(parentid);
-          SingletonPredictionContext singleton = SingletonPredictionContext.create(parent, returnState);
-          oldIdToNewObject.put(oldId, singleton);
-        } else {
-          JSONArray parentidsJson = object.getJSONArray("parentids");
-          PredictionContext[] parents = new PredictionContext[parentidsJson.length()];
-          for (int j = 0; j < parents.length; j++) {
-            int parentId = parentidsJson.getInt(j);
-            parents[j] = oldIdToNewObject.get(parentId);
-          }
-
-          JSONArray returnStatesJson = object.getJSONArray("returnStates");
-          int[] returnStates = new int[returnStatesJson.length()];
-          for (int j = 0; j < returnStates.length; j++) {
-            returnStates[j] = returnStatesJson.getInt(j);
-          }
-
-          ArrayPredictionContext array = new ArrayPredictionContext(parents, returnStates);
-          oldIdToNewObject.put(oldId, array);
-        }
-
-      }
-      return oldIdToNewObject;
-    } catch (JSONException e) {
-      // TODO Auto-generated catch block
-      throw new RuntimeException(e);
-    }
-  }
-
-  private String cacheToJson(Map<PredictionContext, PredictionContext> chache, StringBuffer buffer) throws JSONException {
-    JSONArray toJson = new JSONArray();
-    List<PredictionContext> values = new ArrayList<PredictionContext>(chache.values());
-    Collections.sort(values, new Comparator<PredictionContext>() {
-
-      @Override
-      public int compare(PredictionContext arg0, PredictionContext arg1) {
-        return arg0.id - arg1.id;
-      }
-
-    });
-
-    for (PredictionContext value : values) {
-      JSONObject object = new JSONObject();
-      object.put("id", value.id);
-      object.put("cachedHashCode", value.cachedHashCode);
-
-      buffer.append(value.id).append(" ").append(value.cachedHashCode).append(" ");
-      if (value instanceof SingletonPredictionContext) {
-        SingletonPredictionContext singleton = (SingletonPredictionContext) value;
-        object.put("returnState", singleton.returnState);
-        object.put("parentid", singleton.parent.id);
-        buffer.append(singleton.returnState).append(" ");
-
-        //        if (value.id <= singleton.parent.id)
-        //          throw new IllegalStateException();
-
-        buffer.append("parent: " + singleton.parent.id);
-      } else if (value instanceof ArrayPredictionContext) {
-        ArrayPredictionContext array = (ArrayPredictionContext) value;
-        buffer.append(array.returnStates.length);
-
-        JSONArray returnStates = new JSONArray();
-        for (int i = 0; i < array.returnStates.length; i++) {
-          returnStates.put(array.returnStates[i]);
-        }
-        JSONArray parentids = new JSONArray();
-        for (int i = 0; i < array.parents.length; i++) {
-          parentids.put(array.parents[i].id);
-          if (value.id <= array.parents[i].id)
-            throw new IllegalStateException();
-        }
-        object.put("returnStates", returnStates);
-        object.put("parentids", parentids);
-      }
-      buffer.append("\n");
-      toJson.put(object);
-    }
-
-    System.out.println(buffer);
-    String jsonString = toJson.toString();
-    return jsonString;
-  }
+//  private String cacheToJson(Map<PredictionContext, PredictionContext> chache, StringBuffer buffer) throws JSONException {
+//    JSONArray toJson = new JSONArray();
+//    List<PredictionContext> values = new ArrayList<PredictionContext>(chache.values());
+//    Collections.sort(values, new Comparator<PredictionContext>() {
+//
+//      @Override
+//      public int compare(PredictionContext arg0, PredictionContext arg1) {
+//        return arg0.id - arg1.id;
+//      }
+//
+//    });
+//
+//    for (PredictionContext value : values) {
+//      JSONObject object = new JSONObject();
+//      object.put("id", value.id);
+//      object.put("cachedHashCode", value.cachedHashCode);
+//
+//      buffer.append(value.id).append(" ").append(value.cachedHashCode).append(" ");
+//      if (value instanceof SingletonPredictionContext) {
+//        SingletonPredictionContext singleton = (SingletonPredictionContext) value;
+//        object.put("returnState", singleton.returnState);
+//        object.put("parentid", singleton.parent.id);
+//        buffer.append(singleton.returnState).append(" ");
+//
+//        //        if (value.id <= singleton.parent.id)
+//        //          throw new IllegalStateException();
+//
+//        buffer.append("parent: " + singleton.parent.id);
+//      } else if (value instanceof ArrayPredictionContext) {
+//        ArrayPredictionContext array = (ArrayPredictionContext) value;
+//        buffer.append(array.returnStates.length);
+//
+//        JSONArray returnStates = new JSONArray();
+//        for (int i = 0; i < array.returnStates.length; i++) {
+//          returnStates.put(array.returnStates[i]);
+//        }
+//        JSONArray parentids = new JSONArray();
+//        for (int i = 0; i < array.parents.length; i++) {
+//          parentids.put(array.parents[i].id);
+//          if (value.id <= array.parents[i].id)
+//            throw new IllegalStateException();
+//        }
+//        object.put("returnStates", returnStates);
+//        object.put("parentids", parentids);
+//      }
+//      buffer.append("\n");
+//      toJson.put(object);
+//    }
+//
+//    System.out.println(buffer);
+//    String jsonString = toJson.toString();
+//    return jsonString;
+//  }
 
   private LinkedList<CommonToken> toCommonTokens(List<Token> from) {
     LinkedList<CommonToken> to = new LinkedList<CommonToken>();
@@ -316,7 +301,7 @@ public class ANTLR4Parser {
   }
 }
 
-class Antlr4_TokenFactory implements TokenFactory<Antlr4_HiddenTokenAwareTree> {
+class Antlr4_TokenFactory implements TokenFactory {
   private LessSource lessSource;
 
   public Antlr4_TokenFactory(LessSource lessSource) {
@@ -329,12 +314,12 @@ class Antlr4_TokenFactory implements TokenFactory<Antlr4_HiddenTokenAwareTree> {
   }
 
   @Override
-  public Antlr4_HiddenTokenAwareTree create(Pair<TokenSource, CharStream> source, int type, String text, int channel, int start, int stop, int line, int charPositionInLine) {
-    Antlr4_HiddenTokenAwareTree t = new Antlr4_HiddenTokenAwareTree(source, type, channel, start, stop);
-    t.setLine(line);
-    t.setCharPositionInLine(charPositionInLine);
-    t.setSource(lessSource);
-    return t;
+  public Token create(Tuple2<? extends TokenSource, CharStream> source, int type, String text, int channel, int start, int stop, int line, int charPositionInLine) {
+  Antlr4_HiddenTokenAwareTree t = new Antlr4_HiddenTokenAwareTree(source, type, channel, start, stop);
+  t.setLine(line);
+  t.setCharPositionInLine(charPositionInLine);
+  t.setSource(lessSource);
+  return t;
   }
 
 }
@@ -476,21 +461,21 @@ class EnhancedTokenStream extends CommonTokenStream {
 
 }
 
-class PublicLessG4Parser extends LessG4Parser {
-
-  public PublicLessG4Parser(TokenStream input) {
-    super(input);
-  }
-
-  public PredictionContextCache getChache() {
-    return _sharedContextCache;
-  }
-
-  public Map<PredictionContext, PredictionContext> getMap() {
-    return (new PublicPredictionContextCache(getChache())).getMap();
-  }
-
-  public DFA[] getArray() {
-    return _decisionToDFA;
-  }
-}
+//class PublicLessG4Parser extends LessG4Parser {
+//
+//  public PublicLessG4Parser(TokenStream input) {
+//    super(input);
+//  }
+//
+//  public PredictionContextCache getChache() {
+//    return _sharedContextCache;
+//  }
+//
+//  public Map<PredictionContext, PredictionContext> getMap() {
+//    return (new PublicPredictionContextCache(getChache())).getMap();
+//  }
+//
+//  public DFA[] getArray() {
+//    return _decisionToDFA;
+//  }
+//}

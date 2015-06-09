@@ -8,7 +8,7 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple2;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.parser.LessG4Lexer;
@@ -31,7 +31,7 @@ public class Antlr4_HiddenTokenAwareTree extends CommonToken {
     super(type, text);
   }
 
-  public Antlr4_HiddenTokenAwareTree(Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
+  public Antlr4_HiddenTokenAwareTree(Tuple2<? extends TokenSource, CharStream> source, int type, int channel, int start, int stop) {
     super(source, type, channel, start, stop);
   }
 
