@@ -1,16 +1,9 @@
-@important: red !important;
-.important {
-  important: @important !important;
-}
-
-.mixin() {
-  normal: value;
-  important: value !important;
-  variable-normal: @variable;
-  variable-important: @variable ! important;
-  @variable: value !important;
-}
-
-.mixin-reference-important {
-  .mixin() !important;
+@my-option:true;
+& when (@my-option = true) {
+  button {
+    color: white;
+  }
+  a {
+    color: blue;
+  }
 }

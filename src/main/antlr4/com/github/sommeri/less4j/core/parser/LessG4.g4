@@ -952,7 +952,7 @@ fragment UNICODE_NON_BREAKING_WS: '\u00A0';
 fragment WS_FRAGMENT : (' '|'\t'|'\f'|UNICODE_NON_BREAKING_WS)+ ;   //('\r'|'\n'|'\t'|'\f'|' ')
 WS : WS_FRAGMENT ;//{ $channel = HIDDEN; } ;
 fragment NL : ('\r' '\n'? | '\n');
-NEW_LINE: NL ;//{ $channel = HIDDEN; } ;
+NEW_LINE: WS_FRAGMENT* NL WS_FRAGMENT*;//{ $channel = HIDDEN; } ;
 
 ws: (WS | NEW_LINE)*;
 mandatory_ws: (WS | NEW_LINE)+;

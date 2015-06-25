@@ -59,8 +59,8 @@ public class ANTLR4Parser {
   private final PerformanceUtil performanceUtil = new PerformanceUtil();
 
   public ParserResult parseStyleSheet(String content, LessSource source) {
-    if (isDebug)
-      DebugAndTestPrint.printTokenStream(content);
+//    if (isDebug)
+//      DebugAndTestPrint.printTokenStream(content);
 
     ANTLRInputStream input = new ANTLRInputStream(content);
     // create a lexer that feeds off of input CharStream
