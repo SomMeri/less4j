@@ -37,7 +37,7 @@ public class LessAstValidator {
     switch (node.getType()) {
     case RULE_SET: {
       checkEmptySelector((RuleSet) node);
-      checkTopLevelNested((RuleSet) node);
+      //checkTopLevelNested((RuleSet) node);
       break;
     }
     case MIXIN_REFERENCE: {
@@ -105,6 +105,7 @@ public class LessAstValidator {
     }
   }
 
+  @SuppressWarnings("unused")
   private void checkTopLevelNested(RuleSet node) {
     if (node.getParent().getType() != ASTCssNodeType.STYLE_SHEET)
       return;

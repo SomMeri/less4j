@@ -1,2 +1,8 @@
 color: red;
 color: green;
+h1 {
+  color: red;
+}
+h1.class {
+  color: red;
+}
