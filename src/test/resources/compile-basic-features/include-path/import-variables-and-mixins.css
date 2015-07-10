@@ -1,0 +1,4 @@
+h1 {
+  content: @variable value is "top level";
+  content: mixin in space;
+}

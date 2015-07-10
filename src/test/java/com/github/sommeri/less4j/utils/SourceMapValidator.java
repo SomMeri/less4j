@@ -2,7 +2,6 @@ package com.github.sommeri.less4j.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
@@ -150,7 +151,7 @@ public class SourceMapValidator {
         MappedFile mapped = toMappedFile(name, content);
         mappedFiles.put(name, mapped);
       } catch (Throwable th) {
-        fail("Could not read source file " + name);
+        throw new RuntimeException("Could not read source file " + name, th);
       }
   }
 
@@ -168,9 +169,21 @@ public class SourceMapValidator {
     if (contents.containsKey(name))
       return contents.get(name);
 
-    File file = new File(root + URLDecoder.decode(name, "utf-8"));
+    String filename = URLDecoder.decode(name, "utf-8");
+    File sourcefile = toFile(filename);
+    
+    File file = sourcefile.isAbsolute()? sourcefile : new File(root + sourcefile.getPath());
     String content = IOUtils.toString(new InputStreamReader(new FileInputStream(file), "utf-8"));
     return content;
+  }
+
+  private File toFile(String filename) {
+    //this is not a production quality, but works well enough for tests
+    try {
+      return new File((new URI(filename)).getPath());
+    } catch (URISyntaxException e) {
+      return new File(filename);
+    }
   }
 
   private final class SymbolsCollector implements EntryVisitor {
