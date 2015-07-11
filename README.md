@@ -48,15 +48,7 @@ Access the compiler through the `com.github.sommeri.less4j.LessCompiler` interfa
 *  `compile(File inputFile)` - compiles a file. Import statements are assumed to be relative to supplied file.
 *  `compile(URL inputFile)` - compiles resource referenced through url/uri.  It supports http, https, jar, ftp, gopher and mail protocols  (e.g. all protocols supported by java.lang.URL).
 *  `compile(String lessContent)` - compiles a string. Compiler will be unable to load imported files, less `@import` statements are compiled into css `@import` statement instead of being processed.
-*  `compile(LessSource inputFile)` - extend `LessSource` to add custom loading data method.
-
-The last method is the most general. It accepts It can be used to load less sheets from arbitrary source, e.g. database, npm or ftp. Less4j comes with following `LessSource` interface implementations:
-* `FileSource` - loads less sheets from filesystem. Import statements are assumed to be relative to that file.
-* `MultiPathFileSource` - loads less sheets from filesystem. It is useful if you need to configure additional list of paths which will be used for imports. This source is less4j equivalent of `--include-path` less.js option.
-* `StringSource` - input less sheet is stored in a string. This class is unable to load imported files. Compiler will be unable to load imported files, less `@import` statements are compiled into css `@import` statement instead of being processed. 
-* `MultiPathStringSource` - input less sheet is stored in a string. Allows you to configure additional list of paths which will be used for imports. This source is less4j equivalent of `--include-path` less.js option.
-* `URLSource` - loads data from URL. It supports http, https, jar, ftp, gopher and mail protocols (e.g. all protocols supported by java.lang.URL). Import statement are assumed to be relative to that url.  
-
+*  `compile(LessSource inputFile)` - use `LessSource` interface to fetch imported files. It can be used to load less sheets from arbitrary source, e.g. database, npm or add non-relative search paths for import statements. Search path is a directory with less files we would like to import e.g., functionality similar to less.js --include-path option. See [wiki](https://github.com/SomMeri/less4j/wiki/Less-Source) for more details.
 
 Each of these method has an additional optional parameter `Configuration options`. Additional options allow you to configure generated [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps), add [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) and add [embedded scripting](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) into to compiler.
  
