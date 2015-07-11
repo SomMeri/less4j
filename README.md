@@ -50,7 +50,7 @@ Access the compiler through the `com.github.sommeri.less4j.LessCompiler` interfa
 *  `CompilationResult compile(String lessContent)` - compiles a string,
 *  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add new resource type. 
 
-Each of these method has an additional optional parameter `Configuration options`. Additional options are used only during [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps) generation, so you may ignore them if you do not need it.     
+Each of these method has an additional optional parameter `Configuration options`. Additional options allow you to configure generated [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps), add [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) and add [embedded scripting](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) into to compiler.
  
 Return object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
