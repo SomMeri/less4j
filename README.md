@@ -45,10 +45,10 @@ The easiest way to integrate less4j into Java project is to use [wro4j](http://a
 
 ## API Description
 Access the compiler through the `com.github.sommeri.less4j.LessCompiler` interface. Its thread safe implementation is `com.github.sommeri.less4j.core.DefaultLessCompiler`. The interface exposes following methods:
-*  `CompilationResult compile(File inputFile)` - compiles a file. Import statement are assumed to be relative to supplied file.
-*  `CompilationResult compile(URL inputFile)` - compiles resource referenced through url/uri.  It supports http, https, jar, ftp, gopher and mail protocols  (e.g. all protocols supported by java.lang.URL).
-*  `CompilationResult compile(String lessContent)` - compiles a string. Compiler will be unable to load imported files, less `@import` statements are compiled into css `@import` statement instead of being processed.
-*  `CompilationResult compile(LessSource inputFile)` - extend `LessSource` to add custom loading data method.
+*  `compile(File inputFile)` - compiles a file. Import statements are assumed to be relative to supplied file.
+*  `compile(URL inputFile)` - compiles resource referenced through url/uri.  It supports http, https, jar, ftp, gopher and mail protocols  (e.g. all protocols supported by java.lang.URL).
+*  `compile(String lessContent)` - compiles a string. Compiler will be unable to load imported files, less `@import` statements are compiled into css `@import` statement instead of being processed.
+*  `compile(LessSource inputFile)` - extend `LessSource` to add custom loading data method.
 
 The last method is the most general. It accepts It can be used to load less sheets from arbitrary source, e.g. database, npm or ftp. Less4j comes with following `LessSource` interface implementations:
 * `FileSource` - loads less sheets from filesystem. Import statements are assumed to be relative to that file.
