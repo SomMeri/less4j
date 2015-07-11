@@ -52,10 +52,10 @@ Access the compiler through the `com.github.sommeri.less4j.LessCompiler` interfa
 
 A common need is to add search paths for import statements e.g., functionality similar to less.js --include-path option. This is [possible](https://github.com/SomMeri/less4j/wiki/Less-Source) using the last method.
 
-### Options
+#### Options
 Each of these method has an additional optional parameter `Configuration options`. Additional options allow you to configure generated [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps), add [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) and add [embedded scripting](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) into to compiler.
  
-### Return Object 
+#### Return Object 
 Return object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
 * `getSourceMap` - returns [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps),
