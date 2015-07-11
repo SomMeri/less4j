@@ -63,7 +63,7 @@ Return object `CompilationResult` has three methods:
 
 Each warning is described by message, line, character number and filename of the place that caused it.
   
-### Example
+#### Example
 ````java
 // create input file
 File inputLessFile = createFile("sampleInput.less", "* { margin: 1 1 1 1; }");
@@ -83,13 +83,13 @@ private static String format(Problem warning) {
 }
 ````
 
-### Error Handling
+#### Error Handling
 `Compile` method may throw `Less4jException`. The exception is checked and can return list of all found compilation errors. In addition, compilation of some syntactically incorrect inputs may still lead to some output or produce a list of warnings. If this is the case, produced css is most likely invalid and the list of warnings incomplete. Even if they are invalid, they still can occasionally help to find errors in the input and the exception provides access to them. 
 
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
 
-### Plugins and Customizations
+#### Plugins and Customizations
 Less4j can be customized in three different ways:
 * custom [less source](https://github.com/SomMeri/less4j/issues/181#issuecomment-31613570) implementation can be used to 
  * read sheets from unsupported places (database, other directories),
