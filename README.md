@@ -48,9 +48,11 @@ Access the compiler through the `com.github.sommeri.less4j.LessCompiler` interfa
 *  `compile(File inputFile)` - compiles a file. Import statements are assumed to be relative to that file.
 *  `compile(URL inputFile)` - compiles resource referenced through url. It supports all protocols supported by java.lang.URL e.g. http, https, jar, ftp, gopher and mail.
 *  `compile(String lessContent)` - compiles a string. Compiler will be unable to load imported files, less @import statements are compiled into css @import statement instead of being processed.
-*  `compile(LessSource inputFile)` - use [`LessSource`](https://github.com/SomMeri/less4j/wiki/Less-Source) interface to fetch imported files. It can be used to load less sheets from arbitrary source, for example database, or add non-relative search paths for import statements. Search path is a directory with less files we would like to import e.g., functionality similar to less.js --include-path option.
+*  `compile(LessSource inputFile)` - compiler uses [`LessSource`](https://github.com/SomMeri/less4j/wiki/Less-Source) interface to fetch imported files. It can be used to load less sheets from arbitrary source, e.g., database or npm. 
 
-Each of these method has an additional optional parameter `Configuration options`. Additional options allow you to configure generated [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps), add [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) and add [embedded scripting](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) into to compiler.
+Note: A common need is to add non-relative search paths for import statements. Search path is a directory with less files we would like to import e.g., functionality similar to less.js --include-path option. This is [possible](https://github.com/SomMeri/less4j/wiki/Less-Source) using the last method.
+
+ Each of these method has an additional optional parameter `Configuration options`. Additional options allow you to configure generated [source map](https://github.com/SomMeri/less4j/wiki/Source-Maps), add [custom functions](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) and add [embedded scripting](https://github.com/SomMeri/less4j/wiki/Extending-Less-Language) into to compiler.
  
 Return object `CompilationResult` has three methods: 
 * `getCss` - returns compiled css,
@@ -59,8 +61,6 @@ Return object `CompilationResult` has three methods:
 
 Each warning is described by message, line, character number and filename of the place that caused it.
   
-`Compile` methods differ in one important point: how they handle `@import file.less` statement. In all cases, files referenced by the import statement are assumed to be relative to current file. They are also assumed to have the same type e.g., the first method assumes that all less files imports link files on local filesystem and second method assumes that all less imports reference files by relative urls. The third method is special, it leaves all imports as they are. It does not load and compile any files.         
-
 ### Example
 ````java
 // create input file
