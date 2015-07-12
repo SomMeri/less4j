@@ -36,7 +36,7 @@ Pom.xml dependency:
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;com.github.sommeri&lt;/groupId&gt;
   &lt;artifactId&gt;less4j&lt;/artifactId&gt;
-  &lt;version&gt;1.12.0&lt;/version&gt;
+  &lt;version&gt;1.13.0&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
@@ -91,7 +91,7 @@ private static String format(Problem warning) {
 
 #### Plugins and Customizations
 Less4j can be customized in three different ways:
-* custom [less source](https://github.com/SomMeri/less4j/issues/181#issuecomment-31613570) implementation can be used to 
+* custom [less source](https://github.com/SomMeri/less4j/wiki/Customizing-Compiler) implementation can be used to 
  * read sheets from unsupported places (database, other directories),
  * set import file sources or search path by code,
  * generate less files on the fly,
