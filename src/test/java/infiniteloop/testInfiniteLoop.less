@@ -1,0 +1,19 @@
+.make-color(){
+	color: red;
+	.make-bold();
+}
+.make-font(){
+	font-size: 20px;
+}
+.make-bold(){
+	font-weight: bold;
+	.make-color();
+}
+.make-all(){
+	.make-bold();
+	.make-font();
+	.make-color();
+}
+body {
+	.make-all();
+}

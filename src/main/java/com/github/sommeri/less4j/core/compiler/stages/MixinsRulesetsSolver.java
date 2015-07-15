@@ -34,6 +34,7 @@ class MixinsRulesetsSolver {
   private final Configuration configuration;
   private final DefaultGuardHelper defaultGuardHelper;
   private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
+  private final InfiniteLoopDetector infiniteLoopDetector = new InfiniteLoopDetector();
 
   public MixinsRulesetsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = parentSolver;
@@ -116,7 +117,7 @@ class MixinsRulesetsSolver {
           IScope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
           mixinScope.getParent().add(mixinArguments);
           IScope mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, mixinScope);
-
+          infiniteLoopDetector.detect(mixinWorkingScope);
           MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
           GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
 
