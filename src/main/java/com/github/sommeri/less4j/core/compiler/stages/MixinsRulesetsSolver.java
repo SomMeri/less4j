@@ -43,6 +43,7 @@ class MixinsRulesetsSolver {
   private final DefaultGuardHelper defaultGuardHelper;
   private final CallerCalleeScopeJoiner scopeManipulation = new CallerCalleeScopeJoiner();
   private final ExpressionManipulator expressionManipulator = new ExpressionManipulator();
+  private final InfiniteLoopDetector infiniteLoopDetector = new InfiniteLoopDetector();
 
   public MixinsRulesetsSolver(ReferencesSolver parentSolver, AstNodesStack semiCompiledNodes, ProblemsHandler problemsHandler, Configuration configuration) {
     this.parentSolver = parentSolver;
@@ -130,6 +131,7 @@ class MixinsRulesetsSolver {
           //that is matters mostly for scope placeholders - if both close placeholders in same copy error happen
           mixinWorkingScope.toIndependentWorkingCopy();
           data.setMixinWorkingScope(mixinWorkingScope);
+          infiniteLoopDetector.detect(mixinWorkingScope);
 
           MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(mixinWorkingScope, problemsHandler, configuration);
           GuardValue guardValue = guardsValidator.evaluateGuards(fullMixin.getGuardsOnPath(), mixin);

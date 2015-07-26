@@ -1,1 +1,12 @@
-@import 's.less';
+//looping case
+.spanX (@index) when (@index > 0) {
+  loop: member @index;
+  .spanX((@index - 1));
+}
+.spanX (@index) when (@index =< 0) { 
+  loop: end;
+}
+
+#loop-here {
+ .spanX(15);
+}
