@@ -1,12 +1,15 @@
-//looping case
-.spanX (@index) when (@index > 0) {
-  loop: member @index;
-  .spanX((@index - 1));
-}
-.spanX (@index) when (@index =< 0) { 
-  loop: end;
+
+#unlocker() {
+  .mixin() {
+    value: @value;
+    .callSomethingElse(@value);
+  }
 }
 
-#loop-here {
- .spanX(15);
+#use-1() {
+  #unlocker();
+  .callSomethingElse(@value) {
+    use-1: @value;
+  }
 }
+
