@@ -48,7 +48,12 @@ Access the compiler through the `com.github.sommeri.less4j.LessCompiler` interfa
 *  `compile(File inputFile)` - compiles a file. Import statements are assumed to be relative to that file.
 *  `compile(URL inputFile)` - compiles resource referenced through url. It supports all protocols supported by java.lang.URL e.g. http, https, jar, ftp, gopher and mail.
 *  `compile(String lessContent)` - compiles a string. Compiler will be unable to load imported files, less @import statements are compiled into css @import statement instead of being processed.
-*  `compile(LessSource inputFile)` - compiler uses [`LessSource`](https://github.com/SomMeri/less4j/wiki/Less-Source) interface to fetch imported files. It can be used to load less sheets from arbitrary source, e.g., database or npm. 
+*  `compile(LessSource inputFile)` - compiler uses [`LessSource`](https://github.com/SomMeri/less4j/wiki/Less-Source) interface to fetch imported files. It can be used to load less sheets from arbitrary source, e.g., database or npm.
+
+Less4j provides three default implementations of `LessCompiler` interface:
+* `ThreadUnsafeLessCompiler` - Core implementation of the compiler. It is thread unsafe.
+* `DefaultLessCompiler` - Thread safe wrapper of the above.
+* `TimeoutedLessCompiler` - Less compiler with timeout. If the compilation does not finish within specified time limit, compiler returns an error. You can use this to stop the compiler before it consumes too much resources on infinitely looping mixins or large less sheets.
 
 Note: a common need is to add search paths for import statements e.g., functionality similar to less.js --include-path option. This is [possible](https://github.com/SomMeri/less4j/wiki/Less-Source) using the last method.
 
@@ -88,11 +93,6 @@ private static String format(Problem warning) {
 
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
-
-#### LessCompiler Implementations
-* `ThreadUnsafeLessCompiler` - Core implementation of the compiler. It is thread unsafe.
-* `DefaultLessCompiler` - Thread safe wrapper of the above.
-* `TimeoutedLessCompiler` - Less compiler with timeout. If the compilation does not finish within specified time limit, compiler returns an error. You can use this to stop the compiler before it consumes too much resources on infinitely looping mixins or large less sheets.
 
 #### Plugins and Customizations
 Less4j can be customized in three different ways:
