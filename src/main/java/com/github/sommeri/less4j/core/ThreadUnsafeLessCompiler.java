@@ -17,6 +17,7 @@ import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
 import com.github.sommeri.less4j.core.problems.GeneralProblem;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.core.problems.UnableToFinish;
 import com.github.sommeri.less4j.platform.Constants;
 import com.github.sommeri.less4j.utils.CssPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
@@ -67,9 +68,9 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   @Override
   public CompilationResult compile(LessSource source, Configuration options) throws Less4jException {
-    if (options==null)
+    if (options == null)
       options = new Configuration();
-      
+
     problemsHandler = new ProblemsHandler();
     astBuilder = new ASTBuilder(problemsHandler);
     compiler = new LessToCssCompiler(problemsHandler, options);
@@ -83,10 +84,15 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   private CompilationResult doCompile(LessSource source, Configuration options) throws Less4jException {
     ANTLRParser.ParseResult result = toAntlrTree(source);
     StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
-    ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
 
-    CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, compiler.getImportedsources(), options);
-    return compilationResult;
+    try {
+      ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
+      CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, compiler.getImportedsources(), options);
+      return compilationResult;
+    } catch (UnableToFinish ex) {
+      problemsHandler.unableToFinish(lessStyleSheet, ex);
+      return createEmptyCompilationResult();
+    }
   }
 
   private ANTLRParser.ParseResult toAntlrTree(LessSource source) throws Less4jException {
@@ -108,20 +114,25 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
   private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Collection<LessSource> additionalSourceFiles, Configuration options) {
     LessSource cssDestination = options == null ? null : options.getCssResultLocation();
-    if (cssDestination==null) {
+    if (cssDestination == null) {
       String guessedCssName = URIUtils.changeSuffix(lessSource.getName(), Constants.CSS_SUFFIX);
       URI guessedURI = URIUtils.changeSuffix(lessSource.getURI(), Constants.CSS_SUFFIX);
       cssDestination = new LessSource.StringSource("", guessedCssName, guessedURI);
     }
-    
+
     CssPrinter builder = new CssPrinter(lessSource, cssDestination, additionalSourceFiles, options);
     builder.append(cssStyleSheet);
     StringBuilder css = builder.toCss();
     String sourceMap = builder.toSourceMap();
-    
+
     handleSourceMapLink(cssStyleSheet, css, options, lessSource, sourceMap);
 
     CompilationResult compilationResult = new CompilationResult(css.toString(), sourceMap, problemsHandler.getWarnings());
+    return compilationResult;
+  }
+
+  private CompilationResult createEmptyCompilationResult() {
+    CompilationResult compilationResult = new CompilationResult("", null, problemsHandler.getWarnings());
     return compilationResult;
   }
 
@@ -130,10 +141,10 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     LessCompiler.SourceMapConfiguration sourceMapConfiguration = options.getSourceMapConfiguration();
     if (!sourceMapConfiguration.shouldLinkSourceMap() && !sourceMapConfiguration.isInline())
       return;
-    
-    if (!sourceMapConfiguration.isInline() && cssResultLocation==null) {
+
+    if (!sourceMapConfiguration.isInline() && cssResultLocation == null) {
       problemsHandler.warnSourceMapLinkWithoutCssResultLocation(cssAst);
-      return ; 
+      return;
     }
 
     addNewLine(css);
@@ -154,18 +165,18 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private void addNewLine(StringBuilder css) {
-    if (css==null)
-      return ;
-    
+    if (css == null)
+      return;
+
     int length = css.length();
-    if (length==0) {
+    if (length == 0) {
       css.append("\n");
-      return ;
+      return;
     }
-    String endingSymbol = css.substring(length-1);
+    String endingSymbol = css.substring(length - 1);
     if ("\n".equals(endingSymbol))
-      return ;
-      
+      return;
+
     css.append("\n");
   }
 

@@ -1,1 +1,12 @@
-@import 's.less';
+.loop(@variable) when (@variable > 1) {
+  variable: @variable;
+  .loop((@variable + 1));
+}
+
+.loop(@variable) when (default()) {
+  end: end;
+}
+
+.use {
+  .loop(3);
+}

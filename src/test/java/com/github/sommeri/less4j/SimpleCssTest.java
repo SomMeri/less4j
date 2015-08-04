@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
@@ -14,6 +15,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
+import com.github.sommeri.less4j.core.TimeoutedLessCompiler;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -21,7 +24,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
  * from the master branch.
  * 
  */
-@Ignore
+//@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
@@ -92,6 +95,10 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     return actual;
   }
   
+  protected LessCompiler getCompiler() {
+    return new TimeoutedLessCompiler(1000, TimeUnit.MILLISECONDS);
+  }
+
   public static class CustomLessSource extends LessSource.FileSource {
 
     private final List<String> searchPaths;

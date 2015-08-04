@@ -26,6 +26,7 @@ import com.github.sommeri.less4j.core.ast.ReusableStructureName;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
+import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.ast.SupportsLogicalOperator;
 import com.github.sommeri.less4j.core.ast.UnknownAtRule;
 import com.github.sommeri.less4j.core.ast.Variable;
@@ -364,6 +365,10 @@ public class ProblemsHandler implements LessProblems {
 
   public void regexpFunctionError(FunctionExpression call, String message) {
     addError(call, "Regular expression failed: " + message); 
+  }
+
+  public void unableToFinish(StyleSheet lessStyleSheet, UnableToFinish ex) {
+    addError(lessStyleSheet, ex.getMessage());
   }
 
 }

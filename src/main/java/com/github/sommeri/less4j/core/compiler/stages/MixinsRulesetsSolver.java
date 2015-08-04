@@ -31,6 +31,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITas
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.view.ScopeView;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
+import com.github.sommeri.less4j.core.problems.UnableToFinish;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 import com.github.sommeri.less4j.utils.Couple;
 
@@ -104,6 +105,9 @@ class MixinsRulesetsSolver {
   }
 
   public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final IScope callerScope, List<FoundMixin> mixins) {
+    if (Thread.currentThread().isInterrupted())
+      throw new UnableToFinish("Thread Interrupted", (ASTCssNode) null);
+    
     final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     if (mixins.isEmpty())
       return result;
