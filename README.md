@@ -89,6 +89,11 @@ private static String format(Problem warning) {
 * `List<Problem> getErrors` - list of all found compilation errors.
 * `CompilationResult getPartialResult()` -  css and list of warnings produced despite compilation errors. There is no guarantee on what exactly will be returned. Use with caution.  
 
+#### LessCompiler Implementations
+* `ThreadUnsafeLessCompiler` - Core implementation of the compiler. It is thread unsafe.
+* `DefaultLessCompiler` - Thread safe wrapper of the above.
+* `TimeoutedLessCompiler` - Less compiler with timeout. If the compilation does not finish within specified time limit, compiler returns an error. You can use this to stop the compiler before it consumes too much resources on infinitely looping mixins or large less sheets.
+
 #### Plugins and Customizations
 Less4j can be customized in three different ways:
 * custom [less source](https://github.com/SomMeri/less4j/wiki/Customizing-Compiler) implementation can be used to 
