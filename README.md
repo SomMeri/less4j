@@ -50,7 +50,7 @@ Access the compiler through the `com.github.sommeri.less4j.LessCompiler` interfa
 *  `compile(String lessContent)` - compiles a string. Compiler will be unable to load imported files, less @import statements are compiled into css @import statement instead of being processed.
 *  `compile(LessSource inputFile)` - compiler uses [`LessSource`](https://github.com/SomMeri/less4j/wiki/Less-Source) interface to fetch imported files. It can be used to load less sheets from arbitrary source, e.g., database or npm.
 
-Less4j provides three implementations of `LessCompiler` interface:
+Less4j provides three implementations of compiler interface:
 * `ThreadUnsafeLessCompiler` - Core implementation of the compiler. It is thread unsafe.
 * `DefaultLessCompiler` - Thread safe wrapper of the above.
 * `TimeoutedLessCompiler` - Less compiler with timeout. If the compilation does not finish within specified time limit, compiler returns an error. You can use this to stop the compiler before it consumes too much resources on infinitely looping mixins or large less sheets.
