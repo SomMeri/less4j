@@ -953,8 +953,8 @@ class Contrast extends CssNameClashMultiParameterFunction {
 class Multiply extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
-    return a * b / 255.0;
+  protected double evaluateNormalized(double a, double b) {
+    return a * b ;
   }
 
   @Override
@@ -967,8 +967,8 @@ class Multiply extends AbstractSimpleColorBlendFunction {
 class Screen extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
-    return 255 - (255 - a) * (255 - b) / 255;
+  protected double evaluateNormalized(double a, double b) {
+    return 1 - (1 - a) * (1 - b);
   }
 
   @Override
@@ -981,8 +981,8 @@ class Screen extends AbstractSimpleColorBlendFunction {
 class Overlay extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
-    return a < 128 ? 2 * a * b / 255 : 255 - 2 * (255 - a) * (255 - b) / 255;
+  protected double evaluateNormalized(double a, double b) {
+    return a < 0.5 ? 2 * a * b  : 1 - 2 * (1 - a) * (1 - b);
   }
 
   @Override
@@ -995,9 +995,14 @@ class Overlay extends AbstractSimpleColorBlendFunction {
 class Softlight extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
-    double t = b * a / 255;
-    return t + a * (255 - (255 - a) * (255 - b) / 255 - t) / 255;
+  protected double evaluateNormalized(double cb, double cs) {
+    double d = 1, e = cb;
+    if (cs > 0.5) {
+        e = 1;
+        d = (cb > 0.25) ? Math.sqrt(cb)
+            : ((16 * cb - 12) * cb + 4) * cb;
+    }
+    return cb - (1 - 2 * cs) * e * (d - cb);
   }
 
   @Override
@@ -1010,8 +1015,8 @@ class Softlight extends AbstractSimpleColorBlendFunction {
 class Hardlight extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
-    return b < 128 ? 2 * b * a / 255 : 255 - 2 * (255 - b) * (255 - a) / 255;
+  protected double evaluateNormalized(double a, double b) {
+    return b < 0.5 ? 2 * b * a  : 1 - 2 * (1 - b) * (1 - a);
   }
 
   @Override
@@ -1024,7 +1029,7 @@ class Hardlight extends AbstractSimpleColorBlendFunction {
 class Difference extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
+  protected double evaluateNormalized(double a, double b) {
     return Math.abs(a - b);
   }
 
@@ -1038,8 +1043,8 @@ class Difference extends AbstractSimpleColorBlendFunction {
 class Exclusion extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
-    return a + b * (255 - a - a) / 255;
+  protected double evaluateNormalized(double a, double b) {
+    return a + b * (1 - a - a);
   }
 
   @Override
@@ -1052,7 +1057,7 @@ class Exclusion extends AbstractSimpleColorBlendFunction {
 class Average extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
+  protected double evaluateNormalized(double a, double b) {
     return (a + b) / 2;
   }
 
@@ -1066,8 +1071,8 @@ class Average extends AbstractSimpleColorBlendFunction {
 class Negation extends AbstractSimpleColorBlendFunction {
 
   @Override
-  protected double evaluate(double a, double b) {
-    return 255 - Math.abs(255 - b - a);
+  protected double evaluateNormalized(double a, double b) {
+    return 1 - Math.abs(1 - b - a);
   }
 
   @Override
@@ -1117,10 +1122,29 @@ abstract class AbstractSimpleColorBlendFunction extends AbstractColorBlendFuncti
 
   @Override
   protected Expression evaluate(ColorExpression color1, ColorExpression color2, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
-    return rgb(evaluate(color1.getRed(), color2.getRed()), evaluate(color1.getGreen(), color2.getGreen()), evaluate(color1.getBlue(), color2.getBlue()), token);
+    double cbRed = color1.getRed()/255.0;
+    double csRed = color2.getRed()/255.0;
+    double resultRed = evaluateNormalized(cbRed, csRed);
+    double cbGreen = color1.getGreen()/255.0;
+    double csGreen = color2.getGreen()/255.0;
+    double resultGreen = evaluateNormalized(cbGreen, csGreen);
+    double cbBlue = color1.getBlue()/255.0;
+    double csBlue = color2.getBlue()/255.0;
+    double resultBlue = evaluateNormalized(cbBlue, csBlue);
+    
+    if (!color1.hasAlpha() && !color2.hasAlpha()) {
+      return rgb(resultRed * 255.0, resultGreen * 255.0, resultBlue * 255.0, token);
+    }
+    
+    double ab = color1.getAlpha();
+    double as = color2.getAlpha();
+    
+    double resultAlpha = as + ab * (1 - as);
+    
+    throw new IllegalStateException("alpha present");
   }
 
-  protected abstract double evaluate(double a, double b);
+  protected abstract double evaluateNormalized(double a, double b);
 
 }
 

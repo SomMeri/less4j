@@ -1,3 +1,104 @@
-.test-2 button {
-  color: green;
+#built-in {
+  escaped: -Some::weird(#thing, y);
+  lighten: #ffcccc;
+  lighten-relative: #ff6666;
+  darken: #330000;
+  darken-relative: #990000;
+  saturate: #203c31;
+  saturate-relative: #28342f;
+  desaturate: #29332f;
+  desaturate-relative: #233930;
+  greyscale: #2e2e2e;
+  spin-p: #bf6a40;
+  spin-n: #bf4055;
+  luma-white: 100%;
+  luma-black: 0%;
+  luma-black-alpha: 0%;
+  luma-red: 21.26%;
+  luma-green: 71.52%;
+  luma-blue: 7.22%;
+  luma-yellow: 92.78%;
+  luma-cyan: 78.74%;
+  luma-white-alpha: 50%;
+  luma-differs-from-luminance: 23.89833349%;
+  luminance-white: 100%;
+  luminance-black: 0%;
+  luminance-black-alpha: 0%;
+  luminance-red: 21.26%;
+  luminance-differs-from-luma: 36.40541176%;
+  contrast-filter: contrast(30%);
+  contrast-white: #000000;
+  contrast-black: #ffffff;
+  contrast-red: #ffffff;
+  contrast-green: #000000;
+  contrast-blue: #ffffff;
+  contrast-yellow: #000000;
+  contrast-cyan: #000000;
+  contrast-light: #111111;
+  contrast-dark: #eeeeee;
+  contrast-light-thresh: #111111;
+  contrast-dark-thresh: #eeeeee;
+  contrast-high-thresh: #eeeeee;
+  contrast-low-thresh: #111111;
+  contrast: #000000;
+  contrast2: #ffffff;
+  contrast3: #dddddd;
+  contrast4: #000000;
+  contrast5: #000000;
+  contrast6: #000000;
+  contrast7: #ffffff;
+  contrast8: #ffffff;
+  format: "rgb(32, 128, 64)";
+  format-string: "hello world";
+  format-multiple: "hello earth 2";
+  format-url-encode: 'red is %23ff0000';
+  eformat: rgb(32, 128, 64);
+  hue: 98;
+  saturation: 12%;
+  lightness: 95%;
+  red: 255;
+  green: 255;
+  blue: 255;
+  alpha: 0.5;
+  luma: 44.11161568%;
+  mix: #800080;
+  mix2: rgba(75, 25, 0, 0.75);
+  color: #ff0011;
+  color2: #aaa;
+  tint: #898989;
+  tint-full: #ffffff;
+  tint-percent: #898989;
+  shade: #686868;
+  shade-full: #000000;
+  shade-percent: #686868;
+  shade-negative: #868686;
+  fade-out: rgba(255, 0, 0, 0.95);
+  fade-in: rgba(255, 0, 0, 0.9500000000000001);
+  fade-out-relative: rgba(255, 0, 0, 0.95);
+  fade-in-relative: rgba(255, 0, 0, 0.9450000000000001);
+  fade-out2: rgba(255, 0, 0, 0);
+  fade-out2-relative: rgba(255, 0, 0, 0.25);
+  hsv: #4d2926;
+  hsva: rgba(77, 40, 38, 0.2);
+  mix: #ff3300;
+  mix-0: #ffff00;
+  mix-100: #ff0000;
+  mix-weightless: #ff8000;
+}
+#alpha {
+  alpha: rgba(153, 94, 51, 0.6);
+}
+#blendmodes {
+  multiply: #ed0000;
+  screen: #f600f6;
+  overlay: #ed0000;
+  softlight: #fa0000;
+  hardlight: #0000ed;
+  difference: #f600f6;
+  exclusion: #f600f6;
+  average: #7b007b;
+  negation: #d73131;
+}
+issue-210 {
+  color: #2cb710e;
 }
