@@ -87,7 +87,8 @@ class ColorsCalculator {
     return number<MIN? MIN : (int)Math.round(number);
   }
 
-  private double roundAlpha(double alpha) {
+  private double combineAlpha(double alpha1, double alpha2) {
+    double alpha = alpha1 * (1.0 - alpha2) + alpha2;
     if (alpha > ALPHA_MAX)
       return ALPHA_MAX;
     
@@ -95,7 +96,7 @@ class ColorsCalculator {
   }
 
   private ColorExpression createResultColor(HiddenTokenAwareTree parentToken, double red, double green, double blue, double alpha1, double alpha2) {
-    double roundAlpha = roundAlpha(alpha1+alpha2);
+    double roundAlpha = combineAlpha(alpha1, alpha2);
     if (roundAlpha<ALPHA_MAX-ALPHA_EPSILON)
       return new ColorWithAlphaExpression(parentToken, round(red), round(green), round(blue), roundAlpha);
     
@@ -142,12 +143,8 @@ class ColorsCalculator {
   }
 
   private double calcAlpha(Expression value) {
-    if (value instanceof ColorWithAlphaExpression) {
-      return ((ColorWithAlphaExpression) value).getAlpha();
-    }
-
     if (value instanceof ColorExpression) {
-      return 1.0;
+      return ((ColorExpression) value).getAlpha();
     }
     
     return Double.POSITIVE_INFINITY;

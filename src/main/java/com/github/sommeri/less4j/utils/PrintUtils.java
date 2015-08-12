@@ -15,11 +15,18 @@ import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 public class PrintUtils {
 
   private static final DecimalFormat FORMATTER = createFormatter();
-
+  private static final DecimalFormat FORMATTER_TWO_DECIMAL = createFormatter2();
+  
   private static DecimalFormat createFormatter() {
     DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
     symbols.setDecimalSeparator('.');
     return new DecimalFormat("#.##################", symbols);
+  }
+
+  private static DecimalFormat createFormatter2() {
+    DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+    symbols.setDecimalSeparator('.');
+    return new DecimalFormat("#.####", symbols);
   }
 
   public static String formatNumber(Long value) {
@@ -31,6 +38,17 @@ public class PrintUtils {
       return "NaN";
 
     return FORMATTER.format(value);
+  }
+  
+  public static String formatNumberTwoDecimal(Long value) {
+    return formatNumberTwoDecimal(value.doubleValue());
+  }
+  
+  public static String formatNumberTwoDecimal(Double value) {
+    if (value.isNaN())
+      return "NaN";
+
+    return FORMATTER_TWO_DECIMAL.format(value);
   }
   
   public static String formatNumber(Number value) {

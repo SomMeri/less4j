@@ -73,9 +73,9 @@
   shade-percent: #686868;
   shade-negative: #868686;
   fade-out: rgba(255, 0, 0, 0.95);
-  fade-in: rgba(255, 0, 0, 0.9500000000000001);
+  fade-in: rgba(255, 0, 0, 0.95);
   fade-out-relative: rgba(255, 0, 0, 0.95);
-  fade-in-relative: rgba(255, 0, 0, 0.9450000000000001);
+  fade-in-relative: rgba(255, 0, 0, 0.945);
   fade-out2: rgba(255, 0, 0, 0);
   fade-out2-relative: rgba(255, 0, 0, 0.25);
   hsv: #4d2926;
@@ -99,6 +99,46 @@
   average: #7b007b;
   negation: #d73131;
 }
+#blendmodes-alpha {
+  multiply: rgba(244, 0, 2, 0.79);
+  screen: rgba(196, 0, 168, 0.88);
+  overlay: rgba(100, 0, 144, 0.72);
+  softlight: rgba(250, 52, 52, 0.88);
+  hardlight: rgba(28, 0, 216, 0.79);
+  difference: rgba(95, 0, 189, 0.52);
+  exclusion: rgba(224, 0, 224, 0.99);
+  average: rgba(15, 0, 231, 0.91);
+  negation: rgba(104, 47, 47, 0.93);
+}
+#blendmodes-alpha-b-zero {
+  multiply: rgba(246, 0, 3, 0.3);
+  screen: rgba(0, 0, 246, 0.6);
+  overlay: rgba(0, 0, 246, 0.6);
+  softlight: rgba(255, 255, 255, 0.6);
+  hardlight: rgba(0, 0, 246, 0.7);
+  difference: rgba(0, 0, 246, 0.4);
+  exclusion: rgba(0, 0, 246, 0.9);
+  average: rgba(0, 0, 246, 0.9);
+  negation: rgba(49, 49, 49, 0.9);
+}
+#blendmodes-alpha-s-zero {
+  multiply: rgba(246, 0, 2, 0.7);
+  screen: rgba(246, 0, 0, 0.7);
+  overlay: rgba(246, 0, 0, 0.3);
+  softlight: rgba(246, 0, 0, 0.7);
+  hardlight: rgba(246, 0, 0, 0.3);
+  difference: rgba(246, 0, 0, 0.2);
+  exclusion: rgba(246, 0, 0, 0.9);
+  average: rgba(246, 0, 0, 0.1);
+  negation: rgba(246, 0, 0, 0.3);
+}
+#blending-vs-star-alpha {
+  multiply: rgba(244, 0, 2, 0.79);
+  multiply: rgba(255, 0, 6, 0.79);
+}
 issue-210 {
   color: #2cb710e;
+}
+issue-293 {
+  color: #ecd0d1;
 }

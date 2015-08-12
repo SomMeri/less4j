@@ -168,7 +168,7 @@ public class ColorExpression extends Expression {
     }
 
     protected String encode(double red, double green, double blue, double alpha) {
-      return "rgba(" + roundFormat(red) + ", " + roundFormat(green) + ", " + roundFormat(blue) + ", " + format(alpha) + ")";
+      return "rgba(" + roundFormat(red) + ", " + roundFormat(green) + ", " + roundFormat(blue) + ", " + roundFormatAlpha(alpha) + ")";
     }
 
     //alpha colors do not have hexadecimal value for now
@@ -177,12 +177,12 @@ public class ColorExpression extends Expression {
       return getValue();
     }
     
-    private String format(double value) {
-      return PrintUtils.formatNumber(value);
-    }
-
     private String roundFormat(double value) {
       return PrintUtils.formatNumber(Math.round(value));
+    }
+
+    private String roundFormatAlpha(double value) {
+      return PrintUtils.formatNumberTwoDecimal(Math.round(value*1000000)/1000000.0);
     }
 
     @Override

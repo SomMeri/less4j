@@ -99,9 +99,9 @@
   shade-percent: #686868;
   shade-negative: #868686;
   fade-out: rgba(255, 0, 0, 0.95);
-  fade-in: rgba(255, 0, 0, 0.9500000000000001);
+  fade-in: rgba(255, 0, 0, 0.95);
   fade-out-relative: rgba(255, 0, 0, 0.95);
-  fade-in-relative: rgba(255, 0, 0, 0.9450000000000001);
+  fade-in-relative: rgba(255, 0, 0, 0.945);
   fade-out2: rgba(255, 0, 0, 0);
   fade-out2-relative: rgba(255, 0, 0, 0.25);
   hsv: #4d2926;

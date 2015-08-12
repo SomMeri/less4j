@@ -1140,9 +1140,21 @@ abstract class AbstractSimpleColorBlendFunction extends AbstractColorBlendFuncti
     double as = color2.getAlpha();
     
     double resultAlpha = as + ab * (1 - as);
-    
-    throw new IllegalStateException("alpha present");
+    resultRed = addAlpha(cbRed, ab, csRed, as, resultRed, resultAlpha);
+    resultGreen = addAlpha(cbGreen, ab, csGreen, as, resultGreen, resultAlpha);
+    resultBlue = addAlpha(cbBlue, ab, csBlue, as, resultBlue, resultAlpha);
+
+    return rgba(resultRed * 255.0, resultGreen * 255.0, resultBlue * 255.0, resultAlpha, token);
   }
+  
+  
+
+  private double addAlpha(double cb, double ab, double cs, double as, double cr, double ar) {
+    return (as * cs + ab * (cb -
+        as * (cb + cs - cr))) / ar;
+  }
+
+
 
   protected abstract double evaluateNormalized(double a, double b);
 
