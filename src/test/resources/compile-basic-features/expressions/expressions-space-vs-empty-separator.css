@@ -20,3 +20,6 @@ multiply {
   margin3: 6;
   margin4: 6;
 }
+space-list-295 {
+  width: calc(2rem - 5 );
+}

@@ -24,11 +24,11 @@ import com.github.sommeri.less4j.core.TimeoutedLessCompiler;
  * from the master branch.
  * 
  */
-//@Ignore
+@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-  private static final String inputLess = "src/test/resources/minitests/debug1.less";
+//  private static final String inputLess = "src/test/resources/minitests/debug1.less";
   //private static final String inputLess = "c:/data/meri/less4java/srot/sppppppppppppppppppp-ample.less";
   //private static final String inputLess = "src/test/resources/minitests/javascript.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
@@ -37,6 +37,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.2//bootstrap-3.0.2//less//theme.less";
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//less//bootstrap.less";
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//flamingo-m.less";
+  
+  private static final String inputLess = "c://data//meri//less4java//srot//semantic-ui//Semantic-UI-LESS//semantic.less";
 
   //private static final String inputLess = "src/test/resources/minitests/bootstrap-debug.less";
   //private static final String inputLess = "src/test/resources/minitests/bootstrap-debug-2.less";
@@ -85,19 +87,19 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     super(inputFile, outputFile, errorList, mapdataFile, testName);
   }
 
-  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
-    LessCompiler compiler = getCompiler();
-    Configuration configuration = createConfiguration(cssOutput);
-    
-    CustomLessSource source = new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8");
-    CompilationResult actual = compiler.compile(source, configuration);
-    //System.out.println(actual.getSourceMap());
-    return actual;
-  }
+//  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
+//    LessCompiler compiler = getCompiler();
+//    Configuration configuration = createConfiguration(cssOutput);
+//    
+//    CustomLessSource source = new CustomLessSource(Arrays.asList("c:/data"), lessFile, "utf-8");
+//    CompilationResult actual = compiler.compile(source, configuration);
+//    //System.out.println(actual.getSourceMap());
+//    return actual;
+//  }
   
-  protected LessCompiler getCompiler() {
-    return new TimeoutedLessCompiler(1000, TimeUnit.MILLISECONDS);
-  }
+//  protected LessCompiler getCompiler() {
+//    return new TimeoutedLessCompiler(1000, TimeUnit.MILLISECONDS);
+//  }
 
   public static class CustomLessSource extends LessSource.FileSource {
 

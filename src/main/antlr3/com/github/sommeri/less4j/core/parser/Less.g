@@ -873,11 +873,13 @@ mathExprLowPrior
 finally { leaveRule(); }
 
 term
-    : (( (a+=plusOrMinus ws)? (a+=value_term
-    | a+=function
-    | a+=expr_in_parentheses
-    | a+=variablereference
-    )
+    : ( (
+      ((plusOrMinus ws)? function) => ((a+=plusOrMinus ws)? a+=function)
+    ) | ( (a+=plusOrMinus ws)? ( 
+            a+=value_term
+            | a+=expr_in_parentheses
+            | a+=variablereference
+          )
     ) | (a+=unsigned_value_term 
         | a+=hexColor
         | a+=escapedValue
@@ -887,11 +889,13 @@ term
     ;
 
 term_no_preceeding_whitespace
-    : ((a+=unsigned_value_term 
+    : (   a+=variablereference
+        | a+=expr_in_parentheses
+        | a+=unsigned_value_term 
         | a+=hexColor
         | a+=escapedValue
         | a+=embeddedScript
-        | a+=special_function))
+        | a+=special_function)
     -> ^(TERM $a*)
     ;
   

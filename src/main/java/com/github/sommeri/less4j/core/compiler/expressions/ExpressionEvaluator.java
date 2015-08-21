@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.github.sommeri.less4j.EmbeddedLessGenerator;
@@ -8,7 +9,9 @@ import com.github.sommeri.less4j.EmbeddedScriptGenerator;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
+import com.github.sommeri.less4j.core.ast.AnonymousExpression;
 import com.github.sommeri.less4j.core.ast.BinaryExpression;
+import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator;
 import com.github.sommeri.less4j.core.ast.BinaryExpressionOperator.Operator;
 import com.github.sommeri.less4j.core.ast.ComparisonExpression;
 import com.github.sommeri.less4j.core.ast.ComparisonExpressionOperator;
@@ -217,6 +220,7 @@ public class ExpressionEvaluator {
     case FAULTY_EXPRESSION:
     case UNICODE_RANGE_EXPRESSION:
     case EMPTY_EXPRESSION:
+    case ANONYMOUS:
       return input.clone();
 
     default:
@@ -338,17 +342,22 @@ public class ExpressionEvaluator {
   public Expression evaluate(BinaryExpression input) {
     Expression leftValue = evaluate(input.getLeft());
     Expression rightValue = evaluate(input.getRight());
+    BinaryExpressionOperator operator = input.getOperator();
     if (leftValue.isFaulty() || rightValue.isFaulty())
       return new FaultyExpression(input);
 
-    if (arithmeticCalculator.accepts(input.getOperator(), leftValue, rightValue))
+    if (arithmeticCalculator.accepts(operator, leftValue, rightValue))
       return arithmeticCalculator.evalute(input, leftValue, rightValue);
 
-    if (colorsCalculator.accepts(input.getOperator(), leftValue, rightValue))
+    if (colorsCalculator.accepts(operator, leftValue, rightValue))
       return colorsCalculator.evalute(input, leftValue, rightValue);
 
-    problemsHandler.cannotEvaluate(input);
-    return new FaultyExpression(input);
+    List<Expression> members = Arrays.asList(leftValue, new AnonymousExpression(operator.getUnderlyingStructure(), operator.getOperator().getSymbol()), rightValue);
+    ListExpression result = new ListExpression(input.getUnderlyingStructure(), members, new ListExpressionOperator(input.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR), lazyScope);
+    
+    return result;
+//    problemsHandler.cannotEvaluate(input);
+//    return new FaultyExpression(input);
   }
 
   public boolean guardsSatisfied(ReusableStructure mixin) {

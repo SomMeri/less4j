@@ -88,8 +88,3 @@ ERROR 27:11 Can't subtract or divide a color from a number
  26:   padding: 2/#003300;
  27:   margin: 2/green;
  28: }
-
-ERROR 30:9 Unable to evaluate expression
- 29: #operationOnString-cannotEvaluate {
- 30:   text: "input" - "output";
- 31: }

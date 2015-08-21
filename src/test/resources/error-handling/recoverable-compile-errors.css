@@ -24,7 +24,7 @@
   margin: !#error#!;
 }
 #operationOnString-cannotEvaluate {
-  text: !#error#!;
+  text: "input" - "output";
 }
 #incompatibleComparisonOperand {
   padding: 2 2 2 2;

@@ -87,6 +87,7 @@ public class SingleImportSolver {
       return null;
     }
 
+    //System.out.println(importedSource.getURI());
     // import once should not import a file that was already imported
     if (isImportOnce(node) && alreadyVisited(importedSource)) {
       astManipulator.removeFromBody(node);
