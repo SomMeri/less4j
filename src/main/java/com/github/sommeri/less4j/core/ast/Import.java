@@ -8,7 +8,7 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class Import extends ASTCssNode {
-  
+
   private ImportMultiplicity multiplicity = ImportMultiplicity.IMPORT;
   private ImportContent contentKind = ImportContent.SUFFIX_BASED;
   private boolean isInline = false;
@@ -38,7 +38,7 @@ public class Import extends ASTCssNode {
   }
 
   public boolean isOptional() {
-     return isOptional;
+    return isOptional;
   }
 
   public void setOptional(boolean isOptional) {
@@ -60,6 +60,16 @@ public class Import extends ASTCssNode {
   public void setMultiplicity(ImportMultiplicity multiplicity) {
     this.multiplicity = multiplicity;
   }
+
+  public boolean isImportOnce() {
+    ImportMultiplicity multiplicity = getMultiplicity();
+    return multiplicity == ImportMultiplicity.IMPORT || multiplicity == ImportMultiplicity.IMPORT_ONCE;
+  }
+
+  public boolean isImportMultiple() {
+    return !isImportOnce();
+  }
+
 
   public Expression getUrlExpression() {
     return urlExpression;
@@ -88,7 +98,7 @@ public class Import extends ASTCssNode {
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
-    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode)urlExpression);
+    List<ASTCssNode> result = ArraysUtils.asNonNullList((ASTCssNode) urlExpression);
     result.addAll(mediums);
     return result;
   }
@@ -96,7 +106,7 @@ public class Import extends ASTCssNode {
   @Override
   public Import clone() {
     Import result = (Import) super.clone();
-    result.urlExpression = urlExpression==null? null : urlExpression.clone();
+    result.urlExpression = urlExpression == null ? null : urlExpression.clone();
     result.mediums = ArraysUtils.deeplyClonedList(mediums);
     result.configureParentToAllChilds();
     return result;
@@ -106,7 +116,7 @@ public class Import extends ASTCssNode {
   public ASTCssNodeType getType() {
     return ASTCssNodeType.IMPORT;
   }
-  
+
   public enum ImportMultiplicity {
     IMPORT, IMPORT_ONCE, IMPORT_MULTIPLE
   }

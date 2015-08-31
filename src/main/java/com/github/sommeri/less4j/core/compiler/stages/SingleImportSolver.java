@@ -1,24 +1,23 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessSource.CannotReadFile;
 import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.LessSource.StringSourceException;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
-import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Import.ImportContent;
-import com.github.sommeri.less4j.core.ast.InlineContent;
 import com.github.sommeri.less4j.core.ast.Import.ImportMultiplicity;
+import com.github.sommeri.less4j.core.ast.InlineContent;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
 import com.github.sommeri.less4j.core.compiler.expressions.TypesConversionUtils;
@@ -34,27 +33,14 @@ public class SingleImportSolver {
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
   private ASTManipulator astManipulator = new ASTManipulator();
 
-  private Set<LessSource> importedSources = new HashSet<LessSource>();
-
+  private Map<LessSource, StyleSheet> astCache = new HashMap<LessSource, StyleSheet>();
+  
   public SingleImportSolver(ProblemsHandler problemsHandler, Configuration configuration) {
     this.problemsHandler = problemsHandler;
     this.configuration = configuration;
   }
 
-  public void solveImports(StyleSheet node, LessSource source) {
-    doSolveImports(node, source);
-  }
-
-  private void doSolveImports(StyleSheet node, LessSource source) {
-    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-    for (ASTCssNode kid : childs) {
-      if (kid.getType() == ASTCssNodeType.IMPORT) {
-        importEncountered((Import) kid, source);
-      }
-    }
-  }
-
-  public ASTCssNode importEncountered(Import node, LessSource source) {
+  public ASTCssNode importEncountered(Import node, LessSource source, AlreadyImportedSources alreadyImportedSources) {
     String filename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler, configuration);
     if (filename == null) {
       problemsHandler.errorWrongImport(node.getUrlExpression());
@@ -87,9 +73,9 @@ public class SingleImportSolver {
       return null;
     }
 
-    //System.out.println(importedSource.getURI());
     // import once should not import a file that was already imported
-    if (isImportOnce(node) && alreadyVisited(importedSource)) {
+    if (node.isImportOnce() && alreadyImportedSources.alreadyVisited(importedSource)) {
+      System.out.println("removed: " + node + " inside: " + node.getSource().getName());
       astManipulator.removeFromBody(node);
       return null;
     }
@@ -97,7 +83,7 @@ public class SingleImportSolver {
     String importedContent;
     try {
       importedContent = importedSource.getContent();
-      importedSources.add(importedSource);
+      alreadyImportedSources.add(importedSource);
     } catch (FileNotFound e) {
       return importFileNotFound(node, filename);
     } catch (CannotReadFile e) {
@@ -110,6 +96,7 @@ public class SingleImportSolver {
     }
     
     StyleSheet importedAst = buildImportedAst(node, importedSource, importedContent);
+    
     if (node.isReferenceOnly() || node.isSilent()) {
       astManipulator.setTreeSilentness(importedAst, true);
     }
@@ -136,10 +123,30 @@ public class SingleImportSolver {
     return replaceByInlineValue(node, "");
   }
 
+  private static final String TEST = "c:/data/meri/less4java/srot/semantic-ui/Semantic-UI-LESS/definitions/views/../../themes/default/globals/site.variables";
+
   private StyleSheet buildImportedAst(Import node, LessSource source, String content) {
+//    String uriStr = source.getURI().toString();
+//    if (TEST.equals(uriStr)) {
+//      System.out.println(source.hashCode() + " " + uriStr);
+//      System.out.println("cache info: " + astCache.size());
+//      for (Entry<LessSource, StyleSheet> entry : astCache.entrySet()) {
+//        LessSource key = entry.getKey();
+//        System.out.println(" ** " + key.equals(source));
+//      }
+//    }
+//    if (astCache.containsKey(source)) {
+//      System.out.println("Cached: " + uriStr);
+//      return astCache.get(source).clone();
+//    }
+    //System.out.println("New one: " + uri);
+//    System.out.println("\"" + uriStr + "\", ");
+
     // parse imported file
     StyleSheet importedAst = parseContent(node, content, source);
 
+//    astCache.put(source, importedAst.clone());
+    
     // add media queries if needed
     if (node.hasMediums()) {
       HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
@@ -154,21 +161,8 @@ public class SingleImportSolver {
       mediaBody.configureParentToAllChilds();
       return result;
     } 
-    
+
     return importedAst;
-  }
-
-  private boolean isImportOnce(Import node) {
-    return node.getMultiplicity() == ImportMultiplicity.IMPORT 
-            || node.getMultiplicity() == ImportMultiplicity.IMPORT_ONCE;
-  }
-
-  private boolean alreadyVisited(LessSource importedSource) {
-    return importedSources.contains(importedSource);
-  }
-  
-  public Set<LessSource> getImportedSources() {
-    return importedSources;
   }
 
   private StyleSheet parseContent(Import importNode, String importedContent, LessSource source) {
@@ -203,4 +197,23 @@ public class SingleImportSolver {
     return lowerCase.endsWith(".css") || lowerCase.endsWith("/css");
   }
 
+  public static class AlreadyImportedSources {
+    private Set<LessSource> sourcesThatCount = new HashSet<LessSource>();
+    private Set<LessSource> allImportedSources;
+
+    public AlreadyImportedSources(Set<LessSource> allImportedSources) {
+      this.allImportedSources = allImportedSources;
+    }
+
+    public void add(LessSource importedSource) {
+      sourcesThatCount.add(importedSource);
+      allImportedSources.add(importedSource);
+    }
+    
+    public boolean alreadyVisited(LessSource importedSource) {
+      boolean result = sourcesThatCount.contains(importedSource);
+      return result;
+    }
+    
+  }
 }

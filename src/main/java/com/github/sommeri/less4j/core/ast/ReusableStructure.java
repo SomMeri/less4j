@@ -144,6 +144,7 @@ public class ReusableStructure extends ASTCssNode implements BodyOwner<GeneralBo
     ReusableStructure result = (ReusableStructure) super.clone();
     result.names = ArraysUtils.deeplyClonedList(names);
     result.parameters = ArraysUtils.deeplyClonedList(parameters);
+    result.guards = ArraysUtils.deeplyClonedList(guards);
     result.body = body==null?null:body.clone();
     result.configureParentToAllChilds();
     return result;

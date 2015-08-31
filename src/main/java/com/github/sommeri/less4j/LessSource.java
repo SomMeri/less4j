@@ -322,12 +322,20 @@ public abstract class LessSource {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      File canonicalInputFile = getCanonicalFile();
+      String canonicalInputFile = getCanonicalPath();
       result = prime * result + ((canonicalInputFile == null) ? 0 : canonicalInputFile.hashCode());
       result = prime * result + ((charsetName == null) ? 0 : charsetName.hashCode());
       return result;
     }
 
+    private String getCanonicalPath() {
+      try {
+        return getInputFile().getCanonicalPath();
+      } catch (IOException e) {
+        return getInputFile().getAbsolutePath();
+      }
+    }
+    
     private File getCanonicalFile() {
       try {
         return getInputFile().getCanonicalFile();
@@ -345,19 +353,31 @@ public abstract class LessSource {
       if (getClass() != obj.getClass())
         return false;
       FileSource other = (FileSource) obj;
-      File absoluteInputFile = getCanonicalFile();
+      String absoluteInputFile = getCanonicalPath(); //FIXME
+//      boolean absoluteInputFileComparison = absoluteInputFile.equals(other.getInputFile().getAbsolutePath());
       if (absoluteInputFile == null) {
         if (other.getInputFile() != null)
           return false;
-      } else if (!absoluteInputFile.equals(other.getInputFile().getAbsoluteFile()))
+      } else if (!absoluteInputFile.equals(other.getCanonicalPath())) //FIXME 
         return false;
       if (charsetName == null) {
         if (other.charsetName != null)
           return false;
       } else if (!charsetName.equals(other.charsetName))
         return false;
+      
+//      System.out.println("found true (" + hitCount +"): "+ getInputFile().getName());
+//      if (hitCount==5) {
+//        hitCount++;
+//        return true;
+//      }
+//      hitCount++;
+//      return false;      
+      
       return true;
     }
+    
+    private static int hitCount = 0; 
 
   }
 
