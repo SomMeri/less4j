@@ -75,7 +75,6 @@ public class SingleImportSolver {
 
     // import once should not import a file that was already imported
     if (node.isImportOnce() && alreadyImportedSources.alreadyVisited(importedSource)) {
-      System.out.println("removed: " + node + " inside: " + node.getSource().getName());
       astManipulator.removeFromBody(node);
       return null;
     }
@@ -123,29 +122,15 @@ public class SingleImportSolver {
     return replaceByInlineValue(node, "");
   }
 
-  private static final String TEST = "c:/data/meri/less4java/srot/semantic-ui/Semantic-UI-LESS/definitions/views/../../themes/default/globals/site.variables";
-
   private StyleSheet buildImportedAst(Import node, LessSource source, String content) {
-//    String uriStr = source.getURI().toString();
-//    if (TEST.equals(uriStr)) {
-//      System.out.println(source.hashCode() + " " + uriStr);
-//      System.out.println("cache info: " + astCache.size());
-//      for (Entry<LessSource, StyleSheet> entry : astCache.entrySet()) {
-//        LessSource key = entry.getKey();
-//        System.out.println(" ** " + key.equals(source));
-//      }
-//    }
-//    if (astCache.containsKey(source)) {
-//      System.out.println("Cached: " + uriStr);
-//      return astCache.get(source).clone();
-//    }
-    //System.out.println("New one: " + uri);
-//    System.out.println("\"" + uriStr + "\", ");
+    if (astCache.containsKey(source)) {
+      return astCache.get(source).clone();
+    }
 
     // parse imported file
     StyleSheet importedAst = parseContent(node, content, source);
 
-//    astCache.put(source, importedAst.clone());
+    astCache.put(source, importedAst.clone());
     
     // add media queries if needed
     if (node.hasMediums()) {
