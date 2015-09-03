@@ -16,7 +16,6 @@ import com.github.sommeri.less4j.core.ast.FaultyNode;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Import;
 import com.github.sommeri.less4j.core.ast.Import.ImportContent;
-import com.github.sommeri.less4j.core.ast.Import.ImportMultiplicity;
 import com.github.sommeri.less4j.core.ast.InlineContent;
 import com.github.sommeri.less4j.core.ast.Media;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
@@ -123,15 +122,8 @@ public class SingleImportSolver {
   }
 
   private StyleSheet buildImportedAst(Import node, LessSource source, String content) {
-    if (astCache.containsKey(source)) {
-      return astCache.get(source).clone();
-    }
+    StyleSheet importedAst = getImportedAst(node, source, content);
 
-    // parse imported file
-    StyleSheet importedAst = parseContent(node, content, source);
-
-    astCache.put(source, importedAst.clone());
-    
     // add media queries if needed
     if (node.hasMediums()) {
       HiddenTokenAwareTree underlyingStructure = node.getUnderlyingStructure();
@@ -147,6 +139,18 @@ public class SingleImportSolver {
       return result;
     } 
 
+    return importedAst;
+  }
+
+  private StyleSheet getImportedAst(Import node, LessSource source, String content) {
+    if (astCache.containsKey(source)) {
+      return astCache.get(source).clone();
+    }
+
+    // parse imported file
+    StyleSheet importedAst = parseContent(node, content, source);
+    
+    astCache.put(source, importedAst.clone());
     return importedAst;
   }
 
