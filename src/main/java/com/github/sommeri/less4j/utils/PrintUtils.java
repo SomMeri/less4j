@@ -5,8 +5,6 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-import javax.xml.bind.DatatypeConverter;
-
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.parser.LessParser;
@@ -108,8 +106,7 @@ public class PrintUtils {
 
   public static String base64Encode(String toEncode, String encodingCharset, ProblemsHandler problemsHandler, ASTCssNode nodeForErrorReport) {
     try {
-      return DatatypeConverter.printBase64Binary(toEncode.getBytes(encodingCharset));
-//      return toEncode;
+      return Base64.encodeBytes(toEncode.getBytes(encodingCharset));
     } catch (UnsupportedEncodingException uex) {
       problemsHandler.errUnknownEncodingCharsetSourceMap(nodeForErrorReport, encodingCharset);
       return null;
@@ -207,7 +204,7 @@ public class PrintUtils {
   }
 
   public static String base64Encode(byte[] data) {
-    return DatatypeConverter.printBase64Binary(data);
+    return Base64.encodeBytes(data);
   }
 
   public static String toString(String[] strings) {

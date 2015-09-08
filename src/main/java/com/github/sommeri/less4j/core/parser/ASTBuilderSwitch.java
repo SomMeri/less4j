@@ -936,35 +936,12 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return new NestedSelectorAppender(token, directlyBefore, directlyAfter, null);
   }
 
-  public ASTCssNode handleSimpleSelector(HiddenTokenAwareTree token) {
-    SimpleSelector result = null;
-    token.pushHiddenToKids();
-    Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
-    HiddenTokenAwareTree kid = iterator.next();
-    if (kid.getGeneralType() == LessLexer.ELEMENT_NAME) {
-      List<HiddenTokenAwareTree> elementNameParts = kid.getChildren();
-      InterpolableName interpolableName = toInterpolableName(kid, elementNameParts);
-      result = new SimpleSelector(kid, null, interpolableName, isStarElementName(elementNameParts));
-      if (!iterator.hasNext())
-        return result;
-      kid = iterator.next();
-    } else {
-      result = new SimpleSelector(kid, null, null, true);
-      result.setEmptyForm(true);
-    }
-
-    addSubsequent(result, kid);
-    while (iterator.hasNext()) {
-      kid = iterator.next();
-      addSubsequent(result, kid);
-    }
-
+  public SimpleSelector handleElementName(HiddenTokenAwareTree kid) {
+    SimpleSelector result;
+    List<HiddenTokenAwareTree> elementNameParts = kid.getChildren();
+    InterpolableName interpolableName = toInterpolableName(kid, elementNameParts);
+    result = new SimpleSelector(kid, null, interpolableName, isStarElementName(elementNameParts));
     return result;
-  }
-
-  private void addSubsequent(SimpleSelector result, HiddenTokenAwareTree kid) {
-    ElementSubsequent subsequent = (ElementSubsequent) switchOn(kid);
-    result.addSubsequent(subsequent);
   }
 
   private boolean isStarElementName(List<HiddenTokenAwareTree> elementNameParts) {

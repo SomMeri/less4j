@@ -336,14 +336,6 @@ public abstract class LessSource {
       }
     }
     
-    private File getCanonicalFile() {
-      try {
-        return getInputFile().getCanonicalFile();
-      } catch (IOException e) {
-        return getInputFile().getAbsoluteFile();
-      }
-    }
-
     @Override
     public boolean equals(Object obj) {
       if (this == obj)
@@ -354,7 +346,6 @@ public abstract class LessSource {
         return false;
       FileSource other = (FileSource) obj;
       String absoluteInputFile = getCanonicalPath(); //FIXME
-//      boolean absoluteInputFileComparison = absoluteInputFile.equals(other.getInputFile().getAbsolutePath());
       if (absoluteInputFile == null) {
         if (other.getInputFile() != null)
           return false;
@@ -366,19 +357,9 @@ public abstract class LessSource {
       } else if (!charsetName.equals(other.charsetName))
         return false;
       
-//      System.out.println("found true (" + hitCount +"): "+ getInputFile().getName());
-//      if (hitCount==5) {
-//        hitCount++;
-//        return true;
-//      }
-//      hitCount++;
-//      return false;      
-      
       return true;
     }
     
-    private static int hitCount = 0; 
-
   }
 
   public static class StringSource extends LessSource {

@@ -43,7 +43,6 @@ tokens {
   NESTED_APPENDER;
   SELECTOR;
   EXTEND_TARGET_SELECTOR;
-  SIMPLE_SELECTOR;
   ESCAPED_SELECTOR;
   EXPRESSION;
   EXPRESSION_PARENTHESES;
@@ -557,19 +556,12 @@ finally { leaveRule(); }
 
 selector_simple_and_appenders
 @init {enterRule(retval, "selector_simple_and_appenders");} // REMOVE
-   : (nestedAppender+ selector_simple_selectors_segment)=>(((nestedAppender)=>(nestedAppender+ selector_simple_selectors_segment))* nestedAppender*) 
-     | (selector_simple_selectors_segment nestedAppender+)=>(((selector_simple_selectors_segment nestedAppender)=>(selector_simple_selectors_segment nestedAppender+))* selector_simple_selectors_segment?)
-     | nestedAppender+ 
-     | selector_simple_selectors_segment
+   : (a+=elementName | a+=elementSubsequent | a+=nestedAppender | escapedSelectorOldSyntax)+
    ;
 finally { leaveRule(); }
 
-selector_simple_selectors_segment
-@init {enterRule(retval, "selector_simple_selectors_segment");} // REMOVE
-    : (simpleSelector|escapedSelectorOldSyntax) 
-      ((combinator (simpleSelector|escapedSelectorOldSyntax))=>(combinator (simpleSelector|escapedSelectorOldSyntax)))*
-    ;
-finally { leaveRule(); }
+//TODO clean up, this version is just a proof of concept
+escapedSelectorOldSyntax: LPAREN VALUE_ESCAPE RPAREN-> ^(ESCAPED_SELECTOR VALUE_ESCAPE);
 
 // if this is changed, chances are the selector must be changed too
 // Less keyword-pseudoclass "extend" takes selector as an argument. The selector can be optionally
@@ -579,18 +571,6 @@ extendTargetSelectors
     -> ^(EXTEND_TARGET_SELECTOR $a*) 
     ;
 
-
-//TODO clean up, this version is just a proof of concept
-escapedSelectorOldSyntax: LPAREN VALUE_ESCAPE RPAREN-> ^(ESCAPED_SELECTOR VALUE_ESCAPE);
-
-simpleSelector
-@init {enterRule(retval, "simpleSelector");} // REMOVE
-    : ( (a+=elementName (a+=elementSubsequent)*)
-        | (a+=elementSubsequent)+
-      )
-    -> ^(SIMPLE_SELECTOR $a*)
-    ;    
-finally { leaveRule(); }
 
 cssClassOrId    
     :   idSelector -> ^(ELEMENT_SUBSEQUENT idSelector)
@@ -608,19 +588,19 @@ elementSubsequent
     ;
 
 idSelector: 
-      (b+=HASH | b+=HASH_SYMBOL b+=INTERPOLATED_VARIABLE) (a+=idOrClassNamePart)* 
+      (b+=HASH | b+=HASH_SYMBOL b+=INTERPOLATED_VARIABLE) ((idOrClassNamePart)=> a+=idOrClassNamePart)* 
    -> ^(ID_SELECTOR $b* $a*)
     ;
     
 //A class name can be also a number e.g., .56 or .5cm or anything else that starts with a dot '.'.
 cssClass
-    : dot=DOT (a+=idOrClassNamePart)+ -> ^(CSS_CLASS $dot $a*); 
+    : dot=DOT ((idOrClassNamePart)=>a+=idOrClassNamePart)+ -> ^(CSS_CLASS $dot $a*); 
     
 idOrClassNamePart
     : ident_except_when | MINUS | allNumberKinds | INTERPOLATED_VARIABLE;
     
 elementName
-    :  (a+=elementNamePart)+ -> ^(ELEMENT_NAME $a*);
+    :  ((elementNamePart)=> a+=elementNamePart)+ -> ^(ELEMENT_NAME $a*);
     
 elementNamePart
     : STAR | IDENT | MINUS | allNumberKinds | INTERPOLATED_VARIABLE | UNDERSCORE;

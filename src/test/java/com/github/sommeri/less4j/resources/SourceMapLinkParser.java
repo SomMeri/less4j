@@ -5,12 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+import com.github.sommeri.less4j.core.problems.BugHappened;
+import com.github.sommeri.less4j.utils.Base64;
 
 public class SourceMapLinkParser {
 
@@ -23,7 +26,13 @@ public class SourceMapLinkParser {
 
     String sourceMapComment = matcher.group();
     String encodedSourceMap = sourceMapComment.substring(sourceMapComment.lastIndexOf(",") + 1, sourceMapComment.lastIndexOf(" */") + 1);
-    String sourceMap = new String(DatatypeConverter.parseBase64Binary(encodedSourceMap));
+    
+    String sourceMap;
+    try {
+      sourceMap = new String(Base64.decode(encodedSourceMap));
+    } catch (IOException e) {
+      throw new IllegalStateException("Invalid base64 eccoding", e);
+    }
     return sourceMap;
   }
 

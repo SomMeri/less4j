@@ -1,12 +1,10 @@
 package com.github.sommeri.less4j.grammar;
 
-import static com.github.sommeri.less4j.grammar.GrammarAsserts.assertChilds;
 import static com.github.sommeri.less4j.grammar.GrammarAsserts.assertValid;
 import static com.github.sommeri.less4j.grammar.GrammarAsserts.assertValidSelector;
 
 import org.junit.Test;
 
-import com.github.sommeri.less4j.core.parser.LessLexer;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
 import com.github.sommeri.less4j.core.parser.ANTLRParser.ParseResult;
 
@@ -45,23 +43,6 @@ public class SelectorsGrammarTest {
     ANTLRParser compiler = new ANTLRParser();
     ANTLRParser.ParseResult result = compiler.parseSelector("h1 + h2 {", null);
     assertValidSelector(result);
-  }
-
-  @Test
-  public void afterCSS2() {
-    ANTLRParser compiler = new ANTLRParser();
-    ANTLRParser.ParseResult result = compiler.parseSelector("li:after {", null);
-    assertValidSelector(result);
-    assertChilds(result.getTree(), LessLexer.SIMPLE_SELECTOR);
-  }
-
-  @Test
-  public void afterCSS3() {
-    ANTLRParser compiler = new ANTLRParser();
-    String selector = "li::after {";
-    ANTLRParser.ParseResult result = compiler.parseSelector(selector, null);
-    assertValidSelector(result);
-    assertChilds(result.getTree(), LessLexer.SIMPLE_SELECTOR);
   }
 
   @Test

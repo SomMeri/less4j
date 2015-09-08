@@ -142,8 +142,8 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.NESTED_APPENDER)
       return handleNestedAppender(token);
 
-    if (type == LessLexer.SIMPLE_SELECTOR)
-      return handleSimpleSelector(token);
+    if (type == LessLexer.ELEMENT_NAME)
+      return handleElementName(token);
 
     if (type == LessLexer.ESCAPED_SELECTOR)
       return handleEscapedSelector(token);
@@ -218,7 +218,7 @@ public abstract class TokenTypeSwitch<T> {
 
   public abstract T handleEscapedSelector(HiddenTokenAwareTree token);
 
-  public abstract T handleSimpleSelector(HiddenTokenAwareTree token);
+  public abstract T handleElementName(HiddenTokenAwareTree token);
 
   public abstract T handleNestedAppender(HiddenTokenAwareTree token);
 
