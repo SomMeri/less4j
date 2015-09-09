@@ -60,7 +60,7 @@ public class ColorFunctions extends BuiltInFunctionsPack {
   protected static final String NEGATION = "negation";
 
   protected static final String TINT = "tint";
-  protected static final String SHADE = "shade"; 
+  protected static final String SHADE = "shade";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -74,8 +74,6 @@ public class ColorFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(HSV_HUE, new HSVHue());
     FUNCTIONS.put(HSV_SATURATION, new HSVSaturation());
     FUNCTIONS.put(HSV_VALUE, new HSVValue());
-    
-    
 
     FUNCTIONS.put(HUE, new Hue());
     FUNCTIONS.put(SATURATION, new Saturation());
@@ -523,7 +521,7 @@ class Luma extends AbstractColorOperationFunction {
     g = (g <= 0.03928) ? g / 12.92 : Math.pow(((g + 0.055) / 1.055), 2.4);
     b = (b <= 0.03928) ? b / 12.92 : Math.pow(((b + 0.055) / 1.055), 2.4);
 
-    double luma =  0.2126 * r + 0.7152 * g + 0.0722 * b;
+    double luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
     return new NumberExpression(token, Double.valueOf(round8(luma * color.getAlpha() * 100)), "%", null, Dimension.PERCENTAGE);
   }
@@ -578,14 +576,14 @@ abstract class AbstractColorOperationFunction extends AbstractColorFunction {
 }
 
 class ColorParameterUtils {
-  
+
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
 
   protected boolean isAbsolute(List<Expression> allParameters, int index) {
     boolean isAbsolute = true;
-    if (allParameters.size()>index) {
+    if (allParameters.size() > index) {
       String kind = conversionUtils.contentToString(allParameters.get(index));
-      if (kind !=null && "relative".equals(kind.toLowerCase()))
+      if (kind != null && "relative".equals(kind.toLowerCase()))
         isAbsolute = false;
     }
     return isAbsolute;
@@ -598,7 +596,7 @@ class ColorParameterUtils {
 }
 
 class Saturate extends CssNameClashMultiParameterFunction {
-  
+
   private ColorParameterUtils paramUtils = new ColorParameterUtils();
 
   @Override
@@ -611,13 +609,12 @@ class Saturate extends CssNameClashMultiParameterFunction {
 
     ColorExpression color = (ColorExpression) firstParam;
     NumberExpression amount = (NumberExpression) splitParameters.get(1);
-    
 
     HSLAValue hsla = AbstractColorFunction.toHSLA(color);
     boolean isAbsolute = paramUtils.isAbsolute(splitParameters, 2);
     if (isAbsolute) {
       applyAbsolute(amount, hsla);
-    } else { 
+    } else {
       applyRelative(amount, hsla);
     }
     return AbstractColorFunction.hsla(hsla, call.getUnderlyingStructure());
@@ -652,7 +649,7 @@ class Saturate extends CssNameClashMultiParameterFunction {
       return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     case 2:
       return validateParameterTypeReportError(parameter, problemsHandler, paramUtils.modeTypeAcceptableTypes());
-      
+
     }
     return false;
   }
@@ -891,10 +888,11 @@ class Contrast extends CssNameClashMultiParameterFunction {
 
   @Override
   public Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
-    /* Contrast needs to support an invalid first parameter to succeed in less.js test cases.
-     * I think this is in order to support filter: rules so may not be a good idea.
-     * We return null to ColorFunctions which will in turn return the input, so in effect we change
-     * nothing.
+    /*
+     * Contrast needs to support an invalid first parameter to succeed in
+     * less.js test cases. I think this is in order to support filter: rules so
+     * may not be a good idea. We return null to ColorFunctions which will in
+     * turn return the input, so in effect we change nothing.
      */
     if (splitParameters.get(0).getType() != ASTCssNodeType.COLOR_EXPRESSION) {
       UnknownFunction unknownFunction = new UnknownFunction();
@@ -909,11 +907,42 @@ class Contrast extends CssNameClashMultiParameterFunction {
     NumberExpression threshold = (NumberExpression) (splitParameters.size() > 3 ? splitParameters.get(3) : new NumberExpression(token, 43.0, "%", null, Dimension.PERCENTAGE));
     double thresholdValue = AbstractColorFunction.number(threshold);
 
-    if (((0.2126 * (color.getRed() / 255) + 0.7152 * (color.getGreen() / 255) + 0.0722 * (color.getBlue() / 255)) * color.getAlpha()) < thresholdValue) {
+    if (luma(dark) > luma(light)) {
+      ColorExpression t = light;
+      light = dark;
+      dark = t;
+    }
+
+    System.out.println("luma: " + luma(color));
+    System.out.println("thresholdValue: " + thresholdValue);
+    System.out.println("threshold: " + threshold);
+    if (luma(color) < thresholdValue) {
       return light;
     } else {
       return dark;
     }
+  }
+
+  private double luma(ColorExpression color) {
+/*    var r = this.rgb[0] / 255,
+        g = this.rgb[1] / 255,
+        b = this.rgb[2] / 255;
+
+    r = (r <= 0.03928) ? r / 12.92 : Math.pow(((r + 0.055) / 1.055), 2.4);
+    g = (g <= 0.03928) ? g / 12.92 : Math.pow(((g + 0.055) / 1.055), 2.4);
+    b = (b <= 0.03928) ? b / 12.92 : Math.pow(((b + 0.055) / 1.055), 2.4);
+
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;*/
+    
+    double r = color.getRed() / 255;
+    double g = color.getGreen() / 255;
+    double b = color.getBlue() / 255;
+
+    r = (r <= 0.03928) ? r / 12.92 : Math.pow(((r + 0.055) / 1.055), 2.4);
+    g = (g <= 0.03928) ? g / 12.92 : Math.pow(((g + 0.055) / 1.055), 2.4);
+    b = (b <= 0.03928) ? b / 12.92 : Math.pow(((b + 0.055) / 1.055), 2.4);
+
+    return (0.2126 * r + 0.7152 * g + 0.0722 * b) * color.getAlpha();
   }
 
   @Override
@@ -930,8 +959,10 @@ class Contrast extends CssNameClashMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      /* Contrast needs to support an invalid first parameter to succeed in less.js test cases.
-       * I think this is in order to support filter: rules so may not be a good idea.
+      /*
+       * Contrast needs to support an invalid first parameter to succeed in
+       * less.js test cases. I think this is in order to support filter: rules
+       * so may not be a good idea.
        */
       return true;
     case 1:
@@ -954,7 +985,7 @@ class Multiply extends AbstractSimpleColorBlendFunction {
 
   @Override
   protected double evaluateNormalized(double a, double b) {
-    return a * b ;
+    return a * b;
   }
 
   @Override
@@ -982,7 +1013,7 @@ class Overlay extends AbstractSimpleColorBlendFunction {
 
   @Override
   protected double evaluateNormalized(double a, double b) {
-    return a < 0.5 ? 2 * a * b  : 1 - 2 * (1 - a) * (1 - b);
+    return a < 0.5 ? 2 * a * b : 1 - 2 * (1 - a) * (1 - b);
   }
 
   @Override
@@ -998,9 +1029,8 @@ class Softlight extends AbstractSimpleColorBlendFunction {
   protected double evaluateNormalized(double cb, double cs) {
     double d = 1, e = cb;
     if (cs > 0.5) {
-        e = 1;
-        d = (cb > 0.25) ? Math.sqrt(cb)
-            : ((16 * cb - 12) * cb + 4) * cb;
+      e = 1;
+      d = (cb > 0.25) ? Math.sqrt(cb) : ((16 * cb - 12) * cb + 4) * cb;
     }
     return cb - (1 - 2 * cs) * e * (d - cb);
   }
@@ -1016,7 +1046,7 @@ class Hardlight extends AbstractSimpleColorBlendFunction {
 
   @Override
   protected double evaluateNormalized(double a, double b) {
-    return b < 0.5 ? 2 * b * a  : 1 - 2 * (1 - b) * (1 - a);
+    return b < 0.5 ? 2 * b * a : 1 - 2 * (1 - b) * (1 - a);
   }
 
   @Override
@@ -1122,23 +1152,23 @@ abstract class AbstractSimpleColorBlendFunction extends AbstractColorBlendFuncti
 
   @Override
   protected Expression evaluate(ColorExpression color1, ColorExpression color2, ProblemsHandler problemsHandler, HiddenTokenAwareTree token) {
-    double cbRed = color1.getRed()/255.0;
-    double csRed = color2.getRed()/255.0;
+    double cbRed = color1.getRed() / 255.0;
+    double csRed = color2.getRed() / 255.0;
     double resultRed = evaluateNormalized(cbRed, csRed);
-    double cbGreen = color1.getGreen()/255.0;
-    double csGreen = color2.getGreen()/255.0;
+    double cbGreen = color1.getGreen() / 255.0;
+    double csGreen = color2.getGreen() / 255.0;
     double resultGreen = evaluateNormalized(cbGreen, csGreen);
-    double cbBlue = color1.getBlue()/255.0;
-    double csBlue = color2.getBlue()/255.0;
+    double cbBlue = color1.getBlue() / 255.0;
+    double csBlue = color2.getBlue() / 255.0;
     double resultBlue = evaluateNormalized(cbBlue, csBlue);
-    
+
     if (!color1.hasAlpha() && !color2.hasAlpha()) {
       return rgb(resultRed * 255.0, resultGreen * 255.0, resultBlue * 255.0, token);
     }
-    
+
     double ab = color1.getAlpha();
     double as = color2.getAlpha();
-    
+
     double resultAlpha = as + ab * (1 - as);
     resultRed = addAlpha(cbRed, ab, csRed, as, resultRed, resultAlpha);
     resultGreen = addAlpha(cbGreen, ab, csGreen, as, resultGreen, resultAlpha);
@@ -1146,15 +1176,10 @@ abstract class AbstractSimpleColorBlendFunction extends AbstractColorBlendFuncti
 
     return rgba(resultRed * 255.0, resultGreen * 255.0, resultBlue * 255.0, resultAlpha, token);
   }
-  
-  
 
   private double addAlpha(double cb, double ab, double cs, double as, double cr, double ar) {
-    return (as * cs + ab * (cb -
-        as * (cb + cs - cr))) / ar;
+    return (as * cs + ab * (cb - as * (cb + cs - cr))) / ar;
   }
-
-
 
   protected abstract double evaluateNormalized(double a, double b);
 
@@ -1187,10 +1212,10 @@ abstract class AbstractColorBlendFunction extends AbstractColorFunction {
 }
 
 abstract class AbstractColorFunction extends CatchAllMultiParameterFunction {
-  
+
   static double round8(double value) {
     double rounding = 100000000.0;
-    return Math.round(value*rounding)/rounding;
+    return Math.round(value * rounding) / rounding;
   }
 
   static double clamp(double val) {
@@ -1241,9 +1266,11 @@ abstract class AbstractColorFunction extends CatchAllMultiParameterFunction {
 
   /**
    * Mix
+   * 
    * @param color1
    * @param color2
-   * @param weight number 0-100.
+   * @param weight
+   *          number 0-100.
    * @return
    */
   protected static Expression mix(ColorExpression color1, ColorExpression color2, NumberExpression weight, HiddenTokenAwareTree token) {
@@ -1310,7 +1337,7 @@ abstract class AbstractColorFunction extends CatchAllMultiParameterFunction {
         h = (g - b) / d + (g < b ? 6 : 0);
       } else if (max == g) {
         h = (b - r) / d + 2;
-      } else { //if (max == b) 
+      } else { // if (max == b)
         h = (r - g) / d + 4;
       }
       h = h / 6;
@@ -1369,7 +1396,7 @@ class HSVAValue {
 }
 
 abstract class AbstractColorAmountFunction extends AbstractColorFunction {
-  
+
   private final ColorParameterUtils paramUtils = new ColorParameterUtils();
   private final boolean supportsRelativeOption;
 
@@ -1394,7 +1421,7 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
 
   @Override
   protected int getMaxParameters() {
-    return supportsRelativeOption? 3 : 2;
+    return supportsRelativeOption ? 3 : 2;
   }
 
   @Override

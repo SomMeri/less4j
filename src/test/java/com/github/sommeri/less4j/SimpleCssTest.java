@@ -38,7 +38,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//less//bootstrap.less";
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//flamingo-m.less";
   
-  private static final String inputLess = "c://data//meri//less4java//srot//semantic-ui//Semantic-UI-LESS//semantic.less";
+private static final String inputLess = "src/test/resources/minitests/debug1.less";
+//  private static final String inputLess = "c://data//meri//less4java//srot//semantic-ui//Semantic-UI-LESS//semantic.less";
 //  private static final String inputLess = "c://data//meri//less4java//srot//semantic-ui//Semantic-UI-LESS//srot//multiple-test.less";
 
   //private static final String inputLess = "src/test/resources/minitests/bootstrap-debug.less";

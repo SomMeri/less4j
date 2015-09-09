@@ -150,3 +150,13 @@ issue-210 {
   color: shade(@color, -15%); 	
 }
 issue-293 {color:multiply(fade(#A21619, 20%), #ffffff);}
+issue-297-contrast {
+  color-normal: contrast(#666666, #101010, #aaaaaa);
+  color-reversed: contrast(#666666, #aaaaaa, #101010);
+  color-normal-treshold: contrast(#666666, #101010, #aaaaaa);
+  color-reversed-treshold: contrast(#666666, #aaaaaa, #101010);
+  color-normal: contrast(#666666, #101010, #aaaaaa, 0.1);
+  color-reversed: contrast(#666666, #aaaaaa, #101010, 0.1);
+  color-normal-treshold: contrast(#666666, #101010, #aaaaaa, 0.1);
+  color-reversed-treshold: contrast(#666666, #aaaaaa, #101010, 0.1);
+}

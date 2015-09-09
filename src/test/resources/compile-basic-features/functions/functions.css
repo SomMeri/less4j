@@ -43,7 +43,7 @@
   contrast-light-thresh: #111111;
   contrast-dark-thresh: #eeeeee;
   contrast-high-thresh: #eeeeee;
-  contrast-low-thresh: #111111;
+  contrast-low-thresh: #eeeeee;
   replace: "Hello, World!";
   replace-captured: "This is a new string.";
   replace-with-flags: "2 + 2 = 4";

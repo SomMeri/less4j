@@ -39,13 +39,13 @@
   contrast-light-thresh: #111111;
   contrast-dark-thresh: #eeeeee;
   contrast-high-thresh: #eeeeee;
-  contrast-low-thresh: #111111;
-  contrast: #000000;
+  contrast-low-thresh: #eeeeee;
+  contrast: #ffffff;
   contrast2: #ffffff;
   contrast3: #dddddd;
   contrast4: #000000;
   contrast5: #000000;
-  contrast6: #000000;
+  contrast6: #ffffff;
   contrast7: #ffffff;
   contrast8: #ffffff;
   format: "rgb(32, 128, 64)";
@@ -141,4 +141,14 @@ issue-210 {
 }
 issue-293 {
   color: #ecd0d1;
+}
+issue-297-contrast {
+  color-normal: #aaaaaa;
+  color-reversed: #aaaaaa;
+  color-normal-treshold: #aaaaaa;
+  color-reversed-treshold: #aaaaaa;
+  color-normal: #101010;
+  color-reversed: #101010;
+  color-normal-treshold: #101010;
+  color-reversed-treshold: #101010;
 }
