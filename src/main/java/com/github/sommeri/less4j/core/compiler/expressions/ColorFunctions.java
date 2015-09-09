@@ -913,9 +913,6 @@ class Contrast extends CssNameClashMultiParameterFunction {
       dark = t;
     }
 
-    System.out.println("luma: " + luma(color));
-    System.out.println("thresholdValue: " + thresholdValue);
-    System.out.println("threshold: " + threshold);
     if (luma(color) < thresholdValue) {
       return light;
     } else {
