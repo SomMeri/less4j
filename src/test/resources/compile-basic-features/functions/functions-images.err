@@ -1,0 +1,15 @@
+Errors produced by compilation of testCase
+ERROR 4:21 Unknown image file format for ../data/image.jpg
+ 3:   data-uri-fail-jpg: image-size('../data/data-uri-fail.jpg');
+ 4:   not-really-image: image-size('../data/image.jpg');
+ 5: }
+
+ERROR 9:21 Unknown image file format for ../data/image.jpg
+  8:   data-uri-fail-jpg: image-width('../data/data-uri-fail.jpg');
+  9:   not-really-image: image-width('../data/image.jpg');
+ 10: }
+
+ERROR 14:21 Unknown image file format for ../data/image.jpg
+ 13:   data-uri-fail-jpg: image-height('../data/data-uri-fail.jpg');
+ 14:   not-really-image: image-height('../data/image.jpg');
+ 15: }

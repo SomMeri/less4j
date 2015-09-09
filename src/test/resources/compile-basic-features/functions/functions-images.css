@@ -1,0 +1,15 @@
+#image-size {
+  data-uri-fail-png: 640px 430px;
+  data-uri-fail-jpg: 640px 430px;
+  not-really-image: !#error#!;
+}
+#image-width {
+  data-uri-fail-png: 640px;
+  data-uri-fail-jpg: 640px;
+  not-really-image: !#error#!;
+}
+#image-height {
+  data-uri-fail-png: 430px;
+  data-uri-fail-jpg: 430px;
+  not-really-image: !#error#!;
+}

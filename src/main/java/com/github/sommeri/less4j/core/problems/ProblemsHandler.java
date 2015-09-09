@@ -98,6 +98,11 @@ public class ProblemsHandler implements LessProblems {
     addError(node, "The file " + filename + " does not exist.");
   }
 
+  public void errorUnknownImageFileFormat(ASTCssNode node, String filename) {
+    addError(node, "Unknown image file format for " + filename);
+  }
+
+
   public void errorWrongImport(Expression urlExpression) {
     addError(urlExpression, "Unsupported @import url kind. File link expression in @import can handle only strings and urls.");
   }

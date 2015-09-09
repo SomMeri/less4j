@@ -1,9 +1,15 @@
 package com.github.sommeri.less4j.core.compiler.expressions;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessSource.CannotReadFile;
@@ -17,6 +23,7 @@ import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
+import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.parser.ConversionUtils;
@@ -34,6 +41,9 @@ public class MiscFunctions extends BuiltInFunctionsPack {
   protected static final String CONVERT = "convert";
   protected static final String EXTRACT = "extract";
   protected static final String DATA_URI = "data-uri";
+  protected static final String IMAGE_SIZE = "image-size";
+  protected static final String IMAGE_WIDTH = "image-width";
+  protected static final String IMAGE_HEIGHT = "image-height";
   protected static final String SVG_GRADIENT = "svg-gradient";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
@@ -44,6 +54,9 @@ public class MiscFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(CONVERT, new Convert());
     FUNCTIONS.put(EXTRACT, new Extract());
     FUNCTIONS.put(DATA_URI, new DataUri());
+    FUNCTIONS.put(IMAGE_SIZE, new ImageSize());
+    FUNCTIONS.put(IMAGE_WIDTH, new ImageWidth());
+    FUNCTIONS.put(IMAGE_HEIGHT, new ImageHeight());
     FUNCTIONS.put(SVG_GRADIENT, new SvgGradient());
   }
 
@@ -65,7 +78,7 @@ class Color extends CatchAllMultiParameterFunction {
     CssString string = (CssString) splitParameters.get(0);
     String text = string.getValue();
 
-    //this does a bit more then less.js: it is able to parse named colors
+    // this does a bit more then less.js: it is able to parse named colors
     ColorExpression parsedColor = ConversionUtils.parseColor(token, text);
     if (parsedColor == null) {
       FaultyExpression faultyExpression = new FaultyExpression(token);
@@ -152,7 +165,9 @@ class GetUnit extends CatchAllMultiParameterFunction {
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     NumberExpression dimension = (NumberExpression) splitParameters.get(0);
-    return new IdentifierExpression(token, dimension.getSuffix()); //not sure about the type
+    return new IdentifierExpression(token, dimension.getSuffix()); // not sure
+                                                                   // about the
+                                                                   // type
   }
 
   @Override
@@ -376,6 +391,108 @@ class DataUri extends CatchAllMultiParameterFunction {
 
 }
 
+class ImageSize extends CatchAllMultiParameterFunction {
+
+  @Override
+  protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
+    CssString filenameArg = (CssString) splitParameters.get(0);
+    String filename = filenameArg.getValue();
+
+    LessSource source = token.getSource();
+    try {
+      LessSource dataSource = source.relativeSource(filename);
+      byte[] data = dataSource.getBytes();
+
+      BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+      if (image==null) {
+        problemsHandler.errorUnknownImageFileFormat(functionCall, filename);
+        return new FaultyExpression(functionCall.getUnderlyingStructure());
+      }
+      
+      int width = image.getWidth();
+      int height = image.getHeight();
+      return toSizeNumber(functionCall.getUnderlyingStructure(), width, height);
+      
+    } catch (FileNotFound ex) {
+      problemsHandler.errorFileNotFound(functionCall, filename);
+      return new FaultyExpression(functionCall.getUnderlyingStructure());
+    } catch (CannotReadFile e) {
+      problemsHandler.errorFileCanNotBeRead(functionCall, filename);
+      return new FaultyExpression(functionCall.getUnderlyingStructure());
+    } catch (IOException e) {
+      problemsHandler.errorFileCanNotBeRead(functionCall, filename);
+      return new FaultyExpression(functionCall.getUnderlyingStructure());
+    } catch (StringSourceException ex) {
+      // imports are relative to current file and we do not know its location
+      problemsHandler.errorFileReferenceNoBaseDirectory(functionCall, filename);
+      return new FaultyExpression(functionCall.getUnderlyingStructure());
+    }
+
+  }
+
+  protected Expression toSizeNumber(HiddenTokenAwareTree token, int width, int height) {
+    Expression widthExp = toPixels(token, width);
+    Expression heightExp = toPixels(token, height);
+    
+    return new ListExpression(token, Arrays.asList(widthExp, heightExp), new ListExpressionOperator(token, ListExpressionOperator.Operator.EMPTY_OPERATOR));
+  }
+
+  protected Expression toPixels(HiddenTokenAwareTree token, int width) {
+    return new NumberExpression(token, (double ) width, "px", null, Dimension.LENGTH);
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
+
+  @Override
+  protected int getMaxParameters() {
+    return 1;
+  }
+
+  @Override
+  protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
+    return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.STRING_EXPRESSION);
+  }
+
+  @Override
+  protected String getName() {
+    return MiscFunctions.IMAGE_SIZE;
+  }
+
+}
+
+class ImageWidth extends ImageSize {
+
+  protected Expression toSizeNumber(HiddenTokenAwareTree token, int width, int height) {
+    Expression widthExp = toPixels(token, width);
+    
+    return widthExp;
+  }
+
+  @Override
+  protected String getName() {
+    return MiscFunctions.IMAGE_WIDTH;
+  }
+
+}
+
+class ImageHeight extends ImageSize {
+
+  protected Expression toSizeNumber(HiddenTokenAwareTree token, int width, int height) {
+    Expression heightExp = toPixels(token, height);
+    
+    return heightExp;
+  }
+
+  @Override
+  protected String getName() {
+    return MiscFunctions.IMAGE_HEIGHT;
+  }
+
+}
+
 class SvgGradient extends CatchAllMultiParameterFunction {
 
   private final TypesConversionUtils conversions = new TypesConversionUtils();
@@ -384,7 +501,7 @@ class SvgGradient extends CatchAllMultiParameterFunction {
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     String direction = toDirection(splitParameters.get(0)), gradientDirectionSvg = "";
     List<Expression> stops = extractStops(splitParameters);
-    if (stops==null || stops.size() < 2) {
+    if (stops == null || stops.size() < 2) {
       problemsHandler.errorSvgGradientArgument(functionCall);
       return new FaultyExpression(functionCall.getUnderlyingStructure());
     }
@@ -435,9 +552,9 @@ class SvgGradient extends CatchAllMultiParameterFunction {
   }
 
   private List<Expression> extractStops(List<Expression> splitParameters) {
-    if (splitParameters.size()==2) {
+    if (splitParameters.size() == 2) {
       Expression expression = splitParameters.get(1);
-      if (ASTCssNodeType.LIST_EXPRESSION==expression.getType()) {
+      if (ASTCssNodeType.LIST_EXPRESSION == expression.getType()) {
         ListExpression list = (ListExpression) expression;
         return list.getExpressions();
       } else {
