@@ -70,11 +70,8 @@
   more-then: -5;
   less-then: 5px;
   more-then: minus 5px;
-  less-then: 5%;
-  more-then: minus 5%;
   more-then: -3;
   more-then: minus 3px;
-  more-then: minus 3%;
 }
 #tryNumberMinuxPx {
   catch: all;
@@ -84,11 +81,8 @@
   more-then: -5;
   less-then: 5px;
   more-then: minus 5px;
-  less-then: 5%;
-  more-then: minus 5%;
   less-then: 3;
   less-then: 3px;
-  less-then: 3%;
 }
 #tryNumberPercentage {
   catch: all;
@@ -96,12 +90,9 @@
   declare: 4%;
   less-then: 5;
   more-then: -5;
-  less-then: 5px;
-  more-then: minus 5px;
   less-then: 5%;
   more-then: minus 5%;
   more-then: -3;
-  more-then: minus 3px;
   more-then: minus 3%;
 }
 #tryNumberMinuxPercentage {
@@ -110,12 +101,9 @@
   declare: minus 4%;
   less-then: 5;
   more-then: -5;
-  less-then: 5px;
-  more-then: minus 5px;
   less-then: 5%;
   more-then: minus 5%;
   less-then: 3;
-  less-then: 3px;
   less-then: 3%;
 }
 #tryString1 {

@@ -30,7 +30,6 @@ import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
 import com.github.sommeri.less4j.core.ast.NamedExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
-import com.github.sommeri.less4j.core.ast.NumberExpression.Dimension;
 import com.github.sommeri.less4j.core.ast.ParenthesesExpression;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.RuleSet;
@@ -263,7 +262,7 @@ public class ExpressionEvaluator {
   }
 
   private boolean compareNumbers(NumberExpression leftE, NumberExpression rightE, ComparisonExpressionOperator operator) {
-    if (!canCompareDimensions(leftE.getDimension(), rightE.getDimension()))
+    if (!leftE.convertibleTo(rightE))
       return false;
 
     Double left = leftE.getValueAsDouble();
@@ -285,10 +284,6 @@ public class ExpressionEvaluator {
     default:
       throw new BugHappened("Unexpected comparison operator", operator);
     }
-  }
-
-  private boolean canCompareDimensions(Dimension left, Dimension right) {
-    return true;
   }
 
   public Expression evaluate(FunctionExpression input) {

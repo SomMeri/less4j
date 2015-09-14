@@ -203,7 +203,7 @@ class Convert extends CatchAllMultiParameterFunction {
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     NumberExpression value = (NumberExpression) splitParameters.get(0);
-    return value.convertTo(conversionUtils.contentToString(splitParameters.get(1)));
+    return value.convertIfPossible(conversionUtils.contentToString(splitParameters.get(1)));
   }
 
   @Override

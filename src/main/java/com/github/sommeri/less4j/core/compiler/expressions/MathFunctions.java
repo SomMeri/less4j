@@ -518,7 +518,7 @@ abstract class MinMax extends AbtractMultiParameterMathFunction {
       next = expanded.next();
       if (next.getType()==ASTCssNodeType.NUMBER) {
         NumberExpression nextNum = (NumberExpression) next;
-        if (!canCompare(result, nextNum)) {
+        if (!result.convertibleTo(nextNum)) {
           problemsHandler.errorIncompatibleTypesCompared(functionCall, result.getSuffix(), nextNum.getSuffix());
           return new FaultyExpression(functionCall);
         }
@@ -531,10 +531,6 @@ abstract class MinMax extends AbtractMultiParameterMathFunction {
   }
 
   protected abstract NumberExpression compareCompatible(NumberExpression first, NumberExpression second);
-
-  private boolean canCompare(NumberExpression first, NumberExpression second) {
-    return first.getDimension() == second.getDimension() || first.getDimension()==Dimension.NUMBER || second.getDimension()==Dimension.NUMBER;
-  }
 
   private List<Expression> expandLists(List<Expression> splitParameters) {
     List<Expression> result = new ArrayList<Expression>();
@@ -587,7 +583,7 @@ class Min extends MinMax {
   }
 
   protected NumberExpression compareCompatible(NumberExpression first, NumberExpression second) {
-    NumberExpression secondConverted = second.convertTo(first.getSuffix());
+    NumberExpression secondConverted = second.convertIfPossible(first.getSuffix());
     if (secondConverted.getValueAsDouble()<first.getValueAsDouble())
       return second;
     
@@ -604,7 +600,7 @@ class Max extends MinMax {
   }
 
   protected NumberExpression compareCompatible(NumberExpression first, NumberExpression second) {
-    NumberExpression secondConverted = second.convertTo(first.getSuffix());
+    NumberExpression secondConverted = second.convertIfPossible(first.getSuffix());
     if (secondConverted.getValueAsDouble()>first.getValueAsDouble())
       return second;
     

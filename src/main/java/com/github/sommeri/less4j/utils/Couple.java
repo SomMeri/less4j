@@ -27,4 +27,9 @@ public class Couple<T, M> {
     this.m = m;
   }
 
+  @Override
+  public String toString() {
+    return "Couple [t=" + t + ", m=" + m + "]";
+  }
+
 }

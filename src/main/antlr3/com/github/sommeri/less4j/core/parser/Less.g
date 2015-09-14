@@ -1426,7 +1426,7 @@ IMPORTANT_SYM : '!' (WS_FRAGMENT|COMMENT_CONTENT)* I M P O R T A N T ;
 fragment EMS :; // 'em'
 fragment EXS :; // 'ex'
 fragment LENGTH :; // 'px'. 'cm', 'mm', 'in'. 'pt', 'pc'
-fragment ANGLE :; // 'deg', 'rad', 'grad'
+fragment ANGLE :; // 'deg', 'rad', 'grad', 'turn'
 fragment TIME :; // 'ms', 's'
 fragment FREQ :; // 'khz', 'hz'
 fragment REPEATER :; // n found in n-th child formulas if I would not do that, the dimension would eat it. 
@@ -1471,6 +1471,9 @@ NUMBER
                 D E G { $type = ANGLE; }
             | (R A D)=>
                 R A D { $type = ANGLE; }
+
+            | (T U R N)=>
+                T U R N { $type = ANGLE; }
             
             | (S)=>S { $type = TIME; }
                 

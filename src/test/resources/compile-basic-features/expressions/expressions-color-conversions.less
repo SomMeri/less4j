@@ -1,0 +1,54 @@
+units-multiply-divide {
+  length1: 40cm / 20cm;
+  length1: 40cm * 20cm;
+  length1: 1cm / 200mm;
+  length1: 1cm / 200mm * 1mm;
+  length2: 1cm / 20mm;
+  length3: 20mm / 1cm;
+  length5: 2cm * 5mm;
+  length-underspecified-plus-1: 1cm * 5;
+  length-underspecified-plus-2: 2 * 3cm;
+  length-underspecified-minus-1: 1cm / 5;
+  length-underspecified-minus-2: 2 / 3cm;
+  length-same-divide: (5px / 3px);
+  length-same-multiply: (5px * 3px);
+}
+units-plus-minus {
+  length1: 1cm + 200mm;
+  length2: 1cm + 20mm;
+  length3: 20mm + 1cm;
+  length5: 1cm - 5mm;
+  length-underspecified-plus-1: 1cm + 5;
+  length-underspecified-plus-2: 2 + 3cm;
+  length-underspecified-minus-1: 1cm - 5;
+  length-underspecified-minus-2: 2 - 3cm;
+  length-compatible: 1cm + (5px / 3px);
+}
+
+units-multiply-divide {
+  length1: 40cm / 20cm;
+  length1: 40cm * 20cm;
+  length1: 1cm / 200mm;
+  length1: 1cm / 200mm * 1mm;
+  length2: 1cm / 20mm;
+  length3: 20mm / 1cm;
+  length5: 2cm * 5mm;
+  length-underspecified-plus-1: 1cm * 5;
+  length-underspecified-plus-2: 2 * 3cm;
+  length-underspecified-minus-1: 1cm / 5;
+  length-underspecified-minus-2: 2 / 3cm;
+  length-same-divide: (5px / 3px);
+  length-same-multiply: (5px * 3px);
+}
+
+units-degrees {
+  all: 1deg + 15rad - 42turn;
+}
+
+units-combinations {
+  multi: 1deg * 15rad * 42cm;
+  multi: (1deg + 15rad) * 42cm;
+  multi: (10cm * 5px) / (1cm * 3px);
+  multi: (10cm / 5px) * (3cm / 1px);
+  multi: (10cm / 5px) * (3px / 1cm);
+}

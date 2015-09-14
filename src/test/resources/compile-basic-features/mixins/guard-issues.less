@@ -1,0 +1,12 @@
+#issue-302 {
+  .mixin(@v1, @v2) when (@v1 > @v2) {
+    guard-bigger: true;
+  }
+  .mixin(@v1, @v2) when (@v1 < @v2) {
+    guard-smaller: true;
+  }
+  .mixin(@v1, @v2) when (default()) {
+    guard: false;
+  }
+  .mixin(10mm, 5deg);
+}

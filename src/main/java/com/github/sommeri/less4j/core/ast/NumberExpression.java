@@ -31,7 +31,6 @@ public class NumberExpression extends Expression implements Cloneable {
     this.dimension = dimension;
   }
 
-  
   public NumberExpression(HiddenTokenAwareTree token, String lowerCaseValue, Dimension repeater, boolean expliciteSign) {
     this(token, lowerCaseValue, repeater);
     this.expliciteSign = expliciteSign;
@@ -90,6 +89,48 @@ public class NumberExpression extends Expression implements Cloneable {
     valueAsDouble = valueAsDouble * -1;
   }
 
+  public boolean convertibleTo(NumberExpression second) {
+    String toSuffix = second.getSuffix();
+    return convertibleTo(toSuffix);
+  }
+
+  public boolean convertibleTo(String toSuffix) {
+    String fromSuffix = getSuffix();
+    if (toSuffix==null || toSuffix.isEmpty() || fromSuffix==null || fromSuffix.isEmpty())
+      return true;
+
+    fromSuffix = fromSuffix.toLowerCase();
+    toSuffix = toSuffix.toLowerCase();
+    if (fromSuffix.equals(toSuffix))
+      return true;
+
+    Map<String, Number> conversions = getDimension().getConversions();
+    return conversions.containsKey(toSuffix.toLowerCase()) && conversions.containsKey(fromSuffix.toLowerCase());
+  }
+
+  public NumberExpression convertIfPossible(String toSuffix) {
+    String fromSuffix = getSuffix();
+    if (toSuffix==null || toSuffix.isEmpty() || fromSuffix==null || fromSuffix.isEmpty())
+      return this;
+
+    fromSuffix = fromSuffix.toLowerCase();
+    toSuffix = toSuffix.toLowerCase();
+    if (fromSuffix.equals(toSuffix))
+      return this;
+
+    Map<String, Number> conversions = getDimension().getConversions();
+    Number multiplier = conversions.get(fromSuffix);
+    Number divisor = conversions.get(toSuffix);
+
+    if (multiplier != null && divisor != null) {
+      HiddenTokenAwareTree token = getUnderlyingStructure();
+      Double value = getValueAsDouble();
+      return new NumberExpression(token, value * multiplier.doubleValue() / divisor.doubleValue(), toSuffix, null, Dimension.forSuffix(toSuffix));
+    } else {
+      return this;
+    }
+
+  }
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
@@ -105,47 +146,15 @@ public class NumberExpression extends Expression implements Cloneable {
     return ASTCssNodeType.NUMBER;
   }
 
-  public NumberExpression convertTo(String targetUnit) {
-    Map<Dimension, String> conversions = new HashMap<Dimension, String>();
-    for (Dimension dim : Dimension.values()) {
-      if (dim.getConversions().containsKey(targetUnit)) {
-        conversions.put(dim, targetUnit);
-      }
-    }
-
-    return convertTo(conversions);
-  }
-
-  public NumberExpression convertTo(Map<Dimension, String> conversions) {
-    double value = getValueAsDouble();
-    String unit = getSuffix();
-    Dimension dimension = getDimension();
-
-    String targetUnit = conversions.get(dimension);
-    if (targetUnit == null) {
-      /* No conversion requested for this type of number */
-      return this;
-    }
-
-    Map<String, Number> group = dimension.getConversions();
-
-    Number multiplier = group.get(unit);
-    Number divisor = group.get(targetUnit);
-
-    if (multiplier != null && divisor != null) {
-      return new NumberExpression(getUnderlyingStructure(), value * multiplier.doubleValue() / divisor.doubleValue(), targetUnit, null, getDimension());
-    } else {
-      throw new IllegalArgumentException("Conversion between " + unit + " and " + targetUnit + " is not supported.");
-    }
-  }
-
   public enum Dimension {
     NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQ, REPEATER, UNKNOWN;
 
     private Map<String, Number> conversions;
 
     public static Dimension forSuffix(String suffix) {
-      if (suffix.equals("%")) {
+      if (suffix == null || suffix.isEmpty()) {
+        return NUMBER;
+      } else if (suffix.equals("%")) {
         return PERCENTAGE;
       } else if (suffix.equals("px") || suffix.equals("cm") || suffix.equals("mm") || suffix.equals("in") || suffix.equals("pt") || suffix.equals("pc")) {
         return LENGTH;
@@ -153,7 +162,7 @@ public class NumberExpression extends Expression implements Cloneable {
         return EMS;
       } else if (suffix.equals("ex")) {
         return EXS;
-      } else if (suffix.equals("deg") || suffix.equals("rad") || suffix.equals("grad")) {
+      } else if (suffix.equals("deg") || suffix.equals("rad") || suffix.equals("grad") || suffix.equals("turn")) {
         return ANGLE;
       } else if (suffix.equals("ms") || suffix.equals("s")) {
         return TIME;
@@ -177,6 +186,7 @@ public class NumberExpression extends Expression implements Cloneable {
         result.put("in", 0.0254);
         result.put("pt", 0.0254 / 72);
         result.put("pc", 0.0254 / 72 * 12);
+
         break;
 
       case TIME:
@@ -191,7 +201,32 @@ public class NumberExpression extends Expression implements Cloneable {
         result.put("turn", 1);
         break;
 
-      default:
+      case FREQ:
+        result.put("khz", 1);
+        result.put("hz", 0.001);
+        break;
+
+      case PERCENTAGE:
+        result.put("%", 1);
+        break;
+
+      case EMS:
+        result.put("em", 1);
+        break;
+
+      case EXS:
+        result.put("ex", 1);
+        break;
+
+      case REPEATER:
+        result.put("n", 1);
+        break;
+
+      case NUMBER:
+        result.put("", 1);
+        break;
+
+      case UNKNOWN:
         break;
       }
 

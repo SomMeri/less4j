@@ -1,0 +1,48 @@
+units-multiply-divide {
+  length1: 2cm;
+  length1: 800cm;
+  length1: 0.005cm;
+  length2: 0.05cm;
+  length3: 20mm;
+  length5: 10cm;
+  length-underspecified-plus-1: 5cm;
+  length-underspecified-plus-2: 6cm;
+  length-underspecified-minus-1: 0.2cm;
+  length-underspecified-minus-2: 0.6666666666666666cm;
+  length-same-divide: 1.6666666666666667px;
+  length-same-multiply: 15px;
+}
+units-plus-minus {
+  length1: 21cm;
+  length2: 3cm;
+  length3: 30mm;
+  length5: 0.5cm;
+  length-underspecified-plus-1: 6cm;
+  length-underspecified-plus-2: 5cm;
+  length-underspecified-minus-1: -4cm;
+  length-underspecified-minus-2: -1cm;
+  length-compatible: 2.666666666666667cm;
+}
+units-multiply-divide {
+  length1: 2cm;
+  length1: 800cm;
+  length1: 0.005cm;
+  length2: 0.05cm;
+  length3: 20mm;
+  length5: 10cm;
+  length-underspecified-plus-1: 5cm;
+  length-underspecified-plus-2: 6cm;
+  length-underspecified-minus-1: 0.2cm;
+  length-underspecified-minus-2: 0.6666666666666666cm;
+  length-same-divide: 1.6666666666666667px;
+  length-same-multiply: 15px;
+}
+units-degrees {
+  all: -14259.563307303764deg;
+}
+units-combinations {
+  multi: 630deg;
+  multi: 36138.34109324186deg;
+  multi: 16.666666666666668cm;
+  multi: 6cm;
+}

@@ -2,21 +2,16 @@ package com.github.sommeri.less4j;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
-import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
-import com.github.sommeri.less4j.core.TimeoutedLessCompiler;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
@@ -28,7 +23,7 @@ import com.github.sommeri.less4j.core.TimeoutedLessCompiler;
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
-//  private static final String inputLess = "src/test/resources/minitests/debug1.less";
+  private static final String inputLess = "src/test/resources/minitests/debug1.less";
   //private static final String inputLess = "c:/data/meri/less4java/srot/sppppppppppppppppppp-ample.less";
   //private static final String inputLess = "src/test/resources/minitests/javascript.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
@@ -38,7 +33,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//less//bootstrap.less";
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//flamingo-m.less";
   
-  private static final String inputLess = "src/test/resources/minitests/issue-299/fileB.less";
+//  private static final String inputLess = "src/test/resources/minitests/issue-299/fileB.less";
 //  private static final String inputLess = "c://data//meri//less4java//srot//semantic-ui//Semantic-UI-LESS//semantic.less";
 //  private static final String inputLess = "c://data//meri//less4java//srot//semantic-ui//Semantic-UI-LESS//srot//multiple-test.less";
 
