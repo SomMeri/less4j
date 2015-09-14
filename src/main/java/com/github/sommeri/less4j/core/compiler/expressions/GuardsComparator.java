@@ -12,7 +12,8 @@ public class GuardsComparator extends ExpressionComparator {
     if (!pattern.convertibleTo(numberExpression))
       return false;
 
-    return equals(pattern.getValueAsDouble(), numberExpression.getValueAsDouble());
+    NumberExpression value = pattern.convertIfPossible(numberExpression.getSuffix());
+    return equals(value.getValueAsDouble(), numberExpression.getValueAsDouble());
   }
 
   @Override

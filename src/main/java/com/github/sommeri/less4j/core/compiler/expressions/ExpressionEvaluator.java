@@ -265,7 +265,7 @@ public class ExpressionEvaluator {
     if (!leftE.convertibleTo(rightE))
       return false;
 
-    Double left = leftE.getValueAsDouble();
+    Double left = leftE.convertIfPossible(rightE.getSuffix()).getValueAsDouble();
     Double right = rightE.getValueAsDouble();
 
     switch (operator.getOperator()) {

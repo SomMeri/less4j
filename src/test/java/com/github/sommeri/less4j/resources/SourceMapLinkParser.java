@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.bind.DatatypeConverter;
-
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
-import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.Base64;
 
 public class SourceMapLinkParser {
