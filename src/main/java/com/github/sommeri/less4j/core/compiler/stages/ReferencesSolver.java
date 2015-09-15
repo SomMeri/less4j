@@ -163,8 +163,9 @@ public class ReferencesSolver {
       if (isMixinReference(kid)) {
         MixinReference reference = (MixinReference) kid;
 
-        List<FoundMixin> foundMixins = findReferencedMixins(reference, referenceScope);
-        GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(reference, referenceScope, foundMixins);
+        EvaluatedMixinReferenceCall evaluatedMixinReference = new EvaluatedMixinReferenceCall(reference, new ExpressionEvaluator(referenceScope, problemsHandler, configuration));
+        List<FoundMixin> foundMixins = findReferencedMixins(evaluatedMixinReference, referenceScope);
+        GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(evaluatedMixinReference, referenceScope, foundMixins);
 
         AstLogic.validateLessBodyCompatibility(reference, replacement.getMembers(), problemsHandler);
         solvedMixinReferences.put(reference, replacement);
@@ -209,7 +210,8 @@ public class ReferencesSolver {
     solvedReferences.put(detachedRulesetReference, errorBody);
   }
 
-  protected List<FoundMixin> findReferencedMixins(MixinReference mixinReference, IScope scope) {
+  protected List<FoundMixin> findReferencedMixins(EvaluatedMixinReferenceCall evaluatedMixinReference, IScope scope) {
+    MixinReference mixinReference = evaluatedMixinReference.getReference();
     MixinReferenceFinder finder = new MixinReferenceFinder(this, semiCompiledNodes, problemsHandler, configuration);
     List<FoundMixin> sameNameMixins = finder.getNearestMixins(scope, mixinReference);
     if (sameNameMixins.isEmpty()) {
@@ -221,13 +223,13 @@ public class ReferencesSolver {
       return new ArrayList<FoundMixin>();
     }
 
-    MixinsReferenceMatcher matcher = new MixinsReferenceMatcher(scope, problemsHandler, configuration);
-    List<FoundMixin> mixins = matcher.filterByParametersNumber(mixinReference, sameNameMixins);
+    MixinsReferenceMatcher matcher = new MixinsReferenceMatcher(evaluatedMixinReference);
+    List<FoundMixin> mixins = matcher.filterByParametersNumber(sameNameMixins);
     if (mixins.isEmpty()) {
       problemsHandler.noMixinHasRightParametersCountError(mixinReference);
       return mixins;
     }
-    mixins = matcher.filterByPatterns(mixinReference, mixins);
+    mixins = matcher.filterByPatterns(mixins);
     if (mixins.isEmpty())
       problemsHandler.patternsInMatchingMixinsDoNotMatch(mixinReference);
 

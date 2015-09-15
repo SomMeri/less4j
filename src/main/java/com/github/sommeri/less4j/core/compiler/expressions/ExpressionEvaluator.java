@@ -87,13 +87,6 @@ public class ExpressionEvaluator {
     functions.add(pack);
   }
 
-  public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
-    if (allArguments.isEmpty())
-      return new IdentifierExpression(parent.getUnderlyingStructure(), "");
-
-    return new ListExpression(parent.getUnderlyingStructure(), allArguments, new ListExpressionOperator(parent.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR));
-  }
-
   public List<Expression> evaluateAll(List<Expression> expressions) {
     List<Expression> values = new ArrayList<Expression>();
     for (Expression argument : expressions) {

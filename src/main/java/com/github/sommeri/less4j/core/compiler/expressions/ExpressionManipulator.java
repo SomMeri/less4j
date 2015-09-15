@@ -3,8 +3,10 @@ package com.github.sommeri.less4j.core.compiler.expressions;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
@@ -103,6 +105,14 @@ public class ExpressionManipulator {
 
   private boolean sameListOperator(ListExpression list, ListExpression sublist) {
     return list.getOperator().getOperator()==sublist.getOperator().getOperator();
+  }
+
+  //FIXME: should probably deep clone allArguments and setup parent child relationships
+  public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
+    if (allArguments.isEmpty())
+      return new IdentifierExpression(parent.getUnderlyingStructure(), "");
+
+    return new ListExpression(parent.getUnderlyingStructure(), allArguments, new ListExpressionOperator(parent.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR));
   }
 
 }

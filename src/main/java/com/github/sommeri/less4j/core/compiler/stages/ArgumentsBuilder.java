@@ -10,7 +10,7 @@ import com.github.sommeri.less4j.core.ast.ArgumentDeclaration;
 import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
-import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionManipulator;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
@@ -20,27 +20,27 @@ class ArgumentsBuilder {
 
   // utils
   private final ProblemsHandler problemsHandler;
-  private final ExpressionEvaluator referenceEvaluator;
+  private final ExpressionManipulator expressionManipulator = new ExpressionManipulator();
   private final String ALL_ARGUMENTS = ReferencesSolver.ALL_ARGUMENTS;
 
   // input
   private Iterator<Expression> positionalParameters;
   private ReusableStructure mixin;
+  private EvaluatedMixinReferenceCall evaluatedReference;
   private MixinReference reference;
 
   // results
   private List<Expression> allValues = new ArrayList<Expression>();
   private IScope argumentsScope;
 
-  public ArgumentsBuilder(MixinReference reference, ReusableStructure pureMixin, ExpressionEvaluator referenceEvaluator, ProblemsHandler problemsHandler) {
+  public ArgumentsBuilder(EvaluatedMixinReferenceCall evaluatedReference, ReusableStructure pureMixin, ProblemsHandler problemsHandler) {
     super();
-    this.referenceEvaluator = referenceEvaluator;
     this.problemsHandler = problemsHandler;
-    this.positionalParameters = reference.getPositionalParameters().iterator();
-    this.reference = reference;
-
-    argumentsScope = ScopeFactory.createDummyScope(reference, "#arguments-" + reference + "#");
-    mixin = pureMixin;
+    this.positionalParameters = evaluatedReference.getPositionalParameters().iterator();
+    this.evaluatedReference = evaluatedReference;
+    this.reference = evaluatedReference.getReference();
+    this.argumentsScope = ScopeFactory.createDummyScope(reference, "#arguments-" + reference + "#");
+    this.mixin = pureMixin;
   }
 
   public IScope build() {
@@ -55,7 +55,7 @@ class ArgumentsBuilder {
 
     }
 
-    Expression allArgumentsValue = referenceEvaluator.joinAll(allValues, reference);
+    Expression allArgumentsValue = expressionManipulator.joinAll(allValues, reference);
     argumentsScope.registerVariableIfNotPresent(ALL_ARGUMENTS, allArgumentsValue);
     return argumentsScope;
   }
@@ -77,17 +77,16 @@ class ArgumentsBuilder {
       if (declaration.getValue() == null)
         problemsHandler.undefinedMixinParameterValue(mixin, declaration, reference);
     }
-
   }
 
   private void fillFromNamed(ArgumentDeclaration declaration) {
-    Expression value = referenceEvaluator.evaluate(reference.getNamedParameter(declaration.getVariable()));
+    Expression value = evaluatedReference.getNamedParameter(declaration.getVariable());
     allValues.add(value);
     argumentsScope.registerVariable(declaration, value);
   }
 
   private boolean canFillFromNamed(ArgumentDeclaration declaration) {
-    return reference.hasNamedParameter(declaration.getVariable());
+    return evaluatedReference.hasNamedParameter(declaration.getVariable());
   }
 
   private void fillFromDefault(ArgumentDeclaration declaration) {
@@ -100,7 +99,7 @@ class ArgumentsBuilder {
   }
 
   private void fillFromPositional(ArgumentDeclaration declaration) {
-    Expression value = referenceEvaluator.evaluate(positionalParameters.next());
+    Expression value = positionalParameters.next();
     allValues.add(value);
     argumentsScope.registerVariable(declaration, value);
   }
@@ -110,9 +109,9 @@ class ArgumentsBuilder {
   }
 
   private void addAsCollector(ArgumentDeclaration declaration) {
-    List<Expression> allArgumentsFrom = referenceEvaluator.evaluateAll(ArraysUtils.remaining(positionalParameters));
+    List<Expression> allArgumentsFrom = ArraysUtils.remaining(positionalParameters);
     allValues.addAll(allArgumentsFrom);
-    Expression value = referenceEvaluator.joinAll(allArgumentsFrom, reference);
+    Expression value = expressionManipulator.joinAll(allArgumentsFrom, reference);
     argumentsScope.registerVariable(declaration, value);
 
   }

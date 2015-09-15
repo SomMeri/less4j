@@ -99,12 +99,13 @@ class MixinsRulesetsSolver {
     }
   }
 
-  private IScope buildMixinsArguments(MixinReference reference, IScope referenceScope, FullMixinDefinition mixin) {
-    ArgumentsBuilder builder = new ArgumentsBuilder(reference, mixin.getMixin(), new ExpressionEvaluator(referenceScope, problemsHandler, configuration), problemsHandler);
+  private IScope buildMixinsArguments(EvaluatedMixinReferenceCall evaluatedReference, IScope referenceScope, FullMixinDefinition mixin) {
+    ArgumentsBuilder builder = new ArgumentsBuilder(evaluatedReference, mixin.getMixin(), problemsHandler);
     return builder.build();
   }
 
-  public GeneralBody buildMixinReferenceReplacement(final MixinReference reference, final IScope callerScope, List<FoundMixin> mixins) {
+  public GeneralBody buildMixinReferenceReplacement(final EvaluatedMixinReferenceCall evaluatedReference, final IScope callerScope, List<FoundMixin> mixins) {
+    final MixinReference reference = evaluatedReference.getReference();
     if (Thread.currentThread().isInterrupted())
       throw new UnableToFinish("Thread Interrupted", (ASTCssNode) null);
     
@@ -126,7 +127,7 @@ class MixinsRulesetsSolver {
         @Override
         public void run() {
           // add arguments
-          IScope mixinArguments = buildMixinsArguments(reference, callerScope, fullMixin);
+          IScope mixinArguments = buildMixinsArguments(evaluatedReference, callerScope, fullMixin);
           data.setArguments(mixinArguments);
           mixinScope.getParent().add(mixinArguments);
           ScopeView mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, mixinScope);

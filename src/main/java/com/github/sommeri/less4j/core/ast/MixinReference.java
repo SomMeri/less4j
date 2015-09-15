@@ -62,10 +62,6 @@ public class MixinReference extends ASTCssNode {
     return positionalParameters;
   }
 
-  public int getNumberOfDeclaredParameters() {
-    return positionalParameters.size() + namedParameters.size();
-  }
-
   public boolean hasNamedParameter(Variable variable) {
     return namedParameters.containsKey(variable.getName());
   }
@@ -80,14 +76,6 @@ public class MixinReference extends ASTCssNode {
 
   public void addNames(List<ReusableStructureName> nameChain) {
     this.nameChain.addAll(nameChain);
-  }
-
-  public boolean hasPositionalParameter(int parameterNumber) {
-    return getPositionalParameters().size() > parameterNumber;
-  }
-  
-  public Expression getPositionalParameter(int parameterNumber) {
-    return getPositionalParameters().get(parameterNumber);
   }
 
   public void addPositionalParameter(Expression parameter) {
@@ -142,16 +130,14 @@ public class MixinReference extends ASTCssNode {
     result.nameChain = nameChain == null ? null : new ArrayList<ReusableStructureName>(nameChain);
     result.finalName = finalName==null?null:finalName.clone();
     result.positionalParameters = ArraysUtils.deeplyClonedList(positionalParameters);
+    result.namedParameters = ArraysUtils.deeplyClonedMap(namedParameters);
     result.configureParentToAllChilds();
     return result;
   }
   
   @NotAstProperty
-  public List<Expression> getAllPositionalArgumentsFrom(int startIndx) {
-    if (hasPositionalParameter(startIndx))
-      return positionalParameters.subList(startIndx, positionalParameters.size());
-    
-    return Collections.emptyList();
+  public Map<String, Expression> getNamedParameters() {
+    return namedParameters;
   }
 
 }
