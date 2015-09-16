@@ -14,8 +14,8 @@ public class ErrorReportingTest extends AbstractFileBasedTest {
   private static final String deprecatedWarnings = "src/test/resources/error-handling/deprecated-warnings/";
   private static final String strict = "src/test/resources/error-handling/malformed-less/";
 
-  public ErrorReportingTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public ErrorReportingTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

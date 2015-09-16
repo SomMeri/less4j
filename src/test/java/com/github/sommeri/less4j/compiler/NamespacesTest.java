@@ -10,8 +10,8 @@ public class NamespacesTest extends BasicFeaturesTest {
   private static final String standardCases = "src/test/resources/compile-basic-features/namespaces/";
   private static final String lessjsIncompatible = "src/test/resources/compile-basic-features/namespaces/lessjs-incompatible";
 
-  public NamespacesTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public NamespacesTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

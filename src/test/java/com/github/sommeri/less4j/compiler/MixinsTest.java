@@ -18,8 +18,8 @@ public class MixinsTest extends AbstractFileBasedTest {
   private static final String lessjsIncompatible = "src/test/resources/compile-basic-features/mixins/lessjs-incompatible";
   private static final String lessjsTests = "src/test/resources/compile-basic-features/mixins/less.js";
 
-  public MixinsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public MixinsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

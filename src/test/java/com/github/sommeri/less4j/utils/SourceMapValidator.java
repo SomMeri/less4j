@@ -15,6 +15,7 @@ import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +65,7 @@ public class SourceMapValidator {
     SourceMapConsumerV3 sourceMap = parseGeneratedMap(compilationResult);
 
     Mapdata mapdata = checkAgainstMapdataFile(sourceMap, mapdataFile);
-    loadMappedSourceFiles(sourceMap.getOriginalSources(), getSourceRoot(cssFileLocation));
+    loadMappedSourceFiles(sourceMap.getOriginalSources(), getSourceRoot(cssFileLocation), sourceMap.getOriginalSourcesContent());
 
     validateSymbolMappings(sourceMap, mapdata);
   }
@@ -144,10 +145,11 @@ public class SourceMapValidator {
     }
   }
 
-  private void loadMappedSourceFiles(Collection<String> originalSources, String root) {
+  private void loadMappedSourceFiles(Collection<String> originalSources, String root, Collection<String> originalSourcesContent) {
+    Iterator<String> iterator = originalSourcesContent.iterator();
     for (String name : originalSources)
       try {
-        String content = getFileContent(root, name);
+        String content = getFileContent(root, name, iterator.next());
         MappedFile mapped = toMappedFile(name, content);
         mappedFiles.put(name, mapped);
       } catch (Throwable th) {
@@ -165,7 +167,7 @@ public class SourceMapValidator {
     return mapped;
   }
 
-  private String getFileContent(String root, String name) throws UnsupportedEncodingException, IOException, FileNotFoundException {
+  private String getFileContent(String root, String name, String fallbackContent) throws UnsupportedEncodingException, IOException, FileNotFoundException {
     if (contents.containsKey(name))
       return contents.get(name);
 
@@ -173,6 +175,9 @@ public class SourceMapValidator {
     File sourcefile = toFile(filename);
     
     File file = sourcefile.isAbsolute()? sourcefile : new File(root + sourcefile.getPath());
+    if (fallbackContent!=null && !file.exists()) {
+      return fallbackContent;
+    }
     String content = IOUtils.toString(new InputStreamReader(new FileInputStream(file), "utf-8"));
     return content;
   }

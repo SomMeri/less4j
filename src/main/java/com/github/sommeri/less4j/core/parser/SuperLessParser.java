@@ -175,7 +175,6 @@ public abstract class SuperLessParser extends Parser {
   protected static final String RULE_UNKNOWN_AT_RULE = "unknown ruleset";
   
   
-  
 
   protected List<Problem> errors = new ArrayList<Problem>();
   protected LexerLogic lexerLogic = new LexerLogic();

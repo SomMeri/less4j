@@ -18,8 +18,8 @@ public class W3CSpecificationsTest extends AbstractFileBasedTest {
   private static final String pagedMedia = "src/test/resources/w3c-specifications/CSS Paged Media Module Level 3";
   private static final String supportsAtRule = "src/test/resources/w3c-specifications/CSS Conditional Rules Module Level 3/6 at-supports";
   
-  public W3CSpecificationsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public W3CSpecificationsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

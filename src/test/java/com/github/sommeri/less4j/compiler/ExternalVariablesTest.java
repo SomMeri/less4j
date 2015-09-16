@@ -5,11 +5,11 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-public class FunctionsTest extends BasicFeaturesTest {
+public class ExternalVariablesTest extends BasicFeaturesTest {
 
-  private static final String standardCases = "src/test/resources/compile-basic-features/functions/";
+  private static final String standardCases = "src/test/resources/external-variables/";
 
-  public FunctionsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+  public ExternalVariablesTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
     super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 

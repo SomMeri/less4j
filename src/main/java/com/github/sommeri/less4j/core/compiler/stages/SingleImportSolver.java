@@ -164,7 +164,7 @@ public class SingleImportSolver {
       return result;
     }
     ASTBuilder astBuilder = new ASTBuilder(problemsHandler);
-    StyleSheet lessStyleSheet = astBuilder.parse(parsedSheet.getTree());
+    StyleSheet lessStyleSheet = astBuilder.parseStyleSheet(parsedSheet.getTree());
     return lessStyleSheet;
 
   }

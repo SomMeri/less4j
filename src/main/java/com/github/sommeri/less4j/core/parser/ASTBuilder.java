@@ -2,13 +2,18 @@ package com.github.sommeri.less4j.core.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.antlr.runtime.CommonToken;
 
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.Comment;
+import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.Variable;
+import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.validators.LessAstValidator;
 
@@ -21,13 +26,35 @@ public class ASTBuilder {
     this.problemsHandler = problemsHandler;
   }
 
-  public StyleSheet parse(HiddenTokenAwareTree tree) {
+  public StyleSheet parseStyleSheet(HiddenTokenAwareTree tree) {
+    ASTCssNode result = parseAnything(tree);
+    return (StyleSheet) result;
+  }
+
+  public VariableDeclaration parseVariable(String name, HiddenTokenAwareTree valueTree) {
+    Expression value = (Expression) parseAnything(valueTree);
+    
+    Variable variable = new Variable(value.getUnderlyingStructure(), name);
+    VariableDeclaration result = new VariableDeclaration(value.getUnderlyingStructure(), variable, value);
+    result.configureParentToAllChilds();
+    return result;
+  }
+
+  public List<VariableDeclaration> parseVariables(Map<String, HiddenTokenAwareTree> variables) {
+    List<VariableDeclaration> result = new ArrayList<VariableDeclaration>();
+    for (Entry<String, HiddenTokenAwareTree> entry : variables.entrySet()) {
+      result.add(parseVariable(entry.getKey(), entry.getValue()));
+    }
+    return result;
+  }
+
+  public ASTCssNode parseAnything(HiddenTokenAwareTree tree) {
     ASTBuilderSwitch builder = new ASTBuilderSwitch(problemsHandler);
     ASTCssNode result = builder.switchOn(tree);
     convertComments(result);
     solveParentChildRelationShips(result);
     checkForWarnings(result);
-    return (StyleSheet) result;
+    return result;
   }
 
  private void checkForWarnings(ASTCssNode result) {

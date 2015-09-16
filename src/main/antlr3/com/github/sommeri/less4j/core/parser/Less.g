@@ -213,6 +213,8 @@ styleSheet
         EOF ) -> ^(STYLE_SHEET ($a)*)
     ;
 finally { leaveRule(); }
+
+expression_full_done: ws a+=expression_full ws EOF -> $a*;
     
 //styleSheet
 //@init {enterRule(retval, RULE_STYLESHEET);}
@@ -692,7 +694,7 @@ semicolon
 mixinReferenceArguments
     : // nothing
     | variabledeclarationNoSemi (ws! COMMA! ws! variabledeclarationNoSemi)*
-    | expression_full (ws! COMMA! ws! variabledeclarationNoSemi (ws! COMMA! ws! variabledeclarationNoSemi)*)?
+    | expression_full (ws! COMMA! ws! variabledeclarationNoSemi)*
     ;
 
 reusableStructureName
@@ -810,7 +812,7 @@ expression_full
     : ( (a+=mathExprHighPriorNoWhitespaceList (
             (operator mathExprHighPriorNoWhitespaceList)=>(b+=operator c+=mathExprHighPriorNoWhitespaceList)
             | (term_no_preceeding_whitespace)=>(b+=operator_fictional c+=term_no_preceeding_whitespace)
-         )* (b+=operator_fictional c+=prio)?
+         )* (b+=operator_fictional c+=prio)? 
       )) -> ^(EXPRESSION $a* ($b $c)* )
     ;
 finally { leaveRule(); }

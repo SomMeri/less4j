@@ -10,8 +10,8 @@ public class NestedRulesetsTest extends BasicFeaturesTest {
   private static final String standardCases = "src/test/resources/compile-basic-features/nested-rulesets/";
   private static final String lessjs = "src/test/resources/compile-basic-features/nested-rulesets/less.js/";
 
-  public NestedRulesetsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public NestedRulesetsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

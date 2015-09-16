@@ -23,8 +23,8 @@ public class ExtendsTest extends BasicFeaturesTest {
   private static final String extendAllMatch2 = "src/test/resources/compile-basic-features/extends/extend-all/match-replacement-by-x/";
   private static final String extendAllMultiple = "src/test/resources/compile-basic-features/extends/extend-all/multiple-matches/";
 
-  public ExtendsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public ExtendsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

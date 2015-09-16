@@ -3,7 +3,12 @@ package com.github.sommeri.less4j.core;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
@@ -12,9 +17,12 @@ import com.github.sommeri.less4j.LessSource.CannotReadFile;
 import com.github.sommeri.less4j.LessSource.FileNotFound;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.StyleSheet;
+import com.github.sommeri.less4j.core.ast.VariableDeclaration;
 import com.github.sommeri.less4j.core.compiler.LessToCssCompiler;
 import com.github.sommeri.less4j.core.parser.ANTLRParser;
+import com.github.sommeri.less4j.core.parser.ANTLRParser.ParseResult;
 import com.github.sommeri.less4j.core.parser.ASTBuilder;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.GeneralProblem;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.problems.UnableToFinish;
@@ -82,12 +90,17 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private CompilationResult doCompile(LessSource source, Configuration options) throws Less4jException {
-    ANTLRParser.ParseResult result = toAntlrTree(source);
-    StyleSheet lessStyleSheet = astBuilder.parse(result.getTree());
+    ParseResult result = toAntlrTree(source);
+    StyleSheet lessStyleSheet = astBuilder.parseStyleSheet(result.getTree());
 
+    Map<String, HiddenTokenAwareTree> variables = toAntlrTree(options.getVariables());
+    List<VariableDeclaration> externalVariables = astBuilder.parseVariables(variables);
+    lessStyleSheet.addMembers(externalVariables);
+    lessStyleSheet.configureParentToAllChilds();
+    
     try {
       ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
-      CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, compiler.getImportedsources(), options);
+      CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, externalVariables, compiler.getImportedsources(), options);
       return compilationResult;
     } catch (UnableToFinish ex) {
       problemsHandler.unableToFinish(lessStyleSheet, ex);
@@ -95,8 +108,8 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     }
   }
 
-  private ANTLRParser.ParseResult toAntlrTree(LessSource source) throws Less4jException {
-    ANTLRParser.ParseResult result;
+  private ParseResult toAntlrTree(LessSource source) throws Less4jException {
+    ParseResult result;
     try {
       result = parser.parseStyleSheet(source.getContent(), source);
     } catch (FileNotFound ex) {
@@ -112,7 +125,32 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     return result;
   }
 
-  private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, Collection<LessSource> additionalSourceFiles, Configuration options) {
+  private Map<String, HiddenTokenAwareTree> toAntlrTree(Map<String, String> variables) throws Less4jException {
+    Map<String, HiddenTokenAwareTree> result = new HashMap<String, HiddenTokenAwareTree>();
+    List<Problem> problems = new ArrayList<Problem>();
+    for (Entry<String, String> entry : variables.entrySet()) {
+      String nameStr = entry.getKey();
+      String valueStr = entry.getValue();
+      ParseResult valueParseResult = toAntlrExpressionTree(nameStr, valueStr);
+      
+      problems.addAll(valueParseResult.getErrors());
+      result.put(nameStr, valueParseResult.getTree());
+    }
+
+    if (!problems.isEmpty()) {
+      CompilationResult compilationResult = new CompilationResult("Errors parsing custom variables, partial result is not available.");
+      throw new Less4jException(problems, compilationResult);
+    }
+
+    return result;
+  }
+
+  private ParseResult toAntlrExpressionTree(String dummySourceName, String expression) {
+    LessSource source = new DummyLessSource(dummySourceName, expression);
+    return parser.parseFullExpression(expression, source);
+  }
+
+  private CompilationResult createCompilationResult(ASTCssNode cssStyleSheet, LessSource lessSource, List<VariableDeclaration> externalVariables, Collection<LessSource> additionalSourceFiles, Configuration options) {
     LessSource cssDestination = options == null ? null : options.getCssResultLocation();
     if (cssDestination == null) {
       String guessedCssName = URIUtils.changeSuffix(lessSource.getName(), Constants.CSS_SUFFIX);
@@ -120,7 +158,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       cssDestination = new LessSource.StringSource("", guessedCssName, guessedURI);
     }
 
-    CssPrinter builder = new CssPrinter(lessSource, cssDestination, additionalSourceFiles, options);
+    CssPrinter builder = new CssPrinter(lessSource, cssDestination, extractSources(externalVariables), additionalSourceFiles, options);
     builder.append(cssStyleSheet);
     StringBuilder css = builder.toCss();
     String sourceMap = builder.toSourceMap();
@@ -129,6 +167,14 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 
     CompilationResult compilationResult = new CompilationResult(css.toString(), sourceMap, problemsHandler.getWarnings());
     return compilationResult;
+  }
+
+  private List<LessSource> extractSources(List<VariableDeclaration> externalVariables) {
+    List<LessSource> result = new ArrayList<LessSource>();
+    for (VariableDeclaration variableDeclaration : externalVariables) {
+      result.add(variableDeclaration.getSource());
+    }
+    return result;
   }
 
   private CompilationResult createEmptyCompilationResult() {
@@ -155,7 +201,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       String encodedSourceMap = PrintUtils.base64Encode(sourceMap, encodingCharset, problemsHandler, cssAst);
       commentText = "/*# sourceMappingURL=data:application/json;base64," + encodedSourceMap + " */";
     } else {
-      //compose linking comment
+      // compose linking comment
       String url = sourceMapConfiguration.getSourceMapNameGenerator().generateUrl(cssResultLocation);
       String encodedUrl = PrintUtils.urlEncode(url, encodingCharset, problemsHandler, cssAst);
       commentText = "/*# sourceMappingURL=" + encodedUrl + " */";
@@ -187,6 +233,38 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
     if (name == null)
       name = URIUtils.changeSuffix(source.getName(), Constants.CSS_SUFFIX);
 
+    return name;
+  }
+
+}
+
+class DummyLessSource extends LessSource {
+
+  private final String content;
+  private final String name;
+
+  public DummyLessSource(String name, String content) {
+    super();
+    this.name = name;
+    this.content = content;
+  }
+
+  @Override
+  public LessSource relativeSource(String filename) throws FileNotFound, CannotReadFile, StringSourceException {
+    return this;
+  }
+
+  @Override
+  public String getContent() throws FileNotFound, CannotReadFile {
+    return content;
+  }
+
+  @Override
+  public byte[] getBytes() throws FileNotFound, CannotReadFile {
+    return content == null ? null : content.getBytes();
+  }
+
+  public String getName() {
     return name;
   }
 

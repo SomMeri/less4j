@@ -150,10 +150,15 @@ class RelativeFileSourceNamePrinter implements SourceNamePrinter {
 
   @Override
   public String printSourceName(LessSource source) {
+    if (source == null)
+      return "";
+
     File file = source instanceof LessSource.FileSource ? ((LessSource.FileSource) source).getInputFile() : null;
 
-    if (file == null)
-      return "";
+    if (file == null) {
+      String name = source.getName();
+      return name == null ? "" : name;
+    }
 
     if (rootInputFile == null) {
       return file.getPath();

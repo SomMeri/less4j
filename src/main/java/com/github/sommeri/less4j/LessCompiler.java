@@ -7,7 +7,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface LessCompiler {
 
@@ -35,6 +37,7 @@ public interface LessCompiler {
     private LessSource cssResultLocation;
     private SourceMapConfiguration sourceMapConfiguration = new SourceMapConfiguration();
     private List<LessFunction> functionPackages = new ArrayList<LessFunction>();
+    private Map<String, String> externalVariables  = new HashMap<String, String>();
     private EmbeddedScriptGenerator embeddedScriptGenerator;
     private boolean compressing = false;
 
@@ -79,6 +82,18 @@ public interface LessCompiler {
 
     public void addCustomFunction(LessFunction functionPackage) {
       this.functionPackages.add(functionPackage);
+    }
+
+    public void addExternalVariables(Map<String, String> variables) {
+      this.externalVariables.putAll(variables);
+    }
+
+    public void addExternalVariable(String name, String value) {
+      this.externalVariables.put(name, value);
+    }
+
+    public Map<String, String> getVariables() {
+      return externalVariables;
     }
 
     public EmbeddedScriptGenerator getEmbeddedScriptGenerator() {
@@ -223,10 +238,6 @@ public interface LessCompiler {
   public interface Problem {
 
     public Type getType();
-
-    public File getFile();
-
-    public URL getURL();
 
     public LessSource getSource();
 

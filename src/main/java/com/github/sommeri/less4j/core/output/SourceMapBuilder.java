@@ -26,15 +26,17 @@ public class SourceMapBuilder {
   private final SourceMapGenerator generator;
   private final LessCompiler.SourceMapConfiguration configuration;
   private final Collection<LessSource> additionalSourceFiles;
+  private final Collection<LessSource> includeContentOf;
   private final Map<LessSource, String> cachedContent;
 
   private LessSource cssDestination;
 
-  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource cssDestination, Collection<LessSource> additionalSourceFiles, LessCompiler.SourceMapConfiguration configuration) {
+  public SourceMapBuilder(ExtendedStringBuilder cssBuilder, LessSource cssDestination, Collection<LessSource> nonTreeSources, Collection<LessSource> additionalSourceFiles, LessCompiler.SourceMapConfiguration configuration) {
     this.cssBuilder = cssBuilder;
     this.cssDestination = cssDestination;
     this.configuration = configuration;
     this.additionalSourceFiles = additionalSourceFiles;
+    this.includeContentOf = nonTreeSources;
     generator = SourceMapGeneratorFactory.getInstance(SourceMapFormat.V3);
     cachedContent = new HashMap<LessSource, String>();
   }
@@ -61,7 +63,7 @@ public class SourceMapBuilder {
     FilePosition sourceStartPosition = toFilePosition(sourceToken);
     String sourceName = toSourceName(sourceToken);
     String sourceContent = toSourceContent(sourceToken, sourceName);
-
+    
     generator.addMapping(sourceName, sourceContent, mappedSymbol, sourceStartPosition, outputStartPosition, outputEndPosition);
   }
 
@@ -110,7 +112,7 @@ public class SourceMapBuilder {
   }
 
   private String toSourceContent(HiddenTokenAwareTree underlyingStructure, String sourceName, LessSource source) {
-    if (configuration.isIncludeSourcesContent() || sourceName==null) {
+    if (configuration.isIncludeSourcesContent() || sourceName==null || includeContentOf.contains(source)) {
       if (cachedContent.containsKey(source)) {
         return cachedContent.get(source);
       }

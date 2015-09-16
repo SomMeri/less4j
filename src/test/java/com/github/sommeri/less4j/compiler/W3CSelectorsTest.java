@@ -35,8 +35,8 @@ public class W3CSelectorsTest extends AbstractFileBasedTest {
   private static final String lessjsIncompatibleNegatedNth = "src/test/resources/w3c-official-test-cases/CSS3-Selectors/less.js-incompatible/correct-css/negated-nth";
   private static final String lessjsIncompatibleNegatedVarious = "src/test/resources/w3c-official-test-cases/CSS3-Selectors/less.js-incompatible/correct-css/negated-various";
 
-  public W3CSelectorsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public W3CSelectorsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

@@ -1,0 +1,23 @@
+@default: default;
+@number: 1;
+
+#something {
+  identifier: @identifier;
+  string: @string;
+  escaped: @escaped;
+  list: List @list has length length(@list). Its first element has length length(extract(@list, 1));
+  expression: @expression;
+  another-variable: @another-variable;
+  overwrite: @overwrite;
+}
+
+#detached-ruleset {
+  .mixin(@argument) {
+    mixin-argument: @argument;
+  }
+  @detached-ruleset-simple();
+  @detached-ruleset-mixin();
+
+}
+
+@overwrite: should not see this;

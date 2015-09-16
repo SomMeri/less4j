@@ -21,8 +21,8 @@ public class MultiPathLessSourceTest extends AbstractFileBasedTest {
   private static final String includePath = "src/test/resources/compile-basic-features/import";
   private boolean useStringSource;
 
-  public MultiPathLessSourceTest(File inputFile, File outputFile, File errorList, File mapdataFile, String kind, String testName, boolean useStringSource) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public MultiPathLessSourceTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String kind, String testName, boolean useStringSource) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
     this.useStringSource = useStringSource;
   }
 
@@ -55,16 +55,16 @@ public class MultiPathLessSourceTest extends AbstractFileBasedTest {
     for (Object[] objects : loadedTestFiles) {
       Object[] useStringSourceArray = new Object[objects.length + 2];
       System.arraycopy(objects, 0, useStringSourceArray, 0, objects.length);
-      useStringSourceArray[5] = useStringSourceArray[4];
-      useStringSourceArray[4] = "String Based";
-      useStringSourceArray[6] = true;
+      useStringSourceArray[6] = useStringSourceArray[5];
+      useStringSourceArray[5] = "String Based";
+      useStringSourceArray[7] = true;
       result.add(useStringSourceArray);
 
       Object[] useFileSourceArray = new Object[objects.length + 2];
       System.arraycopy(objects, 0, useFileSourceArray, 0, objects.length);
-      useFileSourceArray[5] = useFileSourceArray[4];
-      useFileSourceArray[4] = "File Based";
-      useFileSourceArray[6] = false;
+      useFileSourceArray[6] = useFileSourceArray[5];
+      useFileSourceArray[5] = "File Based";
+      useFileSourceArray[7] = false;
       result.add(useFileSourceArray);
     }
     return result;

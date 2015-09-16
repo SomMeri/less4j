@@ -13,8 +13,8 @@ public class CompressionTest extends BasicFeaturesTest {
 
   private static final String compressionCases = "src/test/resources/compile-basic-features/compression/";
 
-  public CompressionTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public CompressionTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

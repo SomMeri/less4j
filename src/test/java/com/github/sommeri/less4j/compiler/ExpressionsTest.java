@@ -12,8 +12,8 @@ public class ExpressionsTest extends BasicFeaturesTest {
   private static final String lessjs = "src/test/resources/compile-basic-features/expressions/less.js/";
   private static final String lessjsincompatible = "src/test/resources/compile-basic-features/expressions/less.js-incompatible/";
 
-  public ExpressionsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public ExpressionsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

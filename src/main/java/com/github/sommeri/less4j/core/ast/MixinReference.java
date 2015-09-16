@@ -1,7 +1,6 @@
 package com.github.sommeri.less4j.core.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +134,6 @@ public class MixinReference extends ASTCssNode {
     return result;
   }
   
-  @NotAstProperty
   public Map<String, Expression> getNamedParameters() {
     return namedParameters;
   }

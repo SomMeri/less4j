@@ -65,7 +65,7 @@ public abstract class Body extends ASTCssNode {
     body = new ArrayList<ASTCssNode>();
   }
 
-  public void addMembers(List<ASTCssNode> members) {
+  public void addMembers(List<? extends ASTCssNode> members) {
     body.addAll(members);
   }
 

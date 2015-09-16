@@ -12,8 +12,8 @@ public class ImportsTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/import/";
 
-  public ImportsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public ImportsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")

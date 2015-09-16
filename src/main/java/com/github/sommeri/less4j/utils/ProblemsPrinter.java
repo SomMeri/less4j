@@ -134,7 +134,11 @@ public class ProblemsPrinter {
         return "";
 
       URI uri = source.getURI();
-      return uri == null ? "" : uri.toString();
+      if (uri!=null)
+        return uri.toString();
+      
+      String name = source.getName();
+      return name == null ? "" : name;
     }
 
   }

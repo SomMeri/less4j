@@ -1,0 +1,15 @@
+#something {
+  identifier: identifier;
+  string: "string";
+  escaped: escaped;
+  list: List 0 1 2 3, a b c has length 2 . Its first element has length 4;
+  expression: 3;
+  another-variable: default;
+  overwrite: all right;
+}
+#detached-ruleset {
+  mixin-argument: value;
+}
+#detached-ruleset div {
+  property: value;
+}

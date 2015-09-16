@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -21,6 +23,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.commandline.CommandLinePrint;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 import com.github.sommeri.less4j.utils.SourceMapValidator;
+import com.github.sommeri.less4j.utils.TestConfigParser;
 import com.github.sommeri.less4j.utils.TestFileUtils;
 import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
@@ -33,26 +36,27 @@ public abstract class AbstractFileBasedTest {
   private final File cssOutput;
   private final File errorList;
   private final File mapdataFile;
+  private final File configFile;
   @SuppressWarnings("unused")
   private final String testName;
 
-  public AbstractFileBasedTest(File lessFile, File cssOutput, File errorList, File mapdataFile, String testName) {
+  public AbstractFileBasedTest(File lessFile, File cssOutput, File errorList, File mapdataFile, File configFile, String testName) {
     this.lessFile = lessFile;
     this.cssOutput = cssOutput;
     this.mapdataFile = mapdataFile;
     this.testName = testName;
     this.errorList = errorList;
+    this.configFile = configFile;
   }
 
   protected static TestFileUtils createTestFileUtils() {
-    return new TestFileUtils(".err", ".mapdata");
+    return new TestFileUtils(".err", ".mapdata", ".config");
   }
 
   @Test
   public void compileAndCompare() {
     try {
       CompilationResult actual = compile(lessFile, cssOutput);
-      //System.out.println(actual.getSourceMap());
       assertCorrectCssAndWarnings(actual);
       assertSourceMapValid(actual);
     } catch (Less4jException ex) {
@@ -79,6 +83,8 @@ public abstract class AbstractFileBasedTest {
     Configuration configuration = new Configuration();
     configuration.setCssResultLocation(new LessSource.FileSource(cssOutput));
     configuration.getSourceMapConfiguration().setLinkSourceMap(false);
+    
+    configuration.addExternalVariables(externalVariables());
     return configuration;
   }
 
@@ -142,6 +148,14 @@ public abstract class AbstractFileBasedTest {
 
   protected String expectedCss() {
     return readFile(cssOutput);
+  }
+
+  protected Map<String, String> externalVariables() {
+    if (configFile == null || !configFile.exists())
+      return new HashMap<String, String>();
+
+    TestConfigParser configParser = new TestConfigParser(readFile(configFile));
+    return configParser.externalVariables();
   }
 
   protected String readFile(File file) {

@@ -1,0 +1,3 @@
+#faulty {
+  variable-does-not-exist: !#error#!;
+}

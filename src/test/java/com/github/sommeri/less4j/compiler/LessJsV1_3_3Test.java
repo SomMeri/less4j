@@ -30,8 +30,8 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
   private static final Set<String> excludeInput = new HashSet<String>(Arrays.asList(new String[] {"comments.less", "whitespace.less"}));
   private static final Set<String> disabled = new HashSet<String>(Arrays.asList(new String[] {"urls.less"}));
 
-  public LessJsV1_3_3Test(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public LessJsV1_3_3Test(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Parameters(name="Less: {4}")
@@ -43,7 +43,8 @@ public class LessJsV1_3_3Test extends AbstractFileBasedTest {
         File css = findCorrespondingCss(less);
         File err = URIUtils.changeSuffix(css, ".err");
         File mapdata = URIUtils.changeSuffix(css, ".mapdata");
-        result.add(new Object[] { less, css, err, mapdata, less.getName() });
+        File config = URIUtils.changeSuffix(css, ".config");
+        result.add(new Object[] { less, css, err, mapdata, config, less.getName() });
       }
     }
     return result;

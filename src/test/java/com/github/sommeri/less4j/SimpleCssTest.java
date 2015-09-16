@@ -19,7 +19,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
  * from the master branch.
  * 
  */
-//@Ignore
+@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 
@@ -28,6 +28,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   //private static final String inputLess = "src/test/resources/minitests/javascript.less";
   private static final String outputCss = "src/test/resources/minitests/debug1.css";
   private static final String mapdata = "src/test/resources/minitests/debug1.mapdata";
+
+  private static final String config = "src/test/resources/minitests/debug1.config";
 
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.0.2//bootstrap-3.0.2//less//theme.less";
 //private static final String inputLess = "c://data//meri//less4java//bootstrap-3.2.0-less//less//bootstrap.less";
@@ -80,8 +82,8 @@ public class SimpleCssTest extends AbstractFileBasedTest {
   // ***********************************************************************
   // *** fail but it is OK - not implemented in less-1.3.0.js
 
-  public SimpleCssTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public SimpleCssTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
 //  protected CompilationResult compile(File lessFile, File cssOutput) throws Less4jException {
@@ -148,15 +150,6 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     }
   }
 
-//  @Override
-//  protected Configuration createConfiguration(File cssOutput) {
-//    Configuration configuration = super.createConfiguration(cssOutput);
-//    configuration.getSourceMapConfiguration().setInline(false);
-//    configuration.getSourceMapConfiguration().setLinkSourceMap(false);
-//    configuration.getSourceMapConfiguration().setIncludeSourcesContent(true);
-//    return configuration;
-//  }
-
   @Override
   protected Configuration createConfiguration(File cssOutput) {
     Configuration configuration = new Configuration();
@@ -165,13 +158,16 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     configuration.getSourceMapConfiguration().setInline(false);
     configuration.getSourceMapConfiguration().setLinkSourceMap(false);
     
+    //configuration.addVariables(externalVariables());
+    
     return configuration;
   }
+
   @Parameters(name = "Less: {4}")
   public static Collection<Object[]> allTestsParameters() {
     //justWait();
     Collection<Object[]> result = new ArrayList<Object[]>();
-    result.add(new Object[] { new File(inputLess), new File(outputCss), null, new File(mapdata), inputLess });
+    result.add(new Object[] { new File(inputLess), new File(outputCss), null, new File(mapdata), new File(config), inputLess });
     return result;
   }
 

@@ -78,7 +78,7 @@ public class LessAstValidator {
 
   private void checkInapropriateLocation(DetachedRuleset detachedRuleset) {
     ASTCssNode parent = detachedRuleset.getParent();
-    if (!isVariableDeclaration(parent) && !isMixinReference(parent)) {
+    if (parent!=null && !isVariableDeclaration(parent) && !isMixinReference(parent)) {
       manipulator.replace(detachedRuleset, new FaultyExpression(detachedRuleset));
       problemsHandler.wrongDetachedRulesetLocation(detachedRuleset);
     }

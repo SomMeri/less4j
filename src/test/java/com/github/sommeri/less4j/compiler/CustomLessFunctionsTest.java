@@ -20,8 +20,8 @@ public class CustomLessFunctionsTest extends AbstractFileBasedTest {
 
   private static final String standardCases = "src/test/resources/compile-basic-features/customfunc/";
 
-  public CustomLessFunctionsTest(File inputFile, File outputFile, File errorList, File mapdataFile, String testName) {
-    super(inputFile, outputFile, errorList, mapdataFile, testName);
+  public CustomLessFunctionsTest(File inputFile, File outputFile, File errorList, File mapdataFile, File configFile, String testName) {
+    super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
   @Override

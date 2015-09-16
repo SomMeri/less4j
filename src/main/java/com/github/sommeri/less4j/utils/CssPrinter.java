@@ -93,17 +93,19 @@ public class CssPrinter {
   private LessSource cssDestination;
   private LessCompiler.Configuration options;
   private Collection<LessSource> additionalSourceFiles;
+  private Collection<LessSource> externalVariables;
 
   public CssPrinter() {
     super();
   }
 
-  public CssPrinter(LessSource lessSource, LessSource cssDestination, Collection<LessSource> additionalSourceFiles, LessCompiler.Configuration options) {
+  public CssPrinter(LessSource lessSource, LessSource cssDestination, Collection<LessSource> externalVariables, Collection<LessSource> additionalSourceFiles, LessCompiler.Configuration options) {
     this.lessSource = lessSource;
     this.cssDestination = cssDestination;
     this.options = options;
     this.additionalSourceFiles = additionalSourceFiles;
-    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, additionalSourceFiles, getSourceMapConfiguration(options));
+    this.externalVariables = externalVariables;
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, externalVariables, additionalSourceFiles, getSourceMapConfiguration(options));
   }
 
   public CssPrinter(CssPrinter configureFromPrinter) {
@@ -111,8 +113,9 @@ public class CssPrinter {
     this.lessSource = configureFromPrinter.lessSource;
     this.cssDestination = configureFromPrinter.cssDestination;
     this.additionalSourceFiles = configureFromPrinter.additionalSourceFiles;
+    this.externalVariables = configureFromPrinter.externalVariables;
     this.cssOnly = new ExtendedStringBuilder(configureFromPrinter.cssOnly);
-    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, additionalSourceFiles, getSourceMapConfiguration(options));
+    this.cssAndSM = new SourceMapBuilder(cssOnly, cssDestination, externalVariables, additionalSourceFiles, getSourceMapConfiguration(options));
   }
 
   private LessCompiler.SourceMapConfiguration getSourceMapConfiguration(LessCompiler.Configuration options) {

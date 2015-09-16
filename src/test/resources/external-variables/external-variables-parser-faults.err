@@ -1,0 +1,6 @@
+Errors produced by compilation of testCase
+ERROR @parse-error-1 1:3 no viable alternative at input 'test' in detached ruleset (which started at 1:1)
+ 1: { test
+
+ERROR @parse-error-2 1:3 no viable alternative at input 'test' in detached ruleset (which started at 1:1)
+ 1: { test

@@ -19,8 +19,8 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.antlr.runtime.tree.Tree;
 
-import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.utils.debugonly.DebugAndTestPrint;
 
 /**
@@ -40,8 +40,12 @@ public class ANTLRParser {
     return parse(declaration, source, InputType.DECLARATION);
   }
 
-  public ParseResult parseExpression(String expression, LessSource source) {
-    return parse(expression, source, InputType.EXPRESSION);
+  public ParseResult parseFullExpression(String expression, LessSource source) {
+    return parse(expression, source, InputType.EXPRESSION_FULL);
+  }
+
+  public ParseResult parseVariableName(String expression, LessSource source) {
+    return parse(expression, source, InputType.VARIABLE_NAME);
   }
 
   public ParseResult parseTerm(String term, LessSource source) {
@@ -140,10 +144,16 @@ public class ANTLRParser {
         return parser.term();
       }
     },
-    EXPRESSION {
+    EXPRESSION_FULL {
       @Override
       public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
-        return parser.expression_full();
+        return parser.expression_full_done();
+      }
+    },
+    VARIABLE_NAME {
+      @Override
+      public ParserRuleReturnScope parseTree(LessParser parser) throws RecognitionException {
+        return parser.variablename();
       }
     },
     DECLARATION {
