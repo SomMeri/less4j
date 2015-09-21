@@ -1,1 +1,12 @@
-div{color: red;}
+#namespace {
+   @namespace: @variable;
+   .mixin() {
+    declaration: @variable @namespace;
+  }
+   namespace: @variable;
+}
+
+#use-place-1 {
+  #namespace > .mixin();
+  @variable: in-caller;
+}

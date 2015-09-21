@@ -1,0 +1,5 @@
+Errors produced by compilation of testCase
+ERROR 3:17 The variable "@variable" was not declared.
+ 2:   #namespace {
+ 3:     @namespace: @variable;
+ 4:     .mixin() {

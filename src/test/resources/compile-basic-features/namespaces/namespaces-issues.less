@@ -1,0 +1,13 @@
+#issue-163 {
+  #namespace {
+    @namespace: @variable;
+    .mixin() {
+      declaration: @variable @namespace;
+    }
+  }
+
+  #use-place-1 {
+    #namespace > .mixin();
+    @variable: in-caller;
+  }
+}

@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.ReusableStructure;
 import com.github.sommeri.less4j.core.ast.ReusableStructureName;
+import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
 import com.github.sommeri.less4j.core.compiler.expressions.GuardValue;
 import com.github.sommeri.less4j.core.compiler.expressions.MixinsGuardsValidator;
 import com.github.sommeri.less4j.core.compiler.scopes.FoundMixin;
@@ -107,8 +108,8 @@ public class MixinReferenceFinder {
         String name = toName(nameChain.subList(0, prefix));
         List<String> theRest = prefix==nameChain.size()? new ArrayList<String>(): nameChain.subList(prefix, nameChain.size());
 
-        for (FullMixinDefinition fullMixin : scope.getMixinsByName(name)) {
-          List<FoundMixin> foundInNamespaces = buildAndFind(fullMixin, theRest, reference);
+        for (FullMixinDefinition fullNamespace : scope.getMixinsByName(name)) {
+          List<FoundMixin> foundInNamespaces = buildAndFind(fullNamespace, theRest, reference);
           result.addAll(foundInNamespaces);
         }
       }
@@ -126,15 +127,15 @@ public class MixinReferenceFinder {
     return builder.toString();
   }
 
-  private List<FoundMixin> buildAndFind(FullMixinDefinition fullMixin, final List<String> nameChain, final MixinReference reference) {
+  private List<FoundMixin> buildAndFind(FullMixinDefinition fullNamespace, final List<String> nameChain, final MixinReference reference) {
 
     final List<FoundMixin> result = new ArrayList<FoundMixin>();
 
-    final ReusableStructure mixin = fullMixin.getMixin();
-    final GeneralBody bodyClone = mixin.getBody().clone();
-    final IScope scope = fullMixin.getScope();
+    final ReusableStructure namespace = fullNamespace.getMixin();
+    final GeneralBody bodyClone = namespace.getBody().clone();
+    final IScope scope = fullNamespace.getScope();
     
-    if (mixin.hasMandatoryParameters()) {
+    if (namespace.hasMandatoryParameters()) {
       return result;
     }
 
@@ -146,9 +147,13 @@ public class MixinReferenceFinder {
         // try to compile it.
         if (!semiCompiledNodes.contains(bodyClone)) {
           parentSolver.unsafeDoSolveReferences(bodyClone, scope);
+         
+          // this needs to be done to enforce https://github.com/SomMeri/less4j/issues/163
+          ExpressionEvaluator evaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
+          evaluator.evaluateValues(scope);
         }
         MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(scope, problemsHandler, configuration);
-        GuardValue guardValue = guardsValidator.evaluateGuards(mixin);
+        GuardValue guardValue = guardsValidator.evaluateGuards(namespace);
         
         if (guardValue!=GuardValue.DO_NOT_USE) { //FIXME: maybe, maybe not, I am not sure now
           List<FoundMixin> found = findInMatchingNamespace(scope, nameChain, reference);
