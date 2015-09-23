@@ -163,7 +163,7 @@ public class SimpleCssTest extends AbstractFileBasedTest {
     return configuration;
   }
 
-  @Parameters(name = "Less: {4}")
+  @Parameters(name = "Less: {5}")
   public static Collection<Object[]> allTestsParameters() {
     //justWait();
     Collection<Object[]> result = new ArrayList<Object[]>();

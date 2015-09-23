@@ -112,6 +112,9 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.AT_NAME)
       return handleVariable(token);
 
+    if (type == LessLexer.VARIABLE_REFERENCE)
+      return handleVariableReference(token);
+
     if (type == LessLexer.INDIRECT_VARIABLE)
       return handleIndirectVariable(token);
 
@@ -249,6 +252,8 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleArgumentDeclaration(HiddenTokenAwareTree token);
 
   public abstract T handleVariable(HiddenTokenAwareTree token);
+
+  public abstract T handleVariableReference(HiddenTokenAwareTree token);
 
   public abstract T handleIndirectVariable(HiddenTokenAwareTree token);
 

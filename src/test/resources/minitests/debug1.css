@@ -1,16 +1,16 @@
-#inequality #compatible-equal {
-  guard-equal: true;
-}
-#inequality #compatible-different {
-  guard-smaller: true;
-}
-#inequality #incompatible {
-  guard: false;
-}
-#conversions #no-unit {
-  declare: 4 is less then 10%;
-  declare: 4 is less then 5cm;
-}
-#conversions #conversion {
-  declare: 40mm is less then 5cm;
+#argumentsArgument {
+  declaration1: b2;
+  declaration2: b1 b2;
+  declaration5: b1 b1 b2;
+  declaration6: b2;
+  declaration7: b1 b2;
+  declaration5: c1 c1 c2 c3;
+  declaration6: c2 c3;
+  declaration7: c1 c2;
+  declaration5: d1 d1 d2 d3 d4;
+  declaration6: d2 d3 d4;
+  declaration7: d1 d2;
+  declaration5: e1 e1 e2 e3 e4 e5;
+  declaration6: e2 e3 e4 e5;
+  declaration7: e1 e2;
 }

@@ -96,7 +96,7 @@ public abstract class AbstractFileBasedTest {
     assertEquals(lessFile.toString(), canonize(expectedCss()), canonize(error.getPartialResult().getCss()));
   }
 
-  private void assertCorrectCssAndWarnings(CompilationResult actual) {
+  protected void assertCorrectCssAndWarnings(CompilationResult actual) {
     //validate css
     String expectedCss = canonize(expectedCss());
     String actualCss = canonize(actual.getCss());

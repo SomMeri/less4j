@@ -277,6 +277,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return termBuilder.buildFromVariable(token);
   }
 
+  public Variable handleVariableReference(HiddenTokenAwareTree token) {
+    return termBuilder.buildFromVariableReference(token);
+  }
+
   public IndirectVariable handleIndirectVariable(HiddenTokenAwareTree token) {
     return termBuilder.buildFromIndirectVariable(token);
   }
@@ -432,7 +436,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public DetachedRulesetReference handleDetachedRulesetReference(HiddenTokenAwareTree token) {
-    DetachedRulesetReference result = new DetachedRulesetReference(token, termBuilder.buildFromVariable(token.getChild(0)));
+    DetachedRulesetReference result = new DetachedRulesetReference(token, termBuilder.buildFromVariableReference(token.getChild(0)));
     if (token.getChildCount()<3) {
       problemsHandler.detachedRulesetCallWithoutParentheses(result);
     } 
@@ -904,7 +908,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     List<HiddenTokenAwareTree> children = token.getChildren();
     HiddenTokenAwareTree firstChild = children.get(0);
     if (firstChild.getGeneralType() == LessLexer.DOT3)
-      return new ArgumentDeclaration(firstChild, new Variable(firstChild, "@"), null, true);
+      return new ArgumentDeclaration(firstChild, new Variable(firstChild, "@", false, true), null);
 
     HiddenTokenAwareTree name = firstChild;
 
@@ -913,7 +917,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     HiddenTokenAwareTree separator = children.get(1);
     if (separator.getGeneralType() == LessLexer.DOT3) {
-      return new ArgumentDeclaration(token, new Variable(name, name.getText()), null, true);
+      return new ArgumentDeclaration(token, new Variable(name, name.getText(), false, true), null);
     }
     HiddenTokenAwareTree expression = children.get(2);
     separator.giveHidden(name, expression);
@@ -1111,7 +1115,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       HiddenTokenAwareTree token = iterator.next();
       if (token.getGeneralType() == LessLexer.COMMA) {
         token.pushHiddenToSiblings();
-      } else if (token.getGeneralType() == LessLexer.STRING || token.getGeneralType() == LessLexer.IDENT || token.getGeneralType() == LessLexer.AT_NAME || token.getGeneralType()==LessLexer.INDIRECT_VARIABLE) {
+      } else if (token.getGeneralType() == LessLexer.STRING || token.getGeneralType() == LessLexer.IDENT || token.getGeneralType() == LessLexer.AT_NAME || token.getGeneralType()==LessLexer.INDIRECT_VARIABLE || token.getGeneralType() == LessLexer.VARIABLE_REFERENCE) {
         result.add(new KeyframesName(token.commentsLessClone(), termBuilder.buildFromTerm(token)));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);

@@ -27,7 +27,7 @@ public class ExtendsTest extends BasicFeaturesTest {
     super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
-  @Parameters(name="Less: {4}")
+  @Parameters(name="Less: {5}")
   public static Collection<Object[]> allTestsParameters() {
     return createTestFileUtils().loadTestFiles(standardCases, extendAllEmbedded, lessJsIncompatible, extendFull, extendAllCombinator, extendAll, misc, extendAllMatch1, extendAllMatch2, extendAllMultiple);
   }

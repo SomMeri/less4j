@@ -1,6 +1,7 @@
 package com.github.sommeri.less4j.core.parser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -58,7 +59,7 @@ public class TermBuilder {
     switch (offsetChild.getGeneralType()) {
     case LessLexer.IDENT_TERM:
       return buildFromLongIdentifier(token, offsetChild);
-      
+
     case LessLexer.IDENT:
     case LessLexer.PERCENT:
       return buildFromPercent(token, offsetChild);
@@ -99,6 +100,9 @@ public class TermBuilder {
 
     case LessLexer.AT_NAME:
       return buildFromVariable(token, offsetChild);
+
+    case LessLexer.VARIABLE_REFERENCE:
+      return buildFromVariableReference(token, offsetChild);
 
     case LessLexer.INDIRECT_VARIABLE:
       return buildFromIndirectVariable(token, offsetChild);
@@ -254,11 +258,11 @@ public class TermBuilder {
     for (HiddenTokenAwareTree child : children) {
       text.append(child.getText().trim());
     }
-    
-    if (children.size()==1 && children.get(0).getGeneralType() == LessLexer.IMPORTANT_SYM) {
+
+    if (children.size() == 1 && children.get(0).getGeneralType() == LessLexer.IMPORTANT_SYM) {
       return new KeywordExpression(parent, children.get(0).getText().trim(), true);
     }
-    
+
     return createIdentifierExpression(parent, text.toString());
   }
 
@@ -312,7 +316,9 @@ public class TermBuilder {
     HiddenTokenAwareTree parameterNode = children.get(1);
 
     Expression parameter = (Expression) parentBuilder.switchOn(parameterNode);
-    //FIXME: (API) this is a hack - if what come out is not comma separated list, add it to comma separated list. - once there is API changing version it will be better to store parameters list in the function
+    // FIXME: (API) this is a hack - if what come out is not comma separated
+    // list, add it to comma separated list. - once there is API changing
+    // version it will be better to store parameters list in the function
     if (!isListOfParameters(parameter)) {
       parameter = packIntoListExpression(parameter);
     }
@@ -333,11 +339,11 @@ public class TermBuilder {
   }
 
   private boolean isListOfParameters(Expression parameter) {
-    if (parameter.getType()!=ASTCssNodeType.LIST_EXPRESSION)
+    if (parameter.getType() != ASTCssNodeType.LIST_EXPRESSION)
       return false;
-    
-    ListExpression list = (ListExpression)parameter;
-    return list.getOperator().getOperator()==ListExpressionOperator.Operator.COMMA;
+
+    ListExpression list = (ListExpression) parameter;
+    return list.getOperator().getOperator() == ListExpressionOperator.Operator.COMMA;
   }
 
   private String buildFunctionName(HiddenTokenAwareTree token) {
@@ -352,13 +358,29 @@ public class TermBuilder {
   public Variable buildFromVariable(HiddenTokenAwareTree variableToken) {
     return buildFromVariable(null, variableToken);
   }
-
+  
   private Variable buildFromVariable(HiddenTokenAwareTree realOwner, HiddenTokenAwareTree variableToken) {
     if (realOwner != null) {
       realOwner.addFollowing(variableToken.getFollowing());
       return new Variable(realOwner, variableToken.getText());
     }
     return new Variable(variableToken, variableToken.getText());
+  }
+
+  public Variable buildFromVariableReference(HiddenTokenAwareTree variableToken) {
+    return buildFromVariableReference(null, variableToken);
+  }
+
+  private Variable buildFromVariableReference(HiddenTokenAwareTree realOwner, HiddenTokenAwareTree variableToken) {
+    Iterator<HiddenTokenAwareTree> kids = variableToken.getChildren().iterator();
+    HiddenTokenAwareTree name = kids.next();
+    boolean isCollector = kids.hasNext();
+    
+    if (realOwner != null) {
+      realOwner.addFollowing(variableToken.getFollowing());
+      return new Variable(realOwner, name.getText(), false, isCollector);
+    }
+    return new Variable(variableToken, name.getText(), false, isCollector);
   }
 
   public IndirectVariable buildFromIndirectVariable(HiddenTokenAwareTree variableToken) {

@@ -409,7 +409,8 @@ collector:   DOT3 -> ^(ARGUMENT_DECLARATION DOT3);
 
 variablereference
 @init {enterRule(retval, RULE_VARIABLE_REFERENCE);}
-    : variablename | INDIRECT_VARIABLE
+    : a=variablename b+=DOT3? -> ^(VARIABLE_REFERENCE $a $b*)  
+    | INDIRECT_VARIABLE DOT3?
     ;
 finally { leaveRule(); }
 
@@ -802,10 +803,10 @@ finally { leaveRule(); }
 
 detachedRulesetReference
 @init {enterRule(retval, RULE_DETACHED_RULESET_REFERENCE);}
-    : a+=AT_NAME (ws a+=LPAREN ws a+=RPAREN)? ws SEMI
-    -> ^(DETACHED_RULESET_REFERENCE $a*)
+    : a+=AT_NAME (ws b+=LPAREN ws b+=RPAREN)? ws SEMI
+    -> ^(DETACHED_RULESET_REFERENCE ^(VARIABLE_REFERENCE $a* ) $b*)
     ;
-finally { leaveRule(); }
+finally { leaveRule(); } 
 
 expression_full
 @init {enterRule(retval, RULE_EXPRESSION);}

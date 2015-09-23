@@ -10,15 +10,21 @@ public class Variable extends Expression {
   
   private String name;
   private boolean hasInterpolatedForm;
+  private boolean collector;
 
   public Variable(HiddenTokenAwareTree underlyingStructure, String name) {
     this(underlyingStructure, name, false);
   }
 
   public Variable(HiddenTokenAwareTree underlyingStructure, String name, boolean hasInterpolatedForm) {
+    this(underlyingStructure, name, hasInterpolatedForm, false);
+  }
+
+  public Variable(HiddenTokenAwareTree underlyingStructure, String name, boolean hasInterpolatedForm, boolean collector) {
     super(underlyingStructure);
     this.name = name;
     this.hasInterpolatedForm = hasInterpolatedForm;
+    this.collector = collector;
   }
 
   public String getName() {
@@ -37,6 +43,14 @@ public class Variable extends Expression {
     this.hasInterpolatedForm = has;
   }
 
+  public boolean isCollector() {
+    return collector;
+  }
+
+  public void setCollector(boolean collector) {
+    this.collector = collector;
+  }
+
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
@@ -50,7 +64,8 @@ public class Variable extends Expression {
 
   @Override
   public String toString() {
-    return getName()==null? "Variable" : getName();
+    String result = getName()==null? "Variable" : getName();
+    return collector? result + "..." : result;
   }
 
   @Override

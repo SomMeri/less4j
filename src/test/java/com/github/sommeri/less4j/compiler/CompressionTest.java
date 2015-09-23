@@ -17,7 +17,7 @@ public class CompressionTest extends BasicFeaturesTest {
     super(inputFile, outputFile, errorList, mapdataFile, configFile, testName);
   }
 
-  @Parameters(name="Less: {4}")
+  @Parameters(name="Less: {5}")
   public static Collection<Object[]> allTestsParameters() {
     return createTestFileUtils().loadTestFiles(compressionCases);
   }

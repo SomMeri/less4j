@@ -1,11 +1,10 @@
 package com.github.sommeri.less4j.core.ast;
 
+import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 
 public class ArgumentDeclaration extends AbstractVariableDeclaration {
   
-  private boolean isCollector = false;
-
   public ArgumentDeclaration(AbstractVariableDeclaration copy) {
     super(copy);
   }
@@ -14,21 +13,18 @@ public class ArgumentDeclaration extends AbstractVariableDeclaration {
     super(underlyingStructure, variable, value);
   }
 
-  public ArgumentDeclaration(HiddenTokenAwareTree underlyingStructure, Variable variable, Expression value, boolean isCollector) {
-    this(underlyingStructure, variable, value);
-    this.isCollector = isCollector;
-  }
-
   public ArgumentDeclaration(Variable variable, Expression value) {
     this(variable.getUnderlyingStructure(), variable, value);
   }
 
+  @NotAstProperty
   public boolean isCollector() {
-    return isCollector;
+    return getVariable().isCollector();
   }
 
-  public void setCollector(boolean isCollector) {
-    this.isCollector = isCollector;
+  @NotAstProperty
+  public void setCollector(boolean collector) {
+    getVariable().setCollector(collector);
   }
 
   @Override
