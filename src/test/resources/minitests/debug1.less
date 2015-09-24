@@ -1,15 +1,10 @@
-// with tail
-.tail-loop() { the: end; }
-.tail-loop(@head, @tail...) {
-  @first: extract(@head, 1);
-  @second: extract(@head, 2);
-
-  @{first}: @second;
-  tail: @tail;
-  .tail-loop(@tail...);
+.loop() { the: end; }
+.loop(@head, @tail...) {
+  value: @head;
+  .loop(@tail...);
 }
 
 .class {
-  @values : a A, b B, c C;
-  .tail-loop(@values...);
+  @values : 1 2 3 4;
+  .loop(@values...);
 }

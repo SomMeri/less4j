@@ -1,0 +1,6 @@
+#issue-304 .div {
+  property: ;
+}
+#issue-304 divdiv {
+  property: !important;
+}
