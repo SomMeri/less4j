@@ -1,0 +1,41 @@
+@list: 1 2 3;
+@comma-list: 1, 2, 3;
+@not-list: not-list;
+
+collapsed-list {.mixin(@list)}    // 1 argument
+expanded-list {.mixin(@list...)} // 3 arguments
+expanded-comma-list {.mixin(@comma-list...)} // 3 arguments
+expanded-not-list {.mixin(@not-list...)} // 3 arguments
+pass-wrapper {.wrapper(@list)}  // 1 argument
+
+
+.mixin(@a1) {
+    one-parameter: @a1;
+}
+
+.mixin(@a1, @a2, @a3) {
+    three-parameters-1: @a1;
+    three-parameters-2: @a2;
+    three-parameters-3: @a3;
+}
+
+.wrapper(@args...) {
+    .mixin(@args...); // 1 argument of `c` expands as 3 arguments
+}
+
+// with tail
+.tail-loop() { the: end; }
+.tail-loop(@head, @tail...) {
+  @first: extract(@head, 1);
+  @second: extract(@head, 2);
+
+  @{first}: @second;
+  tail: @tail;
+  .tail-loop(@tail...);
+}
+
+.tail-loop-here {
+  @values : a A, b B, c C;
+  .tail-loop(@values...);
+}
+

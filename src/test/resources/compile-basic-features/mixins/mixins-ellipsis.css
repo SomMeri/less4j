@@ -1,0 +1,28 @@
+collapsed-list {
+  one-parameter: 1 2 3;
+}
+expanded-list {
+  three-parameters-1: 1;
+  three-parameters-2: 2;
+  three-parameters-3: 3;
+}
+expanded-comma-list {
+  three-parameters-1: 1;
+  three-parameters-2: 2;
+  three-parameters-3: 3;
+}
+expanded-not-list {
+  one-parameter: not-list;
+}
+pass-wrapper {
+  one-parameter: 1 2 3;
+}
+.tail-loop-here {
+  a: A;
+  tail: b B c C;
+  b: B;
+  tail: c C;
+  c: C;
+  tail: ;
+  the: end;
+}

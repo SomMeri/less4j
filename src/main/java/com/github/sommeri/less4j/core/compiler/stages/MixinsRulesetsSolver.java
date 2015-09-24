@@ -30,6 +30,7 @@ import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.IFun
 import com.github.sommeri.less4j.core.compiler.scopes.InScopeSnapshotRunner.ITask;
 import com.github.sommeri.less4j.core.compiler.scopes.ScopeFactory;
 import com.github.sommeri.less4j.core.compiler.scopes.view.ScopeView;
+import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.core.problems.UnableToFinish;
 import com.github.sommeri.less4j.utils.ArraysUtils;
@@ -108,12 +109,13 @@ class MixinsRulesetsSolver {
     final MixinReference reference = evaluatedReference.getReference();
     if (Thread.currentThread().isInterrupted())
       throw new UnableToFinish("Thread Interrupted", (ASTCssNode) null);
-    
+
     final GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
     if (mixins.isEmpty())
       return result;
 
-    //candidate mixins with information about their default() function use are stored here
+    // candidate mixins with information about their default() function use are
+    // stored here
     final List<BodyCompilationData> compiledMixins = new ArrayList<BodyCompilationData>();
 
     for (final FoundMixin fullMixin : mixins) {
@@ -121,7 +123,8 @@ class MixinsRulesetsSolver {
       final IScope mixinScope = fullMixin.getScope();
 
       final BodyCompilationData data = new BodyCompilationData(mixin);
-      // the following needs to run in snapshot because calculateMixinsWorkingScope modifies that scope
+      // the following needs to run in snapshot because
+      // calculateMixinsWorkingScope modifies that scope
       InScopeSnapshotRunner.runInLocalDataSnapshot(mixinScope.getParent(), new ITask() {
 
         @Override
@@ -131,8 +134,10 @@ class MixinsRulesetsSolver {
           data.setArguments(mixinArguments);
           mixinScope.getParent().add(mixinArguments);
           ScopeView mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, mixinScope);
-          //it the mixin calls itself recursively, each copy should work on independent copy of local data
-          //that is matters mostly for scope placeholders - if both close placeholders in same copy error happen
+          // it the mixin calls itself recursively, each copy should work on
+          // independent copy of local data
+          // that is matters mostly for scope placeholders - if both close
+          // placeholders in same copy error happen
           mixinWorkingScope.toIndependentWorkingCopy();
           data.setMixinWorkingScope(mixinWorkingScope);
 
@@ -142,36 +147,41 @@ class MixinsRulesetsSolver {
 
           compiledMixins.add(data);
         }
-      }); //end of InScopeSnapshotRunner.runInLocalDataSnapshot
+      }); // end of InScopeSnapshotRunner.runInLocalDataSnapshot
     }
 
-    // filter out mixins we do not want to use  
+    // filter out mixins we do not want to use
     List<BodyCompilationData> mixinsToBeUsed = defaultGuardHelper.chooseMixinsToBeUsed(compiledMixins, reference);
 
     for (final BodyCompilationData data : mixinsToBeUsed) {
       final ScopeView mixinWorkingScope = data.getMixinWorkingScope();
 
-      // compilation must run in another localDataSnapshot, because imported detached ruleset stored in 
+      // compilation must run in another localDataSnapshot, because imported
+      // detached ruleset stored in
       // variables point to original scope - making snapshot above is not enough
-      // since they point to scope as defined during definition, they would not know parameters
+      // since they point to scope as defined during definition, they would not
+      // know parameters
       // of mixins that define them
       InScopeSnapshotRunner.runInLocalDataSnapshot(mixinWorkingScope.getParent(), new ITask() {
 
         @Override
         public void run() {
           BodyOwner<?> mixin = data.getCompiledBodyOwner();
-          // add arguments again - detached rulesets imported into this one 
-          // via returned variables from sub-calls need would not see arguments otherwise
-          // bc they keep link to original copy and there is no other way how to access them 
+          // add arguments again - detached rulesets imported into this one
+          // via returned variables from sub-calls need would not see arguments
+          // otherwise
+          // bc they keep link to original copy and there is no other way how to
+          // access them
           IScope arguments = data.getArguments();
           mixinWorkingScope.getParent().add(arguments);
 
           Couple<List<ASTCssNode>, IScope> compiled = resolveCalledBody(callerScope, mixin, mixinWorkingScope, ReturnMode.MIXINS_AND_VARIABLES);
-          // update mixin replacements and update scope with imported variables and mixins
+          // update mixin replacements and update scope with imported variables
+          // and mixins
           result.addMembers(compiled.getT());
           callerScope.addToDataPlaceholder(compiled.getM());
         }
-      }); //end of InScopeSnapshotRunner.runInLocalData........Snapshot
+      }); // end of InScopeSnapshotRunner.runInLocalData........Snapshot
 
     }
 
@@ -191,7 +201,7 @@ class MixinsRulesetsSolver {
     callerScope.addToDataPlaceholder(compiled.getM());
     callerScope.closeDataPlaceholder();
 
-    //resolveImportance(reference, result);
+    // resolveImportance(reference, result);
     shiftComments(reference, result);
 
     return result;
@@ -221,18 +231,22 @@ class MixinsRulesetsSolver {
     if (expressionManipulator.isImportant(expression))
       return;
 
-    //FIXME !!!!!!!!!! correct underlying - or correct  keyword!!!
-    KeywordExpression important = new KeywordExpression(expression.getUnderlyingStructure(), "!important", true);
+    HiddenTokenAwareTree underlying = expression != null ? expression.getUnderlyingStructure() : declaration.getUnderlyingStructure();
+    KeywordExpression important = createImportantKeyword(underlying);
 
     ListExpression list = expressionManipulator.findRightmostSpaceSeparatedList(expression);
     if (list == null) {
-      list = new ListExpression(expression.getUnderlyingStructure(), ArraysUtils.asList(expression), new ListExpressionOperator(expression.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR));
+      list = new ListExpression(underlying, ArraysUtils.asNonNullList(expression), new ListExpressionOperator(underlying, ListExpressionOperator.Operator.EMPTY_OPERATOR));
     }
     list.addExpression(important);
     list.configureParentToAllChilds();
 
     declaration.setExpression(list);
     list.setParent(declaration);
+  }
+
+  private KeywordExpression createImportantKeyword(HiddenTokenAwareTree underlyingStructure) {
+    return new KeywordExpression(underlyingStructure, "!important", true);
   }
 
   class ImportedScopeFilter implements ExpressionFilter {

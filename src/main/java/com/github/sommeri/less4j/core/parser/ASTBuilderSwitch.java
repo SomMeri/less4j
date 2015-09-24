@@ -179,10 +179,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       HiddenTokenAwareTree operatorToken = iterator.next();
       operatorToken.pushHiddenToSiblings();
       ListExpressionOperator operator = createListOperator(operatorToken);
-      if (operator==null) {
-        System.out.println(operatorToken);
-        System.out.println("");
-      }
       if (operator.getOperator()==ListExpressionOperator.Operator.EMPTY_OPERATOR) {
         space = operator;
       } else {

@@ -21,7 +21,6 @@ public class ScopeView extends BasicScope {
   }
 
   public void toIndependentWorkingCopyAllParents() {
-    //System.out.println(" +++ saving: " + this);
     this.saveableLocalScope.save();
     
     if (hasParent()) {

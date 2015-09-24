@@ -25,6 +25,7 @@ public class TypeFunctions extends BuiltInFunctionsPack {
   protected static final String ISEM = "isem";
   protected static final String ISURL = "isurl";
   protected static final String ISUNIT = "isunit";
+  protected static final String ISLIST = "islist";
 
   private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
   static {
@@ -38,6 +39,7 @@ public class TypeFunctions extends BuiltInFunctionsPack {
     FUNCTIONS.put(ISEM, new IsEm());
     FUNCTIONS.put(ISURL, new IsUrl());
     FUNCTIONS.put(ISUNIT, new IsUnit());
+    FUNCTIONS.put(ISLIST, new IsList());
   }
 
   public TypeFunctions(ProblemsHandler problemsHandler) {
@@ -65,6 +67,15 @@ class IsRuleset extends AbstractTypeFunction {
   @Override
   protected boolean checkType(Expression parameter) {
     return parameter.getType() == ASTCssNodeType.DETACHED_RULESET;
+  }
+
+}
+
+class IsList extends AbstractTypeFunction {
+
+  @Override
+  protected boolean checkType(Expression parameter) {
+    return parameter.getType() == ASTCssNodeType.LIST_EXPRESSION;
   }
 
 }

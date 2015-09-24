@@ -1,12 +1,15 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Expression;
+import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.MixinReference;
 import com.github.sommeri.less4j.core.ast.Variable;
 import com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator;
@@ -22,12 +25,37 @@ public class EvaluatedMixinReferenceCall {
     this.reference = reference;
     
     for (Expression expression : reference.getPositionalParameters()) {
-      positionalParameters.add(evaluator.evaluate(expression));
+      Expression value = evaluator.evaluate(expression);
+      addPositional(expression, value);
     }
     
     for (Entry<String, Expression> entry : reference.getNamedParameters().entrySet()) {
       namedParameters.put(entry.getKey(), evaluator.evaluate(entry.getValue()));
     }
+  }
+
+  private void addPositional(Expression original, Expression evaluated) {
+    if (isEllipsisVariable(original)) {
+      positionalParameters.addAll(expandList(evaluated));
+    } else {
+      positionalParameters.add(evaluated);
+    }
+  }
+
+  private List<Expression> expandList(Expression value) {
+    if (value.getType()!=ASTCssNodeType.LIST_EXPRESSION) {
+      return Arrays.asList(value);
+    }
+    ListExpression list = (ListExpression) value;
+    return list.getExpressions();
+  }
+
+  private boolean isEllipsisVariable(Expression expression) {
+    if (expression.getType()!=ASTCssNodeType.VARIABLE)
+      return false;
+    
+    Variable variable = (Variable) expression;
+    return variable.isCollector();
   }
 
   public MixinReference getReference() {

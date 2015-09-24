@@ -6,7 +6,6 @@ import java.util.List;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Expression;
-import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.KeywordExpression;
 import com.github.sommeri.less4j.core.ast.ListExpression;
 import com.github.sommeri.less4j.core.ast.ListExpressionOperator;
@@ -17,7 +16,7 @@ public class ExpressionManipulator {
 
   public Expression findRightmostListedExpression(Expression expression) {
     Expression result = expression;
-    while (result.getType() == ASTCssNodeType.LIST_EXPRESSION) {
+    while (result!=null && result.getType() == ASTCssNodeType.LIST_EXPRESSION) {
       ListExpression parentList = (ListExpression) result;
       result = ArraysUtils.last(parentList.getExpressions());
     }
@@ -25,6 +24,9 @@ public class ExpressionManipulator {
   }
   
   public ListExpression findRightmostSpaceSeparatedList(Expression expression) {
+    if (expression==null)
+      return null;
+    
     ListExpression result = null;
     Expression rightmost = expression;
     while (rightmost.getType() == ASTCssNodeType.LIST_EXPRESSION) {
@@ -109,9 +111,6 @@ public class ExpressionManipulator {
 
   //FIXME: should probably deep clone allArguments and setup parent child relationships
   public Expression joinAll(List<Expression> allArguments, ASTCssNode parent) {
-    if (allArguments.isEmpty())
-      return new IdentifierExpression(parent.getUnderlyingStructure(), "");
-
     return new ListExpression(parent.getUnderlyingStructure(), allArguments, new ListExpressionOperator(parent.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR));
   }
 

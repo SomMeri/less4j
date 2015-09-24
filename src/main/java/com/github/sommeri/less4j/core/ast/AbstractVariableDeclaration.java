@@ -37,6 +37,16 @@ public abstract class AbstractVariableDeclaration extends ASTCssNode {
     this.value = value;
   }
 
+  @NotAstProperty
+  public boolean isCollector() {
+    return getVariable().isCollector();
+  }
+
+  @NotAstProperty
+  public void setCollector(boolean collector) {
+    getVariable().setCollector(collector);
+  }
+
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
