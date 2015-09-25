@@ -68,10 +68,12 @@
   tint: #898989;
   tint-full: #ffffff;
   tint-percent: #898989;
+  tint-no-amount: #ff0101;
   shade: #686868;
   shade-full: #000000;
   shade-percent: #686868;
   shade-negative: #868686;
+  shade-no-amount: #fe0000;
   fade-out: rgba(255, 0, 0, 0.95);
   fade-in: rgba(255, 0, 0, 0.95);
   fade-out-relative: rgba(255, 0, 0, 0.95);

@@ -1124,6 +1124,11 @@ class Tint extends AbstractColorAmountFunction {
   protected String getName() {
     return ColorFunctions.TINT;
   }
+  
+  @Override
+  protected int getMinParameters() {
+    return 1;
+  }
 
 }
 
@@ -1141,6 +1146,11 @@ class Shade extends AbstractColorAmountFunction {
   @Override
   protected String getName() {
     return ColorFunctions.SHADE;
+  }
+
+  @Override
+  protected int getMinParameters() {
+    return 1;
   }
 
 }
@@ -1404,9 +1414,13 @@ abstract class AbstractColorAmountFunction extends AbstractColorFunction {
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
     ColorExpression color = (ColorExpression) splitParameters.get(0);
-    NumberExpression amount = (NumberExpression) splitParameters.get(1);
+    NumberExpression amount = splitParameters.size()>1? (NumberExpression) splitParameters.get(1) : defaultAmount(color.getUnderlyingStructure());
 
     return evaluate(color, amount, paramUtils.isAbsolute(splitParameters, 2), token);
+  }
+
+  protected NumberExpression defaultAmount(HiddenTokenAwareTree underlying) {
+    return new NumberExpression(underlying, 0.5, "", null, Dimension.NUMBER);
   }
 
   protected abstract Expression evaluate(ColorExpression color, NumberExpression amount, boolean isAbsolute, HiddenTokenAwareTree token);

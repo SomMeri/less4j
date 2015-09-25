@@ -26,7 +26,7 @@ public class NumberExpression extends Expression implements Cloneable {
     this.originalString = originalString;
   }
 
-  public NumberExpression(HiddenTokenAwareTree token, String originalString, Dimension dimension) {
+  private NumberExpression(HiddenTokenAwareTree token, String originalString, Dimension dimension) {
     this(token, originalString);
     this.dimension = dimension;
   }
