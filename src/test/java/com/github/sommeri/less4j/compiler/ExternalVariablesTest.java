@@ -18,4 +18,10 @@ public class ExternalVariablesTest extends BasicFeaturesTest {
     return createTestFileUtils().loadTestFiles(standardCases);
   }
 
+  @Override
+  protected String canonize(String text) {
+    text = super.canonize(text);
+    return text.replaceAll("parse-error-[0-9]", "parse-error-x");
+  }
+
 }
