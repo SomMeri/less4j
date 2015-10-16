@@ -202,9 +202,6 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<version>1.4</version>
-						<configuration>
-							<passphrase>${gpg.passphrase}</passphrase>
-						</configuration>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
