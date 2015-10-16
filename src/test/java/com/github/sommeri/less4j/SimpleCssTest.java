@@ -15,11 +15,11 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
 
 /**
  * The test reproduces test files found in original less.js implementation. As
- * less.js has only only one tag and that tag is one year old, we took tests
+ * less.js has only only one tag and that tag is one year old, we took testsque
  * from the master branch.
  * 
  */
-@Ignore
+//@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 

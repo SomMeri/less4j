@@ -207,7 +207,7 @@ public class ASTManipulator {
     doSetTreeSilentness(node, isSilent);
   }
 
-  public void doSetTreeSilentness(ASTCssNode node,boolean isSilent) {
+  private void doSetTreeSilentness(ASTCssNode node,boolean isSilent) {
     node.setSilent(isSilent);
     for (ASTCssNode kid : node.getChilds()) {
 //      if (kid.getSource().equals(node.getSource()))
