@@ -223,7 +223,7 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 						<!-- releasing as standalone app -->
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-shade-plugin</artifactId>
-						<version>2.0</version>
+						<version>2.4.1</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
