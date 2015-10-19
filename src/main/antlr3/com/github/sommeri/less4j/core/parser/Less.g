@@ -621,9 +621,7 @@ attrib
                     | b+=SUFFIXMATCH
                     | b+=SUBSTRINGMATCH
                 )
-                (
-                      c+=term
-                )
+                      ws c+=term
             )?
     
       ws RBRACKET) -> ^(ATTRIBUTE $a* $b* $c*)
