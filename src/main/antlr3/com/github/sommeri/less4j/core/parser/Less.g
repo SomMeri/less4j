@@ -1233,14 +1233,7 @@ fragment Z : ('z'|'Z')
 // grammar a lot.
 //
 fragment COMMENT_CONTENT : '/*' ( options { greedy=false; } : .*) '*/';
-COMMENT : content=COMMENT_CONTENT WS_FRAGMENT? newLine=NL?
-                    {
-                         // Comments on channel 2 in case we want to find them
-                         emitAs($content, COMMENT, HIDDEN);
-                         if ($newLine!=null)
-                            emitAs($newLine, NEW_LINE, HIDDEN);
-                    }
-                ;
+COMMENT : content=COMMENT_CONTENT { $channel = HIDDEN; };
 
 //TODO: document: annoying - causes antlr null pointer exception during generation
 //catch in lexer is impossible

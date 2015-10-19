@@ -89,11 +89,14 @@ public class ListToTreeCombiner {
     else
       secondChild.addPreceding(tail);
   }
-
+  //this method assumes that ast is empty
   private void addAllContainedTokens(HiddenTokenAwareTree ast) {
-    int stop = ast.getTokenStopIndex();
-    List<CommonToken> result = readPrefix(stop);
-    ast.addOrphans(result);
+    int actualTokenIndex = ast.getTokenIndex();
+    List<CommonToken> preceeding = readPrefix(actualTokenIndex);
+    ast.addPreceding(preceeding);
+    int lastHiddenBehind = ast.getTokenStopIndex(); 
+    List<CommonToken> following = readPrefix(lastHiddenBehind);
+    ast.addFollowing(following);
   }
 
   private LinkedList<HiddenTokenAwareTree> getChildren(HiddenTokenAwareTree ast) {
@@ -108,9 +111,6 @@ public class ListToTreeCombiner {
 
   private void addAllPrecedingTokens(HiddenTokenAwareTree target) {
     int upTo = target.getTokenStartIndex();
-    if (!target.hasChildren())
-      upTo = target.getTokenStopIndex();
-    
     List<CommonToken> tokens = readPrefix(upTo);
     target.addPreceding(tokens);
   }

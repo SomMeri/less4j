@@ -310,6 +310,15 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
     return type;
   }
 
+  public int getTokenIndex() {
+    if ( token!=null ) {
+      return token.getTokenIndex();
+    }
+    // 
+    return startIndex;
+  }
+
+
   public void setStopToken(Token stopToken) {
     this.stopToken = stopToken;
   }

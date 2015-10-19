@@ -1,7 +1,13 @@
-.GenerateGraphStyle (@colorValue1;@colorValue2;@contrastDiff) when (luma(@colorValue2) <= 50) {
-  color: @colorValue1;
+.hello { 
+  background: 50%/*{}*/ 50%/*{}*/ repeat-x/*{}*/; 
 }
 
-div {
-  .GenerateGraphStyle(blue, red, 1);
+.ui-widget-content { border: 1px solid #aaaaaa/*{borderColorContent}*/; background: #ffffff/*{bgColorContent}*/ url(img/jQuery/ui-bg_flat_75_ffffff_40x100.png)/*{bgImgUrlContent}*/ 50%/*{bgContentXPos}*/ 50%/*{bgContentYPos}*/ repeat-x/*{bgContentRepeat}*/; color: #222222/*{fcContent}*/; }
+
+.comments {
+  color: #808080, /* blue */ #ffa500;
+ }
+ 
+.bg {
+  background-image: linear-gradient(#333 /*{comment}*/, #111);
 }

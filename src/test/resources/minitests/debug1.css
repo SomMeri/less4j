@@ -1,7 +1,14 @@
-.class {
-  a: A;
-  b: B;
-  c: C;
-  tail: b B, c C;
-  tail: c C;
+.hello {
+  background: 50% /*{}*/ 50% /*{}*/ repeat-x;
+}
+.ui-widget-content {
+  border: 1px solid #aaaaaa;
+  background: #ffffff /*{bgColorContent}*/ url(img/jQuery/ui-bg_flat_75_ffffff_40x100.png) /*{bgImgUrlContent}*/ 50% /*{bgContentXPos}*/ 50% /*{bgContentYPos}*/ repeat-x;
+  color: #222222 /*{fcContent}*/;
+}
+.comments {
+  color: #808080, /* blue */ #ffa500;
+}
+.bg {
+  background-image: linear-gradient(#333 /*{comment}*/, #111);
 }

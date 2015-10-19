@@ -4,3 +4,6 @@
 #issue-304 divdiv {
   property: !important;
 }
+.hello {
+  background: 50% /*{}*/ 50% /*{}*/ repeat-x;
+}
