@@ -258,14 +258,14 @@ media_queries_declaration:
 
 media_top_level
 @init {enterRule(retval, RULE_MEDIA);}
-    : MEDIA_SYM mandatory_ws m1+=media_queries_declaration ws b+=top_level_body_with_declaration
+    : MEDIA_SYM ws m1+=media_queries_declaration ws b+=top_level_body_with_declaration
     -> ^(MEDIA_SYM $m1* $b*)
     ;
 finally { leaveRule(); }
 
 media_in_general_body
 @init {enterRule(retval, RULE_MEDIA);}
-    : MEDIA_SYM mandatory_ws m1+=media_queries_declaration ws b+=general_body
+    : MEDIA_SYM ws m1+=media_queries_declaration ws b+=general_body
     -> ^(MEDIA_SYM $m1* $b*)
     ;
 finally { leaveRule(); }
