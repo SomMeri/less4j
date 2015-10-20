@@ -36,7 +36,7 @@ Pom.xml dependency:
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;com.github.sommeri&lt;/groupId&gt;
   &lt;artifactId&gt;less4j&lt;/artifactId&gt;
-  &lt;version&gt;1.13.0&lt;/version&gt;
+  &lt;version&gt;1.15.1&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
