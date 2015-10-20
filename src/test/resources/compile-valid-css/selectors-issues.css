@@ -1,3 +1,7 @@
 html[a="ie"] {
   property: value;
 }
+.clear:before,
+.clear:after {
+  display: table;
+}

@@ -249,16 +249,23 @@ public class HiddenTokenAwareTree extends CommonTree implements Cloneable {
   }
 
   public void pushHiddenToSiblings() {
-    HiddenTokenAwareTree previousSibling = getPreviousSibling();
-    if (previousSibling != null) {
-      previousSibling.addFollowing(getPreceding());
-      getPreceding().clear();
-    }
+    pushPreviousHiddenToSibling();
+    pushFollowingHiddenToSibling();
+  }
 
+  public void pushFollowingHiddenToSibling() {
     HiddenTokenAwareTree nextSibling = getNextSibling();
     if (nextSibling != null) {
       nextSibling.addBeforePreceding(getFollowing());
       getFollowing().clear();
+    }
+  }
+
+  public void pushPreviousHiddenToSibling() {
+    HiddenTokenAwareTree previousSibling = getPreviousSibling();
+    if (previousSibling != null) {
+      previousSibling.addFollowing(getPreceding());
+      getPreceding().clear();
     }
   }
 

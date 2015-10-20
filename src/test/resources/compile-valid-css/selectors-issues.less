@@ -3,3 +3,11 @@
 html[a = "ie"] {
   property: value;
 }
+
+//https://github.com/SomMeri/less4j/issues/314
+.clear {
+  &:before,
+  &:after {
+    display:table;
+  }
+}

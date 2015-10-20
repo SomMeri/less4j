@@ -484,7 +484,7 @@ ruleSet
 finally { leaveRule(); }
 
 selectorSeparator
-    : COMMA ;
+    : COMMA ((mandatory_ws)=> mandatory_ws |  ) -> COMMA;
 
 nestedAppender // this must be here because of special case & & <- the space belongs to both appenders
     :  ((MEANINGFULL_WHITESPACE? APPENDER MEANINGFULL_WHITESPACE APPENDER)=>a+=MEANINGFULL_WHITESPACE? a+=APPENDER) -> ^(NESTED_APPENDER $a* DUMMY_MEANINGFULL_WHITESPACE)

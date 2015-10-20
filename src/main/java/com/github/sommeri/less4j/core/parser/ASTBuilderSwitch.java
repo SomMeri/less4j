@@ -350,6 +350,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       } else if (kid.getGeneralType() == LessLexer.COMMA) {
         if (previousKid != null)
           previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
+        
+        kid.pushFollowingHiddenToSibling();
       }
     }
 
