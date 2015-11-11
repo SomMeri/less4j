@@ -55,7 +55,7 @@ public class ExpressionEvaluator {
   private ArithmeticCalculator arithmeticCalculator;
   private ColorsCalculator colorsCalculator;
   private ExpressionComparator comparator = new GuardsComparator();
-  private List<FunctionsPackage> functions = new ArrayList<FunctionsPackage>();
+  private List<FunctionsPackage> functions = new ArrayList<FunctionsPackage>(10);
   private StringInterpolator stringInterpolator;
   private StringInterpolator embeddedScriptInterpolator;
   private EmbeddedScriptGenerator embeddedScripting;

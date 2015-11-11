@@ -144,6 +144,18 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 		</plugins>
 	</build>
 	<url>https://github.com/SomMeri/less4j</url>
