@@ -247,8 +247,8 @@ public interface LessCompiler {
   }
 
   public interface Cache {
-	Object get(Object key);
-	void set(Object key, Object value);
+	Object get(LessSource key);
+	void set(LessSource key, Object value);
   }
 
   

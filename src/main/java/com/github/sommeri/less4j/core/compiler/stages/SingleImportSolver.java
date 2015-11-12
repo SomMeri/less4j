@@ -42,11 +42,11 @@ public class SingleImportSolver {
     	final HashMap<Object, Object> map = new HashMap<Object, Object>();
     	astCache = new Cache() {
 			@Override
-			public Object get(Object key) {
+			public Object get(LessSource key) {
 				return map.get(key);
 			}
 			@Override
-			public void set(Object key, Object value) {
+			public void set(LessSource key, Object value) {
 				map.put(key, value);		
 			}    		
     	};
