@@ -93,12 +93,16 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
 	StyleSheet lessStyleSheet = null;
 	if (options != null && options.getCache() != null) {
 		lessStyleSheet = (StyleSheet) options.getCache().get(source);
+		if (lessStyleSheet != null) {
+			lessStyleSheet = lessStyleSheet.clone(); // need to leave cached version unchanged
+		}
 	}
 	if (lessStyleSheet == null) {
 		ParseResult result = toAntlrTree(source);
 		lessStyleSheet = astBuilder.parseStyleSheet(result.getTree());
 		if (options != null && options.getCache() != null) {
 			options.getCache().set(source, lessStyleSheet);
+			lessStyleSheet = lessStyleSheet.clone(); // need to leave cached version unchanged
 		}
 	}
 

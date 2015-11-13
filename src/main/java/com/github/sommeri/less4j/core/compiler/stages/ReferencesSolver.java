@@ -103,13 +103,17 @@ public class ReferencesSolver {
   }
 
   private void solveNonCalligReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
-    ExpressionEvaluator cssGuardsValidator = new ExpressionEvaluator(iteratedScope.getScope(), problemsHandler, configuration);
+    ExpressionEvaluator cssGuardsValidator = null;
+    IScope guardEvaluatorScope = iteratedScope.getScope();    
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid) || isDetachedRulesetReference(kid))
         continue;
 
       if (isRuleset(kid)) {
         RuleSet ruleSet = (RuleSet) kid;
+        if (cssGuardsValidator == null) {
+          cssGuardsValidator = new ExpressionEvaluator(guardEvaluatorScope, problemsHandler, configuration);
+        }
         if (cssGuardsValidator.guardsSatisfied(ruleSet)) {
           ruleSet.removeGuards();
         } else {
@@ -159,11 +163,12 @@ public class ReferencesSolver {
 
   private Map<ASTCssNode, GeneralBody> solveCalls(List<ASTCssNode> childs, IScope referenceScope) {
     Map<ASTCssNode, GeneralBody> solvedMixinReferences = new HashMap<ASTCssNode, GeneralBody>();
+    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
         MixinReference reference = (MixinReference) kid;
 
-        EvaluatedMixinReferenceCall evaluatedMixinReference = new EvaluatedMixinReferenceCall(reference, new ExpressionEvaluator(referenceScope, problemsHandler, configuration));
+        EvaluatedMixinReferenceCall evaluatedMixinReference = new EvaluatedMixinReferenceCall(reference, expressionEvaluator);
         List<FoundMixin> foundMixins = findReferencedMixins(evaluatedMixinReference, referenceScope);
         GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(evaluatedMixinReference, referenceScope, foundMixins);
 
@@ -176,7 +181,6 @@ public class ReferencesSolver {
         if (fullNodeDefinition == null) {
           handleUnavailableDetachedRulesetReference(detachedRulesetReference, solvedMixinReferences);
         } else {
-          ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
           Expression evaluatedDetachedRuleset = expressionEvaluator.evaluate(fullNodeDefinition);
           fullNodeDefinition = evaluatedDetachedRuleset;
           if (evaluatedDetachedRuleset.getType() != ASTCssNodeType.DETACHED_RULESET) {
@@ -237,45 +241,53 @@ public class ReferencesSolver {
   }
 
   private boolean solveIfVariableReference(ASTCssNode node, IScope scope) {
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
+    ExpressionEvaluator expressionEvaluator = null; 
     switch (node.getType()) {
     case VARIABLE: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((Variable) node);
       manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case INDIRECT_VARIABLE: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((IndirectVariable) node);
       manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case STRING_EXPRESSION: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((CssString) node);
       manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case ESCAPED_VALUE: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((EscapedValue) node);
       manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case EMBEDDED_SCRIPT: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((EmbeddedScript) node);
       manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case ESCAPED_SELECTOR: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       SimpleSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator);
       manipulator.replaceAndSynchronizeSilentness(node, replacement);
       return true;
     }
     case FIXED_NAME_PART: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       FixedNamePart part = (FixedNamePart) node;
       FixedNamePart replacement = interpolateFixedNamePart(part, expressionEvaluator);
       manipulator.replaceMemberAndSynchronizeSilentness(part, replacement);
       return true;
     }
     case VARIABLE_NAME_PART: {
+      expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       VariableNamePart part = (VariableNamePart) node;
       Expression value = expressionEvaluator.evaluate(part.getVariable());
       FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure(), part);

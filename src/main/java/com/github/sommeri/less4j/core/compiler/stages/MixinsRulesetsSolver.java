@@ -55,7 +55,6 @@ class MixinsRulesetsSolver {
   }
 
   private Couple<List<ASTCssNode>, IScope> resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope referencedMixinScope, final ReturnMode returnMode) {
-    final ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referencedMixinScope, problemsHandler, configuration);
 
     // ... and I'm starting to see the point of closures ...
     return InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new IFunction<Couple<List<ASTCssNode>, IScope>>() {
@@ -68,6 +67,7 @@ class MixinsRulesetsSolver {
         // collect variables and mixins to be imported
         IScope returnValues = ScopeFactory.createDummyScope();
         if (returnMode == ReturnMode.MIXINS_AND_VARIABLES) {
+          ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referencedMixinScope, problemsHandler, configuration);
           returnValues.addFilteredVariables(new ImportedScopeFilter(expressionEvaluator, callerScope), referencedMixinScope);
         }
         List<FullMixinDefinition> unmodifiedMixinsToImport = referencedMixinScope.getAllMixins();

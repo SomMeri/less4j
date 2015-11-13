@@ -9,6 +9,8 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 public class IdSelector extends ElementSubsequent {
 
   private InterpolableName name;
+  private String cachedName;
+  private String cachedFullName;
 
   public IdSelector(HiddenTokenAwareTree token, InterpolableName name) {
     super(token);
@@ -16,11 +18,25 @@ public class IdSelector extends ElementSubsequent {
   }
 
   public String getName() {
-    return name.getName();
+	if (cachedName != null) {
+		return cachedName;
+	}
+    String result = name.getName();
+    if (!isInterpolated()) {
+    	cachedName = result;
+    }
+    return result;
   }
 
   public String getFullName() {
-    return "#" + getName();
+	if (cachedFullName != null) {
+	  return cachedFullName;
+	}
+    String result = "#" + getName();
+    if (!isInterpolated()) {
+    	cachedFullName = result;
+    }
+    return result;
   }
 
   @Override
