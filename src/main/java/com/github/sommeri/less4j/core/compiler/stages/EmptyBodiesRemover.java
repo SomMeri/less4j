@@ -22,8 +22,10 @@ public class EmptyBodiesRemover {
         ownerlessComments.addAll(kid.getTrailingComments());
         manipulator.removeFromBody(kid);
       } else {
-        manipulator.addOpeningComments(kid, ownerlessComments);
-        ownerlessComments = new ArrayList<Comment>();
+    	if (!ownerlessComments.isEmpty()) {
+    		manipulator.addOpeningComments(kid, ownerlessComments);
+    		ownerlessComments = new ArrayList<Comment>();
+    	}
       }
     }
   }

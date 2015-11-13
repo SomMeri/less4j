@@ -67,7 +67,8 @@ public class Selector extends ASTCssNode implements Cloneable {
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
-    ArrayList<ASTCssNode> result = new ArrayList<ASTCssNode>(combinedParts);
+    ArrayList<ASTCssNode> result = new ArrayList<ASTCssNode>(combinedParts.size() + extend.size());
+    result.addAll(combinedParts);
     result.addAll(extend);
     return result;
   }

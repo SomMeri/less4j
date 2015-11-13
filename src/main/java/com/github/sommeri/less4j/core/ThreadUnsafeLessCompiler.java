@@ -90,8 +90,17 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private CompilationResult doCompile(LessSource source, Configuration options) throws Less4jException {
-    ParseResult result = toAntlrTree(source);
-    StyleSheet lessStyleSheet = astBuilder.parseStyleSheet(result.getTree());
+	StyleSheet lessStyleSheet = null;
+	if (options != null && options.getCache() != null) {
+		lessStyleSheet = (StyleSheet) options.getCache().get(source);
+	}
+	if (lessStyleSheet == null) {
+		ParseResult result = toAntlrTree(source);
+		lessStyleSheet = astBuilder.parseStyleSheet(result.getTree());
+		if (options != null && options.getCache() != null) {
+			options.getCache().set(source, lessStyleSheet);
+		}
+	}
 
     Map<String, HiddenTokenAwareTree> variables = toAntlrTree(options.getVariables());
     List<VariableDeclaration> externalVariables = astBuilder.parseVariables(variables);
