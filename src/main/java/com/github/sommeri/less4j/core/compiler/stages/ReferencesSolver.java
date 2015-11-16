@@ -163,11 +163,13 @@ public class ReferencesSolver {
 
   private Map<ASTCssNode, GeneralBody> solveCalls(List<ASTCssNode> childs, IScope referenceScope) {
     Map<ASTCssNode, GeneralBody> solvedMixinReferences = new HashMap<ASTCssNode, GeneralBody>();
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
+    ExpressionEvaluator expressionEvaluator = null;
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
         MixinReference reference = (MixinReference) kid;
-
+        if (expressionEvaluator == null) {
+        	expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
+        }
         EvaluatedMixinReferenceCall evaluatedMixinReference = new EvaluatedMixinReferenceCall(reference, expressionEvaluator);
         List<FoundMixin> foundMixins = findReferencedMixins(evaluatedMixinReference, referenceScope);
         GeneralBody replacement = mixinsSolver.buildMixinReferenceReplacement(evaluatedMixinReference, referenceScope, foundMixins);
@@ -181,6 +183,9 @@ public class ReferencesSolver {
         if (fullNodeDefinition == null) {
           handleUnavailableDetachedRulesetReference(detachedRulesetReference, solvedMixinReferences);
         } else {
+          if (expressionEvaluator == null) {
+        	  expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
+          }
           Expression evaluatedDetachedRuleset = expressionEvaluator.evaluate(fullNodeDefinition);
           fullNodeDefinition = evaluatedDetachedRuleset;
           if (evaluatedDetachedRuleset.getType() != ASTCssNodeType.DETACHED_RULESET) {
@@ -199,7 +204,7 @@ public class ReferencesSolver {
     }
     return solvedMixinReferences;
   }
-
+  
   private void handleUnavailableDetachedRulesetReference(DetachedRulesetReference detachedRulesetReference, Map<ASTCssNode, GeneralBody> solvedReferences) {
     problemsHandler.detachedRulesetNotfound(detachedRulesetReference);
     GeneralBody errorBody = new GeneralBody(detachedRulesetReference.getUnderlyingStructure());
