@@ -11,15 +11,12 @@ import com.github.sommeri.less4j.core.ast.Body;
 public class SupportedLessBodyMembers {
 
   private static final EnumSet<ASTCssNodeType> KEYFRAMES_SUPPORTED_MEMBERS;
-  private static final EnumSet<ASTCssNodeType> ALL_NODE_TYPES; 
+  private static final EnumSet<ASTCssNodeType> ALL_NODE_TYPES;
   private static final EnumSet<ASTCssNodeType> STYLE_SHEET_SUPPORTED_MEMBERS;
 
   static {
-	KEYFRAMES_SUPPORTED_MEMBERS  = EnumSet.of(ASTCssNodeType.RULE_SET,
-			                                  ASTCssNodeType.MIXIN_REFERENCE,
-			                                  ASTCssNodeType.REUSABLE_STRUCTURE,
-			                                  ASTCssNodeType.VARIABLE_DECLARATION);
-    
+    KEYFRAMES_SUPPORTED_MEMBERS = EnumSet.of(ASTCssNodeType.RULE_SET, ASTCssNodeType.MIXIN_REFERENCE, ASTCssNodeType.REUSABLE_STRUCTURE, ASTCssNodeType.VARIABLE_DECLARATION);
+
     ALL_NODE_TYPES = EnumSet.allOf(ASTCssNodeType.class);
 
     STYLE_SHEET_SUPPORTED_MEMBERS = EnumSet.allOf(ASTCssNodeType.class);
@@ -35,13 +32,13 @@ public class SupportedLessBodyMembers {
   }
 
   public Set<ASTCssNodeType> getSupportedMembers(ASTCssNodeType bodyType, ASTCssNodeType ownerType) {
-    //special case - style sheet does not have owner 
+    // special case - style sheet does not have owner
     switch (bodyType) {
     case STYLE_SHEET:
       return Collections.unmodifiableSet(STYLE_SHEET_SUPPORTED_MEMBERS);
 
     default:
-      //nothing is needed
+      // nothing is needed
     }
 
     if (ownerType == null)
@@ -50,9 +47,10 @@ public class SupportedLessBodyMembers {
     switch (ownerType) {
     case KEYFRAMES:
       return Collections.unmodifiableSet(KEYFRAMES_SUPPORTED_MEMBERS);
-      // turns out that the owner type to be is known very rarely
-      // there is no reason to fill this with specifics - 
-      // I'm leaving this here so I do not waste time attempting to do the same thing 
+    // turns out that the owner type to be is known very rarely
+    // there is no reason to fill this with specifics -
+    // I'm leaving this here so I do not waste time attempting to do the same
+    // thing
 
     default:
       return allNodeTypes();

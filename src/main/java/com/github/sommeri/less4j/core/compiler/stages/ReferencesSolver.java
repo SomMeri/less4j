@@ -76,10 +76,10 @@ public class ReferencesSolver {
   }
 
   private void unsafeDoSolveReferences(ASTCssNode node, IteratedScope iteratedScope) {
-    // The stack of nodes under compilation is necessary to prevent 
-    // cycling. The cycling is possible if two namespaces reference 
-    // each other and therefore each effectively requires compiled 
-    // version of itself 
+    // The stack of nodes under compilation is necessary to prevent
+    // cycling. The cycling is possible if two namespaces reference
+    // each other and therefore each effectively requires compiled
+    // version of itself
     semiCompiledNodes.push(node);
 
     try {
@@ -93,7 +93,8 @@ public class ReferencesSolver {
         // solve whatever is not a mixin/detached ruleset reference
         solveNonCalligReferences(childs, iteratedScope);
 
-        // replace mixin references by their solutions - we need to do it in the end
+        // replace mixin references by their solutions - we need to do it in the
+        // end
         // the scope and ast would get out of sync otherwise
         replaceMixinReferences(solvedReferences);
       }
@@ -103,8 +104,10 @@ public class ReferencesSolver {
   }
 
   private void solveNonCalligReferences(List<ASTCssNode> childs, IteratedScope iteratedScope) {
+    // performance optimization - create css guards validator only when it is needed
+    // this came out of profiling and is worth keeping this way
     ExpressionEvaluator cssGuardsValidator = null;
-    IScope guardEvaluatorScope = iteratedScope.getScope();    
+    IScope guardEvaluatorScope = iteratedScope.getScope();
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid) || isDetachedRulesetReference(kid))
         continue;
@@ -112,13 +115,14 @@ public class ReferencesSolver {
       if (isRuleset(kid)) {
         RuleSet ruleSet = (RuleSet) kid;
         if (cssGuardsValidator == null) {
+          // this is first time we need guards validator, therefore it needs to be created
           cssGuardsValidator = new ExpressionEvaluator(guardEvaluatorScope, problemsHandler, configuration);
         }
         if (cssGuardsValidator.guardsSatisfied(ruleSet)) {
           ruleSet.removeGuards();
         } else {
           manipulator.removeFromClosestBody(ruleSet);
-          //skip child scope
+          // skip child scope
           iteratedScope.getNextChild();
           continue;
         }
@@ -163,12 +167,15 @@ public class ReferencesSolver {
 
   private Map<ASTCssNode, GeneralBody> solveCalls(List<ASTCssNode> childs, IScope referenceScope) {
     Map<ASTCssNode, GeneralBody> solvedMixinReferences = new HashMap<ASTCssNode, GeneralBody>();
+    // performance optimization - create expressions evaluator only when it is needed
+    // this came out of profiling and is worth keeping this way
     ExpressionEvaluator expressionEvaluator = null;
     for (ASTCssNode kid : childs) {
       if (isMixinReference(kid)) {
         MixinReference reference = (MixinReference) kid;
         if (expressionEvaluator == null) {
-        	expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
+          // this is first time we need expressions evaluator, therefore it needs to be created
+          expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
         }
         EvaluatedMixinReferenceCall evaluatedMixinReference = new EvaluatedMixinReferenceCall(reference, expressionEvaluator);
         List<FoundMixin> foundMixins = findReferencedMixins(evaluatedMixinReference, referenceScope);
@@ -179,12 +186,12 @@ public class ReferencesSolver {
       } else if (isDetachedRulesetReference(kid)) {
         DetachedRulesetReference detachedRulesetReference = (DetachedRulesetReference) kid;
         Expression fullNodeDefinition = referenceScope.getValue(detachedRulesetReference.getVariable());
-        
+
         if (fullNodeDefinition == null) {
           handleUnavailableDetachedRulesetReference(detachedRulesetReference, solvedMixinReferences);
         } else {
           if (expressionEvaluator == null) {
-        	  expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
+            expressionEvaluator = new ExpressionEvaluator(referenceScope, problemsHandler, configuration);
           }
           Expression evaluatedDetachedRuleset = expressionEvaluator.evaluate(fullNodeDefinition);
           fullNodeDefinition = evaluatedDetachedRuleset;
@@ -204,7 +211,7 @@ public class ReferencesSolver {
     }
     return solvedMixinReferences;
   }
-  
+
   private void handleUnavailableDetachedRulesetReference(DetachedRulesetReference detachedRulesetReference, Map<ASTCssNode, GeneralBody> solvedReferences) {
     problemsHandler.detachedRulesetNotfound(detachedRulesetReference);
     GeneralBody errorBody = new GeneralBody(detachedRulesetReference.getUnderlyingStructure());
@@ -212,7 +219,7 @@ public class ReferencesSolver {
     solvedReferences.put(detachedRulesetReference, errorBody);
   }
 
-  private void handleWrongDetachedRulesetReference(DetachedRulesetReference detachedRulesetReference, Expression value,  Map<ASTCssNode, GeneralBody> solvedReferences) {
+  private void handleWrongDetachedRulesetReference(DetachedRulesetReference detachedRulesetReference, Expression value, Map<ASTCssNode, GeneralBody> solvedReferences) {
     problemsHandler.wrongDetachedRulesetReference(detachedRulesetReference, value);
     GeneralBody errorBody = new GeneralBody(detachedRulesetReference.getUnderlyingStructure());
     errorBody.addMember(new FaultyNode(detachedRulesetReference));
@@ -224,7 +231,7 @@ public class ReferencesSolver {
     MixinReferenceFinder finder = new MixinReferenceFinder(this, semiCompiledNodes, problemsHandler, configuration);
     List<FoundMixin> sameNameMixins = finder.getNearestMixins(scope, mixinReference);
     if (sameNameMixins.isEmpty()) {
-      //error reporting
+      // error reporting
       if (!finder.foundNamespace())
         problemsHandler.undefinedNamespace(mixinReference);
 
@@ -246,7 +253,9 @@ public class ReferencesSolver {
   }
 
   private boolean solveIfVariableReference(ASTCssNode node, IScope scope) {
-    ExpressionEvaluator expressionEvaluator = null; 
+    // performance optimization - create expressions evaluator only when it is needed
+    // this came out of profiling and is worth keeping this way
+    ExpressionEvaluator expressionEvaluator = null;
     switch (node.getType()) {
     case VARIABLE: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);

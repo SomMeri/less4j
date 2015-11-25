@@ -33,23 +33,24 @@ public class SingleImportSolver {
   private ASTManipulator astManipulator = new ASTManipulator();
 
   private Cache astCache;
-  
+
   public SingleImportSolver(ProblemsHandler problemsHandler, Configuration configuration) {
     this.problemsHandler = problemsHandler;
     this.configuration = configuration;
     this.astCache = configuration.getCache();
-    if (astCache == null) {  
-    	final HashMap<Object, Object> map = new HashMap<Object, Object>();
-    	astCache = new Cache() {
-			@Override
-			public Object getAst(LessSource key) {
-				return map.get(key);
-			}
-			@Override
-			public void setAst(LessSource key, Object value) {
-				map.put(key, value);		
-			}    		
-    	};
+    if (astCache == null) {
+      final HashMap<Object, Object> map = new HashMap<Object, Object>();
+      astCache = new Cache() {
+        @Override
+        public Object getAst(LessSource key) {
+          return map.get(key);
+        }
+
+        @Override
+        public void setAst(LessSource key, Object value) {
+          map.put(key, value);
+        }
+      };
     }
   }
 
@@ -69,7 +70,7 @@ public class SingleImportSolver {
     // css file imports should be left as they are
     // FIXME ! they should be relativized
     if (!node.isInline() && treatAsCss(node, filename))
-      return null; 
+      return null;
 
     filename = addLessSuffixIfNeeded(filename, urlParams);
     LessSource importedSource;
@@ -106,9 +107,9 @@ public class SingleImportSolver {
     if (node.isInline()) {
       return replaceByInlineValue(node, importedContent);
     }
-    
+
     StyleSheet importedAst = buildImportedAst(node, importedSource, importedContent);
-    
+
     if (node.isReferenceOnly() || node.isSilent()) {
       astManipulator.setTreeSilentness(importedAst, true);
     }
@@ -122,7 +123,7 @@ public class SingleImportSolver {
     InlineContent content = new InlineContent(underlyingStructure, importedContent);
     result.addMember(content);
     result.configureParentToAllChilds();
-    
+
     astManipulator.replaceInBody(node, content);
     return result;
   }
@@ -151,18 +152,18 @@ public class SingleImportSolver {
       media.configureParentToAllChilds();
       mediaBody.configureParentToAllChilds();
       return result;
-    } 
+    }
 
     return importedAst;
   }
 
   private StyleSheet getImportedAst(Import node, LessSource source, String content) {
-	StyleSheet importedAst = (StyleSheet) astCache.getAst(source);
-	if (importedAst == null) {
-	  importedAst = parseContent(node, content, source);
-	  astCache.setAst(source, importedAst);
-	}
-	return importedAst.clone();
+    StyleSheet importedAst = (StyleSheet) astCache.getAst(source);
+    if (importedAst == null) {
+      importedAst = parseContent(node, content, source);
+      astCache.setAst(source, importedAst);
+    }
+    return importedAst.clone();
   }
 
   private StyleSheet parseContent(Import importNode, String importedContent, LessSource source) {
@@ -189,7 +190,7 @@ public class SingleImportSolver {
 
   private boolean treatAsCss(Import node, String filename) {
     ImportContent contentKind = node.getContentKind();
-    return contentKind==ImportContent.CSS || (contentKind==ImportContent.SUFFIX_BASED && isCssFile(filename));
+    return contentKind == ImportContent.CSS || (contentKind == ImportContent.SUFFIX_BASED && isCssFile(filename));
   }
 
   private boolean isCssFile(String filename) {
@@ -209,11 +210,11 @@ public class SingleImportSolver {
       sourcesThatCount.add(importedSource);
       allImportedSources.add(importedSource);
     }
-    
+
     public boolean alreadyVisited(LessSource importedSource) {
       boolean result = sourcesThatCount.contains(importedSource);
       return result;
     }
-    
+
   }
 }
