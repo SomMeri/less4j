@@ -3,9 +3,9 @@ package com.github.sommeri.less4j.core.compiler.stages;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
+import com.github.sommeri.less4j.LessCompiler.Cache;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessSource.CannotReadFile;
@@ -32,11 +32,25 @@ public class SingleImportSolver {
   private TypesConversionUtils conversionUtils = new TypesConversionUtils();
   private ASTManipulator astManipulator = new ASTManipulator();
 
-  private Map<LessSource, StyleSheet> astCache = new HashMap<LessSource, StyleSheet>();
+  private Cache astCache;
   
   public SingleImportSolver(ProblemsHandler problemsHandler, Configuration configuration) {
     this.problemsHandler = problemsHandler;
     this.configuration = configuration;
+    this.astCache = configuration.getCache();
+    if (astCache == null) {  
+    	final HashMap<Object, Object> map = new HashMap<Object, Object>();
+    	astCache = new Cache() {
+			@Override
+			public Object get(LessSource key) {
+				return map.get(key);
+			}
+			@Override
+			public void set(LessSource key, Object value) {
+				map.put(key, value);		
+			}    		
+    	};
+    }
   }
 
   public ASTCssNode importEncountered(Import node, LessSource source, AlreadyImportedSources alreadyImportedSources) {
@@ -143,15 +157,12 @@ public class SingleImportSolver {
   }
 
   private StyleSheet getImportedAst(Import node, LessSource source, String content) {
-    if (astCache.containsKey(source)) {
-      return astCache.get(source).clone();
-    }
-
-    // parse imported file
-    StyleSheet importedAst = parseContent(node, content, source);
-    
-    astCache.put(source, importedAst.clone());
-    return importedAst;
+	StyleSheet importedAst = (StyleSheet) astCache.get(source);
+	if (importedAst == null) {
+	  importedAst = parseContent(node, content, source);
+	  astCache.set(source, importedAst);
+	}
+	return importedAst.clone();
   }
 
   private StyleSheet parseContent(Import importNode, String importedContent, LessSource source) {

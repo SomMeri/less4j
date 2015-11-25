@@ -161,10 +161,9 @@ public class LessToCssCompiler {
 
   private void evaluateExpressions(ASTCssNode node) {
     ASTManipulator manipulator = new ASTManipulator();
-    //variables are not supposed to be there now
-    ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler, configuration);
-
     if (node instanceof Expression) {
+      //variables are not supposed to be there now
+      ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(problemsHandler, configuration);
       Expression value = expressionEvaluator.evaluate((Expression) node);
       manipulator.replace(node, value);
     } else {
@@ -183,7 +182,6 @@ public class LessToCssCompiler {
           evaluateExpressions(kid);
           break;
         }
-
       }
     }
   }

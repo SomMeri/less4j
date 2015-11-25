@@ -1,8 +1,7 @@
 package com.github.sommeri.less4j.core.validators;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
@@ -11,13 +10,21 @@ import com.github.sommeri.less4j.core.ast.Body;
 //this check is that important, the allowed css types check can be
 public class SupportedLessBodyMembers {
 
-  private static final Set<ASTCssNodeType> KEYFRAMES_SUPPORTED_MEMBERS = new HashSet<ASTCssNodeType>();
+  private static final EnumSet<ASTCssNodeType> KEYFRAMES_SUPPORTED_MEMBERS;
+  private static final EnumSet<ASTCssNodeType> ALL_NODE_TYPES; 
+  private static final EnumSet<ASTCssNodeType> STYLE_SHEET_SUPPORTED_MEMBERS;
 
   static {
-    KEYFRAMES_SUPPORTED_MEMBERS.add(ASTCssNodeType.RULE_SET);
-    KEYFRAMES_SUPPORTED_MEMBERS.add(ASTCssNodeType.MIXIN_REFERENCE);
-    KEYFRAMES_SUPPORTED_MEMBERS.add(ASTCssNodeType.REUSABLE_STRUCTURE);
-    KEYFRAMES_SUPPORTED_MEMBERS.add(ASTCssNodeType.VARIABLE_DECLARATION);
+	KEYFRAMES_SUPPORTED_MEMBERS  = EnumSet.of(ASTCssNodeType.RULE_SET,
+			                                  ASTCssNodeType.MIXIN_REFERENCE,
+			                                  ASTCssNodeType.REUSABLE_STRUCTURE,
+			                                  ASTCssNodeType.VARIABLE_DECLARATION);
+    
+    ALL_NODE_TYPES = EnumSet.allOf(ASTCssNodeType.class);
+
+    STYLE_SHEET_SUPPORTED_MEMBERS = EnumSet.allOf(ASTCssNodeType.class);
+    STYLE_SHEET_SUPPORTED_MEMBERS.remove(ASTCssNodeType.DECLARATION);
+    STYLE_SHEET_SUPPORTED_MEMBERS.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
   }
 
   public Set<ASTCssNodeType> getSupportedMembers(Body node) {
@@ -31,11 +38,7 @@ public class SupportedLessBodyMembers {
     //special case - style sheet does not have owner 
     switch (bodyType) {
     case STYLE_SHEET:
-      Set<ASTCssNodeType> result = allNodeTypes();
-      // removed only the elements that are likely to end there, this method could be done in more precise way  
-      result.remove(ASTCssNodeType.DECLARATION);
-      result.remove(ASTCssNodeType.PAGE_MARGIN_BOX);
-      return result;
+      return Collections.unmodifiableSet(STYLE_SHEET_SUPPORTED_MEMBERS);
 
     default:
       //nothing is needed
@@ -58,7 +61,7 @@ public class SupportedLessBodyMembers {
   }
 
   private Set<ASTCssNodeType> allNodeTypes() {
-    return new HashSet<ASTCssNodeType>(Arrays.asList(ASTCssNodeType.values()));
+    return Collections.unmodifiableSet(ALL_NODE_TYPES);
   }
 
 }

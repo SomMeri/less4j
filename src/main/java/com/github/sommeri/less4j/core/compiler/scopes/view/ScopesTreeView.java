@@ -1,9 +1,7 @@
 package com.github.sommeri.less4j.core.compiler.scopes.view;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.github.sommeri.less4j.core.compiler.scopes.AbstractScopesTree;
 import com.github.sommeri.less4j.core.compiler.scopes.IScope;
@@ -19,7 +17,8 @@ public class ScopesTreeView extends AbstractScopesTree {
   
   private ScopeView publicParent;
   private List<IScope> publicChilds = null;
-  private Map<IScope, ScopeView> fakeChildsMap = new HashMap<IScope, ScopeView>();
+  private IScope fakeChildScope;
+  private ScopeView fakeChildScopeView;
 
   public ScopesTreeView(IScopesTree originalStructure, IScope joinToParentTree, ScopeView publicParent, ScopeView publicChild) {
     super();
@@ -27,8 +26,10 @@ public class ScopesTreeView extends AbstractScopesTree {
     this.joinToParentTree = joinToParentTree;
     this.publicParent = publicParent;
 
-    if (publicChild!=null)
-      this.fakeChildsMap.put(publicChild.getUnderlying(), publicChild);
+    if (publicChild!=null) {
+    	fakeChildScope = publicChild.getUnderlying();
+    	fakeChildScopeView = publicChild;
+    }
   }
 
   public void setScope(ScopeView scope) {
@@ -70,8 +71,8 @@ public class ScopesTreeView extends AbstractScopesTree {
 
     List<IScope> result = new ArrayList<IScope>();
     for (IScope childScope : realChilds) {
-      if (fakeChildsMap.containsKey(childScope)) {
-        result.add(fakeChildsMap.get(childScope));
+      if (fakeChildScope != null && fakeChildScope.equals(childScope)) {
+        result.add(fakeChildScopeView);
       } else {
         result.add(ScopeFactory.createChildScopeView(childScope, scope, joinToParentTree));
       }

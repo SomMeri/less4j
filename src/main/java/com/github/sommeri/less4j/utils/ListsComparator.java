@@ -1,41 +1,39 @@
 package com.github.sommeri.less4j.utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ListsComparator {
 
   public <T> boolean equals(List<T> first, List<T> second, ListMemberComparator<T> comparator) {
-    if (first.size() != second.size())
+    if (first.size() != second.size()) {
       return false;
-
-    Iterator<T> i1 = first.iterator();
-    Iterator<T> i2 = second.iterator();
-    while (i1.hasNext()) {
-      T firstMember = i1.next();
-      T secondMember = i2.next();
-      if (!comparator.equals(firstMember, secondMember))
-        return false;
-    }
-    return true;
+	}
+    return equals(first, second, first.size(), comparator);
+  }
+		  
+  public <T> boolean equals(List<T> first, List<T> second, int count, ListMemberComparator<T> comparator) {
+    for (int i = 0; i < first.size() && i < count; i++) {
+	  if (!comparator.equals(first.get(i), second.get(i))) {
+	    return false;
+	  }
+	}
+	return true;
   }
 
   public <T> boolean prefix(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {
     if (lookFor.isEmpty())
-      return true;
+	  return true;
 
-    if (lookFor.size() > inList.size())
-      return false;
+	if (lookFor.size() > inList.size())
+	  return false;
+	
+	int beforeLast = lookFor.size() - 1;
 
-    List<T> relevantInList = ArraysUtils.sameLengthPrefix(inList, lookFor);
-    List<T> relevantInListWithoutLast = ArraysUtils.sublistWithoutLast(relevantInList);
-    List<T> lookForWithoutLast = ArraysUtils.sublistWithoutLast(lookFor);
+	if (!equals(lookFor, inList, beforeLast, comparator))
+	  return false;
 
-    if (!equals(lookForWithoutLast, relevantInListWithoutLast, comparator))
-      return false;
-
-    return comparator.prefix(ArraysUtils.last(lookFor), ArraysUtils.last(relevantInList));
+	return comparator.prefix(lookFor.get(beforeLast), inList.get(beforeLast));
   }
 
   public <T> MatchMarker<T> prefixMatches(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {

@@ -40,6 +40,7 @@ public interface LessCompiler {
     private Map<String, String> externalVariables  = new HashMap<String, String>();
     private EmbeddedScriptGenerator embeddedScriptGenerator;
     private boolean compressing = false;
+    private Cache cache;
 
     /**
      * This is needed in for source map.
@@ -116,6 +117,16 @@ public interface LessCompiler {
     public boolean isCompressing() {
       return compressing;
     }
+    
+	public Cache getCache() {
+	  return cache;
+	}
+
+	public Configuration setCache(Cache cache) {
+	  this.cache = cache;
+	  return this;
+	}
+
   }
 
   public static class SourceMapConfiguration {
@@ -235,6 +246,12 @@ public interface LessCompiler {
 
   }
 
+  public interface Cache {
+	Object get(LessSource key);
+	void set(LessSource key, Object value);
+  }
+
+  
   public interface Problem {
 
     public Type getType();

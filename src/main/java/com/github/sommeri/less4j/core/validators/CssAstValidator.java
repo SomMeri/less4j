@@ -1,7 +1,5 @@
 package com.github.sommeri.less4j.core.validators;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
@@ -22,8 +20,8 @@ public class CssAstValidator {
     if (node instanceof Body)
       validateBody((Body)node);
     
-    List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
-    for (ASTCssNode kid : childs) {
+    // no need to copy the array for validation?
+    for (ASTCssNode kid : node.getChilds()) {
       validate(kid);
     }
 

@@ -27,6 +27,8 @@ public class LocalScope implements ILocalScope {
   
   private LocalScopeData localData = new LocalScopeData();
   private Stack<LocalScopeData> localDataSnapshots = new Stack<LocalScopeData>();
+  private boolean cloneOnWrite = false;
+  private boolean cloned;
 
   private List<String> names;
 
@@ -41,6 +43,13 @@ public class LocalScope implements ILocalScope {
     localData =  initialLocalData;
   }
 
+  public LocalScope(ASTCssNode owner, LocalScopeData initialLocalData, List<String> names, String type, boolean cloneOnWrite, boolean cloned) {
+	this(owner, names, type);
+	localData =  initialLocalData;
+	this.cloneOnWrite = cloneOnWrite;
+	this.cloned = cloned;
+  }
+  
   @Override
   public ASTCssNode getOwner() {
     return owner;
@@ -138,8 +147,7 @@ public class LocalScope implements ILocalScope {
   }
 
   public ILocalScope cloneCurrentDataSnapshot() {
-    LocalScopeData dataClone = localData.clone();
-    return new LocalScope(owner, dataClone, names, type);
+    return new LocalScope(owner, localData, names, type, true, false);
   }
 
   
@@ -152,32 +160,39 @@ public class LocalScope implements ILocalScope {
    * instead.
    */
   public void createCurrentDataSnapshot() {
-    localDataSnapshots.push(localData);
-    localData = localData.clone();
-  }
+	    localDataSnapshots.push(localData);
+	    cloneOnWrite = true;
+	    cloned = false;
+	  }
 
   /**
    * Do not call this method directly. Use {@link InScopeSnapshotRunner}
    * instead.
    */
   public void createOriginalDataSnapshot() {
-    localDataSnapshots.push(localData);
-    localData = localDataSnapshots.firstElement().clone();
-  }
+	    localDataSnapshots.push(localData);
+	    localData = localDataSnapshots.firstElement();
+	    cloneOnWrite = true;
+	    cloned = false;
+	  }
 
   /**
    * Do not call this method directly. Use {@link InScopeSnapshotRunner}
    * instead.
    */
   public void discardLastDataSnapshot() {
-    localData = localDataSnapshots.pop();
-  }
+	    localData = localDataSnapshots.pop();
+	    cloneOnWrite = false;
+	    cloned = false;    
+	  }
 
   public MixinsDefinitionsStorage getLocalMixins() {
+	cloneIfNeeded();
     return localData.getMixins();
   }
 
   public VariablesDeclarationsStorage getLocalVariables() {
+	cloneIfNeeded();
     return localData.getVariables();
   }
 
@@ -195,6 +210,13 @@ public class LocalScope implements ILocalScope {
 
   public List<FullMixinDefinition> getMixinsByName(String name) {
     return getLocalMixins().getMixins(name);
+  }
+  
+  private void cloneIfNeeded() {
+	if (cloneOnWrite && !cloned) {
+      localData = localData.clone();
+      cloned = true;
+	}	
   }
 
   @Override

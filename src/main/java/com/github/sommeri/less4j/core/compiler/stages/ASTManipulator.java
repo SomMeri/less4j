@@ -2,6 +2,7 @@ package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -72,7 +73,8 @@ public class ASTManipulator {
   }
 
   private boolean isAstProperty(PropertyDescriptor descriptor) {
-    return descriptor.getReadMethod()!=null && !descriptor.getReadMethod().isAnnotationPresent(NotAstProperty.class);
+	Method rm = descriptor.getReadMethod();
+    return rm!=null && !rm.isAnnotationPresent(NotAstProperty.class);
   }
 
   private boolean isList(Class<?> propertyType) {
@@ -89,8 +91,8 @@ public class ASTManipulator {
   }
 
   private void replaceInProperty(PropertyDescriptor propertyDescriptor, ASTCssNode parent, ASTCssNode oldChild, ASTCssNode newChild) {
-    setPropertyValue(newChild, parent, "parent");
-    setPropertyValue(oldChild, null, "parent");
+	newChild.setParent(parent);
+	oldChild.setParent(null);
     setPropertyValue(parent, newChild, propertyDescriptor);
   }
 
@@ -162,16 +164,7 @@ public class ASTManipulator {
   }
 
   private void setPropertyValue(ASTCssNode parent, ASTCssNode value, PropertyDescriptor descriptor) {
-    try {
-      PropertyUtils.setProperty(parent, descriptor.getName(), value);
-    } catch (IllegalAccessException e) {
-      throw new BugHappened(e, value);
-    } catch (InvocationTargetException e) {
-      throw new BugHappened(e, value);
-    } catch (NoSuchMethodException e) {
-      throw new BugHappened(e, value);
-    }
-
+    setPropertyValue(parent, value, descriptor.getName());
   }
 
   private Object getPropertyValue(ASTCssNode object, PropertyDescriptor descriptor) {

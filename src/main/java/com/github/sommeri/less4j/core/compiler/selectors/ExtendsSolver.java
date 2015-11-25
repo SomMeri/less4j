@@ -42,17 +42,36 @@ public class ExtendsSolver {
   }
 
   private void solveInlineExtends(Selector extendingSelector) {
+	ArrayList<ExtendRefs> doExtends = null;
     for (RuleSet ruleSet : allRulesets) {
-      List<Selector> selectors = new ArrayList<Selector>(ruleSet.getSelectors());
-      for (Selector targetSelector : selectors) {
+      for (Selector targetSelector : ruleSet.getSelectors()) {
         Selector newSelector = constructNewSelector(extendingSelector, targetSelector);
         if (newSelector!=null && canExtend(extendingSelector, newSelector, ruleSet)) {
-          doTheExtend(extendingSelector, newSelector, ruleSet, targetSelector);
+            if (doExtends == null) {
+          	  doExtends = new ArrayList<ExtendRefs>();
+            }
+            doExtends.add(new ExtendRefs(ruleSet, targetSelector, newSelector));          
         }
       }
-
+    }
+    if (doExtends != null) {
+      for (ExtendRefs refs : doExtends) {
+        doTheExtend(extendingSelector, refs.newSelector, refs.ruleSet, refs.targetSelector);
+      }
     }
   }
+  
+  private static class ExtendRefs {
+	ExtendRefs(RuleSet ruleSet, Selector targetSelector, Selector newSelector) {
+      this.ruleSet = ruleSet;
+	  this.targetSelector = targetSelector;
+	  this.newSelector = newSelector;
+	}
+	RuleSet ruleSet;
+	Selector targetSelector;
+	Selector newSelector;
+  }
+
 
   private void doTheExtend(Selector extendingSelector, Selector newSelector, RuleSet ruleSet, Selector targetSelector) {
     addSelector(ruleSet, newSelector);
