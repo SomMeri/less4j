@@ -24,20 +24,20 @@ public class ASTManipulator {
   public ASTCssNode findParentOfType(ASTCssNode node, ASTCssNodeType... type) {
     Set<ASTCssNodeType> allTypes = new HashSet<ASTCssNodeType>();
     Collections.addAll(allTypes, type);
-    
+
     ASTCssNode candidate = node;
-    while (candidate.getParent()!=null) {
-      candidate=candidate.getParent();
+    while (candidate.getParent() != null) {
+      candidate = candidate.getParent();
       if (allTypes.contains(candidate.getType()))
         return candidate;
     }
     return candidate;
   }
-  
+
   public void replaceMemberAndSynchronizeSilentness(InterpolableNamePart oldMember, FixedNamePart newMember) {
     if (oldMember.hasParent())
       oldMember.getParent().replaceMember(oldMember, newMember);
-    
+
     setTreeSilentness(newMember, oldMember.isSilent());
   }
 
@@ -45,7 +45,7 @@ public class ASTManipulator {
     setTreeSilentness(newChild, oldChild.isSilent());
     replace(oldChild, newChild);
   }
-  
+
   public void replace(ASTCssNode oldChild, ASTCssNode newChild) {
     if (oldChild == newChild)
       return;
@@ -73,8 +73,8 @@ public class ASTManipulator {
   }
 
   private boolean isAstProperty(PropertyDescriptor descriptor) {
-	Method rm = descriptor.getReadMethod();
-    return rm!=null && !rm.isAnnotationPresent(NotAstProperty.class);
+    Method rm = descriptor.getReadMethod();
+    return rm != null && !rm.isAnnotationPresent(NotAstProperty.class);
   }
 
   private boolean isList(Class<?> propertyType) {
@@ -91,8 +91,8 @@ public class ASTManipulator {
   }
 
   private void replaceInProperty(PropertyDescriptor propertyDescriptor, ASTCssNode parent, ASTCssNode oldChild, ASTCssNode newChild) {
-	newChild.setParent(parent);
-	oldChild.setParent(null);
+    newChild.setParent(parent);
+    oldChild.setParent(null);
     setPropertyValue(parent, newChild, propertyDescriptor);
   }
 
@@ -196,15 +196,15 @@ public class ASTManipulator {
     to.configureParentToAllChilds();
   }
 
-  public void setTreeSilentness(ASTCssNode node,boolean isSilent) {
+  public void setTreeSilentness(ASTCssNode node, boolean isSilent) {
     doSetTreeSilentness(node, isSilent);
   }
 
-  private void doSetTreeSilentness(ASTCssNode node,boolean isSilent) {
+  private void doSetTreeSilentness(ASTCssNode node, boolean isSilent) {
     node.setSilent(isSilent);
     for (ASTCssNode kid : node.getChilds()) {
-//      if (kid.getSource().equals(node.getSource()))
-        doSetTreeSilentness(kid, isSilent);
+      // if (kid.getSource().equals(node.getSource()))
+      doSetTreeSilentness(kid, isSilent);
     }
   }
 

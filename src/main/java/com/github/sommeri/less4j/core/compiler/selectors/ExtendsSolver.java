@@ -27,7 +27,7 @@ public class ExtendsSolver {
 
   private List<RuleSet> allRulesets = new ArrayList<RuleSet>();
   private List<Selector> inlineExtends = new ArrayList<Selector>();
-  
+
   private PerformedExtendsDB performedExtends = new PerformedExtendsDB();
 
   public void solveExtends(ASTCssNode node) {
@@ -42,15 +42,17 @@ public class ExtendsSolver {
   }
 
   private void solveInlineExtends(Selector extendingSelector) {
-	ArrayList<ExtendRefs> doExtends = null;
+    // performance optimization - create the array only when it is needed
+    // this came out of profiling and is worth keeping this way
+    ArrayList<ExtendRefs> doExtends = null;
     for (RuleSet ruleSet : allRulesets) {
       for (Selector targetSelector : ruleSet.getSelectors()) {
         Selector newSelector = constructNewSelector(extendingSelector, targetSelector);
-        if (newSelector!=null && canExtend(extendingSelector, newSelector, ruleSet)) {
-            if (doExtends == null) {
-          	  doExtends = new ArrayList<ExtendRefs>();
-            }
-            doExtends.add(new ExtendRefs(ruleSet, targetSelector, newSelector));          
+        if (newSelector != null && canExtend(extendingSelector, newSelector, ruleSet)) {
+          if (doExtends == null) {
+            doExtends = new ArrayList<ExtendRefs>();
+          }
+          doExtends.add(new ExtendRefs(ruleSet, targetSelector, newSelector));
         }
       }
     }
@@ -60,22 +62,22 @@ public class ExtendsSolver {
       }
     }
   }
-  
-  private static class ExtendRefs {
-	ExtendRefs(RuleSet ruleSet, Selector targetSelector, Selector newSelector) {
-      this.ruleSet = ruleSet;
-	  this.targetSelector = targetSelector;
-	  this.newSelector = newSelector;
-	}
-	RuleSet ruleSet;
-	Selector targetSelector;
-	Selector newSelector;
-  }
 
+  private static class ExtendRefs {
+    ExtendRefs(RuleSet ruleSet, Selector targetSelector, Selector newSelector) {
+      this.ruleSet = ruleSet;
+      this.targetSelector = targetSelector;
+      this.newSelector = newSelector;
+    }
+
+    RuleSet ruleSet;
+    Selector targetSelector;
+    Selector newSelector;
+  }
 
   private void doTheExtend(Selector extendingSelector, Selector newSelector, RuleSet ruleSet, Selector targetSelector) {
     addSelector(ruleSet, newSelector);
-    
+
     performedExtends.register(extendingSelector, targetSelector);
 
     Collection<Selector> thoseWhoExtendedExtending = performedExtends.getPreviousExtending(extendingSelector);
@@ -89,7 +91,7 @@ public class ExtendsSolver {
   private boolean canExtend(Selector extendingSelector, RuleSet targetRuleSet) {
     return canExtend(extendingSelector, extendingSelector, targetRuleSet);
   }
-  
+
   private boolean canExtend(Selector extendingSelector, Selector newSelector, RuleSet targetRuleSet) {
     if (containsSelector(newSelector, targetRuleSet))
       return false;
@@ -108,8 +110,8 @@ public class ExtendsSolver {
 
   private boolean containsSelector(Selector extendingSelector, RuleSet targetRuleSet) {
     for (Selector selector : targetRuleSet.getSelectors()) {
-      //if (comparator.contains(selector, extendingSelector))  
-      if (comparator.equals(selector, extendingSelector))  
+      // if (comparator.contains(selector, extendingSelector))
+      if (comparator.equals(selector, extendingSelector))
         return true;
     }
     return false;
@@ -127,10 +129,10 @@ public class ExtendsSolver {
 
   private void setVisibility(RuleSet ruleSet, Selector newSelector) {
     if (newSelector.isSilent() || !ruleSet.isSilent())
-      return ;
+      return;
     ruleSet.setSilent(false);
     ASTCssNode node = ruleSet;
-    while (node.hasParent()){
+    while (node.hasParent()) {
       node = node.getParent();
       setNecessaryParentVisibility(node, false);
     }
@@ -143,33 +145,33 @@ public class ExtendsSolver {
   }
 
   private void setNecessaryParentVisibility(ASTCssNode node, boolean isSilent) {
-      //TODO:this could have nicer more general solution
-      switch (node.getType()) {
-      case GENERAL_BODY:
-        node.setSilent(isSilent);
-        GeneralBody body = (GeneralBody)node;
-        safeSetSilent(body.getOpeningCurlyBrace(), isSilent);
-        safeSetSilent(body.getClosingCurlyBrace(), isSilent);
-        break;
-      case MEDIA:
-        node.setSilent(isSilent);
-        Media media = (Media)node;
-        for (MediaQuery medium : media.getMediums()) {
-          manipulator.setTreeSilentness(medium, isSilent);
-        }
-        break;
-      case SUPPORTS:
-        node.setSilent(isSilent);
-        Supports supports = (Supports)node;
-        manipulator.setTreeSilentness(supports.getCondition(), isSilent);
-        break;
-      default:
-        break;
+    // TODO:this could have nicer more general solution
+    switch (node.getType()) {
+    case GENERAL_BODY:
+      node.setSilent(isSilent);
+      GeneralBody body = (GeneralBody) node;
+      safeSetSilent(body.getOpeningCurlyBrace(), isSilent);
+      safeSetSilent(body.getClosingCurlyBrace(), isSilent);
+      break;
+    case MEDIA:
+      node.setSilent(isSilent);
+      Media media = (Media) node;
+      for (MediaQuery medium : media.getMediums()) {
+        manipulator.setTreeSilentness(medium, isSilent);
       }
+      break;
+    case SUPPORTS:
+      node.setSilent(isSilent);
+      Supports supports = (Supports) node;
+      manipulator.setTreeSilentness(supports.getCondition(), isSilent);
+      break;
+    default:
+      break;
+    }
   }
 
   private void safeSetSilent(SyntaxOnlyElement node, boolean isSilent) {
-    if (node!=null) {
+    if (node != null) {
       node.setSilent(isSilent);
     }
   }
@@ -180,12 +182,12 @@ public class ExtendsSolver {
 
     List<Extend> allExtends = extending.getExtend();
     for (Extend extend : allExtends) {
-      if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget())) 
+      if (!extend.isAll() && comparator.equals(possibleTarget, extend.getTarget()))
         return setNewSelectorVisibility(extend, extending.clone());
-      
+
       if (extend.isAll()) {
         Selector addSelector = comparator.replaceInside(extend.getTarget(), possibleTarget, extend.getParentAsSelector());
-        if (addSelector!=null)
+        if (addSelector != null)
           return setNewSelectorVisibility(extend, addSelector);
       }
     }
@@ -236,11 +238,11 @@ public class ExtendsSolver {
     List<Extend> result = new ArrayList<Extend>();
     List<ASTCssNode> members = new ArrayList<ASTCssNode>(ruleset.getBody().getMembers());
     for (ASTCssNode node : members) {
-      if (node.getType()==ASTCssNodeType.EXTEND) {
+      if (node.getType() == ASTCssNodeType.EXTEND) {
         Extend extend = (Extend) node;
         manipulator.removeFromBody(extend);
         result.add(extend);
-      } else if (node.getType()==ASTCssNodeType.MULTI_TARGET_EXTEND) {
+      } else if (node.getType() == ASTCssNodeType.MULTI_TARGET_EXTEND) {
         MultiTargetExtend extend = (MultiTargetExtend) node;
         manipulator.removeFromBody(extend);
         result.addAll(extend.getAllExtends());
@@ -252,9 +254,9 @@ public class ExtendsSolver {
 }
 
 class PerformedExtendsDB {
-  
+
   private Map<Selector, List<Selector>> allSelectorExtends = new HashMap<Selector, List<Selector>>();
-  
+
   protected List<Selector> getPreviousExtending(Selector selector) {
     List<Selector> result = allSelectorExtends.get(selector);
     if (result == null) {

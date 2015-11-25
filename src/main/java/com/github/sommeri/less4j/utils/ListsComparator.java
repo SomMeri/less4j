@@ -8,32 +8,32 @@ public class ListsComparator {
   public <T> boolean equals(List<T> first, List<T> second, ListMemberComparator<T> comparator) {
     if (first.size() != second.size()) {
       return false;
-	}
+    }
     return equals(first, second, first.size(), comparator);
   }
-		  
+
   public <T> boolean equals(List<T> first, List<T> second, int count, ListMemberComparator<T> comparator) {
     for (int i = 0; i < first.size() && i < count; i++) {
-	  if (!comparator.equals(first.get(i), second.get(i))) {
-	    return false;
-	  }
-	}
-	return true;
+      if (!comparator.equals(first.get(i), second.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public <T> boolean prefix(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {
     if (lookFor.isEmpty())
-	  return true;
+      return true;
 
-	if (lookFor.size() > inList.size())
-	  return false;
-	
-	int beforeLast = lookFor.size() - 1;
+    if (lookFor.size() > inList.size())
+      return false;
 
-	if (!equals(lookFor, inList, beforeLast, comparator))
-	  return false;
+    int beforeLast = lookFor.size() - 1;
 
-	return comparator.prefix(lookFor.get(beforeLast), inList.get(beforeLast));
+    if (!equals(lookFor, inList, beforeLast, comparator))
+      return false;
+
+    return comparator.prefix(lookFor.get(beforeLast), inList.get(beforeLast));
   }
 
   public <T> MatchMarker<T> prefixMatches(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {
@@ -45,12 +45,12 @@ public class ListsComparator {
     List<T> lookForWithoutLast = ArraysUtils.sublistWithoutLast(lookFor);
 
     if (!equals(lookForWithoutLast, relevantInListWithoutLast, comparator))
-      return null ;
+      return null;
 
     boolean isPrefix = comparator.prefix(ArraysUtils.last(lookFor), ArraysUtils.last(relevantInList));
     if (isPrefix)
       return new MatchMarker<T>(ArraysUtils.first(relevantInList), ArraysUtils.last(relevantInList), false);
-    
+
     return null;
   }
 
@@ -75,7 +75,7 @@ public class ListsComparator {
   }
 
   public <T> boolean suffix(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {
-    return null!=suffixMatches(lookFor, inList, comparator);
+    return null != suffixMatches(lookFor, inList, comparator);
   }
 
   public <T> MatchMarker<T> suffixMatches(List<T> lookFor, List<T> inList, ListMemberComparator<T> comparator) {
@@ -89,11 +89,10 @@ public class ListsComparator {
     if (!equals(lookForWithoutFirst, relevantInListWithoutFirst, comparator))
       return null;
 
-    
     boolean isSuffix = comparator.suffix(ArraysUtils.first(lookFor), ArraysUtils.first(relevantInList));
     if (isSuffix)
       return new MatchMarker<T>(ArraysUtils.first(relevantInList), ArraysUtils.last(relevantInList), false);
-    
+
     return null;
   }
 
@@ -196,12 +195,12 @@ public class ListsComparator {
     }
 
     public boolean firstIsLast() {
-      return first==last;
+      return first == last;
     }
 
     public boolean isIn(List<T> list) {
       return list.contains(getFirst()) && list.contains(getLast());
     }
-    
+
   }
 }
