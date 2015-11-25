@@ -42,11 +42,11 @@ public class SingleImportSolver {
     	final HashMap<Object, Object> map = new HashMap<Object, Object>();
     	astCache = new Cache() {
 			@Override
-			public Object get(LessSource key) {
+			public Object getAst(LessSource key) {
 				return map.get(key);
 			}
 			@Override
-			public void set(LessSource key, Object value) {
+			public void setAst(LessSource key, Object value) {
 				map.put(key, value);		
 			}    		
     	};
@@ -157,10 +157,10 @@ public class SingleImportSolver {
   }
 
   private StyleSheet getImportedAst(Import node, LessSource source, String content) {
-	StyleSheet importedAst = (StyleSheet) astCache.get(source);
+	StyleSheet importedAst = (StyleSheet) astCache.getAst(source);
 	if (importedAst == null) {
 	  importedAst = parseContent(node, content, source);
-	  astCache.set(source, importedAst);
+	  astCache.setAst(source, importedAst);
 	}
 	return importedAst.clone();
   }

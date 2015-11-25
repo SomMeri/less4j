@@ -18,8 +18,8 @@ public class CssAstValidator {
 
   public void validate(ASTCssNode node) {
     if (node instanceof Body)
-      validateBody((Body)node);
-    
+      validateBody((Body) node);
+
     // no need to copy the array for validation?
     for (ASTCssNode kid : node.getChilds()) {
       validate(kid);
@@ -29,13 +29,13 @@ public class CssAstValidator {
 
   private void validateBody(Body node) {
     Set<ASTCssNodeType> supportedMembers = allowedBodyMembers.getSupportedMembers(node);
-    
+
     for (ASTCssNode member : node.getMembers()) {
       if (!supportedMembers.contains(member.getType())) {
         problemsHandler.wrongMemberInCssBody(member, node);
       }
     }
-    
+
   }
 
 }

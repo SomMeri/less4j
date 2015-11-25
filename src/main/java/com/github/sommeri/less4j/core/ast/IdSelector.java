@@ -18,23 +18,23 @@ public class IdSelector extends ElementSubsequent {
   }
 
   public String getName() {
-	if (cachedName != null) {
-		return cachedName;
-	}
+    if (cachedName != null) {
+      return cachedName;
+    }
     String result = name.getName();
     if (!isInterpolated()) {
-    	cachedName = result;
+      cachedName = result;
     }
     return result;
   }
 
   public String getFullName() {
-	if (cachedFullName != null) {
-	  return cachedFullName;
-	}
+    if (cachedFullName != null) {
+      return cachedFullName;
+    }
     String result = "#" + getName();
     if (!isInterpolated()) {
-    	cachedFullName = result;
+      cachedFullName = result;
     }
     return result;
   }
@@ -47,8 +47,10 @@ public class IdSelector extends ElementSubsequent {
   @Override
   public void extendName(String extension) {
     name.extendName(extension);
+    cachedName = null;
+    cachedFullName = null;
   }
-  
+
   @Override
   @NotAstProperty
   public List<? extends ASTCssNode> getChilds() {
@@ -62,7 +64,7 @@ public class IdSelector extends ElementSubsequent {
 
   @Override
   public IdSelector clone() {
-    IdSelector clone = (IdSelector)super.clone();
+    IdSelector clone = (IdSelector) super.clone();
     clone.name = name.clone();
     clone.configureParentToAllChilds();
     return clone;
@@ -77,5 +79,4 @@ public class IdSelector extends ElementSubsequent {
     return builder.toString();
   }
 
-  
 }

@@ -9,7 +9,7 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class Declaration extends ASTCssNode {
 
-  //private String name;
+  // private String name;
   private InterpolableName name;
   private Expression expression;
   private ListExpressionOperator.Operator mergeOperator;
@@ -34,9 +34,9 @@ public class Declaration extends ASTCssNode {
   }
 
   public boolean isMerging() {
-    return mergeOperator!=null;
+    return mergeOperator != null;
   }
-  
+
   public void setName(InterpolableName name) {
     this.name = name;
   }
@@ -65,25 +65,25 @@ public class Declaration extends ASTCssNode {
   }
 
   public boolean isFontDeclaration() {
-	String n = getNameAsString();
-    return n!=null ? n.toLowerCase().equals("font") : false;
+    String n = getNameAsString();
+    return n != null ? n.toLowerCase().equals("font") : false;
   }
 
   public boolean isFilterDeclaration() {
-	String n = getNameAsString();
-    return n!=null ? n.toLowerCase().endsWith("filter") : false;
+    String n = getNameAsString();
+    return n != null ? n.toLowerCase().endsWith("filter") : false;
   }
-  
+
   @Override
   public String toString() {
-    return ""+ name + ":" + expression;
+    return "" + name + ":" + expression;
   }
-  
+
   @Override
   public Declaration clone() {
     Declaration result = (Declaration) super.clone();
-    result.name = name==null?null:name.clone();
-    result.expression = expression==null?null:expression.clone();
+    result.name = name == null ? null : name.clone();
+    result.expression = expression == null ? null : expression.clone();
     result.configureParentToAllChilds();
     return result;
   }

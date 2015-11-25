@@ -49,7 +49,7 @@ public class ExpressionEvaluator {
 
   private VariableCycleDetector cycleDetector = new VariableCycleDetector();
   private final IScope lazyScope;
-  //private final Stack<IScope> eagerScopes = new Stack<IScope>();
+  // private final Stack<IScope> eagerScopes = new Stack<IScope>();
   private final ProblemsHandler problemsHandler;
 
   private ArithmeticCalculator arithmeticCalculator;
@@ -228,7 +228,7 @@ public class ExpressionEvaluator {
     if (value.getType() != ASTCssNodeType.IDENTIFIER_EXPRESSION)
       return false;
 
-    //this comparison must be case sensitive! 
+    // this comparison must be case sensitive!
     IdentifierExpression identifier = (IdentifierExpression) value;
     return "true".equals(identifier.getValue());
   }
@@ -342,10 +342,10 @@ public class ExpressionEvaluator {
 
     List<Expression> members = Arrays.asList(leftValue, new AnonymousExpression(operator.getUnderlyingStructure(), operator.getOperator().getSymbol()), rightValue);
     ListExpression result = new ListExpression(input.getUnderlyingStructure(), members, new ListExpressionOperator(input.getUnderlyingStructure(), ListExpressionOperator.Operator.EMPTY_OPERATOR), lazyScope);
-    
+
     return result;
-//    problemsHandler.cannotEvaluate(input);
-//    return new FaultyExpression(input);
+    // problemsHandler.cannotEvaluate(input);
+    // return new FaultyExpression(input);
   }
 
   public boolean guardsSatisfied(ReusableStructure mixin) {
@@ -360,7 +360,7 @@ public class ExpressionEvaluator {
     if (guards == null || guards.isEmpty())
       return true;
 
-    //list of guards does or
+    // list of guards does or
     for (Guard guard : guards) {
       if (evaluate(guard))
         return true;
@@ -374,7 +374,7 @@ public class ExpressionEvaluator {
     if (conditions == null || conditions.isEmpty())
       return true;
 
-    //guards can only do and
+    // guards can only do and
     for (GuardCondition condition : conditions) {
       if (!evaluate(condition))
         return false;
@@ -415,7 +415,7 @@ public class ExpressionEvaluator {
     if (owningScope == null)
       throw new BugHappened("Detached ruleset with unknown scope.", input);
 
-    //FIXME: !!!!!! this is pointless remove
+    // FIXME: !!!!!! this is pointless remove
     clone.setScope(composedScope(owningScope));
     return clone;
   }

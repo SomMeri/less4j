@@ -90,27 +90,27 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
   }
 
   private CompilationResult doCompile(LessSource source, Configuration options) throws Less4jException {
-	StyleSheet lessStyleSheet = null;
-	if (options != null && options.getCache() != null) {
-		lessStyleSheet = (StyleSheet) options.getCache().get(source);
-		if (lessStyleSheet != null) {
-			lessStyleSheet = lessStyleSheet.clone(); // need to leave cached version unchanged
-		}
-	}
-	if (lessStyleSheet == null) {
-		ParseResult result = toAntlrTree(source);
-		lessStyleSheet = astBuilder.parseStyleSheet(result.getTree());
-		if (options != null && options.getCache() != null) {
-			options.getCache().set(source, lessStyleSheet);
-			lessStyleSheet = lessStyleSheet.clone(); // need to leave cached version unchanged
-		}
-	}
+    StyleSheet lessStyleSheet = null;
+    if (options != null && options.getCache() != null) {
+      lessStyleSheet = (StyleSheet) options.getCache().getAst(source);
+      if (lessStyleSheet != null) {
+        lessStyleSheet = lessStyleSheet.clone(); // need to leave cached version unchanged
+      }
+    }
+    if (lessStyleSheet == null) {
+      ParseResult result = toAntlrTree(source);
+      lessStyleSheet = astBuilder.parseStyleSheet(result.getTree());
+      if (options != null && options.getCache() != null) {
+        options.getCache().setAst(source, lessStyleSheet);
+        lessStyleSheet = lessStyleSheet.clone(); // need to leave cached version unchanged
+      }
+    }
 
     Map<String, HiddenTokenAwareTree> variables = toAntlrTree(options.getVariables());
     List<VariableDeclaration> externalVariables = astBuilder.parseVariables(variables);
     lessStyleSheet.addMembers(externalVariables);
     lessStyleSheet.configureParentToAllChilds();
-    
+
     try {
       ASTCssNode cssStyleSheet = compiler.compileToCss(lessStyleSheet, source, options);
       CompilationResult compilationResult = createCompilationResult(cssStyleSheet, source, externalVariables, compiler.getImportedsources(), options);
@@ -145,7 +145,7 @@ public class ThreadUnsafeLessCompiler implements LessCompiler {
       String nameStr = entry.getKey();
       String valueStr = entry.getValue();
       ParseResult valueParseResult = toAntlrExpressionTree(nameStr, valueStr);
-      
+
       problems.addAll(valueParseResult.getErrors());
       result.put(nameStr, valueParseResult.getTree());
     }

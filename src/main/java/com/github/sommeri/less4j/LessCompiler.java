@@ -30,14 +30,14 @@ public interface LessCompiler {
   public CompilationResult compile(LessSource source, Configuration options) throws Less4jException;
 
   /**
-   * WARNING: experimental API 
+   * WARNING: experimental API
    */
   public static class Configuration {
 
     private LessSource cssResultLocation;
     private SourceMapConfiguration sourceMapConfiguration = new SourceMapConfiguration();
     private List<LessFunction> functionPackages = new ArrayList<LessFunction>();
-    private Map<String, String> externalVariables  = new HashMap<String, String>();
+    private Map<String, String> externalVariables = new HashMap<String, String>();
     private EmbeddedScriptGenerator embeddedScriptGenerator;
     private boolean compressing = false;
     private Cache cache;
@@ -58,16 +58,17 @@ public interface LessCompiler {
       this.cssResultLocation = cssResultLocation == null ? null : new LessSource.FileSource(cssResultLocation);
     }
 
-   /**
-    * @deprecated Use getSourceMapConfiguration().shouldLinkSourceMap() instead
-    */
+    /**
+     * @deprecated Use getSourceMapConfiguration().shouldLinkSourceMap() instead
+     */
     @Deprecated
     public boolean shouldLinkSourceMap() {
       return sourceMapConfiguration.shouldLinkSourceMap();
     }
 
     /**
-     * @deprecated Use getSourceMapConfiguration().setLinkSourceMap(boolean) instead
+     * @deprecated Use getSourceMapConfiguration().setLinkSourceMap(boolean)
+     *             instead
      */
     public void setLinkSourceMap(boolean linkSourceMap) {
       sourceMapConfiguration.setLinkSourceMap(linkSourceMap);
@@ -117,15 +118,15 @@ public interface LessCompiler {
     public boolean isCompressing() {
       return compressing;
     }
-    
-	public Cache getCache() {
-	  return cache;
-	}
 
-	public Configuration setCache(Cache cache) {
-	  this.cache = cache;
-	  return this;
-	}
+    public Cache getCache() {
+      return cache;
+    }
+
+    public Configuration setCache(Cache cache) {
+      this.cache = cache;
+      return this;
+    }
 
   }
 
@@ -142,7 +143,8 @@ public interface LessCompiler {
     }
 
     /**
-     * If set to <code>false</code>, generated css does not contain link to source map file. 
+     * If set to <code>false</code>, generated css does not contain link to
+     * source map file.
      */
     public SourceMapConfiguration setLinkSourceMap(boolean linkSourceMap) {
       this.linkSourceMap = linkSourceMap;
@@ -154,7 +156,8 @@ public interface LessCompiler {
     }
 
     /**
-     * If set to <code>true</code>, whole source map is encoded and embedded into generated css. It is <code>false</code> by default.
+     * If set to <code>true</code>, whole source map is encoded and embedded
+     * into generated css. It is <code>false</code> by default.
      */
     public SourceMapConfiguration setInline(boolean inline) {
       this.inline = inline;
@@ -178,10 +181,11 @@ public interface LessCompiler {
     }
 
     /**
-     * If set to false, final source map contains unmodified (absolute) paths to 
-     * original less files. If set to true, generated map contains relative paths. Note that 
-     * "correct" source map should contain relative paths. Use this option only if 
-     * you need some kind of post processing on generated map.
+     * If set to false, final source map contains unmodified (absolute) paths to
+     * original less files. If set to true, generated map contains relative
+     * paths. Note that "correct" source map should contain relative paths. Use
+     * this option only if you need some kind of post processing on generated
+     * map.
      */
     public SourceMapConfiguration setRelativizePaths(boolean relativizePaths) {
       this.relativizePaths = relativizePaths;
@@ -193,8 +197,9 @@ public interface LessCompiler {
     }
 
     /**
-     * If set to <code>true</code>, content of compiled (source) files is included inside source map. 
-     * Source map is independent of compiled less files locations.
+     * If set to <code>true</code>, content of compiled (source) files is
+     * included inside source map. Source map is independent of compiled less
+     * files locations.
      */
     public SourceMapConfiguration setIncludeSourcesContent(boolean includeSourcesContent) {
       this.includeSourcesContent = includeSourcesContent;
@@ -206,7 +211,8 @@ public interface LessCompiler {
     }
 
     public SourceMapConfiguration setSourceMapNameGenerator(SourceMapUrlGenerator sourceMapNameGenerator) {
-      this.sourceMapNameGenerator = sourceMapNameGenerator != null ? sourceMapNameGenerator : new DefaultSourceMapUrlGenerator();
+      this.sourceMapNameGenerator = sourceMapNameGenerator != null ? sourceMapNameGenerator
+          : new DefaultSourceMapUrlGenerator();
       return this;
     }
   }
@@ -247,11 +253,12 @@ public interface LessCompiler {
   }
 
   public interface Cache {
-	Object get(LessSource key);
-	void set(LessSource key, Object value);
+    
+    Object getAst(LessSource key);
+
+    void setAst(LessSource key, Object value);
   }
 
-  
   public interface Problem {
 
     public Type getType();

@@ -12,30 +12,29 @@ public class CssClass extends ElementSubsequent {
   private String cachedName;
   private String cachedFullName;
 
-
   public CssClass(HiddenTokenAwareTree token, InterpolableName name) {
     super(token);
     this.name = name;
   }
 
   public String getName() {
-	if (cachedName != null) {
-		return cachedName;
-	}
+    if (cachedName != null) {
+      return cachedName;
+    }
     String result = name.getName();
     if (!isInterpolated()) {
-    	cachedName = result;
+      cachedName = result;
     }
     return result;
   }
 
   public String getFullName() {
-	if (cachedFullName != null) {
-	  return cachedFullName;
-	}
+    if (cachedFullName != null) {
+      return cachedFullName;
+    }
     String result = "." + getName();
     if (!isInterpolated()) {
-    	cachedFullName = result;
+      cachedFullName = result;
     }
     return result;
   }
@@ -51,7 +50,7 @@ public class CssClass extends ElementSubsequent {
     cachedName = null;
     cachedFullName = null;
   }
-  
+
   @Override
   public ASTCssNodeType getType() {
     return ASTCssNodeType.CSS_CLASS;
@@ -65,7 +64,7 @@ public class CssClass extends ElementSubsequent {
 
   @Override
   public CssClass clone() {
-    CssClass clone = (CssClass)super.clone();
+    CssClass clone = (CssClass) super.clone();
     clone.name = name.clone();
     clone.configureParentToAllChilds();
     return clone;
