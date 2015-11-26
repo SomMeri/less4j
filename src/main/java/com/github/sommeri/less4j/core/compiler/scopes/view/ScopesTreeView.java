@@ -64,7 +64,7 @@ public class ScopesTreeView extends AbstractScopesTree {
     return publicChilds;
   }
 
-  private List<IScope> createPublicChilds() {
+  protected List<IScope> createPublicChilds() {
     List<IScope> realChilds = originalStructure.getChilds();
     if (realChilds == null)
       return null;
