@@ -14,7 +14,7 @@ public class ScopesTreeView extends AbstractScopesTree {
 
   private IScope joinToParentTree;
   private final IScopesTree originalStructure;
-  
+
   private ScopeView publicParent;
   private List<IScope> publicChilds = null;
   private IScope fakeChildScope;
@@ -26,9 +26,9 @@ public class ScopesTreeView extends AbstractScopesTree {
     this.joinToParentTree = joinToParentTree;
     this.publicParent = publicParent;
 
-    if (publicChild!=null) {
-    	fakeChildScope = publicChild.getUnderlying();
-    	fakeChildScopeView = publicChild;
+    if (publicChild != null) {
+      fakeChildScope = publicChild.getUnderlying();
+      fakeChildScopeView = publicChild;
     }
   }
 
@@ -64,7 +64,7 @@ public class ScopesTreeView extends AbstractScopesTree {
     return publicChilds;
   }
 
-  public List<IScope> createPublicChilds() {
+  private List<IScope> createPublicChilds() {
     List<IScope> realChilds = originalStructure.getChilds();
     if (realChilds == null)
       return null;
@@ -77,7 +77,7 @@ public class ScopesTreeView extends AbstractScopesTree {
         result.add(ScopeFactory.createChildScopeView(childScope, scope, joinToParentTree));
       }
     }
-    
+
     return result;
 
   }

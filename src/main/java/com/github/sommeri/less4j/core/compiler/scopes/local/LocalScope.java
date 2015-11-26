@@ -20,11 +20,12 @@ import com.github.sommeri.less4j.core.compiler.scopes.local.VariablesDeclaration
 
 public class LocalScope implements ILocalScope {
 
-  // following is used only during debugging - to generate human readable toString
+  // following is used only during debugging - to generate human readable
+  // toString
   private String type;
   private final ASTCssNode owner;
   private boolean presentInAst = true;
-  
+
   private LocalScopeData localData = new LocalScopeData();
   private Stack<LocalScopeData> localDataSnapshots = new Stack<LocalScopeData>();
   private boolean cloneOnWrite = false;
@@ -40,16 +41,16 @@ public class LocalScope implements ILocalScope {
 
   public LocalScope(ASTCssNode owner, LocalScopeData initialLocalData, List<String> names, String type) {
     this(owner, names, type);
-    localData =  initialLocalData;
+    localData = initialLocalData;
   }
 
   public LocalScope(ASTCssNode owner, LocalScopeData initialLocalData, List<String> names, String type, boolean cloneOnWrite, boolean cloned) {
-	this(owner, names, type);
-	localData =  initialLocalData;
-	this.cloneOnWrite = cloneOnWrite;
-	this.cloned = cloned;
+    this(owner, names, type);
+    localData = initialLocalData;
+    this.cloneOnWrite = cloneOnWrite;
+    this.cloned = cloned;
   }
-  
+
   @Override
   public ASTCssNode getOwner() {
     return owner;
@@ -150,7 +151,6 @@ public class LocalScope implements ILocalScope {
     return new LocalScope(owner, localData, names, type, true, false);
   }
 
-  
   public boolean hasTheSameLocalData(ILocalScope otherScope) {
     return otherScope.getLocalData() == localData;
   }
@@ -160,39 +160,39 @@ public class LocalScope implements ILocalScope {
    * instead.
    */
   public void createCurrentDataSnapshot() {
-	    localDataSnapshots.push(localData);
-	    cloneOnWrite = true;
-	    cloned = false;
-	  }
+    localDataSnapshots.push(localData);
+    cloneOnWrite = true;
+    cloned = false;
+  }
 
   /**
    * Do not call this method directly. Use {@link InScopeSnapshotRunner}
    * instead.
    */
   public void createOriginalDataSnapshot() {
-	    localDataSnapshots.push(localData);
-	    localData = localDataSnapshots.firstElement();
-	    cloneOnWrite = true;
-	    cloned = false;
-	  }
+    localDataSnapshots.push(localData);
+    localData = localDataSnapshots.firstElement();
+    cloneOnWrite = true;
+    cloned = false;
+  }
 
   /**
    * Do not call this method directly. Use {@link InScopeSnapshotRunner}
    * instead.
    */
   public void discardLastDataSnapshot() {
-	    localData = localDataSnapshots.pop();
-	    cloneOnWrite = false;
-	    cloned = false;    
-	  }
+    localData = localDataSnapshots.pop();
+    cloneOnWrite = false;
+    cloned = false;
+  }
 
   public MixinsDefinitionsStorage getLocalMixins() {
-	cloneIfNeeded();
+    cloneIfNeeded();
     return localData.getMixins();
   }
 
   public VariablesDeclarationsStorage getLocalVariables() {
-	cloneIfNeeded();
+    cloneIfNeeded();
     return localData.getVariables();
   }
 
@@ -211,12 +211,12 @@ public class LocalScope implements ILocalScope {
   public List<FullMixinDefinition> getMixinsByName(String name) {
     return getLocalMixins().getMixins(name);
   }
-  
+
   private void cloneIfNeeded() {
-	if (cloneOnWrite && !cloned) {
+    if (cloneOnWrite && !cloned) {
       localData = localData.clone();
       cloned = true;
-	}	
+    }
   }
 
   @Override
