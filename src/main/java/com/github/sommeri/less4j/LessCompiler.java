@@ -252,10 +252,22 @@ public interface LessCompiler {
 
   }
 
+  /**
+   * Cache with objects to be reused between runs. Use this to speed up compilation
+   * when you multiple sheets import and use the same less files. Use with caution, 
+   * may cause faults if imported data change between consecutive runs.   
+   *
+   */
   public interface Cache {
     
+    /**
+     * Get ast corresponding to parsed source.  
+     */
     Object getAst(LessSource key);
 
+    /**
+     * Set ast corresponding to parsed source.  
+     */
     void setAst(LessSource key, Object value);
   }
 
