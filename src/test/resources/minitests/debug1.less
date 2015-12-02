@@ -1,3 +1,8 @@
-.select2-dropdown-open.select2-drop-above [class ^= "select2-choice"] .btn-default {
-    border: none ! important;
+.keyframes(@name; @rules) {
+    @-webkit-keyframes @name {
+        @rules();
+    }
+    @keyframes @name {
+        @rules();
+    }
 }

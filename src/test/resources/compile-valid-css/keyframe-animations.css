@@ -36,3 +36,13 @@
     left: 200px;
   }
 }
+@-webkit-keyframes name {
+  from {
+    left: 100px;
+  }
+}
+@keyframes name {
+  from {
+    left: 100px;
+  }
+}

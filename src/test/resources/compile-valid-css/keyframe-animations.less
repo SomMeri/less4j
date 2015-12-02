@@ -41,3 +41,14 @@
     left: 200px;
   }
 }
+
+// detached ruleset in keyframe https://github.com/SomMeri/less4j/issues/322
+.keyframesMixin(@name; @rules) {
+    @-webkit-keyframes @name {
+        @rules();
+    }
+    @keyframes @name {
+        @rules();
+    }
+}
+.keyframesMixin(name, { from { left: 100px }});
