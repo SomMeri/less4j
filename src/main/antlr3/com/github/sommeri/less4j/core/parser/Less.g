@@ -518,8 +518,8 @@ top_level_body_with_declaration
 
 general_body
   : LBRACE ( 
-                 (ws declarationWithSemicolon)=> (ws a+=declarationWithSemicolon)
-               | (ws ruleSet)=>(ws a+=ruleSet)
+                (ws ruleSet)=>(ws a+=ruleSet)
+               | (ws declarationWithSemicolon)=> (ws a+=declarationWithSemicolon)
                | (ws mixinReferenceWithSemi)=>(ws a+=mixinReferenceWithSemi)
                | (ws namespaceReferenceWithSemi)=>(ws a+=namespaceReferenceWithSemi)
                | (ws reusableStructure)=>(ws a+=reusableStructure)

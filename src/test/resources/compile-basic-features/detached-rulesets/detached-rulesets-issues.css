@@ -2,3 +2,9 @@
   name: extra;
   property: extra;
 }
+#usePlace-323 .print {
+  grid: grid;
+}
+#usePlace-323 .print a:not(.btn) {
+  text-decoration: none;
+}

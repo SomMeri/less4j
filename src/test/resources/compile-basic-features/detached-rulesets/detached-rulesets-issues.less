@@ -13,3 +13,16 @@
   
   .variations(extra , property);
 }
+// https://github.com/SomMeri/less4j/issues/323
+#usePlace-323 {
+  .make-grid(...) {
+    grid: grid;
+  }
+  .print {
+    a:not(.btn) {
+      text-decoration: none;
+    }
+
+    .make-grid(sm);
+  }
+}

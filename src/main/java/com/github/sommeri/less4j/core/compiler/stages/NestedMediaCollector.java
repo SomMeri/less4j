@@ -15,6 +15,8 @@ import com.github.sommeri.less4j.utils.ArraysUtils;
  * Collects all nested media childs. It assumes that all media at-rules already bubbled on top and
  * are nested only inside other media at-rules.
  */
+// FIXME (import) test media inside media where inner media are behind reference
+// FIXME (import) test directive inside directive where inner directive is behind reference
 public class NestedMediaCollector {
 
   private final ASTManipulator manipulator = new ASTManipulator();

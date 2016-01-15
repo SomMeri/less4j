@@ -1,8 +1,10 @@
-.keyframes(@name; @rules) {
-    @-webkit-keyframes @name {
-        @rules();
-    }
-    @keyframes @name {
-        @rules();
-    }
+.make-grid(...) {
+  grid: grid;
+}
+.print {
+  a:not(.btn) {
+    text-decoration: none;
+  }
+
+  .make-grid(sm);
 }
