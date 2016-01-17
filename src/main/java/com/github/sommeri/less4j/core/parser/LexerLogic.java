@@ -43,7 +43,7 @@ public class LexerLogic {
   }
 
   public boolean isIdentifier(int type) {
-    return type == LessLexer.IDENT || type == LessLexer.IDENT_WHEN || type == LessLexer.IDENT_NOT  || type == LessLexer.IDENT_NTH_CHILD || type == LessLexer.NTH_LAST_CHILD || type == LessLexer.NTH_OF_TYPE || type == LessLexer.NTH_LAST_OF_TYPE || type == LessLexer.IDENT_EXTEND;
+    return type == LessLexer.IDENT || type == LessLexer.IDENT_WHEN || type == LessLexer.IDENT_NOT || type == LessLexer.IDENT_AND || type == LessLexer.IDENT_OR|| type == LessLexer.IDENT_NTH_CHILD || type == LessLexer.NTH_LAST_CHILD || type == LessLexer.NTH_OF_TYPE || type == LessLexer.NTH_LAST_OF_TYPE || type == LessLexer.IDENT_EXTEND;
   }
 
   public boolean isPageMarginBox(Token token) {

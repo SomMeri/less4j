@@ -79,6 +79,7 @@ tokens {
   MIXIN_PATTERN;
   GUARD_CONDITION;
   GUARD;
+  GUARD_IN_PARENTHESIS;
   DUMMY_MEANINGFULL_WHITESPACE; //ANTLR, please
   KEYFRAMES_DECLARATION;
   KEYFRAMES;
@@ -195,10 +196,10 @@ ident_keywords: IDENT_WHEN;
 
 ident_special_pseudoclasses: ident_nth | IDENT_EXTEND;
 
-ident: IDENT | IDENT_NOT | ident_keywords | ident_special_pseudoclasses;
-ident_except_when: IDENT | IDENT_NOT | ident_special_pseudoclasses;
-ident_except_not: IDENT | ident_keywords | ident_special_pseudoclasses;
-ident_general_pseudo: IDENT | IDENT_NOT | ident_keywords;
+ident: IDENT | IDENT_NOT | IDENT_AND | IDENT_OR | ident_keywords | ident_special_pseudoclasses;
+ident_except_when: IDENT | IDENT_NOT | IDENT_AND | IDENT_OR | ident_special_pseudoclasses;
+ident_except_not: IDENT | IDENT_AND | IDENT_OR | ident_keywords | ident_special_pseudoclasses;
+ident_general_pseudo: IDENT | IDENT_NOT | IDENT_AND | IDENT_OR | ident_keywords;
 // -------------
 // Main rule. This is the main entry rule for the parser, the top level
 // grammar rule.
@@ -713,13 +714,26 @@ reusableStructureGuards
     ;
     
 guard
-    : a=guardCondition  (ws b+=ident ws c+=guardCondition)*
+    : a=guardAnd  (ws b+=IDENT_OR ws c+=guardAnd)*
     -> ^(GUARD $a* ($b $c)*)
     ;    
 
-guardCondition
-    : (a+=ident ws)? LPAREN ws b+=mathExprHighPrior (ws b+=compareOperator ws b+=mathExprHighPrior)? ws RPAREN
-    -> ^(GUARD_CONDITION $a* $b*)
+guardAnd
+    : a=guardCondition  (ws b+=IDENT_AND ws c+=guardCondition)*
+    -> ^(GUARD $a* ($b $c)*)
+    ;    
+
+guardCondition: (a+=IDENT_NOT ws)? b+=guardInParentheses
+    -> ^(GUARD_IN_PARENTHESIS $a* $b*)
+    ;
+
+guardInParentheses:  LPAREN ws ((guard)=>a+=guard | a+=guardAtomicCondition) ws RPAREN
+    -> $a*
+    ;
+
+guardAtomicCondition
+    : b+=mathExprHighPrior (ws b+=compareOperator ws b+=mathExprHighPrior)?
+    -> ^(GUARD_CONDITION $b*)
     ;   
 
 compareOperator
@@ -1371,6 +1385,8 @@ ESCAPED_SCRIPT : '~' '`' ( ESCAPED_SYMBOL | ~('\f'|'\\'|'`') )*
 //
 //
 IDENT_NOT: N O T;
+IDENT_AND: A N D;
+IDENT_OR: O R;
 IDENT_EXTEND: E X T E N D;
 IDENT_NTH_CHILD: N T H MINUS C H I L D; 
 NTH_LAST_CHILD: N T H MINUS L A S T MINUS C H I L D;

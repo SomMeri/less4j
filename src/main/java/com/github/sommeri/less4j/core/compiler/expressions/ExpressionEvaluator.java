@@ -23,7 +23,9 @@ import com.github.sommeri.less4j.core.ast.Expression;
 import com.github.sommeri.less4j.core.ast.FaultyExpression;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.Guard;
+import com.github.sommeri.less4j.core.ast.GuardBinary;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
+import com.github.sommeri.less4j.core.ast.GuardNegated;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.IndirectVariable;
 import com.github.sommeri.less4j.core.ast.ListExpression;
@@ -370,24 +372,45 @@ public class ExpressionEvaluator {
   }
 
   public boolean evaluate(Guard guard) {
-    List<GuardCondition> conditions = guard.getConditions();
-    if (conditions == null || conditions.isEmpty())
-      return true;
-
-    // guards can only do and
-    for (GuardCondition condition : conditions) {
-      if (!evaluate(condition))
-        return false;
+    switch (guard.getGuardType()) {
+    case BINARY:
+      return evaluate((GuardBinary) guard);
+    case CONDITION:
+      return evaluate((GuardCondition) guard);
+    case NEGATED:
+      return evaluate((GuardNegated) guard);
     }
 
-    return true;
+    throw new BugHappened("Unexpected guard type (" + guard.getGuardType() + ")", guard);
+  }
+
+  private boolean evaluate(GuardBinary guard) {
+    boolean left = evaluate(guard.getLeft());
+
+    switch (guard.getOperator()) {
+    case AND: {
+      boolean result = !left ? false : evaluate(guard.getRight());
+      return result;
+    }
+    case OR: {
+      boolean result = left ? true : evaluate(guard.getRight());
+      return result;
+    }
+    }
+
+    throw new BugHappened("Unexpected guard logical operator (" + guard.getOperator() + ")", guard);
+  }
+
+  private boolean evaluate(GuardNegated guard) {
+    boolean nestedGuardValue = evaluate(guard.getGuard());
+    boolean result = guard.isNegated() ? !nestedGuardValue : nestedGuardValue;
+    return result;
   }
 
   private boolean evaluate(GuardCondition guardCondition) {
     Expression condition = guardCondition.getCondition();
-    boolean conditionStatus = booleanEvalueate(condition);
-
-    return guardCondition.isNegated() ? !conditionStatus : conditionStatus;
+    boolean result = booleanEvalueate(condition);
+    return result;
   }
 
   public boolean isRatioExpression(Expression expression) {

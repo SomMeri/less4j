@@ -139,6 +139,9 @@ public abstract class TokenTypeSwitch<T> {
     if (type == LessLexer.GUARD)
       return handleGuard(token);
 
+    if (type == LessLexer.GUARD_IN_PARENTHESIS)
+      return handleGuardInParentheses(token);
+
     if (type == LessLexer.GUARD_CONDITION)
       return handleGuardCondition(token);
 
@@ -234,6 +237,8 @@ public abstract class TokenTypeSwitch<T> {
   public abstract T handleGuardCondition(HiddenTokenAwareTree token);
 
   public abstract T handleGuard(HiddenTokenAwareTree token);
+  
+  public abstract T handleGuardInParentheses(HiddenTokenAwareTree token);
 
   public abstract T handleMixinPattern(HiddenTokenAwareTree token);
 

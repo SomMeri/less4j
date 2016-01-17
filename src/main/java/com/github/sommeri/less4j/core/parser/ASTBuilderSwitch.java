@@ -34,7 +34,9 @@ import com.github.sommeri.less4j.core.ast.FontFace;
 import com.github.sommeri.less4j.core.ast.FunctionExpression;
 import com.github.sommeri.less4j.core.ast.GeneralBody;
 import com.github.sommeri.less4j.core.ast.Guard;
+import com.github.sommeri.less4j.core.ast.GuardBinary;
 import com.github.sommeri.less4j.core.ast.GuardCondition;
+import com.github.sommeri.less4j.core.ast.GuardNegated;
 import com.github.sommeri.less4j.core.ast.IdSelector;
 import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.Import;
@@ -104,6 +106,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private final TermBuilder termBuilder;
   // as stated here: http://www.w3.org/TR/css3-selectors/#pseudo-elements
   private static Set<String> COLONLESS_PSEUDOELEMENTS = new HashSet<String>();
+
   static {
     COLONLESS_PSEUDOELEMENTS.add("first-line");
     COLONLESS_PSEUDOELEMENTS.add("first-letter");
@@ -120,7 +123,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private final static String IMPORT_OPTION_ONCE = "once";
   private final static String IMPORT_OPTION_MULTIPLE = "multiple";
   private final static String IMPORT_OPTION_OPTIONAL = "optional";
-  
+
   public ASTBuilderSwitch(ProblemsHandler problemsHandler) {
     super();
     this.problemsHandler = problemsHandler;
@@ -157,8 +160,8 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       head.setUnderlyingStructure(token);
       return head;
     }
-    
-    if (null!=toListExpressionOperator(children.get(1))) 
+
+    if (null != toListExpressionOperator(children.get(1)))
       return createListExpression(token, children);
 
     return createBinaryExpression(token, children);
@@ -170,16 +173,16 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     Expression head = (Expression) switchOn(iterator.next());
     List<Expression> spaceSeparatedExpressions = new ArrayList<Expression>();
     spaceSeparatedExpressions.add(head);
-    ListExpressionOperator space=null;
-    
+    ListExpressionOperator space = null;
+
     List<Expression> commaSeparatedExpressions = new ArrayList<Expression>();
-    ListExpressionOperator comma=null;
+    ListExpressionOperator comma = null;
 
     while (iterator.hasNext()) {
       HiddenTokenAwareTree operatorToken = iterator.next();
       operatorToken.pushHiddenToSiblings();
       ListExpressionOperator operator = createListOperator(operatorToken);
-      if (operator.getOperator()==ListExpressionOperator.Operator.EMPTY_OPERATOR) {
+      if (operator.getOperator() == ListExpressionOperator.Operator.EMPTY_OPERATOR) {
         space = operator;
       } else {
         comma = operator;
@@ -198,12 +201,12 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   private Expression maybeList(List<Expression> expressions, ListExpressionOperator operator) {
     if (expressions.isEmpty())
       return null;
-    
+
     Expression first = expressions.get(0);
-    if (expressions.size()==1) {
+    if (expressions.size() == 1) {
       return first;
     }
-    
+
     return new ListExpression(first.getUnderlyingStructure(), expressions, operator);
   }
 
@@ -249,9 +252,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public ListExpressionOperator createListOperator(HiddenTokenAwareTree token) {
     ListExpressionOperator.Operator operator = toListExpressionOperator(token);
-    if (operator==null)
+    if (operator == null)
       return null;
-    
+
     ListExpressionOperator result = new ListExpressionOperator(token, operator);
     return result;
   }
@@ -306,7 +309,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     if (!iterator.hasNext()) {
       return new Declaration(token, name, expression, mergeOperator);
     }
-    
+
     throw new BugHappened(GRAMMAR_MISMATCH, token);
   }
 
@@ -350,7 +353,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       } else if (kid.getGeneralType() == LessLexer.COMMA) {
         if (previousKid != null)
           previousKid.getUnderlyingStructure().addFollowing(kid.getPreceding());
-        
+
         kid.pushFollowingHiddenToSibling();
       }
     }
@@ -427,7 +430,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     reference.setUnderlyingStructure(token);
     reference.addNames(nameChain);
     return reference;
-  }  
+  }
 
   public Expression handleMixinPattern(HiddenTokenAwareTree token) {
     return termBuilder.buildFromTerm(token.getChild(0));
@@ -435,9 +438,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public DetachedRulesetReference handleDetachedRulesetReference(HiddenTokenAwareTree token) {
     DetachedRulesetReference result = new DetachedRulesetReference(token, termBuilder.buildFromVariableReference(token.getChild(0)));
-    if (token.getChildCount()<3) {
+    if (token.getChildCount() < 3) {
       problemsHandler.detachedRulesetCallWithoutParentheses(result);
-    } 
+    }
     return result;
   }
 
@@ -446,27 +449,37 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   public Guard handleGuard(HiddenTokenAwareTree token) {
-    Guard result = new Guard(token);
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
-    result.addCondition(handleGuardCondition(iterator.next()));
+
+    Guard result = (Guard) switchOn(iterator.next());
+    if (!iterator.hasNext())
+      return result;
+
     while (iterator.hasNext()) {
-      validateGuardAnd(iterator.next());
-      result.addCondition(handleGuardCondition(iterator.next()));
+      GuardBinary.Operator operator = convertGuardAndOr(iterator.next());
+      Guard right = (Guard) switchOn(iterator.next());
+      result = new GuardBinary(token, result, operator, right);
     }
 
     return result;
   }
 
+  public Guard handleGuardInParentheses(HiddenTokenAwareTree token) {
+    Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
+
+    HiddenTokenAwareTree head = iterator.next();
+    boolean isNegated = isGuardNot(head);
+    if (isNegated) {
+      head = iterator.next();
+    }
+
+    Guard parenthesisContent = (Guard) switchOn(head);
+    return isNegated ? new GuardNegated(token, parenthesisContent) : parenthesisContent;
+  }
+
   public GuardCondition handleGuardCondition(HiddenTokenAwareTree token) {
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
     HiddenTokenAwareTree kid = iterator.next();
-
-    boolean isNegated = false;
-    if (kid.getGeneralType() != LessLexer.EXPRESSION) {
-      validateGuardNegation(kid);
-      isNegated = true;
-      kid = iterator.next();
-    }
 
     Expression condition = handleExpression(kid);
     if (iterator.hasNext()) {
@@ -475,7 +488,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       condition = new ComparisonExpression(token, condition, toComparisonOperator(operatorToken), followingExpression);
     }
 
-    return new GuardCondition(token, isNegated, condition);
+    return new GuardCondition(token, condition);
   }
 
   private ComparisonExpressionOperator toComparisonOperator(HiddenTokenAwareTree token) {
@@ -502,16 +515,22 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     throw new BugHappened(GRAMMAR_MISMATCH, token);
   }
 
-  public void validateGuardNegation(HiddenTokenAwareTree token) {
+  public GuardBinary.Operator convertGuardAndOr(HiddenTokenAwareTree token) {
     String operator = token.getText().trim();
-    if (!"not".equals(operator))
-      throw new BugHappened(GRAMMAR_MISMATCH, token);
+
+    if ("or".equals(operator)) {
+      return GuardBinary.Operator.OR;
+    }
+    if ("and".equals(operator)) {
+      return GuardBinary.Operator.AND;
+    }
+
+    throw new BugHappened(GRAMMAR_MISMATCH, token);
   }
 
-  public void validateGuardAnd(HiddenTokenAwareTree token) {
+  public boolean isGuardNot(HiddenTokenAwareTree token) {
     String operator = token.getText().trim();
-    if (!"and".equals(operator))
-      throw new BugHappened(GRAMMAR_MISMATCH, token);
+    return "not".equals(operator);
   }
 
   public GeneralBody handleGeneralBody(HiddenTokenAwareTree token) {
@@ -544,27 +563,26 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     return builder.buildSelector();
   }
 
-  //This is kind of hack, extend compiles to list of extends
+  // This is kind of hack, extend compiles to list of extends
   public ASTCssNode handleExtendTargetSelector(HiddenTokenAwareTree token) {
     token.pushHiddenToKids();
-    
-    if (token.getChildren().size()==1) {
+
+    if (token.getChildren().size() == 1) {
       Selector selector = (Selector) switchOn(token.getChildren().get(0));
       return convertSelectorToExtend(token, selector);
     }
-      
-    
+
     MultiTargetExtend extend = new MultiTargetExtend(token);
     List<HiddenTokenAwareTree> children = token.getChildren();
     for (HiddenTokenAwareTree kid : children) {
-      if (kid.getGeneralType()==LessLexer.COMMA) {
+      if (kid.getGeneralType() == LessLexer.COMMA) {
         kid.pushHiddenToSiblings();
       } else {
         Selector selector = (Selector) switchOn(kid);
         extend.addExtend(convertSelectorToExtend(token, selector));
       }
     }
-   
+
     return extend;
   }
 
@@ -614,7 +632,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     case IDENTIFIER_EXPRESSION:
     case STRING_EXPRESSION:
     case NUMBER:
-      //those are OK
+      // those are OK
       break;
 
     default:
@@ -676,10 +694,11 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     if (children.size() >= 3) {
       HiddenTokenAwareTree parameter = children.get(2);
-      //FIXME: this is not really sufficient for all cases less.js supports (1@{num}n+3)
+      // FIXME: this is not really sufficient for all cases less.js supports
+      // (1@{num}n+3)
       if (parameter.getGeneralType() == LessLexer.INTERPOLATED_VARIABLE)
         return new PseudoClass(token, pseudoClassName, toInterpolabledVariable(parameter, parameter.getText()));
-      
+
       return new PseudoClass(token, pseudoClassName, switchOn(parameter));
     }
 
@@ -852,7 +871,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   public InterpolatedMediaExpression handleInterpolatedMediaExpression(HiddenTokenAwareTree token) {
     Iterator<HiddenTokenAwareTree> children = token.getChildren().iterator();
     List<Expression> expressions = new ArrayList<Expression>();
-        
+
     while (children.hasNext()) {
       Variable expression = (Variable) switchOn(children.next());
       expressions.add(expression);
@@ -893,10 +912,10 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
   }
 
   private Expression variableValue(HiddenTokenAwareTree underlyingIfEmpty, HiddenTokenAwareTree expression) {
-    if (expression.getGeneralType()==LessLexer.SEMI) {
+    if (expression.getGeneralType() == LessLexer.SEMI) {
       return new EmptyExpression(underlyingIfEmpty);
-    } 
-    
+    }
+
     return (Expression) switchOn(expression);
   }
 
@@ -1027,7 +1046,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       SupportsConditionInParentheses result = new SupportsConditionInParentheses(token, openingParentheses, condition, closingParentheses);
       return result;
     } else if (first.getGeneralType() == LessLexer.IDENT) {
-      //TODO: warning on wrong operator (anything that is not 'not')
+      // TODO: warning on wrong operator (anything that is not 'not')
       SyntaxOnlyElement negation = toSyntaxOnlyElement(first);
       SupportsCondition condition = (SupportsCondition) switchOn(children.next());
 
@@ -1113,7 +1132,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       HiddenTokenAwareTree token = iterator.next();
       if (token.getGeneralType() == LessLexer.COMMA) {
         token.pushHiddenToSiblings();
-      } else if (token.getGeneralType() == LessLexer.STRING || token.getGeneralType() == LessLexer.IDENT || token.getGeneralType() == LessLexer.AT_NAME || token.getGeneralType()==LessLexer.INDIRECT_VARIABLE || token.getGeneralType() == LessLexer.VARIABLE_REFERENCE) {
+      } else if (token.getGeneralType() == LessLexer.STRING || token.getGeneralType() == LessLexer.IDENT || token.getGeneralType() == LessLexer.AT_NAME || token.getGeneralType() == LessLexer.INDIRECT_VARIABLE || token.getGeneralType() == LessLexer.VARIABLE_REFERENCE) {
         result.add(new KeyframesName(token.commentsLessClone(), termBuilder.buildFromTerm(token)));
       } else {
         throw new BugHappened(GRAMMAR_MISMATCH, token);
@@ -1246,9 +1265,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
     PseudoClass asPseudoclass = (PseudoClass) extendAsPseudo;
     ASTCssNode parameter = asPseudoclass.getParameter();
-    if (parameter.getType()!=ASTCssNodeType.EXTEND && parameter.getType()!=ASTCssNodeType.MULTI_TARGET_EXTEND)
+    if (parameter.getType() != ASTCssNodeType.EXTEND && parameter.getType() != ASTCssNodeType.MULTI_TARGET_EXTEND)
       throw new BugHappened(GRAMMAR_MISMATCH, extendAsPseudo);
-    
+
     return parameter;
   }
 
@@ -1274,7 +1293,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
       default:
         throw new BugHappened(GRAMMAR_MISMATCH, next);
       }
-      
+
     }
     problemsHandler.warnUnknowAtRule(result);
     return result;
@@ -1289,7 +1308,7 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
         token.pushHiddenToSiblings();
       } else {
         result.add(handleExpression(token));
-      } 
+      }
     }
 
     return result;
