@@ -450,14 +450,17 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   public Guard handleGuard(HiddenTokenAwareTree token) {
     Iterator<HiddenTokenAwareTree> iterator = token.getChildren().iterator();
+    return createGuard(token, iterator);
+  }
 
+  private Guard createGuard(HiddenTokenAwareTree token, Iterator<HiddenTokenAwareTree> iterator) {
     Guard result = (Guard) switchOn(iterator.next());
     if (!iterator.hasNext())
       return result;
 
-    while (iterator.hasNext()) {
+    if (iterator.hasNext()) {
       GuardBinary.Operator operator = convertGuardAndOr(iterator.next());
-      Guard right = (Guard) switchOn(iterator.next());
+      Guard right = createGuard(token, iterator);
       result = new GuardBinary(token, result, operator, right);
     }
 
