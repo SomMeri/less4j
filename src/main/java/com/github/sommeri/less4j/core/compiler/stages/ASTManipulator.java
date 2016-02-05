@@ -14,8 +14,7 @@ import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Body;
 import com.github.sommeri.less4j.core.ast.Comment;
-import com.github.sommeri.less4j.core.ast.FixedNamePart;
-import com.github.sommeri.less4j.core.ast.InterpolableNamePart;
+import com.github.sommeri.less4j.core.ast.ASTCssNode.Visibility;
 import com.github.sommeri.less4j.core.ast.annotations.NotAstProperty;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 
@@ -32,18 +31,6 @@ public class ASTManipulator {
         return candidate;
     }
     return candidate;
-  }
-
-  public void replaceMemberAndSynchronizeSilentness(InterpolableNamePart oldMember, FixedNamePart newMember) {
-    if (oldMember.hasParent())
-      oldMember.getParent().replaceMember(oldMember, newMember);
-
-    setTreeSilentness(newMember, oldMember.isSilent());
-  }
-
-  public void replaceAndSynchronizeSilentness(ASTCssNode oldChild, ASTCssNode newChild) {
-    setTreeSilentness(newChild, oldChild.isSilent());
-    replace(oldChild, newChild);
   }
 
   public void replace(ASTCssNode oldChild, ASTCssNode newChild) {
@@ -105,6 +92,13 @@ public class ASTManipulator {
     Body pBody = (Body) parent;
     pBody.removeMember(node);
     node.setParent(null);
+  }
+
+  public void removeFromBody(Body body, List<ASTCssNode> nodes) {
+    body.removeMembers(nodes);
+    for (ASTCssNode node : nodes) {
+      node.setParent(null);
+    }
   }
 
   public void replaceInBody(ASTCssNode oldNode, ASTCssNode newNode) {
@@ -196,18 +190,6 @@ public class ASTManipulator {
     to.configureParentToAllChilds();
   }
 
-  public void setTreeSilentness(ASTCssNode node, boolean isSilent) {
-    doSetTreeSilentness(node, isSilent);
-  }
-
-  private void doSetTreeSilentness(ASTCssNode node, boolean isSilent) {
-    node.setSilent(isSilent);
-    for (ASTCssNode kid : node.getChilds()) {
-      // if (kid.getSource().equals(node.getSource()))
-      doSetTreeSilentness(kid, isSilent);
-    }
-  }
-
   public void addOpeningComments(ASTCssNode newOwner, List<Comment> comments) {
     newOwner.addOpeningComments(comments);
     for (Comment comment : comments) {
@@ -215,4 +197,18 @@ public class ASTManipulator {
     }
   }
 
+  /**
+   * Sets visibility to node and its children. Nodes with visibility block on them 
+   * are ignored.
+   * 
+   */
+  public void setTreeVisibility(ASTCssNode node, Visibility visibility) {
+    node.setVisibility(visibility);
+    for (ASTCssNode kid : node.getChilds()) {
+      if (!kid.hasVisibilityBlock() && visibility != kid.getVisibility()) {
+        setTreeVisibility(kid, visibility);
+      }
+    }
+  }
+  
 }

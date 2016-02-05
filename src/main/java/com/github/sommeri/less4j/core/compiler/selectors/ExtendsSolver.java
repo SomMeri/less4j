@@ -7,18 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNode.Visibility;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Extend;
-import com.github.sommeri.less4j.core.ast.GeneralBody;
-import com.github.sommeri.less4j.core.ast.Media;
-import com.github.sommeri.less4j.core.ast.MediaQuery;
 import com.github.sommeri.less4j.core.ast.MultiTargetExtend;
 import com.github.sommeri.less4j.core.ast.RuleSet;
 import com.github.sommeri.less4j.core.ast.Selector;
-import com.github.sommeri.less4j.core.ast.Supports;
-import com.github.sommeri.less4j.core.ast.SyntaxOnlyElement;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
 import com.github.sommeri.less4j.utils.ArraysUtils;
+import com.github.sommeri.less4j.utils.Couple;
 
 public class ExtendsSolver {
 
@@ -73,17 +70,29 @@ public class ExtendsSolver {
     RuleSet ruleSet;
     Selector targetSelector;
     Selector newSelector;
+    @Override
+    public String toString() {
+      String visibility = "[" + ruleSet.getVisibility() + ", " + targetSelector.getVisibility() + ", "+newSelector.getVisibility() + "]";
+      String string = "ExtendRefs "+visibility+"[\n  ruleSet=" + ruleSet + ",\n"
+          + "  targetSelector=" + targetSelector + ",\n"
+              + "  newSelector=" + newSelector + "\n]";
+      return string;
+    }
+    
+    
   }
 
   private void doTheExtend(Selector extendingSelector, Selector newSelector, RuleSet ruleSet, Selector targetSelector) {
     addSelector(ruleSet, newSelector);
 
-    performedExtends.register(extendingSelector, targetSelector);
+    performedExtends.register(extendingSelector, newSelector.getVisibility(), targetSelector);
 
-    Collection<Selector> thoseWhoExtendedExtending = performedExtends.getPreviousExtending(extendingSelector);
-    for (Selector extendedExtending : thoseWhoExtendedExtending) {
-      if (canExtend(extendedExtending, ruleSet)) {
-        doTheExtend(extendedExtending, extendedExtending.clone(), ruleSet, targetSelector);
+    Collection<Couple<Selector, Visibility>> thoseWhoExtendedExtending = performedExtends.getPreviousExtending(extendingSelector);
+    for (Couple<Selector, Visibility> extendedExtending : thoseWhoExtendedExtending) {
+      if (canExtend(extendedExtending.getT(), ruleSet)) {
+        Selector nextSelector = extendedExtending.getT().clone();
+        manipulator.setTreeVisibility(nextSelector, extendedExtending.getM());
+        doTheExtend(extendedExtending.getT(), nextSelector, ruleSet, targetSelector);
       }
     }
   }
@@ -93,8 +102,9 @@ public class ExtendsSolver {
   }
 
   private boolean canExtend(Selector extendingSelector, Selector newSelector, RuleSet targetRuleSet) {
-    if (containsSelector(newSelector, targetRuleSet))
+    if (containsSelector(newSelector, targetRuleSet)) {
       return false;
+    }
 
     // selectors are able to extend only rulesets inside the same @media body.
     return compatibleMediaLocation(extendingSelector, targetRuleSet);
@@ -105,7 +115,8 @@ public class ExtendsSolver {
     if (grandParent == null || grandParent.getType() == ASTCssNodeType.STYLE_SHEET)
       return true;
 
-    return grandParent == findOwnerNode(targetRuleSet);
+    boolean result = grandParent == findOwnerNode(targetRuleSet);
+    return result;
   }
 
   private boolean containsSelector(Selector extendingSelector, RuleSet targetRuleSet) {
@@ -124,56 +135,27 @@ public class ExtendsSolver {
   private void addSelector(RuleSet ruleSet, Selector selector) {
     selector.setParent(ruleSet);
     ruleSet.addSelector(selector);
-    setVisibility(ruleSet, selector);
-  }
 
-  private void setVisibility(RuleSet ruleSet, Selector newSelector) {
-    if (newSelector.isSilent() || !ruleSet.isSilent())
-      return;
-    ruleSet.setSilent(false);
-    ASTCssNode node = ruleSet;
-    while (node.hasParent()) {
-      node = node.getParent();
-      setNecessaryParentVisibility(node, false);
-    }
+    if (selector.getVisibility() == Visibility.VISIBLE) {
+      //visibility of children
+      manipulator.setTreeVisibility(ruleSet.getBody(), Visibility.VISIBLE);
+      ruleSet.setVisibility(Visibility.VISIBLE);
 
-    List<? extends ASTCssNode> childs = ruleSet.getChilds();
-    childs.removeAll(ruleSet.getSelectors());
-    for (ASTCssNode kid : childs) {
-      manipulator.setTreeSilentness(kid, false);
-    }
-  }
-
-  private void setNecessaryParentVisibility(ASTCssNode node, boolean isSilent) {
-    // TODO:this could have nicer more general solution
-    switch (node.getType()) {
-    case GENERAL_BODY:
-      node.setSilent(isSilent);
-      GeneralBody body = (GeneralBody) node;
-      safeSetSilent(body.getOpeningCurlyBrace(), isSilent);
-      safeSetSilent(body.getClosingCurlyBrace(), isSilent);
-      break;
-    case MEDIA:
-      node.setSilent(isSilent);
-      Media media = (Media) node;
-      for (MediaQuery medium : media.getMediums()) {
-        manipulator.setTreeSilentness(medium, isSilent);
+      //visibility of parents
+      ASTCssNode node = ruleSet;
+      while (node.hasParent()) {
+        node = node.getParent();
+        switch (node.getVisibility()) {
+        case DEFAULT:
+          node.setVisibility(Visibility.VISIBLE);
+          break;
+        case VISIBLE:
+          break;
+        }
       }
-      break;
-    case SUPPORTS:
-      node.setSilent(isSilent);
-      Supports supports = (Supports) node;
-      manipulator.setTreeSilentness(supports.getCondition(), isSilent);
-      break;
-    default:
-      break;
+      
     }
-  }
 
-  private void safeSetSilent(SyntaxOnlyElement node, boolean isSilent) {
-    if (node != null) {
-      node.setSilent(isSilent);
-    }
   }
 
   private Selector constructNewSelector(Selector extending, Selector possibleTarget) {
@@ -195,7 +177,8 @@ public class ExtendsSolver {
   }
 
   private Selector setNewSelectorVisibility(Extend extend, Selector newSelector) {
-    manipulator.setTreeSilentness(newSelector, extend.isSilent());
+    manipulator.setTreeVisibility(newSelector, extend.getVisibility());
+
     return newSelector;
   }
 
@@ -255,21 +238,22 @@ public class ExtendsSolver {
 
 class PerformedExtendsDB {
 
-  private Map<Selector, List<Selector>> allSelectorExtends = new HashMap<Selector, List<Selector>>();
+  private Map<Selector, List<Couple<Selector, Visibility>>> allSelectorExtends = new HashMap<Selector, List<Couple<Selector, Visibility>>>();
 
-  protected List<Selector> getPreviousExtending(Selector selector) {
-    List<Selector> result = allSelectorExtends.get(selector);
+  protected List<Couple<Selector, Visibility>> getPreviousExtending(Selector selector) {
+    List<Couple<Selector, Visibility>> result = allSelectorExtends.get(selector);
     if (result == null) {
-      result = new ArrayList<Selector>();
+      result = new ArrayList<Couple<Selector, Visibility>>();
       allSelectorExtends.put(selector, result);
     }
 
     return result;
   }
 
-  protected void register(Selector extendingSelector, Selector targetSelector) {
-    List<Selector> tied = getPreviousExtending(targetSelector);
-    tied.add(extendingSelector);
+  protected void register(Selector extendingSelector, Visibility extendingSelectorVisibility, Selector targetSelector) {
+    List<Couple<Selector, Visibility>> tied = getPreviousExtending(targetSelector);
+    tied.add(new Couple<Selector, Visibility>(extendingSelector, extendingSelectorVisibility));
   }
 
 }
+

@@ -10,8 +10,7 @@ import com.github.sommeri.less4j.core.ast.RuleSet;
 
 public abstract class TreeDeclarationsVisitor {
 
-  //FIXME !!!!!!!!!!!!! rename to apply
-  public void applyToProperties(ASTCssNode node) {
+  public void apply(ASTCssNode node) {
     switch (node.getType()) {
     case RULE_SET:
       RuleSet ruleset = (RuleSet) node;
@@ -31,7 +30,7 @@ public abstract class TreeDeclarationsVisitor {
   private void applyToKidsProperties(ASTCssNode node) {
     List<ASTCssNode> childs = new ArrayList<ASTCssNode>(node.getChilds());
     for (ASTCssNode kid : childs) {
-      applyToProperties(kid);
+      apply(kid);
     }
   }
   

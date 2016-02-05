@@ -155,7 +155,7 @@ public class MixinReferenceFinder {
         MixinsGuardsValidator guardsValidator = new MixinsGuardsValidator(scope, problemsHandler, configuration);
         GuardValue guardValue = guardsValidator.evaluateGuards(namespace);
         
-        if (guardValue!=GuardValue.DO_NOT_USE) { //FIXME: maybe, maybe not, I am not sure now
+        if (guardValue!=GuardValue.DO_NOT_USE) {
           List<FoundMixin> found = findInMatchingNamespace(scope, nameChain, reference);
           for (FoundMixin foundMixin : found) {
             foundMixin.prefixGuardValue(guardValue);

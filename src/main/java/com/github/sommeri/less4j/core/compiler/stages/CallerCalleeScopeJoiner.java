@@ -43,7 +43,7 @@ public class CallerCalleeScopeJoiner {
   public List<FullMixinDefinition> mixinsToImport(IScope callerScope, IScope calleeScope, List<FullMixinDefinition> unmodifiedMixinsToImport) {
     List<FullMixinDefinition> result = new ArrayList<FullMixinDefinition>();
     for (FullMixinDefinition mixinToImport : unmodifiedMixinsToImport) {
-      boolean isLocalImport = isLocallyDefined(calleeScope, mixinToImport.getScope());//why caller and not callee??? FIXME !!!!!!!!!!!!
+      boolean isLocalImport = isLocallyDefined(calleeScope, mixinToImport.getScope());//why caller and not callee???
       ScopeView newScope = null;
       if (isLocalImport) {
         // we need to copy the whole tree, because this runs inside referenced mixin scope 

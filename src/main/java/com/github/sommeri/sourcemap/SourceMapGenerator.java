@@ -75,7 +75,7 @@ public interface SourceMapGenerator {
            FilePosition outputStartPosition, FilePosition outputEndPosition);
   
   /**
-   * TODO: add file 
+   * Add source file to be shown in the map. 
    * 
    * @param sourceName
    * @param sourceContent

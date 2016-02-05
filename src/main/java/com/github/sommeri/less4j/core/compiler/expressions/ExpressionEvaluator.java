@@ -51,7 +51,7 @@ public class ExpressionEvaluator {
 
   private VariableCycleDetector cycleDetector = new VariableCycleDetector();
   private final IScope lazyScope;
-  // private final Stack<IScope> eagerScopes = new Stack<IScope>();
+
   private final ProblemsHandler problemsHandler;
 
   private ArithmeticCalculator arithmeticCalculator;
@@ -438,13 +438,7 @@ public class ExpressionEvaluator {
     if (owningScope == null)
       throw new BugHappened("Detached ruleset with unknown scope.", input);
 
-    // FIXME: !!!!!! this is pointless remove
-    clone.setScope(composedScope(owningScope));
     return clone;
-  }
-
-  private IScope composedScope(IScope owningScope) {
-    return owningScope;
   }
 
   private Expression handleUndefinedVariable(Variable variable, boolean failOnUndefined) {

@@ -345,11 +345,11 @@ public abstract class LessSource {
       if (getClass() != obj.getClass())
         return false;
       FileSource other = (FileSource) obj;
-      String absoluteInputFile = getCanonicalPath(); //FIXME
+      String absoluteInputFile = getCanonicalPath();
       if (absoluteInputFile == null) {
         if (other.getInputFile() != null)
           return false;
-      } else if (!absoluteInputFile.equals(other.getCanonicalPath())) //FIXME 
+      } else if (!absoluteInputFile.equals(other.getCanonicalPath())) 
         return false;
       if (charsetName == null) {
         if (other.charsetName != null)

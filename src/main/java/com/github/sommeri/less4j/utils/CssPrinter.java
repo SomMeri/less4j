@@ -131,7 +131,7 @@ public class CssPrinter {
   public boolean append(ASTCssNode node) {
     // opening comments should not be docked directly in front of following
     // thing
-    if (node == null || node.isSilent())
+    if (node == null)
       return false;
 
     appendComments(node.getOpeningComments(), true);
@@ -952,8 +952,7 @@ public class CssPrinter {
   private <T extends ASTCssNode> List<T> filterSilent(List<T> nodes) {
     List<T> result = new ArrayList<T>();
     for (T t : nodes) {
-      if (!t.isSilent())
-        result.add(t);
+      result.add(t);
     }
     return result;
   }

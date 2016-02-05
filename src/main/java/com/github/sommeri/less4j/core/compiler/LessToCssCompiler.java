@@ -9,6 +9,7 @@ import java.util.Set;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.ast.ASTCssNode;
+import com.github.sommeri.less4j.core.ast.ASTCssNode.Visibility;
 import com.github.sommeri.less4j.core.ast.ASTCssNodeType;
 import com.github.sommeri.less4j.core.ast.Declaration;
 import com.github.sommeri.less4j.core.ast.Expression;
@@ -20,9 +21,10 @@ import com.github.sommeri.less4j.core.compiler.scopes.IScope;
 import com.github.sommeri.less4j.core.compiler.selectors.ExtendsSolver;
 import com.github.sommeri.less4j.core.compiler.selectors.UselessLessElementsRemover;
 import com.github.sommeri.less4j.core.compiler.stages.ASTManipulator;
-import com.github.sommeri.less4j.core.compiler.stages.EmptyBodiesRemover;
-import com.github.sommeri.less4j.core.compiler.stages.ImportsAndScopeSolver;
 import com.github.sommeri.less4j.core.compiler.stages.DirectiveBubblerAndMerger;
+import com.github.sommeri.less4j.core.compiler.stages.EmptyBodiesRemover;
+import com.github.sommeri.less4j.core.compiler.stages.FinalVisibilitySolver;
+import com.github.sommeri.less4j.core.compiler.stages.ImportsAndScopeSolver;
 import com.github.sommeri.less4j.core.compiler.stages.PropertiesMerger;
 import com.github.sommeri.less4j.core.compiler.stages.ReferencesSolver;
 import com.github.sommeri.less4j.core.compiler.stages.UnNestingAndBubbling;
@@ -47,8 +49,11 @@ public class LessToCssCompiler {
     this.importedSources = resolveImportsAndReferences(less, source);
     
     evaluateExpressions(less);
+    
+    markAllVisibleNodes(less);
     freeNestedRulesetsAndMedia(less);
     solveExtends(less);
+    removeInvisibleNodes(less);
 
     finalMediaMergingAndBubbling(less);
     // TODO the following line is probably useless now, investigate (removal is now part of freeNestedRulesetsAndMedia step)
@@ -74,10 +79,10 @@ public class LessToCssCompiler {
 
   private void finishDeclarations(StyleSheet less) {
     PropertiesMerger propertiesMerger = new PropertiesMerger();
-    propertiesMerger.applyToProperties(less);
+    propertiesMerger.apply(less);
     
     UselessImportantRemover remover = new UselessImportantRemover();
-    remover.applyToProperties(less);
+    remover.apply(less);
   }
 
   private void solveExtends(StyleSheet less) {
@@ -85,11 +90,17 @@ public class LessToCssCompiler {
     extendsSolver.solveExtends(less);
   }
 
+  private void markAllVisibleNodes(StyleSheet less) {
+    ASTManipulator manipulator = new ASTManipulator();
+    manipulator.setTreeVisibility(less, Visibility.VISIBLE);
+  }
+
   private void freeNestedRulesetsAndMedia(StyleSheet less) {
     UnNestingAndBubbling nestingBubbling = new UnNestingAndBubbling();
     nestingBubbling.unnestRulesetsAndDirectives(less);
   }
 
+  //FIXME: meri: test for equivalent of #2162 -  but with detached rulesetss
   private Set<LessSource> resolveImportsAndReferences(StyleSheet less, LessSource source) {
     ImportsAndScopeSolver solver = new ImportsAndScopeSolver(problemsHandler, configuration);
     IScope scope = solver.buildImportsAndScope(less, source);
@@ -138,6 +149,11 @@ public class LessToCssCompiler {
   private void finalMediaMergingAndBubbling(StyleSheet less) {
     DirectiveBubblerAndMerger bubblerAndMerger = new DirectiveBubblerAndMerger(problemsHandler);
     bubblerAndMerger.bubbleAndMergeMedia(less);
+  }
+  
+  private void removeInvisibleNodes(StyleSheet less) {
+    FinalVisibilitySolver remover = new FinalVisibilitySolver();
+    remover.resolveVisibility(less);
   }
 
   private void sortTopLevelElements(StyleSheet less) {

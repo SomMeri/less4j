@@ -34,7 +34,6 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.utils.LessPrinter;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
-//TODO: this could benefit from some kind of dependency injection framework.
 public class ProblemsHandler implements LessProblems {
 
   private ProblemsCollector collector = new ProblemsCollector();

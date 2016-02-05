@@ -11,9 +11,12 @@ import com.github.sommeri.less4j.utils.PubliclyCloneable;
 public abstract class ASTCssNode implements PubliclyCloneable {
 
   private ASTCssNode parent;
-  private boolean isSilent = false;
-  //I'm using underlying structure as identified in cycle detector. If it stops to be identifying,
-  //cycle detector must be modified. !
+  private Visibility visibility = Visibility.DEFAULT;
+  private int visibilityBlocks = 0;
+
+  // I'm using underlying structure as identified in cycle detector. If it stops
+  // to be identifying,
+  // cycle detector must be modified. !
   private HiddenTokenAwareTree underlyingStructure;
   private List<Comment> openingComments = new ArrayList<Comment>();
   private List<Comment> orphanComments = new ArrayList<Comment>();
@@ -25,12 +28,33 @@ public abstract class ASTCssNode implements PubliclyCloneable {
       throw new IllegalArgumentException("Underlying can not be null. It is used for error reporting, so place there the closest token possible.");
   }
 
-  public boolean isSilent() {
-    return isSilent;
+
+  @NotAstProperty
+  public Visibility getVisibility() {
+    return visibility;
   }
 
-  public void setSilent(boolean isSilent) {
-    this.isSilent = isSilent;
+  @NotAstProperty
+  public void setVisibility(Visibility isVisible) {
+    this.visibility = isVisible;
+  }
+
+  @NotAstProperty
+  public int getVisibilityBlocks() {
+    return visibilityBlocks;
+  }
+
+  public boolean hasVisibilityBlock() {
+    return visibilityBlocks != 0;
+  }
+
+  @NotAstProperty
+  public void setVisibilityBlocks(int visibilityBlocks) {
+    this.visibilityBlocks = visibilityBlocks;
+  }
+
+  public void addVisibilityBlocks(int blocks) {
+    this.visibilityBlocks += blocks;
   }
 
   /**
@@ -49,7 +73,7 @@ public abstract class ASTCssNode implements PubliclyCloneable {
   }
 
   public boolean hasParent() {
-    return getParent()!=null;
+    return getParent() != null;
   }
 
   /**
@@ -152,8 +176,13 @@ public abstract class ASTCssNode implements PubliclyCloneable {
     builder.append(this.getClass().getSimpleName()).append(" (");
     builder.append(getSourceLine()).append(":").append(getSourceColumn());
     builder.append(")");
-
+    
     return builder.toString();
+  }
+  
+  public enum Visibility {
+    DEFAULT, 
+    VISIBLE
   }
 
 }

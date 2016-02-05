@@ -631,7 +631,6 @@ class SvgGradient extends CatchAllMultiParameterFunction {
 
   @Override
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
-    // TODO Auto-generated method stub
     return true;
   }
 

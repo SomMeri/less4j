@@ -134,6 +134,10 @@ public abstract class Body extends ASTCssNode {
     return body.remove(node);
   }
 
+  public boolean removeMembers(List<ASTCssNode> nodes) {
+    return body.removeAll(nodes);
+  }
+
   public Body clone() {
     Body result = (Body) super.clone();
     result.body = ArraysUtils.deeplyClonedList(body);

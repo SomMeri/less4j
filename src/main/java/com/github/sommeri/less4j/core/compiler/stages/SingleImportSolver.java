@@ -110,8 +110,11 @@ public class SingleImportSolver {
 
     StyleSheet importedAst = buildImportedAst(node, importedSource, importedContent);
 
-    if (node.isReferenceOnly() || node.isSilent()) {
-      astManipulator.setTreeSilentness(importedAst, true);
+    if (node.isReferenceOnly() || node.hasVisibilityBlock()) {
+      int childVisibilityBlocks = node.getVisibilityBlocks() + (node.isReferenceOnly()? 1 : 0);
+      for (ASTCssNode child : importedAst.getChilds()) {
+        child.setVisibilityBlocks(childVisibilityBlocks);
+      }
     }
     astManipulator.replaceInBody(node, importedAst.getChilds());
     return importedAst;

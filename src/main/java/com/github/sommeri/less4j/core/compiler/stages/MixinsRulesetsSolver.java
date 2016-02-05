@@ -54,7 +54,7 @@ class MixinsRulesetsSolver {
     this.defaultGuardHelper = new DefaultGuardHelper(problemsHandler);
   }
 
-  private Couple<List<ASTCssNode>, IScope> resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope referencedMixinScope, final ReturnMode returnMode) {
+  private Couple<List<ASTCssNode>, IScope> resolveCalledBody(final IScope callerScope, final BodyOwner<?> bodyOwner, final IScope referencedMixinScope, final ReturnMode returnMode, final int visibilityBlocks) {
 
     // ... and I'm starting to see the point of closures ...
     return InScopeSnapshotRunner.runInLocalDataSnapshot(referencedMixinScope, new IFunction<Couple<List<ASTCssNode>, IScope>>() {
@@ -63,6 +63,9 @@ class MixinsRulesetsSolver {
       public Couple<List<ASTCssNode>, IScope> run() {
         // compile referenced mixin - keep the original copy unchanged
         List<ASTCssNode> replacement = compileBody(bodyOwner.getBody(), referencedMixinScope);
+        for (ASTCssNode node : replacement) {
+          node.addVisibilityBlocks(visibilityBlocks);
+        }
 
         // collect variables and mixins to be imported
         IScope returnValues = ScopeFactory.createDummyScope();
@@ -116,7 +119,7 @@ class MixinsRulesetsSolver {
 
     // candidate mixins with information about their default() function use are
     // stored here
-    final List<BodyCompilationData> compiledMixins = new ArrayList<BodyCompilationData>();
+    final List<BodyCompilationData> readyMixins = new ArrayList<BodyCompilationData>();
 
     for (final FoundMixin fullMixin : mixins) {
       final ReusableStructure mixin = fullMixin.getMixin();
@@ -145,13 +148,13 @@ class MixinsRulesetsSolver {
           GuardValue guardValue = guardsValidator.evaluateGuards(fullMixin.getGuardsOnPath(), mixin);
           data.setGuardValue(guardValue);
 
-          compiledMixins.add(data);
+          readyMixins.add(data);
         }
       }); // end of InScopeSnapshotRunner.runInLocalDataSnapshot
     }
 
     // filter out mixins we do not want to use
-    List<BodyCompilationData> mixinsToBeUsed = defaultGuardHelper.chooseMixinsToBeUsed(compiledMixins, reference);
+    List<BodyCompilationData> mixinsToBeUsed = defaultGuardHelper.chooseMixinsToBeUsed(readyMixins, reference);
 
     for (final BodyCompilationData data : mixinsToBeUsed) {
       final ScopeView mixinWorkingScope = data.getMixinWorkingScope();
@@ -175,7 +178,7 @@ class MixinsRulesetsSolver {
           IScope arguments = data.getArguments();
           mixinWorkingScope.getParent().add(arguments);
 
-          Couple<List<ASTCssNode>, IScope> compiled = resolveCalledBody(callerScope, mixin, mixinWorkingScope, ReturnMode.MIXINS_AND_VARIABLES);
+          Couple<List<ASTCssNode>, IScope> compiled = resolveCalledBody(callerScope, mixin, mixinWorkingScope, ReturnMode.MIXINS_AND_VARIABLES, reference.getVisibilityBlocks());
           // update mixin replacements and update scope with imported variables
           // and mixins
           result.addMembers(compiled.getT());
@@ -194,7 +197,7 @@ class MixinsRulesetsSolver {
 
   public GeneralBody buildDetachedRulesetReplacement(DetachedRulesetReference reference, IScope callerScope, DetachedRuleset detachedRuleset, IScope detachedRulesetScope) {
     IScope mixinWorkingScope = scopeManipulation.joinIfIndependent(callerScope, detachedRulesetScope);
-    Couple<List<ASTCssNode>, IScope> compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope, ReturnMode.MIXINS);
+    Couple<List<ASTCssNode>, IScope> compiled = resolveCalledBody(callerScope, detachedRuleset, mixinWorkingScope, ReturnMode.MIXINS, reference.getVisibilityBlocks());
     GeneralBody result = new GeneralBody(reference.getUnderlyingStructure());
 
     result.addMembers(compiled.getT());

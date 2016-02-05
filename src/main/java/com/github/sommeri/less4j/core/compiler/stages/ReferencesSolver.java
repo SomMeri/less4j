@@ -160,7 +160,6 @@ public class ReferencesSolver {
       ASTCssNode mixinReference = entry.getKey();
       GeneralBody replacement = entry.getValue();
 
-      manipulator.setTreeSilentness(replacement, mixinReference.isSilent());
       manipulator.replaceInBody(mixinReference, replacement.getMembers());
     }
   }
@@ -260,44 +259,44 @@ public class ReferencesSolver {
     case VARIABLE: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((Variable) node);
-      manipulator.replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replace(node, replacement);
       return true;
     }
     case INDIRECT_VARIABLE: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((IndirectVariable) node);
-      manipulator.replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replace(node, replacement);
       return true;
     }
     case STRING_EXPRESSION: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((CssString) node);
-      manipulator.replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replace(node, replacement);
       return true;
     }
     case ESCAPED_VALUE: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((EscapedValue) node);
-      manipulator.replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replace(node, replacement);
       return true;
     }
     case EMBEDDED_SCRIPT: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       Expression replacement = expressionEvaluator.evaluate((EmbeddedScript) node);
-      manipulator.replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replace(node, replacement);
       return true;
     }
     case ESCAPED_SELECTOR: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       SimpleSelector replacement = interpolateEscapedSelector((EscapedSelector) node, expressionEvaluator);
-      manipulator.replaceAndSynchronizeSilentness(node, replacement);
+      manipulator.replace(node, replacement);
       return true;
     }
     case FIXED_NAME_PART: {
       expressionEvaluator = new ExpressionEvaluator(scope, problemsHandler, configuration);
       FixedNamePart part = (FixedNamePart) node;
       FixedNamePart replacement = interpolateFixedNamePart(part, expressionEvaluator);
-      manipulator.replaceMemberAndSynchronizeSilentness(part, replacement);
+      manipulator.replace(part, replacement);
       return true;
     }
     case VARIABLE_NAME_PART: {
@@ -306,7 +305,7 @@ public class ReferencesSolver {
       Expression value = expressionEvaluator.evaluate(part.getVariable());
       FixedNamePart fixedName = toFixedName(value, node.getUnderlyingStructure(), part);
       FixedNamePart replacement = interpolateFixedNamePart(fixedName, expressionEvaluator);
-      manipulator.replaceMemberAndSynchronizeSilentness(part, replacement);
+      manipulator.replace(part, replacement);
       return true;
     }
     default: // nothing

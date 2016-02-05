@@ -255,11 +255,9 @@ class HiddenTokenAwareTreeAdaptor extends CommonTreeAdaptor {
     ((Tree)t).setTokenStartIndex(start);
     ((Tree)t).setTokenStopIndex(stop);
     
-    //FIXME: !!!!!!!!!!!! maybe remove, only for debug purposes
     if (t instanceof HiddenTokenAwareTree) {
       HiddenTokenAwareTree token = (HiddenTokenAwareTree) t;
       token.setStopToken(stopToken);
-      
     }
   }
   

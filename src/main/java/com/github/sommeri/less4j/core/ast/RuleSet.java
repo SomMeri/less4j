@@ -30,6 +30,10 @@ public class RuleSet extends ASTCssNode implements BodyOwner<GeneralBody> {
    return selectors;
   }
   
+  public void setSelectors(List<Selector> selectors) {
+    this.selectors = selectors;
+  }
+
   public GeneralBody getBody() {
     return body;
   }

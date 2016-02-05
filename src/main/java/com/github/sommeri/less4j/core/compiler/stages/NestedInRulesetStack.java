@@ -45,6 +45,7 @@ public class NestedInRulesetStack {
   private void combine(RuleSet ruleSet, List<Selector> previousSelectors) {
     List<Selector> result = new ArrayList<Selector>();
     for (Selector selector : ruleSet.getSelectors()) {
+      //FIXME: meri: review whether they have all the right visibility in the end
       result.addAll(selectorsManipulator.replaceAppenders(selector, previousSelectors));
     }
 
