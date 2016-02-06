@@ -1,8 +1,10 @@
 package com.github.sommeri.less4j.core.compiler.stages;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.github.sommeri.less4j.LessCompiler.Cache;
@@ -54,10 +56,10 @@ public class SingleImportSolver {
     }
   }
 
-  public ASTCssNode importEncountered(Import node, LessSource source, AlreadyImportedSources alreadyImportedSources) {
-    String filename = conversionUtils.extractFilename(node.getUrlExpression(), problemsHandler, configuration);
+  public ASTCssNode importEncountered(Import importNode, LessSource source, AlreadyImportedSources alreadyImportedSources) {
+    String filename = conversionUtils.extractFilename(importNode.getUrlExpression(), problemsHandler, configuration);
     if (filename == null) {
-      problemsHandler.errorWrongImport(node.getUrlExpression());
+      problemsHandler.errorWrongImport(importNode.getUrlExpression());
       return null;
     }
     String urlParams = "";
@@ -69,7 +71,7 @@ public class SingleImportSolver {
 
     // css file imports should be left as they are
     // FIXME ! they should be relativized
-    if (!node.isInline() && treatAsCss(node, filename))
+    if (!importNode.isInline() && treatAsCss(importNode, filename))
       return null;
 
     filename = addLessSuffixIfNeeded(filename, urlParams);
@@ -77,19 +79,19 @@ public class SingleImportSolver {
     try {
       importedSource = source.relativeSource(filename);
     } catch (FileNotFound ex) {
-      return importFileNotFound(node, filename);
+      return importFileNotFound(importNode, filename);
     } catch (CannotReadFile e) {
-      problemsHandler.errorFileCanNotBeRead(node, filename);
+      problemsHandler.errorFileCanNotBeRead(importNode, filename);
       return null;
     } catch (StringSourceException ex) {
       // imports are relative to current file and we do not know its location
-      problemsHandler.warnLessImportNoBaseDirectory(node.getUrlExpression());
+      problemsHandler.warnLessImportNoBaseDirectory(importNode.getUrlExpression());
       return null;
     }
 
     // import once should not import a file that was already imported
-    if (node.isImportOnce() && alreadyImportedSources.alreadyVisited(importedSource)) {
-      astManipulator.removeFromBody(node);
+    if (importNode.isImportOnce() && alreadyImportedSources.alreadyVisited(importedSource)) {
+      astManipulator.removeFromBody(importNode);
       return null;
     }
 
@@ -98,26 +100,33 @@ public class SingleImportSolver {
       importedContent = importedSource.getContent();
       alreadyImportedSources.add(importedSource);
     } catch (FileNotFound e) {
-      return importFileNotFound(node, filename);
+      return importFileNotFound(importNode, filename);
     } catch (CannotReadFile e) {
-      problemsHandler.errorFileCanNotBeRead(node, filename);
+      problemsHandler.errorFileCanNotBeRead(importNode, filename);
       return null;
     }
 
-    if (node.isInline()) {
-      return replaceByInlineValue(node, importedContent);
+    if (importNode.isInline()) {
+      ASTCssNode importedNode = replaceByInlineValue(importNode, importedContent);
+      configureVisibilityBlocks(importNode, Arrays.asList(importedNode));
+      return importedNode;
     }
 
-    StyleSheet importedAst = buildImportedAst(node, importedSource, importedContent);
+    StyleSheet importedAst = buildImportedAst(importNode, importedSource, importedContent);
 
-    if (node.isReferenceOnly() || node.hasVisibilityBlock()) {
-      int childVisibilityBlocks = node.getVisibilityBlocks() + (node.isReferenceOnly()? 1 : 0);
-      for (ASTCssNode child : importedAst.getChilds()) {
+    List<ASTCssNode> importedNodes = importedAst.getChilds();
+    configureVisibilityBlocks(importNode, importedAst.getChilds());
+    astManipulator.replaceInBody(importNode, importedNodes);
+    return importedAst;
+  }
+
+  private void configureVisibilityBlocks(Import importNode, List<ASTCssNode> nodes) {
+    if (importNode.isReferenceOnly() || importNode.hasVisibilityBlock()) {
+      int childVisibilityBlocks = importNode.getVisibilityBlocks() + (importNode.isReferenceOnly()? 1 : 0);
+      for (ASTCssNode child : nodes) {
         child.setVisibilityBlocks(childVisibilityBlocks);
       }
     }
-    astManipulator.replaceInBody(node, importedAst.getChilds());
-    return importedAst;
   }
 
   private ASTCssNode replaceByInlineValue(Import node, String importedContent) {

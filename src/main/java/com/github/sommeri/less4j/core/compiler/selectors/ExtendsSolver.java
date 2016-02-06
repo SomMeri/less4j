@@ -60,39 +60,28 @@ public class ExtendsSolver {
     }
   }
 
-  private static class ExtendRefs {
-    ExtendRefs(RuleSet ruleSet, Selector targetSelector, Selector newSelector) {
-      this.ruleSet = ruleSet;
-      this.targetSelector = targetSelector;
-      this.newSelector = newSelector;
-    }
+   private void doTheExtend(Selector originalExtendingSelector, Selector addSelector, RuleSet target, Selector targetSelector) {
+    addSelector(target, addSelector);
 
-    RuleSet ruleSet;
-    Selector targetSelector;
-    Selector newSelector;
-    @Override
-    public String toString() {
-      String visibility = "[" + ruleSet.getVisibility() + ", " + targetSelector.getVisibility() + ", "+newSelector.getVisibility() + "]";
-      String string = "ExtendRefs "+visibility+"[\n  ruleSet=" + ruleSet + ",\n"
-          + "  targetSelector=" + targetSelector + ",\n"
-              + "  newSelector=" + newSelector + "\n]";
-      return string;
-    }
-    
-    
-  }
+    performedExtends.register(targetSelector, originalExtendingSelector, addSelector.getVisibility());
 
-  private void doTheExtend(Selector extendingSelector, Selector newSelector, RuleSet ruleSet, Selector targetSelector) {
-    addSelector(ruleSet, newSelector);
-
-    performedExtends.register(extendingSelector, newSelector.getVisibility(), targetSelector);
-
-    Collection<Couple<Selector, Visibility>> thoseWhoExtendedExtending = performedExtends.getPreviousExtending(extendingSelector);
-    for (Couple<Selector, Visibility> extendedExtending : thoseWhoExtendedExtending) {
-      if (canExtend(extendedExtending.getT(), ruleSet)) {
-        Selector nextSelector = extendedExtending.getT().clone();
-        manipulator.setTreeVisibility(nextSelector, extendedExtending.getM());
-        doTheExtend(extendedExtending.getT(), nextSelector, ruleSet, targetSelector);
+    // Following solves this situation: 
+    // ** extendingSelector: b
+    // ** targetSelector: a
+    //
+    // a {}
+    // c:extends(b) {}
+    // b:extends(a) {}
+    //
+    // Since c extended b before, c needs to extend also a {}.
+    //
+    Collection<PerformedExtend> mayNeedToExtendTargetToo = performedExtends.getThoseWhoExtended(originalExtendingSelector);
+    for (PerformedExtend info : mayNeedToExtendTargetToo) {
+      Selector selector = info.getSelector();
+      if (canExtend(selector, target)) {
+        Selector nextSelector = selector.clone();
+        manipulator.setTreeVisibility(nextSelector, info.getVisibility());
+        doTheExtend(selector, nextSelector, target, targetSelector);
       }
     }
   }
@@ -234,26 +223,63 @@ public class ExtendsSolver {
     return result;
   }
 
-}
-
-class PerformedExtendsDB {
-
-  private Map<Selector, List<Couple<Selector, Visibility>>> allSelectorExtends = new HashMap<Selector, List<Couple<Selector, Visibility>>>();
-
-  protected List<Couple<Selector, Visibility>> getPreviousExtending(Selector selector) {
-    List<Couple<Selector, Visibility>> result = allSelectorExtends.get(selector);
-    if (result == null) {
-      result = new ArrayList<Couple<Selector, Visibility>>();
-      allSelectorExtends.put(selector, result);
+  private static class ExtendRefs {
+    ExtendRefs(RuleSet ruleSet, Selector targetSelector, Selector newSelector) {
+      this.ruleSet = ruleSet;
+      this.targetSelector = targetSelector;
+      this.newSelector = newSelector;
     }
 
-    return result;
+    RuleSet ruleSet;
+    Selector targetSelector;
+    Selector newSelector;
+    
+    @Override
+    public String toString() {
+      String visibility = "[" + ruleSet.getVisibility() + ", " + targetSelector.getVisibility() + ", "+newSelector.getVisibility() + "]";
+      String string = "ExtendRefs "+visibility+"[\n  ruleSet=" + ruleSet + ",\n"
+          + "  targetSelector=" + targetSelector + ",\n"
+              + "  newSelector=" + newSelector + "\n]";
+      return string;
+    }
+    
   }
 
-  protected void register(Selector extendingSelector, Visibility extendingSelectorVisibility, Selector targetSelector) {
-    List<Couple<Selector, Visibility>> tied = getPreviousExtending(targetSelector);
-    tied.add(new Couple<Selector, Visibility>(extendingSelector, extendingSelectorVisibility));
+  private static class PerformedExtendsDB {
+
+    private Map<Selector, List<PerformedExtend>> allSelectorExtends = new HashMap<Selector, List<PerformedExtend>>();
+
+    protected List<PerformedExtend> getThoseWhoExtended(Selector selector) {
+      List<PerformedExtend> result = allSelectorExtends.get(selector);
+      if (result == null) {
+        result = new ArrayList<PerformedExtend>();
+        allSelectorExtends.put(selector, result);
+      }
+
+      return result;
+    }
+
+    protected void register(Selector targetSelector, Selector extendingSelector, Visibility extendingSelectorVisibility) {
+      List<PerformedExtend> tied = getThoseWhoExtended(targetSelector);
+      tied.add(new PerformedExtend(extendingSelector, extendingSelectorVisibility));
+    }
+
   }
 
+  private static class PerformedExtend extends Couple<Selector, Visibility> {
+
+    public PerformedExtend(Selector extendingSelector, Visibility extendingSelectorVisibility) {
+      super(extendingSelector, extendingSelectorVisibility);
+    }
+    
+    public Selector getSelector() {
+      return getT();
+    }
+    public Visibility getVisibility() {
+      return getM();
+    }
+  }
+  
 }
+
 

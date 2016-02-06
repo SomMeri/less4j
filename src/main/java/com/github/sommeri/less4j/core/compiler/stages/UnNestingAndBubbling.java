@@ -25,12 +25,6 @@ public class UnNestingAndBubbling {
       switch (kid.getType()) {
       case RULE_SET: {
         List<ASTCssNode> nestedRulesets = collectNestedRuleSets((RuleSet) kid);
-        String blocksText = "";
-        String visibilityText = "";
-        for (ASTCssNode astCssNode : nestedRulesets) {
-          blocksText = blocksText + " " + astCssNode.getVisibilityBlocks();
-          visibilityText = visibilityText + " " + astCssNode.getVisibility();
-        }
         manipulator.addIntoBody(nestedRulesets, kid);
         uselessLessElementsRemover.removeFrom((RuleSet) kid);
         break;
