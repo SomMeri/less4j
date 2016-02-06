@@ -73,7 +73,7 @@ public class ExtendsSolver {
     // c:extends(b) {}
     // b:extends(a) {}
     //
-    // Since c extended b before, c needs to extend also a {}.
+    // Since c extended b before. Therefore, when b is extending a, c needs to extend it too.
     //
     Collection<PerformedExtend> mayNeedToExtendTargetToo = performedExtends.getThoseWhoExtended(originalExtendingSelector);
     for (PerformedExtend info : mayNeedToExtendTargetToo) {
