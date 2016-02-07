@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.sourcemap.FilePosition;
@@ -129,8 +129,8 @@ public class SourceMapValidator {
       return new Mapdata();
 
     try {
-      JSONTokener tokener = new JSONTokener(new InputStreamReader(new FileInputStream(mapdataFile), "utf-8"));
-      JSONObject mapdata = new JSONObject(tokener);
+      JsonParser parser = new JsonParser();
+      JsonObject mapdata = parser.parse(new InputStreamReader(new FileInputStream(mapdataFile), "utf-8")).getAsJsonObject();
 
       List<String> expectedSources = JSONUtils.getStringList(mapdata, SOURCES_PROPERTY);
       List<String> expectedSourcesContent = JSONUtils.getStringList(mapdata, SOURCES_CEONTENT_PROPERTY);
