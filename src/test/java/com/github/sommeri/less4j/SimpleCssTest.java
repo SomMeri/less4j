@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -18,7 +19,7 @@ import com.github.sommeri.less4j.LessCompiler.Configuration;
  * from the master branch.
  * 
  */
-//@Ignore
+@Ignore
 @RunWith(Parameterized.class)
 public class SimpleCssTest extends AbstractFileBasedTest {
 

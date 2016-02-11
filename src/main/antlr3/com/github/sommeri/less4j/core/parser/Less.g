@@ -1324,10 +1324,9 @@ EXCLAMATION_MARK: '!';
 fragment APPENDER_FRAGMENT: '&';
 fragment MEANINGFULL_WHITESPACE: ;
 //TODO explain why I need appender fragment
-APPENDER: ws1=WS_FRAGMENT? app=APPENDER_FRAGMENT ws2=WS_FRAGMENT? {
-  emitAs($ws1, MEANINGFULL_WHITESPACE);
+APPENDER: ws1=WS_FRAGMENT? app=APPENDER_FRAGMENT {
+  emitAs($ws1, WS);
   emitAs($app, APPENDER);
-  emitAs($ws2, MEANINGFULL_WHITESPACE);
 };
 
 // -----------------

@@ -5,3 +5,6 @@ html[a="ie"] {
 .clear:after {
   display: table;
 }
+a.b:c {
+  property: value;
+}

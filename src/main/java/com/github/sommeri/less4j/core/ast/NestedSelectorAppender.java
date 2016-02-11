@@ -8,13 +8,8 @@ import com.github.sommeri.less4j.core.problems.BugHappened;
 
 public class NestedSelectorAppender extends SelectorPart {
 
-  private boolean directlyBefore;
-  private boolean directlyAfter;
-
-  public NestedSelectorAppender(HiddenTokenAwareTree underlyingStructure, boolean directlyBefore, boolean directlyAfter, SelectorCombinator leadingCombinator) {
+  public NestedSelectorAppender(HiddenTokenAwareTree underlyingStructure, SelectorCombinator leadingCombinator) {
     super(underlyingStructure, leadingCombinator);
-    this.directlyBefore = directlyBefore;
-    this.directlyAfter = directlyAfter;
   }
 
   @Override
@@ -23,20 +18,8 @@ public class NestedSelectorAppender extends SelectorPart {
     return super.getChilds();
   }
 
-  public boolean isDirectlyBefore() {
-    return directlyBefore;
-  }
-
-  public void setDirectlyBefore(boolean directlyBefore) {
-    this.directlyBefore = directlyBefore;
-  }
-
   public boolean isDirectlyAfter() {
-    return directlyAfter;
-  }
-
-  public void setDirectlyAfter(boolean directlyAfter) {
-    this.directlyAfter = directlyAfter;
+    return !hasLeadingCombinator();
   }
 
   @Override
@@ -64,14 +47,13 @@ public class NestedSelectorAppender extends SelectorPart {
     return (Selector) super.getParent();
   }
 
+  //FIXME (now) proper toString
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder("\"");
     if (!isDirectlyAfter())
       builder.append(" ");
     builder.append("&");
-    if (!isDirectlyBefore())
-      builder.append(" ");
     builder.append("\"");
     
     return builder.toString();

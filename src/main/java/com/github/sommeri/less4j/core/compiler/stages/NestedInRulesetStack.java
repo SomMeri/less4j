@@ -18,7 +18,11 @@ public class NestedInRulesetStack {
   private LinkedList<ASTCssNode> nestedNodes = new LinkedList<ASTCssNode>();
 
   public NestedInRulesetStack(RuleSet topLevelNode) {
-    pushSelectors(topLevelNode);
+    List<Selector> topSelectors = new ArrayList<Selector>();
+    for (Selector selector : topLevelNode.getSelectors()) {
+      topSelectors.add(selectorsManipulator.removeAppenders(selector.clone()));
+    }
+    selectors.push(topSelectors);
   }
 
   public void popSelectors() {
@@ -45,7 +49,8 @@ public class NestedInRulesetStack {
   private void combine(RuleSet ruleSet, List<Selector> previousSelectors) {
     List<Selector> result = new ArrayList<Selector>();
     for (Selector selector : ruleSet.getSelectors()) {
-      //FIXME: meri: review whether they have all the right visibility in the end
+      // FIXME: meri: review whether they have all the right visibility in the
+      // end
       result.addAll(selectorsManipulator.replaceAppenders(selector, previousSelectors));
     }
 

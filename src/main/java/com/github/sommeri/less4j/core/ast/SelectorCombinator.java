@@ -15,6 +15,10 @@ public class SelectorCombinator extends ASTCssNode implements Cloneable {
     this(underlyingStructure, CombinatorType.DESCENDANT, CombinatorType.DESCENDANT.getDefaultSymbol());
   }
 
+  public SelectorCombinator(HiddenTokenAwareTree underlyingStructure, CombinatorType combinator) {
+    this(underlyingStructure, combinator, combinator.getDefaultSymbol());
+  }
+
   public SelectorCombinator(HiddenTokenAwareTree underlyingStructure, CombinatorType combinator, String symbol) {
     super(underlyingStructure);
     this.combinator = combinator;

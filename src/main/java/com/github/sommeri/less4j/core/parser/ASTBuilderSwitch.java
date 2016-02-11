@@ -947,17 +947,9 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
 
   @Override
   public ASTCssNode handleNestedAppender(HiddenTokenAwareTree token) {
-    boolean directlyBefore = true;
-    boolean directlyAfter = true;
-    if (token.getChildren().size() == 2) {
-      directlyBefore = isMeaningfullWhitespace(token);
-      directlyAfter = !directlyBefore;
-    } else if (token.getChildren().size() == 3) {
-      directlyBefore = false;
-      directlyAfter = false;
-    }
-
-    return new NestedSelectorAppender(token, directlyBefore, directlyAfter, null);
+    //FIXME (now) set descendant in constructor and remove `directly` booleans
+    NestedSelectorAppender result = new NestedSelectorAppender(token, null);
+    return result;
   }
 
   public SimpleSelector handleElementName(HiddenTokenAwareTree kid) {
@@ -980,11 +972,6 @@ class ASTBuilderSwitch extends TokenTypeSwitch<ASTCssNode> {
     HiddenTokenAwareTree valueToken = token.getChild(0);
     String quotedText = valueToken.getText();
     return new EscapedSelector(valueToken, quotedText.substring(2, quotedText.length() - 1), "" + quotedText.charAt(1), null);
-  }
-
-  private boolean isMeaningfullWhitespace(HiddenTokenAwareTree kid) {
-    int type = kid.getChild(0).getGeneralType();
-    return type == LessLexer.MEANINGFULL_WHITESPACE || type == LessLexer.DUMMY_MEANINGFULL_WHITESPACE;
   }
 
   @Override

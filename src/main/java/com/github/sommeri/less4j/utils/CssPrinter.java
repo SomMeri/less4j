@@ -992,26 +992,6 @@ public class CssPrinter {
     return true;
   }
 
-  private void appendSimpleSelectorTail(SimpleSelector selector) {
-    List<ElementSubsequent> allChilds = selector.getSubsequent();
-    for (ElementSubsequent astCssNode : allChilds) {
-      append(astCssNode);
-    }
-  }
-
-  private boolean appendCssClass(CssClass cssClass) {
-    cssAndSM.append(cssClass.getFullName(), cssClass.getUnderlyingStructure());
-    return true;
-  }
-
-  private void appendSimpleSelectorHead(SimpleSelector selector) {
-    cssOnly.ensureSeparator();
-    if (!selector.isStar() || !selector.isEmptyForm()) {
-      InterpolableName elementName = selector.getElementName();
-      cssAndSM.appendIgnoreNull(elementName.getName(), elementName.getUnderlyingStructure());
-    }
-  }
-
   public boolean appendSelectorCombinator(SelectorCombinator combinator) {
     SelectorCombinator.CombinatorType realCombinator = combinator.getCombinatorType();
     switch (realCombinator) {
@@ -1024,6 +1004,26 @@ public class CssPrinter {
 
     }
 
+    return true;
+  }
+
+  private void appendSimpleSelectorHead(SimpleSelector selector) {
+    cssOnly.ensureSeparator();
+    if (!selector.isStar() || !selector.isEmptyForm()) {
+      InterpolableName elementName = selector.getElementName();
+      cssAndSM.appendIgnoreNull(elementName.getName(), elementName.getUnderlyingStructure());
+    }
+  }
+
+  private void appendSimpleSelectorTail(SimpleSelector selector) {
+    List<ElementSubsequent> allChilds = selector.getSubsequent();
+    for (ElementSubsequent astCssNode : allChilds) {
+      append(astCssNode);
+    }
+  }
+
+  private boolean appendCssClass(CssClass cssClass) {
+    cssAndSM.append(cssClass.getFullName(), cssClass.getUnderlyingStructure());
     return true;
   }
 

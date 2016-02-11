@@ -5,16 +5,54 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.github.sommeri.less4j.core.ast.ASTCssNode;
 import com.github.sommeri.less4j.core.ast.ElementSubsequent;
 import com.github.sommeri.less4j.core.ast.Extend;
 import com.github.sommeri.less4j.core.ast.NestedSelectorAppender;
 import com.github.sommeri.less4j.core.ast.Selector;
 import com.github.sommeri.less4j.core.ast.SelectorCombinator;
 import com.github.sommeri.less4j.core.ast.SelectorPart;
+import com.github.sommeri.less4j.core.ast.SimpleSelector;
 import com.github.sommeri.less4j.core.problems.BugHappened;
 import com.github.sommeri.less4j.utils.ArraysUtils;
 
 public class SelectorsManipulator {
+
+  public Selector removeAppenders(Selector selector) {
+    selector = replaceLeadingAppendersByEmptiness(selector);
+    if (!selector.containsAppender())
+      return selector;
+    
+    Selector replacement = replaceMiddleAppendersByEmptiness(selector);
+    return replacement;
+  }
+
+  private Selector replaceMiddleAppendersByEmptiness(Selector selector) {
+    Selector empty = new Selector(selector.getUnderlyingStructure(), createEmptySimpleSelector(selector));
+    List<Selector> replaceAppenders = replaceAppenders(selector, Arrays.asList(empty));
+    Selector replacement = replaceAppenders.get(0);
+    return replacement;
+  }
+
+  private Selector replaceLeadingAppendersByEmptiness(Selector selector) {
+    while (!selector.isEmpty() && selector.getHead().isAppender()) {
+      selector.getHead().setParent(null);
+      selector.removeHead();
+    }
+    
+    if (selector.isEmpty()) {
+      SimpleSelector empty = createEmptySimpleSelector(selector);
+      selector.addPart(empty);
+    }
+    return selector;
+  }
+
+  private SimpleSelector createEmptySimpleSelector(ASTCssNode underlyingStructureSource) {
+    SimpleSelector empty = new SimpleSelector(underlyingStructureSource.getUnderlyingStructure(), null, null, true);
+    empty.setEmptyForm(true);
+    return empty;
+  }
+
 
   public List<Selector> replaceAppenders(Selector inSelector, List<Selector> replacements) {
     if (!inSelector.containsAppender()) {
@@ -63,7 +101,7 @@ public class SelectorsManipulator {
 
   public Selector indirectJoinNoClone(Selector first, SelectorCombinator combinator, List<SelectorPart> second, List<Extend> extend) {
     first.addExtends(extend);
-    
+
     if (second.isEmpty())
       return first;
 
@@ -126,7 +164,8 @@ public class SelectorsManipulator {
   private Collection<Selector> replaceFirstAppender(Selector selector, List<Selector> previousSelectors) {
     if (selector.getHead().isAppender()) {
       NestedSelectorAppender appender = (NestedSelectorAppender) selector.getHead();
-      return joinAll(previousSelectors, chopOffHead(selector), appender.getLeadingCombinator(), appender.isDirectlyBefore());
+      Selector reminder = chopOffHead(selector);
+      return joinAll(previousSelectors, reminder, appender.getLeadingCombinator(), isDirectlyAfterPreviousPart(reminder));
     }
 
     // appender somewhere in the middle
@@ -136,17 +175,23 @@ public class SelectorsManipulator {
 
     Selector afterAppender = splitOn(selector, appender);
     List<Selector> partialResults = joinAll(selector, previousSelectors, appender.getLeadingCombinator(), appender.isDirectlyAfter());
-    return joinAll(partialResults, afterAppender, null, appender.isDirectlyBefore());
+    //FIXME (now) last parameter should be nide and repats cold in 146
+    return joinAll(partialResults, afterAppender, null, isDirectlyAfterPreviousPart(afterAppender));
+  }
+
+  private boolean isDirectlyAfterPreviousPart(Selector selector) {
+    return selector == null ? false : !selector.hasLeadingCombinator();
   }
 
   private List<Selector> joinAll(Selector first, List<Selector> seconds, SelectorCombinator leadingCombinator, boolean appenderDirectlyPlaced) {
-    //pretending null as after appender, less.js does not handle this case anyway
-    //this case being:
-    //.input-group-addon + {
-    //  .selector {
-    //    heeej: hoou;
-    //  }
-    //}
+    // pretending null as after appender, less.js does not handle this case
+    // anyway
+    // this case being:
+    // .input-group-addon + {
+    // .selector {
+    // heeej: hoou;
+    // }
+    // }
     boolean directJoin = isDirect(leadingCombinator, appenderDirectlyPlaced, null);
     if (directJoin)
       return directJoinAll(first, seconds);
@@ -198,7 +243,8 @@ public class SelectorsManipulator {
   }
 
   private boolean isDirect(SelectorCombinator beforeAppenderCombinator, boolean appenderDirectlyPlaced, Selector afterAppender) {
-    return beforeAppenderCombinator == null && appenderDirectlyPlaced && (afterAppender == null || !afterAppender.hasLeadingCombinator());
+    boolean result = beforeAppenderCombinator == null && appenderDirectlyPlaced && (afterAppender == null || !afterAppender.hasLeadingCombinator());
+    return result;
   }
 
   private Selector splitOn(Selector selector, NestedSelectorAppender appender) {
@@ -206,18 +252,18 @@ public class SelectorsManipulator {
     int indexOfAppender = parts.indexOf(appender);
     List<SelectorPart> appenderAndAfter = parts.subList(indexOfAppender, parts.size());
 
-    //remove appender
+    // remove appender
     appenderAndAfter.remove(0);
     appender.setParent(null);
 
-    //create selector with after appender parts
+    // create selector with after appender parts
     Selector result = null;
     if (!appenderAndAfter.isEmpty()) {
       result = new Selector(selector.getUnderlyingStructure(), new ArrayList<SelectorPart>(appenderAndAfter));
       result.configureParentToAllChilds();
     }
 
-    //leave only before appender parts in original selector
+    // leave only before appender parts in original selector
     appenderAndAfter.clear();
     return result;
   }

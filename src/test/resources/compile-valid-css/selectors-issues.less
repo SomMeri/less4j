@@ -11,3 +11,10 @@ html[a = "ie"] {
     display:table;
   }
 }
+
+//https://github.com/SomMeri/less4j/issues/329 - Malformed less causes infinite loop
+a&.b {
+  &:c {
+    property: value;
+  }
+}
