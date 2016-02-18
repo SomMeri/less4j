@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.LessSource.CannotReadFile;
 import com.github.sommeri.less4j.LessSource.FileNotFound;
@@ -46,27 +47,33 @@ public class MiscFunctions extends BuiltInFunctionsPack {
   protected static final String IMAGE_HEIGHT = "image-height";
   protected static final String SVG_GRADIENT = "svg-gradient";
 
-  private static Map<String, Function> FUNCTIONS = new HashMap<String, Function>();
+  private final Configuration configuration;
+  private Map<String, Function> allFunctions;
+  private static Map<String, Function> STATIC_FUNCTIONS = new HashMap<String, Function>();
   static {
-    FUNCTIONS.put(COLOR, new Color());
-    FUNCTIONS.put(UNIT, new Unit());
-    FUNCTIONS.put(GET_UNIT, new GetUnit());
-    FUNCTIONS.put(CONVERT, new Convert());
-    FUNCTIONS.put(EXTRACT, new Extract());
-    FUNCTIONS.put(DATA_URI, new DataUri());
-    FUNCTIONS.put(IMAGE_SIZE, new ImageSize());
-    FUNCTIONS.put(IMAGE_WIDTH, new ImageWidth());
-    FUNCTIONS.put(IMAGE_HEIGHT, new ImageHeight());
-    FUNCTIONS.put(SVG_GRADIENT, new SvgGradient());
+    STATIC_FUNCTIONS.put(COLOR, new Color());
+    STATIC_FUNCTIONS.put(UNIT, new Unit());
+    STATIC_FUNCTIONS.put(GET_UNIT, new GetUnit());
+    STATIC_FUNCTIONS.put(CONVERT, new Convert());
+    STATIC_FUNCTIONS.put(EXTRACT, new Extract());
+    STATIC_FUNCTIONS.put(IMAGE_SIZE, new ImageSize());
+    STATIC_FUNCTIONS.put(IMAGE_WIDTH, new ImageWidth());
+    STATIC_FUNCTIONS.put(IMAGE_HEIGHT, new ImageHeight());
+    STATIC_FUNCTIONS.put(SVG_GRADIENT, new SvgGradient());
   }
 
-  public MiscFunctions(ProblemsHandler problemsHandler) {
+  public MiscFunctions(ProblemsHandler problemsHandler, Configuration configuration) {
     super(problemsHandler);
+    this.configuration = configuration;
   }
 
   @Override
   protected Map<String, Function> getFunctions() {
-    return FUNCTIONS;
+    if (allFunctions==null) {
+      allFunctions = new HashMap<String, Function>(STATIC_FUNCTIONS);
+      allFunctions.put(DATA_URI, new DataUri(configuration));
+    }
+    return allFunctions;
   }
 
 }
@@ -279,6 +286,11 @@ class DataUri extends CatchAllMultiParameterFunction {
 
   private NodeMime mime = new NodeMime();
   private static final int DATA_URI_MAX_KB = 32;
+  private boolean ieCompatibility;
+
+  public DataUri(Configuration configuration) {
+    this.ieCompatibility = configuration.hasIeCompatibility();
+  }
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
@@ -312,7 +324,7 @@ class DataUri extends CatchAllMultiParameterFunction {
       // IE8 cannot handle a data-uri larger than 32KB. If this is exceeded
       // and the --ieCompat flag is enabled, return a normal url() instead.
       int encodedSizeInKB = encodedData.length() / 1024;
-      if (encodedSizeInKB >= DATA_URI_MAX_KB) {
+      if (encodedSizeInKB >= DATA_URI_MAX_KB && ieCompatibility) {
         problemsHandler.warnIE8UnsafeDataUri(functionCall, filename, encodedSizeInKB, DATA_URI_MAX_KB);
         FunctionExpression result = new FunctionExpression(token, "url", functionCall.getParameter().clone());
         result.configureParentToAllChilds();

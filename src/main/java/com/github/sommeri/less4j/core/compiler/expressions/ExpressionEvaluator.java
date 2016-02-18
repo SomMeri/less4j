@@ -80,9 +80,9 @@ public class ExpressionEvaluator {
     functions.add(new MathFunctions(problemsHandler));
     functions.add(new StringFunctions(problemsHandler));
     functions.add(new ColorFunctions(problemsHandler));
-    functions.add(new MiscFunctions(problemsHandler));
     functions.add(new EmbeddedScriptFunctions(problemsHandler));
     functions.add(new TypeFunctions(problemsHandler));
+    functions.add(new MiscFunctions(problemsHandler, configuration));
   }
 
   protected void addFunctionsPack(FunctionsPackage pack) {

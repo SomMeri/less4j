@@ -40,6 +40,7 @@ public interface LessCompiler {
     private Map<String, String> externalVariables = new HashMap<String, String>();
     private EmbeddedScriptGenerator embeddedScriptGenerator;
     private boolean compressing = false;
+    private boolean ieCompatibility = true;
     private Cache cache;
 
     /**
@@ -117,6 +118,22 @@ public interface LessCompiler {
 
     public boolean isCompressing() {
       return compressing;
+    }
+
+    /**
+     * Currently only used for the data-uri function to ensure that images aren't created 
+     * that are too large for the browser to handle.
+     */
+    public boolean hasIeCompatibility() {
+      return ieCompatibility;
+    }
+
+    /**
+     * Currently only used for the data-uri function to ensure that images aren't created 
+     * that are too large for the browser to handle.
+     */
+    public void setIeCompatibility(boolean ieCompatibility) {
+      this.ieCompatibility = ieCompatibility;
     }
 
     public Cache getCache() {
@@ -211,8 +228,7 @@ public interface LessCompiler {
     }
 
     public SourceMapConfiguration setSourceMapNameGenerator(SourceMapUrlGenerator sourceMapNameGenerator) {
-      this.sourceMapNameGenerator = sourceMapNameGenerator != null ? sourceMapNameGenerator
-          : new DefaultSourceMapUrlGenerator();
+      this.sourceMapNameGenerator = sourceMapNameGenerator != null ? sourceMapNameGenerator : new DefaultSourceMapUrlGenerator();
       return this;
     }
   }
@@ -259,7 +275,7 @@ public interface LessCompiler {
    *
    */
   public interface Cache {
-    
+
     /**
      * Get ast corresponding to parsed source.  
      */

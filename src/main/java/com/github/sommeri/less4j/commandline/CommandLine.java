@@ -63,13 +63,13 @@ public class CommandLine {
     }
 
     if (arguments.isMultiMode()) {
-      runAsMultimode(arguments.getFiles(), arguments.getOutputDirectory(), arguments.isSourceMap(), arguments.isCompressing(), arguments.isPrintIncorrect());
+      runAsMultimode(arguments.getFiles(), arguments.getOutputDirectory(), arguments.isSourceMap(), arguments.isCompressing(), arguments.isIeCompatibility(), arguments.isPrintIncorrect());
     } else {
-      runAsSinglemode(arguments.getFiles(), arguments.isSourceMap(), arguments.isCompressing(), arguments.isPrintIncorrect());
+      runAsSinglemode(arguments.getFiles(), arguments.isSourceMap(), arguments.isCompressing(), arguments.isIeCompatibility(), arguments.isPrintIncorrect());
     }
   }
 
-  private void runAsSinglemode(List<String> files, boolean generateSourceMap, boolean isCompressing, boolean printPartial) {
+  private void runAsSinglemode(List<String> files, boolean generateSourceMap, boolean isCompressing, boolean ieCompatibility, boolean printPartial) {
     if (files.isEmpty()) {
       print.reportError("No file available.");
       return;
@@ -84,7 +84,7 @@ public class CommandLine {
     String mapFileName = singleModeMapFilename(cssFileName, generateSourceMap);
 
     try {
-      CompilationResult content = compile(lessFile, cssFile, generateSourceMap, isCompressing);
+      CompilationResult content = compile(lessFile, cssFile, generateSourceMap, isCompressing, ieCompatibility);
       singleModePrint(files, lessFileName, lessFile, cssFileName, mapFileName, content);
     } catch (Less4jException ex) {
       CompilationResult partialResult = ex.getPartialResult();
@@ -122,7 +122,7 @@ public class CommandLine {
     }
   }
 
-  private void runAsMultimode(List<String> files, String outputDirectory, boolean generateSourceMap, boolean isCompressing, boolean printPartial) {
+  private void runAsMultimode(List<String> files, String outputDirectory, boolean generateSourceMap, boolean isCompressing, boolean ieCompatibility, boolean printPartial) {
     if (!print.ensureDirectory(outputDirectory))
       return;
 
@@ -131,7 +131,7 @@ public class CommandLine {
       String cssFilename = toOutputFilename(outputDirectory, filename, Constants.CSS_SUFFIX);
       String mapFilename = generateSourceMap? toOutputFilename(outputDirectory, filename, Constants.FULL_SOURCE_MAP_SUFFIX): null;
       try {
-        CompilationResult content = compile(inputFile, toFile(cssFilename), generateSourceMap, isCompressing);
+        CompilationResult content = compile(inputFile, toFile(cssFilename), generateSourceMap, isCompressing, ieCompatibility);
         print.printToFiles(content, filename, inputFile, cssFilename, mapFilename);
       } catch (Less4jException ex) {
         CompilationResult partialResult = ex.getPartialResult();
@@ -160,10 +160,11 @@ public class CommandLine {
     return outputDirectory + new File(filename).getName();
   }
 
-  private CompilationResult compile(File lessFile, File cssFile, boolean generateSourceMap, boolean isCompressing) throws Less4jException {
+  private CompilationResult compile(File lessFile, File cssFile, boolean generateSourceMap, boolean isCompressing, boolean ieCompatibility) throws Less4jException {
     Configuration configuration = new Configuration();
     configuration.setCssResultLocation(cssFile);
     configuration.setCompressing(isCompressing);
+    configuration.setIeCompatibility(ieCompatibility);
     configuration.getSourceMapConfiguration().setLinkSourceMap(generateSourceMap && cssFile != null);
 
     DefaultLessCompiler compiler = new DefaultLessCompiler();
