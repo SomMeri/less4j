@@ -121,16 +121,18 @@ public interface LessCompiler {
     }
 
     /**
-     * Currently only used for the data-uri function to ensure that images aren't created 
-     * that are too large for the browser to handle.
+     * Turns off and on ie-compatible limitations. Currently used only inside data-uri 
+     * function. If it is on, data-uri wont encode images too large for ie8. Turning 
+     * it off is equivalent to calling less.js with --no-ie-compat option.
      */
     public boolean hasIeCompatibility() {
       return ieCompatibility;
     }
 
     /**
-     * Currently only used for the data-uri function to ensure that images aren't created 
-     * that are too large for the browser to handle.
+     * Turns off and on ie-compatible limitations. Currently used only inside data-uri 
+     * function. If it is on, data-uri wont encode images too large for ie8. Turning 
+     * it off is equivalent to calling less.js with --no-ie-compat option.
      */
     public void setIeCompatibility(boolean ieCompatibility) {
       this.ieCompatibility = ieCompatibility;

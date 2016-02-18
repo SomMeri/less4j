@@ -34,7 +34,7 @@ public class Arguments {
   @Parameter(names={"-pi", "--printIncorrect"}, description="Print result of syntactically incorrect input file. If not present, syntactically incorrect input files produce no result. If present, less4j prints whatever came out of the compilation as a compilation result - most likely an invalid CSS. ")
   private boolean printIncorrect;
 
-  @Parameter(names={"-iec", "--ieCompatibility"}, description="Turns off ie-compatible liminations. Currently used only inside data-uri function. If it is on, data-uri wont encode images too large for ie8. Turning it off is equivalent to calling less.js with --no-ie-compat option.")
+  @Parameter(names={"-iec", "--ieCompatibility"}, description="Turns off and on ie-compatible limitations. Currently used only inside data-uri function. If it is on, data-uri wont encode images too large for ie8. Turning it off is equivalent to calling less.js with --no-ie-compat option.")
   private boolean ieCompatibility = true;
   
   public boolean isHelp() {
