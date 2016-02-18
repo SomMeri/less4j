@@ -95,9 +95,16 @@ public class SingleImportSolver {
       return null;
     }
 
-    String importedContent;
+    StyleSheet importedAst;
     try {
-      importedContent = importedSource.getContent();
+      if (importNode.isInline()) {
+        ASTCssNode importedNode = replaceByInlineValue(importNode, importedSource.getContent());
+        alreadyImportedSources.add(importedSource);
+        configureVisibilityBlocks(importNode, Arrays.asList(importedNode));
+        return importedNode;
+      }
+
+      importedAst = buildImportedAst(importNode, importedSource);
       alreadyImportedSources.add(importedSource);
     } catch (FileNotFound e) {
       return importFileNotFound(importNode, filename);
@@ -105,14 +112,6 @@ public class SingleImportSolver {
       problemsHandler.errorFileCanNotBeRead(importNode, filename);
       return null;
     }
-
-    if (importNode.isInline()) {
-      ASTCssNode importedNode = replaceByInlineValue(importNode, importedContent);
-      configureVisibilityBlocks(importNode, Arrays.asList(importedNode));
-      return importedNode;
-    }
-
-    StyleSheet importedAst = buildImportedAst(importNode, importedSource, importedContent);
 
     List<ASTCssNode> importedNodes = importedAst.getChilds();
     configureVisibilityBlocks(importNode, importedAst.getChilds());
@@ -148,8 +147,8 @@ public class SingleImportSolver {
     return replaceByInlineValue(node, "");
   }
 
-  private StyleSheet buildImportedAst(Import node, LessSource source, String content) {
-    StyleSheet importedAst = getImportedAst(node, source, content);
+  private StyleSheet buildImportedAst(Import node, LessSource source) throws FileNotFound, CannotReadFile {
+    StyleSheet importedAst = getImportedAst(node, source);
 
     // add media queries if needed
     if (node.hasMediums()) {
@@ -169,10 +168,10 @@ public class SingleImportSolver {
     return importedAst;
   }
 
-  private StyleSheet getImportedAst(Import node, LessSource source, String content) {
+  private StyleSheet getImportedAst(Import node, LessSource source) throws FileNotFound, CannotReadFile {
     StyleSheet importedAst = (StyleSheet) astCache.getAst(source);
     if (importedAst == null) {
-      importedAst = parseContent(node, content, source);
+      importedAst = parseContent(node, source.getContent(), source);
       astCache.setAst(source, importedAst);
     }
     return importedAst.clone();
