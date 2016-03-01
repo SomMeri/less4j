@@ -1,0 +1,17 @@
+@gridColumns:             12;
+@gridColumnWidth:         60px;
+@gridGutterWidth:         20px;
+
+#grid {
+	.core (@gridColumnWidth, @gridGutterWidth) {
+		.span(@columns) {
+			width: ((@gridColumnWidth) * @columns) + (@gridGutterWidth * (@columns - 1)) - 14;
+		}
+	}
+}
+
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+	#grid > .core > .span(@gridColumns);
+}
