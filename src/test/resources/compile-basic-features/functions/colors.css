@@ -52,6 +52,9 @@
 .darkenblue {
   color: #0000cc;
 }
+.correctlyroundedhexcolors {
+  color: #10363d;
+}
 .unknowncolors {
   color: blue2;
   border: 2px solid superred;

@@ -90,9 +90,10 @@ public class ColorExpression extends Expression {
 
   protected String toHex(double color) {
     String prefix = "";
-    if (color < 16)
+    int roundedColor = (int) Math.round(color);
+    if (roundedColor < 16)
       prefix = "0";
-    return prefix + Integer.toHexString((int) Math.round(color));
+    return prefix + Integer.toHexString(roundedColor);
   }
 
   @Override
@@ -195,7 +196,8 @@ public class ColorExpression extends Expression {
       return new Color((int) Math.round(this.red), (int) Math.round(this.green), (int) Math.round(this.blue), Math.round(this.alpha * 255));
     }
 
-    public boolean hasAlpha() {
+    @Override
+	public boolean hasAlpha() {
       return true;
     }
   }
