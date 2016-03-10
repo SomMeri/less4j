@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.sommeri</groupId>
 	<artifactId>less4j</artifactId>
-	<version>1.17.1-SNAPSHOT</version> 
+	<version>1.17.1</version> 
 	<packaging>jar</packaging>
 	<name>less4j</name>
 	<description>Less language is an extension of css and less4j compiles it into regular css. It adds several dynamic features into css: variables, expressions, nested rules. 
@@ -164,7 +164,7 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 		<url>https://github.com/SomMeri/less4j</url>
 		<connection>scm:git:https://github.com/SomMeri/less4j.git</connection>
 		<developerConnection>scm:git:https://github.com/SomMeri/less4j.git</developerConnection>
-	  <tag>HEAD</tag>
+	  <tag>less4j-1.17.1</tag>
   </scm>
 	<issueManagement>
 		<system>Github</system>
