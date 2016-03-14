@@ -8,6 +8,7 @@ import com.github.sommeri.less4j.core.ast.IdentifierExpression;
 import com.github.sommeri.less4j.core.ast.NumberExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression;
 import com.github.sommeri.less4j.core.ast.SignedExpression.Sign;
+import com.github.sommeri.less4j.utils.MathUtils;
 
 public abstract class ExpressionComparator {
 
@@ -110,18 +111,7 @@ public abstract class ExpressionComparator {
   }
 
   protected boolean equals(Double value, Double value2) {
-    if (value == null || value2==null)
-      return value2 == null && value==null;
-
-    value = normalize0(value);
-    value2 = normalize0(value2);
-    return value.compareTo(value2) == 0;
+    return MathUtils.equals(value, value2);
   }
 
-  private Double normalize0(Double value) {
-    if (value.compareTo(-0.0) == 0)
-      value = 0.0;
-    return value;
-  }
-  
 }

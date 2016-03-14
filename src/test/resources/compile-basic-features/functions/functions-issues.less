@@ -2,3 +2,10 @@
 a {
   color: mix(#008 + #800, #FFF, 50%);
 }
+// https://github.com/SomMeri/less4j/issues/338
+test {
+  @value: identifier;
+  extract-identifier-0: extract(@value, 0);
+  extract-identifier-1: extract(@value, 1);
+  extract-identifier-2: extract(@value, 2);
+}

@@ -32,6 +32,7 @@ import com.github.sommeri.less4j.core.parser.HiddenTokenAwareTree;
 import com.github.sommeri.less4j.core.problems.ProblemsHandler;
 import com.github.sommeri.less4j.nodemime.NodeMime;
 import com.github.sommeri.less4j.utils.InStringCssPrinter;
+import com.github.sommeri.less4j.utils.MathUtils;
 import com.github.sommeri.less4j.utils.PrintUtils;
 
 public class MiscFunctions extends BuiltInFunctionsPack {
@@ -50,6 +51,7 @@ public class MiscFunctions extends BuiltInFunctionsPack {
   private final Configuration configuration;
   private Map<String, Function> allFunctions;
   private static Map<String, Function> STATIC_FUNCTIONS = new HashMap<String, Function>();
+
   static {
     STATIC_FUNCTIONS.put(COLOR, new Color());
     STATIC_FUNCTIONS.put(UNIT, new Unit());
@@ -69,7 +71,7 @@ public class MiscFunctions extends BuiltInFunctionsPack {
 
   @Override
   protected Map<String, Function> getFunctions() {
-    if (allFunctions==null) {
+    if (allFunctions == null) {
       allFunctions = new HashMap<String, Function>(STATIC_FUNCTIONS);
       allFunctions.put(DATA_URI, new DataUri(configuration));
     }
@@ -245,9 +247,22 @@ class Extract extends CatchAllMultiParameterFunction {
 
   @Override
   protected Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression functionCall, HiddenTokenAwareTree token) {
-    List<Expression> values = collect((ListExpression) splitParameters.get(0));
+    Expression firstParameter = splitParameters.get(0);
     NumberExpression index = (NumberExpression) splitParameters.get(1);
-    return values.get(index.getValueAsDouble().intValue() - 1);
+    if (isList(firstParameter)) {
+      List<Expression> values = collect((ListExpression) firstParameter);
+      return values.get(index.getValueAsDouble().intValue() - 1);
+    }
+    
+    if (MathUtils.equals(index.getValueAsDouble(), 1.0)) {
+      return firstParameter;
+    }
+    
+    return functionCall;
+  }
+
+  private boolean isList(Expression value) {
+    return value.getType() == ASTCssNodeType.LIST_EXPRESSION;
   }
 
   private List<Expression> collect(ListExpression values) {
@@ -268,7 +283,7 @@ class Extract extends CatchAllMultiParameterFunction {
   protected boolean validateParameter(Expression parameter, int position, ProblemsHandler problemsHandler) {
     switch (position) {
     case 0:
-      return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.LIST_EXPRESSION);
+      return true;
     case 1:
       return validateParameterTypeReportError(parameter, problemsHandler, ASTCssNodeType.NUMBER);
     }
@@ -416,15 +431,15 @@ class ImageSize extends CatchAllMultiParameterFunction {
       byte[] data = dataSource.getBytes();
 
       BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
-      if (image==null) {
+      if (image == null) {
         problemsHandler.errorUnknownImageFileFormat(functionCall, filename);
         return new FaultyExpression(functionCall.getUnderlyingStructure());
       }
-      
+
       int width = image.getWidth();
       int height = image.getHeight();
       return toSizeNumber(functionCall.getUnderlyingStructure(), width, height);
-      
+
     } catch (FileNotFound ex) {
       problemsHandler.errorFileNotFound(functionCall, filename);
       return new FaultyExpression(functionCall.getUnderlyingStructure());
@@ -445,12 +460,12 @@ class ImageSize extends CatchAllMultiParameterFunction {
   protected Expression toSizeNumber(HiddenTokenAwareTree token, int width, int height) {
     Expression widthExp = toPixels(token, width);
     Expression heightExp = toPixels(token, height);
-    
+
     return new ListExpression(token, Arrays.asList(widthExp, heightExp), new ListExpressionOperator(token, ListExpressionOperator.Operator.EMPTY_OPERATOR));
   }
 
   protected Expression toPixels(HiddenTokenAwareTree token, int width) {
-    return new NumberExpression(token, (double ) width, "px", null, Dimension.LENGTH);
+    return new NumberExpression(token, (double) width, "px", null, Dimension.LENGTH);
   }
 
   @Override
@@ -479,7 +494,7 @@ class ImageWidth extends ImageSize {
 
   protected Expression toSizeNumber(HiddenTokenAwareTree token, int width, int height) {
     Expression widthExp = toPixels(token, width);
-    
+
     return widthExp;
   }
 
@@ -494,7 +509,7 @@ class ImageHeight extends ImageSize {
 
   protected Expression toSizeNumber(HiddenTokenAwareTree token, int width, int height) {
     Expression heightExp = toPixels(token, height);
-    
+
     return heightExp;
   }
 

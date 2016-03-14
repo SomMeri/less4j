@@ -1,17 +1,73 @@
-@gridColumns:             12;
-@gridColumnWidth:         60px;
-@gridGutterWidth:         20px;
-
-#grid {
-	.core (@gridColumnWidth, @gridGutterWidth) {
-		.span(@columns) {
-			width: ((@gridColumnWidth) * @columns) + (@gridGutterWidth * (@columns - 1)) - 14;
-		}
-	}
+.wrapper {
+    .component {
+        .grid {
+            .test-data {
+                .in-1(20px; col-1, 100px; col-2; col-3, hidden; col-4; m);
+            }
+        }
+    }
 }
 
-.navbar-static-top .container,
-.navbar-fixed-top .container,
-.navbar-fixed-bottom .container {
-	#grid > .core > .span(@gridColumns);
-} 
+.impl(@error) {
+    there-was-an-error: @error;
+}
+.impl(@fixed-cols; @fluid-cols; @total-fixed-width) {
+    //counter: @counter;
+    fixed-cols-@{counter}: @fixed-cols;
+    fluid-cols: @fluid-cols;
+    total-fixed-width: @total-fixed-width;
+}
+
+.in-1(...) {
+
+    @gutter-x: extract(@arguments, 1);
+    gutter-x: @gutter-x;
+
+    .loop(@counter; @args; @fixed; @fluid; @tfw) when (@counter > 1) {
+
+        @col-args: extract(@args, @counter);
+
+        // Is fixed
+        .is-fixed-column(@col-args);
+        .is-fixed-column(@col-args) when (length(@col-args) > 1) {
+
+            @col-width: extract(@col-args, length(@col-args));
+
+            .is-fixed-column-inner(@col-width);
+            .is-fixed-column-inner(@col-width) when (ispixel(@col-width)), (isem(@col-width)) {
+                .loop(@counter - 1; @args; (@fixed + 1); @fluid; @tfw + @col-width);
+            }
+        }
+
+        // Is fluid
+        .is-fluid-column(@col-args);
+        .is-fluid-column(@col-args) when (length(@col-args) > 1) {
+
+            @col-width: extract(@col-args, length(@col-args));
+
+            .is-fluid-column-inner(@col-width);
+            .is-fluid-column-inner(@col-width) when (ispercentage(@col-width)) {
+                .loop(@counter - 1; @args; @fixed; @fluid + 1; @tfw);
+            }
+
+        }
+        .is-fluid-column(@col-args) when (length(@col-args) = 1) {
+            .loop(@counter - 1; @args; @fixed; @fluid + 1; @tfw);
+        }
+
+        // Is other
+        .is-other-column(@col-args);
+        .is-other-column(@col-args) when (length(@col-args) > 1) {
+            @col-type: extract(@col-args, length(@col-args));
+
+            .is-other-column-inner(@col-type);
+            .is-other-column-inner(@col-type) when (iskeyword(@col-type)) {
+                .loop(@counter - 1; @args; @fixed; @fluid; @tfw);
+            }
+        }
+    }
+    .loop(@counter; @args; @fixed; @fluid; @tfw) when (@counter = 1) {
+        .impl(@fixed; @fluid; @tfw);
+    }
+    .loop(length(@arguments) - 1; @arguments; 0; 0; 0);
+}

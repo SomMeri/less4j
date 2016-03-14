@@ -1,3 +1,6 @@
-.something ~ {
-  trailing-appender-combinator: 1;
+.wrapper .component .grid .test-data {
+  gutter-x: 20px;
+  fixed-cols-1: 1;
+  fluid-cols: 2;
+  total-fixed-width: 100px;
 }

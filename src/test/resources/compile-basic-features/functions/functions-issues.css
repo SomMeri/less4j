@@ -1,3 +1,8 @@
 a {
   color: #c480c4;
 }
+test {
+  extract-identifier-0: extract(identifier, 0);
+  extract-identifier-1: identifier;
+  extract-identifier-2: extract(identifier, 2);
+}
