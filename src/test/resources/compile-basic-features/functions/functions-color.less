@@ -41,14 +41,6 @@
   contrast-dark-thresh: contrast(#000, #111111, #eeeeee, 0.5);
   contrast-high-thresh: contrast(#555, #111111, #eeeeee, 0.6);
   contrast-low-thresh: contrast(#555, #111111, #eeeeee, 0.1);
-  contrast: contrast(#aaaaaa);
-  contrast2: contrast(#222222, #101010);
-  contrast3: contrast(#222222, #101010, #dddddd);
-  contrast4: contrast(hsl(90, 100%, 50%),#000000,#ffffff,40%);
-  contrast5: contrast(hsl(90, 100%, 50%),#000000,#ffffff,60%);
-  contrast6: contrast(hsl(90, 100%, 50%),#000000,#ffffff,80%);
-  contrast7: contrast(hsl(90, 100%, 50%),#000000,#ffffff,90%);
-  contrast8: contrast(hsl(90, 100%, 50%),#000000,#ffffff,100%);
   format: %("rgb(%d, %d, %d)", @r, 128, 64);
   format-string: %("hello %s", "world");
   format-multiple: %("hello %s %d", "earth", 2);
@@ -157,8 +149,4 @@ issue-297-contrast {
   color-reversed: contrast(#666666, #aaaaaa, #101010);
   color-normal-treshold: contrast(#666666, #101010, #aaaaaa);
   color-reversed-treshold: contrast(#666666, #aaaaaa, #101010);
-  color-normal: contrast(#666666, #101010, #aaaaaa, 0.1);
-  color-reversed: contrast(#666666, #aaaaaa, #101010, 0.1);
-  color-normal-treshold: contrast(#666666, #101010, #aaaaaa, 0.1);
-  color-reversed-treshold: contrast(#666666, #aaaaaa, #101010, 0.1);
 }

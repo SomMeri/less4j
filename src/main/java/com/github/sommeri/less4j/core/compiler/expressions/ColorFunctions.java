@@ -902,22 +902,31 @@ class Contrast extends CssNameClashMultiParameterFunction {
     HiddenTokenAwareTree token = call.getUnderlyingStructure();
 
     ColorExpression color = (ColorExpression) splitParameters.get(0);
-    ColorExpression dark = (ColorExpression) (splitParameters.size() > 1 ? splitParameters.get(1) : new ColorExpression(token, 0, 0, 0));
-    ColorExpression light = (ColorExpression) (splitParameters.size() > 2 ? splitParameters.get(2) : new ColorExpression(token, 255, 255, 255));
-    NumberExpression threshold = (NumberExpression) (splitParameters.size() > 3 ? splitParameters.get(3) : new NumberExpression(token, 43.0, "%", null, Dimension.PERCENTAGE));
-    double thresholdValue = AbstractColorFunction.number(threshold);
+    ColorExpression color1 = (ColorExpression) (splitParameters.size() > 1 ? splitParameters.get(1) : new ColorExpression(token, 0, 0, 0));
+    ColorExpression color2 = (ColorExpression) (splitParameters.size() > 2 ? splitParameters.get(2) : new ColorExpression(token, 255, 255, 255));
 
-    if (luma(dark) > luma(light)) {
-      ColorExpression t = light;
-      light = dark;
-      dark = t;
-    }
-
-    if (luma(color) < thresholdValue) {
-      return light;
+    double luma = luma(color);
+    double luma1 = luma(color1);
+    double luma2 = luma(color2);
+    
+    double contrast1, contrast2;
+    if (luma > luma1) {
+      contrast1 = (luma + 0.05) / (luma1 + 0.05);  
     } else {
-      return dark;
+      contrast1 = (luma1 + 0.05) / (luma + 0.05);
     }
+    
+    if (luma > luma2) {
+      contrast2 = (luma + 0.05) / (luma2 + 0.05);  
+    } else {
+      contrast2 = (luma2 + 0.05) / (luma + 0.05);
+    }
+    
+    if (contrast1> contrast2) {
+      return color1;
+    }
+    
+    return color2;
   }
 
   private double luma(ColorExpression color) {
@@ -949,6 +958,7 @@ class Contrast extends CssNameClashMultiParameterFunction {
 
   @Override
   protected int getMaxParameters() {
+    //this include legacy "treshold" parameter which is not used anymore
     return 4;
   }
 
