@@ -885,7 +885,12 @@ class Greyscale extends AbstractColorOperationFunction {
 }
 
 class Contrast extends CssNameClashMultiParameterFunction {
-
+  // Return which of `color1` and `color2` has the greatest contrast with `color`
+  // according to the standard WCAG contrast ratio calculation.
+  // http://www.w3.org/TR/WCAG20/#contrast-ratiodef
+  // The threshold param is no longer used, in line with SASS.
+  // filter: contrast(3.2);
+  // should be kept as is, so check for color
   @Override
   public Expression evaluate(List<Expression> splitParameters, ProblemsHandler problemsHandler, FunctionExpression call, Expression evaluatedParameter) {
     /*
