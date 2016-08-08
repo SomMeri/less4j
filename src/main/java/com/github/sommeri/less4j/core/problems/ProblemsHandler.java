@@ -332,11 +332,11 @@ public class ProblemsHandler implements LessProblems {
   }
 
   public void warnUnknowAtRule(UnknownAtRule unknown) {
-    addWarning(unknown, "Unknown at-rule, resulting css may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (altrough it is unlikely). If that happen, less4j implementation will change too.");
+    addWarning(unknown, "Unknown at-rule, resulting CSS may be incorrect. Unknown at-rules support in less.js is undocumented and may be changed in the future (although it is unlikely). If that happens, less4j implementation will change too.");
   }
 
   public void warnSourceMapLinkWithoutCssResultLocation(ASTCssNode less) {
-    addWarning(less, "Cannot link source map. Css result location is not know and could not be deduced from input less source.");
+    addWarning(less, "Cannot link source map. CSS result location is not known and could not be deduced from input less source.");
   }
 
   public void errUnknownEncodingCharsetSourceMap(ASTCssNode nodeForErrorReport, String encodingCharset) {
@@ -352,7 +352,7 @@ public class ProblemsHandler implements LessProblems {
   }
 
   public void stringInterpolationNotSupported(HiddenTokenAwareTree errorNode, Expression value) {
-    addError(errorNode, "String interpolation does not requeted expression type. Requested expression was defined at " + printer.toPosition(value));
+    addError(errorNode, "String interpolation does not requested expression type. Requested expression was defined at " + printer.toPosition(value));
   }
 
   public void errorIncompatibleTypesCompared(FunctionExpression errorNode, String suffix1, String suffix2) {
