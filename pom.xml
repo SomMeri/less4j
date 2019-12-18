@@ -58,7 +58,7 @@ Less4j is a port. The original compiler was written in JavaScript and is called 
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.3</version>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.beust</groupId>
